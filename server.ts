@@ -4,7 +4,7 @@ import path from "path";
 
 async function startServer() {
   const mode = process.env.APP_MODE || "full";
-  const PORT = 3000;
+  const PORT = parseInt(process.env.PORT || "3000", 10);
   let server: Server;
   const app = express();
 
