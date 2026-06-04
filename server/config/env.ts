@@ -1,4 +1,20 @@
 import { z } from "zod";
+import fs from "fs";
+import path from "path";
+
+// Load .env file programmatically if it exists
+try {
+  const envPath = path.resolve(process.cwd(), ".env");
+  if (fs.existsSync(envPath)) {
+    // @ts-ignore
+    if (typeof process.loadEnvFile === "function") {
+      // @ts-ignore
+      process.loadEnvFile(envPath);
+    }
+  }
+} catch (e) {
+  console.warn("Failed to load .env file using process.loadEnvFile", e);
+}
 
 const envSchema = z.object({
   NODE_ENV: z

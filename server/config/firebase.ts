@@ -64,34 +64,42 @@ export function ensureInitialized() {
           firebaseConfig.projectId,
       );
       let credential;
-      if (env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+      let serviceAccountKey: any = null;
+
+      // 1. Check if local JSON file exists
+      const localKeyPath = path.resolve(process.cwd(), "firebase-service-account.json");
+      if (fs.existsSync(localKeyPath)) {
+        try {
+          console.log("[FIREBASE] Using service account key from local file: firebase-service-account.json");
+          serviceAccountKey = JSON.parse(fs.readFileSync(localKeyPath, "utf-8"));
+        } catch (fileErr) {
+          console.error("[FIREBASE] Failed to read/parse local firebase-service-account.json:", fileErr);
+        }
+      }
+
+      // 2. Fallback to env key if not loaded from file
+      if (!serviceAccountKey && env.FIREBASE_SERVICE_ACCOUNT_KEY) {
         try {
           console.log("[FIREBASE] Using service account key from environment.");
           let keyString = env.FIREBASE_SERVICE_ACCOUNT_KEY;
           const trimmed = keyString.trim();
-          if (!trimmed.startsWith("{")) keyString = "{" + trimmed;
-          if (!keyString.trim().endsWith("}")) keyString = keyString + "}";
-
-          credential = admin.credential.cert(JSON.parse(keyString));
+          if (fs.existsSync(trimmed)) {
+            serviceAccountKey = JSON.parse(fs.readFileSync(trimmed, "utf-8"));
+          } else {
+            if (!trimmed.startsWith("{")) keyString = "{" + trimmed;
+            if (!keyString.trim().endsWith("}")) keyString = keyString + "}";
+            serviceAccountKey = JSON.parse(keyString);
+          }
         } catch (e: unknown) {
           console.error(
-            "[FIREBASE] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY",
+            "[FIREBASE] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY from env",
             e instanceof Error ? e.message : String(e),
           );
-          console.log(
-            "[FIREBASE] Falling back to applicationDefault credentials.",
-          );
-          try {
-            credential = admin.credential.applicationDefault();
-          } catch (appDefaultErr) {
-            console.warn("[FIREBASE] applicationDefault credentials failed. Using dummy fallback cert to ensure container liveness.");
-            credential = admin.credential.cert({
-              projectId: firebaseConfig.projectId || "svet-gradjevine-mock",
-              privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADA\n-----END PRIVATE KEY-----",
-              clientEmail: "mock@svet-gradjevine-mock.iam.gserviceaccount.com"
-            });
-          }
         }
+      }
+
+      if (serviceAccountKey) {
+        credential = admin.credential.cert(serviceAccountKey);
       } else {
         console.log("[FIREBASE] Using applicationDefault credentials.");
         try {

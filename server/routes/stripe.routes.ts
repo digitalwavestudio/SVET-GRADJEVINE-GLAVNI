@@ -37,7 +37,7 @@ let stripeClient: Stripe | null = null;
 function getStripe(): Stripe {
   if (!stripeClient) {
     stripeClient = new Stripe(stripeSecret, {
-      apiVersion: "2024-04-10" /* removed any */ as unknown as "2026-04-22.dahlia",
+      apiVersion: "2024-04-10" as any,
     });
   }
   return stripeClient;
