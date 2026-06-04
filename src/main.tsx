@@ -4,7 +4,9 @@ window.onerror = function(message, source, lineno, colno, error) {
     msgStr.includes('cannot set property fetch') ||
     msgStr.includes('fetch of #<window>') ||
     msgStr.includes('resizeobserver') ||
-    msgStr.includes('script error')
+    msgStr.includes('script error') ||
+    msgStr.includes('serviceworker') ||
+    msgStr.includes('abort')
   ) {
     console.warn('[Benign Platform Error Ignored]:', message);
     return true; // Cancel error bubbling & console dump
@@ -33,7 +35,9 @@ window.addEventListener('unhandledrejection', function(event) {
   if (
     reasonStr.includes('cannot set property fetch') ||
     reasonStr.includes('fetch of #<window>') ||
-    reasonStr.includes('resizeobserver')
+    reasonStr.includes('resizeobserver') ||
+    reasonStr.includes('serviceworker') ||
+    reasonStr.includes('abort')
   ) {
     console.warn('[Benign Rejection Ignored]:', event.reason);
     event.preventDefault();
