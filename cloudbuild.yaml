@@ -1,11 +1,11 @@
 steps:
   # 1. Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/svet-gradjevine:$COMMIT_SHA', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA', '.']
     
   # 2. Push Docker image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/svet-gradjevine:$COMMIT_SHA']
+    args: ['push', 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA']
     
   # 3. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -13,11 +13,11 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'svet-gradjevine'
+      - 'svet-gra-evine'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/svet-gradjevine:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA'
       - '--region'
-      - 'europe-west3'  # Opciono prilagodi na željeni region (npr. europe-west1)
+      - 'us-west1'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
@@ -25,4 +25,7 @@ steps:
       - '8080'
 
 images:
-  - 'gcr.io/$PROJECT_ID/svet-gradjevine:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
