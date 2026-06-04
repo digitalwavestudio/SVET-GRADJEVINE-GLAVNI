@@ -572,7 +572,7 @@ function getRedisUrl(): string | null {
     const port = env.REDIS_PORT || "6379";
     let auth = "";
     if (env.REDIS_PASSWORD) {
-      auth = `default:${env.REDIS_PASSWORD}@`;
+      auth = `:${env.REDIS_PASSWORD}@`;
     }
     return `redis://${auth}${host}:${port}`;
   }
