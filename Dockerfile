@@ -3,7 +3,7 @@ FROM node:20-slim AS build
 WORKDIR /app
 COPY package*.json ./
 COPY packages/ ./packages/
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -12,7 +12,7 @@ FROM node:20-slim
 WORKDIR /app
 COPY package*.json ./
 COPY packages/ ./packages/
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/firebase-applet-config.json ./firebase-applet-config.json
 
