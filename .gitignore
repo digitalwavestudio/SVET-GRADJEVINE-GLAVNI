@@ -7,6 +7,8 @@ coverage/
 !.env.example
 *.txt
 fix_*.ts
+firebase-service-account.json
+
 
 # Build outputs
 dist/
