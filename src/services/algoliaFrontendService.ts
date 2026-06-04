@@ -1,8 +1,16 @@
 import { algoliasearch } from 'algoliasearch';
 import { apiClient } from '@/src/lib/apiClient';
 
-const appId = import.meta.env.VITE_ALGOLIA_APP_ID;
-const apiKey = import.meta.env.VITE_ALGOLIA_SEARCH_KEY;
+const getEnvVar = (viteKey: string | undefined, keyName: string): string => {
+  const runtimeVal = (window as any).__APP_ENV__?.[keyName];
+  if (runtimeVal && !runtimeVal.startsWith('%')) {
+    return runtimeVal;
+  }
+  return viteKey || '';
+};
+
+const appId = getEnvVar(import.meta.env.VITE_ALGOLIA_APP_ID, 'VITE_ALGOLIA_APP_ID');
+const apiKey = getEnvVar(import.meta.env.VITE_ALGOLIA_SEARCH_KEY, 'VITE_ALGOLIA_SEARCH_KEY');
 
 // Algolia client initialization
 export const algoliaClient = (appId && apiKey) ? algoliasearch(appId, apiKey) : null;
@@ -75,7 +83,7 @@ export const algoliaSearch = async (
     }
 
     const facetFilters: string[] = [];
-    let algoliaIndex = import.meta.env.VITE_ALGOLIA_INDEX_NAME || 'listings';
+    let algoliaIndex = getEnvVar(import.meta.env.VITE_ALGOLIA_INDEX_NAME, 'VITE_ALGOLIA_INDEX_NAME') || 'listings';
     
     // Self-healing: if the index name looks like a 32-character hex key (mismatched Write Key), fall back to 'listings'
     if (/^[a-f0-9]{32}$/i.test(algoliaIndex)) {

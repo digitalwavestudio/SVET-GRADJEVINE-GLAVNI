@@ -1,6 +1,7 @@
 import { Server } from "http";
 import express from "express";
 import path from "path";
+import fs from "fs";
 
 async function startServer() {
   const mode = process.env.APP_MODE || "full";
@@ -244,9 +245,28 @@ async function startServer() {
     } else {
       const distPath = path.join(process.cwd(), "dist");
       app.use(express.static(distPath));
+      
+      let cachedHtml: string | null = null;
       app.use((req, res) => {
         if (req.url.startsWith("/api")) return res.status(404).json({ error: "Not Found" });
-        res.sendFile(path.join(distPath, "index.html"));
+        
+        try {
+          if (!cachedHtml) {
+            cachedHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+          }
+          
+          let html = cachedHtml;
+          html = html.replace("%VITE_ALGOLIA_APP_ID%", process.env.VITE_ALGOLIA_APP_ID || process.env.ALGOLIA_APP_ID || "");
+          html = html.replace("%VITE_ALGOLIA_SEARCH_KEY%", process.env.VITE_ALGOLIA_SEARCH_KEY || process.env.ALGOLIA_API_KEY || "");
+          html = html.replace("%VITE_ALGOLIA_INDEX_NAME%", process.env.VITE_ALGOLIA_INDEX_NAME || process.env.ALGOLIA_INDEX_NAME || "listings");
+          html = html.replace("%VITE_EMAILJS_PUBLIC_KEY%", process.env.VITE_EMAILJS_PUBLIC_KEY || "");
+          html = html.replace("%VITE_EMAILJS_SERVICE_ID%", process.env.VITE_EMAILJS_SERVICE_ID || "");
+          
+          res.status(200).set({ "Content-Type": "text/html" }).end(html);
+        } catch (err) {
+          console.error("Failed to serve index.html with replacement:", err);
+          res.sendFile(path.join(distPath, "index.html"));
+        }
       });
     }
 

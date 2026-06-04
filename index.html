@@ -16,6 +16,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     
     <script>
+      window.__APP_ENV__ = {
+        VITE_ALGOLIA_APP_ID: "%VITE_ALGOLIA_APP_ID%",
+        VITE_ALGOLIA_SEARCH_KEY: "%VITE_ALGOLIA_SEARCH_KEY%",
+        VITE_ALGOLIA_INDEX_NAME: "%VITE_ALGOLIA_INDEX_NAME%",
+        VITE_EMAILJS_PUBLIC_KEY: "%VITE_EMAILJS_PUBLIC_KEY%",
+        VITE_EMAILJS_SERVICE_ID: "%VITE_EMAILJS_SERVICE_ID%"
+      };
+    </script>
+    <script>
       // 1. Slepi globalni presretač grešaka za iFrame platformu (AI Studio preview)
       // Sprečava nekritične ili eksterne greške (poput izmene window.fetch) da obore celu aplikaciju.
       window.addEventListener('error', function(e) {

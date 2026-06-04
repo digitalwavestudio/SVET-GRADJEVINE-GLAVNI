@@ -11,6 +11,14 @@ import emailjs from '@emailjs/browser';
  * - {{message}} - Poruka ili propratno pismo kandidata
  * - {{reply_to}} - Email adresa kandidata (opciono, za direktan odgovor)
  */
+const getEnvVar = (viteKey: string | undefined, keyName: string): string => {
+  const runtimeVal = (window as any).__APP_ENV__?.[keyName];
+  if (runtimeVal && !runtimeVal.startsWith('%')) {
+    return runtimeVal;
+  }
+  return viteKey || '';
+};
+
 export const sendJobApplicationEmail = async (
   employerEmail: string,
   employerName: string,
@@ -19,9 +27,9 @@ export const sendJobApplicationEmail = async (
   message: string,
   candidateEmail?: string
 ) => {
-  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const serviceId = getEnvVar(import.meta.env.VITE_EMAILJS_SERVICE_ID, 'VITE_EMAILJS_SERVICE_ID');
+  const templateId = getEnvVar(import.meta.env.VITE_EMAILJS_TEMPLATE_ID, 'VITE_EMAILJS_TEMPLATE_ID');
+  const publicKey = getEnvVar(import.meta.env.VITE_EMAILJS_PUBLIC_KEY, 'VITE_EMAILJS_PUBLIC_KEY');
 
   // Tihi izlaz ako ključevi nisu konfigurisani
   if (!serviceId || !templateId || !publicKey) {
@@ -54,9 +62,9 @@ export const sendChatMessageEmail = async (
   senderName: string,
   messageText: string
 ) => {
-  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-  const templateId = import.meta.env.VITE_EMAILJS_CHAT_TEMPLATE_ID;
-  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const serviceId = getEnvVar(import.meta.env.VITE_EMAILJS_SERVICE_ID, 'VITE_EMAILJS_SERVICE_ID');
+  const templateId = getEnvVar(import.meta.env.VITE_EMAILJS_CHAT_TEMPLATE_ID, 'VITE_EMAILJS_CHAT_TEMPLATE_ID');
+  const publicKey = getEnvVar(import.meta.env.VITE_EMAILJS_PUBLIC_KEY, 'VITE_EMAILJS_PUBLIC_KEY');
 
   if (!serviceId || !templateId || !publicKey) {
     return;
