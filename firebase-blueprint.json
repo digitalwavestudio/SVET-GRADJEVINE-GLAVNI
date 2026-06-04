@@ -1,0 +1,664 @@
+{
+  "entities": {
+    "Job": {
+      "title": "Job Posting",
+      "description": "Standard job advertisement on the platform",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Job title" },
+        "description": { "type": "string", "description": "Detailed job description" },
+        "location": { "type": "string", "description": "Display name of location" },
+        "locationSlug": { "type": "string", "description": "SEO slug for location" },
+        "sectorSlug": { "type": "string", "description": "SEO slug for industrial sector" },
+        "professionSlug": { "type": "string", "description": "SEO slug for profession" },
+        "plataMin": { "type": "number", "description": "Minimum salary" },
+        "plataMax": { "type": "number", "description": "Maximum salary" },
+        "engagementSlug": { "type": "string", "description": "SEO slug for engagement type" },
+        "experienceSlug": { "type": "string", "description": "SEO slug for experience level" },
+        "benefits": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["active", "pending", "expired", "deleted"] },
+        "companyId": { "type": "string", "description": "Reference to Company entity" },
+        "comp": { "type": "string", "description": "Denormalized company name" },
+        "logo": { "type": "string", "description": "Denormalized company logo URL" },
+        "isPremium": { "type": "boolean" },
+        "premiumUntil": { "type": "string", "format": "date-time" },
+        "isUrgent": { "type": "boolean" },
+        "viewsCount": { "type": "number" },
+        "applicantsCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "companyId", "status", "createdAt", "locationSlug", "sectorSlug"]
+    },
+    "Company": {
+      "title": "Company Profile",
+      "description": "Construction company or contractor profile",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "sector": { "type": "string" },
+        "location": { "type": "string" },
+        "description": { "type": "string" },
+        "isPremium": { "type": "boolean" },
+        "premiumUntil": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "sector"]
+    },
+    "Accommodation": {
+      "title": "Accommodation Ad",
+      "description": "Rental offer for worker housing",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "typeSlug": { "type": "string" },
+        "locationSlug": { "type": "string" },
+        "totalBeds": { "type": "number" },
+        "availableBeds": { "type": "number" },
+        "price": { "type": "string" },
+        "priceType": { "type": "string", "enum": ["perPerson", "total"] },
+        "amenities": { "type": "array", "items": { "type": "string" } },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "description": { "type": "string" },
+        "authorId": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["active", "pending", "expired"]
+        },
+        "isPremium": { "type": "boolean" },
+        "premiumUntil": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "title",
+        "typeSlug",
+        "locationSlug",
+        "totalBeds",
+        "authorId",
+        "createdAt",
+        "price",
+        "priceType"
+      ]
+    },
+    "Transaction": {
+      "title": "Wallet Transaction",
+      "description": "Immutable ledger of wallet credits and debits",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number", "description": "Positive for credit, negative for debit" },
+        "currency": { "type": "string" },
+        "type": { "type": "string", "enum": ["deposit", "withdrawal", "payment", "refund"] },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed"] },
+        "referenceId": { "type": "string", "description": "ID of Checkout or Package" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "type", "status", "createdAt"]
+    },
+    "Checkout": {
+      "title": "Checkout Event",
+      "description": "Payment process record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "packageId": { "type": "string" },
+        "packageName": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string" },
+        "partnerId": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["initiated", "pending", "confirmed", "failed"]
+        },
+        "paymentMethod": { "type": "string" },
+        "externalId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "packageId", "amount", "status", "createdAt"]
+    },
+    "SupportTicket": {
+      "title": "Support Ticket",
+      "description": "User inquiries and support requests",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["new", "pending", "resolved", "closed"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "subject", "message", "status", "createdAt"]
+    },
+    "Application": {
+      "title": "Job Application",
+      "description": "User's application for a specific job",
+      "type": "object",
+      "properties": {
+        "jobId": { "type": "string" },
+        "jobTitle": { "type": "string" },
+        "employerId": { "type": "string" },
+        "companyId": { "type": "string" },
+        "applicantId": { "type": "string" },
+        "applicantName": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "reviewed", "accepted", "rejected", "withdrawn"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["jobId", "applicantId", "status", "createdAt"]
+    },
+    "Machine": {
+      "title": "Construction Machine Ad",
+      "description": "Offer for machine rental or sale",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "categorySlug": { "type": "string" },
+        "brandSlug": { "type": "string" },
+        "locationSlug": { "type": "string" },
+        "price": { "type": "number" },
+        "priceType": { "type": "string", "enum": ["daily", "monthly", "sale"] },
+        "weightKg": { "type": "number" },
+        "year": { "type": "number" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "pending", "expired", "deleted"] },
+        "authorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "categorySlug", "locationSlug", "price", "authorId"]
+    },
+    "RealEstate": {
+      "title": "Industrial Real Estate Ad",
+      "description": "Offer for land or industrial zones",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "typeSlug": { "type": "string" },
+        "locationSlug": { "type": "string" },
+        "areaM2": { "type": "number" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "pending", "expired"] },
+        "authorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "typeSlug", "locationSlug", "areaM2", "authorId"]
+    },
+    "Catering": {
+      "title": "Catering Offer",
+      "description": "Food delivery service for construction sites",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "categorySlug": { "type": "string" },
+        "locationSlug": { "type": "string" },
+        "pricePerMeal": { "type": "number" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "pending", "expired"] },
+        "authorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "categorySlug", "locationSlug", "authorId"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "Basic user account data",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["standard", "majstor", "poslodavac", "smestaj", "ketering", "placevi", "masine", "admin"] },
+        "isVerified": { "type": "boolean" },
+        "partnerBalance": { "type": "number", "description": "User's wallet balance in RSD" },
+        "status": { "type": "string", "enum": ["active", "suspended", "pending"] },
+        "bio": { "type": "string" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "email", "role"]
+    },
+    "Conversation": {
+      "title": "Conversation Thread",
+      "description": "Metadata for a chat between two parties",
+      "type": "object",
+      "properties": {
+        "participants": { "type": "array" },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "lastSenderId": { "type": "string" },
+        "adId": { "type": "string" },
+        "adType": { "type": "string" },
+        "adTitle": { "type": "string" },
+        "unreadCount": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participants", "updatedAt"]
+    },
+    "Message": {
+      "title": "Chat Message",
+      "description": "Individual message content",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "senderId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["text", "senderId", "createdAt"]
+    },
+    "Admin": {
+      "title": "Administrator",
+      "description": "User with elevated privileges",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "addedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Marketplace": {
+      "title": "B2B/P2P Marketplace Item",
+      "description": "General item for sale or rent in the marketplace",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "locationSlug": { "type": "string" },
+        "price": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "pending", "expired", "deleted"] },
+        "authorId": { "type": "string" },
+        "isPremium": { "type": "boolean" },
+        "premiumUntil": { "type": "string", "format": "date-time" },
+        "isUrgent": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "categoryId", "locationSlug", "authorId", "status", "createdAt"]
+    },
+    "Migration": {
+      "title": "Database Migration",
+      "description": "Record of an executed data migration script",
+      "type": "object",
+      "properties": {
+        "script": { "type": "string" },
+        "executedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SystemLog": {
+      "title": "System Log",
+      "description": "Centralized error or event log",
+      "type": "object",
+      "properties": {
+        "level": { "type": "string", "enum": ["info", "warn", "error"] },
+        "message": { "type": "string" },
+        "context": { "type": "object" },
+        "uid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Site": {
+      "title": "Construction Site",
+      "description": "A construction project or location",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "authorId": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "deleted"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "authorId", "createdAt"]
+    },
+    "Worker": {
+      "title": "Worker Status",
+      "description": "Presence of a worker on a site",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "profession": { "type": "string" },
+        "isPresent": { "type": "boolean" },
+        "checkIn": { "type": "string" },
+        "checkOut": { "type": "string" },
+        "hourlyRate": { "type": "number" },
+        "workDescription": { "type": "string" },
+        "location": { "type": "object" }
+      }
+    },
+    "Resource": {
+      "title": "Site Resource",
+      "description": "Machinery or material on a site",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "number" },
+        "unit": { "type": "string" },
+        "unitPrice": { "type": "number" }
+      }
+    },
+    "Event": {
+      "title": "Calendar Event",
+      "description": "Activity or milestone in the calendar",
+      "type": "object",
+      "properties": {
+        "day": { "type": "number" },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "endDay": { "type": "number" },
+        "title": { "type": "string" },
+        "type": { "type": "string" },
+        "color": { "type": "string" },
+        "hasAlarm": { "type": "boolean" },
+        "authorId": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["day", "month", "year", "title", "type", "authorId"]
+    },
+    "Diary": {
+      "title": "Diary Entry",
+      "description": "Daily notes for a project",
+      "type": "object",
+      "properties": {
+        "content": { "type": "string" },
+        "day": { "type": "number" },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "authorId": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Metric": {
+      "title": "Daily Metrics",
+      "description": "Daily cost and presence summary",
+      "type": "object",
+      "properties": {
+        "totalWorkers": { "type": "number" },
+        "activeWorkers": { "type": "number" },
+        "dailyCost": { "type": "number" },
+        "authorId": { "type": "string" },
+        "lastUpdate": { "type": "string", "format": "date-time" }
+      }
+    },
+    "OutboxTask": {
+      "title": "Outbox Task",
+      "description": "Background task queue for exact once processing (e.g., Fan-out sync, notifications)",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "description": "Type of the task (e.g., FAN_OUT_PROFILE_UPDATE)" },
+        "payload": { "type": "object", "description": "Arbitrary payload for the task" },
+        "status": { "type": "string", "enum": ["pending", "processing", "completed", "failed"] },
+        "retryCount": { "type": "number" },
+        "error": { "type": "string", "description": "Error message if failed" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "payload", "status", "retryCount", "createdAt", "updatedAt"]
+    },
+    "Activity": {
+      "title": "User Activity",
+      "description": "Notification or action record for a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      }
+    },
+    "UserStats": {
+      "title": "Individual User Statistics",
+      "description": "Aggregated metrics for a single user to optimize dashboard performance",
+      "type": "object",
+      "properties": {
+        "activeAds": { "type": "number", "description": "Count of user's active advertisements" },
+        "totalViews": { "type": "number", "description": "Sum of views across all user's ads" },
+        "pendingApplications": { "type": "number", "description": "Count of applications waiting for response" },
+        "totalApplications": { "type": "number", "description": "Total applications received or sent" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Report": {
+      "title": "User Report",
+      "description": "Reporting inappropriate content",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string" },
+        "targetId": { "type": "string" },
+        "targetType": { "type": "string" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Favorite": {
+      "title": "Ad Favorite",
+      "description": "Saved advertisement by a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "adId": { "type": "string" },
+        "adType": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "adId", "adType", "createdAt"]
+    },
+    "AggregateStats": {
+      "title": "Aggregated Platform Stats",
+      "description": "Counters for platform-wide metrics to avoid expensive count queries",
+      "type": "object",
+      "properties": {
+        "activeAds": { "type": "number" },
+        "pendingAds": { "type": "number" },
+        "premiumPartners": { "type": "number" },
+        "totalUsers": { "type": "number" },
+        "verifiedCompanies": { "type": "number" },
+        "jobsCount": { "type": "number" },
+        "machinesCount": { "type": "number" },
+        "companiesCount": { "type": "number" },
+        "estimatedRevenue": { "type": "number" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      }
+    },
+    "MagazineArticle": {
+      "title": "Magazine Article",
+      "description": "Editorial content for the magazine section",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "featuredImage": { "type": "string" },
+        "gallery": { "type": "array", "items": { "type": "string" } },
+        "authorId": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published", "scheduled", "archived"] },
+        "viewCount": { "type": "number" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "MagazineCategory": {
+      "title": "Magazine Category",
+      "description": "Categorization for magazine content",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "order": { "type": "number" },
+        "isActive": { "type": "boolean" }
+      }
+    },
+    "MagazineMetadata": {
+      "title": "Magazine Global Metadata",
+      "description": "Counters and summary for the magazine section",
+      "type": "object",
+      "properties": {
+        "totalArticles": { "type": "number" },
+        "totalViews": { "type": "number" },
+        "popularTags": { "type": "array", "items": { "type": "string" } },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      }
+    },
+    "AuditLog": {
+      "title": "Audit Log",
+      "description": "Immutable record of administrative actions for compliance and accountability",
+      "type": "object",
+      "properties": {
+        "adminId": { "type": "string" },
+        "adminEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "targetType": { "type": "string" },
+        "targetId": { "type": "string" },
+        "details": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["adminId", "action", "targetType", "targetId", "timestamp"]
+    },
+    "Rfq": {
+      "title": "B2B Request For Quotation (RFQ)",
+      "description": "Tender specification sent to B2B suppliers",
+      "type": "object",
+      "properties": {
+        "regionId": { "type": "string", "description": "ID of location/region" },
+        "phone": { "type": "string" },
+        "category": { "type": "string", "description": "Calculator category" },
+        "specification": { "type": "array", "items": { "type": "object" } },
+        "status": { "type": "string", "enum": ["active", "processed", "closed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["regionId", "phone", "category", "specification", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Ledger of sensitive administrative actions (Backend write only)"
+    },
+    "/rfqs/{rfqId}": {
+      "schema": "Rfq",
+      "description": "Request for quotations submitted via calculators"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "List of platform administrators"
+    },
+    "/_migrations/{migrationId}": {
+      "schema": "Migration",
+      "description": "Migration tracking data"
+    },
+    "/_logs/{logId}": {
+      "schema": "SystemLog",
+      "description": "Centralized system logs"
+    },
+    "/conversations/{convId}": {
+      "schema": "Conversation",
+      "description": "Chat metadata"
+    },
+    "/conversations/{convId}/messages/{msgId}": {
+      "schema": "Message",
+      "description": "Real-time messages"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Registered user accounts"
+    },
+    "/jobs/{jobId}": {
+      "schema": "Job",
+      "description": "All job postings"
+    },
+    "/machines/{machineId}": {
+      "schema": "Machine",
+      "description": "All construction equipment"
+    },
+    "/plots/{id}": {
+      "schema": "RealEstate",
+      "description": "Industrial lands and zones"
+    },
+    "/caterings/{id}": {
+      "schema": "Catering",
+      "description": "Food services for sites"
+    },
+    "/marketplace/{id}": {
+      "schema": "Marketplace",
+      "description": "B2B and P2P marketplace items"
+    },
+    "/companies/{companyId}": {
+      "schema": "Company",
+      "description": "All company profiles"
+    },
+    "/accommodations/{accommodationId}": {
+      "schema": "Accommodation",
+      "description": "All accommodation advertisements"
+    },
+    "/applications/{appId}": {
+      "schema": "Application",
+      "description": "All worker applications for jobs"
+    },
+    "/favorites/{id}": {
+      "schema": "Favorite",
+      "description": "User's saved advertisements"
+    },
+    "/checkouts/{id}": {
+      "schema": "Checkout",
+      "description": "All payment and checkout records"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Ledger of all wallet transactions (Backend write only)"
+    },
+    "/supportTickets/{ticketId}": {
+      "schema": "SupportTicket",
+      "description": "All support tickets submitted by users"
+    },
+    "/sites/{siteId}": {
+      "schema": "Site",
+      "description": "Construction sites"
+    },
+    "/sites/{siteId}/workers/{workerId}": {
+      "schema": "Worker",
+      "description": "Workers present on site"
+    },
+    "/sites/{siteId}/resources/{resourceId}": {
+      "schema": "Resource",
+      "description": "Resources/machinery used on site"
+    },
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Calendar events"
+    },
+    "/diaries/{diaryId}": {
+      "schema": "Diary",
+      "description": "Project diaries"
+    },
+    "/user_stats/{userId}": {
+      "schema": "UserStats",
+      "description": "Aggregated stats for the dashboard"
+    },
+    "/metrics/{metricId}": {
+      "schema": "Metric",
+      "description": "Daily operation metrics"
+    },
+    "/metadata/{docId}": {
+      "schema": "AggregateStats",
+      "description": "Global and categorical platform statistics"
+    },
+    "/outbox_tasks/{taskId}": {
+      "schema": "OutboxTask",
+      "description": "Tasks for asynchronous background processing"
+    },
+    "/articles/{articleId}": {
+      "schema": "MagazineArticle",
+      "description": "Magazine editorial content"
+    },
+    "/magazine_categories/{catId}": {
+      "schema": "MagazineCategory",
+      "description": "Magazine content categories"
+    },
+    "/metadata/magazine_stats": {
+      "schema": "MagazineMetadata",
+      "description": "Aggregated stats for the magazine"
+    }
+  }
+}

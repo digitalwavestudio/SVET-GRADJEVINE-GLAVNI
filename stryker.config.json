@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.stryker-mutator.io/stryker-config.json",
+  "packageManager": "npm",
+  "reporters": ["html", "clear-text", "progress"],
+  "testRunner": "vitest",
+  "checkers": ["typescript"],
+  "tsconfigFile": "tsconfig.json",
+  "mutate": [
+    "server/services/*.ts",
+    "!server/services/*.test.ts"
+  ]
+}

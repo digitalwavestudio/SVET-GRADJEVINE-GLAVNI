@@ -1,0 +1,22 @@
+name: CI Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - name: Security Audit (SCA)
+        run: npm run test:security
+      - run: npm run lint
+      - run: npm run test:contract
+      - run: npm test
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - run: npm run test:e2e

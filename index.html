@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#0F1923" />
+    <title>Svet Građevine - Premium Marketplace</title>
+    <meta name="description" content="Vodeća platforma za građevinsku industriju u Srbiji. Pronađite poslove, majstore, mašine i materijal na jednom mestu." />
+    
+
+
+    <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script>
+      // 1. Slepi globalni presretač grešaka za iFrame platformu (AI Studio preview)
+      // Sprečava nekritične ili eksterne greške (poput izmene window.fetch) da obore celu aplikaciju.
+      window.addEventListener('error', function(e) {
+        var msg = (e.message || '').toLowerCase();
+        if (
+          msg.indexOf('cannot set property fetch') > -1 ||
+          msg.indexOf('fetch of #<window>') > -1 ||
+          msg.indexOf('resizeobserver') > -1 ||
+          msg.indexOf('script error') > -1
+        ) {
+          console.warn('[Ignored Platform/Extension Error]:', e.message);
+          e.preventDefault();
+          e.stopPropagation();
+          return true; // Sprečava dalju propagaciju i podrazumevane logove pregledača
+        }
+        console.error('[Global Error]', e.message);
+      }, true);
+
+      window.addEventListener('unhandledrejection', function(e) {
+        var reason = String(e.reason && e.reason.message ? e.reason.message : e.reason || '').toLowerCase();
+        if (
+          reason.indexOf('cannot set property fetch') > -1 ||
+          reason.indexOf('fetch of #<window>') > -1 ||
+          reason.indexOf('resizeobserver') > -1
+        ) {
+          console.warn('[Ignored Platform/Extension Rejection]:', e.reason);
+          e.preventDefault();
+          e.stopPropagation();
+          return true;
+        }
+        console.error('[Unhandled Rejection]', e.reason);
+      }, true);
+
+      // 2. Fallback štit za redefiniciju window.fetch
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return originalFetch;
+            },
+            set: function(val) {
+              originalFetch = val;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (err1) {
+          try {
+            var proto = Object.getPrototypeOf(window);
+            if (proto) {
+              Object.defineProperty(proto, 'fetch', {
+                get: function() {
+                  return window.fetch;
+                },
+                set: function(val) {
+                  originalFetch = val;
+                },
+                configurable: true,
+                enumerable: true
+              });
+            }
+          } catch (err2) {
+            // Tihi neuspeh, već je pokriven 'error' slušaocem iznad
+          }
+        }
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+    <style>
+      #root:empty { background-color: #0F1923; min-height: 100vh; }
+    </style>
+  </head>
+  <body class="bg-surface">
+    <div id="root"></div>
+  </body>
+</html>

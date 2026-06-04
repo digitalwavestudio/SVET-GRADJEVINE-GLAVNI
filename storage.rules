@@ -1,0 +1,68 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // --- REUSABLE HELPERS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'mancoresolution@gmail.com'
+      );
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isPdf() {
+      return request.resource.contentType == 'application/pdf';
+    }
+
+    // Deny all by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // 1. Branding (Admin Only)
+    match /branding/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 2. Public Profiles & Avatars
+    match /profiles/avatars/{allPaths=**} {
+      allow read: if true;
+      allow create: if isSignedIn() && isImage() && request.resource.size < 2 * 1024 * 1024; // Limit to 2MB (often pre-compressed anyway)
+      allow update, delete: if isAdmin();
+    }
+
+    match /companies/logos/{allPaths=**} {
+      allow read: if true;
+      allow create: if isSignedIn() && isImage() && request.resource.size < 2 * 1024 * 1024; // Limit to 2MB
+      allow update, delete: if isAdmin();
+    }
+
+    match /companies/covers/{allPaths=**} {
+      allow read: if true;
+      allow create: if isSignedIn() && isImage() && request.resource.size < 4 * 1024 * 1024; // Limit to 4MB
+      allow update, delete: if isAdmin();
+    }
+
+    // 3. User Portfolio (Integrated from CVEditor)
+    match /users/{userId}/portfolio/{allPaths=**} {
+      allow read: if true; // Public or employer access based on system design
+      allow create: if isSignedIn() && request.auth.uid == userId && (isImage() || isPdf()) && request.resource.size < 5 * 1024 * 1024; // Limit to 5MB (portfolio files)
+      allow update, delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 4. Advertisement Gallery Images
+    match /ads/gallery/{allPaths=**} {
+      allow read: if true;
+      allow create: if isSignedIn() && isImage() && request.resource.size < 5 * 1024 * 1024; // Limit to 5MB (highly optimized photo slots)
+      allow update, delete: if isAdmin();
+    }
+  }
+}

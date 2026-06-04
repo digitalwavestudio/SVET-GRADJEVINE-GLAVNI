@@ -1,0 +1,316 @@
+import { Request, Response, NextFunction } from "express";
+import { UnifiedSearchService } from "../services/unified-search.service.ts";
+import { UnifiedAdsService } from "../services/unified-ads.service.ts";
+import { db } from "../config/firebase.ts";
+import { admin as firebaseAdmin } from "../config/firebase.ts";
+import { ImageTransformer } from "../utils/image.transformer.ts";
+import type { AuthenticatedRequest } from "../types/auth.ts";
+
+export const getPublicAds = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=300, stale-while-revalidate=600",
+  );
+  try {
+    const category = req.params.category || "all";
+    const limitCount = req.query.limit ? Math.min(Number(req.query.limit) || 10, 100) : 10;
+    const cursor = req.query.cursor as string | undefined;
+
+    const { CacheService } = await import("../services/cache.service.ts");
+    const cacheKey = cursor ? `public_ads_${category}_${limitCount}_${cursor}` : `public_ads_${category}_${limitCount}`;
+
+    // Sprečava "Cache Stampede" udare kad cache istekne
+    const response = await CacheService.getOrSetSWR(
+      cacheKey,
+      async () => {
+        const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
+        const { publicAdsResponseSchema } = await import("../dto/ads.dto.ts");
+        const res = await UnifiedAdsService.getPublicAds(category, limitCount, cursor);
+        return publicAdsResponseSchema.parse(res);
+      },
+      1800000,
+      { docs: [], lastVisibleId: null, hasMore: false } // Fallback to empty docs on quota failure
+    ); // 30 min cache
+
+    res.json(response);
+  } catch (dbError) {
+    console.error("[ADS] Firestore error (likely quota):", dbError);
+    res.json({
+      docs: [],
+      lastVisibleId: null,
+      hasMore: false,
+      error: "Service temporarily limited",
+    });
+  }
+};
+
+export const getMyAds = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const { limitCount = 20, cursor, searchQ } = req.query;
+    const limitNum = Math.min(Number(limitCount) || 20, 50);
+    const cacheKey = `myAds_${user.uid}_${limitNum}_${cursor || 'initial'}_${searchQ || 'none'}`;
+    const { CacheService } = await import("../services/cache.service.ts");
+
+    let resultPayload: any | null = await CacheService.get(cacheKey);
+
+    if (!resultPayload) {
+      try {
+        const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
+        const { myAdsResponseSchema } = await import("../dto/ads.dto.ts");
+        const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum, cursor as string, searchQ as string);
+        resultPayload = myAdsResponseSchema.parse(resPayload);
+        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000); // 2 min cache
+      } catch (quotaError) {
+         console.error("[ADS] getMyAds quota error:", quotaError);
+         resultPayload = { docs: [], lastVisibleId: null, hasMore: false };
+      }
+    }
+
+    res.json(resultPayload);
+  } catch (dbError) {
+    console.error("[ADS] getMyAds Error:", dbError);
+    next(dbError);
+  }
+};
+
+export const searchAds = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { category, filters = {}, pageSize = 20, lastVisibleId } = req.body;
+    const limit = Number(pageSize) || 20;
+
+    // Zaštita od "Denial of Wallet"
+    const { RateLimiterService } =
+      await import("../services/rate-limiter.service.ts");
+    const ip =
+      req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown";
+    const ipStr = Array.isArray(ip) ? ip[0] : ip;
+    const allowed = await RateLimiterService.isAllowed(
+      `search:${ipStr}`,
+      10,
+      1,
+    ); // 10 pretraga u sekundi
+    if (!allowed) {
+      return res
+        .status(429)
+        .json({ error: "Previše zahteva. Sačekajte trenutak." });
+    }
+
+    const { UnifiedSearchService } =
+      await import("../services/unified-search.service.ts");
+    const { CacheService } = await import("../services/cache.service.ts");
+
+    const filtersStr = JSON.stringify(filters);
+    const cacheKey = `search_ads_${category || "all"}_${filtersStr}_${limit}_${lastVisibleId || "none"}`;
+
+    // Agresivno SWR keširanje na bazi query-parametr-hash-a
+    // Povećavamo TTL na 60 minuta (3600000 ms) za anonimne pretrage
+    const result = await CacheService.getOrSetSWR(
+      cacheKey,
+      async () => {
+        const { publicAdsResponseSchema } = await import("../dto/ads.dto.ts");
+        const searchRes = await UnifiedSearchService.search(
+          category || "all",
+          filters,
+          limit,
+          lastVisibleId,
+        );
+        return publicAdsResponseSchema.parse(searchRes);
+      },
+      3600000, // 60 min cache
+      { docs: [], lastVisibleId: null, hasMore: false }
+    );
+
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAdById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  // Edge/BFF caching headers for public ad fetching
+  res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=300, stale-while-revalidate=86400, stale-if-error=86400",
+  );
+
+  try {
+    const { id } = req.params;
+
+    const { CacheService } = await import("../services/cache.service.ts");
+    const { CacheKeys } = await import("../constants/cache-keys.ts");
+    const cacheKey = CacheKeys.adDetail(id);
+
+    const data = await CacheService.getOrSetSWR(
+      cacheKey,
+      async () => {
+        const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
+        const { publicAdSchema } = await import("../dto/ads.dto.ts");
+        const docData = await UnifiedAdsService.getAdById("", id);
+
+        if (!docData) {
+          return { error: "Oglas nije pronađen ili je obrisan", status: 410 };
+        }
+
+        if (docData.status === "deleted" || docData.status === "inactive") {
+          const views = (docData.viewsCount as number) || 0;
+          const hasTraffic = views >= 50;
+          if (hasTraffic) {
+            const parentSlug =
+              docData.type === "machine"
+                ? "/masine"
+                : docData.type === "job"
+                  ? "/poslovi"
+                  : "/alat-i-oprema";
+            return {
+              error: "Oglas je obrisan",
+              redirect: parentSlug,
+              status: 410,
+            };
+          } else {
+            return {
+              error: "Oglas je obrisan, nije više dostupan",
+              status: 410,
+            };
+          }
+        }
+
+        // Povezujemo userProfileLoader kako bismo spakovali pojedinačna čitanja autora u jedan upit
+        if (docData.authorId && typeof docData.authorId === "string") {
+          const { userProfileLoader } = await import("../utils/dataloader.ts");
+          const author = await userProfileLoader.load(docData.authorId).catch(() => null);
+          if (author) {
+            docData.authorSnapshot = {
+              uid: author.uid || author.id,
+              displayName: author.displayName || "",
+              photoURL: author.avatarUrl || author.photoURL || "",
+              companyName: author.companyName || "",
+              verified: author.verified || false
+            };
+          }
+        }
+
+        return publicAdSchema.parse(docData);
+      },
+      1800000,
+      null // Fallback
+    ); // 30 min cache
+
+    if (data && data.error && data.status) {
+      return res.status(data.status as number).json(data);
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error("[ADS] getAdById Error:", err);
+    res.status(503).json({ error: "Servis trenutno nedostupan" });
+  }
+};
+
+export const getAdsBatch = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "ids must be a non-empty array" });
+    }
+
+    // Limit to 30 to prevent massive abuse and align with Firestore 'in' limits
+    if (ids.length > 30) {
+      return res.status(400).json({ error: "Maximum 30 ids per batch" });
+    }
+
+    const { CacheService } = await import("../services/cache.service.ts");
+    const { CacheKeys } = await import("../constants/cache-keys.ts");
+
+    // First, try to fetch all from cache using mget optimization
+    const cacheMap = await CacheService.getMultiple<any & { id: string }>(ids.map(id => CacheKeys.adDetail(id)));
+
+    const results: (any & { id: string })[] = [];
+    const missingIds: string[] = [];
+
+    ids.forEach((id) => {
+      const cached = cacheMap.get(CacheKeys.adDetail(id));
+      if (cached) {
+        results.push(cached);
+      } else {
+        missingIds.push(id);
+      }
+    });
+
+    if (missingIds.length > 0) {
+      // Chunking inside just in case length is > 30, though we guarded it
+      const snap = await db
+        .collection("listings")
+        .where(firebaseAdmin.firestore.FieldPath.documentId(), "in", missingIds)
+        .get();
+
+      const fetchedDocs = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Update cache
+      fetchedDocs.forEach((doc) => {
+        CacheService.set(CacheKeys.adDetail(doc.id), doc, 1800000).catch(() => {});
+        results.push(doc);
+      });
+    }
+
+    const { publicAdSchema } = await import("../dto/ads.dto.ts");
+
+    // Return in deterministic order map
+    const idMap = new Map(results.map((r) => [r.id, publicAdSchema.parse(r)]));
+    const finalOrdered = ids.map((id) => idMap.get(id)).filter(Boolean);
+
+    res.json(finalOrdered);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateAd = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
+    const result = await UnifiedAdsService.updateAdById(id, updates, user);
+
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};

@@ -1,0 +1,264 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. GLOBAL SAFETY NET
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE HELPERS ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isEmailVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    // --- ENTERPRISE COST-SHIELD AND RATE-LIMITERS (Pillar 2 & 8) ---
+    function isRateLimitedByTime(existingTime) {
+      return existingTime != null && (request.time.toMillis() - existingTime.toMillis() < 5000); // 5 sec cooldown per client write on same doc
+    }
+
+    // --- VALIDATION BLUEPRINTS (Pillar 2) ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['firstName', 'lastName', 'email', 'role']) &&
+             data.keys().size() <= 12 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.firstName is string && data.firstName.size() <= 50 &&
+             data.lastName is string && data.lastName.size() <= 50 &&
+             (!data.keys().hasAny(['bio']) || (data.bio is string && data.bio.size() <= 10000)) && // description string limit (10KB)
+             (!data.keys().hasAny(['photoURL']) || (data.photoURL is string && data.photoURL.size() <= 2048));
+    }
+
+    function isValidAd(data) {
+      return data.keys().hasAll(['title', 'locationSlug', 'status', 'createdAt']) &&
+             data.title is string && data.title.size() <= 150 &&
+             data.locationSlug is string && data.locationSlug.size() <= 100 &&
+             (!data.keys().hasAny(['description']) || (data.description is string && data.description.size() <= 10000)) && // description <= 10KB
+             (!data.keys().hasAny(['benefits']) || (data.benefits is list && data.benefits.size() <= 20 && (data.benefits.size() == 0 || data.benefits[0] is string))) && // array bounds
+             (!data.keys().hasAny(['images']) || (data.images is list && data.images.size() <= 10 && (data.images.size() == 0 || data.images[0] is string))); // array bounds
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['text', 'senderId', 'createdAt']) &&
+             data.keys().size() <= 5 &&
+             data.text is string && data.text.size() <= 5000 && // limit message content to 5KB
+             data.senderId == request.auth.uid;
+    }
+
+    // --- USERS ---
+    match /users/{userId} {
+      // PII Isolation: Only owner or admin can read the full profile via direct Firestore
+      // Public profile data should be handled via server API or a public subcollection
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      
+      // Strict Backend-First Pipeline. However, if any direct client edits are allowed, we enforce Temporal Cooldown & Payload Bounds.
+      allow update: if isValidId(userId) && isOwner(userId) && isValidUser(incoming()) && 
+                    !isRateLimitedByTime(existing().get('updatedAt', null)) && 
+                    incoming().role == existing().role; // Do not let user self-grade role
+      allow create, delete: if false;
+    }
+
+    // --- ADMINS ---
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if false; 
+    }
+
+    // --- LISTINGS (Unified for Jobs, Machines, Accommodations, etc.) ---
+    // Zero-Trust: Direct client reads are strictly permitted only for public (active) listings or owned by the auth user.
+    function canReadAd(data) {
+      return data.status == 'active' || isAdmin() || (isSignedIn() && (data.authorId == request.auth.uid || data.companyId == request.auth.uid));
+    }
+    
+    match /listings/{adId} {
+      allow get: if isValidId(adId) && canReadAd(existing());
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      
+      // Zero-Trust: All writes, edits, and deletions are strictly blocked on the client side.
+      allow write: if false;
+    }
+
+    // Legacy paths - Zero-Trust client restrictions with query limit defense
+    match /jobs/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      allow write: if false; 
+    }
+    match /machines/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      allow write: if false; 
+    }
+    match /accommodations/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      allow write: if false; 
+    }
+    match /caterings/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      allow write: if false; 
+    }
+    match /plots/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      allow write: if false; 
+    }
+    match /marketplace/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && canReadAd(resource.data);
+      allow write: if false; 
+    }
+    match /companies/{id} { 
+      allow get: if isValidId(id) && canReadAd(existing()); 
+      allow list: if (request.query.limit != null && request.query.limit <= 50);
+      allow write: if false; 
+    }
+
+    // --- APPLICATIONS ---
+    match /applications/{appId} {
+      allow get: if isValidId(appId) && isSignedIn() && (resource.data.applicantId == request.auth.uid || resource.data.employerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (request.query.limit != null && request.query.limit <= 50) && (resource.data.applicantId == request.auth.uid || resource.data.employerId == request.auth.uid || isAdmin());
+      
+      // Zero-Trust: Applying or changing status of applications is strictly blocked on client, allowed only via Express API
+      allow write: if false;
+    }
+
+    // --- FAVORITES ---
+    match /favorites/{favoriteId} {
+      // Secure List Queries (Pillar 8): Evaluate resource.data against request.auth.uid
+      allow read: if isValidId(favoriteId) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      
+      // Backend-First Principle: All toggling happens via Express API to ensure relational integrity
+      allow write: if false;
+    }
+
+    // --- CHAT ---
+    match /conversations/{convId} {
+      allow read: if isValidId(convId) && isSignedIn() && (request.auth.uid in resource.data.participants);
+      
+      // Zero-Trust: All chat conversation status/ownership writes must go through server-side logic only
+      allow write: if false;
+
+      match /messages/{msgId} {
+        allow read: if isValidId(msgId) && isSignedIn() && (request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participants);
+        
+        // Zero-Trust: Creating, updating, or deleting messages directly from the client is strictly forbidden
+        allow write: if false;
+      }
+    }
+
+    // --- WALLET & TRANSACTIONS ---
+    match /transactions/{transId} {
+      allow get: if isValidId(transId) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow write: if false; // Backend only (ledger integrity)
+    }
+
+    match /checkouts/{id} {
+      allow read: if isValidId(id) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow write: if false; // Backend only
+    }
+
+    match /checkout_sessions/{id} {
+      allow read: if isValidId(id) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow write: if false; // Backend only
+    }
+
+    // --- OUTBOX & DLQ (Pillar 6: Isolation) ---
+    match /outbox/{id} {
+      allow read: if isValidId(id) && isAdmin();
+      allow write: if false; // Backend only
+    }
+    match /outbox_tasks/{id} {
+      allow read: if isValidId(id) && isAdmin();
+      allow write: if false; // Backend only
+    }
+    
+    match /dlq/{id} {
+      allow read: if isValidId(id) && isAdmin();
+      allow write: if false; // Backend only
+    }
+
+    // --- AUDIT LOGS ---
+    match /audit_logs/{id} {
+      allow read: if isValidId(id) && isAdmin();
+      allow write: if false; // Backend only (audit integrity)
+    }
+
+    // --- ACTIVITIES (In-app notifications) ---
+    match /activities/{id} {
+      allow read: if isValidId(id) && isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isValidId(id) && isEmailVerified() && existing().userId == request.auth.uid && incoming().diff(existing()).affectedKeys().hasOnly(['read']) && incoming().read == true;
+      allow create, delete: if false; // Created and deleted by backend
+    }
+
+    // --- RFQS (Zero-Trust) ---
+    match /rfqs/{rfqId} {
+      allow get: if isValidId(rfqId) && (isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid));
+      allow list: if isAdmin();
+      allow write: if false; // Strict Backend-Only
+    }
+
+    // --- SUPPORT TICKETS ---
+    match /supportTickets/{ticketId} {
+      allow read: if isValidId(ticketId) && isAdmin();
+      allow write: if false; // Strict backend-first setup
+    }
+
+    // --- SITES & WORKERS & RESOURCES ---
+    match /sites/{siteId} {
+      allow read: if isValidId(siteId) && (isAdmin() || (isSignedIn() && resource.data.authorId == request.auth.uid));
+      allow write: if false;
+
+      match /workers/{workerId} {
+        allow read: if isValidId(workerId) && (isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/sites/$(siteId)).data.authorId == request.auth.uid));
+        allow write: if false;
+      }
+      match /resources/{resourceId} {
+        allow read: if isValidId(resourceId) && (isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/sites/$(siteId)).data.authorId == request.auth.uid));
+        allow write: if false;
+      }
+    }
+
+    // --- EVENTS & DIARIES & DAILY METRICS ---
+    match /events/{eventId} {
+      allow read: if isValidId(eventId) && (isAdmin() || (isSignedIn() && resource.data.authorId == request.auth.uid));
+      allow write: if false;
+    }
+    match /diaries/{diaryId} {
+      allow read: if isValidId(diaryId) && (isAdmin() || (isSignedIn() && resource.data.authorId == request.auth.uid));
+      allow write: if false;
+    }
+    match /metrics/{metricId} {
+      allow read: if isValidId(metricId) && (isAdmin() || (isSignedIn() && resource.data.authorId == request.auth.uid));
+      allow write: if false;
+    }
+
+    // --- MAGAZINE & ARTICLES & CATEGORIES ---
+    match /articles/{articleId} {
+      allow get: if isValidId(articleId) && (existing().status == 'published' || isAdmin());
+      allow list: if (request.query.limit != null && request.query.limit <= 50) && (resource.data.status == 'published' || isAdmin());
+      allow write: if false;
+    }
+    match /magazine_categories/{catId} {
+      allow read: if isValidId(catId);
+      allow write: if false;
+    }
+
+    // --- SYSTEM & METRICS ---
+    match /_logs/{id} { 
+      allow write: if isValidId(id) && isEmailVerified() && incoming().message.size() <= 5000; // Impose size guard to prevent flood attacks
+      allow read: if isValidId(id) && isAdmin(); 
+    }
+    match /_migrations/{id} { allow read, write: if false; }
+    match /metadata/{id} { allow read: if isValidId(id); allow write: if false; }
+    match /user_stats/{userId} { 
+      allow read: if isValidId(userId) && (isOwner(userId) || isAdmin()); 
+      allow write: if false; 
+    }
+  }
+}

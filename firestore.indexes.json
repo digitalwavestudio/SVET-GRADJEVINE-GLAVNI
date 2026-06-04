@@ -1,0 +1,912 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "authorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "authorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "system_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "activities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "participants",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "employerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "applicantId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "jobId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isPremium",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "premiumUntil",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isUrgent",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "urgentUntil",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isPremiumProfile",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "premiumUntil",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "_geoloc.lat",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "_geoloc.lng",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isUrgent",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isUrgent",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isVerified",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isVerified",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "mainCategories",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "listings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "mainCategories",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "professionSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "locationSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "professionSlug",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "articles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "category",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isPremium",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "htmlContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "whatWeOffer",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "requirements",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "amenities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "features",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "responsibilities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "searchableText",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "searchKeywords",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "images",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "resumeUrl",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "coverLetter",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "body",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "textContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "htmlContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "whatWeOffer",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "requirements",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "amenities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "features",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "responsibilities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "searchableText",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "searchKeywords",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "images",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "resumeUrl",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "coverLetter",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "body",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "textContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "htmlContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "whatWeOffer",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "requirements",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "amenities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "features",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "responsibilities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "searchableText",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "searchKeywords",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "images",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "resumeUrl",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "coverLetter",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "body",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "textContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "htmlContent",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "whatWeOffer",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "requirements",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "amenities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "features",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "responsibilities",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "searchableText",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "searchKeywords",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "images",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "resumeUrl",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "coverLetter",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "body",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "textContent",
+      "indexes": []
+    }
+  ]
+}

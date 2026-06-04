@@ -1,0 +1,53 @@
+node_modules/
+build/
+coverage/
+.DS_Store
+*.log
+.env
+!.env.example
+*.txt
+fix_*.ts
+
+# Build outputs
+dist/
+dist-*
+
+# Agent temporary scripts
+/*.js
+!eslint.config.js
+!vite.config.js
+!tailwind.config.js
+!postcss.config.js
+fix*
+patch*
+refactor*
+revert*
+rewrite*
+run_debug*
+test_flow*
+ts_nocheck*
+fund_wallet*
+remove_wildcards*
+copy_sections*
+script*
+b.*
+p.*
+r.*
+
+# Dokumentacija, auditi i roadmap-ovi
+ARCHITECTURE_AUDIT.md
+FIRESTORE_OPTIMIZATION_AUDIT.md
+ROADMAP_*.md
+SECURITY_REPORT.md
+STA_JE_SLEDECE.md
+STRATEGY_*.md
+security_spec.md
+firestore_indexes.md
+
+# Analizatori i izveštaji
+*.csv
+*.tsv
+
+# Arhivi koda
+*.zip
+*.tar

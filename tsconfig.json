@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "strict": true,
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "paths": {
+      "@svet-gradjevine/ui": ["./packages/ui/src/index.ts"],
+      "@svet-gradjevine/shared": ["./packages/shared/src/index.ts"],
+      "@svet-gradjevine/api": ["./packages/api/src/index.ts"],
+      "@svet-gradjevine/ui/*": ["./packages/ui/src/*"],
+      "@svet-gradjevine/shared/*": ["./packages/shared/src/*"],
+      "@svet-gradjevine/api/*": ["./packages/api/src/*"],
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*",
+    "server/**/*",
+    "packages/**/*",
+    "scripts/**/*",
+    "*.ts",
+    "*.tsx"
+  ],
+  "exclude": [
+    "app",
+    "node_modules",
+    "dist",
+    "coverage",
+    ".stryker-tmp",
+    ".vite",
+    ".next"
+  ]
+}

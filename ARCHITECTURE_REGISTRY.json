@@ -1,0 +1,162 @@
+{
+  "project_name": "Svet Građevine",
+  "version": "1.0.0",
+  "last_audit": "2026-05-28",
+  "meta_comment": "Ovaj fajl definise tehnoloski plafon i zatvoreni arhitektonski katalog. Svaka regresija na nize nivoe tehnologije bice automatski detektovana od strane INTEGRITY_SHIELD skripte.",
+  "technological_ceiling": {
+    "background_jobs": {
+      "approved": [
+        "BullMQ"
+      ],
+      "forbidden": [
+        "setInterval",
+        "setTimeout polling loops",
+        "in-memory-queue",
+        "cron-node"
+      ]
+    },
+    "caching": {
+      "approved": [
+        "Redis",
+        "TanStack Query on client-side with explicit staleTime"
+      ],
+      "forbidden": [
+        "in-memory plain global variables",
+        "localstorage bypass for server state"
+      ]
+    },
+    "search": {
+      "approved": [
+        "UnifiedSearchService",
+        "Algolia Search Layer"
+      ],
+      "forbidden": [
+        "raw Firestore collection-wide search with regex/contains",
+        "custom memory searches"
+      ]
+    },
+    "validation": {
+      "approved": [
+        "Zod Schema validation on BFF"
+      ],
+      "forbidden": [
+        "pure manual standard js if-checks for body validation",
+        "express-validator"
+      ]
+    },
+    "database_writes": {
+      "approved": [
+        "Express API endpoints with Transactions & Outbox Pattern (UnifiedAdsService)"
+      ],
+      "forbidden": [
+        "direct client-side Firestore raw writes for critical collections"
+      ]
+    },
+    "metrics_accumulation": {
+      "approved": [
+        "ViewStatsService",
+        "MetricsService using Redis hincrby and cron flushing to db.batch"
+      ],
+      "forbidden": [
+        "live direct Firestore updates per individual click/view",
+        "runtime Firestore count() queries on raw collections"
+      ]
+    }
+  },
+  "protected_architectural_paths": [
+    "./server/services/unified-search.service.ts",
+    "./server/services/unified-ads.service.ts",
+    "./server/services/outbox.worker.ts",
+    "./server/services/viewStatsService.ts",
+    "./server/services/metrics.service.ts",
+    "./server/services/algolia-redis-batcher.service.ts",
+    "./server/services/chat-buffer.service.ts",
+    "./server/services/jwks.service.ts",
+    "./server/services/job-application.service.ts",
+    "./server/routes/api.routes.ts",
+    "./ROADMAP_SERVER_OPTIMIZATION.md",
+    "./ARCHITECTURE_AUDIT.md",
+    "./eslint.config.js",
+    "./src/lib/queryClient.ts"
+  ],
+  "frozen_checksums": {
+    "./server/services/unified-search.service.ts": "fee777ba8a1cd6872c98123b9205535920ca47f5869277c02c31a3ba51f615ad",
+    "./server/services/unified-ads.service.ts": "ddfd911461d151de44429ddad0a1ed9504211cb359c653ce70ff3023bfde3145",
+    "./server/services/outbox.worker.ts": "4aa8612f256c35c635188563558c5a46a12d23d8f3f2ff9aa99146ba46cf8372",
+    "./server/services/viewStatsService.ts": "77b4f14ebd96978f6341db2adbacb445ff2e2bddf983636b3133c14f20d0c7a8",
+    "./server/services/metrics.service.ts": "f318a07d3966a0e5744a0171135d4777d8682240d12117019952b1908dc646e2",
+    "./server/services/algolia-redis-batcher.service.ts": "1947aa5035001add61054f11e63f5d2d3ef30a119a3548ffd826f756271068df",
+    "./server/services/chat-buffer.service.ts": "5627e491a169dd797b1b3c25aa8e6c4f71b15549c5a23c0e147b81b23a05aa82",
+    "./server/services/jwks.service.ts": "9a65fd15ebd662bb0641437f3ee6fda6232c31481fdef9cf5596410900625922",
+    "./server/services/job-application.service.ts": "debb278b94282136b8cf81cc64c22bc8974f4c028377b48d6fce667c2e39aea8",
+    "./server/routes/api.routes.ts": "f95b34253b4d109fc8ccf5cc6618960ca005aa656e9005ef47f3f45a417b356e",
+    "./ROADMAP_SERVER_OPTIMIZATION.md": "ae9a8bcca36623052665b595d6de7aa209f8ae854c189cb911b2c6b5cc4a0b1c",
+    "./ARCHITECTURE_AUDIT.md": "edaca65a4a15db5c7d45144404c681e213451972464d098ce2b13a3f4e4b0a0a",
+    "./eslint.config.js": "599618a14b3379ab25b4f42c5a49a1cfafda901b1e038411790c8a912a9de42c",
+    "./src/lib/queryClient.ts": "eb72660ebc40867ec96f0e6a7eea94ddaaa7fce92355b0956afbd80abfde99d2"
+  },
+  "forbidden_code_grep_rules": [
+    {
+      "pattern": "setInterval\\s*\\(",
+      "locations": [
+        "./server/services/"
+      ],
+      "error_message": "Zabranjena je upotreba setInterval unutar novih runtime Express servisa. Koristi iskljucivo BullMQ i worker queue sisteme za asinkrone zadatke.",
+      "exemptions": [
+        "chat-archiver.service.ts",
+        "cleanup.service.ts",
+        "dashboard-lru.ts",
+        "dlq-monitoring.service.ts",
+        "dlq.worker.ts",
+        "housekeeping.service.ts",
+        "metrics.service.ts",
+        "monitoring.service.ts",
+        "outbox.worker.ts",
+        "reconciliation.service.ts",
+        "sse.service.ts",
+        "viewStatsService.ts",
+        "dashboard-prewarm.service.ts",
+        "storage-cleanup.worker.ts"
+      ]
+    },
+    {
+      "pattern": "import\\s+.*\\s+from\\s+['\"]worker_threads['\"]",
+      "locations": [
+        "./server/"
+      ],
+      "error_message": "Zabranjeno je rucno instanciranje node Workera i in-memory threadova preko 'worker_threads'. Koristi iskljucivo BullMQ integraciju.",
+      "exemptions": []
+    },
+    {
+      "pattern": "onSnapshot\\s*\\(",
+      "locations": [
+        "./src/pages/",
+        "./src/components/"
+      ],
+      "error_message": "Zabranjeni su nekontrolisani realtime onSnapshot listeneri na klijentu. Koristi TanStack Query polling sa visibility-state proveri-zasicenost zastitom ili preusmeri na Redis sync.",
+      "exemptions": [
+        "ChatWindow.tsx",
+        "useChatWindow.tsx",
+        "Chat.tsx"
+      ]
+    },
+    {
+      "pattern": "TODO:\\s*implementirati\\s*ostatak",
+      "locations": [
+        "./server/",
+        "./src/"
+      ],
+      "error_message": "🚫 AI SLOP BYPASS: Strogo je zabranjeno ostavljanje 'TODO: implementirati ostatak' komentara umesto pisanja korisnog koda. Popuni logiku odmah.",
+      "exemptions": []
+    },
+    {
+      "pattern": "\\.\\.\\.\\s*ostatak\\s*koda",
+      "locations": [
+        "./server/",
+        "./src/"
+      ],
+      "error_message": "🚫 AI SLOP TRUNCATION: Strogo je zabranjeno ostavljanje '... ostatak koda' umesto punog koda.",
+      "exemptions": []
+    }
+  ]
+}

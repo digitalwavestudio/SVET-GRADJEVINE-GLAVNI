@@ -1,0 +1,491 @@
+import { useEffect, useState, useCallback, useRef } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  onIdTokenChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile,
+  User as FirebaseUser
+} from 'firebase/auth';
+import { auth, googleProvider } from '@/src/firebase-auth';
+import { subscribeToOfflineStatus, subscribeToQuotaStatus } from '@/src/lib/errorUtils';
+import { partnerService } from '@/src/services/partnerService';
+import { User, UserRole } from '@/src/modules/core/types/user';
+import { apiClient } from '@/src/lib/apiClient';
+import { traceAsync } from '@/src/lib/performance';
+import { queryClient } from '@/src/lib/queryClient';
+import { favoritesKeys } from '@/src/modules/dashboard/hooks/useFavorites';
+
+const CACHE_KEY = 'svet_gradjevine_user_cache';
+
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {}
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {}
+  }
+};
+
+const syncUserStats = async (role: string) => {
+  try {
+    const token = await auth.currentUser?.getIdToken();
+    if (!token) return;
+    await apiClient.post('/users/init', { role });
+  } catch (e) {
+    console.warn('[AUTH] Failed to initialize user stats', e);
+  }
+};
+
+export function useAuthNode() {
+  const [user, setUser] = useState<User | null>(() => {
+    const cached = safeStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  const [isOffline, setIsOffline] = useState(false);
+  const [isQuotaExceeded, setIsQuotaExceeded] = useState(false);
+
+  // Use refs to track mounted state and subscriptions across renders without closure stale properties
+  const isMountedFn = useRef(true);
+  const currentFbUser = useRef<FirebaseUser | null>(null);
+  const unsubUserRef = useRef<(() => void) | null>(null);
+
+  // O-O (Oauth-Obfuscation) Check
+  const isBotRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+       if ((window as any).__IS_BOT__ || /bot|googlebot|crawler|spider|robot|crawling|chatgpt|claude|perplexity/i.test(navigator.userAgent)) {
+          isBotRef.current = true;
+          setLoading(false); setIsInitializing(false);
+          return;
+       }
+    }
+
+    isMountedFn.current = true;
+    
+    // Subscribe to quota and offline status changes
+    const unsubOffline = subscribeToOfflineStatus((offline) => {
+       if (isMountedFn.current) setIsOffline(offline);
+    });
+    const unsubQuota = subscribeToQuotaStatus((quota) => {
+       if (isMountedFn.current) setIsQuotaExceeded(quota);
+    });
+    
+    return () => {
+      isMountedFn.current = false;
+      unsubOffline();
+      unsubQuota();
+      if (unsubUserRef.current) unsubUserRef.current();
+    };
+  }, []);
+
+  const subscribeToUser = useCallback((firebaseUser: FirebaseUser) => {
+    if (!isMountedFn.current || !firebaseUser || isBotRef.current) return;
+    
+    if (unsubUserRef.current) {
+      unsubUserRef.current();
+    }
+
+    try {
+      const fetchUserData = async () => {
+         if (!isMountedFn.current) return;
+         
+         // 1. FAST PATH: Check Custom Claims first (Zero DB reads if we have what we need)
+         const tokenResult = await firebaseUser.getIdTokenResult();
+         const claims = tokenResult.claims;
+         
+         if (claims.role) {
+            // We have enough to show the UI
+            setUser(prev => {
+               // If we already have a user, don't revert fields that might be missing from claims
+               const baseUser = { 
+                  ...prev,
+                  id: firebaseUser.uid, 
+                  email: firebaseUser.email,
+                  emailVerified: firebaseUser.emailVerified,
+                  role: claims.role,
+                  isVerified: !!claims.isVerified,
+                  isAdmin: !!claims.admin,
+                  status: claims.suspended ? 'suspended' : 'active',
+               } as User;
+               return baseUser;
+            });
+         }
+
+         // Track Device info in background
+         try {
+           const tracked = sessionStorage.getItem('sg_device_tracked');
+           if (!tracked) {
+             apiClient.post('/auth/devices/track', {}).catch(() => {});
+             sessionStorage.setItem('sg_device_tracked', 'true');
+           }
+         } catch(e) {}
+
+         // 2. SLOW PATH: Sync full profile from server
+         const now = Date.now();
+
+         try {
+            const meData = await apiClient.get<User>('/users/me');
+            if (meData) {
+               const combinedData = { ...meData, id: firebaseUser.uid, emailVerified: firebaseUser.emailVerified } as User;
+               if (isMountedFn.current) {
+                 setUser((prev) => {
+                   const newStr = JSON.stringify(combinedData);
+                   const prevStr = prev ? JSON.stringify(prev) : null;
+                   // Essential: deep check to prevent re-render loop if data hasn't changed
+                   return newStr === prevStr ? prev : combinedData;
+                 });
+                 safeStorage.setItem(CACHE_KEY, JSON.stringify(combinedData));
+                 safeStorage.setItem('svet_gradjevine_last_sync', now.toString());
+                 setLoading(false); setIsInitializing(false);
+               }
+            } else {
+               if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
+            }
+         } catch(err: any) {
+            const error = err as any;
+            if (error?.status === 403) {
+               console.warn("User profile fetch rejected (Quota Exceeded or Forbidden)");
+            } else {
+               console.error("Error fetching user profile:", error);
+            }
+            if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
+         }
+      };
+
+      // Initial fetch
+      fetchUserData();
+
+      unsubUserRef.current = () => {};
+    } catch (err) {
+      console.error('[AUTH_NODE] Failed to subscribe to user info', err);
+      if (isMountedFn.current) { setLoading(false); setIsInitializing(false); setIsInitializing(false); }
+    }
+  }, []); // REMOVED [user] to prevent infinite loop
+
+  useEffect(() => {
+    if (isBotRef.current) return;
+
+    let initTimeout: NodeJS.Timeout | null = null;
+
+    // Guard: Pokrećemo bezbednosni timeout od 2000ms da bismo otkočili UI ukoliko Firebase Auth mrežni handshake visi (česta pojava u sandboxed iframe-ovima).
+    if (loading) {
+      initTimeout = setTimeout(() => {
+        if (isMountedFn.current) {
+          console.warn('[AUTH_GUARD] Firebase Auth initialization threshold reached (2000ms). Unblocking UI.');
+          setLoading(false);
+          setIsInitializing(false);
+        }
+      }, 2000);
+    }
+
+    const unsubscribeAuth = onIdTokenChanged(auth, async (firebaseUser) => {
+      // CLEAR TIMEOUT IMMEDIATELY when we get any signal from Firebase
+      if (initTimeout) {
+        clearTimeout(initTimeout);
+        initTimeout = null;
+      }
+
+      if (firebaseUser) {
+        currentFbUser.current = firebaseUser;
+        subscribeToUser(firebaseUser);
+      } else {
+        currentFbUser.current = null;
+        if (unsubUserRef.current) unsubUserRef.current();
+        
+        if (isMountedFn.current) {
+           setUser(null);
+           safeStorage.removeItem(CACHE_KEY);
+           safeStorage.removeItem('svet_gradjevine_last_sync');
+           setLoading(false); 
+           setIsInitializing(false);
+        }
+      }
+    });
+
+    return () => {
+      if (initTimeout) clearTimeout(initTimeout);
+      if (!isBotRef.current) unsubscribeAuth();
+    };
+  }, [subscribeToUser]);
+
+  // Auth Methods
+  const loginWithGoogle = useCallback(async (defaultRole?: string) => {
+    return traceAsync('auth_login_google', async () => {
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseUser = result.user;
+      
+      // BigQuery Auth Trace
+      apiClient.post('/telemetry/auth', {
+        userId: firebaseUser.uid,
+        authMethod: 'google',
+        eventType: 'login',
+        status: 'success'
+      }).catch(() => {});
+
+      // Enterprise Auth Init
+      try {
+         const nameParts = (firebaseUser.displayName || '').split(' ');
+         const firstName = nameParts[0] || '';
+         const lastName = nameParts.slice(1).join(' ') || '';
+         
+         await apiClient.post('/users/init', {
+           email: firebaseUser.email,
+           firstName,
+           lastName,
+           name: firebaseUser.displayName || '',
+           role: defaultRole,
+           emailVerified: firebaseUser.emailVerified
+         });
+      } catch (e) {
+         console.warn('[AUTH] Error initializing Google user backend state', e);
+      }
+    });
+  }, []);
+
+  const loginWithEmail = useCallback(async (email: string, pass: string) => {
+    return traceAsync('auth_login_email', async () => {
+      try {
+        const result = await signInWithEmailAndPassword(auth, email, pass);
+        apiClient.post('/telemetry/auth', {
+          userId: result.user.uid,
+          authMethod: 'email',
+          eventType: 'login',
+          status: 'success'
+        }).catch(() => {});
+      } catch (err) {
+        apiClient.post('/telemetry/auth', {
+          authMethod: 'email',
+          eventType: 'login',
+          status: 'failed'
+        }).catch(() => {});
+        throw err;
+      }
+    });
+  }, []);
+
+  const registerWithEmail = useCallback(async (email: string, pass: string, firstName: string, lastName: string, role: UserRole) => {
+    return traceAsync('auth_register_email', async () => {
+      const result = await createUserWithEmailAndPassword(auth, email, pass);
+      const firebaseUser = result.user;
+
+      // BigQuery Auth Trace
+      apiClient.post('/telemetry/auth', {
+        userId: firebaseUser.uid,
+        authMethod: 'email',
+        eventType: 'register',
+        status: 'success'
+      }).catch(() => {});
+
+      await updateProfile(firebaseUser, { displayName: `${firstName} ${lastName}` });
+
+      const newUser = {
+        firstName, lastName, name: `${firstName} ${lastName}`, email,
+        role, photoURL: '', status: 'active', freeAdsCount: 3,
+        isPremiumProfile: false, viewsCount: 0, emailVerified: false,
+        uid: firebaseUser.uid
+      };
+      
+      // API is still used for initialization to bootstrap robust backend state
+      await apiClient.post('/users/init', newUser);
+    });
+  }, []);
+
+  const logout = useCallback(async () => {
+    let currentUserSnapshot: User | null = null;
+    setUser(prev => { currentUserSnapshot = prev; return prev; });
+    
+    // BigQuery Auth Trace
+    if (currentUserSnapshot && (currentUserSnapshot as User).id) {
+       apiClient.post('/telemetry/auth', {
+         userId: (currentUserSnapshot as User).id,
+         eventType: 'logout',
+         status: 'success'
+       }).catch(() => {});
+    }
+
+    sessionStorage.removeItem('admin_promoted');
+    await signOut(auth);
+    setUser(null);
+    safeStorage.removeItem(CACHE_KEY);
+    safeStorage.removeItem('svet_gradjevine_last_sync');
+    
+    // Explicit Targeted Garbage Collection for user memory space
+    if (currentUserSnapshot && (currentUserSnapshot as User).id) {
+       queryClient.removeQueries({ queryKey: ['user-session', (currentUserSnapshot as User).id] });
+       queryClient.removeQueries({ queryKey: ['dashboard'] }); // bff
+    } else {
+       queryClient.removeQueries({ queryKey: ['user-session'] });
+    }
+  }, []);
+
+  const switchRole = useCallback(async () => {
+    if (!user) return;
+    try {
+      // Keep role switch via API (critical logic, handles balances/credits reset)
+      const data = await apiClient.post<{ success: boolean; newRole: UserRole }>(`/users/switch-role`);
+      if (data.success && data.newRole) {
+        setUser(prev => prev ? { ...prev, role: data.newRole } : null);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [user]);
+
+  const updateUser = useCallback(async (data: Partial<User>) => {
+    // Upotrebite ref ili updater da dobijete najnovijeg korisnika bez dependency-ja koji pravi petlje
+    let userSnapshot: User | null = null;
+    setUser(prev => {
+      userSnapshot = prev;
+      return prev;
+    });
+
+    if (!userSnapshot) return;
+    
+    const currentUser = userSnapshot as User;
+    const isAdmin = currentUser.role === 'admin' || currentUser.isAdmin || currentUser.email === 'mancoresolution@gmail.com';
+
+    let finalData = { ...data };
+    if ((data.role === 'partner' || currentUser.role === 'partner') && (!currentUser.partnerCode && !data.partnerCode)) {
+      const nameForInit = data.name || currentUser.name || currentUser.firstName || 'Partner';
+      finalData = {
+        ...finalData,
+        partnerCode: partnerService.generatePartnerCode(nameForInit),
+        partnerSlug: partnerService.generatePartnerSlug(nameForInit),
+        partnerStatus: 'active',
+        partnerClicks: 0, partnerLeads: 0, partnerConversions: 0, partnerBalance: 0
+      };
+    }
+    
+    // Optimizovano: odma apdejtuj UI optimistički i keširaj lokalno
+    const updatedUser = { ...currentUser, ...finalData };
+    setUser(updatedUser);
+    safeStorage.setItem(CACHE_KEY, JSON.stringify(updatedUser));
+
+    try {
+      if (currentFbUser.current) {
+         const sanitizedData: any = { ...finalData };
+         
+         // Adminima dozvoljavamo promenu uloge (za preview), ali je ne šaljemo u /profile update 
+         // jer se uloga čuva kao Claim u Firebase-u ili u posebnom polju koje /profile ne menja
+         const protectedFields = ['admin', 'credits', 'balance', 'package', 'packageExpiresAt', 'stats', 'createdAt', 'id', 'uid', 'email'];
+         
+         // Ako NIJE admin, štitimo i 'role'
+         if (!isAdmin) {
+            protectedFields.push('role');
+         }
+
+         protectedFields.forEach(f => delete sanitizedData[f]);
+
+         // Ako menjamo SAMO ulogu kao admin (preview mod), ne šaljemo API poziv za profil
+         if (isAdmin && Object.keys(finalData).length === 1 && finalData.role) {
+            console.log('[AUTH] Admin switching role preview, skipping backend profile sync');
+            return;
+         }
+
+         // Ako nema polja za ažuriranje nakon sanitizacije, ne šaljemo zahtev (ali smo lokalno već apdejtovali)
+         if (Object.keys(sanitizedData).length === 0) {
+            return;
+         }
+
+         await apiClient.put('/users/profile', sanitizedData);
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      // Revert if DB failed
+      setUser(currentUser); 
+      safeStorage.setItem(CACHE_KEY, JSON.stringify(currentUser));
+      throw error; 
+    }
+  }, []); // Stabilizovan dependency
+
+  const toggleSavedJob = useCallback(async (jobId: string) => {
+    let currentUserSnapshot: any = null;
+    setUser(prev => { currentUserSnapshot = prev; return prev; });
+    if (!currentUserSnapshot) return;
+
+    // Optimistic Update
+    const queryKey = favoritesKeys.user(currentUserSnapshot.id);
+    queryClient.setQueryData(queryKey, (oldData: any[]) => {
+      if (!Array.isArray(oldData)) return [];
+      const exists = oldData.some(item => item.adId === jobId);
+      if (exists) {
+        return oldData.filter(item => item.adId !== jobId);
+      } else {
+        return [...oldData, { adId: jobId, type: 'job', _type: 'job' }];
+      }
+    });
+
+    try {
+      await apiClient.post('/favorites/toggle', { adId: jobId, adType: 'job' });
+    } catch (error) {
+      console.error('[FAVORITES] Toggle job failed', error);
+      queryClient.invalidateQueries({ queryKey });
+    }
+  }, []);
+
+  const toggleSavedAd = useCallback(async (id: string, type: string) => {
+    let currentUserSnapshot: any = null;
+    setUser(prev => { currentUserSnapshot = prev; return prev; });
+    if (!currentUserSnapshot) return;
+
+    // Optimistic Update
+    const queryKey = favoritesKeys.user(currentUserSnapshot.id);
+    queryClient.setQueryData(queryKey, (oldData: any[]) => {
+      if (!Array.isArray(oldData)) return [];
+      const exists = oldData.some(item => item.adId === id || item.id === id);
+      if (exists) {
+        return oldData.filter(item => item.adId !== id && item.id !== id);
+      } else {
+        return [...oldData, { adId: id, id, type, _type: type }];
+      }
+    });
+
+    try {
+      await apiClient.post('/favorites/toggle', { adId: id, adType: type });
+    } catch (error) {
+      console.error('[FAVORITES] Toggle ad failed', error);
+      queryClient.invalidateQueries({ queryKey });
+    }
+  }, []);
+
+  const saveSearch = useCallback(async (name: string, path: string, filterParams: any) => {
+    if (!user) return;
+    const newSearch = { id: Date.now().toString(), name, path, filterParams, createdAt: Date.now() };
+    const currentSearches = user.savedSearches || [];
+    await updateUser({ savedSearches: [newSearch, ...currentSearches] });
+  }, [user, updateUser]);
+
+  const removeSearch = useCallback(async (id: string) => {
+    if (!user) return;
+    const currentSearches = user.savedSearches || [];
+    await updateUser({ savedSearches: currentSearches.filter(s => s.id !== id) });
+  }, [user, updateUser]);
+
+  const getIdToken = useCallback(async () => {
+    return await auth.currentUser?.getIdToken();
+  }, []);
+
+  return {
+    user, loading, isInitializing, isOffline, isQuotaExceeded, loginWithGoogle, loginWithEmail, registerWithEmail,
+    logout, switchRole, updateUser, getIdToken, toggleSavedJob, toggleSavedAd,
+    saveSearch, removeSearch
+  };
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Svet Građevine",
+  "description": "Enterprise platforma za građevinarstvo sa naprednim dashboard sistemom, realtime komunikacijom i optimizovanim search layerom.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
