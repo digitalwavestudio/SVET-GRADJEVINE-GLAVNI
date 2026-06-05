@@ -2,15 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useInView } from 'react-intersection-observer';
 import { useAdminUsers } from '@/src/modules/admin/hooks/useAdminUsers';
-import { useAdminStore } from '@/src/modules/admin/store/adminStore';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import { AdminAddFundsModal } from './AdminAddFundsModal';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 
 export function UsersTab() {
-  const usersSearchQuery = useAdminStore((state) => state.usersSearchQuery);
-  const setUsersSearchQuery = useAdminStore((state) => state.setUsersSearchQuery);
-  const [localQuery, setLocalQuery] = useState(usersSearchQuery);
+  const [localQuery, setLocalQuery] = useState('');
   const [fundingUser, setFundingUser] = useState<{ id: string, name: string } | null>(null);
   
   const debouncedQuery = useDebounce(localQuery, 400);
@@ -20,11 +17,6 @@ export function UsersTab() {
     rootMargin: '100px',
   });
 
-  // Update global store only after debounce
-  React.useEffect(() => {
-    setUsersSearchQuery(debouncedQuery);
-  }, [debouncedQuery, setUsersSearchQuery]);
-
   const { 
     allUsers, 
     isLoading, 
@@ -32,7 +24,7 @@ export function UsersTab() {
     isFetchingNextPage, 
     fetchUsers,
     toggleUserSuspensionMutation
-  } = useAdminUsers(usersSearchQuery);
+  } = useAdminUsers(debouncedQuery);
 
   // Trigger fetch of next page when in view
   useEffect(() => {

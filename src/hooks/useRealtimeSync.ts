@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys, dashboardKeys } from '../lib/queryKeysFactory';
 import { auth } from '../firebase-auth';
-import { onIdTokenChanged } from 'firebase/auth';
 
 export function useRealtimeSync() {
   const { user } = useAuth();
@@ -38,31 +37,15 @@ export function useRealtimeSync() {
     let fallbackInterval: NodeJS.Timeout | null = null;
     let isFallbackActive = false;
 
-    const unsubscribeAuth = onIdTokenChanged(auth, async (fbUser) => {
-      if (!active) return;
-
-      // Close previous EventSource connection if it exists
-      if (eventSource) {
-        eventSource.close();
-        eventSource = null;
-      }
-
-      if (!fbUser) {
-        return;
-      }
-
+    const initSSE = async () => {
       try {
-        const token = await fbUser.getIdToken();
+        const token = await auth.currentUser?.getIdToken();
         if (!active) return;
 
         let url = '/api/stream';
-        if (token) {
-          url += `?token=${encodeURIComponent(token)}`;
-        }
+        if (token) url += `?token=${encodeURIComponent(token)}`;
 
-        eventSource = new EventSource(url, {
-          withCredentials: true
-        });
+        eventSource = new EventSource(url, { withCredentials: true });
 
         eventSource.onmessage = (event) => {
           try {
@@ -86,7 +69,6 @@ export function useRealtimeSync() {
           if (!isFallbackActive && active) {
             console.warn('[QoS Adaptive Mode] SSE connection failed. Falling back to transient polling mechanism.');
             isFallbackActive = true;
-            
             fallbackInterval = setInterval(() => {
               if (document.visibilityState === 'visible') {
                 console.log('[QoS Polling Fallback] Syncing...');
@@ -98,17 +80,14 @@ export function useRealtimeSync() {
       } catch (err) {
         console.error('[SSE] Failed to connect:', err);
       }
-    });
+    };
+
+    initSSE();
 
     return () => {
       active = false;
-      unsubscribeAuth();
-      if (eventSource) {
-        eventSource.close();
-      }
-      if (fallbackInterval) {
-        clearInterval(fallbackInterval);
-      }
+      if (eventSource) eventSource.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
     };
   }, [user, queryClient]);
 }

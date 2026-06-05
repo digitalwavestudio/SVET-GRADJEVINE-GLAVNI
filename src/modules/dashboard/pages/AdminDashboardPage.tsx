@@ -31,7 +31,7 @@ import {
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { useAdminSettings } from '@/src/modules/admin/hooks/useAdminDashboardNode';
 import { useAdminStats } from '@/src/modules/admin/hooks/useAdminStats';
-import { useAdminStore } from '@/src/modules/admin/store/adminStore';
+import { useState } from 'react';
 import { generateSlug } from '@/src/lib/seo';
 
 const PageLoader = () => (
@@ -94,8 +94,7 @@ export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.isAdmin || user?.email === 'mancoresolution@gmail.com';
   const navigate = useNavigate();
-  const activeTab = useAdminStore((state) => state.activeTab);
-  const setActiveTab = useAdminStore((state) => state.setActiveTab);
+  const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'users' | 'verify' | 'finances' | 'support' | 'abuse' | 'marketing' | 'broadcast' | 'branding' | 'sync' | 'audit' | 'settings' | 'observability' | 'housekeeping' | 'resilience' | 'magazine'>('overview');
   
   const {
       launchMode,

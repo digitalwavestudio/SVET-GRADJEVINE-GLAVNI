@@ -4,7 +4,7 @@ import { SyncManager } from "../sync.service.ts";
 import { CacheService } from "../cache.service.ts";
 import { AdminUsersService } from "./admin-users.service.ts";
 
-import { moderationQueueResponseSchema } from "../../dto/admin.dto.ts";
+
 
 export class AdminAdsService {
   static async editListing(
@@ -97,117 +97,68 @@ export class AdminAdsService {
     const cached = await CacheService.get<{ items: any[]; nextCursor: string | null; hasMore: boolean }>(cacheKey);
     if (cached) return cached;
 
-    let listingsQuery: FirebaseFirestore.Query = db
-      .collection("listings")
+    const queryLimit = searchQ ? 100 : limitCount;
+    let listingsQuery = db.collection("listings")
       .where("status", "in", ["pending", "pending_payment"])
       .orderBy("createdAt", "desc")
-      .limit(searchQ ? 100 : limitCount);
+      .limit(queryLimit);
 
-    let mastersQuery: FirebaseFirestore.Query = db
-      .collection("users")
+    let mastersQuery = db.collection("users")
       .where("role", "==", "majstor")
       .where("status", "==", "pending")
-      .limit(searchQ ? 100 : limitCount);
+      .limit(queryLimit);
 
     if (cursorStr) {
       const cursorMillis = parseInt(cursorStr, 10);
       if (!isNaN(cursorMillis)) {
-        const firestoreCursor =
-          firebaseAdmin.firestore.Timestamp.fromMillis(cursorMillis);
+        const firestoreCursor = firebaseAdmin.firestore.Timestamp.fromMillis(cursorMillis);
         listingsQuery = listingsQuery.startAfter(firestoreCursor);
       }
     }
 
-    // 1. Listings
-    const listingsSnap = await listingsQuery.get();
+    const [listingsSnap, mastersSnap] = await Promise.all([
+      listingsQuery.get(),
+      mastersQuery.get()
+    ]);
 
-    const items = listingsSnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      _collection: "listings", 
-      _typeLabel: (doc.data().type as string | undefined)?.toUpperCase() || "OGLAS",
-      title: (doc.data().title as string | undefined) || "Bez naslova",
-    }));
+    const getTimestamp = (val: any) => val?.toMillis ? val.toMillis() : (val?._seconds ? val._seconds * 1000 : 0);
 
-    // 2. Majstori (role: majstor, status: pending)
-    const mastersSnap = await mastersQuery.get();
-
-    const mastersData = mastersSnap.docs.map(doc => {
+    const items = listingsSnap.docs.map(doc => {
       const d = doc.data();
-      return {
-        id: doc.id,
-        ...d,
-        _collection: "users",
-        _typeLabel: "MAJSTOR",
-        title:
-          d.name ||
-          `${d.firstName || ""} ${d.lastName || ""}`.trim() ||
-          "Bez naslova",
-      };
+      return { id: doc.id, ...d, _collection: "listings", _typeLabel: (d.type as string)?.toUpperCase() || "OGLAS", title: d.title || "Bez naslova", sortTime: getTimestamp(d.createdAt) };
     });
 
-    type QueueItem = {
-      id: string;
-      _collection: string;
-      _typeLabel: string;
-      title: string;
-      createdAt?: { _seconds?: number; seconds?: number; _nanoseconds?: number; nanoseconds?: number };
-      [key: string]: unknown;
-    };
+    const masters = mastersSnap.docs.map(doc => {
+      const d = doc.data();
+      return { id: doc.id, ...d, _collection: "users", _typeLabel: "MAJSTOR", title: d.name || `${d.firstName || ""} ${d.lastName || ""}`.trim() || "Bez naslova", sortTime: getTimestamp(d.createdAt) };
+    });
 
-    let combined: QueueItem[] = [...(items as unknown as QueueItem[]), ...(mastersData as unknown as QueueItem[])];
+    let combined = [...items, ...masters];
 
     if (cursorStr) {
       const cursorMillis = parseInt(cursorStr, 10);
       if (!isNaN(cursorMillis)) {
-        combined = combined.filter((i) => {
-          const secs = i.createdAt?._seconds || i.createdAt?.seconds || 0;
-          const nanos = i.createdAt?._nanoseconds || i.createdAt?.nanoseconds || 0;
-          const millis = secs * 1000 + Math.floor(nanos / 1000000);
-          return millis < cursorMillis;
-        });
+        combined = combined.filter(i => i.sortTime < cursorMillis);
       }
     }
 
     if (searchQ) {
       const lowQ = searchQ.toLowerCase();
-      combined = combined.filter((i) =>
-        i.title.toLowerCase().includes(lowQ),
-      );
+      combined = combined.filter(i => i.title.toLowerCase().includes(lowQ));
     }
 
-    combined.sort((a, b) => {
-      const dateA = (a.createdAt?._seconds || a.createdAt?.seconds || 0) as number;
-      const dateB = (b.createdAt?._seconds || b.createdAt?.seconds || 0) as number;
-      return dateB - dateA;
-    });
+    combined.sort((a, b) => b.sortTime - a.sortTime);
 
     const finalItems = combined.slice(0, limitCount);
+    const nextCursor = finalItems.length > 0 ? finalItems[finalItems.length - 1].sortTime.toString() : null;
 
-    let nextCursor = null;
-    if (finalItems.length > 0) {
-      const lastItem = finalItems[finalItems.length - 1];
-      const lastSecs =
-        lastItem.createdAt?._seconds || lastItem.createdAt?.seconds || 0;
-      const lastNanos =
-        lastItem.createdAt?._nanoseconds ||
-        lastItem.createdAt?.nanoseconds ||
-        0;
-      if (lastSecs > 0) {
-        nextCursor = (
-          lastSecs * 1000 +
-          Math.floor(lastNanos / 1000000)
-        ).toString();
-      }
-    }
-
-    const result = moderationQueueResponseSchema.parse({
+    const result = {
       items: finalItems,
       nextCursor,
-      hasMore: combined.length > limitCount,
-    });
+      hasMore: combined.length > limitCount
+    };
 
-    await CacheService.set(cacheKey, result, 60000); // 1 min cache
+    await CacheService.set(cacheKey, result, 60000);
     return result;
   }
 }
