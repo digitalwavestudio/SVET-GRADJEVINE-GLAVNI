@@ -55,7 +55,12 @@ export default function LoginPage() {
   useEffect(() => {
     if (user && !authLoading) {
       if (user.emailVerified || user.email === 'mancoresolution@gmail.com') {
-        navigate(from, { replace: true });
+        const isAdmin = user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com';
+        if (isAdmin && from === '/moj-profil') {
+          navigate('/admin', { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
       } else {
         setError('Vaš email nije potvrđen. Molimo proverite inbox.');
         // Optionally logout or just keep them here
@@ -110,8 +115,8 @@ export default function LoginPage() {
       // EMERGENCY BYPASS: If real Google login fails due to quota/network,
       // allow entry if we are in development and user is the owner.
       if (email === 'mancoresolution@gmail.com') {
-         setError("Google servis nedostupan, ali vas prepoznajemo. Prebacujem na dashboard...");
-         setTimeout(() => navigate('/moj-profil'), 1500);
+         setError("Google servis nedostupan, ali vas prepoznajemo. Prebacujem na admin hub...");
+         setTimeout(() => navigate('/admin'), 1500);
       } else {
          setError("Greška prilikom Google prijave. Ako ste unutar Preview prozora, kliknite ikonicu da otvorite aplikaciju u novom tabu.");
       }
