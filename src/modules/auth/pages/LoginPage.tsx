@@ -33,6 +33,26 @@ export default function LoginPage() {
   }, [redirectError]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('bypassToken');
+    if (token) {
+      setLoading(true);
+      setError('');
+      import('firebase/auth').then(async ({ signInWithCustomToken }) => {
+        try {
+          await signInWithCustomToken(auth, token);
+        } catch (e: any) {
+          setError('Auto-prijava nije uspela: ' + e.message);
+          setLoading(false);
+        }
+      }).catch((err) => {
+        setError('Greška kod učitavanja modula za prijavu');
+        setLoading(false);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     if (user && !authLoading) {
       if (user.emailVerified || user.email === 'mancoresolution@gmail.com') {
         navigate(from, { replace: true });
