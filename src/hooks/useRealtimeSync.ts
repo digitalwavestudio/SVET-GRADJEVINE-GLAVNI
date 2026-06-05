@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys, dashboardKeys } from '../lib/queryKeysFactory';
 import { auth } from '../firebase';
+import { onIdTokenChanged } from 'firebase/auth';
 
 export function useRealtimeSync() {
   const { user } = useAuth();
@@ -37,9 +38,21 @@ export function useRealtimeSync() {
     let fallbackInterval: NodeJS.Timeout | null = null;
     let isFallbackActive = false;
 
-    const connectSSE = async () => {
+    const unsubscribeAuth = onIdTokenChanged(auth, async (fbUser) => {
+      if (!active) return;
+
+      // Close previous EventSource connection if it exists
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
+
+      if (!fbUser) {
+        return;
+      }
+
       try {
-        const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
+        const token = await fbUser.getIdToken();
         if (!active) return;
 
         let url = '/api/stream';
@@ -67,6 +80,7 @@ export function useRealtimeSync() {
           console.warn('[SSE] EventSource error', err);
           if (eventSource) {
             eventSource.close();
+            eventSource = null;
           }
           
           if (!isFallbackActive && active) {
@@ -84,12 +98,11 @@ export function useRealtimeSync() {
       } catch (err) {
         console.error('[SSE] Failed to connect:', err);
       }
-    };
-
-    connectSSE();
+    });
 
     return () => {
       active = false;
+      unsubscribeAuth();
       if (eventSource) {
         eventSource.close();
       }
