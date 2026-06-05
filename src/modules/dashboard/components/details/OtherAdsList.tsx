@@ -2,6 +2,8 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { AnimatePresence, motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { MachineAdData } from '../../types/ads';
+import { DashboardAdStatusBadge } from './shared/DashboardAdStatusBadge';
+import { DashboardAdActions } from './shared/DashboardAdActions';
 
 interface OtherAdsListProps {
   ads: MachineAdData[];
@@ -113,17 +115,7 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
               </div>
 
               <div>
-                {ad.status === 'pending' ? (
-                  <span className="flex items-center gap-2 text-yellow-500 font-black text-[10px] tracking-widest uppercase bg-yellow-500/10 px-3 py-1 rounded-full w-fit">
-                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
-                    Na čekanju
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2 text-green-500 font-black text-[10px] tracking-widest uppercase bg-green-500/10 px-3 py-1 rounded-full w-fit">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                    Aktivan
-                  </span>
-                )}
+                <DashboardAdStatusBadge status={ad.status} />
               </div>
               
               <div className="text-sm font-black text-white tracking-tighter">
@@ -144,46 +136,16 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                     <span className="material-symbols-outlined text-lg">visibility</span>
                   </Link>
                 )}
-                  <>
-                    <button 
-                      onClick={() => onPromote(ad.id, ad.collName || '', false)}
-                      className={`w-10 h-10 rounded-[10px] flex items-center justify-center transition-all ${ad.isPremium ? 'bg-secondary text-slate-950 font-bold' : 'bg-white/5 text-secondary hover:bg-secondary hover:text-slate-950'}`}
-                      title={ad.isPremium ? 'Premium oglas' : 'Izdvoj kao Premium'}
-                    >
-                      <span className="material-symbols-outlined text-lg" style={ad.isPremium ? { fontVariationSettings: "'FILL' 1" } : {}}>hotel_class</span>
-                    </button>
-                    <button 
-                      onClick={() => onPromote(ad.id, ad.collName || '', true)}
-                      className={`w-10 h-10 rounded-[10px] flex items-center justify-center transition-all ${ad.isUrgent ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'bg-white/5 text-orange-500 hover:bg-orange-500 hover:text-white'}`}
-                      title={ad.isUrgent ? 'Hitno' : 'Označi kao Hitno'}
-                    >
-                      <span className="material-symbols-outlined text-lg" style={ad.isUrgent ? { fontVariationSettings: "'FILL' 1" } : {}}>bolt</span>
-                    </button>
-                  </>
-                <Link 
-                  to={`/postavi-oglas?type=${ad.postType}&edit=${ad.id}`} 
-                  className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all"
-                >
-                  <span className="material-symbols-outlined text-lg">edit</span>
-                </Link>
-
-                {ad.status === 'pending' && (
-                  <button 
-                    onClick={() => onApprove(ad.id)}
-                    className="w-10 h-10 rounded-[10px] bg-green-500/10 text-green-500 flex items-center justify-center hover:bg-green-500 hover:text-white transition-all shadow-[0_0_15px_rgba(34,197,94,0.2)]"
-                    title="Aktiviraj (Simulacija uplate)"
-                  >
-                    <span className="material-symbols-outlined text-lg">check_circle</span>
-                  </button>
-                )}
-                <button 
-                  onClick={() => onDelete(ad.id)}
-                  className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-error hover:text-white transition-all"
-                  title="Obriši"
-                >
-                  <span className="material-symbols-outlined text-lg">delete</span>
-                </button>
-              </div>
+                  
+                  <DashboardAdActions 
+                    ad={ad} 
+                    size="sm" 
+                    collection={ad.collName || ''} 
+                    onPromote={onPromote} 
+                    onApprove={onApprove} 
+                    onDelete={onDelete} 
+                  />
+                </div>
             </motion.div>
             );
           })}

@@ -28,35 +28,42 @@ export function VerifyTab() {
     staleTime: 5 * 60 * 1000, // 5 minuta
   });
 
-  const handleAction = async (
-    requestId: string,
-    action: "approve" | "reject",
-  ) => {
-    const comment =
-      action === "reject" ? prompt("Razlog odbijanja:") : "Odobreno";
-    if (action === "reject" && !comment) return;
-
-    setProcessingId(requestId);
-    try {
-      await apiClient.post(`/verification/requests/${requestId}/process`, {
-        action,
-        comment,
-      });
-      queryClient.setQueryData(
+  const processRequestMutation = useMutation({
+    mutationFn: async ({ requestId, action, comment }: { requestId: string; action: "approve" | "reject"; comment: string }) => {
+      return apiClient.post(`/verification/requests/${requestId}/process`, { action, comment });
+    },
+    onMutate: async ({ requestId }) => {
+      setProcessingId(requestId);
+      await queryClient.cancelQueries({ queryKey: queryKeys.admin.verificationRequests });
+      const previousRequests = queryClient.getQueryData<VerificationRequest[]>(queryKeys.admin.verificationRequests);
+      
+      queryClient.setQueryData<VerificationRequest[]>(
         queryKeys.admin.verificationRequests,
-        (old: VerificationRequest[] | undefined) =>
-          old ? old.filter((r) => r.id !== requestId) : [],
+        (old) => old ? old.filter((r) => r.id !== requestId) : []
       );
-      alert(
-        action === "approve"
-          ? "Korisnik je verifikovan!"
-          : "Zahtev je odbijen.",
-      );
-    } catch (err: any) {
-      alert("Greška pri obradi: " + (err.response?.data?.error || err.message));
-    } finally {
+      
+      return { previousRequests };
+    },
+    onError: (err: any, variables, context) => {
+      if (context?.previousRequests) {
+        queryClient.setQueryData(queryKeys.admin.verificationRequests, context.previousRequests);
+      }
+      alert("Greška pri obradi: " + (err?.response?.data?.error || err.message));
+    },
+    onSuccess: (data, variables) => {
+      alert(variables.action === "approve" ? "Korisnik je verifikovan!" : "Zahtev je odbijen.");
+    },
+    onSettled: () => {
       setProcessingId(null);
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.verificationRequests });
     }
+  });
+
+  const handleAction = async (requestId: string, action: "approve" | "reject") => {
+    const comment = action === "reject" ? prompt("Razlog odbijanja:") : "Odobreno";
+    if (action === "reject" && !comment) return;
+    
+    processRequestMutation.mutate({ requestId, action, comment });
   };
 
   if (isLoading) {

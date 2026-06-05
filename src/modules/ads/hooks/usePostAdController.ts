@@ -17,6 +17,7 @@ import { dashboardKeys } from '@/src/lib/queryKeysFactory';
 import { getValidationSchema, getAutoTitle } from '@/src/modules/ads/utils/adUtils';
 import { applyPayloadTransform } from '@/src/modules/ads/hooks/usePostAdControllerPayload';
 import { usePostAdStore } from '@/src/modules/ads/stores/usePostAdStore';
+import { mapEditItemToFormData } from '@/src/modules/ads/utils/adMappers';
 
 const COOLDOWN_SECONDS = 60;
 const LAST_POST_KEY = 'svet_gradjevine_last_post_time';
@@ -279,7 +280,7 @@ interface MarketplaceData {
 
 type AdItemData = PlotData | MachineData | CompanyData | AccommodationData | CateringData | JobData | MarketplaceData;
 
-interface AdFormData {
+export interface AdFormData {
   location: string;
   tacnaLokacija: string;
   opis: string;
@@ -341,14 +342,7 @@ interface AdFormData {
   const { trigger, reset, watch, setValue, getValues, handleSubmit: rhfHandleSubmit } = methods;
   const formData = watch();
 
-  useEffect(() => {
-    // Sync to Zustand
-    const subscription = methods.watch((value) => {
-      setFormDataStore(value as AdFormData);
-    });
-    return () => subscription.unsubscribe();
-  }, [methods.watch, setFormDataStore]);
-
+  // Removed aggressive debounced sync. Draft is saved manually when changing steps.
   useEffect(() => {
     if (!editId) {
       const draft = localStorage.getItem('postAdDraft');
@@ -361,16 +355,6 @@ interface AdFormData {
       }
     }
   }, [editId]);
-
-  useEffect(() => {
-    if (!showDraftPrompt && !editId && formData) {
-      const timer = setTimeout(() => {
-        localStorage.setItem('postAdDraft', JSON.stringify({ category: selectedCategory, step, formData }));
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [formData, selectedCategory, step, showDraftPrompt, editId]);
 
   useEffect(() => {
     const lastPost = localStorage.getItem(LAST_POST_KEY);
@@ -412,251 +396,26 @@ interface AdFormData {
 
   useEffect(() => {
     if (hasPopulatedEditRef.current || !editItem) return;
-    
-    // Virtual arrays to mock previously used context lists
-    const mockPlots = editType === 'plac' || editType === 'placevi' ? [editItem] : [];
-    const mockMachines = editType === 'masine' || editType === 'machine' || editType === 'gradjevinske-masine' ? [editItem] : [];
-    const mockCompanies = editType === 'company' || editType === 'firma' || editType === 'poslodavac' ? [editItem] : [];
-    const mockAccommodations = editType === 'accommodation' || editType === 'smeštaj' ? [editItem] : [];
-    const mockCaterings = editType === 'catering' || editType === 'ketering' ? [editItem] : [];
-    const mockJobs = editType === 'job' || editType === 'posao' ? [editItem] : [];
 
-    if (editFlag === 'true' && editId && editItem) {
-      const item = editItem;
-      if (editType === 'plac' || editType === 'placevi') {
-        const plotToEdit = item as PlotData;
-        if (plotToEdit && plotToEdit.id === editId) {
-          setSelectedCategory('plot');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...methods.getValues(),
-            location: plotToEdit.location || '',
-            tacnaLokacija: plotToEdit.address || '',
-            opis: plotToEdit.description || '',
-            phone: plotToEdit.contact?.phone || '',
-            email: plotToEdit.contact?.email || '',
-            images: plotToEdit.images || [],
-            paket: plotToEdit.isPremium ? 'premium' : (plotToEdit.isUrgent ? 'urgent' : 'free'),
-            plotArea: plotToEdit.area?.toString() || '',
-            plotAreaUnit: (plotToEdit.areaUnit === 'ha' ? 'ha' : 'ari') as 'ari' | 'ha',
-            plotPrice: plotToEdit.price?.toString() || '',
-            plotCurrency: plotToEdit.currency || 'EUR',
-            plotPurpose: plotToEdit.purpose || 'građevinsko',
-            plotInfrastructure: { 
-              struja: !!(plotToEdit.infrastructure as { electricity?: boolean })?.electricity,
-              voda: !!(plotToEdit.infrastructure as { water?: boolean })?.water,
-              kanalizacija: !!(plotToEdit.infrastructure as { sewer?: boolean })?.sewer,
-              gas: !!(plotToEdit.infrastructure as { gas?: boolean })?.gas,
-              optika: !!(plotToEdit.infrastructure as { internet?: boolean })?.internet 
-            },
-            plotAccessRoad: (plotToEdit.accessRoad === 'tucanik' ? 'tucanik' : (plotToEdit.accessRoad === 'zemlja' ? 'zemljani' : 'asfalt')) as 'asfalt' | 'tucanik' | 'zemljani',
-            plotCadastralNumber: plotToEdit.cadastralNumber || '',
-            plotCadastralMunicipality: plotToEdit.cadastralMunicipality || '',
-            plotOccupancy: plotToEdit.occupancy?.toString() || '',
-            plotBuildabilityIndex: plotToEdit.buildabilityIndex?.toString() || '',
-            plotMaxFloors: plotToEdit.maxFloors?.toString() || '',
-            plotNotes: plotToEdit.notes || '',
-            plotDocs: plotToEdit.docs?.length ? plotToEdit.docs : [{ label: '', url: '' }],
-            plotHeating: plotToEdit.heating || false,
-            plotTelephone: plotToEdit.telephone || false,
-            plotTechnicalWater: plotToEdit.technicalWater || false,
-            plotDrinkingWater: plotToEdit.drinkingWater || false,
-            plotRailAccess: plotToEdit.railAccess || false,
-            plotHighwayAccess: plotToEdit.highwayAccess || false,
-            plotAirportAccess: plotToEdit.airportAccess || false,
-            plotPlannedPurpose: plotToEdit.plannedPurpose || '',
-            plotMinParcelSize: plotToEdit.minParcelSize?.toString() || '',
-            plotMaxParcelSize: plotToEdit.maxParcelSize?.toString() || '',
-            plotBuildingHeight: plotToEdit.buildingHeight?.toString() || '',
-            plotParkingStandard: plotToEdit.parkingStandard || '',
-            plotProductionParkingStandard: plotToEdit.productionParkingStandard || '',
-            plotParcelNumbers: plotToEdit.parcelNumbers || '',
-            plotMunicipalityName: plotToEdit.municipalityName || '',
-            plotPopulationEstimate: plotToEdit.populationEstimate?.toString() || '',
-            plotAverageSalary: plotToEdit.averageSalary?.toString() || '',
-            plotMarketValueEstimate: plotToEdit.marketValueEstimate || '',
-            plotDevelopmentFeeBusiness: plotToEdit.developmentFeeBusiness || '',
-            plotDevelopmentFeeResidential: plotToEdit.developmentFeeResidential || '',
-            plotFreeZone: plotToEdit.freeZone || false,
-            plotGreenEnergySuitable: plotToEdit.greenEnergySuitable || false
-          });
-        }
-      } else if (editType === 'masine' || editType === 'machine' || editType === 'gradjevinske-masine') {
-        const machineToEdit = item as any as MachineData;
-        if (machineToEdit && machineToEdit.id === editId) {
-          setSelectedCategory('machines');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...getValues(),
-            machBrand: machineToEdit.manufacturer || '',
-            machModel: machineToEdit.modelstr || '',
-            machCategory: machineToEdit.categoryId || '',
-            machSubCategory: machineToEdit.subcategoryId || '',
-            machYear: machineToEdit.year || '',
-            machPower: machineToEdit.powerKw || '',
-            machHours: machineToEdit.workingHours || '',
-            machFuel: machineToEdit.fuelType || '',
-            machAdType: (machineToEdit.adType === 'iznajmljivanje' ? 'iznajmljivanje' : 'prodaja') as 'prodaja' | 'iznajmljivanje',
-            machPrice: machineToEdit.price !== 'Na upit' ? machineToEdit.price : '',
-            machPricePerDay: machineToEdit.pricePerDay || '',
-            machOperator: (machineToEdit.operatorIncluded ? 'sa-rukovaocem' : 'bez-rukovaoca') as 'bez-rukovaoca' | 'sa-rukovaocem',
-            machWeight: machineToEdit.weightKg || '',
-            machWeightKg: machineToEdit.weightKg?.toString() || '',
-            machLengthMm: machineToEdit.lengthMm?.toString() || '',
-            machWidthMm: machineToEdit.widthMm?.toString() || '',
-            machHeightMm: machineToEdit.heightMm?.toString() || '',
-            machLoadCapacityKg: machineToEdit.loadCapacityKg?.toString() || '',
-            machBucketCapacityM3: machineToEdit.bucketCapacityM3?.toString() || '',
-            machMaxDigDepthMm: machineToEdit.maxDigDepthMm?.toString() || '',
-            machMaxReachMm: machineToEdit.maxReachMm?.toString() || '',
-            machServiceHistory: machineToEdit.serviceHistory || '',
-            machVideoUrl: machineToEdit.videoUrl || '',
-            location: machineToEdit.locationSlug || '',
-            phone: machineToEdit.phone || '',
-            whatsapp: machineToEdit.whatsapp || false,
-            images: machineToEdit.images || [],
-            paket: machineToEdit.isPremium ? 'premium' : (machineToEdit.isUrgent ? 'urgent' : 'free')
-          });
-        }
-      } else if (editType === 'company' || editType === 'firma' || editType === 'poslodavac') {
-        const companyToEdit = item as any as CompanyData;
-        if (companyToEdit && companyToEdit.id === editId) {
-          setSelectedCategory('company');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...getValues(),
-            companyName: companyToEdit.name || '',
-            companyPIB: companyToEdit.pib || '',
-            companyAddress: companyToEdit.address || '',
-            location: companyToEdit.locationSlug || '',
-            phone: companyToEdit.phone || '',
-            companyWorkingHours: companyToEdit.workingHours || '',
-            companyDescription: companyToEdit.description || '',
-            companyDescriptionValue: companyToEdit.description || '',
-            companyMainCats: companyToEdit.mainCategories || [],
-            companySubCats: companyToEdit.subCategories || [],
-            companyCoverage: (companyToEdit.coverageType === 'regional' || companyToEdit.coverageType === 'national' || companyToEdit.coverageType === 'international') ? companyToEdit.coverageType : 'local',
-            companyCoverageValue: companyToEdit.coverageValue || '',
-            companyIG: companyToEdit.instagram || '',
-            companyFB: companyToEdit.facebook || '',
-            companyWeb: companyToEdit.website || '',
-            companyLogo: companyToEdit.logo || '',
-            images: companyToEdit.images || [],
-            companyEmployees: companyToEdit.employeeCount || '1-5',
-            companyPortfolioImages: companyToEdit.portfolioImages || [],
-            companyReferences: companyToEdit.references?.join('\n') || '',
-            companyLicenses: companyToEdit.licenses?.join('\n') || '',
-            companyCertifications: companyToEdit.certifications?.join('\n') || '',
-            companyEquipmentSummary: companyToEdit.equipmentSummary || '',
-            companyTeamSpecialties: companyToEdit.teamSpecialties?.join('\n') || '',
-            paket: companyToEdit.isPremium ? 'premium' : (companyToEdit.isUrgent ? 'urgent' : 'free')
-          });
-        }
-      } else if (editType === 'smestaj' || editType === 'accommodation') {
-        const accToEdit = item as any as AccommodationData;
-        if (accToEdit && accToEdit.id === editId) {
-          setSelectedCategory('accommodation');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...getValues(),
-            accType: accToEdit.typeSlug || '',
-            location: accToEdit.locationSlug || '',
-            totalBeds: accToEdit.totalBeds?.toString() || '',
-            availableBeds: accToEdit.availableBeds?.toString() || '',
-            price: accToEdit.price || '',
-            priceType: accToEdit.priceType || 'perPerson',
-            amenities: accToEdit.amenities || [],
-            opis: accToEdit.description || '',
-            images: accToEdit.images || [],
-            paket: accToEdit.isPremium ? 'premium' : (accToEdit.isUrgent ? 'urgent' : 'free'),
-            accDistanceToSiteKm: accToEdit.distanceToSiteKm?.toString() || '',
-            accParkingAvailable: accToEdit.parkingAvailable || false,
-            accTruckAccess: accToEdit.truckAccess || false,
-            accLaundryAvailable: accToEdit.laundryAvailable || false,
-            accKitchenAvailable: accToEdit.kitchenAvailable || false,
-            accWifiAvailable: accToEdit.wifiAvailable || false,
-            accAirConditioning: accToEdit.airConditioning || false,
-            accInvoiceAvailable: accToEdit.invoiceAvailable || false,
-            accMinStayDays: accToEdit.minStayDays?.toString() || '',
-            accContactPhone: accToEdit.contactPhone || ''
-          });
-        }
-      } else if (editType === 'ketering' || editType === 'catering') {
-        const catToEdit = item as any as CateringData & { telefon?: string, contactPhone?: string };
-        if (catToEdit && catToEdit.id === editId) {
-          setSelectedCategory('catering');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...getValues(),
-            catTitle: catToEdit.title || '',
-            catKitchenType: catToEdit.kitchenType || '',
-            location: catToEdit.locationSlug || '',
-            tacnaLokacija: catToEdit.tacnaLokacija || '',
-            catMinOrder: catToEdit.minOrder?.toString() || '',
-            catPricePerMeal: catToEdit.pricePerMeal || '',
-            catDeliveryZone: catToEdit.deliveryZone || '',
-            amenities: catToEdit.amenities || [],
-            opis: catToEdit.description || '',
-            phone: catToEdit.telefon || catToEdit.contactPhone || '',
-            images: catToEdit.images || [],
-            paket: catToEdit.isPremium ? 'premium' : (catToEdit.isUrgent ? 'urgent' : 'free'),
-            catInvoiceAvailable: catToEdit.invoiceAvailable || false,
-            catHaccpCertified: catToEdit.haccpCertified || false,
-            catPackagingIncluded: catToEdit.packagingIncluded || false,
-            catDailyCapacityMeals: catToEdit.dailyCapacityMeals?.toString() || '',
-            catContactPhone: catToEdit.contactPhone || '',
-            catMenuItems: catToEdit.menuItems?.join('\n') || ''
-          });
-        }
-      } else if (editId && (editType === 'job' || editType === 'posao')) {
-        const jobToEdit = item as any as JobData & { sal?: string, salary?: string, telefon?: string, phone?: string };
-        if (jobToEdit) {
-          const salStr = jobToEdit.sal || jobToEdit.salary || '';
-          const salParts = salStr.toString().replace('€', '').split(' — ');
-          const min = salParts[0]?.trim();
-          const max = salParts[1]?.trim();
-          
-          setSelectedCategory('job');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...getValues(),
-            sector: jobToEdit.sectorSlug || '',
-            profession: jobToEdit.professionSlug || '',
-            location: jobToEdit.locationSlug || '',
-            plataMin: min || '',
-            plataMax: max || '',
-            dinamikaIsplate: 'mesecna', 
-            iskustvo: jobToEdit.experienceSlug || '',
-            tipAngazmana: jobToEdit.engagementSlug || 'puno-radno-vreme',
-            benefiti: jobToEdit.benefits || [],
-            opis: jobToEdit.description || '', 
-            phone: jobToEdit.telefon || jobToEdit.phone || '',
-            email: '',
-            paket: jobToEdit.isPremium ? 'premium' : 'free'
-          });
-        }
-      } else if (editType === 'marketplace' || editType === 'berza' || editType === 'alat-i-oprema') {
-        const marketToEdit = item as any as MarketplaceData & { telefon?: string, phone?: string }; 
-        if (marketToEdit && marketToEdit.id === editId) {
-          setSelectedCategory('marketplace');
-          hasPopulatedEditRef.current = true;
-          reset({
-            ...getValues(),
-            title: marketToEdit.title || '',
-            marketCategory: marketToEdit.marketCategory || '',
-            marketCondition: marketToEdit.marketCondition || 'new',
-            marketValue: marketToEdit.price || '',
-            location: marketToEdit.locationSlug || '',
-            tacnaLokacija: marketToEdit.address || '',
-            opis: marketToEdit.description || '',
-            images: marketToEdit.images || [],
-            phone: marketToEdit.phone || marketToEdit.telefon || '',
-            paket: marketToEdit.isPremium ? 'premium' : (marketToEdit.isUrgent ? 'urgent' : 'free')
-          });
-        }
+    if (editFlag === 'true' && editId && editType) {
+      const mappedData = mapEditItemToFormData(editType, editId, editItem, getValues);
+      
+      if (mappedData) {
+        hasPopulatedEditRef.current = true;
+        
+        // Map original string type to categories internally used here
+        if (editType === 'plac' || editType === 'placevi') setSelectedCategory('plot');
+        else if (editType === 'masine' || editType === 'machine' || editType === 'gradjevinske-masine') setSelectedCategory('machines');
+        else if (editType === 'company' || editType === 'firma' || editType === 'poslodavac') setSelectedCategory('company');
+        else if (editType === 'smestaj' || editType === 'accommodation') setSelectedCategory('accommodation');
+        else if (editType === 'ketering' || editType === 'catering') setSelectedCategory('catering');
+        else if (editType === 'job' || editType === 'posao') setSelectedCategory('job');
+        else if (editType === 'marketplace' || editType === 'berza' || editType === 'alat-i-oprema') setSelectedCategory('marketplace');
+        
+        reset(mappedData);
       }
     }
-  }, [editItem, editFlag, editId, editType, getValues, reset]);
+  }, [editItem, editFlag, editId, editType, getValues, reset, setSelectedCategory]);
 
 
   const onFormSubmit = async (data: AdFormData) => {

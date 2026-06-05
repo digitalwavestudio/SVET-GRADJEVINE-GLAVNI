@@ -24,7 +24,8 @@ export function UsersTab({}: UsersTabProps) {
     isLoading, 
     hasMore, 
     isFetchingNextPage, 
-    fetchUsers 
+    fetchUsers,
+    toggleUserSuspensionMutation
   } = useAdminUsers(debouncedQuery);
 
   // Trigger fetch of next page when in view
@@ -142,19 +143,14 @@ export function UsersTab({}: UsersTabProps) {
                                 <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
                              </button>
                              <button 
-                               onClick={async () => {
+                               onClick={() => {
                                  const reason = window.prompt("Razlog za promenu statusa/suspenziju:");
                                  if (!reason) return;
-                                 try {
-                                   const { auth: firebaseAuth } = await import('@/src/firebase');
-                                   const token = await firebaseAuth.currentUser?.getIdToken();
-                                   const res = await fetch(`/api/admin/users/${u.id}/suspend`, {
-                                     method: 'POST',
-                                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                                     body: JSON.stringify({ status: u.status === 'suspended' ? 'active' : 'suspended', reason })
-                                   });
-                                   if (res.ok) alert("Status korisnika uspešno promenjen!");
-                                 } catch (err) { alert("Greška pri operaciji"); }
+                                 toggleUserSuspensionMutation.mutate({ 
+                                    userId: u.id, 
+                                    newStatus: u.status === 'suspended' ? 'active' : 'suspended', 
+                                    reason 
+                                 });
                                }}
                                className={`w-10 h-10 rounded-[10px] transition-all flex items-center justify-center p-0 border ${
                                  u.status === 'suspended' ? 'bg-green-500/10 text-green-500 border-green-500/30 hover:bg-green-500 hover:text-white' : 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white'

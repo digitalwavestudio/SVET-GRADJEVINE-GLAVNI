@@ -160,12 +160,14 @@ export function ObservabilityTab() {
   };
 
   const handleRetry = async (id: string, source: string) => {
-    try {
-      console.log(`Retrying task ${id} from ${source}`);
-      alert(`Retry triggered for task ${id}. Logic needs to be implemented in Backend.`);
-    } catch (err) {
-      console.error(err);
-    }
+    retryMutation.mutate({ id, source }, {
+      onSuccess: () => {
+         alert(`Retry triggered for task ${id}.`);
+      },
+      onError: (err: any) => {
+         alert("Greška pri retry-u: " + (err.message || 'Nepoznata greška'));
+      }
+    });
   };
 
   return (

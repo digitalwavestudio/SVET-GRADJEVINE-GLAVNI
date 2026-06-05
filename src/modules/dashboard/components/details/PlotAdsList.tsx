@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { REAL_ESTATE_PURPOSES } from '@/src/constants/taxonomy';
 import { MachineAdData } from '../../types/ads';
+import { DashboardAdStatusBadge } from './shared/DashboardAdStatusBadge';
+import { DashboardAdActions } from './shared/DashboardAdActions';
 
 interface PlotAdsListProps {
   ads: MachineAdData[];
@@ -43,15 +45,7 @@ export function PlotAdsList({ ads, onPromote, onApprove, onDelete }: PlotAdsList
             >
             <div className="flex-1 w-full">
               <div className="flex flex-wrap items-center gap-3 mb-3">
-                {ad.status === 'pending' ? (
-                  <span className="flex items-center gap-1.5 text-yellow-500 font-black text-[9px] tracking-widest uppercase bg-yellow-500/10 px-3 py-1.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span> Na čekanju
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5 text-green-500 font-black text-[9px] tracking-widest uppercase bg-green-500/10 px-3 py-1.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Aktivan
-                  </span>
-                )}
+                <DashboardAdStatusBadge status={ad.status} />
                 
                 {ad.plotPurpose && (
                   <span className="bg-white/5 border border-white/10 text-white/70 font-black text-[9px] tracking-widest uppercase px-3 py-1.5 rounded-full">
@@ -99,26 +93,15 @@ export function PlotAdsList({ ads, onPromote, onApprove, onDelete }: PlotAdsList
             </div>
 
               <div className="flex items-center gap-2 w-full xl:w-auto mt-4 xl:mt-0 pt-4 xl:pt-0 border-t border-white/5 xl:border-none">
-                <>
-                  <button onClick={() => onPromote(ad.id, 'real_estate', false)} className={`w-12 h-12 rounded-[10px] flex items-center justify-center transition-all ${ad.isPremium ? 'bg-secondary text-slate-950 font-bold' : 'bg-white/5 text-secondary hover:bg-secondary hover:text-slate-950'}`} title={ad.isPremium ? 'Premium oglas' : 'Izdvoj kao Premium'}>
-                    <span className="material-symbols-outlined text-xl" style={ad.isPremium ? { fontVariationSettings: "'FILL' 1" } : {}}>hotel_class</span>
-                  </button>
-                  <button onClick={() => onPromote(ad.id, 'real_estate', true)} className={`w-12 h-12 rounded-[10px] flex items-center justify-center transition-all ${ad.isUrgent ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'bg-white/5 text-orange-500 hover:bg-orange-500 hover:text-white'}`} title={ad.isUrgent ? 'Hitno' : 'Označi kao Hitno'}>
-                    <span className="material-symbols-outlined text-xl" style={ad.isUrgent ? { fontVariationSettings: "'FILL' 1" } : {}}>bolt</span>
-                  </button>
-                </>
-              <Link to={`/postavi-oglas?type=plac&edit=${ad.id}`} className="w-12 h-12 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all xl:flex-none" title="Izmeni plac">
-                <span className="material-symbols-outlined text-xl">edit</span>
-              </Link>
-              {ad.status === 'pending' && (
-                <button onClick={() => onApprove(ad.id)} className="w-12 h-12 rounded-[10px] bg-green-500/10 text-green-500 flex items-center justify-center hover:bg-green-500 hover:text-white transition-all shadow-[0_0_15px_rgba(34,197,94,0.2)] xl:flex-none" title="Aktiviraj (Simulacija uplate)">
-                  <span className="material-symbols-outlined text-xl">check_circle</span>
-                </button>
-              )}
-              <button onClick={() => onDelete(ad.id)} className="w-12 h-12 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-error hover:text-white transition-all xl:flex-none" title="Obriši plac">
-                <span className="material-symbols-outlined text-xl">delete</span>
-              </button>
-            </div>
+                <DashboardAdActions 
+                  ad={ad} 
+                  size="md" 
+                  collection="real_estate" 
+                  onPromote={onPromote} 
+                  onApprove={onApprove} 
+                  onDelete={onDelete} 
+                />
+              </div>
           </motion.div>
           );
         })}

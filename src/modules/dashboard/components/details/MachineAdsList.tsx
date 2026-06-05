@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { FUEL_TYPES } from '@/src/constants/machineTaxonomy';
 import { MachineAdData } from '../../types/ads';
+import { DashboardAdStatusBadge } from './shared/DashboardAdStatusBadge';
+import { DashboardAdActions } from './shared/DashboardAdActions';
 
 interface MachineAdsListProps {
   ads: MachineAdData[];
@@ -70,15 +72,7 @@ export function MachineAdsList({ ads, onPromote, onApprove, onDelete }: MachineA
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                   <div>
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
-                      {ad.status === 'pending' ? (
-                        <span className="flex items-center gap-1.5 text-yellow-500 font-black text-[9px] tracking-widest uppercase bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
-                          <span className="w-1 h-1 rounded-full bg-yellow-500 animate-pulse"></span> Na čekanju
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 text-green-500 font-black text-[9px] tracking-widest uppercase bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-                          <span className="w-1 h-1 rounded-full bg-green-500"></span> Aktivan
-                        </span>
-                      )}
+                      <DashboardAdStatusBadge status={ad.status} />
                       {ad.isPremium && <span className="bg-white/10 text-white font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-full border border-white/10 flex items-center gap-1"><span className="material-symbols-outlined text-[10px] text-[#ffad3a]">star</span> Premium</span>}
                       {ad.isUrgent && <span className="bg-orange-500/20 text-orange-500 font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-full border border-orange-500/20 flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">bolt</span> Hitno</span>}
                     </div>
@@ -143,46 +137,14 @@ export function MachineAdsList({ ads, onPromote, onApprove, onDelete }: MachineA
                         PREGLED
                       </Link>
                       
-                      <Link 
-                        to={`/postavi-oglas?type=machine&edit=${ad.id}`}
-                        className="flex-1 md:flex-none h-12 px-6 bg-[#ffad3a]/10 border border-[#ffad3a]/20 rounded-[10px] flex items-center justify-center text-[10px] font-black text-[#ffad3a] uppercase tracking-widest hover:bg-[#ffad3a] hover:text-black transition-all gap-2 shadow-lg shadow-[#ffad3a]/10"
-                      >
-                        <span className="material-symbols-outlined text-base">edit_note</span>
-                        IZMENI
-                      </Link>
-
-                      <button 
-                        onClick={() => onPromote(ad.id, 'machines', false)}
-                        className={`h-12 w-12 rounded-[10px] flex items-center justify-center transition-all ${ad.isPremium ? 'bg-secondary text-slate-950 font-bold' : 'bg-white/5 text-secondary border border-white/10 hover:bg-secondary hover:border-secondary hover:text-slate-950'}`}
-                        title={ad.isPremium ? 'Premium oglas' : 'Izdvoj kao Premium'}
-                      >
-                        <span className="material-symbols-outlined text-xl" style={ad.isPremium ? { fontVariationSettings: "'FILL' 1" } : {}}>hotel_class</span>
-                      </button>
-                      
-                      <button 
-                        onClick={() => onPromote(ad.id, 'machines', true)}
-                        className={`h-12 w-12 rounded-[10px] flex items-center justify-center transition-all ${ad.isUrgent ? 'bg-orange-500 border border-orange-500 text-white shadow-sm shadow-orange-500/20' : 'bg-white/5 border border-white/10 text-orange-500 hover:bg-orange-500 hover:border-orange-500 hover:text-white'}`}
-                        title={ad.isUrgent ? 'Hitno' : 'Označi kao Hitno'}
-                      >
-                        <span className="material-symbols-outlined text-xl" style={ad.isUrgent ? { fontVariationSettings: "'FILL' 1" } : {}}>bolt</span>
-                      </button>
-
-                      {ad.status === 'pending' && (
-                        <button 
-                          onClick={() => onApprove(ad.id)}
-                          className="h-12 w-12 bg-green-500/10 border border-green-500/20 rounded-[10px] flex items-center justify-center text-green-500 hover:bg-green-500 hover:text-white transition-all shadow-sm shadow-green-500/10"
-                          title="Aktiviraj (Simulacija)"
-                        >
-                          <span className="material-symbols-outlined text-xl">check_circle</span>
-                        </button>
-                      )}
-
-                      <button 
-                        onClick={() => onDelete(ad.id)}
-                        className="h-12 w-12 bg-red-500/10 border border-red-500/20 rounded-[10px] flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"
-                      >
-                        <span className="material-symbols-outlined text-xl">delete_sweep</span>
-                      </button>
+                      <DashboardAdActions 
+                        ad={ad} 
+                        size="md" 
+                        collection="machines" 
+                        onPromote={onPromote} 
+                        onApprove={onApprove} 
+                        onDelete={onDelete} 
+                      />
                     </div>
                   </div>
               </div>

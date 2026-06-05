@@ -13,78 +13,9 @@ import { z } from 'zod';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '@/src/lib/apiClient';
 
-import { Laptop, Phone, Fingerprint } from 'lucide-react';
-
-const SessionManager = () => {
-  const [sessions, setSessions] = React.useState<Record<string, unknown>[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const res = await apiClient.get<Record<string, unknown>>('/auth/devices');
-        if (Array.isArray(res.sessions)) setSessions(res.sessions as Record<string, unknown>[]);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSessions();
-  }, []);
-
-  const revokeOthers = async () => {
-    try {
-      await apiClient.post('/auth/devices/revoke-others', {});
-      toast.success('Sve ostale sesije su prekinute.');
-      const res = await apiClient.get<Record<string, unknown>>('/auth/devices');
-      if (Array.isArray(res.sessions)) setSessions(res.sessions as Record<string, unknown>[]);
-    } catch (e) {
-      toast.error('Došlo je do greške prilikom prekidanja sesija.');
-    }
-  };
-
-  return (
-    <div className="bg-[#121A21] rounded-[10px] p-6 sm:p-8 border border-white/5 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-xl text-white font-black uppercase tracking-widest font-heading mb-2">Aktivne Sesije</h3>
-          <p className="text-gray-400 text-sm">Upravljajte uređajima koji trenutno imaju pristup Vašem nalogu.</p>
-        </div>
-        <button 
-          onClick={revokeOthers}
-          className="bg-red-500/10 text-red-500 border border-red-500/20 px-6 py-2 rounded-[10px] hover:bg-red-500/20 transition-all text-xs font-black uppercase tracking-wider"
-        >
-          Odjavi sve ostale uređaje
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        {loading ? (
-          <div className="h-20 flex items-center justify-center"><div className="w-5 h-5 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div></div>
-        ) : sessions.length === 0 ? (
-          <div className="text-gray-500 text-sm text-center py-4">Nema aktivnih sesija.</div>
-        ) : (
-          sessions.map((session, i) => (
-            <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/5">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400">
-                   {String(session.userAgent || '').includes('Mobile') ? <Phone size={18} /> : <Laptop size={18} />}
-                </div>
-                <div>
-                  <div className="text-white text-sm font-medium">{String(session.userAgent || 'Nepoznat uređaj')}</div>
-                  <div className="text-gray-500 text-xs mt-1">Zadnja aktivnost:{' '}
-                    {new Date(((session as { lastActive?: string | number | Date })?.lastActive as string | number | Date)).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-};
+import { ProfileSettingsTab } from './components/settings/ProfileSettingsTab';
+import { NotificationSettingsTab } from './components/settings/NotificationSettingsTab';
+import { SecuritySettingsTab } from './components/settings/SecuritySettingsTab';
 
 export default function SettingsPage() {
   const { user, updateUser } = useAuth();
@@ -349,203 +280,14 @@ export default function SettingsPage() {
               : "space-y-6"
             }>
               {activeSection === 'profile' && (
-                <motion.div 
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-10"
-                >
-                  <div className="flex flex-col md:flex-row gap-8 items-start pb-10 border-b border-white/5">
-                    <div className="relative group">
-                      <div className="w-40 h-40 rounded-[10px] bg-white flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-secondary transition-all p-2 shadow-2xl">
-                        {formData.photoURL ? (
-                          <OptimizedImage 
-                            src={formData.photoURL} 
-                            fallbackType="default" 
-                            alt="Profilna slika" 
-                            className="w-full h-full object-contain rounded-[5px]" 
-                            containerClassName="w-full h-full"
-                          /> 
-                            
-                        ) : (
-                          <span className="text-6xl font-black text-slate-950">{formData.name.charAt(0)}</span>
-                        )}
-                      </div>
-                      <button 
-                        onClick={() => fileInputRef.current?.click()}
-                        className="absolute -bottom-3 -right-3 w-12 h-12 bg-secondary text-slate-950 rounded-[10px] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
-                      >
-                        <input 
-                          type="file" 
-                          ref={fileInputRef} 
-                          onChange={handleFileChange} 
-                          className="hidden" 
-                          accept="image/*"
-                        />
-                        <span className="material-symbols-outlined text-xl">photo_camera</span>
-                      </button>
-                    </div>
-                    <div className="flex-1 space-y-4">
-                      <h3 className="text-2xl font-black text-white uppercase tracking-tight">IDENTITET NA PLATFORMI</h3>
-                      <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-relaxed">
-                        OVE INFORMACIJE SU JAVNE I POMAŽU KLIJENTIMA DA VAS PRONAĐU. FOTOGRAFIJA JE KLJUČNA ZA POVERENJE. <span className="text-secondary opacity-60">(LIMIT: 100KB)</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">IME I PREZIME</label>
-                        <input 
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          placeholder="npr. Marko Perić"
-                          className={`w-full bg-white/[0.03] border ${errors.name ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none`}
-                        />
-                        {errors.name && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.name}</p>}
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">TELEFON ZA KONTAKT</label>
-                        <input 
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          placeholder="npr. +381 60 123 4567"
-                          className={`w-full bg-white/[0.03] border ${errors.phone ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none`}
-                        />
-                        {errors.phone && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.phone}</p>}
-                      </div>
-                    </div>
-
-                    {user?.role === 'poslodavac' && (
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">NAZIV FIRME</label>
-                        <input 
-                          name="company"
-                          value={formData.company}
-                          onChange={handleInputChange}
-                          placeholder="npr. ENERGOPROJEKT D.O.O."
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                        />
-                      </div>
-                    )}
-                    
-                    {user?.role !== 'standard' && user?.role !== 'poslodavac' && (
-                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">VAŠA PROFESIJA / SPECIJALNOST</label>
-                         <input 
-                           name="profession"
-                           value={formData.profession}
-                           onChange={handleInputChange}
-                           placeholder="npr. Keramičar, Tesar, Šef gradilišta..."
-                           className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                         />
-                       </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">KRATAK OPIS / O NAMA</label>
-                      <textarea 
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        rows={4}
-                        placeholder="Opišite vaše iskustvo, misiju ili usluge koje nudite..."
-                        className={`w-full bg-white/[0.03] border ${errors.description ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none resize-none`}
-                      />
-                      {errors.description && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.description}</p>}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">FACEBOOK PROFIL / STRANICA</label>
-                          <input 
-                            name="facebook"
-                            value={formData.facebook}
-                            onChange={handleInputChange}
-                            placeholder="facebook.com/vas-profil"
-                            className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                          />
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">INSTAGRAM PROFIL</label>
-                          <input 
-                            name="instagram"
-                            value={formData.instagram}
-                            onChange={handleInputChange}
-                            placeholder="@vas_profil"
-                            className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                          />
-                       </div>
-                    </div>
-
-                    {(user?.role === 'poslodavac' || user?.role === 'majstor') && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-white/5 pt-8 mt-8">
-                        <div className="md:col-span-2">
-                          <h4 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-secondary">verified_user</span>
-                            APR Verifikacija i Licence
-                          </h4>
-                          <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-relaxed mb-6">
-                            Unesite vaše poslovne podatke i licence kako biste dobili "TRUST ENGINE" bedž na vašem profilu. Ovi podaci se verifikuju od strane administracije.
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Matični Broj (MB)</label>
-                          <input 
-                            name="mb"
-                            value={formData.mb}
-                            onChange={handleInputChange}
-                            placeholder="npr. 12345678"
-                            className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">PIB</label>
-                          <input 
-                            name="pib"
-                            value={formData.pib}
-                            onChange={handleInputChange}
-                            placeholder="npr. 101234567"
-                            className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                          />
-                        </div>
-                        <div className="md:col-span-2 space-y-2">
-                          <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Selektor Inženjerskih i Izvođačkih Licenci</label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                            {['Licenca 300', 'Licenca 310', 'Licenca 410', 'Licenca 411', 'Licenca 800', 'Majstorsko pismo', 'Sertifikat ISO', 'Ostale komorske licence'].map((lic) => (
-                              <label key={lic} className="flex items-center gap-3 cursor-pointer group bg-white/[0.02] border border-white/5 p-4 rounded-[10px] hover:border-secondary transition-colors">
-                                <input 
-                                  type="checkbox"
-                                  className="w-4 h-4 rounded-[4px] border-white/20 bg-transparent text-secondary focus:ring-secondary/20 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
-                                  checked={formData.licences.includes(lic)}
-                                  onChange={(e) => {
-                                    if (e.target.checked) setFormData(p => ({ ...p, licences: [...p.licences, lic] }));
-                                    else setFormData(p => ({ ...p, licences: p.licences.filter(l => l !== lic) }));
-                                  }}
-                                />
-                                <span className="text-[11px] font-bold text-white/70 group-hover:text-white transition-colors uppercase tracking-wider">{lic}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="pt-6 border-t border-white/5">
-                      <div className="space-y-2 max-w-md">
-                        <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">EMAIL ADRESA (PRIVATNO)</label>
-                        <input 
-                          name="email"
-                          value={formData.email}
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-4 px-6 text-sm font-bold tracking-widest uppercase opacity-40 cursor-not-allowed outline-none"
-                          disabled
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                <ProfileSettingsTab 
+                  formData={formData}
+                  errors={errors}
+                  user={user}
+                  fileInputRef={fileInputRef}
+                  handleInputChange={handleInputChange}
+                  handleFileChange={handleFileChange}
+                />
               )}
 
               {activeSection === 'cv' && (
@@ -583,84 +325,13 @@ export default function SettingsPage() {
                 </motion.div>
               )}
 
-              {activeSection === 'security' && (
-                <motion.div 
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-8"
-                >
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">TRENUTNA LOZINKA</label>
-                      <input 
-                        type="password"
-                        name="currentPassword"
-                        className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-4 px-6 text-xs font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">NOVA LOZINKA</label>
-                        <input 
-                          type="password"
-                          name="newPassword"
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-4 px-6 text-xs font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">POTVRDI LOZINKU</label>
-                        <input 
-                          type="password"
-                          name="confirmPassword"
-                          className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-4 px-6 text-xs font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-6 bg-blue-500/5 border border-blue-500/10 rounded-[10px]">
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="material-symbols-outlined text-blue-500 text-lg">info</span>
-                      <h4 className="text-[10px] font-black text-blue-500 uppercase tracking-widest">SAVET ZA BEZBEDNOST</h4>
-                    </div>
-                    <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider leading-relaxed">
-                      LOZINKA TREBA DA SADRŽI NAJMANJE 8 KARAKTERA, UKLJUČUJUĆI BROJEVE I SPECIJALNE ZNAKOVE.
-                    </p>
-                  </div>
-
-                  <SessionManager />
-                </motion.div>
-              )}
+              {activeSection === 'security' && <SecuritySettingsTab />}
 
               {activeSection === 'notifications' && (
-                <motion.div 
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  {[
-                    { key: 'email', label: 'EMAIL NOTIFIKACIJE', desc: 'PRIMAJTE OBAVEŠTENJA O NOVIM PORUKAMA I PRIJAVAMA NA EMAIL.' },
-                    { key: 'browser', label: 'BROWSER NOTIFIKACIJE', desc: 'DOZVOLITE APLIKACIJI DA ŠALJE OBAVEŠTENJA DOK JE OTVORENA.' },
-                    { key: 'sms', label: 'SMS OBAVEŠTENJA', desc: 'PRIMAJTE HITNA OBAVEŠTENJA PUTEM SMS PORUKA.' },
-                    { key: 'marketing', label: 'MARKETING I PONUDE', desc: 'PRIMAJTE INFORMACIJE O NOVIM PAKETIMA I PROMOCIJAMA.' },
-                  ].map((item) => (
-                    <div key={item.key} className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-[10px]">
-                      <div className="space-y-1">
-                        <h4 className="text-[11px] font-black text-white uppercase tracking-tight">{item.label}</h4>
-                        <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest">{item.desc}</p>
-                      </div>
-                      <button 
-                        onClick={() => toggleNotification(item.key as "email" | "marketing" | "browser" | "sms")}
-                        className={`w-12 h-6 rounded-full transition-all relative ${notifications[item.key as keyof typeof notifications] ? 'bg-secondary' : 'bg-white/10'}`}
-                      >
-                        <motion.div 
-                          animate={{ x: notifications[item.key as keyof typeof notifications] ? 24 : 4 }}
-                          className={`absolute top-1 w-4 h-4 rounded-full ${notifications[item.key as keyof typeof notifications] ? 'bg-slate-950' : 'bg-white/40'}`}
-                        />
-                      </button>
-                    </div>
-                  ))}
-                </motion.div>
+                <NotificationSettingsTab 
+                  notifications={notifications}
+                  toggleNotification={toggleNotification}
+                />
               )}
 
               <div className="mt-12 pt-8 border-t border-white/5 flex justify-end gap-4">

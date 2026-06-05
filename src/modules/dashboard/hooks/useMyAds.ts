@@ -87,8 +87,98 @@ export function useMyAds(userId: string | undefined, searchQuery?: string) {
   };
 }
 
+async function performOptimisticUpdate({
+  queryClient,
+  userId,
+  user,
+  id,
+  action,
+}: {
+  queryClient: import('@tanstack/react-query').QueryClient;
+  userId: string;
+  user: any;
+  id: string;
+  action: "delete" | "approve" | "reject";
+}) {
+  const cacheKey = myAdsKeys.user(userId);
+  await queryClient.cancelQueries({ queryKey: cacheKey });
+  await queryClient.cancelQueries({ queryKey: factoryQueryKeys.ads.all });
+
+  const prevData = queryClient.getQueryData<InfiniteData<PaginatedAds>>(cacheKey);
+
+  let originalStatus: string | undefined = undefined;
+  if (prevData) {
+    for (const page of prevData.pages) {
+      const found = page.docs.find((ad) => ad.id === id);
+      if (found) {
+        originalStatus = found.status;
+        break;
+      }
+    }
+  }
+
+  const previousAds = prevData ? JSON.parse(JSON.stringify(prevData)) : undefined;
+
+  queryClient.setQueryData<InfiniteData<PaginatedAds>>(cacheKey, (old) => {
+    if (!old) return old;
+    return {
+      ...old,
+      pages: old.pages.map((page) => ({
+        ...page,
+        docs: action === "delete" 
+          ? page.docs.filter((ad) => ad.id !== id)
+          : page.docs.map((ad) => ad.id === id ? { ...ad, status: action === "approve" ? "active" : "rejected" } : ad),
+      })),
+    };
+  });
+
+  let originalBffData: unknown = undefined;
+  let bffKey: readonly unknown[] | null = null;
+  if (user?.id) {
+    const currentUser = user as { role?: string; userType?: string; id: string };
+    const role = currentUser.role || currentUser.userType || "";
+    bffKey = dashboardKeys.bff(role, currentUser.id);
+    originalBffData = queryClient.getQueryData(bffKey);
+    
+    if (originalBffData) {
+      queryClient.setQueryData(bffKey, (old: unknown) => {
+        if (!old) return old;
+        const typedOld = old as { stats?: { activeAds?: number; totalAds?: number; pendingAds?: number } };
+        const updatedStats = { ...(typedOld.stats || {}) };
+        
+        if (action === "delete") {
+          const statusToDecrease = originalStatus || "active";
+          if (statusToDecrease === "active") {
+            if (typeof updatedStats.activeAds === "number") updatedStats.activeAds = Math.max(0, updatedStats.activeAds - 1);
+            if (typeof updatedStats.totalAds === "number") updatedStats.totalAds = Math.max(0, updatedStats.totalAds - 1);
+          } else if (statusToDecrease === "pending" || statusToDecrease === "pending_payment") {
+            if (typeof updatedStats.pendingAds === "number") updatedStats.pendingAds = Math.max(0, updatedStats.pendingAds - 1);
+            if (typeof updatedStats.totalAds === "number") updatedStats.totalAds = Math.max(0, updatedStats.totalAds - 1);
+          } else {
+            if (typeof updatedStats.totalAds === "number") updatedStats.totalAds = Math.max(0, updatedStats.totalAds - 1);
+          }
+        } else if (action === "approve") {
+          if (typeof updatedStats.activeAds === "number") updatedStats.activeAds += 1;
+          if (originalStatus === "pending" || originalStatus === "pending_payment") {
+            if (typeof updatedStats.pendingAds === "number") updatedStats.pendingAds = Math.max(0, updatedStats.pendingAds - 1);
+          }
+        } else if (action === "reject") {
+          if (originalStatus === "active") {
+            if (typeof updatedStats.activeAds === "number") updatedStats.activeAds = Math.max(0, updatedStats.activeAds - 1);
+          } else if (originalStatus === "pending" || originalStatus === "pending_payment") {
+            if (typeof updatedStats.pendingAds === "number") updatedStats.pendingAds = Math.max(0, updatedStats.pendingAds - 1);
+          }
+        }
+        
+        return { ...typedOld, stats: updatedStats };
+      });
+    }
+  }
+
+  return { previousAds, originalBffData, bffKey };
+}
+
 export function useMyAdsMutations(userId: string | undefined) {
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const updateAdStatus = async (id: string, status: string) => {
@@ -108,73 +198,7 @@ export function useMyAdsMutations(userId: string | undefined) {
     },
     onMutate: async ({ id }) => {
       if (!userId) return;
-
-      const cacheKey = myAdsKeys.user(userId);
-      // Cancel active outgoings to protect against stale list refetches
-      await queryClient.cancelQueries({ queryKey: cacheKey });
-      await queryClient.cancelQueries({ queryKey: factoryQueryKeys.ads.all });
-
-      const prevData = queryClient.getQueryData<InfiniteData<PaginatedAds>>(cacheKey);
-      
-      let originalStatus: string | undefined = undefined;
-      if (prevData) {
-        for (const page of prevData.pages) {
-          const found = page.docs.find((ad) => ad.id === id);
-          if (found) {
-            originalStatus = found.status;
-            break;
-          }
-        }
-      }
-
-      // Enterprise optimistic update workflow: Kloniranje trenutnog grid stanja 100% da se spreči mutacija po referenci
-      const previousAds = prevData ? JSON.parse(JSON.stringify(prevData)) : undefined;
-
-      // OPTIMISTIC UPDATE: Evict the deleted ad from the list immediately for smooth UX
-      queryClient.setQueryData<InfiniteData<PaginatedAds>>(cacheKey, (old) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page) => ({
-            ...page,
-            docs: page.docs.filter((ad) => ad.id !== id),
-          })),
-        };
-      });
-
-      // Atomic cache update for dynamic Dashboard BFF Response
-      let originalBffData: unknown = undefined;
-      let bffKey: readonly unknown[] | null = null;
-      if (user?.id) {
-        const currentUser = user as { role?: string; userType?: string; id: string };
-        const role = currentUser.role || currentUser.userType || "";
-        bffKey = dashboardKeys.bff(role, currentUser.id);
-        originalBffData = queryClient.getQueryData(bffKey);
-        
-        if (originalBffData) {
-          queryClient.setQueryData(bffKey, (old: unknown) => {
-            if (!old) return old;
-            const typedOld = old as { stats?: { activeAds?: number; totalAds?: number; pendingAds?: number } };
-            const updatedStats = { ...(typedOld.stats || {}) };
-            const statusToDecrease = originalStatus || "active";
-            if (statusToDecrease === "active") {
-              if (typeof updatedStats.activeAds === "number") updatedStats.activeAds = Math.max(0, updatedStats.activeAds - 1);
-              if (typeof updatedStats.totalAds === "number") updatedStats.totalAds = Math.max(0, updatedStats.totalAds - 1);
-            } else if (statusToDecrease === "pending" || statusToDecrease === "pending_payment") {
-              if (typeof updatedStats.pendingAds === "number") updatedStats.pendingAds = Math.max(0, updatedStats.pendingAds - 1);
-              if (typeof updatedStats.totalAds === "number") updatedStats.totalAds = Math.max(0, updatedStats.totalAds - 1);
-            } else {
-              if (typeof updatedStats.totalAds === "number") updatedStats.totalAds = Math.max(0, updatedStats.totalAds - 1);
-            }
-            return {
-              ...typedOld,
-              stats: updatedStats
-            };
-          });
-        }
-      }
-
-      return { previousAds, originalBffData, bffKey };
+      return performOptimisticUpdate({ queryClient, userId, user, id, action: "delete" });
     },
     onError: (err, variables, context) => {
       if (!navigator.onLine) {
@@ -209,72 +233,7 @@ export function useMyAdsMutations(userId: string | undefined) {
     },
     onMutate: async ({ id }) => {
       if (!userId) return;
-
-      const cacheKey = myAdsKeys.user(userId);
-      await queryClient.cancelQueries({ queryKey: cacheKey });
-      await queryClient.cancelQueries({ queryKey: factoryQueryKeys.ads.all });
-
-      const prevData = queryClient.getQueryData<InfiniteData<PaginatedAds>>(cacheKey);
-
-      let originalStatus: string | undefined = undefined;
-      if (prevData) {
-        for (const page of prevData.pages) {
-          const found = page.docs.find((ad) => ad.id === id);
-          if (found) {
-            originalStatus = found.status;
-            break;
-          }
-        }
-      }
-
-      // Enterprise optimistic update workflow: Kloniranje
-      const previousAds = prevData ? JSON.parse(JSON.stringify(prevData)) : undefined;
-
-      // OPTIMISTIC UPDATE
-      queryClient.setQueryData<InfiniteData<PaginatedAds>>(cacheKey, (old) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page) => ({
-            ...page,
-            docs: page.docs.map((ad) =>
-              ad.id === id ? { ...ad, status: "active" } : ad,
-            ),
-          })),
-        };
-      });
-
-      // Atomic cache update for dynamic Dashboard BFF Response
-      let originalBffData: unknown = undefined;
-      let bffKey: readonly unknown[] | null = null;
-      if (user?.id) {
-        const currentUser = user as { role?: string; userType?: string; id: string };
-        const role = currentUser.role || currentUser.userType || "";
-        bffKey = dashboardKeys.bff(role, currentUser.id);
-        originalBffData = queryClient.getQueryData(bffKey);
-        
-        if (originalBffData) {
-          queryClient.setQueryData(bffKey, (old: unknown) => {
-            if (!old) return old;
-            const typedOld = old as { stats?: { activeAds?: number; pendingAds?: number } };
-            const updatedStats = { ...(typedOld.stats || {}) };
-            if (typeof updatedStats.activeAds === "number") {
-              updatedStats.activeAds = updatedStats.activeAds + 1;
-            }
-            if (originalStatus === "pending" || originalStatus === "pending_payment") {
-              if (typeof updatedStats.pendingAds === "number") {
-                updatedStats.pendingAds = Math.max(0, updatedStats.pendingAds - 1);
-              }
-            }
-            return {
-              ...typedOld,
-              stats: updatedStats
-            };
-          });
-        }
-      }
-
-      return { previousAds, originalBffData, bffKey };
+      return performOptimisticUpdate({ queryClient, userId, user, id, action: "approve" });
     },
     onError: (err, variables, context) => {
       if (userId && context?.previousAds) {
@@ -306,71 +265,7 @@ export function useMyAdsMutations(userId: string | undefined) {
     },
     onMutate: async ({ id }) => {
       if (!userId) return;
-
-      const cacheKey = myAdsKeys.user(userId);
-      await queryClient.cancelQueries({ queryKey: cacheKey });
-
-      const prevData = queryClient.getQueryData<InfiniteData<PaginatedAds>>(cacheKey);
-
-      let originalStatus: string | undefined = undefined;
-      if (prevData) {
-        for (const page of prevData.pages) {
-          const found = page.docs.find((ad) => ad.id === id);
-          if (found) {
-            originalStatus = found.status;
-            break;
-          }
-        }
-      }
-
-      // Enterprise optimistic update workflow: Kloniranje
-      const previousAds = prevData ? JSON.parse(JSON.stringify(prevData)) : undefined;
-
-      queryClient.setQueryData<InfiniteData<PaginatedAds>>(cacheKey, (old) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pages: old.pages.map((page) => ({
-            ...page,
-            docs: page.docs.map((ad) =>
-              ad.id === id ? { ...ad, status: "rejected" } : ad,
-            ),
-          })),
-        };
-      });
-
-      // Atomic cache update for dynamic Dashboard BFF Response
-      let originalBffData: unknown = undefined;
-      let bffKey: readonly unknown[] | null = null;
-      if (user?.id) {
-        const currentUser = user as { role?: string; userType?: string; id: string };
-        const role = currentUser.role || currentUser.userType || "";
-        bffKey = dashboardKeys.bff(role, currentUser.id);
-        originalBffData = queryClient.getQueryData(bffKey);
-        
-        if (originalBffData) {
-          queryClient.setQueryData(bffKey, (old: unknown) => {
-            if (!old) return old;
-             const typedOld = old as { stats?: { activeAds?: number; pendingAds?: number } };
-            const updatedStats = { ...(typedOld.stats || {}) };
-            if (originalStatus === "active") {
-              if (typeof updatedStats.activeAds === "number") {
-                updatedStats.activeAds = Math.max(0, updatedStats.activeAds - 1);
-              }
-            } else if (originalStatus === "pending" || originalStatus === "pending_payment") {
-              if (typeof updatedStats.pendingAds === "number") {
-                updatedStats.pendingAds = Math.max(0, updatedStats.pendingAds - 1);
-              }
-            }
-            return {
-              ...typedOld,
-              stats: updatedStats
-            };
-          });
-        }
-      }
-
-      return { previousAds, originalBffData, bffKey };
+      return performOptimisticUpdate({ queryClient, userId, user, id, action: "reject" });
     },
     onError: (err, variables, context) => {
       if (userId && context?.previousAds) {
