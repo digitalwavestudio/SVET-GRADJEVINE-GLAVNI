@@ -371,9 +371,9 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                   {checkouts.map((ctx, idx) => (
                     <div
                       key={ctx.id || idx}
-                      className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-[10px] hover:bg-white/[0.04] transition-colors"
+                      className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-[10px] hover:bg-white/[0.04] transition-colors"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 w-full md:w-auto">
                         <div
                           className={`w-10 h-10 rounded-[10px] flex items-center justify-center ${
                             ctx.status === "confirmed"
@@ -405,7 +405,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right flex items-center gap-6">
+                      <div className="text-left md:text-right flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t border-white/5 md:border-0 pt-3 md:pt-0">
                         <div>
                           <div className="text-sm font-black text-white">
                             €{ctx.amount.toFixed(2)}

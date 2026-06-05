@@ -276,7 +276,7 @@ export default function SettingsPage() {
             <ProfileHealth score={liveScore} hideButton={true} />
             
             <div className={activeSection === 'profile' || activeSection === 'security' || activeSection === 'notifications' 
-              ? "bg-[#0A0F14] border border-white/5 rounded-[10px] p-10" 
+              ? "bg-[#0A0F14] border border-white/5 rounded-[10px] p-4 md:p-10" 
               : "space-y-6"
             }>
               {activeSection === 'profile' && (
@@ -334,12 +334,12 @@ export default function SettingsPage() {
                 />
               )}
 
-              <div className="mt-12 pt-8 border-t border-white/5 flex justify-end gap-4">
-                <button className="px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase text-white/40 hover:text-white transition-all">ODUSTANI</button>
+              <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-end gap-4">
+                <button className="w-full md:w-auto px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase text-white/40 hover:text-white transition-all">ODUSTANI</button>
                 <button 
                   onClick={handleSave}
                   disabled={isSaving || user?.syncStatus === 'syncing'}
-                  className="bg-secondary text-slate-950 font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full md:w-auto bg-secondary text-slate-950 font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                   {isSaving && <Spinner className="w-4 h-4" />}
                   {isSaving ? 'ČUVANJE...' : user?.syncStatus === 'syncing' ? 'SINHRONIZACIJA...' : 'SAČUVAJ IZMENE'}

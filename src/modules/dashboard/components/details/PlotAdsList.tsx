@@ -85,14 +85,14 @@ export function PlotAdsList({ ads, onPromote, onApprove, onDelete }: PlotAdsList
                     {REAL_ESTATE_PURPOSES.find(p => p.id === ad.purpose || p.slug === ad.purpose)?.name || ad.purpose}
                   </span>
                 )}
-                <span className="flex items-center gap-2 border-l border-white/10 pl-6 text-white/70" title="Pregledi">
+                <span className="flex items-center gap-2 md:border-l border-white/10 md:pl-6 text-white/70" title="Pregledi">
                   <span className="material-symbols-outlined text-[14px] text-white/40">visibility</span>
                   {ad.viewsCount || 0} PREGLEDA
                 </span>
               </div>
             </div>
 
-              <div className="flex items-center gap-2 w-full xl:w-auto mt-4 xl:mt-0 pt-4 xl:pt-0 border-t border-white/5 xl:border-none">
+              <div className="flex flex-col md:flex-row md:items-center justify-stretch md:justify-start gap-2 w-full xl:w-auto mt-4 xl:mt-0 pt-4 xl:pt-0 border-t border-white/5 xl:border-none">
                 <DashboardAdActions 
                   ad={ad} 
                   size="md" 

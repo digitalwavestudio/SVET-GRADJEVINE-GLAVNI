@@ -30,7 +30,7 @@ export function AdminHeader({ activeTab }: AdminHeaderProps) {
   };
 
   return (
-    <header className="relative h-[220px] flex items-center mb-12 overflow-hidden rounded-[10px] bg-surface-container-low border border-white/5 p-12">
+    <header className="relative min-h-[150px] md:h-[220px] flex items-center mb-6 md:mb-12 overflow-hidden rounded-[10px] bg-surface-container-low border border-white/5 p-6 md:p-12">
       {/* Background decoration for admin signature */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none"></div>
@@ -41,13 +41,13 @@ export function AdminHeader({ activeTab }: AdminHeaderProps) {
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         className="relative z-10 flex-1"
       >
-        <div className="flex items-center gap-3 text-secondary text-[10px] font-black tracking-[0.4em] uppercase mb-6">
+        <div className="flex items-center gap-2 md:gap-3 text-secondary text-[8px] md:text-[10px] font-black tracking-[0.2em] md:tracking-[0.4em] uppercase mb-4 md:mb-6">
           <span className="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_rgba(254,191,13,0.5)]"></span>
           SISTEM MODERACIJA OPERATIVAN
         </div>
-        <div className="flex items-center gap-6">
-          <img src={logoImage} alt="Svet Građevine Logo" className="h-12 w-auto object-contain brightness-110" />
-          <h2 className="text-6xl font-black tracking-[-0.05em] uppercase leading-none text-white italic">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+          <img src={logoImage} alt="Svet Građevine Logo" className="h-8 md:h-12 w-auto object-contain brightness-110 self-start md:self-auto" />
+          <h2 className="text-3xl md:text-6xl font-black tracking-[-0.05em] uppercase leading-none text-white italic">
             {tabTitles[activeTab] || 'ADMIN PANEL'}
           </h2>
         </div>

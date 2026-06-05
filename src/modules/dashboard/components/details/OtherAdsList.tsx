@@ -26,7 +26,7 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
         </div>
       )}
       <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] overflow-hidden">
-        <div className="p-8 border-b border-white/5 bg-white/[0.01]">
+        <div className="hidden md:block p-8 border-b border-white/5 bg-white/[0.01]">
           <div className="grid grid-cols-6 gap-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">
             <div className="col-span-2">NASLOV I TIP</div>
             <div>STATUS</div>
@@ -54,10 +54,10 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                   damping: 28,
                   mass: 0.8
                 }}
-                className="p-8 grid grid-cols-6 gap-4 items-center hover:bg-white/[0.02] transition-all group"
+                className="p-4 md:p-8 flex flex-col md:grid md:grid-cols-6 gap-4 md:items-center border-b border-white/5 md:border-0 hover:bg-white/[0.02] transition-all group"
               >
-              <div className="col-span-2 flex items-center gap-6">
-                <div className="w-14 h-14 bg-white/5 rounded-[10px] flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-secondary/30 transition-all font-black text-white/20 text-xl group-hover:bg-secondary/10 group-hover:text-secondary shrink-0">
+              <div className="md:col-span-2 flex items-center gap-4 md:gap-6">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-white/5 rounded-[10px] flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-secondary/30 transition-all font-black text-white/20 text-xl group-hover:bg-secondary/10 group-hover:text-secondary shrink-0">
                   {ad.logo ? (
                     <OptimizedImage 
                       src={ad.logo} 
@@ -114,19 +114,22 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                 </div>
               </div>
 
-              <div>
+              <div className="mt-2 md:mt-0 flex md:block items-center justify-between">
+                <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">STATUS</span>
                 <DashboardAdStatusBadge status={ad.status} />
               </div>
               
-              <div className="text-sm font-black text-white tracking-tighter">
+              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter">
+                <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">PREGLEDI</span>
                 {ad.viewsCount || 0}
               </div>
 
-              <div className="text-sm font-black text-white tracking-tighter">
+              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter">
+                <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">PRIJAVE / UPITI</span>
                 {ad.applicantsCount || 0}
               </div>
               
-                <div className="text-right flex justify-end gap-3">
+                <div className="text-right flex justify-start md:justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t border-white/5 md:border-0">
                 {ad.collName === 'companies' && (
                   <Link 
                     to={`/firma/${ad.id}`} 

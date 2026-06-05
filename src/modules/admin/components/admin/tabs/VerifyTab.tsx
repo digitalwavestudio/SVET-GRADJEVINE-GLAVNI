@@ -98,10 +98,10 @@ export function VerifyTab() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-white/[0.02]">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full block md:table">
+             <thead className="hidden md:table-header-group">
+                <tr className="bg-white/[0.02]">
                 <th className="px-10 py-6 text-left text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
                   KORISNIK / DOKUMENTA
                 </th>
@@ -116,12 +116,12 @@ export function VerifyTab() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="block md:table-row-group divide-y md:divide-y-0 divide-white/5">
               {requests.length === 0 ? (
-                <tr>
+                <tr className="block md:table-row">
                   <td
                     colSpan={4}
-                    className="px-10 py-20 text-center text-[10px] font-black text-white/20 uppercase tracking-widest"
+                    className="block md:table-cell px-10 py-20 text-center text-[10px] font-black text-white/20 uppercase tracking-widest"
                   >
                     NEMA ZAHTEVA NA ČEKANJU
                   </td>
@@ -130,10 +130,10 @@ export function VerifyTab() {
                 requests.map((r) => (
                   <tr
                     key={r.id}
-                    className="hover:bg-white/[0.01] transition-colors"
+                    className="block md:table-row border-b border-white/5 p-4 md:p-0 hover:bg-white/[0.01] transition-colors relative"
                   >
-                    <td className="px-10 py-8">
-                      <div className="flex items-center gap-5">
+                    <td className="block md:table-cell md:px-10 py-4 md:py-8">
+                      <div className="flex flex-col md:flex-row md:items-center gap-5">
                         <div className="flex -space-x-4">
                           {r.documentUrls.map((url, i) => (
                             <a
@@ -155,18 +155,28 @@ export function VerifyTab() {
                           <div className="text-lg font-black text-white uppercase tracking-tight leading-none mb-1">
                             {r.userName}
                           </div>
-                          <div className="text-[10px] font-black text-white/30 uppercase tracking-widest">
+                          <div className="text-[10px] font-black text-white/30 uppercase tracking-widest break-all">
                             {r.userEmail}
                           </div>
                         </div>
+                        {/* Mobile Badges */}
+                        <div className="flex md:hidden items-center gap-2 mt-2">
+                           <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded-[6px] border border-blue-500/20">
+                             {r.userRole}
+                           </span>
+                           <div className="flex items-center gap-1 text-yellow-500 bg-yellow-500/10 py-1 px-2 rounded-[6px] border border-yellow-500/20">
+                             <span className="material-symbols-outlined text-[10px] animate-pulse">pending</span>
+                             <span className="text-[8px] font-black uppercase tracking-widest">NA ČEKANJU</span>
+                           </div>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-10 py-8">
+                    <td className="hidden md:table-cell px-10 py-8">
                       <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1.5 rounded-[10px] border border-blue-500/20">
                         {r.userRole}
                       </span>
                     </td>
-                    <td className="px-10 py-8 text-center">
+                    <td className="hidden md:table-cell px-10 py-8 text-center">
                       <div className="flex items-center justify-center gap-2 text-yellow-500 bg-yellow-500/10 py-2 px-4 rounded-[10px] border border-yellow-500/20 mx-auto w-fit">
                         <span className="material-symbols-outlined text-sm animate-pulse">
                           pending
@@ -176,19 +186,19 @@ export function VerifyTab() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-10 py-8 text-right min-w-[300px]">
-                      <div className="flex justify-end gap-3">
+                    <td className="block md:table-cell md:px-10 pt-4 pb-2 md:py-8 text-right md:min-w-[300px]">
+                      <div className="flex md:justify-end gap-3 w-full">
                         <button
                           onClick={() => handleAction(r.id, "reject")}
                           disabled={processingId === r.id}
-                          className="px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white disabled:opacity-50"
+                          className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white disabled:opacity-50"
                         >
                           {processingId === r.id ? "..." : "ODBIJ"}
                         </button>
                         <button
                           onClick={() => handleAction(r.id, "approve")}
                           disabled={processingId === r.id}
-                          className="px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all bg-green-500 text-slate-950 hover:bg-green-400 disabled:opacity-50"
+                          className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all bg-green-500 text-slate-950 hover:bg-green-400 disabled:opacity-50"
                         >
                           {processingId === r.id ? "..." : "ODOBRI"}
                         </button>

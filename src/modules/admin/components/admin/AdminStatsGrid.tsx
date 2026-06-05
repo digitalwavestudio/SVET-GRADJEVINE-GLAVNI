@@ -62,7 +62,7 @@ export function AdminStatsGrid() {
         <motion.div
           key={idx}
           variants={item}
-          className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 flex flex-col justify-between hover:border-secondary/30 transition-all group"
+          className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 md:p-8 flex flex-col justify-between hover:border-secondary/30 transition-all group"
         >
           <div>
             <div

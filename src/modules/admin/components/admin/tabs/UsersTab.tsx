@@ -61,9 +61,9 @@ export function UsersTab({}: UsersTabProps) {
              />
           </div>
        </div>
-       <div className="overflow-x-auto p-4">
-          <table className="w-full border-collapse">
-             <thead>
+       <div className="w-full overflow-x-auto">
+          <table className="w-full block md:table border-collapse">
+             <thead className="hidden md:table-header-group">
                 <tr className="bg-white/[0.02]">
                    <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">KORISNIK / FIRMA</th>
                    <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">ULOGA</th>
@@ -72,11 +72,11 @@ export function UsersTab({}: UsersTabProps) {
                    <th className="px-8 py-6 text-right text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">AKCIJE</th>
                 </tr>
              </thead>
-             <tbody className="divide-y divide-white/5">
+             <tbody className="block md:table-row-group divide-y md:divide-y-0 divide-white/5">
                 {isLoading ? (
                    Array.from({ length: 5 }).map((_, i) => (
-                     <tr key={i} className="hover:bg-white/[0.01]/10">
-                       <td className="px-8 py-6">
+                     <tr key={i} className="block md:table-row border-b border-white/5 hover:bg-white/[0.01]/10 p-4 md:p-0">
+                       <td className="block md:table-cell md:px-8 py-4 md:py-6">
                          <div className="flex items-center gap-4">
                            <Skeleton className="w-10 h-10 rounded-[10px]" />
                            <div className="space-y-2">
@@ -85,19 +85,19 @@ export function UsersTab({}: UsersTabProps) {
                            </div>
                          </div>
                        </td>
-                       <td className="px-8 py-6">
+                       <td className="hidden md:table-cell px-8 py-6">
                          <Skeleton className="w-20 h-5 rounded-[10px]" />
                        </td>
-                       <td className="px-8 py-6">
+                       <td className="hidden md:table-cell px-8 py-6">
                          <Skeleton className="w-16 h-3.5" variant="text" />
                        </td>
-                       <td className="px-8 py-6">
+                       <td className="hidden md:table-cell px-8 py-6">
                          <Skeleton className="w-24 h-3.5" variant="text" />
                        </td>
-                       <td className="px-8 py-6 text-right">
-                         <div className="flex justify-end gap-2">
-                           <Skeleton className="w-10 h-10 rounded-[10px]" />
-                           <Skeleton className="w-10 h-10 rounded-[10px]" />
+                       <td className="block md:table-cell md:px-8 py-2 md:py-6 md:text-right mt-4 md:mt-0">
+                         <div className="flex md:justify-end gap-2">
+                           <Skeleton className="w-full md:w-10 h-10 rounded-[10px]" />
+                           <Skeleton className="w-full md:w-10 h-10 rounded-[10px]" />
                          </div>
                        </td>
                      </tr>
@@ -110,31 +110,43 @@ export function UsersTab({}: UsersTabProps) {
                    const initial = userName.charAt(0).toUpperCase();
 
                    return (
-                       <tr key={u.id || i} className="hover:bg-white/[0.01] transition-colors">
-                          <td className="px-8 py-6">
-                             <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-white/5 rounded-[10px] flex items-center justify-center font-black text-secondary">{initial}</div>
-                                <div>
-                                   <div className="text-sm font-black text-white uppercase tracking-tight">{userName}</div>
-                                   <div className="text-[10px] font-bold text-white/20">{u.email}</div>
+                       <tr key={u.id || i} className="block md:table-row border-b border-white/5 p-4 md:p-0 hover:bg-white/[0.01] transition-colors relative">
+                          <td className="block md:table-cell md:px-8 py-3 md:py-6">
+                             <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                <div className="flex items-center gap-4">
+                                   <div className="w-10 h-10 bg-white/5 rounded-[10px] flex items-center justify-center font-black text-secondary shrink-0">{initial}</div>
+                                   <div>
+                                      <div className="text-sm font-black text-white uppercase tracking-tight">{userName}</div>
+                                      <div className="text-[10px] font-bold text-white/20 break-all">{u.email}</div>
+                                   </div>
+                                </div>
+                                {/* Mobile inline badges */}
+                                <div className="flex md:hidden items-center gap-2 mt-2">
+                                   <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded-[6px]">{userRole}</span>
+                                   <span className={`text-[8px] font-black uppercase tracking-widest ${
+                                      userStatus === 'PREMIUM' ? 'text-secondary font-black' : 
+                                      userStatus === 'VERIFIED' ? 'text-green-500' : 'text-white/30'
+                                   }`}>{userStatus}</span>
+                                   {u.status === 'suspended' && <span className="px-2 py-0.5 bg-red-500/20 text-red-500 text-[8px] font-black rounded uppercase">suspended</span>}
                                 </div>
                              </div>
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="hidden md:table-cell px-8 py-6">
                              <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-[10px]">{userRole}</span>
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="hidden md:table-cell px-8 py-6">
                              <span className={`text-[10px] font-black uppercase tracking-widest ${
                                 userStatus === 'PREMIUM' ? 'text-secondary font-black' : 
                                 userStatus === 'VERIFIED' ? 'text-green-500' : 'text-white/30'
                              }`}>{userStatus}</span>
                              {u.status === 'suspended' && <span className="ml-2 px-2 py-0.5 bg-red-500/20 text-red-500 text-[8px] font-black rounded uppercase">suspended</span>}
                           </td>
-                          <td className="px-8 py-6">
+                          <td className="hidden md:table-cell px-8 py-6">
                              <div className="text-[10px] font-black text-white uppercase tracking-tighter">{joinedDate}</div>
                              <div className="text-[8px] font-bold text-white/20 uppercase tracking-widest">ID: {u.id?.slice(0, 8)}...</div>
                           </td>
-                          <td className="px-8 py-6 text-right flex items-center justify-end gap-2">
+                          <td className="block md:table-cell md:px-8 pt-4 pb-2 md:py-6 text-right md:flex md:items-center md:justify-end gap-2">
+                             <div className="flex gap-2">
                              <button
                                onClick={() => setFundingUser({ id: u.id, name: userName })}
                                className="w-10 h-10 bg-secondary/10 text-secondary hover:bg-secondary hover:text-slate-950 rounded-[10px] transition-all flex items-center justify-center p-0"
@@ -158,7 +170,9 @@ export function UsersTab({}: UsersTabProps) {
                                title={u.status === 'suspended' ? "Aktiviraj korisnika" : "Suspenduj korisnika"}
                              >
                                 <span className="material-symbols-outlined text-lg">{u.status === 'suspended' ? 'play_arrow' : 'block'}</span>
+                                <span className="md:hidden ml-2 text-xs font-black uppercase tracking-widest">{u.status === 'suspended' ? 'Aktiviraj' : 'Suspenduj'}</span>
                              </button>
+                             </div>
                           </td>
                        </tr>
                    );

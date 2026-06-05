@@ -79,7 +79,7 @@ export function MachineAdsList({ ads, onPromote, onApprove, onDelete }: MachineA
                     <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight group-hover:text-[#ffad3a] transition-colors">{ad.adTitle || ad.title}</h3>
                     <p className="text-[10px] font-black text-[#a2acb9] tracking-widest uppercase mt-1">{ad.manufacturer || ad.brand} • {ad.modelstr || ad.model || 'N/A'}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left md:text-right mt-2 md:mt-0">
                       <div className="text-[10px] font-black text-[#a2acb9] tracking-widest uppercase mb-1">CENA</div>
                       <div className="text-2xl font-black text-[#ffad3a] tracking-tighter">
                         {ad.price ? `€${Number(ad.price).toLocaleString()}` : (ad.pricePerDay ? `€${ad.pricePerDay}/dan` : 'NA UPIT')}
@@ -110,8 +110,8 @@ export function MachineAdsList({ ads, onPromote, onApprove, onDelete }: MachineA
                 </div>
 
                 {/* Stats & Actions */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-white/5">
-                    <div className="flex gap-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 border-t border-white/5">
+                    <div className="flex justify-between md:justify-start w-full md:w-auto gap-8">
                       <div className="flex items-center gap-3">
                           <span className="material-symbols-outlined text-[#a2acb9] text-xl opacity-40">visibility</span>
                           <div>

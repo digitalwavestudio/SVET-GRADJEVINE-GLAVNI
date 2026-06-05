@@ -59,7 +59,7 @@ export function DashboardLayout({
         <DashboardTopHeader fileInputRef={fileInputRef} />
 
         {/* Page Content */}
-        <div className="flex-1 p-6 md:p-10 relative z-10 w-full max-w-7xl mx-auto">
+        <div className="flex-1 p-4 md:p-10 relative z-10 w-full max-w-7xl mx-auto">
           <ErrorBoundary>
             <Suspense fallback={<DashboardSkeleton />}>
               <AnimatePresence mode="wait">

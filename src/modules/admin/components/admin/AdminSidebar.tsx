@@ -11,6 +11,8 @@ interface AdminSidebarProps {
   launchMode: boolean;
   toggleLaunchMode: () => void;
   isUpdatingLaunchMode: boolean;
+  isMobileMenuOpen?: boolean;
+  setIsMobileMenuOpen?: (val: boolean) => void;
 }
 
 const containerVars: any = {
@@ -36,7 +38,9 @@ export function AdminSidebar({
   setActiveTab,
   launchMode,
   toggleLaunchMode,
-  isUpdatingLaunchMode
+  isUpdatingLaunchMode,
+  isMobileMenuOpen,
+  setIsMobileMenuOpen
 }: AdminSidebarProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -64,12 +68,23 @@ export function AdminSidebar({
   ];
 
   return (
-    <motion.div 
-      initial="hidden"
-      animate="show"
-      variants={containerVars}
-      className="fixed left-0 top-0 bottom-0 w-80 bg-[#0A0F14] border-r border-white/5 z-50 flex flex-col p-8"
-    >
+    <>
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-slate-950/80 z-40 backdrop-blur-sm" 
+          onClick={() => setIsMobileMenuOpen?.(false)}
+        />
+      )}
+      
+      <motion.div 
+        initial="hidden"
+        animate="show"
+        variants={containerVars}
+        className={`fixed left-0 top-0 bottom-0 w-80 bg-[#0A0F14] border-r border-white/5 z-50 flex flex-col p-8 transition-transform duration-300 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
       <div className="flex items-center gap-4 mb-16">
         <div className="w-12 h-12 bg-secondary rounded-[10px] flex items-center justify-center shadow-[0_0_30px_rgba(254,191,13,0.3)]">
           <span className="material-symbols-outlined text-slate-950 text-3xl font-bold">terminal</span>
@@ -144,5 +159,6 @@ export function AdminSidebar({
         </div>
       </div>
     </motion.div>
+    </>
   );
 }

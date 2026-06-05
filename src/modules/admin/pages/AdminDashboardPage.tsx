@@ -59,6 +59,7 @@ export default function AdminDashboardPage() {
   const isAdmin = user?.role === 'admin' || user?.isAdmin || user?.email === 'mancoresolution@gmail.com';
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'users' | 'verify' | 'finances' | 'support' | 'abuse' | 'marketing' | 'broadcast' | 'branding' | 'sync' | 'audit' | 'settings' | 'observability' | 'housekeeping' | 'resilience' | 'magazine'>('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const {
       launchMode,
@@ -134,16 +135,30 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-body selection:bg-secondary selection:text-slate-950">
+    <div className="min-h-screen bg-slate-950 text-white font-body selection:bg-secondary selection:text-slate-950 flex flex-col md:flex-row">
+      
+      {/* Hamburger / Top Bar for Mobile */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#0A0F14] sticky top-0 z-40">
+         <div className="flex items-center gap-3">
+           <span className="material-symbols-outlined text-secondary">terminal</span>
+           <span className="font-black tracking-widest text-sm uppercase">Admin Hub</span>
+         </div>
+         <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-white/5 rounded">
+            <span className="material-symbols-outlined">menu</span>
+         </button>
+      </div>
+
       <AdminSidebar 
         activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+        setActiveTab={(t) => { setActiveTab(t); setIsMobileMenuOpen(false); }} 
         launchMode={launchMode}
         toggleLaunchMode={toggleLaunchMode}
         isUpdatingLaunchMode={isUpdatingLaunchMode}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
-      <main className="ml-80 p-12">
+      <main className="md:ml-80 p-4 md:p-12 flex-1 w-full overflow-hidden">
         <AdminHeader activeTab={activeTab} />
 
         <AnimatePresence mode="wait">
