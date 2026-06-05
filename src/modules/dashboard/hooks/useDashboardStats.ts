@@ -132,9 +132,15 @@ export const BffDashboardResponseSchema = z.object({
       logZodFieldFailure("estimatedRevenue", ctx.error);
       return 0;
     }),
-    chartData: z.array(z.record(z.string(), z.union([z.string(), z.number()]))).optional().catch((ctx) => {
+    chartData: z.object({
+      registrationData: z.array(z.record(z.string(), z.union([z.string(), z.number()]))).optional(),
+      sectorData: z.array(z.object({
+        name: z.string(),
+        value: z.number()
+      })).optional()
+    }).optional().catch((ctx) => {
       logZodFieldFailure("chartData", ctx.error);
-      return [];
+      return { registrationData: [], sectorData: [] };
     }),
     smartMatches: z.array(SmartMatchSchema).optional().catch((ctx) => {
       logZodFieldFailure("smartMatches", ctx.error);

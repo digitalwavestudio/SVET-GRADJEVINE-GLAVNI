@@ -39,7 +39,13 @@ export const resetCircuitBreakerParamsSchema = z.object({
 });
 
 export const basePaginationQuerySchema = z.object({
-  limit: z.string().regex(/^\d+$/).optional().transform(val => (val ? Number(val) : undefined)),
+  limit: z.union([z.string(), z.number()])
+    .optional()
+    .transform(val => {
+      if (val === undefined) return undefined;
+      const parsed = Number(val);
+      return isNaN(parsed) ? undefined : parsed;
+    }),
   lastDocId: z.string().optional(),
   searchQ: z.string().optional(),
   cursor: z.string().optional()

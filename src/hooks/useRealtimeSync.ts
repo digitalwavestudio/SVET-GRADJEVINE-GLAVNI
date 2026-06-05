@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys, dashboardKeys } from '../lib/queryKeysFactory';
+import { auth } from '../firebase';
 
 export function useRealtimeSync() {
   const { user } = useAuth();
@@ -31,45 +32,67 @@ export function useRealtimeSync() {
       };
     }
 
-    // Production environment: 100% dynamic reactive event-driven SSE
-    const eventSource = new EventSource('/api/stream', {
-      withCredentials: true
-    });
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('[SSE] Received event:', data);
-        if (data.type === 'NEW_MESSAGE' || data.type === 'MESSAGE_READ' || data.type === 'ping') {
-          queryClient.invalidateQueries({ queryKey: ['activities'] });
-        }
-      } catch (err) {
-        console.error('[SSE] Event parsing error:', err);
-      }
-    };
-
+    let active = true;
+    let eventSource: EventSource | null = null;
     let fallbackInterval: NodeJS.Timeout | null = null;
     let isFallbackActive = false;
-    
-    eventSource.onerror = (err) => {
-      console.warn('[SSE] EventSource error', err);
-      eventSource.close();
-      
-      if (!isFallbackActive) {
-        console.warn('[QoS Adaptive Mode] SSE connection failed. Falling back to transient polling mechanism.');
-        isFallbackActive = true;
-        
-        fallbackInterval = setInterval(() => {
-          if (document.visibilityState === 'visible') {
-            console.log('[QoS Polling Fallback] Syncing...');
-            queryClient.invalidateQueries({ queryKey: ['activities'] });
+
+    const connectSSE = async () => {
+      try {
+        const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
+        if (!active) return;
+
+        let url = '/api/stream';
+        if (token) {
+          url += `?token=${encodeURIComponent(token)}`;
+        }
+
+        eventSource = new EventSource(url, {
+          withCredentials: true
+        });
+
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            console.log('[SSE] Received event:', data);
+            if (data.type === 'NEW_MESSAGE' || data.type === 'MESSAGE_READ' || data.type === 'ping') {
+              queryClient.invalidateQueries({ queryKey: ['activities'] });
+            }
+          } catch (err) {
+            console.error('[SSE] Event parsing error:', err);
           }
-        }, 600000);
+        };
+
+        eventSource.onerror = (err) => {
+          console.warn('[SSE] EventSource error', err);
+          if (eventSource) {
+            eventSource.close();
+          }
+          
+          if (!isFallbackActive && active) {
+            console.warn('[QoS Adaptive Mode] SSE connection failed. Falling back to transient polling mechanism.');
+            isFallbackActive = true;
+            
+            fallbackInterval = setInterval(() => {
+              if (document.visibilityState === 'visible') {
+                console.log('[QoS Polling Fallback] Syncing...');
+                queryClient.invalidateQueries({ queryKey: ['activities'] });
+              }
+            }, 600000);
+          }
+        };
+      } catch (err) {
+        console.error('[SSE] Failed to connect:', err);
       }
     };
 
+    connectSSE();
+
     return () => {
-      eventSource.close();
+      active = false;
+      if (eventSource) {
+        eventSource.close();
+      }
       if (fallbackInterval) {
         clearInterval(fallbackInterval);
       }

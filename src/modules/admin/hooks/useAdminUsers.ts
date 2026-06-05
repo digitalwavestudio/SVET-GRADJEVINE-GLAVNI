@@ -19,14 +19,12 @@ export function useAdminUsers(searchQ: string = "") {
         if (searchQ) url += `&searchQ=${encodeURIComponent(searchQ)}`;
         if (pageParam) url += `&lastDocId=${pageParam}`;
 
-        const fetchedUsers = await apiClient.get<any[]>(url, { signal });
+        const fetchedData = await apiClient.get<any>(url, { signal });
+        const usersList = fetchedData?.users || [];
 
         return {
-          users: fetchedUsers || [],
-          nextPageParam:
-              fetchedUsers && fetchedUsers.length === LIMIT
-                ? fetchedUsers[fetchedUsers.length - 1].id
-                : null,
+          users: usersList,
+          nextPageParam: fetchedData?.hasMore ? fetchedData.lastVisibleId : null,
         };
       },
       getNextPageParam: (lastPage) => lastPage.nextPageParam,

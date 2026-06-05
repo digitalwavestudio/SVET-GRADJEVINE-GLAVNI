@@ -36,11 +36,17 @@ export const authMiddleware = async (
     console.warn("[AUTH] Error checking IP blacklist:", err);
   }
 
+  let idToken = "";
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (authHeader?.startsWith("Bearer ")) {
+    idToken = authHeader.split("Bearer ")[1];
+  } else if (req.query.token && typeof req.query.token === "string") {
+    idToken = req.query.token;
+  }
+
+  if (!idToken) {
     return next();
   }
-  const idToken = authHeader.split("Bearer ")[1];
   try {
     ensureInitialized();
     const authUser = await MonitoringService.tracePhase("auth_verification", async () => {

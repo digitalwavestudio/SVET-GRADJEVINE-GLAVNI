@@ -107,7 +107,6 @@ export class AdminAdsService {
       .collection("users")
       .where("role", "==", "majstor")
       .where("status", "==", "pending")
-      .orderBy("createdAt", "desc")
       .limit(searchQ ? 100 : limitCount);
 
     if (cursorStr) {
@@ -116,7 +115,6 @@ export class AdminAdsService {
         const firestoreCursor =
           firebaseAdmin.firestore.Timestamp.fromMillis(cursorMillis);
         listingsQuery = listingsQuery.startAfter(firestoreCursor);
-        mastersQuery = mastersQuery.startAfter(firestoreCursor);
       }
     }
 
@@ -158,6 +156,18 @@ export class AdminAdsService {
     };
 
     let combined: QueueItem[] = [...(items as unknown as QueueItem[]), ...(mastersData as unknown as QueueItem[])];
+
+    if (cursorStr) {
+      const cursorMillis = parseInt(cursorStr, 10);
+      if (!isNaN(cursorMillis)) {
+        combined = combined.filter((i) => {
+          const secs = i.createdAt?._seconds || i.createdAt?.seconds || 0;
+          const nanos = i.createdAt?._nanoseconds || i.createdAt?.nanoseconds || 0;
+          const millis = secs * 1000 + Math.floor(nanos / 1000000);
+          return millis < cursorMillis;
+        });
+      }
+    }
 
     if (searchQ) {
       const lowQ = searchQ.toLowerCase();
