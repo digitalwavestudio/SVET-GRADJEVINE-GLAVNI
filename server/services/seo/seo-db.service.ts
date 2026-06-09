@@ -1,4 +1,4 @@
-﻿import { db } from "../../config/firebase.ts";
+import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { UnifiedSearchService } from "../unified-search.service.ts";
 import { SEOSchemaService } from "./seo-schema.service.ts";
@@ -8,8 +8,8 @@ export class SEODbService {
     const category = params.category as string;
     const city = params.city as string;
     const categoryOrCity = params.categoryOrCity as string;
-    let title = "GraÄ‘evinski Portal";
-    let description = "NajveÄ‡i portal za graÄ‘evinarstvo na Balkanu.";
+    let title = "Građevinski Portal";
+    let description = "Najveći portal za građevinarstvo na Balkanu.";
     let url = "https://svetgradjevine.com";
 
     const cities = [
@@ -25,93 +25,56 @@ export class SEODbService {
     let stateFilters: Record<string, unknown> = {};
 
     if (hubType === "job_category_city") {
-      const displayCat =
-        category.charAt(0).toUpperCaseimport { db } from "../../config/firebase.ts";
-import { CacheService } from "../cache.service.ts";
-import { UnifiedSearchService } from "../unified-search.service.ts";
-import { SEOSchemaService } from "./seo-schema.service.ts";
-
-export class SEODbService {
-  static async getHubMetaData(hubType: string, params: Record<string, unknown>) {
-    const category = params.category as string;
-    const city = params.city as string;
-    const categoryOrCity = params.categoryOrCity as string;
-    let title = "GraÄ‘evinski Portal";
-    let description = "NajveÄ‡i portal za graÄ‘evinarstvo na Balkanu.";
-    let url = "https://svetgradjevine.com";
-
-    const cities = [
-      "beograd",
-      "novi-sad",
-      "nis",
-      "kragujevac",
-      "subotica",
-      "zrenjanin",
-      "pancevo",
-    ];
-    let stateCategory = "jobs";
-    let stateFilters: Record<string, unknown> = {};
-
-    if (hubType === "job_category_city") {
-      const displayCat =
-        category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
-      const displayCity =
-        city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
-      title = `Poslovi ${displayCat} u ${displayCity} | Svet GraÄ‘evine`;
-      description = `TraÅ¾ite posao kao ${displayCat} u gradu ${displayCity}? Pogledajte najnovije oglase za posao na vodeÄ‡em graÄ‘evinskom portalu.`;
+      const displayCat = category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
+      const displayCity = city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
+      title = `Poslovi ${displayCat} u ${displayCity} | Svet Građevine`;
+      description = `Tražite posao kao ${displayCat} u gradu ${displayCity}? Pogledajte najnovije oglase za posao na vodećem građevinskom portalu.`;
       url += `/poslovi/${category}/${city}`;
       stateCategory = "jobs";
       stateFilters = { locationSlug: city, professionSlug: category };
     } else if (hubType === "job_single_param") {
       const param = categoryOrCity;
       if (cities.includes(param)) {
-        const displayCity =
-          param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `GraÄ‘evinski Poslovi u ${displayCity} | Svet GraÄ‘evine`;
-        description = `PronaÄ‘ite posao u graÄ‘evini u gradu ${displayCity}. Pogledajte oglase za zidare, tesare, inÅ¾enjere i ostale profile.`;
+        const displayCity = param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
+        title = `Građevinski Poslovi u ${displayCity} | Svet Građevine`;
+        description = `Pronađite posao u građevini u gradu ${displayCity}. Pogledajte oglase za zidare, tesare, inženjere i ostale profile.`;
         stateCategory = "jobs";
         stateFilters = { locationSlug: param };
       } else {
-        const displayCat =
-          param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `Posao: ${displayCat} | Svet GraÄ‘evine`;
-        description = `NajveÄ‡a ponuda oglasa za posao za profil: ${displayCat}. PronaÄ‘ite zaposlenje u graÄ‘evinskom sektoru.`;
+        const displayCat = param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
+        title = `Posao: ${displayCat} | Svet Građevine`;
+        description = `Najveća ponuda oglasa za posao za profil: ${displayCat}. Pronađite zaposlenje u građevinskom sektoru.`;
         stateCategory = "jobs";
         stateFilters = { professionSlug: param };
       }
       url += `/poslovi/${param}`;
     } else if (hubType === "company_city") {
-      const displayCity =
-        city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
-      title = `GraÄ‘evinske Firme: ${displayCity} | Svet GraÄ‘evine`;
-      description = `Katalog graÄ‘evinskih firmi i kompanija u gradu ${displayCity}. PronaÄ‘ite izvoÄ‘aÄe, projektante i partnere.`;
+      const displayCity = city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
+      title = `Građevinske Firme: ${displayCity} | Svet Građevine`;
+      description = `Katalog građevinskih firmi i kompanija u gradu ${displayCity}. Pronađite izvođače, projektante i partnere.`;
       url += `/firme/${city}`;
       stateCategory = "companies";
       stateFilters = { locationSlug: city };
     } else if (hubType === "master_category_city") {
-      const displayCat =
-        category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
-      const displayCity =
-        city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
-      title = `${displayCat}: Majstori i IzvoÄ‘aÄi u mestu ${displayCity} | Svet GraÄ‘evine`;
-      description = `TraÅ¾ite profesionalne izvoÄ‘aÄe za ${displayCat} u gradu ${displayCity}? Pregledajte profile majstora, ocene i kontaktirajte ih direktno.`;
+      const displayCat = category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
+      const displayCity = city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
+      title = `${displayCat}: Majstori i Izvođači u mestu ${displayCity} | Svet Građevine`;
+      description = `Tražite profesionalne izvođače za ${displayCat} u gradu ${displayCity}? Pregledajte profile majstora, ocene i kontaktirajte ih direktno.`;
       url += `/majstori/${category}/${city}`;
       stateCategory = "masters";
       stateFilters = { locationSlug: city, professionSlug: category };
     } else if (hubType === "master_single_param") {
       const param = categoryOrCity;
       if (cities.includes(param)) {
-        const displayCity =
-          param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `GraÄ‘evinski Majstori u gradu ${displayCity} | Svet GraÄ‘evine`;
-        description = `Katalog graÄ‘evinskih majstora i izvoÄ‘aÄa u mestu ${displayCity}. PronaÄ‘ite molere, zidare, keramiÄare i druge struÄnjake.`;
+        const displayCity = param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
+        title = `Građevinski Majstori u gradu ${displayCity} | Svet Građevine`;
+        description = `Katalog građevinskih majstora i izvođača u mestu ${displayCity}. Pronađite molere, zidare, keramičare i druge stručnjake.`;
         stateCategory = "masters";
         stateFilters = { locationSlug: param };
       } else {
-        const displayCat =
-          param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `Majstori: ${displayCat} | Svet GraÄ‘evine`;
-        description = `NajveÄ‡i izbor proverenih majstora za: ${displayCat}. Pogledajte slike izvedenih radova i reference.`;
+        const displayCat = param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
+        title = `Majstori: ${displayCat} | Svet Građevine`;
+        description = `Najveći izbor proverenih majstora za: ${displayCat}. Pogledajte slike izvedenih radova i reference.`;
         stateCategory = "masters";
         stateFilters = { professionSlug: param };
       }
@@ -133,7 +96,7 @@ export class SEODbService {
         title,
         description,
         url,
-        cacheKey
+        cacheKey,
       ).catch(err => {
         console.error(`[SEO-Background] Error compiling hub metadata for ${url}:`, err);
       });
@@ -180,7 +143,7 @@ export class SEODbService {
     title: string,
     description: string,
     url: string,
-    cacheKey: string
+    cacheKey: string,
   ): Promise<void> {
     const { RedisLockManager } = await import("../../utils/redis-lock.ts");
     const lockKey = `lock:seo_hub:${cacheKey}`;
@@ -198,9 +161,7 @@ export class SEODbService {
           { ...stateFilters, skipCount: true },
           10,
         );
-        initialState = {
-          searchResult,
-        };
+        initialState = { searchResult };
       } catch (err) {
         console.warn("[SEO-Background] Failed to fetch static initial state for hub:", err);
       }
@@ -247,7 +208,7 @@ export class SEODbService {
       ];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>https://svetgradjevine.com/</loc><priority>1.0</priority></url>
   <url><loc>https://svetgradjevine.com/poslovi</loc><priority>0.9</priority></url>
   <url><loc>https://svetgradjevine.com/firme</loc><priority>0.8</priority></url>
@@ -261,7 +222,6 @@ export class SEODbService {
   <url><loc>https://svetgradjevine.com/smestaj</loc><priority>0.8</priority></url>
   <url><loc>https://svetgradjevine.com/ketering</loc><priority>0.8</priority></url>
   <url><loc>https://svetgradjevine.com/majstori</loc><priority>0.8</priority></url>`;
-
       const results = await Promise.all(
         collections.map(async (coll) => {
           try {
@@ -269,7 +229,7 @@ export class SEODbService {
               .collection(coll)
               .where("status", "==", "active");
 
-            // SpecifiÄni filteri za kolekcije
+            // Specifični filteri za kolekcije
             if (coll === "users") {
               // Samo javni profili (majstori, firme, partneri) idu u sitemap
               query = query.where("role", "in", [
@@ -351,18 +311,14 @@ export class SEODbService {
               })
               .join("");
           } catch (e) {
-            console.error(
-              `Error processing collection ${coll} for sitemap:`,
-              e,
-            );
+            console.error(`Error processing collection ${coll} for sitemap:`, e);
             return "";
           }
-        }),
+        })
       );
 
       xml += results.join("");
       xml += "\n</urlset>";
-
       await CacheService.set(cacheKey, xml, 21600000); // 6h cache
       return xml;
     } catch (error) {
@@ -371,4 +327,3 @@ export class SEODbService {
     }
   }
 }
-
