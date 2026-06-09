@@ -39,13 +39,13 @@ export const parseSearchIntent = async (query: string) => {
   }
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: `Analiziraj upit za portal "Svet Građevine" i pretvori ga u strukturirane filtere.
       Upit: "${query}"
 
       PRAVILA:
       1. Mapiraj gradove na slug-ove (npr. "u Nišu" -> "nis", "beogradu" -> "beograd").
-      2. Prepoznaj kategoriju: jobs (posao), accommodations (smeštaj), catering (hrana), companies (firme), machines (mašine), real-estate (nekretnine), marketplace (oglasi/prodaja), masters (majstori).
+      2. Prepoznaj kategoriju: jobs (posao), accommodations (smeštaj), catering (hrana), companies (firme), machines (mašine), marketplace (oglasi/prodaja), masters (majstori).
       3. Cena: "do 5000" -> maxPrice: 5000.
       4. Izdvoj ključne reči koje nisu lokacija ili kategorija.
       `,
@@ -81,14 +81,10 @@ export const parseSearchIntent = async (query: string) => {
       },
     });
     const jsonStr = response.text?.trim() || "{}";
-   if (process.env.NODE_ENV === "production") {
-      runPendingMigrations().catch(e => console.error("Migration failed", e));
-      try {
-        DLQMonitoringService.startMonitoring();
-      } catch (e) {
-        console.warn("[DLQ] Monitoring failed to start:", e);
-      }
-    }return { keywords: [query], intentType: "SEARCH" };
+    return JSON.parse(jsonStr);
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    return { keywords: [query], intentType: "SEARCH" };
   }
 };
 

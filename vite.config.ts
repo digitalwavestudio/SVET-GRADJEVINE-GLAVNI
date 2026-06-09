@@ -117,7 +117,19 @@ export default defineConfig(({mode}) => {
     },
     build: {
       outDir: 'dist',
-      emptyOutDir: true
+      emptyOutDir: true,
+      // Raise warning limit to avoid false alarms for large chunks after minification
+      chunkSizeWarningLimit: 1000, // KB
+      // Split vendor code into a separate chunk for better caching and size management
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+          },
+        },
+      },
     },
   };
 });
