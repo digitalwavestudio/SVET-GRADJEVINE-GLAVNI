@@ -162,9 +162,9 @@ const MasterDashboardUI = memo(function MasterDashboardUI({ masterStatus, toggle
         
         <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="md:col-span-3">
            <Card padding="lg" layout="flexColFull">
-              <div className="flex justify-between items-center mb-10 shrink-0">
-                <h2 className="text-2xl font-black text-white uppercase tracking-tight">VAŠE PRIJAVE I POSLOVI</h2>
-                <Link to="/moj-profil/prijave" className="bg-secondary text-slate-950 font-black px-8 py-3 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all">POGLEDAJ SVE PRIJAVE</Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center mb-10 shrink-0">
+                <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">VAŠE PRIJAVE I POSLOVI</h2>
+                <Link to="/moj-profil/prijave" className="bg-secondary text-slate-950 font-black px-8 py-3 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all text-center">POGLEDAJ SVE PRIJAVE</Link>
               </div>
               
               <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-4 shrink-0">NEDAVNE PRIJAVE (LIMIT 5)</h3>

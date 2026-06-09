@@ -69,22 +69,22 @@ export function MyAdsHeader({
               className="w-full bg-white/5 border border-white/10 rounded-[10px] py-4 pl-12 pr-4 text-xs font-bold text-white uppercase tracking-widest placeholder:text-white/20 focus:outline-none focus:border-secondary transition-all" 
             />
         </div>
-        <div className="flex bg-neutral-900/40 p-1 border border-white/5 rounded-[10px] gap-1 shrink-0">
+        <div className="flex bg-neutral-900/40 p-1 border border-white/5 rounded-[10px] gap-1 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
             <button 
               onClick={() => setStatusFilter('all')}
-              className={`px-5 py-3 rounded-[8px] text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'all' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
+              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'all' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
             >
               Svi
             </button>
             <button 
               onClick={() => setStatusFilter('active')}
-              className={`px-5 py-3 rounded-[8px] text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'active' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
+              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'active' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
             >
               Aktivni
             </button>
             <button 
               onClick={() => setStatusFilter('pending')}
-              className={`px-5 py-3 rounded-[8px] text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'pending' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
+              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'pending' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
             >
               Na čekanju
             </button>

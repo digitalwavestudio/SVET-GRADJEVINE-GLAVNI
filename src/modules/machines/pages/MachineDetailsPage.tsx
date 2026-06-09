@@ -34,6 +34,7 @@ import {
 import MediaGallery from '@/src/modules/core/components/details/MediaGallery';
 import PropertyGrid from '@/src/modules/core/components/details/PropertyGrid';
 import StickyContactCard from '@/src/modules/core/components/details/StickyContactCard';
+import { StickyDetailCTABar } from '@/src/components/layout/StickyDetailCTABar';
 import AdminActionToolbar from '@/src/modules/dashboard/components/details/AdminActionToolbar';
 import { AvailabilityCalendar } from '@/src/modules/core/components/calendar/AvailabilityCalendar';
 
@@ -180,7 +181,7 @@ export default function MachineDetailsPage() {
             </div>
 
             <div className="space-y-4">
-              <h1 id="machine-title" className="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] text-white max-w-4xl">
+              <h1 id="machine-title" className="text-4xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] text-white max-w-4xl">
                 {machine.adTitle}
               </h1>
               <div className="flex items-center gap-4 text-secondary font-bold text-xs uppercase tracking-widest">
@@ -193,8 +194,8 @@ export default function MachineDetailsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          <article className="lg:col-span-8 space-y-16" aria-labelledby="machine-title">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-12 lg:gap-16">
+          <article className="lg:col-span-8 space-y-12 lg:space-y-16" aria-labelledby="machine-title">
             {/* Gallery Section */}
             <MediaGallery images={machine.images || []} title={machine.adTitle} imageStatus={machine.imageStatus} />
 
@@ -313,7 +314,7 @@ export default function MachineDetailsPage() {
           </article>
 
           {/* Sidebar Section */}
-          <aside className="lg:col-span-4 translate-y-[-100px] lg:translate-y-0" aria-label="Kontakt informacije">
+          <aside className="lg:col-span-4 translate-y-0 lg:translate-y-[-100px]" aria-label="Kontakt informacije">
             <StickyContactCard 
               phone={machine.phone}
               email={machine.email}
@@ -331,6 +332,14 @@ export default function MachineDetailsPage() {
           <RelatedSEO locationSlug={machine.locationSlug} currentType="machines" />
         </div>
       </main>
+
+      <StickyDetailCTABar
+        phone={machine.phone || ''}
+        onMessage={handleStartChat}
+        price={machine.price || machine.pricePerDay || machine.pricePerHour}
+        currency="EUR"
+        priceLabel={machine.adType === 'prodaja' ? "CENA" : "CENA / DAN"}
+      />
     </div>
   );
 }

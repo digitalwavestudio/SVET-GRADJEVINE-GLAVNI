@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+﻿import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { Request, Response } from "express";
@@ -115,10 +115,10 @@ export class SEORenderEngine {
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(" ");
 
-      const derivedTitle = `${titleWord} | Svet Građevine`;
-      const derivedDesc = `Pogledajte detalje za ${titleWord} na portalu Svet Građevine - najvećem građevinskom portalu na Balkanu.`;
+      const derivedTitle = `${titleWord} | Svet GraÄ‘evine`;
+      const derivedDesc = `Pogledajte detalje za ${titleWord} na portalu Svet GraÄ‘evine - najveÄ‡em graÄ‘evinskom portalu na Balkanu.`;
       const derivedUrl = `https://${host}${reqPath}`;
-      const defaultImage = "https://svetgradjevine.rs/og-default.jpg";
+      const defaultImage = "https://svetgradjevine.com/og-default.jpg";
 
       return `
         <title>${derivedTitle}</title>
@@ -131,8 +131,8 @@ export class SEORenderEngine {
         ${paginationTags}
       `.trim();
     } else {
-      const derivedTitle = `Svet Građevine | Građevinski Portal`;
-      const derivedDesc = `Najveći građevinski portal na Balkanu za poslove, majstore, mašine i nekretnine.`;
+      const derivedTitle = `Svet GraÄ‘evine | GraÄ‘evinski Portal`;
+      const derivedDesc = `NajveÄ‡i graÄ‘evinski portal na Balkanu za poslove, majstore, maÅ¡ine i nekretnine.`;
       const derivedUrl = `https://${host}${reqPath}`;
 
       return `
@@ -209,3 +209,4 @@ export class SEORenderEngine {
     return renderedHtml;
   }
 }
+

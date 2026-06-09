@@ -309,8 +309,8 @@ export default function ConstructionMachinesPage() {
           { label: "Partneri", value: partnerCount?.toLocaleString() || "80", icon: "verified" }
         ]}
       >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl">
-          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
+        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
+          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
             <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:scale-110 transition-transform">manage_search</span>
             <input 
               aria-label="Pretraga mašina po modelu ili proizvođaču" 
@@ -318,11 +318,11 @@ export default function ConstructionMachinesPage() {
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
               placeholder="Model mašine, proizvođač..." 
-              className="w-full bg-transparent outline-none border-none text-white px-6 py-5 font-black uppercase tracking-[0.2em] placeholder:text-white/20 text-[10px]" 
+              className="w-full bg-transparent outline-none border-none text-white px-3 md:px-6 py-4 md:py-5 font-black uppercase tracking-[0.2em] placeholder:text-white/20 text-[10px]" 
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
             />
           </div>
-          <Link to="/postavi-oglas" className="bg-secondary text-slate-950 font-black uppercase tracking-[0.2em] px-12 h-16 rounded-[10px] hover:bg-white transition-all shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 text-[10px]">
+          <Link to="/postavi-oglas" className="w-full md:w-auto bg-secondary text-slate-950 font-black uppercase tracking-[0.2em] px-12 h-16 rounded-[10px] hover:bg-white transition-all shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 text-[10px]">
             <span className="material-symbols-outlined text-xl">add_circle</span>
             <span>OGLASI MAŠINU</span>
           </Link>
@@ -330,7 +330,7 @@ export default function ConstructionMachinesPage() {
       </StandardPageHero>
 
       {/* Main Content Section */}
-      <section className="max-w-7xl mx-auto px-8 py-12 flex flex-col-reverse lg:flex-row-reverse gap-12">
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col-reverse lg:flex-row-reverse gap-12">
         
         {/* Sidebar Filters - Redesigned for B2B */}
         <FilterSidebar>
@@ -600,75 +600,82 @@ export default function ConstructionMachinesPage() {
                         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#111a22] to-transparent pointer-events-none"></div>
                       </div>
 
-                      {/* Card Content Module */}
-                      <div className="p-5 pt-3 flex-1 flex flex-col">
-                        <div className="flex items-center gap-3 mb-4">
-                           {machine.companyLogo ? (
-                             <OptimizedImage 
-                               src={machine.companyLogo} 
-                               fallbackType="company" 
-                               alt={machine.companyName || "Logo kompanije"} 
-                               className="w-full h-full object-cover" 
-                               containerClassName="w-6 h-6 rounded-sm overflow-hidden border border-white/5" 
-                             />
-                           ) : (
-                             <div className="w-6 h-6 rounded-sm bg-white/5 flex items-center justify-center font-black text-white/20 uppercase text-[8px] border border-white/5">
-                               {machine.companyName?.charAt(0) || 'M'}
-                             </div>
-                           )}
+                       {/* Card Content Module */}
+                       <div className="p-5 pt-3 flex-1 flex flex-col">
+                         <div className="flex items-center gap-3 mb-4">
+                           <div className="relative shrink-0 z-20">
+                            {machine.companyLogo ? (
+                              <OptimizedImage 
+                                src={machine.companyLogo} 
+                                fallbackType="company" 
+                                alt={machine.companyName || "Logo kompanije"} 
+                                className="w-full h-full object-cover" 
+                                containerClassName="w-6 h-6 rounded-sm overflow-hidden border border-white/5" 
+                              />
+                            ) : (
+                              <div className="w-6 h-6 rounded-sm bg-white/5 flex items-center justify-center font-black text-white/20 uppercase text-[8px] border border-white/5">
+                                {machine.companyName?.charAt(0) || 'M'}
+                              </div>
+                            )}
+                            {machine.isCompanyVerified && (
+                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center border border-[#111a22] shadow-md">
+                                <span className="material-symbols-outlined text-white text-[6px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                              </div>
+                            )}
+                           </div>
                            <div className="flex flex-col">
                              <div className="flex items-center gap-1">
                                <span className="text-[7px] font-black text-white/40 uppercase tracking-widest leading-none">{machine.companyName || 'SAMOSTALNI OGLAŠIVAČ'}</span>
                                {machine.isCompanyVerified && (
-                                 <span className="material-symbols-outlined text-blue-400 text-[10px]" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                                 <span className="hidden md:inline-block material-symbols-outlined text-blue-400 text-[10px]" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                                )}
                              </div>
                            </div>
-                        </div>
+                         </div>
 
-                        <div className="mb-4">
-                          <Link onMouseEnter={() => prefetch('machine', machine.id)} to={`/gradjevinske-masine/${machine.id}?ref=algolia`} className="block">
-                             <h3 className="text-xl font-black font-headline tracking-tight uppercase leading-tight group-hover:text-secondary transition-all line-clamp-2 italic">{machine.adTitle}</h3>
-                          </Link>
-                          <p className="text-secondary text-[8px] font-black uppercase tracking-widest mt-1 opacity-60 italic">{mCategory}</p>
-                        </div>
+                         <div className="mb-4">
+                           <Link onMouseEnter={() => prefetch('machine', machine.id)} to={`/gradjevinske-masine/${machine.id}?ref=algolia`} className="block after:absolute after:inset-0">
+                              <h3 className="text-xl font-black font-headline tracking-tight uppercase leading-tight group-hover:text-secondary transition-all line-clamp-2 italic">{machine.adTitle}</h3>
+                           </Link>
+                           <p className="text-secondary text-[8px] font-black uppercase tracking-widest mt-1 opacity-60 italic">{mCategory}</p>
+                         </div>
 
-                        {/* Professional Specs Grid */}
-                        <div className="grid grid-cols-2 gap-2 mb-6">
-                           <div className="bg-[#050f19] p-2.5 rounded-sm border border-white/5 flex flex-col justify-center">
-                             <span className="block text-[6px] font-black uppercase tracking-widest text-white/20 mb-1 flex items-center gap-1 leading-none">
-                               <span className="material-symbols-outlined text-[8px]">calendar_month</span> GODIŠTE
-                             </span>
-                             <span className="block text-[10px] font-black uppercase text-white font-mono">{machine.year || 'N/A'}</span>
-                           </div>
-                           <div className="bg-[#050f19] p-2.5 rounded-sm border border-white/5 flex flex-col justify-center">
-                             <span className="block text-[6px] font-black uppercase tracking-widest text-white/20 mb-1 flex items-center gap-1 leading-none">
-                               <span className="material-symbols-outlined text-[8px]">timer</span> RADNI SATI
-                             </span>
-                             <span className="block text-[10px] font-black uppercase text-white font-mono">{machine.workingHours ? `${machine.workingHours} h` : 'N/A'}</span>
-                           </div>
-                        </div>
+                         {/* Professional Specs Grid */}
+                         <div className="hidden md:grid grid-cols-2 gap-2 mb-6">
+                            <div className="bg-[#050f19] p-2.5 rounded-sm border border-white/5 flex flex-col justify-center">
+                              <span className="block text-[6px] font-black uppercase tracking-widest text-white/20 mb-1 flex items-center gap-1 leading-none">
+                                <span className="material-symbols-outlined text-[8px]">calendar_month</span> GODIŠTE
+                              </span>
+                              <span className="block text-[10px] font-black uppercase text-white font-mono">{machine.year || 'N/A'}</span>
+                            </div>
+                            <div className="bg-[#050f19] p-2.5 rounded-sm border border-white/5 flex flex-col justify-center">
+                              <span className="block text-[6px] font-black uppercase tracking-widest text-white/20 mb-1 flex items-center gap-1 leading-none">
+                                <span className="material-symbols-outlined text-[8px]">timer</span> RADNI SATI
+                              </span>
+                              <span className="block text-[10px] font-black uppercase text-white font-mono">{machine.workingHours ? `${machine.workingHours} h` : 'N/A'}</span>
+                            </div>
+                         </div>
 
-                        {/* Card CTA / Price Module */}
-                        <div className="flex flex-col pt-4 border-t border-white/5 mt-auto">
-                           <div className="flex justify-between items-end">
-                              <div>
-                                <span className="block text-[7px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">{machine.adType === 'prodaja' ? 'PRODAJA' : 'NAJAM OD'}</span>
-                                {machine.isNegotiable && !machine.price && !machine.pricePerDay ? (
-                                  <div className="text-lg font-black text-white uppercase tracking-tighter italic">NA UPIT</div>
-                                ) : (
-                                  <div className="text-xl font-black text-white flex items-baseline gap-0.5 tracking-tighter font-mono">
-                                    <span className="text-[10px] text-secondary font-black">€</span>
-                                    {machine.price ? Number(machine.price).toLocaleString() : Number(machine.pricePerDay || machine.pricePerHour).toLocaleString()}
-                                    {machine.adType === 'iznajmljivanje' && <span className="text-[7px] text-white/30 tracking-widest uppercase ml-1 font-sans font-black">/dan</span>}
-                                  </div>
-                                )}
-                              </div>
-                              <Link onMouseEnter={() => prefetch('machine', machine.id)} to={`/gradjevinske-masine/${machine.id}?ref=algolia`} className="text-secondary font-black text-[9px] flex items-center gap-1 hover:underline uppercase tracking-widest">
-                                DETALJI <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                              </Link>
-                           </div>
-                        </div>
+                         {/* Card CTA / Price Module */}
+                         <div className="flex flex-col pt-4 border-t border-white/5 mt-auto">
+                            <div className="flex justify-between items-end">
+                               <div>
+                                 <span className="block text-[7px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">{machine.adType === 'prodaja' ? 'PRODAJA' : 'NAJAM OD'}</span>
+                                 {machine.isNegotiable && !machine.price && !machine.pricePerDay ? (
+                                   <div className="text-lg font-black text-white uppercase tracking-tighter italic">NA UPIT</div>
+                                 ) : (
+                                   <div className="text-xl font-black text-white flex items-baseline gap-0.5 tracking-tighter font-mono">
+                                     <span className="text-[10px] text-secondary font-black">€</span>
+                                     {machine.price ? Number(machine.price).toLocaleString() : Number(machine.pricePerDay || machine.pricePerHour).toLocaleString()}
+                                     {machine.adType === 'iznajmljivanje' && <span className="text-[7px] text-white/30 tracking-widest uppercase ml-1 font-sans font-black">/dan</span>}
+                                   </div>
+                                 )}
+                               </div>
+                               <Link onMouseEnter={() => prefetch('machine', machine.id)} to={`/gradjevinske-masine/${machine.id}?ref=algolia`} className="hidden md:flex text-secondary font-black text-[9px] items-center gap-1 hover:underline uppercase tracking-widest relative z-20">
+                                 DETALJI <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                               </Link>
+                            </div>
+                         </div>
                       </div>
                     </div>
                   );

@@ -34,6 +34,7 @@ import {
 import MediaGallery from '@/src/modules/core/components/details/MediaGallery';
 import PropertyGrid from '@/src/modules/core/components/details/PropertyGrid';
 import StickyContactCard from '@/src/modules/core/components/details/StickyContactCard';
+import { StickyDetailCTABar } from '@/src/components/layout/StickyDetailCTABar';
 import AdminActionToolbar from '@/src/modules/dashboard/components/details/AdminActionToolbar';
 
 export default function AccommodationDetailsPage() {
@@ -150,7 +151,7 @@ export default function AccommodationDetailsPage() {
         type="website"
         jsonLd={[lodgingSchema, breadcrumbSchema]}
       />
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumbs items={[
           { label: 'Smeštaj', path: '/smestaj' },
           { label: locationName, path: `/smestaj?grad=${accommodation.locationSlug}` },
@@ -194,7 +195,7 @@ export default function AccommodationDetailsPage() {
         {/* Gallery Section */}
         <MediaGallery images={accommodation.images || []} title={accommodation.title} imageStatus={accommodation.imageStatus} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-12 mt-12">
           {/* AI BLUEPRINT: STRUKTURIRANI PODACI ZA LLM / SEO */}
           <article id="ai-blueprint" className="lg:col-span-8 space-y-12" aria-labelledby="accommodation-title" itemScope itemType="https://schema.org/LodgingBusiness">
             
@@ -511,6 +512,14 @@ export default function AccommodationDetailsPage() {
         </section>
         <RelatedSEO locationSlug={accommodation.locationSlug} currentType="accommodation" />
       </main>
+
+      <StickyDetailCTABar
+        phone={accommodation.phone || accommodation.contactPhone || ''}
+        onMessage={handleStartChat}
+        price={accommodation.price}
+        currency="EUR"
+        priceLabel={accommodation.priceType === 'perPerson' ? 'PO OSOBI' : 'ZAKUP'}
+      />
     </div>
   );
 }

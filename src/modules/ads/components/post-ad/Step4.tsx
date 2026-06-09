@@ -362,39 +362,63 @@ export function Step4({
               </div>
 
               <div className="space-y-4">
-                {packages.map((pkg) => (
-                  <label
-                    key={pkg.id}
-                    className={`block relative p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-500 group ${formData.paket === pkg.id ? `border-${pkg.color} bg-${pkg.color}/5 shadow-xl` : "border-white/5 bg-white/[0.02] hover:border-white/20"}`}
-                  >
-                    {pkg.recommended && (
-                      <div className="absolute -top-3 right-6 bg-secondary text-slate-950 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
-                        ★ PREPORUČENO
-                      </div>
-                    )}
-                    <div className="flex items-start gap-5">
-                      <div className="pt-1">
-                        <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${formData.paket === pkg.id ? `border-${pkg.color} bg-${pkg.color}` : "border-white/20"}`}
-                        >
-                          {formData.paket === pkg.id && (
-                            <div className="w-2.5 h-2.5 bg-slate-950 rounded-full"></div>
-                          )}
-                        </div>
-                        <input
-                          aria-label="Unos polja"
-                          type="radio"
-                          value={pkg.id}
-                          checked={formData.paket === pkg.id}
-                          onChange={(e) => setValue("paket", e.target.value)}
-                          className="hidden"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center mb-1">
-                          <span
-                            className={`font-black uppercase tracking-widest text-sm ${formData.paket === pkg.id ? `text-${pkg.color}` : "text-white"} ${pkg.id === "premium" ? "animate-blink" : ""}`}
-                          >
+                 {packages.map((pkg) => {
+                   const isSelected = formData.paket === pkg.id;
+                   
+                   // Explicit mapping to prevent tree-shaking compile issues
+                   let borderBgClass = "border-white/5 bg-white/[0.02] hover:border-white/20";
+                   if (isSelected) {
+                     if (pkg.color === "secondary") borderBgClass = "border-secondary bg-secondary/5 shadow-xl";
+                     else if (pkg.color === "primary") borderBgClass = "border-primary bg-primary/5 shadow-xl";
+                     else borderBgClass = "border-white bg-white/5 shadow-xl";
+                   }
+
+                   let textClass = "text-white";
+                   if (isSelected) {
+                     if (pkg.color === "secondary") textClass = "text-secondary";
+                     else if (pkg.color === "primary") textClass = "text-primary";
+                   }
+
+                   let radioClass = "border-white/20";
+                   if (isSelected) {
+                     if (pkg.color === "secondary") radioClass = "border-secondary bg-secondary";
+                     else if (pkg.color === "primary") radioClass = "border-primary bg-primary";
+                     else radioClass = "border-white bg-white";
+                   }
+
+                   return (
+                     <label
+                       key={pkg.id}
+                       className={`block relative p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-500 group ${borderBgClass}`}
+                     >
+                       {pkg.recommended && (
+                         <div className="absolute -top-3 right-6 bg-secondary text-slate-950 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
+                           ★ PREPORUČENO
+                         </div>
+                       )}
+                       <div className="flex items-start gap-5">
+                         <div className="pt-1">
+                           <div
+                             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${radioClass}`}
+                           >
+                             {isSelected && (
+                               <div className="w-2.5 h-2.5 bg-slate-950 rounded-full"></div>
+                             )}
+                           </div>
+                           <input
+                             aria-label="Unos polja"
+                             type="radio"
+                             value={pkg.id}
+                             checked={isSelected}
+                             onChange={(e) => setValue("paket", e.target.value)}
+                             className="hidden"
+                           />
+                         </div>
+                         <div className="flex-1">
+                           <div className="flex justify-between items-center mb-1">
+                             <span
+                               className={`font-black uppercase tracking-widest text-sm ${textClass} ${pkg.id === "premium" ? "animate-blink" : ""}`}
+                             >
                             {pkg.name}
                           </span>
                           <div className="flex items-center gap-2">
@@ -428,8 +452,9 @@ export function Step4({
                         </ul>
                       </div>
                     </div>
-                  </label>
-                ))}
+                     </label>
+                    );
+                 })}
               </div>
             </div>
           </div>

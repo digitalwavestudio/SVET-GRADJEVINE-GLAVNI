@@ -1,4 +1,4 @@
-import { Router } from "express";
+﻿import { Router } from "express";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { SEODbService } from "../services/seo/seo-db.service.ts";
 import { SEOSchemaService } from "../services/seo/seo-schema.service.ts";
@@ -78,7 +78,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
       // COLD CACHE: background compiling is active. Serve a derived SEO friendly skeleton instead of 410/404!
       const html = await SEORenderEngine.assembleHtml({
         reqPath: req.originalUrl,
-        host: req.get("host") || "svetgradjevine.rs",
+        host: req.get("host") || "svetgradjevine.com",
         meta: null,
       });
 
@@ -95,7 +95,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
 
     const html = await SEORenderEngine.assembleHtml({
       reqPath: req.originalUrl,
-      host: req.get("host") || "svetgradjevine.rs",
+      host: req.get("host") || "svetgradjevine.com",
       meta,
     });
 
@@ -153,7 +153,7 @@ seoRouter.get("/:type/:id", injectMetaTags);
 
 // Fallback dynamic OG image generator
 seoRouter.get("/og-image", (req, res) => {
-  const title = (req.query.title as string) || "Svet Građevine";
+  const title = (req.query.title as string) || "Svet GraÄ‘evine";
   const location = (req.query.location as string) || "Srbija";
 
   // Basic SVG structure for a beautiful fallback OG card
@@ -187,15 +187,15 @@ seoRouter.get("/og-image", (req, res) => {
     <!-- Location badge -->
     <rect x="80" y="320" width="auto" height="48" rx="8" fill="#ffffff" fill-opacity="0.1" />
     <text x="100" y="352" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#aaaaaa" letter-spacing="2" text-transform="uppercase">
-      📌 ${location}
+      ðŸ“Œ ${location}
     </text>
 
     <!-- Logo / Brand at bottom -->
     <text x="80" y="550" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="800" fill="#F59E0B" letter-spacing="-0.5">
-      SVET GRAĐEVINE
+      SVET GRAÄEVINE
     </text>
     <text x="360" y="550" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="500" fill="#666666">
-      • Najveći građevinski portal na Balkanu
+      â€¢ NajveÄ‡i graÄ‘evinski portal na Balkanu
     </text>
   </svg>`;
 
@@ -235,7 +235,7 @@ async function withDistributedLock<T>(
   }
 }
 
-// Dinamički sitemap (Index)
+// DinamiÄki sitemap (Index)
 seoRouter.get("/sitemap.xml", async (_req, res) => {
   try {
     const { CacheService } = await import("../services/cache.service.ts");
@@ -352,7 +352,7 @@ seoRouter.get("/sitemap-:type.xml", async (req, res) => {
   }
 });
 
-// Dinamički robots.txt
+// DinamiÄki robots.txt
 seoRouter.get("/robots.txt", (req, res) => {
   const isProd = process.env.NODE_ENV === "production";
 
@@ -444,3 +444,4 @@ seoRouter.get(
     }
   },
 );
+

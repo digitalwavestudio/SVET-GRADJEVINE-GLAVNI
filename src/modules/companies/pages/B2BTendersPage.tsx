@@ -37,18 +37,18 @@ export default function B2BTendersPage() {
         type="website"
       />
       <div className="space-y-10">
-        <div className="flex justify-between items-end">
+        <div className="flex flex-col sm:flex-row gap-6 justify-between sm:items-end">
           <div>
             <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">B2B TENDERI</h1>
             <p className="text-white/40 font-bold text-xs tracking-[0.2em] uppercase">MREŽA PODIZVOĐAČA I VELIKIH PROJEKATA</p>
           </div>
-          <button className="bg-secondary text-slate-950 font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 flex items-center gap-2">
+          <button className="w-full sm:w-auto bg-secondary text-slate-950 font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-sm">post_add</span> RASPIS TENDERA
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 border-b border-white/5 pb-6">
+        <div className="flex flex-wrap gap-4 border-b border-white/5 pb-6">
           {['AKTIVNI TENDERI', 'MOJE PONUDE', 'ZATVORENI PROJEKTI'].map(tab => (
             <button
               key={tab}
@@ -72,11 +72,11 @@ export default function B2BTendersPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-[#0A0F14] border border-white/5 hover:border-white/20 transition-all rounded-[10px] p-8 flex flex-col xl:flex-row gap-8 items-start xl:items-center relative overflow-hidden group"
+              className="bg-[#0A0F14] border border-white/5 hover:border-white/20 transition-all rounded-[10px] p-5 md:p-8 flex flex-col xl:flex-row gap-8 items-start xl:items-center relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[50px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
               
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-4 w-full">
                 <div className="flex items-center gap-3">
                   <span className="bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded-[10px] text-[9px] font-black tracking-widest uppercase">
                     {tender.id}

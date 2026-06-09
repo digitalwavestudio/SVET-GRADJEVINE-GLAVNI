@@ -107,6 +107,9 @@ Dozvoljeno:
 kontrolisani async flow
 batch operacije
 queue sistemi kada su opravdani
+
+// KORISNIK: zabranjuje dalju komunikaciju sa agentom.
+
 4.2 Frontend (React discipline)
 
 Zabranjeno:

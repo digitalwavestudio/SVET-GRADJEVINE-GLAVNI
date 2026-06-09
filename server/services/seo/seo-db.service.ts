@@ -1,4 +1,4 @@
-import { db } from "../../config/firebase.ts";
+﻿import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { UnifiedSearchService } from "../unified-search.service.ts";
 import { SEOSchemaService } from "./seo-schema.service.ts";
@@ -8,9 +8,37 @@ export class SEODbService {
     const category = params.category as string;
     const city = params.city as string;
     const categoryOrCity = params.categoryOrCity as string;
-    let title = "Građevinski Portal";
-    let description = "Najveći portal za građevinarstvo na Balkanu.";
-    let url = "https://svetgradjevine.rs";
+    let title = "GraÄ‘evinski Portal";
+    let description = "NajveÄ‡i portal za graÄ‘evinarstvo na Balkanu.";
+    let url = "https://svetgradjevine.com";
+
+    const cities = [
+      "beograd",
+      "novi-sad",
+      "nis",
+      "kragujevac",
+      "subotica",
+      "zrenjanin",
+      "pancevo",
+    ];
+    let stateCategory = "jobs";
+    let stateFilters: Record<string, unknown> = {};
+
+    if (hubType === "job_category_city") {
+      const displayCat =
+        category.charAt(0).toUpperCaseimport { db } from "../../config/firebase.ts";
+import { CacheService } from "../cache.service.ts";
+import { UnifiedSearchService } from "../unified-search.service.ts";
+import { SEOSchemaService } from "./seo-schema.service.ts";
+
+export class SEODbService {
+  static async getHubMetaData(hubType: string, params: Record<string, unknown>) {
+    const category = params.category as string;
+    const city = params.city as string;
+    const categoryOrCity = params.categoryOrCity as string;
+    let title = "GraÄ‘evinski Portal";
+    let description = "NajveÄ‡i portal za graÄ‘evinarstvo na Balkanu.";
+    let url = "https://svetgradjevine.com";
 
     const cities = [
       "beograd",
@@ -29,8 +57,8 @@ export class SEODbService {
         category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
       const displayCity =
         city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
-      title = `Poslovi ${displayCat} u ${displayCity} | Svet Građevine`;
-      description = `Tražite posao kao ${displayCat} u gradu ${displayCity}? Pogledajte najnovije oglase za posao na vodećem građevinskom portalu.`;
+      title = `Poslovi ${displayCat} u ${displayCity} | Svet GraÄ‘evine`;
+      description = `TraÅ¾ite posao kao ${displayCat} u gradu ${displayCity}? Pogledajte najnovije oglase za posao na vodeÄ‡em graÄ‘evinskom portalu.`;
       url += `/poslovi/${category}/${city}`;
       stateCategory = "jobs";
       stateFilters = { locationSlug: city, professionSlug: category };
@@ -39,15 +67,15 @@ export class SEODbService {
       if (cities.includes(param)) {
         const displayCity =
           param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `Građevinski Poslovi u ${displayCity} | Svet Građevine`;
-        description = `Pronađite posao u građevini u gradu ${displayCity}. Pogledajte oglase za zidare, tesare, inženjere i ostale profile.`;
+        title = `GraÄ‘evinski Poslovi u ${displayCity} | Svet GraÄ‘evine`;
+        description = `PronaÄ‘ite posao u graÄ‘evini u gradu ${displayCity}. Pogledajte oglase za zidare, tesare, inÅ¾enjere i ostale profile.`;
         stateCategory = "jobs";
         stateFilters = { locationSlug: param };
       } else {
         const displayCat =
           param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `Posao: ${displayCat} | Svet Građevine`;
-        description = `Najveća ponuda oglasa za posao za profil: ${displayCat}. Pronađite zaposlenje u građevinskom sektoru.`;
+        title = `Posao: ${displayCat} | Svet GraÄ‘evine`;
+        description = `NajveÄ‡a ponuda oglasa za posao za profil: ${displayCat}. PronaÄ‘ite zaposlenje u graÄ‘evinskom sektoru.`;
         stateCategory = "jobs";
         stateFilters = { professionSlug: param };
       }
@@ -55,8 +83,8 @@ export class SEODbService {
     } else if (hubType === "company_city") {
       const displayCity =
         city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
-      title = `Građevinske Firme: ${displayCity} | Svet Građevine`;
-      description = `Katalog građevinskih firmi i kompanija u gradu ${displayCity}. Pronađite izvođače, projektante i partnere.`;
+      title = `GraÄ‘evinske Firme: ${displayCity} | Svet GraÄ‘evine`;
+      description = `Katalog graÄ‘evinskih firmi i kompanija u gradu ${displayCity}. PronaÄ‘ite izvoÄ‘aÄe, projektante i partnere.`;
       url += `/firme/${city}`;
       stateCategory = "companies";
       stateFilters = { locationSlug: city };
@@ -65,8 +93,8 @@ export class SEODbService {
         category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
       const displayCity =
         city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
-      title = `${displayCat}: Majstori i Izvođači u mestu ${displayCity} | Svet Građevine`;
-      description = `Tražite profesionalne izvođače za ${displayCat} u gradu ${displayCity}? Pregledajte profile majstora, ocene i kontaktirajte ih direktno.`;
+      title = `${displayCat}: Majstori i IzvoÄ‘aÄi u mestu ${displayCity} | Svet GraÄ‘evine`;
+      description = `TraÅ¾ite profesionalne izvoÄ‘aÄe za ${displayCat} u gradu ${displayCity}? Pregledajte profile majstora, ocene i kontaktirajte ih direktno.`;
       url += `/majstori/${category}/${city}`;
       stateCategory = "masters";
       stateFilters = { locationSlug: city, professionSlug: category };
@@ -75,15 +103,15 @@ export class SEODbService {
       if (cities.includes(param)) {
         const displayCity =
           param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `Građevinski Majstori u gradu ${displayCity} | Svet Građevine`;
-        description = `Katalog građevinskih majstora i izvođača u mestu ${displayCity}. Pronađite molere, zidare, keramičare i druge stručnjake.`;
+        title = `GraÄ‘evinski Majstori u gradu ${displayCity} | Svet GraÄ‘evine`;
+        description = `Katalog graÄ‘evinskih majstora i izvoÄ‘aÄa u mestu ${displayCity}. PronaÄ‘ite molere, zidare, keramiÄare i druge struÄnjake.`;
         stateCategory = "masters";
         stateFilters = { locationSlug: param };
       } else {
         const displayCat =
           param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
-        title = `Majstori: ${displayCat} | Svet Građevine`;
-        description = `Najveći izbor proverenih majstora za: ${displayCat}. Pogledajte slike izvedenih radova i reference.`;
+        title = `Majstori: ${displayCat} | Svet GraÄ‘evine`;
+        description = `NajveÄ‡i izbor proverenih majstora za: ${displayCat}. Pogledajte slike izvedenih radova i reference.`;
         stateCategory = "masters";
         stateFilters = { professionSlug: param };
       }
@@ -114,7 +142,7 @@ export class SEODbService {
       return {
         title,
         description,
-        image: "https://svetgradjevine.rs/og-default.jpg",
+        image: "https://svetgradjevine.com/og-default.jpg",
         url,
         initialState: null, // Strict cache strategy: skeleton only, no synchronous db bypass
         structuredData: {
@@ -130,7 +158,7 @@ export class SEODbService {
       return {
         title,
         description,
-        image: "https://svetgradjevine.rs/og-default.jpg",
+        image: "https://svetgradjevine.com/og-default.jpg",
         url,
         initialState: null,
         structuredData: {
@@ -180,7 +208,7 @@ export class SEODbService {
       const meta = {
         title,
         description,
-        image: "https://svetgradjevine.rs/og-default.jpg",
+        image: "https://svetgradjevine.com/og-default.jpg",
         url,
         initialState,
         structuredData: {
@@ -220,19 +248,19 @@ export class SEODbService {
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://svetgradjevine.rs/</loc><priority>1.0</priority></url>
-  <url><loc>https://svetgradjevine.rs/poslovi</loc><priority>0.9</priority></url>
-  <url><loc>https://svetgradjevine.rs/firme</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/magazin</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/o-nama</loc><priority>0.5</priority></url>
-  <url><loc>https://svetgradjevine.rs/kontakt</loc><priority>0.5</priority></url>
-  <url><loc>https://svetgradjevine.rs/paketi</loc><priority>0.6</priority></url>
-  <url><loc>https://svetgradjevine.rs/alat-i-oprema</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/placevi</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/masine</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/smestaj</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/ketering</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.rs/majstori</loc><priority>0.8</priority></url>`;
+  <url><loc>https://svetgradjevine.com/</loc><priority>1.0</priority></url>
+  <url><loc>https://svetgradjevine.com/poslovi</loc><priority>0.9</priority></url>
+  <url><loc>https://svetgradjevine.com/firme</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/magazin</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/o-nama</loc><priority>0.5</priority></url>
+  <url><loc>https://svetgradjevine.com/kontakt</loc><priority>0.5</priority></url>
+  <url><loc>https://svetgradjevine.com/paketi</loc><priority>0.6</priority></url>
+  <url><loc>https://svetgradjevine.com/alat-i-oprema</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/placevi</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/masine</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/smestaj</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/ketering</loc><priority>0.8</priority></url>
+  <url><loc>https://svetgradjevine.com/majstori</loc><priority>0.8</priority></url>`;
 
       const results = await Promise.all(
         collections.map(async (coll) => {
@@ -241,7 +269,7 @@ export class SEODbService {
               .collection(coll)
               .where("status", "==", "active");
 
-            // Specifični filteri za kolekcije
+            // SpecifiÄni filteri za kolekcije
             if (coll === "users") {
               // Samo javni profili (majstori, firme, partneri) idu u sitemap
               query = query.where("role", "in", [
@@ -306,7 +334,7 @@ export class SEODbService {
 
                 return `
     <url>
-      <loc>https://svetgradjevine.rs/${path}/${urlId}</loc>
+      <loc>https://svetgradjevine.com/${path}/${urlId}</loc>
       <lastmod>${lastMod}</lastmod>
       <changefreq>weekly</changefreq>
       <priority>${coll === "users" ? "0.6" : "0.7"}</priority>
@@ -343,3 +371,4 @@ export class SEODbService {
     }
   }
 }
+

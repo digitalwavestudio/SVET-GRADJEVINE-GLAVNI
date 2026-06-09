@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import SeoHead from '@/src/components/SeoHead';
@@ -10,9 +10,9 @@ import { Article } from '@/src/types/magazine';
 import { Share2, Copy, Check, Facebook, Twitter, Linkedin, X, Mail, Printer, MessageSquare } from 'lucide-react';
 
 const SIDEBAR_RECOMMENDED_FALLBACK = [
-  { id: 'rec-1', title: 'Fluktuacija cena gvožđa i armature na Balkanu Q2', category: 'Cenovnik', slug: 'generativni-ai-bim-statiski-proracun' },
-  { id: 'rec-2', title: 'IoT senzori na Gazeli za praćenje zamora materijala', category: 'Inženjering', slug: 'senzorska-mreza-gazela-iot-sistem-zamor-materijala' },
-  { id: 'rec-3', title: 'Automobilska rešenja i mehanizacija za prenos tereta', category: 'Mašine', slug: 'elektromobilnost-gradiliste-elektricni-bageri-20-tona' },
+  { id: 'rec-1', title: 'Fluktuacija cena gvoÅ¾Ä‘a i armature na Balkanu Q2', category: 'Cenovnik', slug: 'generativni-ai-bim-statiski-proracun' },
+  { id: 'rec-2', title: 'IoT senzori na Gazeli za praÄ‡enje zamora materijala', category: 'InÅ¾enjering', slug: 'senzorska-mreza-gazela-iot-sistem-zamor-materijala' },
+  { id: 'rec-3', title: 'Automobilska reÅ¡enja i mehanizacija za prenos tereta', category: 'MaÅ¡ine', slug: 'elektromobilnost-gradiliste-elektricni-bageri-20-tona' },
   { id: 'rec-4', title: 'Brutalizam na Novom Beogradu: Revitalizacija', category: 'Arhitektura', slug: 'minimalizam-brutalizam-moderna-stanogradnja-novi-beograd' },
 ];
 
@@ -73,7 +73,7 @@ export default function ArticlePage() {
   const handleNativeShare = async () => {
     try {
       await navigator.share({
-        title: article?.title || 'Svet Građevine',
+        title: article?.title || 'Svet GraÄ‘evine',
         text: article?.excerpt || '',
         url: window.location.href,
       });
@@ -200,10 +200,10 @@ export default function ArticlePage() {
           >
             <div className="absolute top-0 right-0 w-12 h-2 bg-[#ffb800]"></div>
             <span className="font-mono text-[10px] font-bold text-gray-500 tracking-[0.2em] block mb-2 uppercase">
-              B2B PREPORUKA // SVET GRAĐEVINE KONEKTOR
+              B2B PREPORUKA // SVET GRAÄEVINE KONEKTOR
             </span>
             <p className="text-black font-sans font-bold text-sm md:text-base leading-relaxed mb-6">
-              Za izvođenje građevinskih radova opisanih u analizi, pogledajte verifikovane izvođače i mašine:
+              Za izvoÄ‘enje graÄ‘evinskih radova opisanih u analizi, pogledajte verifikovane izvoÄ‘aÄe i maÅ¡ine:
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 font-mono text-xs">
               <Link 
@@ -211,14 +211,14 @@ export default function ArticlePage() {
                 onClick={() => trackInternalClick("b2b_inline_masters")}
                 className="text-black hover:text-white hover:bg-black uppercase font-black tracking-wider transition-colors inline-flex items-center gap-2 border-b-2 border-black pb-1 hover:border-transparent px-2"
               >
-                // Verifikovani Izvođači
+                // Verifikovani IzvoÄ‘aÄi
               </Link>
               <Link 
                 to="/oglasi"
                 onClick={() => trackInternalClick("b2b_inline_machinery")}
                 className="text-black hover:text-white hover:bg-black uppercase font-black tracking-wider transition-colors inline-flex items-center gap-2 border-b-2 border-black pb-1 hover:border-transparent px-2"
               >
-                // Građevinska Mehanizacija
+                // GraÄ‘evinska Mehanizacija
               </Link>
               <Link 
                 to="/tenderi"
@@ -242,10 +242,10 @@ export default function ArticlePage() {
         >
           <div className="absolute top-0 right-0 w-12 h-2 bg-[#ffb800]"></div>
           <span className="font-mono text-[10px] font-bold text-gray-500 tracking-[0.2em] block mb-2 uppercase">
-            B2B PREPORUKA // SVET GRAĐEVINE KONEKTOR
+            B2B PREPORUKA // SVET GRAÄEVINE KONEKTOR
           </span>
           <p className="text-black font-sans font-bold text-sm md:text-base leading-relaxed mb-6">
-            Za izvođenje građevinskih radova opisanih u analizi, pogledajte verifikovane izvođače i mašine:
+            Za izvoÄ‘enje graÄ‘evinskih radova opisanih u analizi, pogledajte verifikovane izvoÄ‘aÄe i maÅ¡ine:
           </p>
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 font-mono text-xs">
             <Link 
@@ -253,14 +253,14 @@ export default function ArticlePage() {
               onClick={() => trackInternalClick("b2b_inline_masters_end")}
               className="text-black hover:text-white hover:bg-black uppercase font-black tracking-wider transition-colors inline-flex items-center gap-2 border-b-2 border-black pb-1 hover:border-transparent px-2"
             >
-              // Verifikovani Izvođači
+              // Verifikovani IzvoÄ‘aÄi
             </Link>
             <Link 
               to="/oglasi"
               onClick={() => trackInternalClick("b2b_inline_machinery_end")}
               className="text-black hover:text-white hover:bg-black uppercase font-black tracking-wider transition-colors inline-flex items-center gap-2 border-b-2 border-black pb-1 hover:border-transparent px-2"
             >
-              // Građevinska Mehanizacija
+              // GraÄ‘evinska Mehanizacija
             </Link>
             <Link 
               to="/tenderi"
@@ -312,8 +312,8 @@ export default function ArticlePage() {
         <div className="w-24 h-24 bg-gray-100 flex items-center justify-center mb-8 border-4 border-black rounded-none shadow-[4px_4px_0px_rgba(0,0,0,1)]">
           <span className="material-symbols-outlined text-black text-5xl">warning</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-black mb-4">Članak nije pronađen</h1>
-        <p className="text-gray-600 font-bold mb-10 text-lg">Nažalost, nismo uspeli da pronađemo članak koji tražite.</p>
+        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-black mb-4">ÄŒlanak nije pronaÄ‘en</h1>
+        <p className="text-gray-600 font-bold mb-10 text-lg">NaÅ¾alost, nismo uspeli da pronaÄ‘emo Älanak koji traÅ¾ite.</p>
         <Link to="/magazin" className="bg-black text-white px-8 py-4 font-black uppercase text-[11px] tracking-[0.2em] flex items-center gap-2 hover:bg-[#ffb800] hover:text-black transition-colors rounded-none shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:translate-x-1 hover:shadow-none">
           <span className="material-symbols-outlined text-sm">arrow_back</span> NAZAD NA MAGAZIN
         </Link>
@@ -346,15 +346,15 @@ export default function ArticlePage() {
       },
       "publisher": {
         "@type": "Organization",
-        "name": "Svet Građevine",
+        "name": "Svet GraÄ‘evine",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://svetgradjevine.rs/logo.png"
+          "url": "https://svetgradjevine.com/logo.png"
         }
       },
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": `https://svetgradjevine.rs/magazin/${article.slug}`
+        "@id": `https://svetgradjevine.com/magazin/${article.slug}`
       }
     };
   }, [article]);
@@ -366,7 +366,7 @@ export default function ArticlePage() {
   return (
     <div className="bg-[#0b0c10] min-h-screen pt-32 pb-32 font-sans text-gray-100 selection:bg-secondary selection:text-black">
       <SeoHead 
-        title={`${article.title} | Svet Građevine Magazin`}
+        title={`${article.title} | Svet GraÄ‘evine Magazin`}
         description={article.excerpt || article.seo?.description}
         type="article"
         image={article.featuredImage}
@@ -378,7 +378,7 @@ export default function ArticlePage() {
         <div className="max-w-7xl mx-auto px-4 md:px-12 w-full mb-14">
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-2 text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-8 font-bold">
-            <Link to="/" className="hover:text-white transition-colors">Početna</Link>
+            <Link to="/" className="hover:text-white transition-colors">PoÄetna</Link>
             <span className="text-white/20">/</span>
             <Link to="/magazin" className="hover:text-white transition-colors">Magazin</Link>
             <span className="text-white/20">/</span>
@@ -418,7 +418,7 @@ export default function ArticlePage() {
               </span>
             </div>
             <div className="flex flex-col justify-center md:pl-6">
-              <span className="font-mono text-[9px] text-gray-400 uppercase tracking-widest mb-1 font-bold">VREME ČITANJA</span>
+              <span className="font-mono text-[9px] text-gray-400 uppercase tracking-widest mb-1 font-bold">VREME ÄŒITANJA</span>
               <span className="font-mono text-[11px] font-bold text-white uppercase tracking-wider truncate">
                 {article.readingTime || '5'} MINUTA
               </span>
@@ -512,7 +512,7 @@ export default function ArticlePage() {
               {/* Print action */}
               <button 
                 onClick={() => window.print()}
-                title="Odštampaj analizu"
+                title="OdÅ¡tampaj analizu"
                 className="text-gray-400 hover:text-black hover:scale-105 transition-all cursor-pointer p-2 rounded-none"
               >
                 <Printer size={16} />
@@ -520,7 +520,7 @@ export default function ArticlePage() {
 
               {/* Comment trigger */}
               <button 
-                onClick={() => alert("Komentari su odobreni isključivo za verifikovane B2B entitete.")}
+                onClick={() => alert("Komentari su odobreni iskljuÄivo za verifikovane B2B entitete.")}
                 title="Ostavi komentar"
                 className="text-gray-400 hover:text-black hover:scale-105 transition-all cursor-pointer p-2 rounded-none"
               >
@@ -563,7 +563,7 @@ export default function ArticlePage() {
               <section className="bg-[#12141a] border border-secondary rounded-none p-6 md:p-8 mb-16 relative">
                 <div className="absolute top-0 right-0 w-16 h-1 bg-secondary"></div>
                 <span className="font-mono font-bold text-[9px] text-gray-500 tracking-[0.2em] block uppercase mb-3">
-                  // POTENCIJAL SA TRŽIŠTA OGLASA
+                  // POTENCIJAL SA TRÅ½IÅ TA OGLASA
                 </span>
                 <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white mb-6">Povezane B2B Prilike:</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/10 pt-6">
@@ -618,7 +618,7 @@ export default function ArticlePage() {
             <div className="sticky top-32 space-y-6">
               <div className="flex items-center justify-center border border-white/10 bg-[#161a22] py-3 px-4 mb-6">
                 <h4 className="font-sans text-[12px] font-black uppercase tracking-[0.1em] text-white">
-                  Preporučeno Za Vas
+                  PreporuÄeno Za Vas
                 </h4>
               </div>
               
@@ -646,7 +646,7 @@ export default function ArticlePage() {
         {relatedArticles && relatedArticles.length > 0 && (
           <section className="mt-24 border-t-2 border-white/10 bg-[#12141a] pt-16 pb-24" id="section-related-articles">
             <div className="max-w-7xl mx-auto px-4 md:px-12 w-full">
-              <h3 className="text-3xl font-sans font-black uppercase tracking-tighter text-white mb-10">Povezani Članci</h3>
+              <h3 className="text-3xl font-sans font-black uppercase tracking-tighter text-white mb-10">Povezani ÄŒlanci</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                 {relatedArticles.map((rel) => {
                   let relDate = 'Danas';
@@ -713,8 +713,8 @@ export default function ArticlePage() {
           >
             <div className="max-w-[800px] mx-auto bg-[#161920] border border-white/20 rounded-none p-5 md:p-6 shadow-2xl pointer-events-auto flex items-center justify-between gap-6">
               <div className="hidden md:block">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-secondary mb-1.5">DOPADA VAM SE ČLANAK?</p>
-                <h4 className="text-base font-black uppercase tracking-tight text-white">Iskoristite potencijal tržišta</h4>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-secondary mb-1.5">DOPADA VAM SE ÄŒLANAK?</p>
+                <h4 className="text-base font-black uppercase tracking-tight text-white">Iskoristite potencijal trÅ¾iÅ¡ta</h4>
               </div>
               
               <div className="flex items-center justify-end gap-3 w-full md:w-auto">
@@ -724,7 +724,7 @@ export default function ArticlePage() {
                     onClick={() => trackInternalClick("majstori")}
                     className="flex-1 md:flex-none justify-center bg-secondary text-black px-6 py-3.5 border-2 border-secondary hover:bg-white hover:border-white font-black uppercase text-[10px] tracking-[0.1em] text-center transition-colors"
                   >
-                    PRONAĐI MAJSTORA
+                    PRONAÄI MAJSTORA
                   </Link>
                 ) : (
                   <Link 
@@ -780,10 +780,10 @@ export default function ArticlePage() {
                 <Mail className="w-7 h-7" />
               </div>
 
-              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-400 mb-3 block">Dnevna Doza Građevinarstva</span>
-              <h3 className="text-3xl font-black uppercase tracking-tight text-white mb-4 leading-tight">Ne propustite sledeći trend</h3>
+              <span className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-400 mb-3 block">Dnevna Doza GraÄ‘evinarstva</span>
+              <h3 className="text-3xl font-black uppercase tracking-tight text-white mb-4 leading-tight">Ne propustite sledeÄ‡i trend</h3>
               <p className="text-sm text-gray-300 font-medium mb-8 leading-relaxed">
-                Pretplatite se na naš nedeljni bilten i preuzmite besplatni priručnik za optimizaciju troškova gradnje i renoviranja.
+                Pretplatite se na naÅ¡ nedeljni bilten i preuzmite besplatni priruÄnik za optimizaciju troÅ¡kova gradnje i renoviranja.
               </p>
 
               <form onSubmit={handleSubscribeNewsletter} className="space-y-4 relative">
@@ -793,14 +793,14 @@ export default function ArticlePage() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="p-5 bg-green-500/20 border border-green-500 text-green-400 text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2"
                   >
-                    <Check size={16} /> Uspešno ste se prijavili! Hvala.
+                    <Check size={16} /> UspeÅ¡no ste se prijavili! Hvala.
                   </motion.div>
                 ) : (
                   <>
                     <input 
                       type="email"
                       required
-                      placeholder="Unesite vašu e-mail adresu"
+                      placeholder="Unesite vaÅ¡u e-mail adresu"
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
                       disabled={newsletterStatus === 'loading'}
@@ -830,3 +830,4 @@ export default function ArticlePage() {
     </div>
   );
 }
+

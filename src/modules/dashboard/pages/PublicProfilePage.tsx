@@ -112,7 +112,7 @@ export default function PublicProfilePage() {
     <div className="min-h-screen bg-[#050505] text-white">
       {isAdmin && profile && (
         <div className="fixed bottom-0 left-0 right-0 z-[100] bg-slate-900 border-t border-white/10 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-          <div className="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Moderacija Profila</span>
@@ -154,7 +154,7 @@ export default function PublicProfilePage() {
       />
       <Navbar />
       
-      <main className="pt-32 pb-20 px-6">
+      <main className="pt-32 pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <Breadcrumbs items={[
             { label: 'Majstori', path: '/majstori' },
@@ -279,7 +279,7 @@ export default function PublicProfilePage() {
              </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-10">
              {/* Left Column: Details */}
              <div className="lg:col-span-2 space-y-10">
                 {(((profile as PublicProfileData)?.cvData?.about) || profile.description) && (

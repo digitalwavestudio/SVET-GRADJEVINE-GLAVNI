@@ -224,7 +224,7 @@ function PostAdContent() {
         <FormProvider {...methods}>
           <form
             onSubmit={methods.handleSubmit(onFormSubmit as any)}
-            className="bg-white/[0.03] backdrop-blur-xl p-8 md:p-12 rounded-[10px] border border-white/10 shadow-2xl relative overflow-hidden"
+            className="bg-white/[0.03] backdrop-blur-xl p-5 md:p-12 rounded-[10px] border border-white/10 shadow-2xl relative overflow-hidden"
           >
             <input
               type="text"

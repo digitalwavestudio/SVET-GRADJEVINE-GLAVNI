@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import path from "path";
 import fs from "fs";
 import { db } from "../config/firebase.ts";
@@ -69,12 +69,12 @@ async function backgroundPreRenderListingHub(
                <ul>
                  <li><a href="${APP_CONFIG.BASE_URL}/poslovi/beograd">Posao Beograd</a></li>
                  <li><a href="${APP_CONFIG.BASE_URL}/poslovi/novi-sad">Posao Novi Sad</a></li>
-                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/nis">Posao Niš</a></li>
+                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/nis">Posao NiÅ¡</a></li>
                </ul>
                <h3>Popularne profesije</h3>
                <ul>
                  <li><a href="${APP_CONFIG.BASE_URL}/poslovi/zidar">Zidar posao</a></li>
-                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/elektricar">Električar posao</a></li>
+                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/elektricar">ElektriÄar posao</a></li>
                </ul>
              </aside>`;
     }
@@ -82,7 +82,7 @@ async function backgroundPreRenderListingHub(
     const botListHtml = `
           <main>
              <h1>${matchedRoute.label}</h1>
-             <p>${matchedRoute.label} na portalu Svet Građevine.</p>
+             <p>${matchedRoute.label} na portalu Svet GraÄ‘evine.</p>
              <nav>
                <ul>
                  ${itemsHtml}
@@ -91,8 +91,8 @@ async function backgroundPreRenderListingHub(
              ${hubLinks}
           </main>`;
 
-    const title = `${matchedRoute.label} | Svet Građevine`;
-    const desc = `Pretražite najveću bazu za ${matchedRoute.label.toLowerCase()} na Balkanu. Pronađite najbolje ponude i partnere.`;
+    const title = `${matchedRoute.label} | Svet GraÄ‘evine`;
+    const desc = `PretraÅ¾ite najveÄ‡u bazu za ${matchedRoute.label.toLowerCase()} na Balkanu. PronaÄ‘ite najbolje ponude i partnere.`;
 
     const bc = {
       "@context": "https://schema.org",
@@ -101,7 +101,7 @@ async function backgroundPreRenderListingHub(
         {
           "@type": "ListItem",
           position: 1,
-          name: "Početna",
+          name: "PoÄetna",
           item: APP_CONFIG.BASE_URL,
         },
         {
@@ -169,7 +169,7 @@ async function backgroundPreRenderDetailPage(
     }
 
     const baseTitle = adData.title || adData.name || "Oglas";
-    const title = `${baseTitle} | Svet Građevine`;
+    const title = `${baseTitle} | Svet GraÄ‘evine`;
     let desc =
       adData.description ||
       adData.requirements ||
@@ -181,7 +181,7 @@ async function backgroundPreRenderDetailPage(
         .replace(/<[^>]*>?/gm, "")
         .replace(/"/g, "&quot;");
     } else {
-      desc = "Detalji oglasa na portalu Svet Građevine.";
+      desc = "Detalji oglasa na portalu Svet GraÄ‘evine.";
     }
 
     const image =
@@ -195,8 +195,8 @@ async function backgroundPreRenderDetailPage(
          <main itemscope itemtype="https://schema.org/${collectionName === "jobs" ? "JobPosting" : "Product"}">
            <header>
              <h1 itemprop="title name">${baseTitle}</h1>
-             ${adData.city ? `<p itemprop="jobLocation address">📍 Lokacija: ${adData.city}</p>` : ""}
-             ${adData.companyName ? `<p itemprop="hiringOrganization brand">🏢 Kompanija: ${adData.companyName}</p>` : ""}
+             ${adData.city ? `<p itemprop="jobLocation address">ðŸ“ Lokacija: ${adData.city}</p>` : ""}
+             ${adData.companyName ? `<p itemprop="hiringOrganization brand">ðŸ¢ Kompanija: ${adData.companyName}</p>` : ""}
            </header>
            <article itemprop="description">
              ${typeof adData.description === "string" ? adData.description.replace(/\n/g, "<br>") : desc}
@@ -208,7 +208,7 @@ async function backgroundPreRenderDetailPage(
                 ${adData.employmentType ? `<li>Tip zaposlenja: ${adData.employmentType}</li>` : ""}
               </ul>
            </section>
-           <a href="${canonicalUrl}" itemprop="url">Prikaži originalni oglas</a>
+           <a href="${canonicalUrl}" itemprop="url">PrikaÅ¾i originalni oglas</a>
          </main>
        `;
 
@@ -221,14 +221,14 @@ async function backgroundPreRenderDetailPage(
         {
           "@type": "ListItem",
           position: 1,
-          name: "Početna",
-          item: "https://svetgradjevine.rs/",
+          name: "PoÄetna",
+          item: "https://svetgradjevine.com/",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Oglasi",
-          item: "https://svetgradjevine.rs/oglasi",
+          item: "https://svetgradjevine.com/oglasi",
         },
         {
           "@type": "ListItem",
@@ -254,8 +254,8 @@ async function backgroundPreRenderDetailPage(
         employmentType: "FULL_TIME",
         hiringOrganization: {
           "@type": "Organization",
-          name: adData.companyName || "Svet Građevine",
-          logo: "https://svetgradjevine.rs/logo192.png",
+          name: adData.companyName || "Svet GraÄ‘evine",
+          logo: "https://svetgradjevine.com/logo192.png",
         },
         jobLocation: {
           "@type": "Place",
@@ -325,7 +325,7 @@ async function backgroundPreRenderDetailPage(
 <meta property="og:image" content="${image}" />
 <meta property="og:image:alt" content="${baseTitle}" />
 <meta property="og:url" content="${canonicalUrl}" />
-<meta property="og:site_name" content="Svet Građevine" />
+<meta property="og:site_name" content="Svet GraÄ‘evine" />
 <meta property="og:type" content="article" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${title}" />
@@ -391,7 +391,7 @@ export const createSpaMiddleware = () => {
            if (!cachedIndexHtml) {
              cachedIndexHtml = await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
            }
-           console.log(`🛡️ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
+           console.log(`ðŸ›¡ï¸ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
            return res.send(cachedIndexHtml);
         }
       }
@@ -435,7 +435,7 @@ export const createSpaMiddleware = () => {
       let html = cachedIndexHtml;
 
       const adRoutes = [
-        { path: "/posao/", coll: "jobs", label: "Posao u građevini" },
+        { path: "/posao/", coll: "jobs", label: "Posao u graÄ‘evini" },
         {
           path: "/poslovi",
           coll: "jobs",
@@ -445,18 +445,18 @@ export const createSpaMiddleware = () => {
         {
           path: "/gradjevinske-masine/",
           coll: "machines",
-          label: "Građevinske mašine",
+          label: "GraÄ‘evinske maÅ¡ine",
         },
         {
           path: "/masine",
           coll: "machines",
-          label: "Građevinske mašine",
+          label: "GraÄ‘evinske maÅ¡ine",
           alwaysListing: true,
         },
         {
           path: "/smestaj",
           coll: "accommodations",
-          label: "Smeštaj za radnike",
+          label: "SmeÅ¡taj za radnike",
         }, // Handles both /smestaj/id and /smestaj/beograd
         {
           path: "/ketering/provajder/",
@@ -469,14 +469,14 @@ export const createSpaMiddleware = () => {
           label: "Ketering",
           alwaysListing: true,
         },
-        { path: "/placevi", coll: "plots", label: "Građevinsko zemljište" }, // /placevi/:grad and /placevi (Listing)
-        { path: "/nekretnine/", coll: "plots", label: "Građevinsko zemljište" }, // /nekretnine/:id (Detail)
+        { path: "/placevi", coll: "plots", label: "GraÄ‘evinsko zemljiÅ¡te" }, // /placevi/:grad and /placevi (Listing)
+        { path: "/nekretnine/", coll: "plots", label: "GraÄ‘evinsko zemljiÅ¡te" }, // /nekretnine/:id (Detail)
         { path: "/alat-i-oprema", coll: "marketplace", label: "Alat i oprema" }, // Handles both
         { path: "/firma/", coll: "companies", label: "Profil firme" }, // Detail
         {
           path: "/firme",
           coll: "companies",
-          label: "Građevinske kompanije",
+          label: "GraÄ‘evinske kompanije",
           alwaysListing: true,
         },
         {
@@ -494,16 +494,16 @@ export const createSpaMiddleware = () => {
       // Static Pages SEO
       const staticMetas: Record<string, {title: string, desc: string}> = {
         "/o-nama": {
-          title: "O nama | Svet Građevine",
-          desc: "Saznajte više o misiji i viziji najvećeg građevinskog portala na Balkanu.",
+          title: "O nama | Svet GraÄ‘evine",
+          desc: "Saznajte viÅ¡e o misiji i viziji najveÄ‡eg graÄ‘evinskog portala na Balkanu.",
         },
         "/kontakt": {
-          title: "Kontakt | Svet Građevine",
-          desc: "Kontaktirajte nas za saradnju, oglašavanje ili tehničku podršku.",
+          title: "Kontakt | Svet GraÄ‘evine",
+          desc: "Kontaktirajte nas za saradnju, oglaÅ¡avanje ili tehniÄku podrÅ¡ku.",
         },
         "/cenovnik": {
-          title: "Cenovnik oglašavanja | Svet Građevine",
-          desc: "Detaljan pregled cena za isticanje oglasa i banersko oglašavanje.",
+          title: "Cenovnik oglaÅ¡avanja | Svet GraÄ‘evine",
+          desc: "Detaljan pregled cena za isticanje oglasa i banersko oglaÅ¡avanje.",
         },
       };
 
@@ -538,8 +538,8 @@ export const createSpaMiddleware = () => {
           );
 
         if (isListingPage) {
-          const title = `${matchedRoute.label} | Svet Građevine`;
-          const desc = `Pretražite najveću bazu za ${matchedRoute.label.toLowerCase()} na Balkanu. Pronađite najbolje ponude i partnere.`;
+          const title = `${matchedRoute.label} | Svet GraÄ‘evine`;
+          const desc = `PretraÅ¾ite najveÄ‡u bazu za ${matchedRoute.label.toLowerCase()} na Balkanu. PronaÄ‘ite najbolje ponude i partnere.`;
 
           // Breadcrumb for listing
           const bc = {
@@ -549,7 +549,7 @@ export const createSpaMiddleware = () => {
               {
                 "@type": "ListItem",
                 position: 1,
-                name: "Početna",
+                name: "PoÄetna",
                 item: APP_CONFIG.BASE_URL,
               },
               {
@@ -605,10 +605,10 @@ export const createSpaMiddleware = () => {
             .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
             .join(" ");
 
-          const title = `${readableTitle} | Svet Građevine`;
-          const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet Građevine. Najveći građevinski portal i berza na Balkanu.`;
+          const title = `${readableTitle} | Svet GraÄ‘evine`;
+          const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet GraÄ‘evine. NajveÄ‡i graÄ‘evinski portal i berza na Balkanu.`;
           const canonicalUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
-          const defaultImage = "https://svetgradjevine.rs/og-default.jpg";
+          const defaultImage = "https://svetgradjevine.com/og-default.jpg";
 
           let skeletonHtml = html;
           skeletonHtml = skeletonHtml.replace(
@@ -646,3 +646,4 @@ export const createSpaMiddleware = () => {
 
   return router;
 };
+

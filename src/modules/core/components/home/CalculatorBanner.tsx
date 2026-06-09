@@ -4,9 +4,9 @@ import { Calculator, ArrowRight } from 'lucide-react';
 
 export default function CalculatorBanner() {
   return (
-    <section className="py-12 md:py-16 bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-8">
-        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-slate-950 border border-white/10 rounded-[10px] py-12 md:py-16 px-8 md:px-12 shadow-sm">
+    <section className="py-8 md:py-16 bg-surface-container-low">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-slate-950 border border-white/10 rounded-[10px] py-8 md:py-16 px-6 md:px-12 shadow-sm">
           {/* Subtle Background Glow */}
           <div className="absolute top-0 right-0 w-1/3 h-full bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -18,7 +18,7 @@ export default function CalculatorBanner() {
             
             {/* Content */}
             <div className="flex-1 text-center lg:text-left">
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tighter uppercase leading-tight">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-tighter uppercase leading-tight">
                 AI<span className="text-secondary"> Građevinski</span><br className="hidden md:block lg:hidden" /> Kalkulator
               </h3>
               <p className="text-base font-medium text-slate-400 max-w-2xl leading-relaxed">
@@ -27,7 +27,7 @@ export default function CalculatorBanner() {
             </div>
             
             {/* Action */}
-            <div className="shrink-0 flex items-center gap-4 bg-white/5 hover:bg-secondary pl-8 pr-6 py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-sm transition-all duration-500 group-hover:scale-105">
+            <div className="w-full md:w-auto shrink-0 flex items-center justify-between md:justify-center gap-4 bg-white/5 hover:bg-secondary pl-6 md:pl-8 pr-4 md:pr-6 py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-sm transition-all duration-500 group-hover:scale-105">
               Isprobaj odmah 
               <div className="bg-white/10 p-2 rounded-[10px] group-hover:bg-slate-950 group-hover:text-white transition-colors">
                 <ArrowRight className="w-5 h-5" />

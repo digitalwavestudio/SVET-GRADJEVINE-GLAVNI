@@ -135,7 +135,7 @@ export default function CateringItemDetailPage() {
         url={`${APP_CONFIG.BASE_URL}/ketering/${providerId}/stavka/${item.id}`}
         jsonLd={[menuItemSchema]}
       />
-      <main className="max-w-7xl mx-auto px-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-12">
           <Link to="/" className="hover:text-white transition-colors">Početna</Link>

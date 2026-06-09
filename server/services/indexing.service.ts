@@ -5,9 +5,7 @@ export class IndexingService {
     process.env.INDEXNOW_KEY || "svetgradjevine-default-key";
   private static INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 
-  /**
-   * Pushes URL updates to major search engines in real-time.
-   */
+  /** Pushes URL updates to major search engines in real-time. */
   static async pushToIndex(url: string, action: "URL_UPDATED" | "URL_DELETED") {
     console.log(`[IndexingService] Pushing to indexers: ${url} (${action})`);
 
@@ -23,9 +21,9 @@ export class IndexingService {
   private static async notifyIndexNow(url: string) {
     try {
       const payload = {
-        host: "svetgradjevine.rs",
+        host: "svetgradjevine.com",
         key: this.INDEXNOW_KEY,
-        keyLocation: `https://svetgradjevine.rs/${this.INDEXNOW_KEY}.txt`,
+        keyLocation: `https://svetgradjevine.com/${this.INDEXNOW_KEY}.txt`,
         urlList: [url],
       };
 
@@ -37,7 +35,7 @@ export class IndexingService {
 
       if (!res.ok) {
         console.error(
-          `[IndexingService] IndexNow failed with status ${res.status}`,
+          `[IndexingService] IndexNow failed with status ${res.status}`
         );
       } else {
         console.log(`[IndexingService] IndexNow notification sent for ${url}`);
@@ -49,12 +47,15 @@ export class IndexingService {
 
   private static async notifyGoogle(
     url: string,
-    action: "URL_UPDATED" | "URL_DELETED",
+    action: "URL_UPDATED" | "URL_DELETED"
   ) {
     try {
       await GoogleIndexingService.ping(url, action);
     } catch (e) {
-      console.error("[IndexingService] Error within unified Google Indexing delegate:", e);
+      console.error(
+        "[IndexingService] Error within unified Google Indexing delegate:",
+        e
+      );
     }
   }
 }

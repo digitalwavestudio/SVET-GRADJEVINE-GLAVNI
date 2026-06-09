@@ -44,9 +44,19 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.4 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            onDragEnd={(event, info) => {
+              const swipeThreshold = 50;
+              if (info.offset.x < -swipeThreshold) {
+                next();
+              } else if (info.offset.x > swipeThreshold) {
+                prev();
+              }
+            }}
             src={images[activeIndex]}
             alt={`${title || 'Media'} ${activeIndex + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover cursor-grab active:cursor-grabbing"
             fetchPriority="high"
             decoding="async"
             loading="eager"
@@ -56,7 +66,7 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
         </AnimatePresence>
 
         {/* Controls Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-between items-center">
+        <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-between items-center z-10">
           <div className="flex gap-2">
             <button
               onClick={prev}
@@ -80,7 +90,7 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
         </div>
 
         {/* Counter Badge */}
-        <div className="absolute top-6 right-6 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-black text-white/80 uppercase tracking-widest">
+        <div className="absolute top-6 right-6 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-black text-white/80 uppercase tracking-widest z-10">
           {activeIndex + 1} / {images.length}
         </div>
       </div>
@@ -101,8 +111,77 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
         ))}
       </div>
 
-      {/* Fullscreen Modal Logic Placeholder */}
-      {/* Ovde bi išao Portal za fullscreen pregled */}
+      {/* Fullscreen Lightbox Modal */}
+      <AnimatePresence>
+        {fullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4"
+          >
+            {/* Close button */}
+            <button 
+              onClick={() => setFullscreen(false)}
+              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white hover:bg-white/20 active:scale-95 transition-all"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+
+            {/* Main Image */}
+            <div className="relative max-w-5xl w-full aspect-[16/9] overflow-hidden rounded-xl bg-black">
+              <motion.img
+                key={activeIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragEnd={(event, info) => {
+                  const swipeThreshold = 50;
+                  if (info.offset.x < -swipeThreshold) {
+                    next();
+                  } else if (info.offset.x > swipeThreshold) {
+                    prev();
+                  }
+                }}
+                src={images[activeIndex]}
+                className="w-full h-full object-contain cursor-grab active:cursor-grabbing"
+              />
+              
+              {/* Prev/Next Buttons */}
+              <button
+                onClick={prev}
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 border border-white/10 text-white hover:bg-white/20 active:scale-95 transition-all"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={next}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 border border-white/10 text-white hover:bg-white/20 active:scale-95 transition-all"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+
+            {/* Thumbnail Navigation */}
+            <div className="mt-8 flex gap-3 overflow-x-auto max-w-full pb-2 no-scrollbar px-4">
+              {images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveIndex(i)}
+                  className={`relative w-16 h-16 rounded-[8px] overflow-hidden border-2 shrink-0 transition-all ${
+                    activeIndex === i ? 'border-secondary scale-95' : 'border-transparent'
+                  }`}
+                >
+                  <img src={img} className="w-full h-full object-cover" alt="thumbnail" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

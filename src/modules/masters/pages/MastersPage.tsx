@@ -218,8 +218,8 @@ export default function MastersPage() {
           { label: "PREPORUKE", value: recommendationCount?.toLocaleString() || "12k", icon: "recommend" }
         ]}
       >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl">
-          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
+        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
+          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
             <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
             <input
               type="text"
@@ -227,13 +227,13 @@ export default function MastersPage() {
               value={localSearchTerm}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-5 px-6" 
+              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
           <Button 
             onClick={handleApplyFilters}
             variant="primary"
-            className="px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
+            className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
             icon="person_search"
           >
             PRETRAŽI
@@ -241,7 +241,7 @@ export default function MastersPage() {
         </div>
       </StandardPageHero>
 
-      <main className="max-w-7xl mx-auto px-8 relative z-20 py-12">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 relative z-20 py-12">
         <div className="flex flex-col-reverse lg:flex-row-reverse gap-12 mb-16">
         {/* Sidebar Filters */}
         <FilterSidebar>
@@ -431,8 +431,8 @@ export default function MastersPage() {
                         />
                           
                         {candidate.verified && (
-                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-[#111a22] shadow-[0_0_10px_rgba(59,130,246,0.5)]">
-                            <span className="material-symbols-outlined text-white text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-[#111a22] shadow-[0_0_10px_rgba(34,197,94,0.5)]">
+                            <span className="material-symbols-outlined text-white text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                           </div>
                         )}
                       </div>
@@ -456,7 +456,7 @@ export default function MastersPage() {
 
                     {candidate.verified && (
                       <div className="flex flex-wrap gap-1.5 mb-4 group/badges relative">
-                        <div className="flex items-center gap-1.5 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                        <div className="hidden md:flex items-center gap-1.5 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
                           <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
                           <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">APR Verifikovan</span>
                         </div>
@@ -500,7 +500,7 @@ export default function MastersPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 mb-6 h-12 overflow-hidden items-start">
+                    <div className="hidden md:flex flex-wrap gap-1.5 mb-6 h-12 overflow-hidden items-start">
                       {candidate.skills.slice(0, 3).map((s: string) => (
                         <span key={s} className="px-2 py-1 bg-white/5 rounded-sm text-[8px] font-black text-white/40 uppercase tracking-widest border border-white/5">
                           {s}
@@ -521,7 +521,7 @@ export default function MastersPage() {
                        </div>
                        <Link
                         to={`/majstori/${candidate.id}`}
-                        className="text-secondary font-black text-[9px] flex items-center gap-1 hover:underline uppercase tracking-widest"
+                        className="hidden md:inline-flex text-secondary font-black text-[9px] items-center gap-1 hover:underline uppercase tracking-widest"
                       >
                         POGLEDAJ PROFIL <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                       </Link>

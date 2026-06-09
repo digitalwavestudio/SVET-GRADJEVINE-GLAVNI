@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 import { Request, Response, NextFunction } from "express";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { env } from "../config/env.ts";
@@ -127,7 +127,7 @@ export const botPrerenderMiddleware = async (
   // Kategorija + Grad + Cena + Stanje = ZABRANJENO za botove (X-Robots-Tag: noindex).
   const queryKeys = Object.keys(req.query);
 
-  // Dozvoljeni parametar za crawling je isključivo paginacija
+  // Dozvoljeni parametar za crawling je iskljuÄivo paginacija
   const allowedQueryKeys = ["page"];
   const advancedFiltersCount = queryKeys.filter(
     (k) => !allowedQueryKeys.includes(k),
@@ -135,7 +135,7 @@ export const botPrerenderMiddleware = async (
 
   let isFilterTrap = false;
 
-  // Gledamo dubinu AST drveta filtera. pathSegments definišu 1-2 nivoa u strukturi rutiranja.
+  // Gledamo dubinu AST drveta filtera. pathSegments definiÅ¡u 1-2 nivoa u strukturi rutiranja.
   // Bilo koji query parametar menja stanje "Dubina > 2" u pogledu grananja varijacija.
   if (advancedFiltersCount > 0) {
     isFilterTrap = true;
@@ -152,7 +152,7 @@ export const botPrerenderMiddleware = async (
         await redis.expire(rateKey, 60); // 1 minute window
       }
 
-      // Ako IP bot-a pogađa preko 200 req per minute, smatramo ga eksplozivnim (možemo da smanjimo ako treba)
+      // Ako IP bot-a pogaÄ‘a preko 200 req per minute, smatramo ga eksplozivnim (moÅ¾emo da smanjimo ako treba)
       // I zaustavljamo request sa 429 Too Many Requests
       if (hits > 200) {
         console.log(
@@ -239,10 +239,10 @@ export const botPrerenderMiddleware = async (
       if (botMetaHits === 1) await redis.expire(botMetaRateKey, 60);
 
       if (botMetaHits > 10) {
-        console.warn(`🛡️ [SEO Rate Limit] IP ${ip} (${botName}) exceeded 10 meta-reads/min. Serving generic fallback data.`);
+        console.warn(`ðŸ›¡ï¸ [SEO Rate Limit] IP ${ip} (${botName}) exceeded 10 meta-reads/min. Serving generic fallback data.`);
         const genericHtml = await SEORenderEngine.assembleHtml({
           reqPath: req.path,
-          host: req.get("host") || "svetgradjevine.rs",
+          host: req.get("host") || "svetgradjevine.com",
           meta: null,
           pageNum,
           paginationTags,
@@ -255,7 +255,7 @@ export const botPrerenderMiddleware = async (
 
       if (meta) {
         if (meta.isDead) {
-          // Korak 8.2: SEO kolaps sprečavanje
+          // Korak 8.2: SEO kolaps spreÄavanje
           console.log(`[SEO] Bot encountered dead listing on ${req.path}`);
           if (meta.hasTraffic) {
             const adRoutes = [
@@ -306,7 +306,7 @@ export const botPrerenderMiddleware = async (
 
       const htmlContext = await SEORenderEngine.assembleHtml({
         reqPath: req.path,
-        host: req.get("host") || "svetgradjevine.rs",
+        host: req.get("host") || "svetgradjevine.com",
         meta,
         pageNum,
         paginationTags,
@@ -329,7 +329,7 @@ export const botPrerenderMiddleware = async (
 
     const fallbackHtml = await SEORenderEngine.assembleHtml({
       reqPath: req.path,
-      host: req.get("host") || "svetgradjevine.rs",
+      host: req.get("host") || "svetgradjevine.com",
       meta: null,
       pageNum,
       paginationTags,
@@ -350,3 +350,4 @@ export const botPrerenderMiddleware = async (
     next();
   }
 };
+

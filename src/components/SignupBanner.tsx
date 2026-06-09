@@ -69,10 +69,10 @@ export function SignupBanner() {
               </Link>
               <button 
                 onClick={handleClose}
-                className="py-2.5 px-4 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-outline-variant/20 rounded-xl md:rounded-full transition-colors flex items-center justify-center"
+                className="absolute top-2 right-2 md:relative md:top-auto md:right-auto p-1.5 md:py-2.5 md:px-4 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-outline-variant/10 rounded-full transition-colors flex items-center justify-center shadow-lg"
                 aria-label="Zatvori"
               >
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined text-sm md:text-lg">close</span>
               </button>
             </div>
 

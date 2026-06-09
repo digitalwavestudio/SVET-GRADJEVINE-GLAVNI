@@ -254,11 +254,11 @@ export default function RealEstatePage() {
           { label: "Premium Ponuda", value: realEstateStats?.premium?.toLocaleString() || "40", icon: "verified" }
         ]}
       >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-3xl">
-          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
+        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-3xl w-full">
+          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
             <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:scale-110 transition-transform">location_searching</span>
             <input 
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-5 px-6" 
+              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
               placeholder="Pretraži lokacije (npr. Inđija, Subotica)..." 
               type="text"
               aria-label="Pretraga placeva"
@@ -270,7 +270,7 @@ export default function RealEstatePage() {
           <Button 
             onClick={handleApplyFilters}
             variant="primary"
-            className="px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
+            className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
             icon="search"
           >
             PRETRAŽI
@@ -279,7 +279,7 @@ export default function RealEstatePage() {
       </StandardPageHero>
 
       {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-8 py-12 flex flex-col lg:flex-row-reverse gap-12">
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col lg:flex-row-reverse gap-12">
         
         {/* Sidebar Filters */}
         <FilterSidebar>
@@ -462,7 +462,7 @@ export default function RealEstatePage() {
                   {plots.map((plot: any, index: number) => (
                     <div 
                       key={plot.id}
-                      className={`group bg-surface-container-high rounded-[10px] overflow-hidden transition-all duration-300 border border-white/5 flex flex-col hover:border-white/20 ${plot.isPremium ? 'border-secondary/40 shadow-[0_10px_40px_rgba(254,191,13,0.1)]' : ''}`}
+                      className={`group bg-surface-container-high rounded-[10px] overflow-hidden transition-all duration-300 border border-white/5 flex flex-col hover:border-white/20 relative ${plot.isPremium ? 'border-secondary/40 shadow-[0_10px_40px_rgba(254,191,13,0.1)]' : ''}`}
                     >
                     <div className="relative h-64 overflow-hidden shrink-0 border-b border-white/5">
                       {plot.images && plot.images.length > 0 ? (
@@ -482,7 +482,7 @@ export default function RealEstatePage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none opacity-80"></div>
                       
                       {/* Top Badges */}
-                      <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                      <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20">
                         <div className="flex flex-col gap-2">
                           <span className="bg-black/60 backdrop-blur text-white px-3 py-1 rounded-[10px] text-[9px] font-black uppercase tracking-widest border border-white/10 w-fit">
                             Zemljište
@@ -503,9 +503,11 @@ export default function RealEstatePage() {
                       </div>
                       
                       {/* Title & Price overlay */}
-                      <div className="absolute bottom-6 left-6 right-6">
+                      <div className="absolute bottom-6 left-6 right-6 z-10">
                         <h3 className="text-xl font-black text-white uppercase tracking-tight line-clamp-2 drop-shadow-md leading-tight mb-2">
-                          {plot.title}
+                          <Link to={`/placevi/oglas/${plot.id}`} className="after:absolute after:inset-0">
+                            {plot.title}
+                          </Link>
                         </h3>
                         <p className="text-2xl font-black text-secondary tracking-tight">
                           {plot.price ? `€${plot.price.toLocaleString()}` : 'Cena na upit'}
@@ -515,17 +517,24 @@ export default function RealEstatePage() {
                     
                     <div className="p-5 flex flex-col flex-grow bg-surface-container-high">
                       <div className="flex items-center gap-3 mb-4">
-                         {plot.companyLogo ? (
-                           <OptimizedImage src={plot.companyLogo} fallbackType="company" alt={plot.companyName || "Logo kompanije"} className="w-6 h-6 rounded-sm object-cover" containerClassName="w-6 h-6 rounded-sm overflow-hidden" />
-                         ) : (
-                           <div className="w-6 h-6 rounded-sm bg-white/5 flex items-center justify-center font-black text-white/20 uppercase text-[6px]">
-                             {plot.companyName?.charAt(0) || 'P'}
-                           </div>
-                         )}
+                         <div className="relative shrink-0 z-20">
+                           {plot.companyLogo ? (
+                             <OptimizedImage src={plot.companyLogo} fallbackType="company" alt={plot.companyName || "Logo kompanije"} className="w-6 h-6 rounded-sm object-cover" containerClassName="w-6 h-6 rounded-sm overflow-hidden" />
+                           ) : (
+                             <div className="w-6 h-6 rounded-sm bg-white/5 flex items-center justify-center font-black text-white/20 uppercase text-[6px]">
+                               {plot.companyName?.charAt(0) || 'P'}
+                             </div>
+                           )}
+                           {plot.isCompanyVerified && (
+                             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center border border-[#111a22] shadow-md">
+                               <span className="material-symbols-outlined text-white text-[6px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                             </div>
+                           )}
+                         </div>
                          <div className="flex items-center gap-1">
                            <span className="text-[8px] font-black text-white/40 uppercase tracking-widest">{plot.companyName || 'PONUĐAČ'}</span>
                            {plot.isCompanyVerified && (
-                             <span className="material-symbols-outlined text-blue-400 text-[10px]" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                             <span className="hidden md:inline-block material-symbols-outlined text-blue-400 text-[10px]" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                            )}
                          </div>
                       </div>
@@ -538,7 +547,7 @@ export default function RealEstatePage() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2 mb-6">
+                      <div className="hidden md:grid grid-cols-2 gap-2 mb-6">
                         <div className="bg-white/5 p-3 rounded-sm border border-white/5 flex flex-col items-center justify-center text-center">
                           <span className="material-symbols-outlined text-secondary/70 mb-1 text-sm">aspect_ratio</span>
                           <span className="text-[7px] font-black text-white/30 uppercase tracking-widest mb-0.5 leading-none">POVRŠINA</span>
@@ -555,7 +564,7 @@ export default function RealEstatePage() {
                       
                       <Link 
                         to={`/placevi/oglas/${plot.id}`}
-                        className="w-full bg-white/5 border border-white/10 text-white py-3 rounded-sm text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:border-secondary/30 transition-all flex items-center justify-center gap-2 mt-auto group"
+                        className="hidden md:flex w-full bg-white/5 border border-white/10 text-white py-3 rounded-sm text-[9px] font-black uppercase tracking-widest hover:bg-white/10 hover:border-secondary/30 transition-all items-center justify-center gap-2 mt-auto group relative z-20"
                       >
                         Prikaži Detalje
                         <span className="material-symbols-outlined text-sm text-secondary group-hover:translate-x-1 transition-transform">arrow_forward</span>

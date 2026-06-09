@@ -30,45 +30,6 @@ interface UsePostAdControllerProps {
   launchMode?: boolean;
 }
 
-export function usePostAdController({ initialPackage, editId, editType, editFlag, launchMode }: UsePostAdControllerProps) {
-  const { showSuccess, showError } = useToast();
-  const { user } = useAuth();
-  
-  const selectedCategory = usePostAdStore((state) => state.selectedCategory);
-  const setSelectedCategory = usePostAdStore((state) => state.setSelectedCategory);
-  const step = usePostAdStore((state) => state.step);
-  const setStep = usePostAdStore((state) => state.setStep);
-  const formDataStore = usePostAdStore((state) => state.formData);
-  const setFormDataStore = usePostAdStore((state) => state.setFormData);
-  const resetFormStore = usePostAdStore((state) => state.resetForm);
-
-  const [isUploadingImages, setIsUploadingImages] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  const queryClient = useQueryClient();
-  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
-
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [createdAdId, setCreatedAdId] = useState<string | null>(null);
-  const [paymentTab, setPaymentTab] = useState<'uplatnica' | 'faktura'>('uplatnica');
-  const [editItem, setEditItem] = useState<AdItemData | null>(null);
-  const [showDepositPrompt, setShowDepositPrompt] = useState(false);
-  const [missingAmount, setMissingAmount] = useState(0);
-  
-  // Predictable ID for new ads to allow parallel image processing
-  const [adId] = useState(() => {
-    if (editId) return editId;
-    return doc(collection(db, 'listings')).id;
-  });
-
-  // Stable fallback reference number for the session
-  const [sessionRefId] = useState(() => Math.floor(Math.random() * 900000 + 100000).toString());
-
-
-  const editItemFetchedRef = useRef(false);
-  const hasPopulatedEditRef = useRef(false);
-  const pendingFilesRef = useRef<{ [key: string]: File }>({});
-
 interface UserAttributes {
   id: string;
   uid: string;
@@ -301,6 +262,44 @@ export interface AdFormData {
   plotInfrastructure?: Record<string, boolean>;
   [key: string]: string | boolean | string[] | (string | File)[] | { label: string; url: string }[] | Record<string, boolean> | undefined | null | number;
 }
+
+export function usePostAdController({ initialPackage, editId, editType, editFlag, launchMode }: UsePostAdControllerProps) {
+  const { showSuccess, showError } = useToast();
+  const { user } = useAuth();
+  
+  const selectedCategory = usePostAdStore((state) => state.selectedCategory);
+  const setSelectedCategory = usePostAdStore((state) => state.setSelectedCategory);
+  const step = usePostAdStore((state) => state.step);
+  const setStep = usePostAdStore((state) => state.setStep);
+  const formDataStore = usePostAdStore((state) => state.formData);
+  const setFormDataStore = usePostAdStore((state) => state.setFormData);
+  const resetFormStore = usePostAdStore((state) => state.resetForm);
+
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const queryClient = useQueryClient();
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [createdAdId, setCreatedAdId] = useState<string | null>(null);
+  const [paymentTab, setPaymentTab] = useState<'uplatnica' | 'faktura'>('uplatnica');
+  const [editItem, setEditItem] = useState<AdItemData | null>(null);
+  const [showDepositPrompt, setShowDepositPrompt] = useState(false);
+  const [missingAmount, setMissingAmount] = useState(0);
+  
+  // Predictable ID for new ads to allow parallel image processing
+  const [adId] = useState(() => {
+    if (editId) return editId;
+    return doc(collection(db, 'listings')).id;
+  });
+
+  // Stable fallback reference number for the session
+  const [sessionRefId] = useState(() => Math.floor(Math.random() * 900000 + 100000).toString());
+
+  const editItemFetchedRef = useRef(false);
+  const hasPopulatedEditRef = useRef(false);
+  const pendingFilesRef = useRef<{ [key: string]: File }>({});
 
   const methods = useForm<AdFormData>({
     defaultValues: {

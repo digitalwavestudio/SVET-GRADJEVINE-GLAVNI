@@ -37,6 +37,7 @@ import AdminActionToolbar from '@/src/modules/dashboard/components/details/Admin
 import MediaGallery from '@/src/modules/core/components/details/MediaGallery';
 import PropertyGrid from '@/src/modules/core/components/details/PropertyGrid';
 import StickyContactCard from '@/src/modules/core/components/details/StickyContactCard';
+import { StickyDetailCTABar } from '@/src/components/layout/StickyDetailCTABar';
 import { 
   Briefcase, 
   MapPin, 
@@ -374,7 +375,7 @@ export default function JobDetailsPage() {
       )}
 
       {/* Header Bento */}
-      <div className="max-w-7xl mx-auto px-8 mt-8 mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 lg:mt-8 mb-8 lg:mb-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
         <div className="lg:col-span-8 space-y-6">
           <div className="flex flex-wrap items-center gap-3">
             {jobData.isPremium && (
@@ -388,7 +389,7 @@ export default function JobDetailsPage() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <h1 id="job-title" className="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] text-white">
+            <h1 id="job-title" className="text-4xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] text-white">
               {displayTitle}
             </h1>
             
@@ -441,7 +442,7 @@ export default function JobDetailsPage() {
       </div>
 
       {/* Main Content Grid */}
-      <main className="max-w-7xl mx-auto px-8 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12" itemScope itemType="https://schema.org/JobPosting">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 flex flex-col-reverse lg:grid lg:grid-cols-12 gap-12" itemScope itemType="https://schema.org/JobPosting">
         <span hidden itemProp="title">{displayTitle}</span>
         <span hidden itemProp="datePosted">{jobData.createdAt?.toDate ? jobData.createdAt.toDate().toISOString() : new Date().toISOString()}</span>
         <article className="lg:col-span-8 space-y-16" aria-labelledby="job-title">
@@ -618,6 +619,16 @@ export default function JobDetailsPage() {
         targetId={jobData?.id}
         targetType="JOB"
         targetName={displayTitle}
+      />
+
+      <StickyDetailCTABar
+        phone={jobData.phone || jobData.applicationPhone || ''}
+        onMessage={handleStartChat}
+        price={jobData.plataMin ? `${jobData.plataMin}-${jobData.plataMax}` : undefined}
+        currency="EUR"
+        priceLabel="PLATA"
+        ctaText={!hasApplied && !isOwner ? "PRIJAVI SE" : hasApplied ? "PRIJAVLJEN" : undefined}
+        onCtaClick={!hasApplied && !isOwner ? handleApply : undefined}
       />
     </div>
   );

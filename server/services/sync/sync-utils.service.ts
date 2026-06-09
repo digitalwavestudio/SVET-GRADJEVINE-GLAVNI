@@ -1,6 +1,6 @@
-export class SyncUtils {
+﻿export class SyncUtils {
   static getAdUrl(category: string, id: string): string {
-    const baseUrl = "https://svetgradjevine.rs";
+    const baseUrl = "https://svetgradjevine.com";
     switch (category) {
       case "jobs":
         return `${baseUrl}/posao/${id}`;
@@ -118,3 +118,4 @@ export class SyncUtils {
     return { shouldSync, isPartial, changedFields };
   }
 }
+

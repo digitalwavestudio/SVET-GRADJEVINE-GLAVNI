@@ -107,7 +107,7 @@ const MarketplaceItemDetailsPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex flex-col lg:grid lg:grid-cols-3 gap-12">
         <article className="lg:col-span-2 space-y-12" aria-labelledby="marketplace-title">
           {/* Main Visuals & Title */}
           <div className="space-y-8">
@@ -145,7 +145,7 @@ const MarketplaceItemDetailsPage = () => {
                </div>
             </div>
 
-            <Card className="overflow-hidden border-none bg-white/5 rounded-[10px] p-4 shadow-2xl shadow-black/50">
+            <Card className="glass-card overflow-hidden border-none rounded-[10px] p-4 shadow-2xl shadow-black/50">
                <div className="aspect-video bg-slate-900/50 relative rounded-[2.5rem] overflow-hidden group">
                  {item.image ? (
                    <OptimizedImage 
@@ -217,7 +217,7 @@ const MarketplaceItemDetailsPage = () => {
         </article>
 
         <aside className="space-y-8" aria-label="Informacije o prodavcu">
-          <Card className="p-10 border-none shadow-2xl bg-secondary rounded-[10px] text-slate-950 relative overflow-hidden group">
+          <Card className="glass-card p-10 border-none shadow-2xl bg-secondary rounded-[10px] text-slate-950 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
               <User className="w-32 h-32" />
             </div>
@@ -259,7 +259,7 @@ const MarketplaceItemDetailsPage = () => {
             </div>
           </Card>
 
-          <Card className="p-10 bg-white/5 border border-white/5 rounded-[10px] shadow-xl">
+          <Card className="glass-card p-10 bg-white/5 border border-white/5 rounded-[10px] shadow-xl">
             <h3 className="text-sm font-black text-white italic uppercase tracking-tight mb-8 tracking-tight">Korisni saveti</h3>
             <ul className="space-y-6">
               {[

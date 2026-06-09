@@ -59,7 +59,7 @@ const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "" }: { end
   }, [end, duration, delay, hasStarted]);
 
   return (
-    <span ref={counterRef} className="text-4xl font-black text-white block mb-2 uppercase">
+    <span ref={counterRef} className="text-3xl sm:text-4xl font-black text-white block mb-2 uppercase">
       {count}{suffix}
     </span>
   );

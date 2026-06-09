@@ -60,7 +60,7 @@ export function VerifyTab() {
   });
 
   const handleAction = async (requestId: string, action: "approve" | "reject") => {
-    const comment = action === "reject" ? prompt("Razlog odbijanja:") : "Odobreno";
+    const comment = (action === "reject" ? prompt("Razlog odbijanja:") : "Odobreno") || "";
     if (action === "reject" && !comment) return;
     
     processRequestMutation.mutate({ requestId, action, comment });

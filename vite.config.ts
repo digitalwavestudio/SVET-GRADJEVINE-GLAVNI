@@ -76,6 +76,8 @@ export default defineConfig(({mode}) => {
         '@svet-gradjevine/shared': path.resolve(__dirname, './packages/shared/src'),
         '@svet-gradjevine/api': path.resolve(__dirname, './packages/api/src'),
         '@': path.resolve(__dirname, './'),
+        // Alias for ProfileSettingsTab component
+        // Removed custom alias for ProfileSettingsTab; use relative imports or generic alias
       },
     },
     define: {

@@ -5,14 +5,14 @@ import AnimatedCounter from '@/src/modules/core/components/home/AnimatedCounter'
 export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamicWorkersCount, dynamicMachineryCount, dynamicRealEstateCount, dynamicViewsCount }: any) {
   return (<>
     {/* O Nama / Partneri */}
-      <section className="py-24 bg-surface border-t border-outline-variant/10">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-12 md:py-24 bg-surface border-t border-outline-variant/10">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
               <span className="text-secondary font-bold tracking-widest uppercase text-sm mb-4 block">Svet Građevine je mesto gde se posao u građevini pronalazi najbrže.</span>
-              <h2 className="font-headline text-5xl font-black mb-8 leading-tight uppercase">SVE ZA GRAĐEVINU <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-[#FFF5D6] to-secondary">NA JEDNOM MESTU</span></h2>
+              <h2 className="font-headline text-4xl md:text-5xl font-black mb-8 leading-tight uppercase">SVE ZA GRAĐEVINU <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-[#FFF5D6] to-secondary">NA JEDNOM MESTU</span></h2>
               <p className="text-on-surface-variant mb-12 text-lg">Svet Građevine svakog meseca povezuje firme, radnike, dobavljače i investitore na jednoj platformi. Brže do posla, opreme, saradnika i novih projekata širom Srbije i regiona.</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-4 md:gap-x-8">
                 <div className="group cursor-pointer hover:-translate-y-2 transition-transform duration-300">
                   <AnimatedCounter end={totalAdsCount} suffix="+" delay={0} />
                   <span className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant leading-tight block">Aktivnih<br />Oglasa</span>
@@ -40,8 +40,8 @@ export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamic
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-6 h-full">
-              <Link to="/firme" className="col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-secondary transition-all duration-500 min-h-[260px] flex flex-col justify-end shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+              <Link to="/firme" className="col-span-1 md:col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-secondary transition-all duration-500 min-h-[260px] flex flex-col justify-end shadow-sm">
                 <div className="absolute top-0 right-0 p-8">
                   <span className="material-symbols-outlined text-secondary text-5xl opacity-10 group-hover:opacity-100 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 </div>

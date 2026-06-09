@@ -162,10 +162,10 @@ export default function CtaSection() {
               </div>
             </div>
             {/* Visual Grid (Tactical UI) */}
-            <div className="lg:col-span-5 relative">
-              <div className="grid grid-cols-2 gap-6">
+            <div className="lg:col-span-5 relative w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Stats Card */}
-                <div className="glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 shadow-2xl h-fit mt-6">
+                <div className="glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 shadow-2xl h-fit mt-0 sm:mt-6">
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
                     <span className="material-symbols-outlined text-6xl text-white">groups</span>
                   </div>
@@ -174,7 +174,7 @@ export default function CtaSection() {
                   <p className="text-slate-500 text-[10px] uppercase tracking-[0.2em] font-black">Aktivnih Majstora</p>
                 </div>
 
-                <div className="relative rounded-[10px] overflow-hidden shadow-2xl mt-8 border border-white/10 group h-48 md:h-64 bg-slate-900/50">
+                <div className="relative rounded-[10px] overflow-hidden shadow-2xl mt-0 sm:mt-8 border border-white/10 group h-48 md:h-64 bg-slate-900/50">
                   <OptimizedImage 
                     src="/assets/blueprint-background.jpg" 
                     fallbackType="company" 
@@ -195,7 +195,7 @@ export default function CtaSection() {
                 {/* Testimonial Card Slider */}
                 <motion.div 
                   whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(59, 130, 246, 0.25)" }}
-                  className="col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500"
+                  className="col-span-1 sm:col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500"
                 >
                   <div className="absolute top-0 right-0 p-6 opacity-5">
                     <span className="material-symbols-outlined text-8xl text-white">format_quote</span>
@@ -230,7 +230,7 @@ export default function CtaSection() {
                     </motion.div>
                   </AnimatePresence>
 
-                  <div className="flex items-center gap-2 mt-8">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-8 justify-center sm:justify-start">
                     {testimonials.map((_, idx) => (
                       <button
                         key={idx}
@@ -240,8 +240,8 @@ export default function CtaSection() {
                         }}
                         className={`h-1.5 transition-all duration-500 rounded-full ${
                           idx === currentIndex 
-                            ? 'w-10 bg-blue-500' 
-                            : 'w-2 bg-white/10 hover:bg-white/20'
+                            ? 'w-6 sm:w-10 bg-blue-500' 
+                            : 'w-1.5 sm:w-2 bg-white/10 hover:bg-white/20'
                         }`}
                       />
                     ))}
@@ -256,7 +256,7 @@ export default function CtaSection() {
                   <p className="text-slate-500 text-[10px] uppercase tracking-widest font-black">Kompanija</p>
                 </div>
 
-                <div className="glass-card p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-6">
+                <div className="glass-card p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-0 sm:translate-y-6">
                   <div className="w-8 h-1 bg-secondary mb-6 rounded-full shadow-[0_0_10px_rgba(254,191,13,0.5)]"></div>
                   <span className="material-symbols-outlined text-secondary mb-6 block text-4xl group-hover:rotate-12 transition-transform">construction</span>
                   <h3 className="text-3xl font-headline font-black text-white mb-1">{totalAdsCount.toLocaleString('sr-RS')}+</h3>

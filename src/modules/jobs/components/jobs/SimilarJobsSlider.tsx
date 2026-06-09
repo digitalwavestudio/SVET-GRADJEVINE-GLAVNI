@@ -31,7 +31,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
             <Link 
               key={`${job.id}-${index}`} 
               to={buildJobUrl(job)} 
-              className="w-[300px] md:w-[360px] shrink-0 bg-surface-container-high rounded-[10px] border border-white/5 hover:border-secondary/40 transition-all duration-500 group flex flex-col relative overflow-hidden"
+              className="w-[300px] md:w-[360px] shrink-0 glass-card border border-white/5 rounded-[10px] p-4 shadow-2xl shadow-black/50 shadow-gold-glow-subtle group flex flex-col relative overflow-hidden"
             >
               {/* Top Accent Line */}
               <div className="absolute top-0 left-0 w-full h-1 bg-white/5 group-hover:bg-secondary transition-colors duration-500"></div>

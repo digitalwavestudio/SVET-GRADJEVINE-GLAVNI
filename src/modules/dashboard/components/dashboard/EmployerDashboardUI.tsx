@@ -54,7 +54,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
             <div className="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
             <span className="text-xs font-black text-white uppercase tracking-widest">SISTEM AKTIVAN</span>
           </div>
-          <h2 className="text-4xl md:text-7xl font-black text-white uppercase tracking-tighter mb-6 leading-none tracking-[-0.05em]">DOBRO VEČE, <span className="text-secondary">KOMANDNI CENTAR</span></h2>
+          <h2 className="text-3xl sm:text-4xl md:text-7xl font-black text-white uppercase tracking-tighter mb-6 leading-none tracking-[-0.05em]">DOBRO VEČE, <span className="text-secondary">KOMANDNI CENTAR</span></h2>
           <p className="text-white/40 text-sm md:text-base font-bold uppercase tracking-widest mb-12 leading-relaxed">
             EVO KRATKOG PRESEKA UČINKA VAŠIH OGLASA ZA DANAS.
           </p>

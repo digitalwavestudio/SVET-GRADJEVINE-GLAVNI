@@ -1,4 +1,4 @@
-import { Router } from "express";
+﻿import { Router } from "express";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { validateRequest } from "../middleware/validate.ts";
@@ -133,10 +133,10 @@ checkoutRouter.post(
       /*
     const transporter = nodemailer.createTransport({...});
     await transporter.sendMail({
-      from: '"Svet Građevine" <noreply@svetgradjevine.rs>',
+      from: '"Svet GraÄ‘evine" <noreply@svetgradjevine.com>',
       to: customerInfo?.email,
-      subject: `Predračun ${invoiceNumber} - Svet Građevine`,
-      text: 'Poštovani, u prilogu se nalazi Vaš predračun.',
+      subject: `PredraÄun ${invoiceNumber} - Svet GraÄ‘evine`,
+      text: 'PoÅ¡tovani, u prilogu se nalazi VaÅ¡ predraÄun.',
       attachments: [{ filename: `Predracun-${invoiceNumber}.pdf`, content: pdfBuffer }]
     });
     */
@@ -182,3 +182,4 @@ checkoutRouter.patch("/:id", requireAuth, async (req, res, next) => {
     next(error);
   }
 });
+

@@ -34,7 +34,8 @@ export function StandardPageHero({
   overlayGradient = 'linear-gradient(to right, rgba(5, 15, 25, 0.98) 0%, rgba(5, 15, 25, 0.8) 35%, rgba(5, 15, 25, 0.2) 100%)',
 }: StandardPageHeroProps) {
   return (
-    <section className="relative h-screen flex flex-col items-start overflow-hidden bg-surface-container-lowest border-b border-white/5">
+    <section className="relative h-screen flex flex-col items-start overflow-hidden bg-surface-container-lowest border-b border-white/5 glass-panel gold-glow">
+      {/* Background Layer */}
       {/* Background Layer */}
       <div className="absolute inset-0 z-0 text-white">
         {backgroundImage ? (
@@ -63,7 +64,7 @@ export function StandardPageHero({
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex-2 max-w-4xl col-start-1"
+            className="flex-2 max-w-4xl col-start-1 animate-fade-in-up"
           >
             {/* Badge Zone - Row 1 (40px) */}
             <div className="h-full flex items-center">

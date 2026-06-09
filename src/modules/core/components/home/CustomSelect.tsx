@@ -86,7 +86,7 @@ const CustomSelect = ({
 
   return (
     <div
-      className={`flex-1 relative bg-transparent rounded-[10px] transition-all group min-h-[80px] border ${isOpen ? "border-secondary/50 z-[101] shadow-[0_0_20px_rgba(254,191,13,0.1)]" : "border-white/10 z-10 hover:border-secondary/30"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={`flex-1 relative bg-transparent rounded-[10px] transition-all group min-h-[72px] md:min-h-[80px] border ${isOpen ? "border-secondary/50 z-[101] shadow-[0_0_20px_rgba(254,191,13,0.1)]" : "border-white/10 z-10 hover:border-secondary/30"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       ref={dropdownRef}
     >
       <div
@@ -99,7 +99,7 @@ const CustomSelect = ({
             if (!disabled) setIsOpen(!isOpen);
           }
         }}
-        className={`w-full h-full cursor-pointer flex items-center p-4 pl-6 gap-4`}
+        className={`w-full h-full cursor-pointer flex items-center p-3 pl-4 md:p-4 md:pl-6 gap-3 md:gap-4`}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"

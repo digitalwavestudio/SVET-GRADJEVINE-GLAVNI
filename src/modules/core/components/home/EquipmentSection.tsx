@@ -7,26 +7,27 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
   const navigate = useNavigate();
   return (<>
     {/* Oprema i Mašine */}
-      <section className="py-24 bg-surface">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-12 md:py-24 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[#38bdf8] font-black tracking-[0.2em] uppercase text-sm block">Teška Mehanizacija</span>
                 <span className="material-symbols-outlined text-[#38bdf8] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>precision_manufacturing</span>
               </div>
-              <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#38bdf8_0%,#ffffff_60%)] mb-4">GRAĐEVINSKE MAŠINE</h2>
+              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#38bdf8_0%,#ffffff_60%)] mb-4">GRAĐEVINSKE MAŠINE</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Pronađite bagere, kranove, utovarivače i ostalu opremu za vaš sledeći projekat.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-right shrink-0" to="/gradjevinske-masine">
+            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/gradjevinske-masine">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {latestMachines.length > 0 ? latestMachines.map((machine: any, idx: number) => (
-                <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group">
+            <div className="lg:col-span-2 relative w-full">
+              <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-8 scroll-smooth w-full">
+                {latestMachines.length > 0 ? latestMachines.map((machine: any, idx: number) => (
+                <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-[85vw] md:w-auto">
                   <div className="h-48 overflow-hidden relative">
                     <OptimizedImage src={machine.images?.[0] || ""} fallbackType="machine" alt={machine.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       
@@ -68,9 +69,11 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                   <p className="text-on-surface-variant text-base">Oglasa za građevinske mašine trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
                 </div>
               )}
+              </div>
+              <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#0A0F14] to-transparent pointer-events-none z-10 md:hidden"></div>
             </div>
             {/* Category Sidebar */}
-            <div className="bg-[#0A0F14] p-10 rounded-[10px] border border-white/5 flex flex-col relative shadow-2xl overflow-hidden group/sidebar">
+            <div className="bg-[#0A0F14] p-6 sm:p-10 rounded-[10px] border border-white/5 flex flex-col relative shadow-2xl overflow-hidden group/sidebar">
                <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[60px] pointer-events-none group-hover/sidebar:bg-secondary/10 transition-colors duration-500"></div>
                <div className="absolute top-0 left-0 w-[2px] bg-secondary h-0 group-hover/sidebar:h-full transition-all duration-700"></div>
 
@@ -100,7 +103,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               
               <Link 
                 to="/gradjevinske-masine"
-                className="w-full mt-10 py-5 flex items-center justify-center uppercase font-black text-xs tracking-[0.2em] bg-white/5 hover:bg-secondary hover:text-slate-950 transition-all duration-500 rounded-[12px] border border-white/10 hover:border-secondary shadow-lg hover:shadow-secondary/20"
+                className="w-full mt-10 py-4 md:py-5 flex items-center justify-center uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-white/5 hover:bg-secondary hover:text-slate-950 transition-all duration-500 rounded-[12px] border border-white/10 hover:border-secondary shadow-lg hover:shadow-secondary/20"
               >
                 Sve građevinske mašine
               </Link>
@@ -109,7 +112,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           
           <Link 
             to="/postavi-oglas"
-            className={UI_TOKENS.BTN_PRIMARY + " w-full mt-8 py-6 flex items-center justify-center text-lg rounded-[10px]"}
+            className="w-full mt-8 bg-secondary text-slate-950 font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA MAŠINE
           </Link>
@@ -117,29 +120,30 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
       </section>
 
       {/* Placevi Section */}
-      <section className="py-24 bg-surface-container-lowest">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-12 md:py-24 bg-surface-container-lowest">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[#22c55e] font-black tracking-[0.2em] uppercase text-sm block">Nepokretnosti</span>
                 <span className="material-symbols-outlined text-[#22c55e] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>terrain</span>
               </div>
-              <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#22c55e_0%,#ffffff_60%)] mb-4">PLACEVI I LOKACIJE</h2>
+              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#22c55e_0%,#ffffff_60%)] mb-4">PLACEVI I LOKACIJE</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Investicione prilike širom regiona. Pronađite idealno zemljište za gradnju.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-right shrink-0" to="/placevi">
+            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/placevi">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {latestRealEstate.length > 0 ? latestRealEstate.map((plot: any, idx: number) => (
-              <div key={plot.id || idx} className="relative rounded-[10px] overflow-hidden h-[500px] group shadow-2xl cursor-pointer" onClick={() => navigate(`/placevi/${plot.id}`)}>
+          <div className="relative w-full">
+            <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-12 scroll-smooth w-full">
+              {latestRealEstate.length > 0 ? latestRealEstate.map((plot: any, idx: number) => (
+              <div key={plot.id || idx} className="relative rounded-[10px] overflow-hidden h-[420px] sm:h-[500px] group shadow-2xl cursor-pointer shrink-0 w-[85vw] md:w-auto" onClick={() => navigate(`/placevi/${plot.id}`)}>
                 <OptimizedImage src={plot.images?.[0] || ""} fallbackType="real_estate" alt={plot.title || 'Plac'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   
                 <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent opacity-95 group-hover:opacity-100 transition-opacity"></div>
-                <div className="absolute bottom-0 left-0 p-8 w-full transition-transform duration-300 group-hover:-translate-y-2">
+                <div className="absolute bottom-0 left-0 p-5 sm:p-8 w-full transition-transform duration-300 group-hover:-translate-y-2">
                   <div className="flex gap-2 mb-4 flex-wrap">
                     <span className="bg-secondary/20 text-secondary border border-secondary/30 px-3 py-1 rounded-[10px] text-xs font-bold backdrop-blur uppercase">
                       {plot.listingType === 'sale' ? 'PRODAJA' : 'IZDAVANJE'}
@@ -148,16 +152,16 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                       <span className="bg-white/10 text-white border border-white/20 px-3 py-1 rounded-[10px] text-xs font-bold backdrop-blur uppercase">ISTAKNUT</span>
                     )}
                   </div>
-                  <h3 className="text-3xl font-black mb-2 uppercase line-clamp-1">{plot.title || 'Zemljište'}</h3>
+                  <h3 className="text-2xl sm:text-3xl font-black mb-2 uppercase line-clamp-1">{plot.title || 'Zemljište'}</h3>
                   <p className="text-on-surface-variant mb-6 text-sm flex items-center gap-1 line-clamp-1">
                     <span className="material-symbols-outlined text-[16px]">location_on</span> {typeof plot.location === 'object' ? plot.location.address : plot.location}
                     {plot.area && ` | Površina: ${plot.area}`}
                   </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-3xl font-black">
+                  <div className="flex justify-between items-center gap-3">
+                    <span className="text-2xl sm:text-3xl font-black shrink-0">
                       {plot.price ? `€${plot.price.toLocaleString()}` : 'Po upitu'}
                     </span>
-                    <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] text-slate-950 px-8 py-3 rounded-[10px] font-black hover:from-[#fb8c00] hover:to-[#ffeb3b] transition-all duration-300 uppercase shadow-lg shadow-yellow-500/20">Detalji</button>
+                    <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] text-slate-950 px-5 py-2.5 sm:px-8 sm:py-3 rounded-[10px] font-black hover:from-[#fb8c00] hover:to-[#ffeb3b] transition-all duration-300 uppercase shadow-lg shadow-yellow-500/20 text-sm sm:text-base shrink-0">Detalji</button>
                   </div>
                 </div>
               </div>
@@ -168,6 +172,8 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                 <p className="text-on-surface-variant text-base">Prilika za placeve trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
               </div>
             )}
+            </div>
+            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
           <Link 
             to="/postavi-oglas"

@@ -9,7 +9,7 @@ interface ListingSkeletonProps {
 export function ListingSkeleton({ viewMode = 'grid', count = 6 }: ListingSkeletonProps) {
   if (viewMode === 'list') {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 relative overflow-hidden bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer">
         {Array.from({ length: count }).map((_, i) => (
           <div 
             key={i} 
@@ -31,7 +31,7 @@ export function ListingSkeleton({ viewMode = 'grid', count = 6 }: ListingSkeleto
   }
 
   return (
-    <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" : "flex flex-col gap-4"}>
+    <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative overflow-hidden bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" : "flex flex-col gap-4 relative overflow-hidden bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer"}>
       {Array.from({ length: count }).map((_, i) => (
         <div 
           key={i} 

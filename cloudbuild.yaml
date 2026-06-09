@@ -1,11 +1,11 @@
 steps:
   # 1. Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/svet-gra-evine:latest', '.']
     
   # 2. Push Docker image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA']
+    args: ['push', 'gcr.io/$PROJECT_ID/svet-gra-evine:latest']
     
   # 3. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -15,7 +15,7 @@ steps:
       - 'deploy'
       - 'svet-gra-evine'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
       - '--region'
       - 'us-west1'
       - '--platform'
@@ -25,7 +25,7 @@ steps:
       - '8080'
 
 images:
-  - 'gcr.io/$PROJECT_ID/svet-gra-evine:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY

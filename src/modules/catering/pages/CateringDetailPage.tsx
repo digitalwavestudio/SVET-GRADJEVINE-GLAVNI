@@ -147,7 +147,7 @@ export default function CateringDetailPage() {
         jsonLd={[foodSchema, breadcrumbSchema]}
       />
       
-      <main className="max-w-7xl mx-auto px-6 pt-24 lg:pt-32">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32">
         <Breadcrumbs items={[
           { label: 'Ketering', path: '/ketering' },
           { label: locationName, path: `/ketering?grad=${catering.locationSlug}` },
@@ -188,7 +188,7 @@ export default function CateringDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-12">
           <article className="lg:col-span-8 flex flex-col gap-12" aria-labelledby="catering-title">
             <MediaGallery images={catering.images || []} title={catering.title} imageStatus={catering.imageStatus} />
 

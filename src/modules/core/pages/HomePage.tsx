@@ -137,7 +137,7 @@ export default function HomePage() {
         />
       </motion.div>
 
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-px w-full bg-white/10"></div>
       </div>
 

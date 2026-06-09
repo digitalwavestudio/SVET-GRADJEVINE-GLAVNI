@@ -180,6 +180,7 @@ async function performOptimisticUpdate({
 
 export function useMyAdsMutations(userId: string | undefined) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const updateAdStatus = async (id: string, status: string) => {
     return mutationGuard(() => apiClient.patch(`/ads/${id}`, { status }), {

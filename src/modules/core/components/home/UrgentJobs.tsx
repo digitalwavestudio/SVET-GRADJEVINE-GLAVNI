@@ -28,15 +28,15 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
 
   return (<>
     {/* Hitni Oglasi */}
-      <section className="py-24 bg-surface-container-low">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-12 md:py-24 bg-surface-container-low">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex justify-between items-start mb-12">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[#ff512f] font-black tracking-[0.2em] uppercase text-sm block">Premium Prioritet</span>
                 <span className="material-symbols-outlined text-[#ff512f] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>local_fire_department</span>
               </div>
-              <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4">HITNI OGLASI</h2>
+              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4">HITNI OGLASI</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Ponude i poslovi koji zahtevaju najbržu reakciju na tržištu.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
@@ -61,7 +61,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                 return (
                   <div 
                     key={ad.id}
-                    className="relative bg-surface-container-lowest p-6 rounded-[10px] border border-error/20 hover:border-error/50 transition-all group flex flex-col h-full"
+                    className="relative bg-surface-container-lowest p-6 rounded-[10px] border border-error/20 hover:border-error/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.12)] transition-all duration-500 group flex flex-col h-full"
                   >
                     <Link 
                       to={url} 
@@ -75,7 +75,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                     />
                     <div className="flex justify-between items-start mb-4 relative z-20 pointer-events-none">
                       <div className="flex items-center gap-2">
-                        <span className="bg-error text-white text-[10px] font-black px-3 py-1 rounded-[10px] uppercase tracking-tighter">HITNO</span>
+                        <span className="bg-error text-white text-[10px] font-black px-3 py-1 rounded-[10px] uppercase tracking-tighter animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.4)]">HITNO</span>
                         <span className="bg-white/10 text-white/90 border border-white/20 text-[10px] font-black px-3 py-1 rounded-[10px] uppercase tracking-tighter">{typeLabels[ad.type] || 'OGLAS'}</span>
                       </div>
                       <span className="text-on-surface-variant text-sm whitespace-nowrap ml-2">{ad.time || 'Danas'}</span>
@@ -93,15 +93,15 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                           <span className="font-black text-xs">{(ad.comp?.charAt(0) || 'S')}</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center gap-1.5 min-w-0 w-full">
                         <Link 
                           to={`/firma/${ad.authorId || ad.id}`} 
-                          className="text-xs font-bold uppercase hover:text-primary transition-colors line-clamp-1 relative z-20"
+                          className="text-xs font-bold uppercase hover:text-primary transition-colors line-clamp-1 relative z-20 max-w-[110px] sm:max-w-none truncate"
                         >
                           {ad.comp}
                         </Link>
                         {ad.isCompanyVerified && (
-                          <div className="flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-1.5 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                          <div className="flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-1.5 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)] shrink-0">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
                             <span className="text-[7.5px] font-black tracking-[0.15em] uppercase text-green-400">APR Verifikovan</span>
                           </div>

@@ -16,7 +16,7 @@ interface CompanyNavigationTabsProps {
 
 export function CompanyNavigationTabs({ activeTab, setActiveTab, counts }: CompanyNavigationTabsProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-8 bg-white/5 p-2 rounded-[10px] border border-white/5 overflow-x-auto no-scrollbar">
+    <div className="flex flex-nowrap md:flex-wrap gap-2 mb-8 bg-white/5 p-2 rounded-[10px] border border-white/5 overflow-x-auto overflow-y-hidden no-scrollbar">
       {[
         { id: 'jobs', label: 'Poslovi', count: counts.jobs, icon: 'work' },
         { id: 'machines', label: 'Mašine', count: counts.machines, icon: 'construction' },

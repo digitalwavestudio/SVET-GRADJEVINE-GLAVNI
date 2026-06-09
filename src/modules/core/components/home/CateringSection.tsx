@@ -7,26 +7,27 @@ export default function CateringSection({ latestAccommodations = [], latestCater
   const navigate = useNavigate();
   return (<>
       {/* Smeštaj Radnika */}
-      <section className="py-24 bg-surface-container">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-12 md:py-24 bg-surface-container">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[#9fcaff] font-black tracking-[0.2em] uppercase text-sm block">Odmor i Stanovanje</span>
                 <span className="material-symbols-outlined text-[#9fcaff] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>hotel</span>
               </div>
-              <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#9fcaff_0%,#ffffff_60%)] mb-4">SMEŠTAJ RADNIKA</h2>
+              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#9fcaff_0%,#ffffff_60%)] mb-4">SMEŠTAJ RADNIKA</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Obezbedite kvalitetan smeštaj i odmor vašim timovima blizu gradilišta.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-right shrink-0" to="/smestaj">
+            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/smestaj">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {latestAccommodations.length > 0 ? latestAccommodations.map((acc: any, idx: number) => (
+          <div className="relative w-full">
+            <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-3 md:gap-8 scroll-smooth w-full">
+              {latestAccommodations.length > 0 ? latestAccommodations.map((acc: any, idx: number) => (
                <div key={acc.id || idx}
-                 className="bg-surface rounded-[10px] border border-outline-variant/10 overflow-hidden group hover:-translate-y-6 transition-all duration-500 cursor-pointer"
+                 className="bg-surface rounded-[10px] border border-outline-variant/10 overflow-hidden group hover:-translate-y-6 transition-all duration-500 cursor-pointer shrink-0 w-[85vw] md:w-auto"
                  onClick={() => navigate(`/smestaj/${acc.id}`)}
                >
                  <div className="h-64 relative">
@@ -34,7 +35,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                      
                    <div className="absolute bottom-4 left-4 bg-on-background/90 backdrop-blur px-3 py-1 rounded-[10px] text-secondary text-sm font-bold uppercase line-clamp-1">{typeof acc.location === 'object' ? acc.location.address : acc.location}</div>
                  </div>
-                 <div className="p-8">
+                 <div className="p-5 sm:p-8">
                    <h3 className="text-xl font-bold mb-4 uppercase line-clamp-1">{acc.title}</h3>
                    <div className="grid grid-cols-2 gap-4 mb-6">
                      {acc.capacity && (
@@ -76,10 +77,12 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                 <p className="text-on-surface-variant text-base">Oglasa za smeštaj radnika trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
               </div>
             )}
+            </div>
+            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#111a22] to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
           <Link 
             to="/postavi-oglas"
-            className={UI_TOKENS.BTN_PRIMARY + " w-full mt-8 py-6 flex items-center justify-center text-lg rounded-[10px]"}
+            className="w-full mt-8 bg-secondary text-slate-950 font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA SMEŠTAJ
           </Link>
@@ -87,26 +90,27 @@ export default function CateringSection({ latestAccommodations = [], latestCater
       </section>
 
     {/* Ketering za Gradilišta */}
-      <section className="py-24 bg-surface-container-lowest">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-12 md:py-24 bg-surface-container-lowest">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[#2dd4bf] font-black tracking-[0.2em] uppercase text-sm block">Ishrana na Terenu</span>
                 <span className="material-symbols-outlined text-[#2dd4bf] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>restaurant</span>
               </div>
-              <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#2dd4bf_0%,#ffffff_60%)] mb-4">KETERING ZA GRADILIŠTA</h2>
+              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#2dd4bf_0%,#ffffff_60%)] mb-4">KETERING ZA GRADILIŠTA</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Topli obroci i redovna ishrana obezbeđeni direktno na radnom mestu.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-right shrink-0" to="/ketering">
+            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/ketering">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {latestCaterings.length > 0 ? latestCaterings.map((cat: any, idx: number) => (
+          <div className="relative w-full">
+            <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-3 md:gap-8 scroll-smooth w-full">
+              {latestCaterings.length > 0 ? latestCaterings.map((cat: any, idx: number) => (
             <div key={cat.id || idx}
-              className="bg-surface-container-low rounded-[10px] border border-white/5 overflow-hidden group hover:border-secondary/30 transition-all duration-500 cursor-pointer shadow-2xl relative"
+              className="bg-surface-container-low rounded-[10px] border border-white/5 overflow-hidden group hover:border-secondary/30 transition-all duration-500 cursor-pointer shadow-2xl relative shrink-0 w-[85vw] md:w-auto"
               onClick={() => navigate(`/ketering/provajder/${cat.id}`)}
             >
               <div className="absolute inset-0 blueprint-bg opacity-20 pointer-events-none"></div>
@@ -128,14 +132,14 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                 </div>
               </div>
 
-              <div className="p-8 pt-0 relative z-10">
+              <div className="p-5 sm:p-8 pt-0 relative z-10">
                 <div className="flex justify-between items-start mb-8">
                   <div className="pt-6">
                     <div className="flex items-center gap-2 text-secondary mb-2">
                        <span className="material-symbols-outlined text-sm">location_on</span>
                        <span className="text-xs font-bold uppercase tracking-widest line-clamp-1">{typeof cat.location === 'object' ? cat.location.address : cat.location}</span>
                     </div>
-                    <h3 className="text-2xl font-black text-white uppercase leading-tight group-hover:text-secondary transition-colors line-clamp-2">{cat.title || cat.companyName}</h3>
+                    <h3 className="text-xl sm:text-2xl font-black text-white uppercase leading-tight group-hover:text-secondary transition-colors line-clamp-2">{cat.title || cat.companyName}</h3>
                   </div>
                   
                   <div className="bg-gradient-to-br from-secondary to-orange-500 text-slate-950 px-4 py-3 rounded-[10px] -mt-8 relative shadow-xl shadow-orange-500/20 border-4 border-surface-container-low flex flex-col items-center group-hover:-translate-y-2 transition-transform duration-300 shrink-0">
@@ -184,10 +188,12 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                 <p className="text-on-surface-variant text-base">Oglasa za ketering trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
               </div>
             )}
+            </div>
+            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
           <Link 
             to="/postavi-oglas"
-            className={UI_TOKENS.BTN_PRIMARY + " w-full mt-8 py-6 flex items-center justify-center text-lg rounded-[10px]"}
+            className="w-full mt-8 bg-secondary text-slate-950 font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA KETERING
           </Link>

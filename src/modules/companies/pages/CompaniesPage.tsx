@@ -211,30 +211,30 @@ function CompaniesPage() {
           { label: "Premium", value: premiumCount?.toLocaleString() || "45", icon: "category" }
         ]}
       >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl">
-          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
+         <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
+          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
             <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="PRETRAŽI PO NAZIVU ILI DELATNOSTI..."
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-5 px-6" 
+              placeholder="PRETRAŽI FIRME..."
+              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-4 md:px-6" 
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
             />
           </div>
           <button 
             onClick={handleApplyFilters}
-            className="bg-secondary text-slate-950 px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0"
+            className="w-full md:w-auto bg-secondary text-slate-950 px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0"
           >
             <span className="material-symbols-outlined text-xl">search</span>
             <span>PRETRAŽI</span>
           </button>
         </div>
       </StandardPageHero>
-
+ 
       {/* Main Content Area */}
-      <section className="max-w-7xl mx-auto px-8 py-12">
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
         <div className="flex flex-col-reverse lg:flex-row-reverse gap-12">
           {/* Sidebar Filters */}
           <FilterSidebar>

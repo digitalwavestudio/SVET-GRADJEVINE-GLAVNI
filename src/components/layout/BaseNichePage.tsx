@@ -48,7 +48,7 @@ export const BaseNichePage: React.FC<BaseNichePageProps> = ({
 
       {filterConfig && (
         <section className="bg-surface/90 backdrop-blur-3xl relative z-40 border-y border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          <div className="max-w-7xl mx-auto px-8 py-6">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
             <UnifiedFilterBar {...filterConfig} />
           </div>
         </section>

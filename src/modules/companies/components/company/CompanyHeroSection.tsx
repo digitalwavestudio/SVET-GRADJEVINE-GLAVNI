@@ -24,8 +24,8 @@ export function CompanyHeroSection({ company, isTrackedInSession }: CompanyHeroS
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-[#0F1923] via-[#0F1923]/60 to-transparent"></div>
       
-      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-end gap-8">
+      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-12">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-end gap-4 md:gap-8">
           {/* Logo Area */}
           <div className="relative z-10 shrink-0 mb-4 md:mb-0">
             <div className="w-32 h-32 md:w-48 md:h-48 bg-white p-4 rounded-[10px] shadow-2xl border-4 border-[#0F1923] flex items-center justify-center overflow-hidden">

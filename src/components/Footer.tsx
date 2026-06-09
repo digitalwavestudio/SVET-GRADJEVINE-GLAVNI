@@ -10,13 +10,13 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer className="bg-[#0a1016] w-full pt-24 pb-12 px-8 border-t border-white/5 relative overflow-hidden">
+    <footer className="bg-[#0a1016] w-full pt-16 md:pt-24 pb-8 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       {/* Background glow for luxury feel */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
 
       <div className="max-w-[1920px] mx-auto w-full relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 lg:gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 md:gap-12 lg:gap-8 mb-16">
           {/* Brand Column */}
           <div className="lg:col-span-2 pr-0 lg:pr-8">
             <Link to="/" className="flex items-center gap-3 group mb-8">

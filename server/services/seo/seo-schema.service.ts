@@ -12,8 +12,7 @@ export class SEOSchemaService {
       е: "e", ж: "z", з: "z", и: "i", ј: "j", к: "k",
       л: "l", љ: "lj", м: "m", н: "n", њ: "nj", о: "o",
       п: "p", р: "r", с: "s", т: "t", ћ: "c", у: "u",
-      ф: "f", х: "h", ц: "c", ч: "c", џ: "dz", ш: "s",
-      ć: "c", č: "c", đ: "dj", š: "s", ž: "z",
+      ф: "f", х: "h", ц: "c", ч: "c", џ: "dz", ш: "s"
     };
     let str = text.toLowerCase();
     str = str
@@ -63,7 +62,7 @@ export class SEOSchemaService {
     const id = data?.id;
     const schemas: Record<string, unknown>[] = [];
     const breadcrumbItems = [
-      { name: "Početna", item: "https://svetgradjevine.rs/" },
+      { name: "PoÄetna", item: "https://svetgradjevine.com/" },
     ];
 
     // Derived Canonical URL for the entity
@@ -79,27 +78,27 @@ export class SEOSchemaService {
     };
     const mappedType = typeMapping[type] || type;
     const canonicalEntityUrl = fullPath
-      ? `https://svetgradjevine.rs${fullPath}`
-      : `https://svetgradjevine.rs/${mappedType}/${id}`;
+      ? `https://svetgradjevine.com${fullPath}`
+      : `https://svetgradjevine.com/${mappedType}/${id}`;
 
     if (type === "jobs") {
       breadcrumbItems.push({
         name: "Poslovi",
-        item: "https://svetgradjevine.rs/poslovi",
+        item: "https://svetgradjevine.com/poslovi",
       });
 
       const profession = data.kategorija || data.zanimanje || data.category;
       if (profession) {
         breadcrumbItems.push({
           name: profession,
-          item: `https://svetgradjevine.rs/poslovi/${this.slugify(profession)}`,
+          item: `https://svetgradjevine.com/poslovi/${this.slugify(profession)}`,
         });
       }
 
       if (data.location) {
         const locationPath = profession
-          ? `https://svetgradjevine.rs/poslovi/${this.slugify(profession)}/${this.slugify(data.location)}`
-          : `https://svetgradjevine.rs/poslovi/${this.slugify(data.location)}`;
+          ? `https://svetgradjevine.com/poslovi/${this.slugify(profession)}/${this.slugify(data.location)}`
+          : `https://svetgradjevine.com/poslovi/${this.slugify(data.location)}`;
         breadcrumbItems.push({
           name: data.location,
           item: locationPath,
@@ -123,13 +122,13 @@ export class SEOSchemaService {
         hiringOrganization: {
           "@type": "Organization",
           "@id": companyId
-            ? `https://svetgradjevine.rs/firma/${companyId}#org`
+            ? `https://svetgradjevine.com/firma/${companyId}#org`
             : undefined,
-          name: data.companyName || "Svet Građevine",
-          logo: "https://svetgradjevine.rs/logo192.png",
+          name: data.companyName || "Svet GraÄ‘evine",
+          logo: "https://svetgradjevine.com/logo192.png",
           url: companyId
-            ? `https://svetgradjevine.rs/firma/${companyId}`
-            : "https://svetgradjevine.rs",
+            ? `https://svetgradjevine.com/firma/${companyId}`
+            : "https://svetgradjevine.com",
         },
         jobLocation: {
           "@type": "Place",
@@ -160,12 +159,12 @@ export class SEOSchemaService {
     if (type === "companies") {
       breadcrumbItems.push({
         name: "Firme",
-        item: "https://svetgradjevine.rs/firme",
+        item: "https://svetgradjevine.com/firme",
       });
       if (data.city) {
         breadcrumbItems.push({
           name: data.city,
-          item: `https://svetgradjevine.rs/firme/${this.slugify(data.city)}`,
+          item: `https://svetgradjevine.com/firme/${this.slugify(data.city)}`,
         });
       }
       breadcrumbItems.push({ name: data.name, item: canonicalEntityUrl });
@@ -231,7 +230,7 @@ export class SEOSchemaService {
 
     if (type === "machines" || type === "marketplace" || type === "plots") {
       const catMapping: Record<string, string> = {
-        machines: ["Mašine", "gradjevinske-masine"],
+        machines: ["MaÅ¡ine", "gradjevinske-masine"],
         marketplace: ["Alat i Oprema", "alat-i-oprema"],
         plots: ["Placevi", "placevi"],
       };
@@ -240,7 +239,7 @@ export class SEOSchemaService {
 
       breadcrumbItems.push({
         name: catName,
-        item: `https://svetgradjevine.rs/${catPath}`,
+        item: `https://svetgradjevine.com/${catPath}`,
       });
 
       const subCategory =
@@ -248,15 +247,15 @@ export class SEOSchemaService {
       if (subCategory) {
         breadcrumbItems.push({
           name: subCategory,
-          item: `https://svetgradjevine.rs/${catPath}/${this.slugify(subCategory)}`,
+          item: `https://svetgradjevine.com/${catPath}/${this.slugify(subCategory)}`,
         });
       }
 
       if (data.grad || data.city || data.location) {
         const loc = data.grad || data.city || data.location;
         const locPath = subCategory
-          ? `https://svetgradjevine.rs/${catPath}/${this.slugify(subCategory)}/${this.slugify(loc)}`
-          : `https://svetgradjevine.rs/${catPath}/lokacija/${this.slugify(loc)}`;
+          ? `https://svetgradjevine.com/${catPath}/${this.slugify(subCategory)}/${this.slugify(loc)}`
+          : `https://svetgradjevine.com/${catPath}/lokacija/${this.slugify(loc)}`;
         breadcrumbItems.push({
           name: loc,
           item: locPath,
@@ -286,23 +285,23 @@ export class SEOSchemaService {
 
     if (type === "accommodations") {
       breadcrumbItems.push({
-        name: "Smeštaj",
-        item: "https://svetgradjevine.rs/smestaj",
+        name: "SmeÅ¡taj",
+        item: "https://svetgradjevine.com/smestaj",
       });
 
       const accType = data.tip || data.kategorija || data.type;
       if (accType) {
         breadcrumbItems.push({
           name: accType,
-          item: `https://svetgradjevine.rs/smestaj/${this.slugify(accType)}`,
+          item: `https://svetgradjevine.com/smestaj/${this.slugify(accType)}`,
         });
       }
 
       const city = data.city || data.grad || data.locationSlug;
       if (city) {
         const cityPath = accType
-          ? `https://svetgradjevine.rs/smestaj/${this.slugify(accType)}/${this.slugify(city)}`
-          : `https://svetgradjevine.rs/smestaj/lokacija/${this.slugify(city)}`;
+          ? `https://svetgradjevine.com/smestaj/${this.slugify(accType)}/${this.slugify(city)}`
+          : `https://svetgradjevine.com/smestaj/lokacija/${this.slugify(city)}`;
         breadcrumbItems.push({ name: city, item: cityPath });
       }
 
@@ -322,21 +321,21 @@ export class SEOSchemaService {
         },
         telephone: data.telefon || data.contactPhone || data.phone || "",
         url: canonicalEntityUrl,
-        priceRange: `€${data.price || 0}`,
+        priceRange: `â‚¬${data.price || 0}`,
       });
     }
 
     if (type === "caterings") {
       breadcrumbItems.push({
         name: "Ketering",
-        item: "https://svetgradjevine.rs/ketering",
+        item: "https://svetgradjevine.com/ketering",
       });
 
       const city = data.city || data.grad || data.locationSlug;
       if (city) {
         breadcrumbItems.push({
           name: city,
-          item: `https://svetgradjevine.rs/ketering/${this.slugify(city)}`,
+          item: `https://svetgradjevine.com/ketering/${this.slugify(city)}`,
         });
       }
 
@@ -358,7 +357,7 @@ export class SEOSchemaService {
         },
         telephone: data.telefon || data.contactPhone || data.phone || "",
         url: canonicalEntityUrl,
-        servesCuisine: "Domaća kuhinja",
+        servesCuisine: "DomaÄ‡a kuhinja",
         acceptsReservations: "True",
       });
     }
@@ -366,22 +365,22 @@ export class SEOSchemaService {
     if (type === "users") {
       breadcrumbItems.push({
         name: "Majstori",
-        item: "https://svetgradjevine.rs/majstori",
+        item: "https://svetgradjevine.com/majstori",
       });
 
       const profession = data.zanimanje || data.profession || data.kategorija;
       if (profession) {
         breadcrumbItems.push({
           name: profession,
-          item: `https://svetgradjevine.rs/majstori/${this.slugify(profession)}`,
+          item: `https://svetgradjevine.com/majstori/${this.slugify(profession)}`,
         });
       }
 
       const city = data.location || data.city || data.grad;
       if (city) {
         const cityPath = profession
-          ? `https://svetgradjevine.rs/majstori/${this.slugify(profession)}/${this.slugify(city)}`
-          : `https://svetgradjevine.rs/majstori/${this.slugify(city)}`;
+          ? `https://svetgradjevine.com/majstori/${this.slugify(profession)}/${this.slugify(city)}`
+          : `https://svetgradjevine.com/majstori/${this.slugify(city)}`;
         breadcrumbItems.push({ name: city, item: cityPath });
       }
 
@@ -398,7 +397,7 @@ export class SEOSchemaService {
         description:
           data.description?.substring(0, 300) ||
           data.about?.substring(0, 300) ||
-          `Građevinski majstor: ${data.name || ""}`,
+          `GraÄ‘evinski majstor: ${data.name || ""}`,
         address: {
           "@type": "PostalAddress",
           addressLocality: data.location || data.city || "Srbija",
@@ -419,7 +418,7 @@ export class SEOSchemaService {
       if (data.skills && Array.isArray(data.skills)) {
         schema.hasOfferCatalog = {
           "@type": "OfferCatalog",
-          name: "Veštine i Usluge",
+          name: "VeÅ¡tine i Usluge",
           itemListElement: data.skills.map((skill: string, idx: number) => ({
             "@type": "OfferCatalog",
             position: idx + 1,
@@ -577,3 +576,4 @@ export class SEOSchemaService {
     return xml;
   }
 }
+

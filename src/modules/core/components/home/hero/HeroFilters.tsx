@@ -341,13 +341,13 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
               <button
                 type="button"
                 onClick={onSearch}
-                className="h-16 bg-secondary text-[#0d151c] px-16 rounded-[10px] font-headline font-black uppercase italic tracking-tighter text-xl transition-all duration-500 hover:bg-[#ffad3a] hover:scale-105 active:scale-95 shadow-gold-glow-lg flex items-center justify-center gap-3 group"
+                className="h-12 md:h-16 bg-secondary text-[#0d151c] px-6 md:px-16 rounded-[10px] font-headline font-black uppercase italic tracking-tighter text-sm sm:text-base md:text-xl transition-all duration-500 hover:bg-[#ffad3a] hover:scale-105 active:scale-95 shadow-gold-glow-lg flex items-center justify-center gap-3 group"
               >
                 <span>Prikaži rezultate</span>
                 <ArrowRight
-                  size={24}
+                  size={20}
                   strokeWidth={3}
-                  className="group-hover:translate-x-2 transition-transform duration-500"
+                  className="group-hover:translate-x-2 transition-transform duration-500 md:w-6 md:h-6"
                 />
               </button>
             </div>

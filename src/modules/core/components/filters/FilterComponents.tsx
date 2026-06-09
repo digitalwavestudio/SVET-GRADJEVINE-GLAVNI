@@ -1,11 +1,56 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-export const FilterSidebar = ({ children }: { children: React.ReactNode }) => (
-  <aside className="w-full lg:w-[300px] shrink-0 space-y-6 relative z-10">
-    {children}
-  </aside>
-);
+export const FilterSidebar = ({ children }: { children: React.ReactNode }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      {/* Mobile Floating Trigger Button */}
+      <div className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="w-full py-4 bg-secondary text-slate-950 font-black rounded-full shadow-[0_4px_20px_rgba(254,191,13,0.4)] flex items-center justify-center gap-2 uppercase tracking-widest text-xs active:scale-95 transition-transform"
+        >
+          <span className="material-symbols-outlined text-lg">filter_list</span>
+          Filteri i pretraga
+        </button>
+      </div>
+
+      {/* Mobile Drawer Overlay */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex flex-col p-6 animate-in fade-in duration-200">
+          <div className="w-12 h-1 bg-white/25 rounded-full mx-auto mb-4 cursor-pointer" onClick={() => setIsOpen(false)}></div>
+          <div className="flex justify-between items-center pb-4 border-b border-white/5 mb-6">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Pretraga i Filteri</span>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-6 pb-12 pr-1 custom-scrollbar">
+            {children}
+          </div>
+          <div className="pt-4 border-t border-white/5 bg-slate-950">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-full py-4 bg-secondary text-slate-950 font-black rounded-[10px] uppercase tracking-widest text-xs"
+            >
+              Prikaži rezultate
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:block w-full lg:w-[300px] shrink-0 space-y-6 relative z-10">
+        {children}
+      </aside>
+    </>
+  );
+};
 
 export const FilterClearButton = ({ onClick }: { onClick: () => void }) => (
   <button 
@@ -243,14 +288,14 @@ export const SortingBar = ({ currentSort, options, onChange }: {
   options: { value: string; label: string }[],
   onChange: (value: string) => void 
 }) => (
-  <div className="bg-slate-950 border border-white/5 rounded-[10px] p-2 flex items-center justify-between mb-8 shadow-2xl">
-    <div className="flex items-center gap-1 overflow-x-auto no-scrollbar px-2">
+  <div className="bg-slate-950 border border-white/5 rounded-[10px] p-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-8 shadow-2xl gap-2 sm:gap-0">
+    <div className="flex items-center gap-1 overflow-x-auto no-scrollbar px-2 w-full sm:w-auto">
       <span className="material-symbols-outlined text-white/20 text-lg mr-2 shrink-0">sort</span>
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`px-4 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${
+          className={`flex-1 sm:flex-initial px-3 py-2 sm:px-4 sm:py-2 rounded-sm text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${
             currentSort === opt.value 
             ? 'bg-secondary text-slate-950 shadow-sm shadow-secondary/20' 
             : 'text-white/40 hover:bg-white/5 hover:text-white/60'

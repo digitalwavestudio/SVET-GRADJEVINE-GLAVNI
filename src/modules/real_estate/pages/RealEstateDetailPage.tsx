@@ -33,6 +33,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import MediaGallery from '@/src/modules/core/components/details/MediaGallery';
 import PropertyGrid from '@/src/modules/core/components/details/PropertyGrid';
 import StickyContactCard from '@/src/modules/core/components/details/StickyContactCard';
+import { StickyDetailCTABar } from '@/src/components/layout/StickyDetailCTABar';
 import AdminActionToolbar from '@/src/modules/dashboard/components/details/AdminActionToolbar';
 
 export default function RealEstateDetailPage() {
@@ -166,7 +167,7 @@ export default function RealEstateDetailPage() {
         jsonLd={[realEstateSchema, breadcrumbSchema]}
       />
       
-      <main className="max-w-7xl mx-auto px-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={[
           { label: 'Placevi', path: '/placevi' },
           { label: LOCATIONS.find(l => l.slug === plot.locationSlug)?.name || 'Srbija', path: `/placevi?grad=${plot.locationSlug}` },
@@ -248,7 +249,7 @@ export default function RealEstateDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-12 mt-12">
           <div className="lg:col-span-8 flex flex-col gap-12">
             {/* Premium Gallery */}
             <div className="flex flex-col gap-4">
@@ -628,6 +629,14 @@ export default function RealEstateDetailPage() {
         </div>
         <RelatedSEO locationSlug={plot.locationSlug} currentType="plots" />
       </main>
+
+      <StickyDetailCTABar
+        phone={plot.contact?.phone || ''}
+        onMessage={handleStartChat}
+        price={plot.price}
+        currency="EUR"
+        priceLabel="CENA INVESTICIJE"
+      />
     </div>
   );
 }
