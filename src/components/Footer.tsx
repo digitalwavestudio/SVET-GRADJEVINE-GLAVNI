@@ -10,7 +10,7 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer className="bg-[#0a1016] w-full pt-16 md:pt-24 pb-8 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
+    <footer role="contentinfo" className="bg-[#0a1016] w-full pt-16 md:pt-24 pb-8 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       {/* Background glow for luxury feel */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
@@ -19,7 +19,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 md:gap-12 lg:gap-8 mb-16">
           {/* Brand Column */}
           <div className="lg:col-span-2 pr-0 lg:pr-8">
-            <Link to="/" className="flex items-center gap-3 group mb-8">
+            <Link to="/" className="flex items-center gap-3 group mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg" aria-label="Svet Građevine home">
               {logoUrl ? (
                 <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine Logo" loading="lazy" className="w-[180px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
               ) : (
@@ -42,13 +42,13 @@ export default function Footer() {
               Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-slate-200">najbolje građevinske poslove</strong>, pouzdane <strong className="font-bold text-slate-200">majstore i radnike</strong>, iznajmite mehanizaciju ili pronađite adekvatan smeštaj i placeve. Vaša prva tačka za sigurne građevinske projekte.
             </p>
             <div className="flex items-center gap-4">
-              <a href={APP_CONFIG.SOCIAL.FACEBOOK} target="_blank" rel="noopener noreferrer" aria-label="Posetite našu Facebook grupu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300">
+              <a href={APP_CONFIG.SOCIAL.FACEBOOK} target="_blank" rel="noopener noreferrer" aria-label="Posetite našu Facebook grupu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
                 <Facebook size={20} />
               </a>
-              <a href={APP_CONFIG.SOCIAL.INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Pratite nas na Instagramu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300">
+              <a href={APP_CONFIG.SOCIAL.INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Pratite nas na Instagramu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
                 <Instagram size={20} />
               </a>
-              <a href={APP_CONFIG.SOCIAL.LINKEDIN} target="_blank" rel="noopener noreferrer" aria-label="Posetite našu LinkedIn stranicu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300">
+              <a href={APP_CONFIG.SOCIAL.LINKEDIN} target="_blank" rel="noopener noreferrer" aria-label="Posetite našu LinkedIn stranicu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
                 <Linkedin size={20} />
               </a>
             </div>
@@ -73,7 +73,7 @@ export default function Footer() {
                 { path: 'kalkulator', label: 'AI Kalkulator' }
               ].map((item) => (
                 <li key={item.path}>
-                  <Link to={item.path === 'cene-i-statistika' ? '/cene-i-statistika' : `/${item.path}`} className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium cursor-pointer">
+                  <Link to={`/${item.path}`} className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium cursor-pointer touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label={item.label}>
                     {item.label}
                   </Link>
                 </li>
@@ -86,9 +86,9 @@ export default function Footer() {
               <span className="w-2 h-2 rounded-full bg-secondary/70"></span> Kompanija
             </h4>
             <ul className="space-y-4">
-              <li><Link to="/o-nama" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium">O nama</Link></li>
-              <li><Link to="/kontakt" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium">Kontakt</Link></li>
-              <li><Link to="/korisni-linkovi" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium">Korisni linkovi</Link></li>
+              <li><Link to="/o-nama" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="O nama">O nama</Link></li>
+              <li><Link to="/kontakt" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
+              <li><Link to="/korisni-linkovi" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
               <li>
                 <div className="text-sm font-black tracking-widest flex items-center gap-1 uppercase relative group/magazine cursor-default">
                   <span className="!text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_40%,#60a5fa_100%)]">Magazin</span>
@@ -125,9 +125,9 @@ export default function Footer() {
                   </div>
                 </div>
               </li>
-              <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-sm flex items-center gap-1 hover:translate-x-1 duration-300"><span className="material-symbols-outlined text-[16px]">add_circle</span> Predaj oglas</Link></li>
+              <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-sm flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Predaj oglas"><span className="material-symbols-outlined text-[16px]">add_circle</span> Predaj oglas</Link></li>
               {user && (user.email === 'mancoresolution@gmail.com' || user.email === 'sandbox@svetgradjevine.com' || user.role === 'admin' || user.isAdmin) && (
-                <li><Link to="/admin" className="text-red-400 hover:text-red-300 font-black transition-colors text-sm flex items-center gap-1 mt-2 hover:translate-x-1 duration-300"><span className="material-symbols-outlined text-[16px]">terminal</span> Admin Hub</Link></li>
+                <li><Link to="/admin" className="text-red-400 hover:text-red-300 font-black transition-colors text-sm flex items-center gap-1 mt-2 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Admin Hub"><span className="material-symbols-outlined text-[16px]">terminal</span> Admin Hub</Link></li>
               )}
             </ul>
           </div>
@@ -137,9 +137,9 @@ export default function Footer() {
               <span className="w-2 h-2 rounded-full bg-secondary/70"></span> Pravne Info
             </h4>
             <ul className="space-y-4">
-              <li><Link to="/privatnost" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium">Privatnost</Link></li>
-              <li><Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium">Uslovi korišćenja</Link></li>
-              <li><Link to="/pravila-oglasavanja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium">Pravila oglašavanja</Link></li>
+              <li><Link to="/privatnost" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Privatnost">Privatnost</Link></li>
+              <li><Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Uslovi korišćenja">Uslovi korišćenja</Link></li>
+              <li><Link to="/pravila-oglasavanja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Pravila oglašavanja">Pravila oglašavanja</Link></li>
             </ul>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-white/5 flex flex-col justify-between items-center gap-6 relative">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
           
-          <div className="flex items-center gap-6 md:gap-8 flex-wrap justify-center">
+          <div className="flex items-center gap-6 md:gap-8 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">
             <ThemeToggle className="mt-0" />
             <div className="flex items-center gap-2 text-on-surface-variant text-xs font-black uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 hover:border-secondary/50 hover:text-white transition-colors cursor-default">
               <span className="material-symbols-outlined text-[16px]">public</span> Srbija (SRB)

@@ -30,6 +30,11 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Set page title for mobile view
+  useEffect(() => {
+    document.title = "Registracija - Svet Građevine";
+  }, []);
+
   // Initial credits logic based on role
   const getInitialStats = (selectedRole: UserRole) => {
     return {

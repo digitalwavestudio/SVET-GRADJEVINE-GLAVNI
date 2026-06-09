@@ -320,6 +320,14 @@ input, textarea {
   .animate-chevron-bounce { animation: chevron-bounce 1s ease-in-out infinite; }
   .shadow-gold-glow-subtle { box-shadow: 0 0 10px rgba(254,191,13,0.15); }
   .animate-pulse-gold { animation: pulse-gold 2s infinite; }
+  /* Touch target utility */
+  .touch-target { @apply min-h-[48px] min-w-[48px] flex items-center justify-center; }
+  /* Skeleton base */
+  .skeleton { @apply bg-white/10 rounded-md; }
+  /* Fluid typography utilities */
+  .fluid-text-sm { font-size: clamp(0.875rem, 1.5vw, 1rem); }
+  .fluid-text-base { font-size: clamp(1rem, 2vw, 1.125rem); }
+  .fluid-text-lg { font-size: clamp(1.125rem, 2.5vw, 1.25rem); }
 @media (max-width: 640px) {
   .max-w-7xl {
     max-width: 100% !important;

@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState, useCallback, forwardRef, useRef } from 'r
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import LoadingState from '@/src/components/LoadingState';
+import { ListingSkeleton } from '@/src/components/ListingSkeleton';
 import NoResults from '@/src/components/ui/NoResults';
 import Spinner from '@/src/components/ui/Spinner';
 import SeoContentBlock from '@/src/components/SeoContentBlock';
@@ -396,7 +397,7 @@ function CompaniesPage() {
             />
 
             {loading && filteredCompanies.length === 0 ? (
-              <LoadingState count={4} className="grid grid-cols-1 md:grid-cols-2 gap-8" />
+              <ListingSkeleton count={viewMode === 'grid' ? 6 : 4} viewMode={viewMode} />
             ) : filteredCompanies.length === 0 ? (
               <NoResults message="Nije pronađena nijedna firma sa izabranim kriterijumima." icon="business_center" />
             ) : (

@@ -22,6 +22,11 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState('');
   const { addToast } = useToast();
 
+  // Set page title for mobile view
+  useEffect(() => {
+    document.title = "Prijava - Svet Građevine";
+  }, []);
+
   // Handle redirect after login
   const from = location.state?.from?.pathname || '/moj-profil';
   const redirectError = location.state?.error;

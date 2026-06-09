@@ -155,53 +155,71 @@ export default function Navbar() {
             </div>
 
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden absolute left-4 top-4 w-11 h-11 rounded-[10px] border border-white/10 bg-white/5 text-white focus:outline-none hover:bg-white/10 active:scale-95 transition-all duration-300 z-[200]"
-              aria-label="Meni"
-            >
-              <span className={`w-5 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 translate-y-[5px]' : ''}`}></span>
-              <span className={`w-5 h-[2px] bg-white rounded-full transition-opacity duration-300 my-[3px] ${isOpen ? 'opacity-0' : ''}`}></span>
-              <span className={`w-5 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? '-rotate-45 -translate-y-[5px]' : ''}`}></span>
-            </button>
+  onClick={() => setIsOpen(!isOpen)}
+  className="lg:hidden absolute right-4 top-4 w-12 h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
+  aria-label="Meni"
+  aria-controls="mobile-drawer"
+  aria-expanded={isOpen}
+>
+  <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 translate-y-[5px]' : ''}`}>
+  </span>
+  <span className={`w-6 h-[2px] bg-white rounded-full transition-opacity duration-300 my-[3px] ${isOpen ? 'opacity-0' : ''}`}>
+  </span>
+  <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? '-rotate-45 -translate-y-[5px]' : ''}`}>
+  </span>
+</button>
           </div>
         </div>
       </nav>
 
       {/* Mobile Drawer Overlay */}
       <div 
+        role="dialog"
+        aria-modal="true"
+        onClick={() => setIsOpen(false)}
         className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl lg:hidden flex flex-col justify-between p-8 pt-32 transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
           isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
         }`}
       >
-        <div className="flex flex-col gap-6 overflow-y-auto max-h-[60vh] pr-2">
+        <button 
+          onClick={() => setIsOpen(false)} 
+          className="absolute top-8 right-8 text-white p-2"
+          aria-label="Zatvori meni"
+        >
+          <span className="material-symbols-outlined text-3xl">close</span>
+        </button>
+
+        <div className="flex flex-col gap-6 overflow-y-auto max-h-[60vh] pr-2" onClick={(e) => e.stopPropagation()}>
           {/* Nav links */}
-          <nav className="flex flex-col gap-2">
-            {[
-              { path: "/", label: "Naslovna", icon: "home" },
-              { path: "/poslovi", label: "Poslovi", icon: "work" },
-              { path: "/majstori", label: "Majstori", icon: "construction" },
-              { path: "/firme", label: "Firme", icon: "business" },
-              { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
-              { path: "/ketering", label: "Ketering", icon: "restaurant" },
-              { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
-              { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
-              { path: "/placevi", label: "Placevi", icon: "terrain" }
-            ].map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-4 py-3 px-4 rounded-[12px] text-sm font-bold transition-all ${
-                  isActive(link.path)
-                    ? "text-secondary bg-secondary/10 border border-secondary/20"
-                    : "text-slate-300 hover:bg-white/5 border border-transparent"
-                }`}
-              >
-                <span className="material-symbols-outlined text-lg">{link.icon}</span>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+              <nav role="menu" className="flex flex-col gap-2">
+                {[ 
+                  { path: "/", label: "Naslovna", icon: "home" },
+                  { path: "/poslovi", label: "Poslovi", icon: "work" },
+                  { path: "/majstori", label: "Majstori", icon: "construction" },
+                  { path: "/firme", label: "Firme", icon: "business" },
+                  { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
+                  { path: "/ketering", label: "Ketering", icon: "restaurant" },
+                  { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
+                  { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
+                  { path: "/placevi", label: "Placevi", icon: "terrain" }
+                ].map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    role="menuitem"
+                    className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target ${
+                      isActive(link.path)
+                        ? "text-secondary bg-secondary/10 border border-secondary/20"
+                        : "text-slate-300 hover:bg-white/5 border border-transparent"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">{link.icon}</span>
+                    <span className="sr-only">{link.label}</span>
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
         </div>
 
         {/* Footer actions inside drawer */}
