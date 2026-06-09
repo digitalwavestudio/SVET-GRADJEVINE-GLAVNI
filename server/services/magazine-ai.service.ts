@@ -1,14 +1,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Article } from "../../src/types/magazine.ts";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
+let ai: GoogleGenAI | null = null;
+if (process.env.GEMINI_API_KEY) {
+  ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      }
     }
-  }
-});
+  });
+} else {
+  console.warn('[MagazineAIService] GEMINI_API_KEY missing, AI functions disabled.');
+}
 
 export class MagazineAIService {
   /**

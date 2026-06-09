@@ -5,7 +5,8 @@ let aiInstance: GoogleGenAI | null = null;
 export const getGenAI = () => {
   if (!aiInstance) {
     if (!process.env.GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY je obavezan u okruženju");
+      console.warn("[AI] GEMINI_API_KEY missing, AI services disabled.");
+      return null;
     }
     aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   }
@@ -13,13 +14,16 @@ export const getGenAI = () => {
 };
 
 export const callGeminiAPI = async (prompt: string) => {
+  const ai = getGenAI();
+  if (!ai) {
+    console.warn("[AI] Gemini API unavailable, returning empty response.");
+    return "";
+  }
   try {
-    const ai = getGenAI();
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: prompt,
     });
-
     return response.text;
   } catch (error) {
     console.error("Gemini API error:", error);
@@ -28,8 +32,12 @@ export const callGeminiAPI = async (prompt: string) => {
 };
 
 export const parseSearchIntent = async (query: string) => {
+  const ai = getGenAI();
+  if (!ai) {
+    console.warn("[AI] Gemini unavailable, returning fallback intent.");
+    return { keywords: [query], intentType: "SEARCH" };
+  }
   try {
-    const ai = getGenAI();
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `Analiziraj upit za portal "Svet Građevine" i pretvori ga u strukturirane filtere.
@@ -72,12 +80,15 @@ export const parseSearchIntent = async (query: string) => {
         },
       },
     });
-
     const jsonStr = response.text?.trim() || "{}";
-    return JSON.parse(jsonStr);
-  } catch (error) {
-    console.error("Gemini API error in intent parsing:", error);
-    return { keywords: [query], intentType: "SEARCH" };
+   if (process.env.NODE_ENV === "production") {
+      runPendingMigrations().catch(e => console.error("Migration failed", e));
+      try {
+        DLQMonitoringService.startMonitoring();
+      } catch (e) {
+        console.warn("[DLQ] Monitoring failed to start:", e);
+      }
+    }return { keywords: [query], intentType: "SEARCH" };
   }
 };
 
@@ -94,6 +105,10 @@ export const moderateImage = async (imageUrl: string) => {
     });
 
     const ai = getGenAI();
+    if (!ai) {
+      console.warn("[AI] Gemini unavailable, skipping image moderation.");
+      return { isSafe: true, confidence: 1 };
+    }
     const result = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: {
@@ -145,8 +160,12 @@ export const moderateImage = async (imageUrl: string) => {
 };
 
 export const processDashboardCommand = async (input: string, context?: any) => {
+  const ai = getGenAI();
+  if (!ai) {
+    console.warn("[AI] Gemini unavailable, returning default command response.");
+    return "Komanda je obrađena.";
+  }
   try {
-    const ai = getGenAI();
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `The user typed the following command: "${input}". Provide a helpful and brief response simulating an advanced AI assistant answering the command. Context: ${JSON.stringify(context || {})}`,

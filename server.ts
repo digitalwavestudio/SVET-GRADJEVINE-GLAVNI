@@ -111,7 +111,7 @@ async function startServer() {
           initMigrations();
           if (process.env.NODE_ENV === "production") {
             runPendingMigrations().catch(e => console.error("Migration failed", e));
-            DLQMonitoringService.startMonitoring();
+  // DLQ cron registration deferred to after SystemCron is initialized
           }
         }
 
@@ -144,6 +144,10 @@ async function startServer() {
                 await ImageWorker.init();
                 const { SystemCron } = await import("./server/utils/system-cron.ts");
                 await SystemCron.init();
+                const { DLQMonitoringService } = await import("./server/services/dlq-monitoring.service.ts");
+                if (process.env.NODE_ENV === "production") {
+                  DLQMonitoringService.startMonitoring();
+                }
               }
             } catch (err) {
               console.error("[Server] Worker Init Error:", err);

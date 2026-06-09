@@ -42,12 +42,21 @@ export class DLQMonitoringService {
   }
 
   static startMonitoring() {
-    import("../utils/system-cron.ts")
-      .then(({ SystemCron }) => {
-        SystemCron.register("dlq_monitoring_cron", { pattern: "0 */12 * * *" }, async () => {
-          await this.checkIntegrity();
-        }).catch(err => this.logger.error("Failed to register DLQ cron", err));
-      }).catch(err => this.logger.error("Failed to import SystemCron", err));
+    try {
+      import("../utils/system-cron.ts")
+        .then(({ SystemCron }) => {
+          if (SystemCron && typeof SystemCron.register === "function") {
+            SystemCron.register("dlq_monitoring_cron", { pattern: "0 */12 * * *" }, async () => {
+              await this.checkIntegrity();
+            }).catch(err => this.logger.warn("DLQ cron registration failed (possible queue init issue)", err));
+          } else {
+            this.logger.warn("SystemCron not available, skipping DLQ monitoring registration.");
+          }
+        })
+        .catch(err => this.logger.warn("Failed to import SystemCron for DLQ monitoring", err));
+    } catch (e) {
+      this.logger.warn("Unexpected error in DLQ startMonitoring", e);
+    }
   }
 
   static gracefulShutdown() {
