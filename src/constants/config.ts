@@ -1,6 +1,6 @@
 export const APP_CONFIG = {
-  DOMAIN: 'svetgradjevine.rs',
-  BASE_URL: 'https://svetgradjevine.rs',
+  DOMAIN: 'svetgradjevine.com',
+  BASE_URL: 'https://www.svetgradjevine.com',
   get OG_IMAGE_DEFAULT() { return `${this.BASE_URL}/og-image.jpg`; },
   CONTACT_EMAIL: 'office@svetgradjevine.com',
   SUPPORT_EMAIL: 'podrska@svetgradjevine.com',
