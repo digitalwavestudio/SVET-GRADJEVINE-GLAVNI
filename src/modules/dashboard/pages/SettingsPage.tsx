@@ -13,9 +13,9 @@ import { z } from 'zod';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '@/src/lib/apiClient';
 
-import { ProfileSettingsTab } from './components/settings/ProfileSettingsTab';
-import { NotificationSettingsTab } from './components/settings/NotificationSettingsTab';
-import { SecuritySettingsTab } from './components/settings/SecuritySettingsTab';
+import { ProfileSettingsTab } from '../components/settings/ProfileSettingsTab';
+import { NotificationSettingsTab } from '../components/settings/NotificationSettingsTab';
+import { SecuritySettingsTab } from '../components/settings/SecuritySettingsTab';
 
 export default function SettingsPage() {
   const { user, updateUser } = useAuth();

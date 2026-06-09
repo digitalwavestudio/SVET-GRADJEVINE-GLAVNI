@@ -20,10 +20,10 @@ export function generateJobSchema(job: Job, rating?: { ratingValue: number; revi
     "hiringOrganization": {
       "@type": "Organization",
       "name": job.comp || job.company || "Svet Građevine Korisnik",
-      "sameAs": "https://svetgradjevine.rs",
+      "sameAs": "https://svetgradjevine.com",
       "logo": {
         "@type": "ImageObject",
-        "url": job.logo || "https://svetgradjevine.rs/logo.png",
+        "url": job.logo || "https://svetgradjevine.com/logo.png",
         "description": "Logo kompanije"
       }
     },
@@ -67,7 +67,7 @@ export function generateProductSchema(item: any, type: string, rating?: { rating
       "description": item.title || item.name || "Slika proizvoda"
     })) : [{
       "@type": "ImageObject",
-      "url": "https://svetgradjevine.rs/logo.png",
+      "url": "https://svetgradjevine.com/logo.png",
       "description": "Logo Svet Građevine"
     }],
     "description": (item.description || item.opis || "Opis nije dostupan").substring(0, 160),
@@ -80,7 +80,7 @@ export function generateProductSchema(item: any, type: string, rating?: { rating
       "priceCurrency": "EUR",
       "price": price,
       "availability": "https://schema.org/InStock",
-      "url": `https://svetgradjevine.rs/${type}/${item.id}`
+      "url": `https://svetgradjevine.com/${type}/${item.id}`
     },
     "aggregateRating": (rating && typeof rating.ratingValue === 'number') ? {
       "@type": "AggregateRating",
@@ -98,11 +98,11 @@ export function generateLocalBusinessSchema(profile: any, rating?: { ratingValue
     "name": profile.name || `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || "Korisnik",
     "image": {
       "@type": "ImageObject",
-      "url": profile.photoURL || "https://svetgradjevine.rs/logo.png",
+      "url": profile.photoURL || "https://svetgradjevine.com/logo.png",
       "description": `Profilna slika korisnika ${profile.name || ''}`.trim()
     },
-    "@id": `https://svetgradjevine.rs/profil/${profile.uid}`,
-    "url": `https://svetgradjevine.rs/profil/${profile.uid}`,
+    "@id": `https://svetgradjevine.com/profil/${profile.uid}`,
+    "url": `https://svetgradjevine.com/profil/${profile.uid}`,
     "telephone": profile.phone || "",
     "address": {
       "@type": "PostalAddress",
