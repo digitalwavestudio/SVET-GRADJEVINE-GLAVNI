@@ -405,6 +405,10 @@ input, textarea {
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6) !important;
     border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
   }
+  div[role="dialog"] .overflow-y-auto {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
   div[role="dialog"] button.absolute {
     top: 1.5rem !important;
     right: 1.5rem !important;
