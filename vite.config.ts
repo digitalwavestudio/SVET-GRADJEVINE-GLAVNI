@@ -47,6 +47,7 @@ export default defineConfig(({mode}) => {
         injectRegister: 'auto',
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
+          navigateFallbackDenylist: [/^\/__/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
