@@ -209,7 +209,7 @@ export default function Navbar() {
                     to={link.path}
                     onClick={() => setIsOpen(false)}
                     role="menuitem"
-                    className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target ${
+                    className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target justify-start ${
                       isActive(link.path)
                         ? "text-secondary bg-secondary/10 border border-secondary/20"
                         : "text-slate-300 hover:bg-white/5 border border-transparent"
