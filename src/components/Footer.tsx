@@ -77,9 +77,10 @@ export default function Footer() {
               <li>
                 <div className="text-sm font-black tracking-widest flex items-center gap-1 uppercase relative group/magazine cursor-default">
                   <span className="!text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_40%,#60a5fa_100%)]">Magazin</span>
+                  <span className="lg:hidden text-[9px] text-secondary font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
                   
                   {/* Tooltip Popup */}
-                  <div className="absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/magazine:opacity-100 transition-all duration-300 scale-90 group-hover/magazine:scale-100 z-50 transform-gpu">
+                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/magazine:opacity-100 transition-all duration-300 scale-90 group-hover/magazine:scale-100 z-50 transform-gpu">
                     <div className="bg-[#0F1923] border border-secondary/50 p-3 rounded-md shadow-[0_10px_30px_rgba(0,0,0,0.5)] whitespace-nowrap">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="material-symbols-outlined text-secondary text-sm">construction</span>
@@ -95,9 +96,10 @@ export default function Footer() {
               <li>
                 <div className="text-[#b35b10]/50 text-[16px] leading-[20px] font-black tracking-widest flex items-center gap-1 uppercase relative group/partner cursor-default">
                   Partner (Affiliate)
+                  <span className="lg:hidden text-[9px] text-[#b35b10] font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
                   
                   {/* Tooltip Popup */}
-                  <div className="absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 z-50 transform-gpu">
+                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 z-50 transform-gpu">
                     <div className="bg-[#0F1923] border border-secondary/50 p-3 rounded-md shadow-[0_10px_30px_rgba(0,0,0,0.5)] whitespace-nowrap">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="material-symbols-outlined text-secondary text-sm">construction</span>
