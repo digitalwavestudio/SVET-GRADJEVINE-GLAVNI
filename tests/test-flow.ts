@@ -20,11 +20,8 @@ import { db } from '../server/config/firebase.ts';
     await page.goto('http://localhost:3000/registracija', { waitUntil: 'networkidle', timeout: 15000 });
     
     console.log('2. Popunjavam formu za registraciju...');
-    await page.fill('input[name="firstName"]', 'Marko');
-    await page.fill('input[name="lastName"]', 'Firma');
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', password);
-    await page.check('input#terms');
     
     console.log('3. Klikćem na dugme za registraciju...');
     await Promise.all([

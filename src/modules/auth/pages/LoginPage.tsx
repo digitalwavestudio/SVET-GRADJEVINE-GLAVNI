@@ -113,14 +113,17 @@ export default function LoginPage() {
       } else {
         await loginWithGoogle();
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       const errorMsg = getErrorMessage(err);
       console.error('Google Login Error:', errorMsg);
-      if (email === 'mancoresolution@gmail.com') {
-        setError('Google servis nedostupan, ali vas prepoznajemo. Prebacujem na admin hub...');
-        setTimeout(() => navigate('/admin'), 1500);
+      if (err?.code === 'auth/popup-blocked') {
+        setError('Browser je blokirao popup. Dozvolite popup prozore za ovu stranicu i pokušajte ponovo.');
+      } else if (err?.code === 'auth/popup-closed-by-user') {
+        setError('Zatvorili ste popup pre završetka prijave. Pokušajte ponovo.');
+      } else if (err?.code) {
+        setError(`Greška pri Google prijavi (${err.code}): ${errorMsg}`);
       } else {
-        setError('Greška prilikom Google prijave. Ako ste unutar Preview prozora, kliknite ikonicu da otvorite aplikaciju u novom tabu.');
+        setError(`Greška prilikom Google prijave: ${errorMsg}`);
       }
     } finally {
       setLoading(false);

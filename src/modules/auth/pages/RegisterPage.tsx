@@ -17,8 +17,6 @@ export default function RegisterPage() {
   const { logoUrl } = useBrandLogo();
   const [role, setRole] = useState<UserRole>('standard');
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
     companyName: '', // Novo za firme
@@ -96,13 +94,14 @@ export default function RegisterPage() {
     try {
       const userCred = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = userCred.user;
-      
+      const emailPrefix = formData.email.split('@')[0];
+      const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
       const stats = getInitialStats(role);
       
       const userDoc = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        name: role !== 'standard' ? formData.companyName || `${formData.firstName} ${formData.lastName}` : `${formData.firstName} ${formData.lastName}`,
+        firstName: '',
+        lastName: '',
+        name: role !== 'standard' ? formData.companyName || defaultName : defaultName,
         role: role,
         isVerified: false,
         mb: formData.mb,
@@ -110,7 +109,7 @@ export default function RegisterPage() {
         licences: [],
         ...stats,
         // Send fields expected by API /init:
-        displayName: role !== 'standard' ? formData.companyName || `${formData.firstName} ${formData.lastName}` : `${formData.firstName} ${formData.lastName}`,
+        displayName: role !== 'standard' ? formData.companyName || defaultName : defaultName,
         email: user.email,
         uid: user.uid,
         status: 'active',
@@ -331,32 +330,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Ime</label>
-                  <input 
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                    placeholder="Marko" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Prezime</label>
-                  <input 
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                    placeholder="Marković" 
-                  />
-                </div>
-              </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Email adresa</label>
                 <input 

@@ -119,6 +119,13 @@ export class UsersService {
             isPremiumProfile: false,
             emailVerified: fallbackUser.emailVerified || false,
           };
+          // Auto-init in Firestore on first Google login/signup
+          try {
+            await UsersService.initUser(uid, fallbackObj, fallbackUser);
+            console.log(`[UsersService] Auto-initialized Google user ${uid} in Firestore`);
+          } catch (initErr) {
+            console.error(`[UsersService] Failed to auto-initialize Google user ${uid}:`, initErr);
+          }
           return fallbackObj;
         }
         return null;
