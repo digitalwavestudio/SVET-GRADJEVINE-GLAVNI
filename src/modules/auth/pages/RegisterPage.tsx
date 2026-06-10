@@ -226,7 +226,7 @@ export default function RegisterPage() {
         </section>
 
         {/* Right Side: Registration Form (40%) */}
-        <section className="w-full md:w-[40%] bg-surface-container-low flex flex-col justify-center items-center p-8 md:p-12 min-h-screen border-l border-outline-variant/10 relative">
+        <section className="w-full md:w-[40%] bg-surface-container-low flex flex-col justify-center items-center px-4 py-8 sm:p-8 md:p-12 min-h-screen border-l border-outline-variant/10 relative">
           <div className="w-full max-w-md flex flex-col items-center">
             {/* Brand Logo */}
             <div className="flex flex-col items-center gap-4">

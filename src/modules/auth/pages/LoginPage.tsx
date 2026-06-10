@@ -183,7 +183,7 @@ export default function LoginPage() {
         </div>
       )}
   
-      <section className="w-full md:w-2/5 bg-surface-container-low flex flex-col justify-center items-center px-8 py-12 lg:px-16 min-h-screen border-l border-outline-variant/10 relative">
+      <section className="w-full md:w-2/5 bg-surface-container-low flex flex-col justify-center items-center px-4 py-8 sm:px-8 sm:py-12 lg:px-16 min-h-screen border-l border-outline-variant/10 relative">
         
         <div className="w-full max-w-md">
           {/* Header */}
