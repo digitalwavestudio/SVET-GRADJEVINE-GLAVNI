@@ -132,6 +132,16 @@ export default function Navbar() {
           )}
 
           <div className="flex items-center gap-3 lg:gap-4 lg:ml-2">
+            {/* Mobile Postavi Oglas Shortcut */}
+            <Button
+              to="/postavi-oglas"
+              variant="nav-premium"
+              icon="add_circle"
+              className="sm:hidden !min-h-0 !min-w-0 !h-10 !py-1 !px-2.5 mr-14 text-[10px] uppercase font-black tracking-wider shadow-md"
+            >
+              Postavi
+            </Button>
+
             <div className="hidden sm:flex items-center gap-3">
               <Button
                 to="/postavi-oglas"
@@ -182,14 +192,6 @@ export default function Navbar() {
           isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
         }`}
       >
-        <button 
-          onClick={() => setIsOpen(false)} 
-          className="absolute top-8 right-8 text-white p-2"
-          aria-label="Zatvori meni"
-        >
-          <span className="material-symbols-outlined text-3xl">close</span>
-        </button>
-
         <div className="flex flex-col gap-6 overflow-y-auto max-h-[60vh] pr-2" onClick={(e) => e.stopPropagation()}>
           {/* Nav links */}
               <nav role="menu" className="flex flex-col gap-2">
