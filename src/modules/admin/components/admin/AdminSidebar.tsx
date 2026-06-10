@@ -85,14 +85,25 @@ export function AdminSidebar({
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-      <div className="flex items-center gap-4 mb-16">
-        <div className="w-12 h-12 bg-secondary rounded-[10px] flex items-center justify-center shadow-[0_0_30px_rgba(254,191,13,0.3)]">
-          <span className="material-symbols-outlined text-slate-950 text-3xl font-bold">terminal</span>
+      <div className="flex items-center justify-between mb-8 md:mb-16">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-secondary rounded-[10px] flex items-center justify-center shadow-[0_0_30px_rgba(254,191,13,0.3)]">
+            <span className="material-symbols-outlined text-slate-950 text-3xl font-bold">terminal</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">ADMIN <span className="text-secondary">HUB</span></h1>
+            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Svet Građevine v1.0</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-black tracking-tighter uppercase leading-none">ADMIN <span className="text-secondary">HUB</span></h1>
-          <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Svet Građevine v1.0</p>
-        </div>
+        
+        {/* Mobile Close Button */}
+        <button 
+          onClick={() => setIsMobileMenuOpen?.(false)}
+          className="md:hidden p-2 text-white/40 hover:text-white"
+          aria-label="Zatvori meni"
+        >
+          <span className="material-symbols-outlined text-2xl">close</span>
+        </button>
       </div>
 
       <nav className="space-y-2 flex-1 overflow-y-auto no-scrollbar pr-2">
@@ -101,7 +112,7 @@ export function AdminSidebar({
             key={item.id}
             variants={itemVars}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-4 px-6 py-4 rounded-[10px] transition-all group ${
+            className={`w-full flex items-center gap-4 px-4 py-3 md:px-6 md:py-4 rounded-[10px] transition-all group ${
               activeTab === item.id 
                 ? 'bg-secondary text-slate-950 shadow-xl shadow-secondary/10' 
                 : 'text-white/40 hover:bg-white/5 hover:text-white'

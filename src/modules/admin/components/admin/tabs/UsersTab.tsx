@@ -47,9 +47,9 @@ export function UsersTab({}: UsersTabProps) {
        exit={{ opacity: 0, y: -20 }}
        className="bg-[#0A0F14] border border-white/5 rounded-[10px] overflow-hidden"
     >
-       <div className="p-10 border-b border-white/5 flex justify-between items-center">
+       <div className="p-4 sm:p-10 border-b border-white/5 flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
           <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">LISTA REGISTROVANIH KORISNIKA</h3>
-          <div className="relative w-96">
+          <div className="relative w-full sm:w-96">
              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-white/20">search</span>
              <input 
                value={localQuery}
