@@ -4,8 +4,10 @@ import {
   onIdTokenChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   updateProfile,
+  getRedirectResult,
   User as FirebaseUser
 } from 'firebase/auth';
 import { auth, googleProvider } from '@/src/firebase-auth';
@@ -220,45 +222,47 @@ export function useAuthNode() {
       }
     });
 
-    return () => {
-      if (initTimeout) clearTimeout(initTimeout);
-      if (!isBotRef.current) unsubscribeAuth();
-    };
+      // Moved redirect handling to top-level effect
+
+      return () => {
+        if (initTimeout) clearTimeout(initTimeout);
+        if (!isBotRef.current) unsubscribeAuth();
+      };
   }, [subscribeToUser]);
 
-  // Auth Methods
+// Auth Methods
+
+useEffect(() => {
+  getRedirectResult(auth)
+    .then((result) => {
+      console.log('[AUTH] getRedirectResult result:', result);
+      if (result?.user) {
+        currentFbUser.current = result.user;
+        subscribeToUser(result.user);
+      }
+    })
+    .catch((err) => {
+      console.warn('[AUTH] getRedirectResult failed', err);
+    });
+}, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
-      const result = await signInWithPopup(auth, googleProvider);
-      const firebaseUser = result.user;
-      
-      // BigQuery Auth Trace
-      apiClient.post('/telemetry/auth', {
-        userId: firebaseUser.uid,
-        authMethod: 'google',
-        eventType: 'login',
-        status: 'success'
-      }).catch(() => {});
-
-      // Enterprise Auth Init
       try {
-         const nameParts = (firebaseUser.displayName || '').split(' ');
-         const firstName = nameParts[0] || '';
-         const lastName = nameParts.slice(1).join(' ') || '';
-         
-         await apiClient.post('/users/init', {
-           email: firebaseUser.email,
-           firstName,
-           lastName,
-           name: firebaseUser.displayName || '',
-           role: defaultRole,
-           emailVerified: firebaseUser.emailVerified
-         });
-      } catch (e) {
-         console.warn('[AUTH] Error initializing Google user backend state', e);
+        // Attempt popup login first
+        await signInWithPopup(auth, googleProvider);
+      } catch (err: any) {
+        console.warn('[AUTH] Popup login failed, falling back to redirect:', err);
+        // Fallback to redirect for environments where popups are blocked (incognito, Brave, etc.)
+        try {
+          await signInWithRedirect(auth, googleProvider);
+        } catch (redirectErr) {
+          console.error('[AUTH] Redirect login also failed:', redirectErr);
+          throw redirectErr;
+        }
       }
     });
   }, []);
+
 
   const loginWithEmail = useCallback(async (email: string, pass: string) => {
     return traceAsync('auth_login_email', async () => {

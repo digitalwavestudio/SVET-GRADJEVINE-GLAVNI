@@ -83,7 +83,8 @@ export default defineConfig(({mode}) => {
     define: {
       'process.env.ADMIN_EMAILS': JSON.stringify(env.ADMIN_EMAILS || '[]'),
     },
-    server: { 
+    server: {
+      port: 5174,
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: {
         usePolling: false,

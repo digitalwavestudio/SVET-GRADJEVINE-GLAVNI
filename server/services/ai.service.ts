@@ -152,6 +152,8 @@ export const moderateImage = async (imageUrl: string) => {
     console.error("Gemini API error in image moderation:", error);
     // Fallback: allow if AI fails
     return { isSafe: true, confidence: 0 };
+  } finally {
+    // No cleanup needed
   }
 };
 

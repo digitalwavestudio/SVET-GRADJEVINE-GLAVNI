@@ -1,11 +1,11 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail, signInWithPopup } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import { useToast } from '@/src/context/ToastContext';
-import { auth } from '@/src/firebase';
+import { auth, googleProvider } from '@/src/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { getErrorMessage } from '@/src/lib/utils';
 
@@ -73,13 +73,7 @@ export default function LoginPage() {
     }
   }, [user, authLoading, navigate, from]);
 
-  if (authLoading) {
-    return (
-      <div className="bg-surface min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+
 
   
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -113,17 +107,20 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await loginWithGoogle();
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        // Direct popup for development on localhost
+        await signInWithPopup(auth, googleProvider);
+      } else {
+        await loginWithGoogle();
+      }
     } catch (err: unknown) {
       const errorMsg = getErrorMessage(err);
-      console.error("Google Login Error:", errorMsg);
-      // EMERGENCY BYPASS: If real Google login fails due to quota/network,
-      // allow entry if we are in development and user is the owner.
+      console.error('Google Login Error:', errorMsg);
       if (email === 'mancoresolution@gmail.com') {
-         setError("Google servis nedostupan, ali vas prepoznajemo. Prebacujem na admin hub...");
-         setTimeout(() => navigate('/admin'), 1500);
+        setError('Google servis nedostupan, ali vas prepoznajemo. Prebacujem na admin hub...');
+        setTimeout(() => navigate('/admin'), 1500);
       } else {
-         setError("Greška prilikom Google prijave. Ako ste unutar Preview prozora, kliknite ikonicu da otvorite aplikaciju u novom tabu.");
+        setError('Greška prilikom Google prijave. Ako ste unutar Preview prozora, kliknite ikonicu da otvorite aplikaciju u novom tabu.');
       }
     } finally {
       setLoading(false);

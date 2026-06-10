@@ -90,10 +90,6 @@ export default function RegisterPage() {
       setError('Lozinka mora imati barem 8 karaktera, uključujući velika i mala slova i barem jednu cifru.');
       return;
     }
-    if (!formData.termsAccepted) {
-      setError('Morate prihvatiti Uslove korišćenja i Politiku privatnosti.');
-      return;
-    }
 
     setLoading(true);
     setError('');
@@ -163,17 +159,19 @@ export default function RegisterPage() {
   };
 
   const handleGoogleRegister = async () => {
-    if (!formData.termsAccepted) {
-      setError('Morate prihvatiti Uslove korišćenja i Politiku privatnosti za Google Registraciju.');
-      return;
-    }
-
     setLoading(true);
+    setError('');
     try {
       await loginWithGoogle(role);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setError("Ako podaci odgovaraju nalozima, bićete autorizovani.");
+      if (error?.code === 'auth/popup-blocked') {
+        setError('Browser je blokirao popup. Dozvolite popup prozore za ovu stranicu i pokušajte ponovo.');
+      } else if (error?.code === 'auth/popup-closed-by-user') {
+        setError('Zatvorili ste popup pre završetka prijave. Pokušajte ponovo.');
+      } else {
+        setError('Greška prilikom Google registracije. Pokušajte ponovo ili koristite email registraciju.');
+      }
     } finally {
       setLoading(false);
     }
@@ -257,7 +255,7 @@ export default function RegisterPage() {
             <div className="mb-8">
               <button 
                 onClick={handleGoogleRegister}
-                disabled={loading || !formData.termsAccepted}
+                disabled={loading}
                 className="w-full bg-white hover:bg-slate-50 text-slate-900 font-bold py-4 rounded-[10px] transition-all flex items-center justify-center gap-3 border border-slate-200 shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -387,23 +385,13 @@ export default function RegisterPage() {
                 </div>
               </div>
               
-              <div className="flex items-start gap-3 py-2">
-                <input 
-                  id="terms" 
-                  name="termsAccepted"
-                  type="checkbox"
-                  checked={formData.termsAccepted}
-                  onChange={handleInputChange}
-                  className="mt-1 w-5 h-5 rounded border-outline-variant/40 bg-surface text-primary focus:ring-primary/20 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer" 
-                />
-                <label className="text-xs text-on-surface-variant cursor-pointer select-none leading-relaxed" htmlFor="terms">
-                  Slažem se sa <Link to="/uslovi-koriscenja" className="text-primary hover:underline font-bold">Uslovima korišćenja</Link> i <Link to="/politika-privatnosti" className="text-primary hover:underline font-bold">Politikom privatnosti</Link>.
-                </label>
-              </div>
+              <p className="text-xs text-on-surface-variant leading-relaxed py-2">
+                Registracijom prihvatate <Link to="/uslovi-koriscenja" className="text-primary hover:underline font-bold">Uslove korišćenja</Link> i <Link to="/politika-privatnosti" className="text-primary hover:underline font-bold">Politiku privatnosti</Link>.
+              </p>
 
               <button 
                 type="submit"
-                disabled={loading || !formData.termsAccepted}
+                disabled={loading}
                 className={UI_TOKENS.BTN_PRIMARY + " w-full py-4 font-black uppercase tracking-widest text-sm rounded-[10px] transition-all transform active:scale-[0.98] shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"} 
               >
                 {loading ? 'Registrovanje...' : 'Registruj se'}

@@ -183,6 +183,16 @@ async function startServer() {
     app.use(requestLogger);
     app.set("trust proxy", 1);
     app.use(compression());
+
+    const { createProxyMiddleware } = await import("http-proxy-middleware");
+    app.use(
+      "/__/auth",
+      createProxyMiddleware({
+        target: "https://gen-lang-client-0548525213.firebaseapp.com",
+        changeOrigin: true,
+      })
+    );
+
     app.use(rateLimitShield);
 
     app.use(

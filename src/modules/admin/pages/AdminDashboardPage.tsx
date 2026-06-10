@@ -143,7 +143,7 @@ export default function AdminDashboardPage() {
            <span className="material-symbols-outlined text-secondary">terminal</span>
            <span className="font-black tracking-widest text-sm uppercase">Admin Hub</span>
          </div>
-         <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-white/5 rounded">
+         <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-white/5 rounded ml-auto">
             <span className="material-symbols-outlined">menu</span>
          </button>
       </div>
