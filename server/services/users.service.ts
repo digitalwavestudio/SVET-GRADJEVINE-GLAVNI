@@ -77,10 +77,13 @@ export class UsersService {
       if (includePrivate) {
         const userRef = db.collection("users").doc(uid);
         const privRef = userRef.collection("private").doc("data");
-        const [uSnap, pSnap] = await Promise.all([
+        const fetchPromise = Promise.all([
           userRef.get(),
           privRef.get()
         ]);
+        const [uSnap, pSnap] = await (Promise.race([fetchPromise, timeoutPromise]) as Promise<[firebaseAdmin.firestore.DocumentSnapshot, firebaseAdmin.firestore.DocumentSnapshot]>).finally(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+        });
         
         userSnap = uSnap;
         privSnap = pSnap;
