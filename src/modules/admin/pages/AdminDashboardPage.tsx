@@ -177,97 +177,104 @@ export default function AdminDashboardPage() {
                   <AdminChartsSkeleton />
                 </div>
               ) : (
-                <OverviewTab 
-                  dynamicSectorData={(charts?.sectorData || []) as any as SectorData[]}
-                  dynamicRegistrationData={(charts?.registrationData || []) as any as RegistrationData[]}
-                  launchMode={launchMode}
-                  toggleLaunchMode={toggleLaunchMode}
-                  isUpdatingLaunchMode={isUpdatingLaunchMode}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="glass-card p-4">
+                    <OverviewTab 
+                      dynamicSectorData={(charts?.sectorData || []) as any as SectorData[]}
+                      dynamicRegistrationData={(charts?.registrationData || []) as any as RegistrationData[]}
+                      launchMode={launchMode}
+                      toggleLaunchMode={toggleLaunchMode}
+                      isUpdatingLaunchMode={isUpdatingLaunchMode}
+                    />
+                  </div>
+                  <div className="glass-card p-4">
+                    <AdminChartsSkeleton />
+                  </div>
+                </div>
               )}
             </Suspense>
           )}
           {activeTab === 'moderation' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <ModerationTab getDetailLink={getDetailLink} />
+              <div className="glass-card p-4"><ModerationTab getDetailLink={getDetailLink} /></div>
             </Suspense>
           )}
           {activeTab === 'users' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <UsersTab />
+              <div className="glass-card p-4"><UsersTab /></div>
             </Suspense>
           )}
           {activeTab === 'verify' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <VerifyTab />
+              <div className="glass-card p-4"><VerifyTab /></div>
             </Suspense>
           )}
           {activeTab === 'finances' && (
             <AdminErrorBoundary>
               <Suspense fallback={<AdminTabLoading />}>
-                <FinancesTab stats={systemStats} />
+                <div className="glass-card p-4"><FinancesTab stats={systemStats} /></div>
               </Suspense>
             </AdminErrorBoundary>
           )}
           {activeTab === 'support' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <SupportTab />
+              <div className="glass-card p-4"><SupportTab /></div>
             </Suspense>
           )}
           {activeTab === 'abuse' && (
             <AdminErrorBoundary>
               <Suspense fallback={<AdminTabLoading />}>
-                <AbuseTab />
+                <div className="glass-card p-4"><AbuseTab /></div>
               </Suspense>
             </AdminErrorBoundary>
           )}
           {activeTab === 'marketing' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <MarketingTab />
+              <div className="glass-card p-4"><MarketingTab /></div>
             </Suspense>
           )}
           {activeTab === 'broadcast' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <BroadcastTab />
+              <div className="glass-card p-4"><BroadcastTab /></div>
             </Suspense>
           )}
           {activeTab === 'sync' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <SyncTab />
+              <div className="glass-card p-4"><SyncTab /></div>
             </Suspense>
           )}
           {activeTab === 'audit' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <AuditTab />
+              <div className="glass-card p-4"><AuditTab /></div>
             </Suspense>
           )}
           {activeTab === 'observability' && (
             <AdminErrorBoundary>
               <Suspense fallback={<AdminTabLoading />}>
-                <ObservabilityTab />
+                <div className="glass-card p-4"><ObservabilityTab /></div>
               </Suspense>
             </AdminErrorBoundary>
           )}
           {activeTab === 'resilience' && (
             <AdminErrorBoundary>
               <Suspense fallback={<AdminTabLoading />}>
-                <ResilienceTab />
+                <div className="glass-card p-4"><ResilienceTab /></div>
               </Suspense>
             </AdminErrorBoundary>
           )}
           {activeTab === 'settings' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <GlobalSettingsTab />
+              <div className="glass-card p-4"><GlobalSettingsTab /></div>
             </Suspense>
           )}
           {activeTab === 'branding' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <BrandingTab />
+              <div className="glass-card p-4"><BrandingTab /></div>
             </Suspense>
           )}
           {activeTab === 'magazine' && (
             <Suspense fallback={<AdminTabLoading />}>
-              <MagazineTab />
+              <div className="glass-card p-4"><MagazineTab /></div>
             </Suspense>
           )}
         </AnimatePresence>

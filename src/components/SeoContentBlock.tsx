@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, MessageSquare, TrendingUp, HelpCircle, BarChart3 } from 'lucide-react';
 import { MACHINE_CATEGORIES } from '@/src/constants/machineTaxonomy';
 import { LOCATIONS, PROFESSIONS, MARKETPLACE_CATEGORIES, ACCOMMODATION_TYPES, KITCHEN_TYPES, REAL_ESTATE_PURPOSES, TaxonomyItem } from '@/src/constants/taxonomy';
+import Accordion from '@/src/components/Accordion';
 
 interface Props {
   type: 'poslovi' | 'masine' | 'smestaj' | 'ketering' | 'placevi' | 'firme' | 'majstori' | 'alat-i-oprema' | 'berza';
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export default function SeoContentBlock({ type, locationSlug, grad, zanimanje, itemCount }: Props) {
-  const [isExpanded, setIsExpanded] = useState(false);
+
   const actualGrad = grad || locationSlug;
   const gradName = actualGrad ? LOCATIONS.find(l => l.slug === actualGrad)?.name : '';
   
@@ -236,13 +237,7 @@ export default function SeoContentBlock({ type, locationSlug, grad, zanimanje, i
           </article>
 
           {/* Collapsible Container */}
-          <div className={`transition-all duration-500 overflow-hidden relative ${!isExpanded ? 'max-h-[160px] md:max-h-none' : 'max-h-[8000px]'}`}>
-            
-            {/* Fade Overlay for Mobile */}
-            {!isExpanded && (
-              <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#050b10] via-[#050b10]/90 to-transparent pointer-events-none md:hidden z-20" />
-            )}
-
+          <Accordion title="Više informacija">
             <div className="space-y-16">
               {/* Detailed SEO Article */}
               <article className="max-w-5xl mx-auto">
@@ -393,17 +388,7 @@ export default function SeoContentBlock({ type, locationSlug, grad, zanimanje, i
           </div>
 
           {/* Toggle Button for Mobile */}
-          <div className="flex justify-center md:hidden mt-6 relative z-30">
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 text-xs font-black text-secondary uppercase tracking-[0.2em] bg-secondary/10 px-6 py-3.5 rounded-xl border border-secondary/20 hover:bg-secondary hover:text-slate-950 transition-all active:scale-95 touch-target"
-            >
-              <span className="material-symbols-outlined text-sm">
-                {isExpanded ? 'expand_less' : 'expand_more'}
-              </span>
-              {isExpanded ? 'Prikaži manje' : 'Prikaži više informacija'}
-            </button>
-          </div>
+          
         </div>
       </div>
     </section>

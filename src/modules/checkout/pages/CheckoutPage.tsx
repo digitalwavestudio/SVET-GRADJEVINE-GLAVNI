@@ -14,18 +14,18 @@ export default function CheckoutPage() {
   
   // Package pricing
   const packages: Record<string, { name: string, price: number }> = {
-    standard: { name: 'STANDARD PAKET', price: 10 },
-    business: { name: 'BUSINESS PAKET', price: 15 },
-    premium: { name: 'PREMIUM PAKET', price: 25 },
+    starter: { name: 'STARTER PAKET', price: 29 },
+    pro: { name: 'PRO PAKET', price: 79 },
+    enterprise: { name: 'ENTERPRISE PAKET', price: 199 },
   };
 
   const { user } = useAuth();
   const searchParams = new URLSearchParams(location.search);
-  const packageId = searchParams.get('paket') || 'premium';
+  const packageId = searchParams.get('paket') || 'pro';
   const adId = searchParams.get('adId') || undefined;
   const paymentType = (searchParams.get('type') || 'package_purchase') as 'wallet_deposit' | 'package_purchase' | 'ad_payment';
 
-  const selectedPackage = packages[packageId] || packages.premium;
+  const selectedPackage = packages[packageId] || packages.pro;
 
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'qr' | 'invoice'>('card');
   const [promoCode, setPromoCode] = useState('');
@@ -186,7 +186,7 @@ export default function CheckoutPage() {
       <Navbar />
       
       <div className="flex-1 my-10 max-w-7xl mx-auto w-full px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-32">
-        {/* Left: Form */}        <div className="lg:col-span-7 bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 md:p-12 shadow-2xl relative overflow-hidden h-max">
+        {/* Left: Form */}        <div className="lg:col-span-7 bg-[#0A0F14] border border-white/5 rounded-[10px] p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden h-max">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 blur-[80px] rounded-full pointer-events-none"></div>
 

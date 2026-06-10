@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
+import logoImage from '@/src/assets/images/logo.png';
 
 interface CategoryOption {
   id: string;
@@ -45,18 +46,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
       <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center gap-6 mb-12 sm:mb-20 relative z-10 mt-4 sm:mt-10">
         <Link to="/" className="flex flex-col items-center sm:items-start leading-none hover:opacity-80 transition-opacity">
-          {logoUrl ? (
-            <img src={logoUrl} alt="Svet Građevine" className="h-12 sm:h-16 md:h-20 w-auto object-contain drop-shadow-md" />
-          ) : (
-            <>
-              <span className="text-2xl font-black font-headline tracking-tighter text-secondary uppercase">
-                SVET <span className="text-white">GRAĐEVINE</span>
-              </span>
-              <span className="text-[10px] font-bold tracking-[0.3em] text-on-surface-variant uppercase mt-1">
-                Industrial Network
-              </span>
-            </>
-          )}
+          <img src={logoUrl || logoImage} alt="Svet Građevine" className="h-12 sm:h-16 md:h-20 w-auto object-contain drop-shadow-md" />
         </Link>
         <div className="flex flex-col items-center sm:items-end">
           <div className="flex items-center gap-3 mb-2">
