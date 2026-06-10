@@ -188,7 +188,7 @@ async function startServer() {
     app.use(
       "/__/auth",
       createProxyMiddleware({
-        target: "https://gen-lang-client-0548525213.firebaseapp.com",
+        target: "https://gen-lang-client-0548525213.firebaseapp.com/__/auth",
         changeOrigin: true,
       })
     );
