@@ -4,6 +4,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import ThemeToggle from '@/src/components/ThemeToggle';
 import { Facebook, Instagram, Linkedin } from 'lucide-react';
+import logoImage from '@/src/assets/images/logo.png';
 
 export default function Footer() {
   const { user } = useAuth();
@@ -20,23 +21,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2 pr-0 lg:pr-8">
             <Link to="/" className="flex items-center gap-3 group mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg" aria-label="Svet Građevine home">
-              {logoUrl ? (
-                <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine Logo" loading="lazy" className="w-[180px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
-              ) : (
-                <>
-                  <div className="relative flex items-center justify-center w-12 h-12">
-                    <div className="absolute inset-0 bg-secondary rounded-[10px] rotate-6 group-hover:rotate-12 transition-transform duration-500 opacity-20"></div>
-                    <div className="absolute inset-0 bg-secondary rounded-[10px] -rotate-3 group-hover:-rotate-6 transition-transform duration-500"></div>
-                    <span className="material-symbols-outlined text-on-secondary text-3xl relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>construction</span>
-                  </div>
-                  <div className="flex flex-col leading-none">
-                    <span className="text-xl font-black font-headline tracking-tighter text-white group-hover:text-secondary transition-colors uppercase">
-                      SVET <span className="text-secondary group-hover:text-white transition-colors">GRAĐEVINE</span>
-                    </span>
-                    <span className="text-[10px] font-bold tracking-[0.3em] text-on-surface-variant uppercase mt-1 inline-block">Regionalni Lider</span>
-                  </div>
-                </>
-              )}
+              <img width="800" height="600" decoding="async" src={logoUrl || logoImage} alt="Svet Građevine Logo" loading="lazy" className="w-[180px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-sm">
               Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-slate-200">najbolje građevinske poslove</strong>, pouzdane <strong className="font-bold text-slate-200">majstore i radnike</strong>, iznajmite mehanizaciju ili pronađite adekvatan smeštaj i placeve. Vaša prva tačka za sigurne građevinske projekte.
@@ -145,7 +130,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col justify-between items-center gap-6 relative">
+        <div className="pt-8 border-t border-white/5 flex flex-row justify-between items-center gap-6 relative">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
           
           <div className="flex items-center gap-6 md:gap-8 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">

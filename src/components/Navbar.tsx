@@ -156,7 +156,8 @@ export default function Navbar() {
 
             <button
   onClick={() => setIsOpen(!isOpen)}
-  className="lg:hidden absolute right-4 top-4 w-12 h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
+  className="lg:hidden absolute right-4 top-4 w-[48px] h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
+  style={{ left: 'auto', right: '16px' }}
   aria-label="Meni"
   aria-controls="mobile-drawer"
   aria-expanded={isOpen}

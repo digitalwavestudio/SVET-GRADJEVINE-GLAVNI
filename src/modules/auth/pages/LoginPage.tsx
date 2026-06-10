@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
+import logoImage from '@/src/assets/images/logo.png';
 import { useToast } from '@/src/context/ToastContext';
 import { auth, googleProvider } from '@/src/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
@@ -188,14 +189,11 @@ export default function LoginPage() {
           {/* Header */}
           <div className="mb-10 text-center md:text-left">
             <Link to="/" className="inline-flex items-center gap-4 mb-8 group">
-              {logoUrl ? (
-                <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform" style={{ fontVariationSettings: '"FILL" 1' }}>architecture</span>
-                  <span className="text-2xl font-black text-primary tracking-tighter font-headline uppercase">Svet Građevine</span>
-                </>
-              )}
+                {logoUrl ? (
+                  <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
+                ) : (
+                  <img src={logoImage} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
+                )}
             </Link>
             <h2 className="text-3xl font-headline font-black text-on-surface mb-2 uppercase tracking-tight">Dobrodošli nazad</h2>
             <p className="text-on-surface-variant font-medium text-sm">Prijavite se na svoj nalog za pun pristup platformi.</p>

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
+import logoImage from '@/src/assets/images/logo.png';
 import { useToast } from '@/src/context/ToastContext';
 import { auth } from '@/src/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
@@ -226,21 +227,18 @@ export default function RegisterPage() {
 
         {/* Right Side: Registration Form (40%) */}
         <section className="w-full md:w-[40%] bg-surface-container-low flex flex-col justify-center items-center p-8 md:p-12 min-h-screen border-l border-outline-variant/10 relative">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md flex flex-col items-center">
             {/* Brand Logo */}
-            <div className="mb-10 text-center md:text-left relative">
-              <Link to="/" className="inline-flex items-center gap-4 mb-8 group">
-                {logoUrl ? (
-                  <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-transform" style={{ fontVariationSettings: '"FILL" 1' }}>architecture</span>
-                    <span className="text-2xl font-black text-primary tracking-tighter font-headline uppercase">Svet Građevine</span>
-                  </>
-                )}
-              </Link>
-              <h2 className="font-headline text-3xl font-black text-on-surface mb-2 uppercase tracking-tight">Kreiraj nalog</h2>
-              <p className="text-on-surface-variant text-sm font-medium">Postanite deo mreže stručnjaka i firmi u građevini.</p>
+            <div className="flex flex-col items-center gap-4">
+                <Link to="/" className="inline-flex items-center gap-4 group">
+                  {logoUrl ? (
+                    <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
+                  ) : (
+                    <img src={logoImage} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
+                  )}
+                </Link>
+                <h2 className="font-headline text-3xl font-black text-on-surface mb-2 uppercase tracking-tight text-center">DOBRO DOSLI NAZAD</h2>
+                <p className="text-on-surface-variant text-sm font-medium text-center">Prijavite se na svoj nalog za pun pristup platformi</p>
             </div>
 
             {error && (

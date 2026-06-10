@@ -59,22 +59,23 @@ export function SignupBanner() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0 relative z-10 w-full md:w-auto">
+            <div className="flex-grow flex items-center justify-end gap-3 shrink-0 relative z-10 w-full md:w-auto">
               <Link 
                 to="/registracija"
                 onClick={() => setIsVisible(false)}
-                className="flex-1 md:flex-none py-2.5 px-6 bg-primary hover:bg-primary/90 text-on-primary rounded-xl md:rounded-full text-xs font-black uppercase tracking-widest transition-all text-center flex items-center justify-center gap-2"
+                className="w-full md:w-auto py-2.5 px-6 bg-primary hover:bg-primary/90 text-on-primary rounded-xl md:rounded-full text-xs font-black uppercase tracking-widest transition-all text-center flex items-center justify-center gap-2"
               >
                 Preuzmi Kredite
               </Link>
-              <button 
-                onClick={handleClose}
-                className="absolute top-2 right-2 md:relative md:top-auto md:right-auto p-1.5 md:py-2.5 md:px-4 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-outline-variant/10 rounded-full transition-colors flex items-center justify-center shadow-lg"
-                aria-label="Zatvori"
-              >
-                <span className="material-symbols-outlined text-sm md:text-lg">close</span>
-              </button>
             </div>
+
+            <button 
+              onClick={handleClose}
+              className="absolute top-3 right-3 p-1.5 bg-slate-950/80 hover:bg-slate-900 text-white/80 hover:text-white border border-outline-variant/30 rounded-full transition-colors flex items-center justify-center shadow-lg pointer-events-auto z-50 w-7 h-7"
+              aria-label="Zatvori"
+            >
+              <span className="material-symbols-outlined text-xs">close</span>
+            </button>
 
           </div>
         </motion.div>
