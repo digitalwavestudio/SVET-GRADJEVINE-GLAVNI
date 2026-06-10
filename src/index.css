@@ -344,7 +344,7 @@ input, textarea {
     padding-right: 0.75rem !important;
   }
   /* Ensure any fixed width utilities collapse on mobile */
-  [class*="w-96"], [class*="w-20"], [class*="w-14"], [class*="w-12"], [class*="w-10"] {
+  [class*="w-96"], [class*="w-20"], [class*="w-14"], [class*="w-12"] {
     max-width: 100% !important;
     width: 100% !important;
   }
