@@ -47,6 +47,10 @@ export default React.memo(function DashboardHeader({
   const isOffline = !navigator.onLine;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const logoSrc = user?.businessProfile?.logo || user?.photoURL;
+  const isShield = logoSrc === 'shield' || logoSrc === 'stit' || imgError;
 
   const { greeting, briefing } = React.useMemo(
     () => generateDailyBriefing(user as User, {
@@ -79,6 +83,7 @@ export default React.memo(function DashboardHeader({
       }
 
       await updateUser(updateData);
+      setImgError(false); // Reset error state on new upload
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -104,7 +109,7 @@ export default React.memo(function DashboardHeader({
             accept="image/*"
             onChange={handleFileChange}
           />
-          {user.businessProfile?.logo || user.photoURL ? (
+          {logoSrc && !isShield ? (
             <div
               onClick={() => fileInputRef.current?.click()}
               className="w-28 h-28 md:w-32 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-white flex items-center justify-center p-2.5 shadow-2xl group/logo"
@@ -113,11 +118,32 @@ export default React.memo(function DashboardHeader({
                 width="800"
                 height="600"
                 decoding="async"
-                src={user.businessProfile?.logo || user.photoURL}
+                src={logoSrc}
                 className="w-full h-full object-contain"
                 alt="Logo"
                 referrerPolicy="no-referrer"
+                onError={() => setImgError(true)}
               />
+              
+              {/* FB-style transparent overlay u sredini pri prelasku mišem */}
+              <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px] opacity-0 group-hover/logo:opacity-100 transition-all duration-200 flex flex-col items-center justify-center gap-1.5">
+                <span className="material-symbols-outlined text-white text-2xl">photo_camera</span>
+                <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none">PROMENI LOGO</span>
+              </div>
+
+              {/* Loader tokom uploada */}
+              {isUploading && (
+                <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+            </div>
+          ) : isShield ? (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="w-28 h-28 md:w-32 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-[#0A0F14] border border-white/10 flex items-center justify-center shadow-2xl group/logo"
+            >
+              <span className="material-symbols-outlined text-slate-400 text-5xl group-hover/logo:scale-110 transition-transform">shield</span>
               
               {/* FB-style transparent overlay u sredini pri prelasku mišem */}
               <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px] opacity-0 group-hover/logo:opacity-100 transition-all duration-200 flex flex-col items-center justify-center gap-1.5">

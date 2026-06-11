@@ -128,11 +128,14 @@ export default function AiPredictiveActions({ user }: AiPredictiveActionsProps) 
               className={`bg-[#0A0F14] border ${action.border} p-6 rounded-[10px] hover:scale-[1.02] transition-transform flex flex-col justify-between group overflow-hidden relative min-h-[168px]`}
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/[0.05] to-transparent rounded-bl-full pointer-events-none"></div>
-              <div className="flex gap-4 mb-6">
-                <div className={`w-12 h-12 rounded-[10px] ${action.bg} flex items-center justify-center shrink-0`}>
+              <div className="flex items-start gap-4 mb-6">
+                <div 
+                  className={`rounded-[10px] ${action.bg} flex items-center justify-center shrink-0`}
+                  style={{ width: '48px', height: '48px' }}
+                >
                    <span className={`material-symbols-outlined ${action.color} text-2xl group-hover:scale-110 transition-transform`}>{action.icon}</span>
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                    <h4 className="text-white font-black uppercase tracking-tight">{action.title}</h4>
                    <p className="text-[10px] uppercase font-bold text-white/40 tracking-widest mt-1 line-clamp-2">{action.subtitle}</p>
                 </div>

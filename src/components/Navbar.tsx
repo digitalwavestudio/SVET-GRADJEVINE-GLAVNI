@@ -44,7 +44,7 @@ export default function Navbar() {
 
   return (
     <>
-<nav className="bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[100] border-b border-white/5 h-24 transition-all">
+<nav className="bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all">
       <div className="flex justify-between items-center px-4 sm:px-8 h-full max-w-7xl mx-auto w-full">
 
           <div className="flex items-center gap-2">
@@ -137,9 +137,9 @@ export default function Navbar() {
               to="/postavi-oglas"
               variant="nav-premium"
               icon="add_circle"
-              className="sm:hidden !min-h-0 !min-w-0 !h-10 !py-1 !px-2.5 mr-14 text-[10px] uppercase font-black tracking-wider shadow-md"
+              className="sm:hidden !min-h-0 !min-w-0 !h-12 !py-1 !px-3 text-[10px] uppercase font-black tracking-wider shadow-md flex items-center justify-center"
             >
-              Postavi
+              Postavi oglas
             </Button>
 
             <div className="hidden sm:flex items-center gap-3">
@@ -166,8 +166,7 @@ export default function Navbar() {
 
             <button
   onClick={() => setIsOpen(!isOpen)}
-  className="lg:hidden absolute right-4 top-4 w-[48px] h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
-  style={{ left: 'auto', right: '16px' }}
+  className="lg:hidden w-[48px] h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
   aria-label="Meni"
   aria-controls="mobile-drawer"
   aria-expanded={isOpen}
@@ -188,11 +187,11 @@ export default function Navbar() {
         role="dialog"
         aria-modal="true"
         onClick={() => setIsOpen(false)}
-        className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl lg:hidden flex flex-col justify-between p-8 pt-32 transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
+        className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl lg:hidden flex flex-col p-8 pt-24 transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
           isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
         }`}
       >
-        <div className="flex flex-col gap-6 overflow-y-auto max-h-[60vh] pr-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex-1 min-h-[350px] flex flex-col gap-2 overflow-y-auto pr-2 mb-6" onClick={(e) => e.stopPropagation()}>
           {/* Nav links */}
               <nav role="menu" className="flex flex-col gap-2">
                 {[ 

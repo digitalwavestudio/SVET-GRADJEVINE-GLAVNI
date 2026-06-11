@@ -20,8 +20,8 @@ export class MagazineAIService {
    * Generates SEO title (H1) and meta description variants for an article
    */
   static async generateSEOVariants(article: Partial<Article>) {
-    if (!process.env.GEMINI_API_KEY) {
-        console.warn("[MagazineAIService] GEMINI_API_KEY missing, skipping AI SEO generation");
+    if (!ai) {
+        console.warn("[MagazineAIService] AI client not initialized, skipping AI SEO generation");
         return null;
     }
 
@@ -77,8 +77,8 @@ export class MagazineAIService {
     tone: "strucan" | "edukativan" | "novinarski" | "promotivni" | string;
     approximateLength: number;
   }) {
-    if (!process.env.GEMINI_API_KEY) {
-        console.warn("[MagazineAIService] GEMINI_API_KEY missing, skipping AI Article generation");
+    if (!ai) {
+        console.warn("[MagazineAIService] AI client not initialized, skipping AI Article generation");
         return null;
     }
 

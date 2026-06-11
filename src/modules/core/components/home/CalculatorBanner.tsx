@@ -21,13 +21,13 @@ export default function CalculatorBanner() {
               <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-tighter uppercase leading-tight">
                 AI<span className="text-secondary"> Građevinski</span><br className="hidden md:block lg:hidden" /> Kalkulator
               </h3>
-              <p className="text-base font-medium text-slate-400 max-w-2xl leading-relaxed">
+              <p className="hidden md:block text-base font-medium text-slate-400 max-w-2xl leading-relaxed">
                 Zidar, fasader ili keramičar? Izračunaj tačnu specifikaciju materijala i vremena u sekundi. Preciznost koja štedi novac i vreme.
               </p>
             </div>
             
             {/* Action */}
-            <div className="w-full md:w-auto shrink-0 flex items-center justify-between md:justify-center gap-4 bg-white/5 hover:bg-secondary pl-6 md:pl-8 pr-4 md:pr-6 py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-sm transition-all duration-500 group-hover:scale-105">
+            <div className="w-full max-w-[200px] md:w-auto mx-auto lg:mx-0 shrink-0 flex items-center justify-center gap-4 bg-white/5 hover:bg-secondary px-6 md:px-8 py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-sm transition-all duration-500 group-hover:scale-105">
               Isprobaj odmah 
               <div className="bg-white/10 p-2 rounded-[10px] group-hover:bg-slate-950 group-hover:text-white transition-colors">
                 <ArrowRight className="w-5 h-5" />

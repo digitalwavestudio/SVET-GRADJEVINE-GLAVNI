@@ -181,7 +181,7 @@ export default function RegisterPage() {
     <div className="bg-surface font-body text-on-surface antialiased overflow-x-hidden min-h-screen flex flex-col selection:bg-secondary selection:text-on-secondary">
       <main className="flex flex-1 flex-col md:flex-row">
         {/* Left Side: Visual Anchor (60%) */}
-        <section className="relative w-full md:w-[60%] min-h-[409px] md:min-h-screen overflow-hidden">
+        <section className="hidden md:block relative w-full md:w-[60%] min-h-[409px] md:min-h-screen overflow-hidden">
           <div className="absolute inset-0 z-0">
             <OptimizedImage 
               src="/assets/pattern-bg.png" 
@@ -229,7 +229,7 @@ export default function RegisterPage() {
         <section className="w-full md:w-[40%] bg-surface-container-low flex flex-col justify-center items-center px-4 py-8 sm:p-8 md:p-12 min-h-screen border-l border-outline-variant/10 relative">
           <div className="w-full max-w-md flex flex-col items-center">
             {/* Brand Logo */}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 mb-8">
                 <Link to="/" className="inline-flex items-center gap-4 group">
                   {logoUrl ? (
                     <img width="800" height="600" decoding="async" src={logoUrl} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
@@ -237,8 +237,8 @@ export default function RegisterPage() {
                     <img src={logoImage} alt="Svet Građevine" className="w-[180px] md:w-[220px] h-auto object-contain drop-shadow-md" loading="lazy" />
                   )}
                 </Link>
-                <h2 className="font-headline text-3xl font-black text-on-surface mb-2 uppercase tracking-tight text-center">DOBRO DOSLI NAZAD</h2>
-                <p className="text-on-surface-variant text-sm font-medium text-center">Prijavite se na svoj nalog za pun pristup platformi</p>
+                <h2 className="font-headline text-3xl font-black text-on-surface mb-2 uppercase tracking-tight text-center">KREIRAJTE NALOG</h2>
+                <p className="text-on-surface-variant text-sm font-medium text-center">Pridružite se najvećoj građevinskoj mreži u Srbiji</p>
             </div>
 
             {error && (
@@ -249,7 +249,7 @@ export default function RegisterPage() {
             )}
 
             {/* Google Signup (Primary) */}
-            <div className="mb-8">
+            <div className="mb-8 w-full">
               <button 
                 onClick={handleGoogleRegister}
                 disabled={loading}

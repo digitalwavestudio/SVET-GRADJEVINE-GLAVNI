@@ -385,7 +385,7 @@ export default function SeoContentBlock({ type, locationSlug, grad, zanimanje, i
                 </div>
               </nav>
             </div>
-          </div>
+          </Accordion>
 
           {/* Toggle Button for Mobile */}
           
