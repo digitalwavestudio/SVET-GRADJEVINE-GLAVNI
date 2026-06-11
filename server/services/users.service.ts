@@ -118,7 +118,7 @@ export class UsersService {
             isVerified: fallbackUser.emailVerified || fallbackUser.isVerified || false,
             photoURL: fallbackUser.photoURL || "",
             status: "active",
-            freeAdsCount: 0,
+            
             isPremiumProfile: false,
             emailVerified: fallbackUser.emailVerified || false,
           };
@@ -168,7 +168,7 @@ export class UsersService {
           isVerified: fallbackUser.emailVerified || fallbackUser.isVerified || false,
           photoURL: fallbackUser.photoURL || "",
           status: "active",
-          freeAdsCount: 0,
+          
           isPremiumProfile: false,
           emailVerified: fallbackUser.emailVerified || false,
         };
@@ -204,7 +204,7 @@ export class UsersService {
       if (isNew) {
          baseData.createdAt = firebaseAdmin.firestore.FieldValue.serverTimestamp();
          baseData.viewsCount = 0;
-         baseData.freeAdsCount = 3;
+         
          baseData.isPremiumProfile = false;
          transaction.set(userRef, baseData, { merge: true });
       } else {

@@ -209,6 +209,7 @@ async function syncQuotaStatusWithRedis() {
 }
 
 export function checkQuotaStatus(): boolean {
+  if (env.DISABLE_FIRESTORE_QUOTA_CHECK === "true") return false;
   syncQuotaStatusWithRedis(); // Non-blocking async check logic internally runs if time passed
   if (isQuotaExhausted) {
     const now = Date.now();
@@ -262,6 +263,7 @@ async function tryResolveFromRedis(docPath: string): Promise<admin.firestore.Doc
 }
 
 export function triggerQuotaProtection(error: FirestoreQuotaError | unknown): boolean {
+  if (env.DISABLE_FIRESTORE_QUOTA_CHECK === "true") return false;
   const err = error as FirestoreQuotaError;
   const errMsg = err?.message || String(err);
   const errDetails = err?.details || "";

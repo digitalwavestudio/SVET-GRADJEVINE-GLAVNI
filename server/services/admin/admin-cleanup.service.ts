@@ -165,7 +165,7 @@ export class AdminCleanupService {
         await QueueService.addJob(
           JobType.OUTBOX_PROCESS,
           { id: doc.id, ...doc.data() },
-          { jobId: `outbox:${doc.id}`, priority: JobPriority.HIGH },
+          { jobId: `outbox-${doc.id}`, priority: JobPriority.HIGH },
         ).catch(() => {});
       }
     } catch (e: unknown) {

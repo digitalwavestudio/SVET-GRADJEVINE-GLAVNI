@@ -79,6 +79,22 @@ const approveDepositSchema = z.object({
   action: z.enum(["approve", "reject"]),
 });
 
+export const adminModerateListingSchema = z.object({
+  status: z.enum(["approved", "rejected"]),
+  feedback: z.string().optional(),
+});
+
+export const adminEditListingSchema = z.object({
+  updates: z.record(z.string(), z.unknown()),
+});
+
+export const adsSearchSchema = z.object({
+  category: z.string().optional(),
+  filters: z.any().optional(),
+  pageSize: z.coerce.number().int().optional(),
+  lastVisibleId: z.any().optional(),
+});
+
 // === DYNAMIC HIGH-PERFORMANCE VALIDATION CACHE AND SERIALIZERS ===
 
 class FastValidationCache {
@@ -152,7 +168,10 @@ export const SCHEMA_KEYS = new Map<ZodSchema, string>([
   [manualDepositSchema, "manualDepositSchema"],
   [approveDepositSchema, "approveDepositSchema"],
   [submitVerificationSchema, "submitVerificationSchema"],
-  [processVerificationSchema, "processVerificationSchema"]
+  [processVerificationSchema, "processVerificationSchema"],
+  [adminModerateListingSchema, "adminModerateListingSchema"],
+  [adminEditListingSchema, "adminEditListingSchema"],
+  [adsSearchSchema, "adsSearchSchema"]
 ]);
 
 export interface MasterSearchDoc {
@@ -520,6 +539,8 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
       schema = masterSearchSchema;
     } else if (path.endsWith("/api/ads/moderate") || path.endsWith("/ads/moderate")) {
       schema = moderateAdSchema;
+    } else if (path.match(/\/api\/admin\/moderate\/[^/]+\/[^/]+$/) || path.match(/\/admin\/moderate\/[^/]+\/[^/]+$/)) {
+      schema = adminModerateListingSchema;
     } else if (path.endsWith("/api/calendar") || path.endsWith("/calendar")) {
       schema = calendarEventSchema;
     } else if (path.endsWith("/api/metrics/view") || path.endsWith("/metrics/view")) {
@@ -534,6 +555,8 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
       schema = updatePackageSchema;
     } else if (path.endsWith("/api/users/profile") || path.endsWith("/users/profile")) {
        schema = migrateProfileSchema;
+    } else if (path.endsWith("/api/ads/search") || path.endsWith("/ads/search")) {
+      schema = adsSearchSchema;
     }
   } else if (method === "PUT" || method === "PATCH") {
     if (path.match(/\/api\/ads\/[^/]+$/) || path.match(/\/ads\/[^/]+$/)) {
@@ -545,6 +568,8 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
       schema = userProfileSchema;
     } else if (path.match(/\/api\/users\/[^/]+\/admin-action$/) || path.match(/\/users\/[^/]+\/admin-action$/)) {
       schema = adminActionSchema;
+    } else if (path.match(/\/api\/admin\/moderate\/[^/]+\/[^/]+$/) || path.match(/\/admin\/moderate\/[^/]+\/[^/]+$/)) {
+      schema = adminEditListingSchema;
     }
   }
 
@@ -584,8 +609,7 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
         "/api/construction/", "/construction/",
         "/api/analytics/", "/analytics/",
         "/api/favorites/", "/favorites/",
-        "/api/logs", "/logs",
-        "/api/ads/", "/ads/"
+        "/api/logs", "/logs"
       ];
 
       const isExempt = exemptPrefixes.some(prefix => path.includes(prefix));
@@ -692,10 +716,7 @@ const globalSettingsUpdatesSchema = z.object({
     real_estate_premium: z.number().nonnegative("Cena ne može biti negativna"),
     professional_monthly: z.number().nonnegative("Cena ne može biti negativna"),
   }).optional(),
-  limits: z.object({
-    free_listings_per_month: z.number().int("Limit mora biti ceo broj").nonnegative("Limit ne može biti negativan"),
-    max_images_per_ad: z.number().int("Broj slika mora biti ceo broj").nonnegative("Broj slika ne može biti negativan"),
-  }).optional(),
+
   messages: z.object({
     welcome_text: z.string().optional(),
     maintenance_mode: z.boolean().optional(),

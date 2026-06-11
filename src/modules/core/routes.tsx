@@ -2,7 +2,7 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
-const PricingPage = lazy(() => import('./pages/PricingPage'));
+
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
@@ -20,7 +20,7 @@ export const CoreRouter = [
   <Route key="links" path="/korisni-linkovi" element={<UsefulLinksPage />} />,
   <Route key="community" path="/zajednica" element={<CommunityPage />} />,
   <Route key="tools" path="/digitalni-alati" element={<DigitalToolsPage />} />,
-  <Route key="paketi" path="/paketi" element={<PricingPage />} />,
+,
   <Route key="kontakt" path="/kontakt" element={<ContactPage />} />,
   <Route key="o-nama" path="/o-nama" element={<AboutPage />} />,
   <Route key="uslovi" path="/uslovi-koriscenja" element={<TermsPage />} />,

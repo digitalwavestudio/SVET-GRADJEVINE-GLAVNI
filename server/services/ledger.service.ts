@@ -6,13 +6,14 @@ import { getRedis } from "../utils/redis.ts";
 
 const FieldValue = admin.firestore.FieldValue;
 
-export enum TransactionType {
-  DEPOSIT = "deposit",
-  WITHDRAW = "withdraw",
-  PAYMENT = "payment",
-  REFUND = "refund",
-  ADJUSTMENT = "adjustment",
-}
+export const TransactionType = {
+  DEPOSIT: "deposit",
+  WITHDRAW: "withdraw",
+  PAYMENT: "payment",
+  REFUND: "refund",
+  ADJUSTMENT: "adjustment",
+} as const;
+export type TransactionType = keyof typeof TransactionType;
 
 export class FinancialLedgerService {
   private static logger = new Logger({ service: "FinancialLedgerService" });

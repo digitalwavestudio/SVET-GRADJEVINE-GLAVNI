@@ -11,22 +11,31 @@ const getInitials = (name?: string) => {
 };
 
 export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; viewMode: 'list' | 'grid'; prefetch: (t: string, id?: string) => void }) => {
+  const parseDate = (val: any) => {
+    if (!val) return null;
+    if (typeof val === 'object' && val !== null && typeof val.toDate === 'function') return val.toDate();
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const createdDate = parseDate(job.createdAt);
+
   return (
     <article 
       itemScope itemType="https://schema.org/JobPosting"
       className={`group relative h-full glass-card border border-white/5 rounded-[10px] transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_0_30px_rgba(254,191,13,0.05)] hover:-translate-y-1 overflow-hidden ${viewMode === 'list' ? 'p-5 flex flex-col md:flex-row items-center gap-5' : 'p-5 flex flex-col'} ${job.isPremium ? 'border-secondary/30 bg-secondary/[0.03] shadow-[0_0_40px_rgba(254,191,13,0.08)]' : ''}`}
     >
-      <span hidden itemProp="datePosted">{job.createdAt ? new Date(job.createdAt).toISOString() : new Date().toISOString()}</span>
-      {/* Premium Glow Effect */}
-      {job.isPremium && (
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50"></div>
-      )}
-
-      {/* New Badge */}
-      {job.createdAt && (new Date().getTime() - new Date(job.createdAt).getTime() < 48 * 60 * 60 * 1000) && (
-        <span className="absolute top-4 right-4 bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] z-20">
-          NOVO
-        </span>
+      {createdDate && (
+        <>
+          <span hidden itemProp="datePosted">{createdDate.toISOString()}</span>
+          {job.isPremium && (
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50"></div>
+          )}
+          {(new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000) && (
+            <span className="absolute top-4 right-4 bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] z-20">
+              NOVO
+            </span>
+          )}
+        </>
       )}
 
       {/* Logo Section */}

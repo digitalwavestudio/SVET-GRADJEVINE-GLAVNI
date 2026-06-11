@@ -208,7 +208,7 @@ export class VerificationService {
               JobType.OUTBOX_PROCESS,
               { id: result.outboxDocId, ...result.outboxPayload },
               {
-                jobId: `outbox:${result.outboxDocId}`,
+                jobId: `outbox-${result.outboxDocId}`,
                 priority: JobPriority.HIGH,
               },
             ).catch((err) =>

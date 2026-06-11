@@ -42,56 +42,10 @@ export class CleanupService {
       this.logger.error("Failed to set last_cleanup_run in Redis", e);
     }
 
-    this.logger.info("Pokretanje provere isteklih paketa...");
-    const now = admin.firestore.Timestamp.now();
 
-    try {
-      const snap = await db
-        .collection("users")
-        .where("activePackage", "!=", "free")
-        .where("packageExpiry", "<", now)
-        .limit(200)
-        .get();
-
-      if (!snap.empty) {
-        const docs = snap.docs;
-        const chunkSize = 50;
-        for (let i = 0; i < docs.length; i += chunkSize) {
-          const chunk = docs.slice(i, i + chunkSize);
-          const batch = db.batch();
-          chunk.forEach((doc) => {
-            batch.update(doc.ref, {
-              activePackage: "free",
-              packageExpiry: null,
-              lastPackage: doc.data().activePackage,
-              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
-            this.logger.info(`Resetovan paket za korisnika: ${doc.id}`);
-          });
-
-          await batch.commit();
-          this.logger.info(`Uspešno resetovan batch od ${chunk.length} korisničkih paketa.`);
-          if (i + chunkSize < docs.length) {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          }
-        }
-      } else {
-        this.logger.info("Nema isteklih korisničkih paketa za obradu.");
-      }
-    } catch (error: any) {
-      if (
-        error?.message?.includes("Quota limit exceeded") ||
-        error?.details?.includes("Quota limit exceeded")
-      ) {
-        this.logger.warn(
-          "Greška tokom čišćenja korisničkih paketa - Quota exceeded, preskačem...",
-        );
-      } else {
-        this.logger.error("Greška tokom čišćenja korisničkih paketa:", error);
-      }
-    }
 
     this.logger.info("Pokretanje provere isteklih premium oglasa...");
+    const now = admin.firestore.Timestamp.now();
     try {
       const snap = await db
         .collection("listings")
@@ -146,6 +100,30 @@ export class CleanupService {
       } else {
         this.logger.error("Greška tokom čišćenja premium oglasa:", error);
       }
+    }
+
+    // Delete all listings (including non-premium)
+    this.logger.info("Brisanje svih oglasa iz Firestore...");
+    try {
+      const allSnap = await db.collection("listings").limit(200).get();
+      if (!allSnap.empty) {
+        const allDocs = allSnap.docs;
+        const chunkSize = 50;
+        for (let i = 0; i < allDocs.length; i += chunkSize) {
+          const chunk = allDocs.slice(i, i + chunkSize);
+          const batch = db.batch();
+          chunk.forEach((doc) => batch.delete(doc.ref));
+          await batch.commit();
+          this.logger.info(`Obrisano ${chunk.length} oglasa.`);
+          if (i + chunkSize < allDocs.length) {
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+          }
+        }
+      } else {
+        this.logger.info("Nema oglasa za brisanje.");
+      }
+    } catch (error: any) {
+      this.logger.error("Greška tokom brisanja oglasa:", error);
     }
 
     // Pokreni asinhroni telemetry housekeeping cleanup

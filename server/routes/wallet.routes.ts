@@ -58,7 +58,7 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
       await import("../../src/constants/adPackages.ts");
     const matchedPackage = getPackageById(collection, promoteType);
 
-    if (!matchedPackage || matchedPackage.id === "free") {
+    if (!matchedPackage) {
       return res.status(400).json({ error: "Nevažeći tip promocije" });
     }
     const cost = matchedPackage.priceNum;

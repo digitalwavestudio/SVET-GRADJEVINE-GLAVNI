@@ -1,5 +1,5 @@
 import { BigQuery } from '@google-cloud/bigquery';
-import { Logger } from '../utils/logger.ts';
+import { Logger } from '../utils/logger';
 
 let bqClient: BigQuery | null = null;
 const logger = new Logger({ service: "BigQueryService" });

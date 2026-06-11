@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { MonitoringService } from "../services/monitoring.service.ts";
 
 let totalReads = 0;

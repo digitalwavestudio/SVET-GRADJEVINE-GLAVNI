@@ -68,7 +68,7 @@ export class DomainEventPublisher {
         JobType.OUTBOX_PROCESS,
         { id, ...payload },
         {
-          jobId: `outbox:${id}`,
+          jobId: `outbox-${id}`,
           priority: JobPriority.HIGH,
         }
       );

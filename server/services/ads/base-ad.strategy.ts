@@ -117,6 +117,7 @@ export abstract class BaseAdStrategy {
         logo: userData.businessProfile?.logo || userData.photoURL || "",
         isCompanyVerified: (userData as { isVerified?: boolean })?.isVerified || false,
         status: "pending" as AdStatus,
+        moderationStatus: "pending",
         isPremium: isPaidPackage && rawData.paket !== "urgent",
         isUrgent: rawData.paket === "urgent",
         ...(premiumUntil ? { premiumUntil } : {}),
@@ -214,7 +215,7 @@ export abstract class BaseAdStrategy {
         JobType.OUTBOX_PROCESS,
         { id: result.outboxDocId, ...result.outboxPayload },
         {
-          jobId: `outbox:${result.outboxDocId}`,
+          jobId: `outbox-${result.outboxDocId}`,
           priority: JobPriority.HIGH,
         },
       ).catch((err) => {
@@ -226,6 +227,7 @@ export abstract class BaseAdStrategy {
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(() => {});
@@ -359,7 +361,7 @@ export abstract class BaseAdStrategy {
         JobType.OUTBOX_PROCESS,
         { id: result.outboxDocId, ...result.outboxPayload },
         {
-          jobId: `outbox:${result.outboxDocId}`,
+          jobId: `outbox-${result.outboxDocId}`,
           priority: JobPriority.HIGH,
         },
       ).catch((err) => console.error("Queue immediate push failed for updateAd", err.message));
@@ -369,6 +371,7 @@ export abstract class BaseAdStrategy {
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(() => {});
@@ -431,7 +434,7 @@ export abstract class BaseAdStrategy {
         JobType.OUTBOX_PROCESS,
         { id: result.outboxDocId, ...result.outboxPayload },
         {
-          jobId: `outbox:${result.outboxDocId}`,
+          jobId: `outbox-${result.outboxDocId}`,
           priority: JobPriority.HIGH,
         },
       ).catch((err) => console.error("Queue immediate push failed for deleteAd", err.message));
@@ -441,6 +444,7 @@ export abstract class BaseAdStrategy {
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(() => {});
@@ -557,7 +561,7 @@ export abstract class BaseAdStrategy {
         JobType.OUTBOX_PROCESS,
         { id: result.outboxDocId, ...result.outboxPayload },
         {
-          jobId: `outbox:${result.outboxDocId}`,
+          jobId: `outbox-${result.outboxDocId}`,
           priority: JobPriority.HIGH,
         },
       ).catch((err) => console.error("Queue immediate push failed for moderateAd", err.message));
@@ -569,6 +573,7 @@ export abstract class BaseAdStrategy {
        CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
        CacheService.invalidateByPrefix("public_ads_").catch(() => {});
        CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+       CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
 
        import("../dashboard.service.ts").then(({ DashboardService }) => {
          DashboardService.clearEmployerStatsCache(uid).catch(() => {});

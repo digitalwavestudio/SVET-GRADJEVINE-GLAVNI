@@ -90,14 +90,12 @@ export class OutboxWorker {
         "⚠️ Redis missing or connection unavailable. Outbox worker running in fallback mode with local in-memory scavenger.",
       );
       
-      const intervalMs = isProd ? 15 * 60 * 1000 : 2 * 60 * 60 * 1000; // 15 min u prod, 2 sata u dev sandbox-u
-      if (isProd) {
-        this.scavengerInterval = setInterval(() => {
-          this.scavengePendingLocal().catch((err) =>
-            console.error("[OutboxWorker] Local scavenger interval error:", err),
-          );
-        }, intervalMs);
-      }
+      const intervalMs = isProd ? 15 * 60 * 1000 : 3000; // 15 min u prod, 3 sekunde u dev za brzi odziv
+      this.scavengerInterval = setInterval(() => {
+        this.scavengePendingLocal().catch((err) =>
+          console.error("[OutboxWorker] Local scavenger interval error:", err),
+        );
+      }, intervalMs);
       return;
     }
 
@@ -143,7 +141,7 @@ export class OutboxWorker {
         JobType.OUTBOX_SCAVENGE_CRON,
         {},
         {
-          jobId: "cron:outbox_scavenger",
+          jobId: "cron-outbox_scavenger",
           repeat: { pattern: repeatPattern },
           priority: JobPriority.LOW,
         }
@@ -155,7 +153,7 @@ export class OutboxWorker {
           JobType.OUTBOX_SCAVENGE_CRON,
           {},
           {
-            jobId: `cron:outbox_scavenger:${Date.now()}`,
+            jobId: `cron-outbox_scavenger-${Date.now()}`,
             delay: 30000,
           }
         );
@@ -339,7 +337,7 @@ export class OutboxWorker {
       for (const msg of messages) {
         // Dodajemo u red. BullMQ će sprečiti duplikate ako prosledimo msg.id kao JobId
         await QueueService.addJob(JobType.OUTBOX_PROCESS, msg, {
-          jobId: `outbox:${msg.id}`,
+          jobId: `outbox-${msg.id}`,
           priority: JobPriority.HIGH,
         });
       }
@@ -377,7 +375,7 @@ export class OutboxWorker {
             // Re-queue the job with delay
             await QueueService.addJob(JobType.OUTBOX_PROCESS, msg, {
               delay: 1000, // delay by 1 second to wait for the next slot
-              jobId: `outbox:throttled:${msg.id}:${Date.now()}`,
+              jobId: `outbox-throttled-${msg.id}-${Date.now()}`,
             });
             return; // Exit early without updating status to "processed", so it stays pending
           } else {

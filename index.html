@@ -8,12 +8,9 @@
     <title>Svet Građevine - Premium Marketplace</title>
     <meta name="description" content="Svet Građevine – premium platforma za građevinsku industriju u Srbiji. Pronađite poslove, majstore, mašine i materijal na jednom mestu." />
     <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data:; font-src https://fonts.gstatic.com; connect-src 'self' https://api.svet-gradjevine.com https://accounts.google.com https://*.googleapis.com https://*.firebaseapp.com https://*.firebase.com; frame-src 'self' https://accounts.google.com https://*.googleusercontent.com https://*.firebaseapp.com;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https://www.transparenttextures.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.svet-gradjevine.com https://accounts.google.com https://*.googleapis.com https://*.firebaseapp.com https://*.firebase.com ws://localhost:24678; frame-src 'self' https://accounts.google.com https://*.googleusercontent.com https://*.firebaseapp.com;" />
     <!-- Preload critical fonts -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrYVZyTj_6ZqGJ2Q.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="https://fonts.gstatic.com/s/montserrat/v25/JTUQjIg1_i6t8kCHKm45_Q.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJLg.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="https://fonts.gstatic.com/s/jetbrainsmono/v7/NGP2p0Q8wF7t4q0v2K5c.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Font preloads removed to avoid 404 errors -->
     
     <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -106,6 +103,7 @@
     </style>
   </head>
   <body class="bg-surface">
+    <div id="hydrate-fallback"></div>
     <div id="root"></div>
   </body>
 </html>

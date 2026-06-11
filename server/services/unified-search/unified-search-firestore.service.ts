@@ -46,6 +46,7 @@ export class UnifiedSearchFirestore {
       [
         "listings",
         "jobs",
+        "job",
         "machines",
         "accommodations",
         "caterings",
@@ -118,7 +119,7 @@ export class UnifiedSearchFirestore {
     if (filtersAny.accessRoad) q = q.where("accessRoad", "==", true);
     if (filtersAny.highwayAccess) q = q.where("highwayAccess", "==", true);
     if (filtersAny.railAccess) q = q.where("railAccess", "==", true);
-    if (filtersAny.freeZone) q = q.where("freeZone", "==", true);
+
 
     if (filtersAny.profession)
       q = q.where("professionSlug", "==", filtersAny.profession);

@@ -3,11 +3,10 @@ import { Route } from 'react-router-dom';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { jobLoader } from '@/src/lib/loaders';
 
-const JobsPage = lazy(() => import('./pages/JobsPage'));
-const JobDetailsPage = lazy(() => import('./pages/JobDetailsPage'));
-const CVGeneratorPage = lazy(() => import('./pages/CVGeneratorPage'));
-const ApplicationsPage = lazy(() => import('./pages/ApplicationsPage'));
-
+import JobsPage from './pages/JobsPage';
+import JobDetailsPage from './pages/JobDetailsPage';
+import CVGeneratorPage from './pages/CVGeneratorPage';
+import ApplicationsPage from './pages/ApplicationsPage';
 export const JobsRouter = [
   <Route key="jobs-1" path="/poslovi/:zanimanje/:grad" element={<JobsPage />} loader={jobLoader} />,
   <Route key="jobs-2" path="/poslovi/:zanimanje" element={<JobsPage />} loader={jobLoader} />,

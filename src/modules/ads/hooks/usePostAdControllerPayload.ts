@@ -2,7 +2,8 @@ export const applyPayloadTransform = (selectedCategory: string | null, sData: Re
   const payload = { 
     ...commonMeta,
     description: sData.opis,
-    images: sData.images
+    images: sData.images,
+    paket: sData.paket
   };
 
   if (selectedCategory === 'marketplace') {

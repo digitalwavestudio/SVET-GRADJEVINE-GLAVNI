@@ -1,17 +1,18 @@
 import { z } from 'zod';
 
 export const jobSchema = z.object({
-  sector: z.string().min(1, "Sektor je obavezan"),
-  profession: z.string().min(1, "Zanimanje je obavezno"),
-  tipAngazmana: z.string().min(1, "Tip angažmana je obavezan"),
-  iskustvo: z.string().min(1, "Radno iskustvo je obavezno"),
-  dinamikaIsplate: z.string().min(1, "Dinamika isplate je obavezna"),
+  sector: z.string().min(1, "Sektor je obavezan").optional(),
+  profession: z.string().min(1, "Zanimanje je obavezno").optional(),
+  tipAngazmana: z.string().min(1, "Tip angažmana je obavezan").optional(),
+  iskustvo: z.string().min(1, "Radno iskustvo je obavezno").optional(),
+  dinamikaIsplate: z.string().min(1, "Dinamika isplate je obavezna").optional(),
   phone: z.string()
     .min(6, "Neispravan format telefona")
-    .regex(/^\+?[0-9\s\-()]{6,20}$/, "Neispravan format telefona"),
+    .regex(/^\+?[0-9\s\-()]{6,20}$/, "Neispravan format telefona")
+    .optional(),
   title: z.string().max(100, "Naslov je predugačak").optional().or(z.literal('')),
   description: z.string().max(10000, "Opis je predugačak").optional(),
-  opis: z.string().min(10, "Opis mora imati barem 10 karaktera").max(10000, "Opis je predugačak"),
+  opis: z.string().min(10, "Opis mora imati barem 10 karaktera").max(10000, "Opis je predugačak").optional(),
   location: z.string().min(1, "Lokacija je obavezna"),
   locationSlug: z.string().optional(),
   locationName: z.string().optional(),
@@ -22,14 +23,14 @@ export const jobSchema = z.object({
   type: z.string().optional(),
   salary: z.string().optional(),
   salaryType: z.string().optional(),
-  plataMin: z.coerce.number().min(1, "Minimalna plata mora biti veća od 0"),
-  plataMax: z.coerce.number().min(1, "Maksimalna plata mora biti veća od 0"),
-  logo: z.string().max(2083).or(z.literal('')).optional(),
+  plataMin: z.coerce.number().min(1, "Minimalna plata mora biti veća od 0").optional(),
+  plataMax: z.coerce.number().min(1, "Maksimalna plata mora biti veća od 0").optional(),
+  logo: z.string().or(z.literal('')).optional(),
   telefon: z.string().optional(),
   viber: z.union([z.string(), z.boolean(), z.null()]).optional(),
   whatsapp: z.union([z.string(), z.boolean(), z.null()]).optional(),
   images: z.array(z.string()).optional(),
-  tacnaLokacija: z.string().min(1),
+  tacnaLokacija: z.string().min(1).optional(),
   benefits: z.array(z.string()).optional(),
   email: z.string().email().or(z.literal('')).optional(),
   status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
@@ -175,6 +176,8 @@ export const messageSchema = z.object({
   // Note: senderId and timestamps will be securely added by the backend
 });
 
+// <div id="hydrate-fallback">Učitavanje…</div>
+
 export const calendarEventSchema = z.object({
   title: z.string().min(1, "Naslov je obavezan").max(200),
   description: z.string().max(2000).optional(),
@@ -220,8 +223,8 @@ export const masterSearchSchema = z.object({
 });
 
 export const adBaseSchema = z.object({
-  opis: z.string().min(10, "Opis mora imati barem 10 karaktera"),
-  tacnaLokacija: z.string().min(1),
+  opis: z.string().min(10, "Opis mora imati barem 10 karaktera").optional(),
+  tacnaLokacija: z.string().min(1).optional(),
   title: z.string().max(200).optional(),
   description: z.string().max(10000).optional(),
   location: z.string().min(1),

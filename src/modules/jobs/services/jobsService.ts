@@ -242,7 +242,7 @@ export const jobsService = {
   async fetchJobById(id: string): Promise<JobResponse | null> {
     return withRetry(async () => {
       try {
-        const data = await apiClient.get<JobResponse & { redirect?: string }>(`/ads/${id}`);
+        const data = await apiClient.get<JobResponse & { redirect?: string }>(`/jobs/${id}`);
         // If the API returns a smooth error with redirect (200 OK wrapped, or handled by apiClient), 
         // handle it before zod validation
         if (data?.redirect) {

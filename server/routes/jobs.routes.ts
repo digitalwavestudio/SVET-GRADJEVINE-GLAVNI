@@ -25,9 +25,7 @@ import {
 import { z } from "zod";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
 
-const createJobSchema = z.object({
-  job: jobSchema,
-});
+const createJobSchema = jobSchema;
 
 export const jobsRouter = express.Router();
 

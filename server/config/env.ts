@@ -42,6 +42,7 @@ const envSchema = z.object({
   LOG_FORMAT: z.enum(["json", "pretty"]).default("pretty"),
   SLACK_WEBHOOK_URL: z.string().optional(),
   DISCORD_WEBHOOK_URL: z.string().optional(),
+  DISABLE_FIRESTORE_QUOTA_CHECK: z.string().optional(),
   // Add more env variables as needed globally
 });
 

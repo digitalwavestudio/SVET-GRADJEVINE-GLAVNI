@@ -18,11 +18,8 @@ interface JobLike {
 }
 
 export function buildJobUrl(job: JobLike) {
-  const title = job.title || '';
-  const location = job.location || job.loc || '';
-  const company = job.company || job.comp || '';
-  const slug = generateSlug(title, location, company);
-  return getJobLink(`${slug}~${job.id || ''}`);
+  const id = job.id?.toString() ?? '';
+  return getJobLink(id);
 }
 
 export function extractJobId(sluggedId: string): string {

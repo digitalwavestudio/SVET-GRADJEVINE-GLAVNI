@@ -1,7 +1,7 @@
-import { BigQueryService } from './bigquery.service.ts';
-import { db } from '../config/firebase.ts';
-import { Logger } from '../utils/logger.ts';
-import { CacheService } from './cache.service.ts';
+import { BigQueryService } from './bigquery.service';
+import { db } from '../config/firebase';
+import { Logger } from '../utils/logger';
+import { CacheService } from './cache.service';
 
 const logger = new Logger({ service: "CostAnalyticsService" });
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { BigQueryService } from '../services/bigquery.service.ts';
-import { AuditService, AuditAction } from '../services/audit.service.ts';
-import { Logger } from '../utils/logger.ts';
+import { BigQueryService } from '../services/bigquery.service';
+import { AuditService, AuditAction } from '../services/audit.service';
+import { Logger } from '../utils/logger';
 import { trace } from '@opentelemetry/api';
 
 const router = Router();

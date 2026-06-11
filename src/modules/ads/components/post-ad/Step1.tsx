@@ -70,7 +70,14 @@ export function Step1({
             <Input name="companyWeb" label="Web sajt" placeholder="www.firma.rs" />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-between mt-12">
+            <button 
+              type="button"
+              onClick={() => setSelectedCategory?.(null)}
+              className={UI_TOKENS.BTN_SECONDARY}
+            >
+              Nazad
+            </button>
             <button type="button" onClick={nextStep} className={UI_TOKENS.BTN_POST_AD}>
               Nastavi dalje <span className="material-symbols-outlined">arrow_forward</span>
             </button>

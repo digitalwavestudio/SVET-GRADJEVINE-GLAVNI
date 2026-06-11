@@ -57,7 +57,7 @@ export class DLQRecoveryWorker {
         JobType.DLQ_SCAVENGE_CRON,
         {},
         {
-          jobId: "cron:dlq_scavenger",
+          jobId: "cron-dlq_scavenger",
           repeat: { pattern: "*/30 * * * *" }, // svaka 30 min
           priority: JobPriority.LOW,
         }
@@ -154,7 +154,7 @@ export class DLQRecoveryWorker {
             QueueService.addJob(
               JobType.OUTBOX_PROCESS,
               { id: doc.id, ...data },
-              { jobId: `outbox:deep_retry:${doc.id}:${Date.now()}` }
+              { jobId: `outbox-deep_retry-${doc.id}-${Date.now()}` }
             );
           }
         }
@@ -181,7 +181,7 @@ export class DLQRecoveryWorker {
         JobType.OUTBOX_PROCESS,
         { id: doc.id, ...data },
         {
-          jobId: `outbox:retry:${doc.id}:${retryCount}`,
+          jobId: `outbox-retry-${doc.id}-${retryCount}`,
         },
       );
     }
@@ -283,7 +283,7 @@ export class DLQRecoveryWorker {
             });
             if (data.jobType && data.payload) {
               await QueueService.addJob(data.jobType as JobType, data.payload, {
-                jobId: `dlq:deep_retry:${data.jobId}:${Date.now()}`,
+                jobId: `dlq-deep_retry-${data.jobId}-${Date.now()}`,
               });
             }
           }
@@ -301,7 +301,7 @@ export class DLQRecoveryWorker {
 
       if (data.jobType && data.payload) {
         await QueueService.addJob(data.jobType as JobType, data.payload, {
-          jobId: `dlq:retry:${data.jobId}:${recoveries}`,
+          jobId: `dlq-retry-${data.jobId}-${recoveries}`,
         });
       }
 

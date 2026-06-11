@@ -10,6 +10,7 @@ import { useDebounce } from '@/src/hooks/useDebounce';
 import { usePrefetch } from '@/src/hooks/usePrefetch';
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { buildJobUrl } from '@/src/lib/seo';
+import { parseSearchQuery } from '@/src/services/aiService';
 
 import { JobFilters } from '@/src/modules/jobs/components/jobs/JobFilters';
 import { JobListings } from '@/src/modules/jobs/components/jobs/JobListings';
@@ -22,7 +23,7 @@ import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
 import { BENEFITS, LOCATIONS, SECTORS } from '@/src/constants/taxonomy';
 import { useJobs } from '@/src/modules/jobs/hooks/useJobs';
-import { parseSearchQuery } from '@/src/services/aiService';
+
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 import { AnalyticsDashboardUI } from '@/src/components/AnalyticsDashboardUI';
 import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
@@ -42,6 +43,8 @@ function JobsPage() {
   
   const activeFilters = useMemo(() => {
     const currentParams = new URLSearchParams(searchParamsStr);
+    const minSalaryParam = Number(currentParams.get('minSalary'));
+    const maxSalaryParam = Number(currentParams.get('maxSalary'));
     return {
       locationSlug: grad && grad !== 'all' ? grad : undefined,
       radius: currentParams.get('radius') ? Number(currentParams.get('radius')) : undefined,
@@ -50,21 +53,32 @@ function JobsPage() {
       sector: currentParams.get('sector') || undefined,
       engagement: currentParams.get('engagement') || undefined,
       experience: currentParams.get('experience') || undefined,
-      minSalary: Number(currentParams.get('minSalary')) || 0,
-      maxSalary: Number(currentParams.get('maxSalary')) || 5000,
+      minSalary: minSalaryParam && minSalaryParam > 0 ? minSalaryParam : undefined,
+      maxSalary: maxSalaryParam && maxSalaryParam < 5000 ? maxSalaryParam : undefined,
       benefits: currentParams.getAll('benefit')
     };
   }, [grad, zanimanje, searchParamsStr]);
 
   const activeFiltersKey = JSON.stringify(activeFilters);
 
-  const isEmptyFilter = !activeFilters || Object.keys(activeFilters).length === 0 || (Object.keys(activeFilters).length === 1 && (activeFilters as any).status === 'approved');
+  const isEmptyFilter = Object.keys(activeFilters).length === 0;
   const hasLocalActiveFilters = (searchParams.get('minSalary') && searchParams.get('minSalary') !== '0') || (searchParams.get('maxSalary') && searchParams.get('maxSalary') !== '5000') || searchParams.getAll('benefit').length > 0;
   
   // Ako postoji bilo kakav filter (ukljucujuci lokaciju iz propsa ili searchParams), smatramo da je "Filtering"
   const isFiltering = !isEmptyFilter || hasLocalActiveFilters;
 
-  const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = useJobs(activeFilters);
+  const sanitizedFilters = useMemo(() => {
+  const cleaned: Record<string, unknown> = {};
+  Object.entries(activeFilters).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (Array.isArray(value) && value.length === 0) return;
+    if (typeof value === 'string' && value.trim() === '') return;
+    cleaned[key] = value;
+  });
+  return cleaned;
+}, [activeFilters]);
+
+const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = useJobs(sanitizedFilters);
   const isDeepPagingLimitReached = Boolean(hasNextPage && data?.pages && data.pages.length >= 11);
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
@@ -470,31 +484,8 @@ function JobsPage() {
           { label: "KOMPANIJE", value: companyCount?.toLocaleString() || "400", icon: "business" },
           { label: "NOVI DANAS", value: jobStats?.today?.toLocaleString() || "12", icon: "new_releases" }
         ]}
-      >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
-          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
-            <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">auto_awesome</span>
-            <input 
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-4 md:px-6" 
-              placeholder="PITAJ AI: npr. Armirač Novi Sad"
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
-            />
-          </div>
-          <Button 
-            onClick={handleAiSearch}
-            disabled={isAiSearching}
-            variant="primary"
-            className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
-            icon={isAiSearching ? 'sync' : 'auto_awesome'}
-          >
-            {isAiSearching ? 'OBRADA...' : 'AI PRETRAGA'}
-          </Button>
-        </div>
-      </StandardPageHero>
+      />
 
-      {/* AI Search Bar */}
       {/* FACT-SHEET P-SEO DASHBOARD */}
       {((grad && grad !== 'all') || (zanimanje && zanimanje !== 'SVE')) && (
         <section className="max-w-7xl mx-auto px-4 md:px-8 py-8" aria-labelledby="pseo-insights-title">

@@ -108,7 +108,7 @@ export class UnifiedSearchService {
           else if (category === "companies") entityType = "company";
           else if (category === "masters") entityType = "master";
           else if (category === "realEstate") entityType = "realEstate";
-          else if (category === "jobs") entityType = "job";
+          else if (category === "jobs" || category === "job") entityType = "job";
           else if (category === "magazine" || category === "articles") entityType = "article";
         }
 

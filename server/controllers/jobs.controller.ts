@@ -162,7 +162,7 @@ export const createJob = async (
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const { job: validatedJob } = req.body;
+    const validatedJob = req.body;
     const uid = req.user.uid;
     const result = await JobsService.createJob(validatedJob, uid);
     res.json(result);
