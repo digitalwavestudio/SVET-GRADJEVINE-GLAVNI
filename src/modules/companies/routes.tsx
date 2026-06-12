@@ -8,7 +8,7 @@ const CompanyProfilePage = lazy(() => import('./pages/CompanyProfilePage'));
 const MyCompanyPage = lazy(() => import('./pages/MyCompanyPage'));
 const B2BTendersPage = lazy(() => import('./pages/B2BTendersPage'));
 
-export const CompaniesRouter = [
+export const getCompaniesRouter = () => [
   <Route key="comp-1" path="/firme/:grad" element={<CompaniesPage />} loader={companiesLoader} />,
   <Route key="comp-2" path="/firme" element={<CompaniesPage />} loader={companiesLoader} />,
   <Route key="comp-silo" path="/firma/:grad/:id" element={<CompanyProfilePage />} />,

@@ -7,7 +7,7 @@ const RealEstatePage = lazy(() => import('./pages/RealEstatePage'));
 const RealEstateDetailPage = lazy(() => import('./pages/RealEstateDetailPage'));
 const ConstructionSitePage = lazy(() => import('./pages/ConstructionSitePage'));
 
-export const RealEstateRouter = [
+export const getRealEstateRouter = () => [
   <Route key="re-namena-grad" path="/placevi/:namena/:grad" element={<RealEstatePage />} loader={realEstateLoader} />,
   <Route key="re-namena" path="/placevi/:namena" element={<RealEstatePage />} loader={realEstateLoader} />,
   <Route key="re-1" path="/placevi/lokacija/:grad" element={<RealEstatePage />} loader={realEstateLoader} />,

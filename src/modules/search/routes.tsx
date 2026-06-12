@@ -3,6 +3,6 @@ import { Route } from 'react-router-dom';
 
 const SearchResultsPage = lazy(() => import('./pages/SearchResultsPage'));
 
-export const SearchRouter = [
+export const getSearchRouter = () => [
   <Route key="pretraga" path="/pretraga" element={<SearchResultsPage />} />
 ];

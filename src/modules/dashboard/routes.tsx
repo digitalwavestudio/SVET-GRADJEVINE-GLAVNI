@@ -47,7 +47,7 @@ export const prefetchDashboard = () => {
   }
 };
 
-export const DashboardRouter = [
+export const getDashboardRouter = () => [
   <Route key="moj-profil" path="/moj-profil" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />,
   <Route key="verifikacija" path="/moj-profil/verifikacija" element={<ProtectedRoute><VerificationCenterPage /></ProtectedRoute>} />,
   <Route key="oglasi" path="/moj-profil/oglasi" element={<ProtectedRoute><MyAdsPage /></ProtectedRoute>} />,
@@ -62,7 +62,7 @@ export const DashboardRouter = [
   <Route key="m-dashboard" path="/m/dashboard/*" element={<DashboardModule />} />
 ];
 
-export const DashboardPublicRouter = [
+export const getDashboardPublicRouter = () => [
   <Route key="profil" path="/profil/:id" element={<PublicProfilePage />} />,
   <Route key="statistika" path="/cene-i-statistika" element={<StatsPage />} />,
   <Route key="statistika-zanimanje" path="/cene-i-statistika/:zanimanje" element={<StatsPage />} />,

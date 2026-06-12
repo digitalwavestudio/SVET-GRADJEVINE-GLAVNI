@@ -5,7 +5,7 @@ import { accommodationsLoader } from '@/src/lib/loaders';
 const AccommodationPage = lazy(() => import('./pages/AccommodationPage'));
 const AccommodationDetailsPage = lazy(() => import('./pages/AccommodationDetailsPage'));
 
-export const AccommodationsRouter = [
+export const getAccommodationsRouter = () => [
   <Route key="acc-tip-grad" path="/smestaj/:tip/:grad" element={<AccommodationPage />} loader={accommodationsLoader} />,
   <Route key="acc-tip" path="/smestaj/:tip" element={<AccommodationPage />} loader={accommodationsLoader} />,
   <Route key="acc-1" path="/smestaj/lokacija/:grad" element={<AccommodationPage />} loader={accommodationsLoader} />,

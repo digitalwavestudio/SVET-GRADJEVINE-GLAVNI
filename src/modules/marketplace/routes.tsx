@@ -7,7 +7,7 @@ const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
 const MarketplaceItemDetailsPage = lazy(() => import('./pages/MarketplaceItemDetailsPage'));
 const MarketplaceModule = lazy(() => import('./index.tsx'));
 
-export const MarketplaceRouter = [
+export const getMarketplaceRouter = () => [
   <Route key="alat-i-oprema-kategorija-grad" path="/alat-i-oprema/:kategorija/:grad" element={<MarketplaceModule />} loader={marketplaceLoader} />,
   <Route key="alat-i-oprema-kategorija" path="/alat-i-oprema/:kategorija" element={<MarketplaceModule />} loader={marketplaceLoader} />,
   <Route key="alat-i-oprema-grad" path="/alat-i-oprema/lokacija/:grad" element={<MarketplaceModule />} loader={marketplaceLoader} />,
@@ -18,6 +18,6 @@ export const MarketplaceRouter = [
   <Route key="m-marketplace" path="/m/marketplace/*" element={<MarketplaceModule />} loader={marketplaceLoader} />
 ];
 
-export const MarketplaceDashboardRouter = [
+export const getMarketplaceDashboardRouter = () => [
   <Route key="alat-i-oprema" path="/moj-profil/alat-i-oprema" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
 ];

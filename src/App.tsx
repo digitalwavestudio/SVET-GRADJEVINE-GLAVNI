@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
+import { getcreateBrowserRouter, RouterProvider, createRoutesFromElements, Route, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { initGA, trackPageView } from '@/src/lib/analytics';
 import ErrorBoundary from '@/src/components/ErrorBoundary';
 import NetworkStatus from '@/src/components/NetworkStatus';
@@ -13,22 +13,22 @@ import { usePresence } from '@/src/hooks/usePresence';
 import { MainLayout } from '@/src/modules/core/components/layout/MainLayout';
 import NotFoundPage from '@/src/modules/core/pages/NotFoundPage';
 
-import { JobsRouter } from '@/src/modules/jobs/routes';
-import { CompaniesRouter } from '@/src/modules/companies/routes';
-import { RealEstateRouter } from '@/src/modules/real_estate/routes';
-import { MachinesRouter } from '@/src/modules/machines/routes';
-import { CateringRouter } from '@/src/modules/catering/routes';
-import { AccommodationsRouter } from '@/src/modules/accommodations/routes';
-import { DashboardRouter, DashboardPublicRouter } from '@/src/modules/dashboard/routes';
-import { AuthRouter, AuthDashboardRouter } from '@/src/modules/auth/routes';
-import { ToolsDashboardRouter, ToolsPublicRouter } from '@/src/modules/tools/routes';
-import { CoreRouter, CoreDashboardRouter } from '@/src/modules/core/routes';
-import { MarketplaceRouter, MarketplaceDashboardRouter } from '@/src/modules/marketplace/routes';
-import { AdsRouter } from '@/src/modules/ads/routes';
-import { CheckoutRouter } from '@/src/modules/checkout/routes';
-import { MastersRouter } from '@/src/modules/masters/routes';
-import { MagazineRouter } from '@/src/modules/magazine/routes';
-import { SearchRouter } from '@/src/modules/search/routes';
+import { getJobsRouter } from '@/src/modules/jobs/routes';
+import { getCompaniesRouter } from '@/src/modules/companies/routes';
+import { getRealEstateRouter } from '@/src/modules/real_estate/routes';
+import { getMachinesRouter } from '@/src/modules/machines/routes';
+import { getCateringRouter } from '@/src/modules/catering/routes';
+import { getAccommodationsRouter } from '@/src/modules/accommodations/routes';
+import { getDashboardRouter, getDashboardPublicRouter } from '@/src/modules/dashboard/routes';
+import { getAuthRouter, getAuthDashboardRouter } from '@/src/modules/auth/routes';
+import { getToolsDashboardRouter, getToolsPublicRouter } from '@/src/modules/tools/routes';
+import { getCoreRouter, getCoreDashboardRouter } from '@/src/modules/core/routes';
+import { getMarketplaceRouter, getMarketplaceDashboardRouter } from '@/src/modules/marketplace/routes';
+import { getAdsRouter } from '@/src/modules/ads/routes';
+import { getCheckoutRouter } from '@/src/modules/checkout/routes';
+import { getMastersRouter } from '@/src/modules/masters/routes';
+import { getMagazineRouter } from '@/src/modules/magazine/routes';
+import { getSearchRouter } from '@/src/modules/search/routes';
 
 const PageLoader = () => (
   <div className="bg-surface min-h-screen flex items-center justify-center">
@@ -82,34 +82,34 @@ const router = createBrowserRouter(
     <Route element={<RootLayout />} errorElement={<GlobalRouteError />}>
       {/* MAIN LAYOUT (NavBar + Footer) */}
       <Route element={<MainLayout />}>
-        {CoreRouter}
+        {getCoreRouter()}
         
         {/* MODULES */}
-        {JobsRouter}
-        {CompaniesRouter}
-        {RealEstateRouter}
-        {MachinesRouter}
-        {CateringRouter}
-        {AccommodationsRouter}
-        {MarketplaceRouter}
-        {MastersRouter}
-        {AdsRouter}
-        {CheckoutRouter}
-        {/* {MagazineRouter} */}
-        {SearchRouter}
-        {DashboardPublicRouter}
-        {ToolsPublicRouter}
+        {getJobsRouter()}
+        {getCompaniesRouter()}
+        {getRealEstateRouter()}
+        {getMachinesRouter()}
+        {getCateringRouter()}
+        {getAccommodationsRouter()}
+        {getMarketplaceRouter()}
+        {getMastersRouter()}
+        {getAdsRouter()}
+        {getCheckoutRouter()}
+        {/* {getMagazineRouter()} */}
+        {getSearchRouter()}
+        {getDashboardPublicRouter()}
+        {getToolsPublicRouter()}
       </Route>
 
       {/* AUTH LAYOUT (No NavBar/Footer) */}
-      {AuthRouter}
+      {getAuthRouter()}
 
       {/* DASHBOARD LAYOUT (Handled individually by pages) */}
-      {DashboardRouter}
-      {AuthDashboardRouter}
-      {ToolsDashboardRouter}
-      {CoreDashboardRouter}
-      {MarketplaceDashboardRouter}
+      {getDashboardRouter()}
+      {getAuthDashboardRouter()}
+      {getToolsDashboardRouter()}
+      {getCoreDashboardRouter()}
+      {getMarketplaceDashboardRouter()}
 
       {/* NOT FOUND falls back to main layout to show footer over it or blank */}
       <Route element={<MainLayout />}>

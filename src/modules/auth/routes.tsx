@@ -6,11 +6,11 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const RoleSelectionPage = lazy(() => import('./pages/RoleSelectionPage'));
 
-export const AuthRouter = [
+export const getAuthRouter = () => [
   <Route key="prijava" path="/prijava" element={<LoginPage />} />,
   <Route key="registracija" path="/registracija" element={<RegisterPage />} />
 ];
 
-export const AuthDashboardRouter = [
+export const getAuthDashboardRouter = () => [
   <Route key="izbor-uloge" path="/moj-profil/izbor-uloge" element={<ProtectedRoute><RoleSelectionPage /></ProtectedRoute>} />
 ];

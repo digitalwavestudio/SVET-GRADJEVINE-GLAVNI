@@ -6,7 +6,7 @@ const CateringPage = lazy(() => import('./pages/CateringPage'));
 const CateringDetailPage = lazy(() => import('./pages/CateringDetailPage'));
 const CateringItemDetailPage = lazy(() => import('./pages/CateringItemDetailPage'));
 
-export const CateringRouter = [
+export const getCateringRouter = () => [
   <Route key="cat-1" path="/ketering/:grad" element={<CateringPage />} loader={cateringLoader} />,
   <Route key="cat-2" path="/ketering" element={<CateringPage />} loader={cateringLoader} />,
   <Route key="cat-silo" path="/ketering/:grad/:id" element={<CateringDetailPage />} />,

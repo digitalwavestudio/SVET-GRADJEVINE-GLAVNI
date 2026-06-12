@@ -15,7 +15,7 @@ const DigitalToolsPage = lazy(() => import('./pages/DigitalToolsPage'));
 
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 
-export const CoreRouter = [
+export const getCoreRouter = () => [
   <Route key="home" path="/" element={<HomePage />} />,
   <Route key="links" path="/korisni-linkovi" element={<UsefulLinksPage />} />,
   <Route key="community" path="/zajednica" element={<CommunityPage />} />,
@@ -28,6 +28,6 @@ export const CoreRouter = [
   <Route key="pravila" path="/pravila-oglasavanja" element={<AffiliateRulesPage />} />
 ];
 
-export const CoreDashboardRouter = [
+export const getCoreDashboardRouter = () => [
   <Route key="podrska" path="/podrska" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
 ];

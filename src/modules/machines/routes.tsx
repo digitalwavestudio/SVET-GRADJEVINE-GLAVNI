@@ -5,7 +5,7 @@ import { machinesLoader } from '@/src/lib/loaders';
 const ConstructionMachinesPage = lazy(() => import('./pages/ConstructionMachinesPage'));
 const MachineDetailsPage = lazy(() => import('./pages/MachineDetailsPage'));
 
-export const MachinesRouter = [
+export const getMachinesRouter = () => [
   <Route key="mac-1" path="/masine/:kategorija/:grad" element={<ConstructionMachinesPage />} loader={machinesLoader} />,
   <Route key="mac-2" path="/masine/:grad" element={<ConstructionMachinesPage />} loader={machinesLoader} />,
   <Route key="mac-3" path="/masine" element={<ConstructionMachinesPage />} loader={machinesLoader} />,

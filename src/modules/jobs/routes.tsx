@@ -7,7 +7,7 @@ import JobsPage from './pages/JobsPage';
 import JobDetailsPage from './pages/JobDetailsPage';
 import CVGeneratorPage from './pages/CVGeneratorPage';
 import ApplicationsPage from './pages/ApplicationsPage';
-export const JobsRouter = [
+export const getJobsRouter = () => [
   <Route key="jobs-1" path="/poslovi/:zanimanje/:grad" element={<JobsPage />} loader={jobLoader} />,
   <Route key="jobs-2" path="/poslovi/:zanimanje" element={<JobsPage />} loader={jobLoader} />,
   <Route key="jobs-3" path="/poslovi/:grad" element={<JobsPage />} loader={jobLoader} />,
