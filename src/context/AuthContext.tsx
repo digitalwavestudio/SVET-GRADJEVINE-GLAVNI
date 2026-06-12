@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { BusinessNiche, User as SharedUser, UserRole } from '@/src/modules/core/types/user';
-import { useAuthNode } from '@/src/modules/auth';
+import { useAuthNode } from '@/src/modules/auth/hooks/useAuthNode';
 import { safeLocalStorage } from '@/src/lib/safeStorage';
 
 export interface User extends SharedUser {
