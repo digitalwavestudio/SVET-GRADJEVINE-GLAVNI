@@ -12,6 +12,17 @@ export default function Navbar() {
   const { logoUrl } = useBrandLogo();
   const isBot = useBotDetector();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,59 +67,62 @@ export default function Navbar() {
               />
             </Link>
           </div>
-          <div className="hidden lg:flex items-center gap-1 bg-surface-container-lowest/30 backdrop-blur-md p-1.5 px-3 rounded-[10px] border border-white/5">
-            <Link to="/" className={navLinkClass("/")}>
-              <span className={isActive("/") ? "" : hoverGradient}>Naslovna</span>
-            </Link>
-            <Link to="/poslovi" className={navLinkClass("/poslovi")}>
-              <span className={isActive("/poslovi") ? "" : hoverGradient}>
-                Poslovi
-              </span>
-            </Link>
-            <Link to="/majstori" className={navLinkClass("/majstori")}>
-              <span className={isActive("/majstori") ? "" : hoverGradient}>
-                Majstori
-              </span>
-            </Link>
-            <Link to="/firme" className={navLinkClass("/firme")}>
-              <span className={isActive("/firme") ? "" : hoverGradient}>
-                Firme
-              </span>
-            </Link>
-            <Link to="/smestaj" className={navLinkClass("/smestaj")}>
-              <span className={isActive("/smestaj") ? "" : hoverGradient}>
-                Smeštaj
-              </span>
-            </Link>
-            <Link to="/ketering" className={navLinkClass("/ketering")}>
-              <span className={isActive("/ketering") ? "" : hoverGradient}>
-                Ketering
-              </span>
-            </Link>
-            <Link to="/alat-i-oprema" className={navLinkClass("/alat-i-oprema")}>
-              <span className={isActive("/alat-i-oprema") ? "" : hoverGradient}>
-                Alat i oprema
-              </span>
-            </Link>
-            <Link
-              to="/gradjevinske-masine"
-              className={navLinkClass("/gradjevinske-masine")}
-            >
-              <span
-                className={isActive("/gradjevinske-masine") ? "" : hoverGradient}
+          
+          {isDesktop && (
+            <div className="flex items-center gap-1 bg-surface-container-lowest/30 backdrop-blur-md p-1.5 px-3 rounded-[10px] border border-white/5">
+              <Link to="/" className={navLinkClass("/")}>
+                <span className={isActive("/") ? "" : hoverGradient}>Naslovna</span>
+              </Link>
+              <Link to="/poslovi" className={navLinkClass("/poslovi")}>
+                <span className={isActive("/poslovi") ? "" : hoverGradient}>
+                  Poslovi
+                </span>
+              </Link>
+              <Link to="/majstori" className={navLinkClass("/majstori")}>
+                <span className={isActive("/majstori") ? "" : hoverGradient}>
+                  Majstori
+                </span>
+              </Link>
+              <Link to="/firme" className={navLinkClass("/firme")}>
+                <span className={isActive("/firme") ? "" : hoverGradient}>
+                  Firme
+                </span>
+              </Link>
+              <Link to="/smestaj" className={navLinkClass("/smestaj")}>
+                <span className={isActive("/smestaj") ? "" : hoverGradient}>
+                  Smeštaj
+                </span>
+              </Link>
+              <Link to="/ketering" className={navLinkClass("/ketering")}>
+                <span className={isActive("/ketering") ? "" : hoverGradient}>
+                  Ketering
+                </span>
+              </Link>
+              <Link to="/alat-i-oprema" className={navLinkClass("/alat-i-oprema")}>
+                <span className={isActive("/alat-i-oprema") ? "" : hoverGradient}>
+                  Alat i oprema
+                </span>
+              </Link>
+              <Link
+                to="/gradjevinske-masine"
+                className={navLinkClass("/gradjevinske-masine")}
               >
-                Građevinske mašine
-              </span>
-            </Link>
-            <Link to="/placevi" className={navLinkClass("/placevi")}>
-              <span className={isActive("/placevi") ? "" : hoverGradient}>
-                Placevi
-              </span>
-            </Link>
-          </div>
+                <span
+                  className={isActive("/gradjevinske-masine") ? "" : hoverGradient}
+                >
+                  Građevinske mašine
+                </span>
+              </Link>
+              <Link to="/placevi" className={navLinkClass("/placevi")}>
+                <span className={isActive("/placevi") ? "" : hoverGradient}>
+                  Placevi
+                </span>
+              </Link>
+            </div>
+          )}
 
-          {!isBot && (
-            <div className="hidden lg:flex items-center justify-center min-w-[60px] mx-4">
+          {!isBot && isDesktop && (
+            <div className="flex items-center justify-center min-w-[60px] mx-4">
               {user ? (
                 <Button
                   to="/moj-profil"
@@ -133,133 +147,141 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3 lg:gap-4 lg:ml-2">
             {/* Mobile Postavi Oglas Shortcut */}
-            <Button
-              to="/postavi-oglas"
-              variant="nav-premium"
-              icon="add_circle"
-              className="lg:hidden !min-h-0 !min-w-0 !h-12 !py-1 !px-3 text-[10px] uppercase font-black tracking-wider shadow-md flex items-center justify-center"
-            >
-              Postavi oglas
-            </Button>
-
-            <div className="hidden lg:flex items-center gap-3">
+            {!isDesktop && (
               <Button
                 to="/postavi-oglas"
                 variant="nav-premium"
                 icon="add_circle"
+                className="!min-h-0 !min-w-0 !h-12 !py-1 !px-3 text-[10px] uppercase font-black tracking-wider shadow-md flex items-center justify-center"
               >
-                Postavi
-                <br />
-                Oglas
+                Postavi oglas
               </Button>
+            )}
 
-              {!isBot && !user && (
+            {isDesktop && (
+              <div className="flex items-center gap-3">
                 <Button
-                  to="/prijava"
-                  variant="blue"
-                  icon="login"
+                  to="/postavi-oglas"
+                  variant="nav-premium"
+                  icon="add_circle"
                 >
-                  Prijavi se
+                  Postavi
+                  <br />
+                  Oglas
                 </Button>
-              )}
-            </div>
 
-            <button
-  onClick={() => setIsOpen(!isOpen)}
-  className="lg:hidden w-[48px] h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
-  aria-label="Meni"
-  aria-controls="mobile-drawer"
-  aria-expanded={isOpen}
->
-  <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 translate-y-[5px]' : ''}`}>
-  </span>
-  <span className={`w-6 h-[2px] bg-white rounded-full transition-opacity duration-300 my-[3px] ${isOpen ? 'opacity-0' : ''}`}>
-  </span>
-  <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? '-rotate-45 -translate-y-[5px]' : ''}`}>
-  </span>
-</button>
+                {!isBot && !user && (
+                  <Button
+                    to="/prijava"
+                    variant="blue"
+                    icon="login"
+                  >
+                    Prijavi se
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {!isDesktop && (
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-[48px] h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
+                aria-label="Meni"
+                aria-controls="mobile-drawer"
+                aria-expanded={isOpen}
+              >
+                <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 translate-y-[5px]' : ''}`}>
+                </span>
+                <span className={`w-6 h-[2px] bg-white rounded-full transition-opacity duration-300 my-[3px] ${isOpen ? 'opacity-0' : ''}`}>
+                </span>
+                <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? '-rotate-45 -translate-y-[5px]' : ''}`}>
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </nav>
 
       {/* Mobile Drawer Overlay */}
-      <div 
-        role="dialog"
-        aria-modal="true"
-        onClick={() => setIsOpen(false)}
-        className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl lg:hidden flex flex-col p-8 pt-24 transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
-          isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
-        }`}
-      >
-        <div className="flex-1 min-h-[350px] flex flex-col gap-2 overflow-y-auto pr-2 mb-6" onClick={(e) => e.stopPropagation()}>
-          {/* Nav links */}
-              <nav role="menu" className="flex flex-col gap-2">
-                {[ 
-                  { path: "/", label: "Naslovna", icon: "home" },
-                  { path: "/poslovi", label: "Poslovi", icon: "work" },
-                  { path: "/majstori", label: "Majstori", icon: "construction" },
-                  { path: "/firme", label: "Firme", icon: "business" },
-                  { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
-                  { path: "/ketering", label: "Ketering", icon: "restaurant" },
-                  { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
-                  { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
-                  { path: "/placevi", label: "Placevi", icon: "terrain" }
-                ].map((link) => (
+      {!isDesktop && (
+        <div 
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setIsOpen(false)}
+          className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl flex flex-col p-8 pt-24 transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
+            isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
+          }`}
+        >
+          <div className="flex-1 min-h-[350px] flex flex-col gap-2 overflow-y-auto pr-2 mb-6" onClick={(e) => e.stopPropagation()}>
+            {/* Nav links */}
+                <nav role="menu" className="flex flex-col gap-2">
+                  {[ 
+                    { path: "/", label: "Naslovna", icon: "home" },
+                    { path: "/poslovi", label: "Poslovi", icon: "work" },
+                    { path: "/majstori", label: "Majstori", icon: "construction" },
+                    { path: "/firme", label: "Firme", icon: "business" },
+                    { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
+                    { path: "/ketering", label: "Ketering", icon: "restaurant" },
+                    { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
+                    { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
+                    { path: "/placevi", label: "Placevi", icon: "terrain" }
+                  ].map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setIsOpen(false)}
+                      role="menuitem"
+                      className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target justify-start ${
+                        isActive(link.path)
+                          ? "text-secondary bg-secondary/10 border border-secondary/20"
+                          : "text-slate-300 hover:bg-white/5 border border-transparent"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-lg" aria-hidden="true">{link.icon}</span>
+                      <span className="sr-only">{link.label}</span>
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+          </div>
+
+          {/* Footer actions inside drawer */}
+          <div className="flex flex-col gap-4 pt-6 border-t border-white/5">
+            {!isBot && (
+              <>
+                {user ? (
                   <Link
-                    key={link.path}
-                    to={link.path}
+                    to="/moj-profil"
                     onClick={() => setIsOpen(false)}
-                    role="menuitem"
-                    className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target justify-start ${
-                      isActive(link.path)
-                        ? "text-secondary bg-secondary/10 border border-secondary/20"
-                        : "text-slate-300 hover:bg-white/5 border border-transparent"
-                    }`}
+                    className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-lg" aria-hidden="true">{link.icon}</span>
-                    <span className="sr-only">{link.label}</span>
-                    {link.label}
+                    <span className="material-symbols-outlined text-sm">person</span>
+                    Moj Profil ({user.firstName || 'Korisnik'})
                   </Link>
-                ))}
-              </nav>
-        </div>
+                ) : (
+                  <Link
+                    to="/prijava"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-sm">login</span>
+                    Prijavi se
+                  </Link>
+                )}
+              </>
+            )}
 
-        {/* Footer actions inside drawer */}
-        <div className="flex flex-col gap-4 pt-6 border-t border-white/5">
-          {!isBot && (
-            <>
-              {user ? (
-                <Link
-                  to="/moj-profil"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">person</span>
-                  Moj Profil ({user.firstName || 'Korisnik'})
-                </Link>
-              ) : (
-                <Link
-                  to="/prijava"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">login</span>
-                  Prijavi se
-                </Link>
-              )}
-            </>
-          )}
-
-          <Link
-            to="/postavi-oglas"
-            onClick={() => setIsOpen(false)}
-            className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] text-slate-950 rounded-[12px] text-center font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10"
-          >
-            <span className="material-symbols-outlined text-sm">add_circle</span>
-            Postavi Oglas
-          </Link>
+            <Link
+              to="/postavi-oglas"
+              onClick={() => setIsOpen(false)}
+              className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] text-slate-950 rounded-[12px] text-center font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10"
+            >
+              <span className="material-symbols-outlined text-sm">add_circle</span>
+              Postavi Oglas
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
