@@ -3,11 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { safeSessionStorage } from '@/src/lib/safeStorage';
+import { useBrandLogo } from '@/src/context/BrandContext';
+import logoImage from '@/src/assets/images/logo.png';
 
 export function SignupBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
+  const { logoUrl } = useBrandLogo();
 
   useEffect(() => {
     const hasClosed = safeSessionStorage.getItem('signup_banner_closed_v4');
@@ -32,49 +35,61 @@ export function SignupBanner() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ y: 200, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 200, opacity: 0 }}
-          transition={{ type: "spring", bounce: 0, duration: 0.6 }}
-          className="fixed bottom-0 left-0 right-0 z-[5000] p-4 sm:p-6 pointer-events-none"
+          initial={{ y: 200, opacity: 0, scale: 0.95 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 200, opacity: 0, scale: 0.95 }}
+          transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
+          className="fixed bottom-0 left-0 right-0 z-[5000] p-4 sm:p-6 sm:pb-8 pointer-events-none"
         >
-          <div className="max-w-4xl mx-auto bg-surface-container-low border border-primary/30 shadow-[0_0_50px_rgba(var(--primary-rgb),0.15)] rounded-2xl md:rounded-full p-4 sm:p-2 sm:pr-4 flex flex-col md:flex-row items-center gap-4 md:gap-6 pointer-events-auto relative overflow-hidden">
+          <div className="max-w-5xl mx-auto bg-slate-950/80 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5),_0_0_40px_rgba(254,191,13,0.15)] rounded-[24px] sm:rounded-full p-6 sm:p-3 sm:pr-4 flex flex-col md:flex-row items-center gap-6 pointer-events-auto relative overflow-hidden ring-1 ring-white/5">
             
-            {/* Background elements */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none"></div>
+            {/* Ambient Glows */}
+            <div className="absolute -top-32 -left-32 w-64 h-64 bg-[#FEBF0D]/10 blur-[100px] pointer-events-none rounded-full"></div>
+            <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-[#FEBF0D]/10 blur-[100px] pointer-events-none rounded-full"></div>
 
-            <div className="flex-1 flex flex-col sm:flex-row items-center gap-4 relative z-10 w-full">
-              <div className="w-12 h-12 shrink-0 bg-primary/20 rounded-full flex items-center justify-center border border-primary/40 text-primary hidden sm:flex">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>redeem</span>
+            <div className="flex-1 flex flex-col sm:flex-row items-center gap-6 relative z-10 w-full pl-0 sm:pl-4">
+              {/* Logo Section */}
+              <div className="hidden sm:flex shrink-0 items-center justify-center py-2">
+                 <img src={logoUrl || logoImage} alt="Svet Građevine" className="w-[130px] object-contain drop-shadow-md" />
               </div>
               
+              {/* Separator */}
+              <div className="hidden sm:block w-px h-16 bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+              
+              {/* Text Section */}
               <div className="text-center sm:text-left flex-1">
-                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 text-primary rounded-md text-[10px] font-bold uppercase tracking-widest mb-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FEBF0D]/10 text-[#FEBF0D] rounded-[8px] text-[10px] font-black uppercase tracking-[0.2em] mb-2 border border-[#FEBF0D]/20 shadow-[inset_0_0_10px_rgba(254,191,13,0.1)]">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FEBF0D] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FEBF0D]"></span>
+                  </span>
                   Start Budžet
                 </div>
-                <h3 className="text-sm sm:text-base text-white font-medium m-0 leading-snug">
-                  Registruj se sada i preuzmi <strong className="text-primary font-black">1.500 SG Kredita</strong> za prve oglase!
+                <h3 className="text-sm sm:text-base md:text-lg text-slate-300 font-medium m-0 leading-snug">
+                  Registruj se sada i preuzmi <strong className="text-white font-black drop-shadow-[0_0_10px_rgba(254,191,13,0.3)]">1.500 SG Kredita</strong> za prve oglase!
                 </h3>
               </div>
             </div>
 
-            <div className="flex-grow flex items-center justify-end gap-3 shrink-0 relative z-10 w-full md:w-auto">
+            {/* Action Section */}
+            <div className="flex-grow flex items-center justify-end gap-3 shrink-0 relative z-10 w-full md:w-auto mt-2 md:mt-0">
               <Link 
                 to="/registracija"
                 onClick={() => setIsVisible(false)}
-                className="w-full md:w-auto py-2.5 px-6 bg-primary hover:bg-primary/90 text-on-primary rounded-xl md:rounded-full text-xs font-black uppercase tracking-widest transition-all text-center flex items-center justify-center gap-2"
+                className="w-full md:w-auto py-4 px-8 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] hover:from-white hover:to-white text-slate-950 rounded-[16px] sm:rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all shadow-[0_10px_30px_rgba(254,191,13,0.3)] hover:shadow-[0_10px_30px_rgba(255,255,255,0.3)] text-center flex items-center justify-center gap-2 active:scale-95"
               >
+                <span className="material-symbols-outlined text-base">redeem</span>
                 Preuzmi Kredite
               </Link>
             </div>
 
+            {/* Close Button */}
             <button 
               onClick={handleClose}
-              className="absolute top-3 right-3 p-1.5 bg-slate-950/80 hover:bg-slate-900 text-white/80 hover:text-white border border-outline-variant/30 rounded-full transition-colors flex items-center justify-center shadow-lg pointer-events-auto z-50 w-7 h-7"
+              className="absolute top-4 right-4 sm:relative sm:top-0 sm:right-0 p-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white border border-white/10 rounded-full transition-all flex items-center justify-center pointer-events-auto z-50 group hover:scale-110 active:scale-95"
               aria-label="Zatvori"
             >
-              <span className="material-symbols-outlined text-xs">close</span>
+              <span className="material-symbols-outlined text-sm group-hover:rotate-90 transition-transform duration-300">close</span>
             </button>
 
           </div>
