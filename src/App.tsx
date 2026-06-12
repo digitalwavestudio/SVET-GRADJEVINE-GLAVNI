@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { getcreateBrowserRouter, RouterProvider, createRoutesFromElements, Route, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { initGA, trackPageView } from '@/src/lib/analytics';
 import ErrorBoundary from '@/src/components/ErrorBoundary';
 import NetworkStatus from '@/src/components/NetworkStatus';
