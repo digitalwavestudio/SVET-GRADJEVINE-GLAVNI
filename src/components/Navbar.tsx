@@ -137,12 +137,12 @@ export default function Navbar() {
               to="/postavi-oglas"
               variant="nav-premium"
               icon="add_circle"
-              className="sm:hidden !min-h-0 !min-w-0 !h-12 !py-1 !px-3 text-[10px] uppercase font-black tracking-wider shadow-md flex items-center justify-center"
+              className="lg:hidden !min-h-0 !min-w-0 !h-12 !py-1 !px-3 text-[10px] uppercase font-black tracking-wider shadow-md flex items-center justify-center"
             >
               Postavi oglas
             </Button>
 
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-3">
               <Button
                 to="/postavi-oglas"
                 variant="nav-premium"
