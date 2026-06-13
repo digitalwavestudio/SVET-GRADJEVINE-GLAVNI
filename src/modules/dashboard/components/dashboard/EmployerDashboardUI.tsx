@@ -115,29 +115,95 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
         
       </div>
 
-        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="flex items-center gap-4 mt-8">
-          <span className="material-symbols-outlined text-secondary text-3xl">work</span>
-          <h3 className="text-2xl font-black text-white uppercase tracking-tight">UPRAVLJANJE VAŠIM OGLASIMA</h3>
-          <div className="h-px flex-1 bg-white/5"></div>
+                <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <span className="material-symbols-outlined text-secondary text-3xl">work</span>
+            <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">UPRAVLJANJE OGLASIMA</h3>
+          </div>
+          <div className="h-px w-full sm:flex-1 bg-white/5"></div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="lg:col-span-2 space-y-8">
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 flex flex-col min-h-[450px]">
-              <div className="flex justify-between items-start mb-10 shrink-0">
+        {/* KPI / Stats Grid - Full width above content */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-white/10 transition-all flex flex-col justify-between min-h-[130px]">
+             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">UKUPAN BROJ OBJAVA</div>
+             <div>
+               <div className="text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-secondary transition-colors">
+                 {activeMetrics?.totalAds !== undefined ? activeMetrics.totalAds : "N/A"}
+               </div>
+               {activeMetrics?.totalAds === undefined && (
+                 <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">
+                   Nedostupno
+                 </div>
+               )}
+             </div>
+          </div>
+
+          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-emerald-500/30 transition-all flex flex-col justify-between min-h-[130px]">
+             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">AKTIVNI PAKET</div>
+             <div>
+               <div className="text-xl lg:text-2xl font-black text-emerald-400 tracking-tight uppercase">
+                 {activeMetrics?.activePackage || "NEMA PAKETA"}
+               </div>
+               <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
+                 {activeMetrics?.packageExpiry ? "LIMITIRAN DO REVIZIJE" : "PREMIUM PROMOCIJE"}
+               </div>
+             </div>
+          </div>
+
+          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-purple-400/30 transition-all flex flex-col justify-between min-h-[130px]">
+             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">PREMIUM OGLASI</div>
+             <div>
+               <div className="text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter">
+                 {activeMetrics?.premiumAdsCount !== undefined ? activeMetrics.premiumAdsCount : "0"}
+               </div>
+               <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KUPLJENI ARTIKLI</div>
+             </div>
+          </div>
+
+          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-amber-500/30 transition-all flex flex-col justify-between min-h-[130px]">
+             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">INVESTIRANO (RSD)</div>
+             <div>
+               <div className="text-2xl lg:text-3xl font-black text-amber-500 tracking-tighter">
+                 {activeMetrics?.totalSpend !== undefined ? (activeMetrics?.totalSpend || 0).toLocaleString() : "N/A"}
+               </div>
+               <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">BEZBEDNI BUDŽET</div>
+             </div>
+          </div>
+
+          <div className="col-span-2 md:col-span-1 xl:col-span-1 bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-blue-400/30 transition-all flex flex-col justify-between min-h-[130px]">
+             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">NEOBRAĐENE PRIJAVE</div>
+             <div>
+               <div className="text-3xl lg:text-4xl font-black text-blue-400 tracking-tighter">
+                 {activeMetrics?.pendingApplications !== undefined ? activeMetrics.pendingApplications : "N/A"}
+               </div>
+               {activeMetrics?.pendingApplications === undefined ? (
+                 <div className="text-[8px] font-mono font-bold text-red-500/80 uppercase mt-1 tracking-wider">NEDOSTUPNO</div>
+               ) : (
+                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KANDIDATI NA ČEKANJU</div>
+               )}
+             </div>
+          </div>
+        </motion.div>
+
+        {/* Content Layout - Ads list and Activity Feed side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="lg:col-span-2 flex flex-col">
+            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 lg:p-10 flex flex-col flex-1 min-h-[450px]">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 shrink-0">
                 <div>
                   <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">POSLEDNJI OBJAVLJENI OGLASI</h4>
-                  <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest max-w-sm">Brzi pregled vaših nedavnih poslova i broja prijavljenih radnika.</p>
+                  <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest max-w-sm">Pregled nedavnih poslova i prijavljenih radnika.</p>
                 </div>
                 {!statsData && (
-                  <span className="text-[8px] font-black text-orange-400 bg-orange-400/5 border border-orange-400/10 px-2 py-1 rounded-full uppercase tracking-widest animate-pulse">
-                    PODACI PRIVREMENO OGRANIČENI
+                  <span className="text-[8px] font-black text-orange-400 bg-orange-400/5 border border-orange-400/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse self-start sm:self-auto">
+                    PRIVREMENO OGRANIČENO
                   </span>
                 )}
               </div>
 
               {recentAds === undefined || recentAds === null ? (
-                <div className="bg-white/[0.01] border border-dashed border-white/5 rounded-[10px] p-12 text-center flex flex-col items-center gap-4">
+                <div className="flex-1 bg-white/[0.01] border border-dashed border-white/5 rounded-[10px] p-12 flex flex-col items-center justify-center gap-4 text-center">
                   <span className="material-symbols-outlined text-white/10 text-4xl">cloud_off</span>
                   <div className="space-y-1">
                     <h5 className="text-white/60 text-xs font-black uppercase tracking-wider">Spisak oglasa je privremeno nedostupan</h5>
@@ -162,12 +228,12 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                             transform: `translateY(${virtualItem.start}px)`,
                           }}
                         >
-                          <div className="bg-white/[0.02] border border-white/5 p-5 rounded-[10px] flex justify-between items-center group/ad h-full">
-                            <div className="flex-1 min-w-0">
+                          <div className="bg-white/[0.02] border border-white/5 p-4 sm:p-5 rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group/ad h-full transition-colors hover:bg-white/[0.03]">
+                            <div className="flex-1 min-w-0 w-full">
                               <div className="text-white font-black text-sm uppercase tracking-tight group-hover/ad:text-secondary transition-colors truncate pr-2">{ad.title || ad.name}</div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[9px] font-bold text-white/40 uppercase shrink-0">PRIJAVLJENIH KANDIDATA: {ad.applicantsCount || 0}</span>
-                                <span className="text-white/20 text-[8px] shrink-0">•</span>
+                              <div className="flex flex-wrap items-center gap-2 mt-2">
+                                <span className="text-[9px] font-bold text-white/40 uppercase shrink-0">KANDIDATA: {ad.applicantsCount || 0}</span>
+                                <span className="text-white/20 text-[8px] shrink-0 hidden sm:inline">•</span>
                                 <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shrink-0 ${
                                   ad.status === 'active' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
                                   ad.status === 'pending_payment' ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' :
@@ -177,21 +243,20 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                                 }`}>
                                   {ad.status === 'active' ? 'AKTIVAN' :
                                   ad.status === 'pending_payment' ? 'ZAHTEVA PLAĆANJE' :
-                                  ad.status === 'pending' ? 'NA ČEKANJU (PREGLED)' :
+                                  ad.status === 'pending' ? 'NA ČEKANJU' :
                                   ad.status === 'expired' ? 'ISTEKAO' :
                                   ad.status === 'rejected' ? 'ODBIJEN' : ad.status}
                                 </div>
                                 {ad.status === 'active' && (
                                   <>
-                                    <span className="text-white/20 text-[8px] shrink-0">•</span>
+                                    <span className="text-white/20 text-[8px] shrink-0 hidden sm:inline">•</span>
                                     <SyncIndicator adId={ad.id} category={ad.category || ad.type || 'listings'} />
                                     
                                     {ad.health && ad.health.status === 'poor' && (
                                       <div className="ml-2 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 flex items-center gap-1.5 animate-pulse group/tip relative">
                                         <span className="material-symbols-outlined text-[10px] text-red-500">warning</span>
-                                        <span className="text-[8px] font-black text-red-500 uppercase tracking-widest whitespace-nowrap">💡 AI SAVET ZA BOLJI OGLAS</span>
+                                        <span className="text-[8px] font-black text-red-500 uppercase tracking-widest whitespace-nowrap">💡 AI SAVET</span>
                                         
-                                        {/* AI Optimization Tip Tooltip */}
                                         {ad.health.suggestion && (
                                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-white/10 rounded-lg shadow-2xl opacity-0 invisible group-hover/tip:opacity-100 group-hover/tip:visible transition-all z-50 pointer-events-none">
                                             <div className="text-[8px] font-black text-secondary uppercase tracking-[0.2em] mb-2 flex items-center gap-1">
@@ -199,9 +264,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                                               AI SAVET ZA OPTIMIZACIJU
                                             </div>
                                             <p className="text-[10px] text-white/70 font-medium leading-relaxed italic">
-                                              "{ad.health.suggestion}"
+                                              "${ad.health.suggestion}"
                                             </p>
-                                            <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 border-r border-b border-white/10 rotate-45"></div>
                                           </div>
                                         )}
                                       </div>
@@ -211,18 +275,19 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                               </div>
                             </div>
                             
-                            <div className="flex items-center gap-3 shrink-0">
+                            <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
                               {ad.status === 'pending_payment' && (
                                 <button 
                                   onClick={() => setSelectedAdForPayment(ad)}
-                                  className="px-4 py-2 bg-orange-500 text-slate-950 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-orange-400 transition-colors flex items-center gap-2"
+                                  className="flex-1 sm:flex-none px-4 py-2 bg-orange-500 text-slate-950 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-orange-400 transition-colors flex items-center justify-center gap-2"
                                 >
                                   <span className="material-symbols-outlined text-sm">payments</span>
                                   UPLATI
                                 </button>
                               )}
-                              <Link to={`/poslovi/${ad.id}`} className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center text-white/40 hover:text-secondary transition-colors">
+                              <Link to={`/poslovi/${ad.id}`} className="flex-1 sm:flex-none h-10 px-4 sm:px-0 sm:w-10 rounded-[10px] bg-white/5 flex items-center justify-center text-white/40 hover:text-secondary transition-colors">
                                 <span className="material-symbols-outlined text-xl">open_in_new</span>
+                                <span className="sm:hidden ml-2 text-[9px] font-black uppercase tracking-widest">OTVORI OGLAS</span>
                               </Link>
                             </div>
                           </div>
@@ -232,19 +297,19 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                   </div>
                 </div>
               ) : (
-                <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-12 text-center flex flex-col items-center gap-6 relative overflow-hidden group">
+                <div className="flex-1 bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 sm:p-8 md:p-12 text-center flex flex-col items-center justify-center gap-6 relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                  <div className="w-20 h-20 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center relative shadow-2xl">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center relative shadow-2xl">
                     <div className="absolute inset-0 border border-secondary/20 rounded-full animate-ping opacity-20"></div>
-                    <span className="material-symbols-outlined text-3xl text-secondary">campaign</span>
+                    <span className="material-symbols-outlined text-2xl sm:text-3xl text-secondary">campaign</span>
                   </div>
                   <div className="space-y-2 relative z-10">
-                    <h3 className="text-white text-sm font-black uppercase tracking-widest">NEMA AKTIVNIH OGLASA</h3>
-                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] max-w-[250px] mx-auto leading-relaxed">
+                    <h3 className="text-white text-xs sm:text-sm font-black uppercase tracking-widest">NEMA AKTIVNIH OGLASA</h3>
+                    <p className="text-white/40 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] max-w-[250px] mx-auto leading-relaxed">
                       KREIRAJTE SVOJ PRVI OGLAS KAKO BI PRIVUKLI NOVE KANDIDATE.
                     </p>
                   </div>
-                  <Link to="/postavi-oglas" className="mt-2 bg-secondary text-slate-950 text-[9px] font-black uppercase tracking-widest px-8 py-4 rounded-[10px] transition-all shadow-xl shadow-secondary/20 hover:bg-yellow-400 relative z-10">
+                  <Link to="/postavi-oglas" className="mt-2 bg-secondary text-slate-950 text-[9px] font-black uppercase tracking-widest px-6 py-3 sm:px-8 sm:py-4 rounded-[10px] transition-all shadow-xl shadow-secondary/20 hover:bg-yellow-400 relative z-10 w-full sm:w-auto">
                     KREIRAJ OGLAS SADA
                   </Link>
                 </div>
@@ -252,77 +317,15 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
             </div>
           </motion.div>
 
-          <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="space-y-6">
-            <div className="space-y-2">
-              <div className="text-5xl font-black text-white tracking-tighter mb-2 group-hover:text-secondary transition-colors">
-                {activeMetrics?.totalAds !== undefined ? activeMetrics.totalAds : "N/A"}
-              </div>
-              {activeMetrics?.totalAds === undefined && (
-                <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">
-                  Sistemske metrike privremeno nedostupne
-                </div>
-              )}
-              <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
-                UKUPAN BROJ OBJAVA
-              </div>
-            </div>
-
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group hover:border-emerald-500/30 transition-all">
-               <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">AKTIVNI PAKET</div>
-               <div className="text-3xl font-black text-emerald-400 tracking-tight uppercase mb-2">
-                 {activeMetrics?.activePackage || "Nema paketa"}
-               </div>
-               {!activeMetrics && (
-                 <div className="text-[8px] font-bold text-emerald-400/80 uppercase mt-1 tracking-wider">BFF podaci o finansijama su ograničeni</div>
-               )}
-               <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
-                 {activeMetrics?.packageExpiry ? "SISTEM LIMITIRAN DO REVIZIJE" : "PREMIUM PROMOCIJE"}
-               </div>
-            </div>
-
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group hover:border-purple-400/30 transition-all">
-               <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">PREMIUM OGLASI</div>
-               <div className="text-5xl font-black text-purple-400 tracking-tighter mb-2">
-                 {activeMetrics?.premiumAdsCount !== undefined ? activeMetrics.premiumAdsCount : "0"}
-               </div>
-               <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">KUPLJENI PREMIUM ARTIKLI</div>
-            </div>
-
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group hover:border-amber-500/30 transition-all">
-               <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">INVESTIRANO u PROMOCIJU</div>
-               <div className="text-4xl font-black text-amber-500 tracking-tighter mb-2">
-                 {activeMetrics?.totalSpend !== undefined ? (activeMetrics?.totalSpend || 0).toLocaleString() : "N/A"}{" "}
-                 {activeMetrics?.totalSpend !== undefined && <span className="text-xs text-white/40">RSD</span>}
-               </div>
-               <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">PRE-AGREGIRANI BEZBEDNI BUDŽET</div>
-            </div>
-
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group hover:border-blue-400/30 transition-all">
-               <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">NEOBRAĐENE PRIJAVE</div>
-               <div className="text-5xl font-black text-blue-400 tracking-tighter mb-2">
-                 {activeMetrics?.pendingApplications !== undefined ? activeMetrics.pendingApplications : "N/A"}
-               </div>
-               {activeMetrics?.pendingApplications === undefined && (
-                 <div className="text-[8px] font-mono font-bold text-red-500/80 uppercase mt-1 tracking-wider">Modul za prijave privremeno nedostupan</div>
-               )}
-               <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">KANDIDATI KOJI ČEKAJU</div>
-            </div>
-            
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8">
-               <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-8">NEDAVNE AKTIVNOSTI</div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="lg:col-span-1 flex flex-col">
+            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 lg:p-10 flex-1 min-h-[300px] lg:min-h-[450px]">
+               <div className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-6 lg:mb-8">NEDAVNE AKTIVNOSTI</div>
                <DashboardGuard variant="inline" title="Greška u listi aktivnosti">
                  <ActivityFeed />
                </DashboardGuard>
             </div>
           </motion.div>
-        </div>
-      
-
-
-
-
-
-    </motion.div>
+        </div>\n</motion.div>
   );
 });
 

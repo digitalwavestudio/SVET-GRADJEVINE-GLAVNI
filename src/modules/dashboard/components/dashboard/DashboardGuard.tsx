@@ -394,84 +394,52 @@ export default class DashboardGuard extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      // 1. INLINE / COMPACT VARIANT (Graceful local recovery)
       if (this.props.variant === "inline") {
         const payload = this.state.cacheData;
-        const statsObj = payload?.data?.stats || payload?.stats || {};
-        const trendsRaw = payload?.data?.trends || payload?.trends;
-        const trends = Array.isArray(trendsRaw) ? trendsRaw : null;
+        const isActivity = this.props.title?.toLowerCase().includes("aktivn");
 
-        // If we have cached trends, render the recovered inline chart!
-        if (trends && trends.length > 0) {
-          return (
-            <Card className="w-full h-full min-h-[300px] bg-white/[0.01] border border-white/5 rounded-[12px] p-6 flex flex-col justify-between relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                <div className="flex items-center gap-2.5">
-                  <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                  </span>
-                  <div>
-                    <h3 className="text-sm font-bold text-white/95 tracking-tight flex items-center gap-1.5">
-                      {this.props.title || "Analitika Poseta"}
-                      <span className="text-xs font-normal text-amber-500/90 font-mono">
-                        (Lokalni oporavak)
-                      </span>
-                    </h3>
-                    <p className="text-[11px] text-white/40 leading-relaxed">
-                      Učitani su poslednji validni podaci iz lokalne memorije
-                      (prekid veze).
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={this.handleRetry}
-                  disabled={this.state.isRetrying}
-                  className="inline-flex self-start sm:self-auto items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/5 rounded-lg text-xs font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
-                >
-                  <RotateCw
-                    className={`w-3 h-3 ${this.state.isRetrying ? "animate-spin" : ""}`}
-                  />
-                  {this.state.isRetrying ? "Slanje..." : "Pokušaj mrežnu vezu"}
-                </button>
-              </div>
-              <div className="flex-1 w-full min-h-[220px] flex items-center justify-center">
-                {trends && trends.length > 0 ? (
-                  <SvgTrendChartAmber data={trends} />
-                ) : (
-                  <span className="text-white/30 text-xs">Nema zabeleženih trendova</span>
-                )}
-              </div>
-            </Card>
-          );
-        }
-
-        // Fallback to error card if no cached trends exist
         return (
-          <Card className="p-8 flex flex-col items-center justify-center text-center space-y-4 border-dashed border-2 border-red-500/20 bg-red-950/5 min-h-[300px]">
-            <div className="w-12 h-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center shadow-sm border border-red-500/20">
-              <AlertTriangle className="w-6 h-6" />
+          <Card className="w-full h-full min-h-[300px] bg-white/[0.01] border border-white/5 rounded-[12px] p-6 flex flex-col justify-between relative overflow-hidden">
+            <div className="flex flex-col gap-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-amber-500/10 text-amber-500 rounded-lg shrink-0 mt-1">
+                  <WifiOff className="w-4 h-4" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-white/95 tracking-tight flex items-center gap-1.5 flex-wrap">
+                    {this.props.title || "Pregled"}
+                    <span className="text-[10px] font-medium text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                      Rad van mreže
+                    </span>
+                  </h3>
+                  <p className="text-xs text-white/50 mt-1 leading-relaxed">
+                    Trenutno nemate internet vezu. Prikazujemo vam poslednje sačuvane podatke sa ovog uređaja kako biste mogli da nastavite sa radom.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={this.handleRetry}
+                disabled={this.state.isRetrying}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-lg text-xs font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+              >
+                <RotateCw
+                  className={`w-3.5 h-3.5 ${this.state.isRetrying ? "animate-spin" : ""}`}
+                />
+                {this.state.isRetrying ? "Provera veze..." : "Pokušaj ponovo"}
+              </button>
             </div>
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-white/95">
-                {this.props.title || "Greška pri učitavanju komponente"}
-              </h4>
-              <p className="text-xs text-white/40 max-w-[240px] mx-auto leading-relaxed">
-                Došlo je do problema sa vizualizacijom podataka za ovaj segment.
-                Ostatak dashboard-a je dostupan.
-              </p>
+            
+            <div className="flex-1 w-full min-h-[150px] flex items-center justify-center border-t border-white/5 pt-4">
+              {isActivity ? (
+                <div className="text-center p-4">
+                  <span className="material-symbols-outlined text-white/20 text-3xl mb-2 block">history</span>
+                  <span className="text-white/40 text-xs block">Trenutno ne možemo učitati nove aktivnosti dok se ne povežete na internet.</span>
+                </div>
+              ) : (
+                <span className="text-white/30 text-xs">Prikaz je ograničen u režimu rada bez interneta.</span>
+              )}
             </div>
-            <button
-              onClick={this.handleRetry}
-              disabled={this.state.isRetrying}
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/5 rounded-lg text-xs font-semibold transition-all shadow-sm active:scale-[0.98] disabled:opacity-50"
-            >
-              <RotateCw
-                className={`w-3.5 h-3.5 ${this.state.isRetrying ? "animate-spin" : ""}`}
-              />
-              {this.state.isRetrying ? "Osvežavanje..." : "Pokušaj ponovo"}
-            </button>
           </Card>
         );
       }
@@ -491,7 +459,7 @@ export default class DashboardGuard extends Component<Props, State> {
           label: "Pregledi Oglasa",
           value:
             statsObj?.viewsCount ??
-            (statsObj?.employerStats?.totalAdsCount ? "0" : "Dostupno offline"),
+            (statsObj?.employerStats?.totalAdsCount ? "0" : "Dostupno bez interneta"),
           icon: TrendingUp,
           color: "text-indigo-600",
           bg: "bg-indigo-50",
@@ -512,7 +480,7 @@ export default class DashboardGuard extends Component<Props, State> {
         },
         {
           label: "Dostupni Krediti",
-          value: statsObj?.credits || "Mrežno očitanje",
+          value: statsObj?.credits || "Zahteva internet",
           icon: CreditCard,
           color: "text-purple-500",
           bg: "bg-purple-50",
@@ -529,7 +497,7 @@ export default class DashboardGuard extends Component<Props, State> {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-slate-800 tracking-tight">
-                  Aktiviran lokalni offline režim rada
+                  Trenutno nemate internet vezu
                 </h2>
                 <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
                   Došlo je do mrežnih smetnji ili prekida veze sa serverom. Kako
@@ -548,7 +516,7 @@ export default class DashboardGuard extends Component<Props, State> {
               <RotateCw
                 className={`w-4 h-4 ${this.state.isRetrying ? "animate-spin" : ""}`}
               />
-              {this.state.isRetrying ? "Slanje upita..." : "Pokušaj ponovo"}
+              {this.state.isRetrying ? "Provera veze..." : "Pokušaj ponovo"}
             </button>
           </div>
 
@@ -560,7 +528,7 @@ export default class DashboardGuard extends Component<Props, State> {
                   variant="secondary"
                   className="px-3 py-1 font-semibold tracking-wider text-slate-600 text-[10px] uppercase bg-slate-200/60 border-none"
                 >
-                  Istorijski Podaci sačuvani lokalno
+                  Prikazujemo podatke koji su ranije sačuvani
                 </Badge>
               </div>
 
@@ -600,7 +568,7 @@ export default class DashboardGuard extends Component<Props, State> {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-base font-bold text-slate-800">
-                        Analitika Poseta (Offline)
+                        Analitika poseta (Sačuvani podaci)
                       </h3>
                       <span className="text-xs text-slate-400 font-medium font-mono">
                         Poslednja 7 dana
@@ -618,7 +586,7 @@ export default class DashboardGuard extends Component<Props, State> {
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-100">
                         <span className="text-gray-400 text-xs">
-                          Trendovi nisu keširani u lokalnoj memoriji
+                          Trenutno nemamo ranije sačuvane podatke za prikaz
                         </span>
                       </div>
                     )}
@@ -628,7 +596,7 @@ export default class DashboardGuard extends Component<Props, State> {
                 {/* 2. Recent listings cached */}
                 <Card className="p-6">
                   <h3 className="text-base font-bold text-slate-800 mb-4">
-                    Moji nedavni oglasi (Offline)
+                    Moji nedavni oglasi (Sačuvani podaci)
                   </h3>
                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
                     {recentAds && recentAds.length > 0 ? (
@@ -661,7 +629,7 @@ export default class DashboardGuard extends Component<Props, State> {
                     ) : (
                       <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-100">
                         <p className="text-slate-400 text-xs">
-                          Nema zabeleženih aktivnih oglasa u keš memoriji.
+                          Trenutno nemamo ranije sačuvane oglase za prikaz.
                         </p>
                       </div>
                     )}
@@ -677,7 +645,7 @@ export default class DashboardGuard extends Component<Props, State> {
               </div>
               <div className="space-y-2">
                 <h3 className="text-lg font-bold text-slate-800">
-                  Potrebna je internet konekcija
+                  Potreban je internet za prikaz ovih informacija
                 </h3>
                 <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
                   Žao nam je, u ovom trenutku nemate sačuvanih lokalnih kopija
