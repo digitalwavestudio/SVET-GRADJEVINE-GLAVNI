@@ -7,7 +7,11 @@ export type NotificationEventType =
   | 'APPLICATION_REVIEWED' 
   | 'APPLICATION_ACCEPTED' 
   | 'APPLICATION_REJECTED'
-  | 'MESSAGE_RECEIVED';
+  | 'MESSAGE_RECEIVED'
+  | 'MATCH_FOUND'
+  | 'RESOURCE_AVAILABLE'
+  | 'WALLET_TRANSACTION'
+  | 'PROFILE_VERIFIED';
 
 export interface NotificationPayload {
   userId: string;

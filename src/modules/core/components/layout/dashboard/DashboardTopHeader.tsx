@@ -26,6 +26,61 @@ const parseNotificationDate = (createdAt: any): Date => {
   return new Date();
 };
 
+const getNotificationStyles = (type: string, isUnread: boolean) => {
+  let icon = 'notifications';
+  let colorClass = isUnread ? 'text-secondary bg-secondary/15' : 'text-white/60 bg-white/5';
+
+  switch (type) {
+    case 'MESSAGE_RECEIVED':
+    case 'NEW_MESSAGE':
+      icon = 'chat';
+      colorClass = isUnread ? 'text-blue-400 bg-blue-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'APPLICATION_SUBMITTED':
+      icon = 'assignment';
+      colorClass = isUnread ? 'text-amber-400 bg-amber-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'APPLICATION_REVIEWED':
+      icon = 'visibility';
+      colorClass = isUnread ? 'text-cyan-400 bg-cyan-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'APPLICATION_ACCEPTED':
+      icon = 'check_circle';
+      colorClass = isUnread ? 'text-emerald-400 bg-emerald-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'APPLICATION_REJECTED':
+      icon = 'cancel';
+      colorClass = isUnread ? 'text-red-400 bg-red-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'MATCH_FOUND':
+      icon = 'handshake';
+      colorClass = isUnread ? 'text-purple-400 bg-purple-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'RESOURCE_AVAILABLE':
+      icon = 'precision_manufacturing';
+      colorClass = isUnread ? 'text-indigo-400 bg-indigo-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'WALLET_TRANSACTION':
+      icon = 'account_balance_wallet';
+      colorClass = isUnread ? 'text-yellow-400 bg-yellow-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'PROFILE_VERIFIED':
+      icon = 'verified';
+      colorClass = isUnread ? 'text-green-400 bg-green-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'MODERATION_APPROVED':
+      icon = 'gavel';
+      colorClass = isUnread ? 'text-emerald-400 bg-emerald-400/15' : 'text-white/60 bg-white/5';
+      break;
+    case 'MODERATION_REJECTED':
+      icon = 'gavel';
+      colorClass = isUnread ? 'text-red-400 bg-red-400/15' : 'text-white/60 bg-white/5';
+      break;
+  }
+
+  return { icon, colorClass };
+};
+
 interface DashboardTopHeaderProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
 }
@@ -119,24 +174,27 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
                     <button onClick={markAllAsRead} className="text-[10px] font-black text-secondary uppercase tracking-widest hover:text-yellow-400 transition-colors">Označi sve kao pročitano</button>
                   </div>
                   <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-white/5">
-                    {activities.length > 0 ? activities.map((n: any, index: number) => (
-                      <div 
-                        key={`${n.id || 'no-id'}-${index}`} 
-                        onClick={() => handleNotificationClick(n)} 
-                        className={`p-5 hover:bg-white/[0.02] border-b border-white/5 transition-all cursor-pointer group flex gap-4 items-start ${n.read === false ? 'bg-secondary/[0.02] border-l-2 border-l-secondary pl-[18px]' : 'pl-5'}`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg ${n.read === false ? 'bg-secondary/15 text-secondary' : 'bg-white/5 text-white/60'} flex items-center justify-center shrink-0 group-hover:bg-white/10 transition-all`}>
-                          <span className="material-symbols-outlined text-lg">{n.type === 'NEW_MESSAGE' ? 'chat' : 'notifications'}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-baseline gap-2 mb-1">
-                            <h5 className={`text-xs font-bold truncate ${n.read === false ? 'text-white' : 'text-white/70'}`}>{n.title}</h5>
-                            <span className="text-[8px] font-medium text-white/30 whitespace-nowrap shrink-0">{n.createdAt ? formatDistanceToNow(parseNotificationDate(n.createdAt), { addSuffix: true, locale: srLatn }) : ''}</span>
+                    {activities.length > 0 ? activities.map((n: any, index: number) => {
+                      const { icon, colorClass } = getNotificationStyles(n.type, n.read === false);
+                      return (
+                        <div 
+                          key={`${n.id || 'no-id'}-${index}`} 
+                          onClick={() => handleNotificationClick(n)} 
+                          className={`p-5 hover:bg-white/[0.02] border-b border-white/5 transition-all cursor-pointer group flex gap-4 items-start ${n.read === false ? 'bg-secondary/[0.02] border-l-2 border-l-secondary pl-[18px]' : 'pl-5'}`}
+                        >
+                          <div className={`w-9 h-9 rounded-lg ${colorClass} flex items-center justify-center shrink-0 group-hover:bg-white/10 transition-all`}>
+                            <span className="material-symbols-outlined text-lg">{icon}</span>
                           </div>
-                          <p className="text-[10px] text-white/40 font-medium leading-normal line-clamp-2 uppercase tracking-wide">{n.message}</p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-baseline gap-2 mb-1">
+                              <h5 className={`text-xs font-bold truncate ${n.read === false ? 'text-white' : 'text-white/70'}`}>{n.title}</h5>
+                              <span className="text-[8px] font-medium text-white/30 whitespace-nowrap shrink-0">{n.createdAt ? formatDistanceToNow(parseNotificationDate(n.createdAt), { addSuffix: true, locale: srLatn }) : ''}</span>
+                            </div>
+                            <p className="text-[10px] text-white/40 font-medium leading-normal line-clamp-2 uppercase tracking-wide">{n.message}</p>
+                          </div>
                         </div>
-                      </div>
-                    )) : (
+                      );
+                    }) : (
                       <div className="p-10 text-center flex flex-col items-center gap-3">
                         <span className="material-symbols-outlined text-white/20 text-4xl">notifications_off</span>
                         <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Trenutno nemate novih obaveštenja</p>
