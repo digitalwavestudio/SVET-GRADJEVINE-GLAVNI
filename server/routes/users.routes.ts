@@ -301,6 +301,77 @@ usersRouter.post("/consume-credit", requireAuth, async (req, res, next) => {
   }
 });
 
+// ─── Premium Package Activation ───────────────────────────────────────────────
+const PREMIUM_PACKAGE_PRICE = 6000; // SG Krediti
+
+usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
+  try {
+    const uid = req.user?.uid;
+    if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+    const db = admin.firestore();
+    const userRef = db.collection("users").doc(uid);
+    const userSnap = await userRef.get();
+
+    if (!userSnap.exists) {
+      return res.status(404).json({ error: "Korisnik nije pronađen." });
+    }
+
+    const userData = userSnap.data()!;
+    const currentBalance: number = userData.walletBalance || 0;
+
+    // Check if already premium
+    if (userData.isPremium === true) {
+      return res.status(400).json({ error: "Premium paket je već aktivan na vašem nalogu." });
+    }
+
+    // Check balance
+    if (currentBalance < PREMIUM_PACKAGE_PRICE) {
+      return res.status(400).json({
+        error: `Nemate dovoljno kredita. Potrebno: ${PREMIUM_PACKAGE_PRICE} SGK, dostupno: ${currentBalance} SGK.`,
+      });
+    }
+
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const batch = db.batch();
+
+    // Deduct from wallet
+    batch.update(userRef, {
+      walletBalance: admin.firestore.FieldValue.increment(-PREMIUM_PACKAGE_PRICE),
+      isPremium: true,
+      premiumBadge: "gold",
+      premiumActivatedAt: now,
+    });
+
+    // Create transaction record
+    const txRef = db.collection("transactions").doc();
+    batch.set(txRef, {
+      userId: uid,
+      type: "PREMIUM_AKTIVACIJA",
+      description: "Aktivacija Premium paketa – Zlatni bedž",
+      amount: -PREMIUM_PACKAGE_PRICE,
+      status: "completed",
+      createdAt: now,
+    });
+
+    await batch.commit();
+
+    // Invalidate auth cache so updated claims are picked up
+    try {
+      const { CacheService } = await import("../services/cache.service.ts");
+      await CacheService.delete(`auth:claims:${uid}`);
+    } catch (_) { /* non-critical */ }
+
+    return res.json({
+      success: true,
+      message: "Premium paket je uspešno aktiviran. Zlatni bedž je dodat na vaš profil!",
+      newBalance: currentBalance - PREMIUM_PACKAGE_PRICE,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 usersRouter.post(
   "/:id/admin-action",
   requireAuth,

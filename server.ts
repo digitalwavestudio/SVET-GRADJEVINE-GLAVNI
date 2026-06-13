@@ -217,13 +217,13 @@ async function startServer() {
         return next();
       }
       const contentLength = req.headers["content-length"];
-      if (contentLength && parseInt(contentLength, 10) > 204800) {
-        return res.status(413).json({ error: "Payload prevelik. Maksimalna veličina je 200kb." });
+      if (contentLength && parseInt(contentLength, 10) > 5 * 1024 * 1024) {
+        return res.status(413).json({ error: "Payload prevelik. Maksimalna veličina je 5MB." });
       }
       next();
     });
 
-    app.use(express.json({ limit: "200kb" }));
+    app.use(express.json({ limit: "5mb" }));
     app.use(zodPayloadLimiterMiddleware);
     app.use(idempotencyMiddleware);
 

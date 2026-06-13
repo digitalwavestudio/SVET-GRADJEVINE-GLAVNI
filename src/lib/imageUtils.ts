@@ -155,12 +155,10 @@ export async function uploadImage(
     // For avatars, logos, small or branding items, we bypass canvas compression completely
     // to preserve 100% vector/pixel fidelity, ensuring crystal-clear text and logos.
     // Server-side Sharp will then compress and convert to WebP using advanced Lanczos downscaling.
-    const isLogoOrAvatar = 
-      mode === "avatar" || 
-      file.name?.toLowerCase().includes("logo") || 
-      file.name?.toLowerCase().includes("avatar") || 
-      file.type?.includes("svg") ||
-      file.size < 1.5 * 1024 * 1024; // If under 1.5MB, preserve original quality entirely
+    const isLogoOrAvatar =
+        mode === "avatar" ||
+        file.type?.includes("svg") ||
+        file.size < 1.5 * 1024 * 1024; // If under 1.5MB, preserve original quality for avatars and SVGs
 
     const compressedFile = isLogoOrAvatar
       ? file
