@@ -38,11 +38,11 @@ export default function DashboardCharts({ data }: { data?: AuthStat[] }) {
   const tooltipCursor = useMemo(() => ({ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }), []);
 
   return (
-    <div ref={containerRef} className="h-full w-full min-h-[300px] relative">
+    <div ref={containerRef} className="w-full h-[250px] relative">
       {dimensions.width > 0 ? (
         <AreaChart 
           width={dimensions.width} 
-          height={dimensions.height || 300} 
+          height={250} 
           data={chartData} 
           margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
         >

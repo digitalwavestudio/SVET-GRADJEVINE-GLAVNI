@@ -12,6 +12,7 @@ import { userProfileSchema } from '@/src/modules/auth';
 import { z } from 'zod';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '@/src/lib/apiClient';
+import { calculateProfileScore } from '../utils/profileCompletion';
 
 import { ProfileSettingsTab } from '../components/settings/ProfileSettingsTab';
 
@@ -111,17 +112,17 @@ export default function SettingsPage() {
     }
   };
 
-  const calculateScore = (data: Record<string, unknown>) => {
-    let score = 0;
-    if (data.name) score += 10;
-    if (data.photoURL) score += 15;
-    if (data.phone) score += 15;
-    if (typeof data.description === 'string' && data.description.length > 10) score += 20;
-    if (data.profession) score += 15;
-    if (user?.hasCV) score += 15;
-    if (data.facebook) score += 5;
-    if (data.instagram) score += 5;
-    return Math.min(score, 100);
+  const calculateScore = (data: Record<string, any>) => {
+    const mergedUser = {
+      ...user,
+      ...data,
+      businessProfile: user?.role === 'poslodavac' ? {
+        ...user?.businessProfile,
+        logo: data.photoURL || user?.businessProfile?.logo,
+        companyName: data.company || user?.businessProfile?.companyName
+      } : user?.businessProfile
+    };
+    return calculateProfileScore(mergedUser);
   };
 
   const [errors, setErrors] = useState<Record<string, string>>({});

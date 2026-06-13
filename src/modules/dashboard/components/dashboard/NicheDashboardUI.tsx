@@ -5,6 +5,9 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 import NicheWidgets from '@/src/modules/dashboard/components/NicheWidgets';
 import { getCateringLink, getMachineLink, getPlotLink } from '@/src/lib/routeFilters';
 import ChartSkeleton from '@/src/modules/dashboard/components/dashboard/ChartSkeleton';
+import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
+import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
+import DashboardGuard from './DashboardGuard';
 
 import { useAuth } from '@/src/context/AuthContext';
 
@@ -21,6 +24,7 @@ const NicheDashboardUI = memo(function NicheDashboardUI({ setIsUpgradeOpen, dash
   const isCatering = userRole === 'ketering';
   const isMasine = userRole === 'masine';
   const isPlacevi = userRole === 'placevi';
+  const profileScore = calculateProfileScore(user);
   
   const roleData = dashboardBff?.stats || {};
   const safeAnalytics = Array.isArray(roleData?.analytics) ? roleData.analytics : [];
@@ -121,6 +125,9 @@ const NicheDashboardUI = memo(function NicheDashboardUI({ setIsUpgradeOpen, dash
          </div>
       </motion.div>
       <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="space-y-8 h-min">
+        <DashboardGuard variant="inline" title="Zdravlje profila">
+          <ProfileHealth score={profileScore} hideButton={false} />
+        </DashboardGuard>
         <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 text-center text-white relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-3xl -mr-16 -mt-16"></div>
           <div className="relative z-10">

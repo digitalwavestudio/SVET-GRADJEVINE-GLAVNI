@@ -9,15 +9,20 @@ import ChartSkeleton from '@/src/modules/dashboard/components/dashboard/ChartSke
 import { SiteLogisticsPlanner } from '@/src/modules/dashboard/components/dashboard/SiteLogisticsPlanner';
 import { SyncIndicator } from '@/src/modules/dashboard/components/dashboard/SyncIndicator';
 import { RecentAd, DashboardMetrics, ChartTrendData } from '../../types';
+import { useAuth } from '@/src/context/AuthContext';
+import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
+import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 
 const DashboardCharts = lazy(() => import('@/src/modules/dashboard/components/DashboardCharts'));
 const PaymentInstructionsModal = lazy(() => import('@/src/modules/ads/components/ads/PaymentInstructionsModal').then(module => ({ default: module.PaymentInstructionsModal })));
 
 const EmployerDashboardUI = memo(function EmployerDashboardUI() {
+  const { user } = useAuth();
   const { data: statsData } = useDashboardMetrics();
   const { data: trends = [] } = useDashboardTrends();
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<RecentAd | null>(null);
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
+  const profileScore = calculateProfileScore(user);
 
   const currentHour = new Date().getHours();
   let greeting = 'DOBAR DAN';
@@ -52,57 +57,63 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
       variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } }}}
       className="flex flex-col gap-12"
     >
-      <div className="space-y-8">
-                <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="material-symbols-outlined text-secondary text-sm">monitoring</span>
-                        <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Statistika vaših oglasa</h4>
-                      </div>
-                      <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-sm">
-                        Pratite koliko radnika je pregledalo vaše objavljene poslove i koliko njih se prijavilo.
-                      </p>
-                    </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 md:p-10">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-secondary text-sm">monitoring</span>
+                <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Statistika vaših oglasa</h4>
+              </div>
+              <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-sm">
+                Pratite koliko radnika je pregledalo vaše objavljene poslove i koliko njih se prijavilo.
+              </p>
+            </div>
 
-                    <div className="flex items-center gap-3">
-                      {!charts?.dailyAnalytics && (
-                        <span className="text-[8px] font-black text-[#FEBF0D]/75 bg-[#FEBF0D]/5 border border-[#FEBF0D]/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse">
-                          Privremeno nedostupno
-                        </span>
-                      )}
-                      <div className="flex p-1 bg-white/[0.02] border border-white/5 rounded-[8px]">
-                        <button 
-                          onClick={() => setTimeframe('day')}
-                          className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'day' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                        >
-                          Dan
-                        </button>
-                        <button 
-                          onClick={() => setTimeframe('week')}
-                          className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'week' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                        >
-                          7 Dana
-                        </button>
-                        <button 
-                          onClick={() => setTimeframe('month')}
-                          className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'month' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                        >
-                          30 Dana
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <DashboardGuard variant="inline" title="Greška u grafikonu poseta">
-                    <Suspense fallback={<ChartSkeleton />}>
-                      <DashboardCharts data={charts?.dailyAnalytics?.map(d => ({
-                        name: d.date,
-                        prijave: d.applications,
-                        pregledi: d.views
-                      }))} />
-                    </Suspense>
-                  </DashboardGuard>
-                </div>
+            <div className="flex items-center gap-3">
+              {!charts?.dailyAnalytics && (
+                <span className="text-[8px] font-black text-[#FEBF0D]/75 bg-[#FEBF0D]/5 border border-[#FEBF0D]/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse">
+                  Privremeno nedostupno
+                </span>
+              )}
+              <div className="flex p-1 bg-white/[0.02] border border-white/5 rounded-[8px]">
+                <button 
+                  onClick={() => setTimeframe('day')}
+                  className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'day' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                >
+                  Dan
+                </button>
+                <button 
+                  onClick={() => setTimeframe('week')}
+                  className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'week' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                >
+                  7 Dana
+                </button>
+                <button 
+                  onClick={() => setTimeframe('month')}
+                  className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'month' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                >
+                  30 Dana
+                </button>
+              </div>
+            </div>
+          </div>
+          <DashboardGuard variant="inline" title="Greška u grafikonu poseta">
+            <Suspense fallback={<ChartSkeleton />}>
+              <DashboardCharts data={charts?.dailyAnalytics?.map(d => ({
+                name: d.date,
+                prijave: d.applications,
+                pregledi: d.views
+              }))} />
+            </Suspense>
+          </DashboardGuard>
+        </div>
+
+        <div className="lg:col-span-1 flex flex-col justify-stretch">
+          <DashboardGuard variant="inline" title="Zdravlje profila">
+            <ProfileHealth score={profileScore} hideButton={false} />
+          </DashboardGuard>
+        </div>
 
         <Suspense fallback={null}>
           <PaymentInstructionsModal 
@@ -111,8 +122,6 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
             ad={selectedAdForPayment} 
           />
         </Suspense>
-
-        
       </div>
 
                 <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">

@@ -206,7 +206,7 @@ export class UsersService {
       if (isNew) {
          baseData.createdAt = firebaseAdmin.firestore.FieldValue.serverTimestamp();
          baseData.viewsCount = 0;
-         
+         baseData.walletBalance = 1500; // 1500 SG Kredita gratis za prve oglase
          baseData.isPremiumProfile = false;
          transaction.set(userRef, baseData, { merge: true });
       } else {
@@ -214,6 +214,11 @@ export class UsersService {
          if (existingRole) {
             newRole = existingRole; 
             delete baseData.role; 
+         }
+         // Fallback if existing user somehow lacks walletBalance entirely:
+         const existingData = userSnap.data();
+         if (existingData && existingData.walletBalance === undefined) {
+            baseData.walletBalance = 1500;
          }
          transaction.set(userRef, baseData, { merge: true });
       }

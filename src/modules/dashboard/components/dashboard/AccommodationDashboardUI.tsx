@@ -6,12 +6,18 @@ import NicheWidgets from '@/src/modules/dashboard/components/NicheWidgets';
 import { getAccommodationLink } from '@/src/lib/routeFilters';
 import { useDashboardMetrics } from '@/src/modules/dashboard/hooks/useDashboardStats';
 import { DashboardMetrics } from '@/src/modules/dashboard/types';
+import { useAuth } from '@/src/context/AuthContext';
+import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
+import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
+import DashboardGuard from './DashboardGuard';
 
 interface AccommodationDashboardUIProps {
   setIsUpgradeOpen: (val: boolean) => void;
 }
 
 const AccommodationDashboardUI = memo(function AccommodationDashboardUI({ setIsUpgradeOpen }: AccommodationDashboardUIProps) {
+  const { user } = useAuth();
+  const profileScore = calculateProfileScore(user);
   const { data } = useDashboardMetrics();
   const roleData = (data as any as Partial<DashboardMetrics>) || {};
   return (
@@ -102,7 +108,10 @@ const AccommodationDashboardUI = memo(function AccommodationDashboardUI({ setIsU
               </div>
            </div>
         </motion.div>
-        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="space-y-8 h-min">
+         <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="space-y-8 h-min">
+          <DashboardGuard variant="inline" title="Zdravlje profila">
+            <ProfileHealth score={profileScore} hideButton={false} />
+          </DashboardGuard>
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 text-center text-white relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-3xl -mr-16 -mt-16"></div>
             <div className="relative z-10">

@@ -29,7 +29,7 @@ export default function LoginPage() {
   }, []);
 
   // Handle redirect after login
-  const from = location.state?.from?.pathname || '/moj-profil';
+  const from = location.state?.from?.pathname || '/kontrolna-tabla';
   const redirectError = location.state?.error;
 
   useEffect(() => {

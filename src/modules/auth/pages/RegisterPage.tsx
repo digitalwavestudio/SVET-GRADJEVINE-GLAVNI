@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '', // Polje za potvrdu lozinke
     companyName: '', // Novo za firme
     mb: '',
     pib: '',
@@ -29,6 +30,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Set page title for mobile view
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function RegisterPage() {
   };
 
   // Handle redirect after registration
-  const from = location.state?.from?.pathname || '/moj-profil';
+  const from = location.state?.from?.pathname || '/kontrolna-tabla';
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -84,6 +86,10 @@ export default function RegisterPage() {
     e.preventDefault();
     if (formData._honeypot && formData._honeypot.length > 0) {
       setError('Bot detected.');
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Lozinke se ne podudaraju. Molimo proverite ponovni unos.');
       return;
     }
     if (!passwordRegex.test(formData.password)) {
@@ -151,9 +157,17 @@ export default function RegisterPage() {
       
       addToast('Uspešna registracija! Potvrdite email pre prijave.', 'success');
       navigate('/prijava');
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error(err);
-      setError("Ako podaci odgovaraju nalozima, bićete autorizovani.");
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Ova email adresa je već u upotrebi.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Neispravan format email adrese.');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Lozinka je previše slaba.');
+      } else {
+        setError(err.message || 'Greška prilikom registracije. Molimo pokušajte ponovo.');
+      }
     } finally {
       setLoading(false);
     }
@@ -352,12 +366,31 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     required
                     className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                    placeholder="••••••••" 
+                    placeholder="Minimalno 8 karaktera" 
                   />
                   <span 
                     className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors text-[20px]"
                     onClick={() => setShowPassword(prev => !prev)}
                   >{showPassword ? "visibility_off" : "visibility"}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Potvrdite lozinku</label>
+                <div className="relative">
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
+                    placeholder="Ponovite lozinku" 
+                  />
+                  <span 
+                    className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors text-[20px]"
+                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                  >{showConfirmPassword ? "visibility_off" : "visibility"}</span>
                 </div>
               </div>
               

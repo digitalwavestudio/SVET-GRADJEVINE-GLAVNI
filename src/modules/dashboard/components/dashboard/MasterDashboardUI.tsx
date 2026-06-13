@@ -7,6 +7,7 @@ import FirestoreObservability from '@/src/modules/dashboard/components/dashboard
 import { User } from '@/src/modules/core/types/user';
 import { useDashboardMetrics } from '@/src/modules/dashboard/hooks/useDashboardStats';
 import { Skeleton } from '@/src/components/ui/Skeleton';
+import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
 import { AvailabilityManager } from '@/src/modules/dashboard/components/dashboard/AvailabilityManager';
 import { useUserStore } from '@/src/store/userStore';
 import { Card } from '@/src/components/ui/Card';
@@ -65,17 +66,7 @@ const MasterDashboardUI = memo(function MasterDashboardUI({ masterStatus, toggle
   };
 
   const profileScore = useMemo(() => {
-    if (!user) return 0;
-    let score = 0;
-    if (user.firstName && user.lastName) score += 10;
-    if (user.photoURL || user.businessProfile?.logo) score += 15;
-    if (user.phone) score += 15;
-    if (user.description && user.description.length > 10) score += 20;
-    if (user.profession) score += 15;
-    if (user.hasCV) score += 15;
-    if (user.facebook) score += 5;
-    if (user.instagram) score += 5;
-    return score;
+    return calculateProfileScore(user);
   }, [user]);
 
   return (
