@@ -79,21 +79,28 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
               <div className="bg-white/5 border border-white/10 p-6 rounded-[10px] text-left space-y-4">
                 <div>
                   <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Primalac</div>
-                  <div className="font-bold text-white uppercase text-sm">Svet Građevine D.O.O.</div>
-                  <div className="text-white/80 text-xs text-uppercase">Bulevar Mihajla Pupina 10, Beograd</div>
+                  <div className="font-bold text-white uppercase text-sm">SG GROUP</div>
+                  <div className="text-white/80 text-xs">Račanska 2, 11300 Smederevo</div>
                 </div>
                 <div>
                   <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Iznos (RSD)</div>
                   <div className="font-black text-xl text-green-400">{invoiceRequested.amount.toLocaleString('sr-RS')} RSD</div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Broj Računa</div>
-                  <div className="font-black text-white font-mono text-lg bg-black/50 p-2 rounded inline-block">160-0000000000-00</div>
+                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Broj Tekućeg Računa</div>
+                  <div className="font-black text-white font-mono text-lg bg-black/50 p-2 rounded inline-block">265-1630310011188-16</div>
                 </div>
                 <div>
                   <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Poziv na Broj</div>
                   <div className="font-black text-secondary font-mono text-lg bg-secondary/10 p-2 rounded border border-secondary/20 inline-block">{invoiceRequested.referenceNumber}</div>
                   <p className="text-xs text-red-400 font-bold mt-2">OBAVEZNO unesite tačan poziv na broj inače sistem neće automatski prepoznati uplatu!</p>
+                </div>
+                <div>
+                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Firma</div>
+                  <div className="font-bold text-white uppercase text-sm">SG Group</div>
+                  <div className="text-white/80 text-xs">PIB: 114632588</div>
+                  <div className="text-white/80 text-xs">Tekući račun: 265-1630310011188-16</div>
+                  <div className="text-white/80 text-xs">Telefon: +381 66 27 55 32</div>
                 </div>
               </div>
 
@@ -120,13 +127,13 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                   className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${method === 'card' ? 'bg-white text-slate-950 shadow-md transform scale-[1.02]' : 'text-white/60 hover:text-white'}`}
                   onClick={() => setMethod('card')}
                 >
-                  <span className="material-symbols-outlined text-[16px]">credit_card</span> Platna Kartica
+                  <span className="material-symbols-outlined text-[16px]">credit_card</span> Plati m‑bankingom
                 </button>
                 <button
                   className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${method === 'invoice' ? 'bg-secondary text-slate-950 shadow-md transform scale-[1.02]' : 'text-white/60 hover:text-white'}`}
                   onClick={() => setMethod('invoice')}
                 >
-                  <span className="material-symbols-outlined text-[16px]">receipt_long</span> Uplatnica / Faktura
+                  <span className="material-symbols-outlined text-[16px]">receipt_long</span> Faktura / uplatnica
                 </button>
               </div>
 

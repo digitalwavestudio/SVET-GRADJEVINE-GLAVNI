@@ -290,10 +290,7 @@ export default function WalletPage() {
   const role = (user as any)?.role || '';
   const isPoslodavac = role === 'poslodavac';
 
-  const financeCards = useMemo(() => [
-    { label: 'TRENUTNI SALDO', value: walletBalance.toLocaleString(), icon: 'account_balance_wallet', color: 'text-emerald-400', suffix: 'Kredita' },
-    { label: 'STATUS', value: isPremium ? 'PREMIUM' : 'STANDARD', icon: isPremium ? 'workspace_premium' : 'person', color: isPremium ? 'text-amber-400' : 'text-white/40', suffix: '' },
-  ], [walletBalance, isPremium]);
+
 
   return (
     <DashboardLayout>
@@ -336,31 +333,7 @@ export default function WalletPage() {
           </div>
         </header>
 
-        {/* ── Stats Row ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <AnimatePresence mode="wait">
-            {financeCards.map((card, idx) => (
-              <motion.div
-                key={card.label}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 }}
-                className={`bg-[#0A0F14] border p-5 rounded-2xl flex flex-col justify-between transition-colors ${
-                  idx === 1 && isPremium ? 'border-amber-500/30 bg-amber-500/[0.04]' : 'border-white/5 hover:border-white/10'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-[9px] font-black text-white/30 uppercase tracking-widest">{card.label}</span>
-                  <span className={`material-symbols-outlined text-lg ${card.color}`}>{card.icon}</span>
-                </div>
-                <div className={`text-2xl font-black tracking-tighter tabular-nums ${card.color}`}>
-                  {card.value}
-                  {card.suffix && <span className="text-[11px] opacity-50 ml-1">{card.suffix}</span>}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+
 
         {/* ── Tab Content ── */}
         <AnimatePresence mode="wait">
@@ -404,20 +377,14 @@ export default function WalletPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="flex justify-center">
                       <button
                         id="btn-deposit-open"
                         onClick={() => setDepositModalOpen(true)}
-                        className="bg-white text-black font-black py-4 rounded-xl transition-all hover:bg-emerald-400 text-[10px] tracking-widest uppercase shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-1.5"
+                        className="bg-white text-black font-black py-4 px-8 rounded-xl transition-all hover:bg-emerald-400 text-[10px] tracking-widest uppercase shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-1.5"
                       >
                         <span className="material-symbols-outlined text-base">add</span>
                         DOPUNA
-                      </button>
-                      <button
-                        onClick={() => toast('Isplata će biti dostupna uskoro.')}
-                        className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black py-4 rounded-xl transition-all text-[10px] tracking-widest uppercase"
-                      >
-                        ISPLATA
                       </button>
                     </div>
                   </div>
