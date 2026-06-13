@@ -143,7 +143,10 @@ export function UsersTab({}: UsersTabProps) {
                           </td>
                           <td className="hidden md:table-cell px-8 py-6">
                              <div className="text-[10px] font-black text-white uppercase tracking-tighter">{joinedDate}</div>
-                             <div className="text-[8px] font-bold text-white/20 uppercase tracking-widest">ID: {u.id?.slice(0, 8)}...</div>
+                             <div className="text-[8px] font-bold text-white/20 uppercase tracking-widest mb-1">ID: {u.id?.slice(0, 8)}...</div>
+                             <div className="text-[10px] font-black text-secondary tracking-widest uppercase bg-secondary/10 px-2 py-0.5 rounded inline-block">
+                               {(u.walletBalance || 0).toLocaleString()} SGK
+                             </div>
                           </td>
                           <td className="block md:table-cell md:px-8 pt-4 pb-2 md:py-6 text-right md:flex md:items-center md:justify-end gap-2">
                              <div className="flex gap-2">

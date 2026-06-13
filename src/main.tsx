@@ -132,10 +132,12 @@ if (!rootElement) {
               maxAge: 1000 * 60 * 60 * 24, // 24 sata
               dehydrateOptions: {
                 shouldDehydrateQuery: (query) => {
+                  if (!query?.queryKey) return false;
                   const keysToPersist = ["premium-partners", "categories", "magazine", "static-config", "configs"];
                   return keysToPersist.some((key) => {
                     const stringKey = typeof key === "string" ? key : JSON.stringify(key);
                     return query.queryKey.some((qk) => {
+                      if (qk === null || qk === undefined) return false;
                       const qkStr = typeof qk === "string" ? qk : JSON.stringify(qk);
                       return qkStr.includes(stringKey);
                     });

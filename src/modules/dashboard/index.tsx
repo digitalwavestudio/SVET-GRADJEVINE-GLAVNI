@@ -28,7 +28,7 @@ const data = [
 const Dashboard = () => {
   const { user } = useAuth();
   const { data: jobsData } = useJobs({ authorId: user?.id });
-  const userJobs = jobsData?.pages.flatMap(page => page.items) || [];
+  const userJobs = jobsData?.pages.flatMap(page => page?.items || []) || [];
   const { data: marketplaceData } = useMarketplaceList({ authorId: user?.id });
   const userMarketplaceItems = marketplaceData?.pages.flatMap(page => page?.items || []) || [];
 

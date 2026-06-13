@@ -14,7 +14,7 @@ export default function MessagesPage() {
   const { user, getIdToken } = useAuth();
   const navigate = useNavigate();
   const { 
-    conversations, 
+    conversations = [], 
     loadMoreConversations,
     hasMoreConversations,
     isFetchingNextPage,
@@ -41,7 +41,15 @@ export default function MessagesPage() {
       navigate('/prijava');
     }
   }, [user, navigate]);
-  
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const idParam = searchParams.get('id');
+    if (idParam) {
+      setActiveConversationId(idParam);
+    }
+  }, [setActiveConversationId]);
+
   const selectedConv = conversations.find(c => c.id === activeConversationId);
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);

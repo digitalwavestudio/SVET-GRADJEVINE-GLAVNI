@@ -33,7 +33,7 @@ export function useDashboardNavigation() {
     
     // Enterprise architecture: Prefetching strategy based on target route data requirements
     switch (path) {
-      case '/moj-profil':
+      case '/kontrolna-tabla':
         queryClient.prefetchQuery({
           queryKey: dashboardKeys.bff(role, uid),
           queryFn: async () => (await apiClient.get<Record<string, unknown>>("/bff/dashboard")) || {},
@@ -41,24 +41,36 @@ export function useDashboardNavigation() {
         });
         break;
       case '/moj-profil/oglasi':
-        queryClient.prefetchQuery({
+        queryClient.prefetchInfiniteQuery({
           queryKey: [...factoryQueryKeys.user.myAds(uid), ''],
-          queryFn: async () => (await apiClient.get<Record<string, unknown>[]>('/ads/my-ads?limitCount=15')) || [],
+          queryFn: async () => {
+             const data = await apiClient.get<Record<string, unknown>>('/ads/my-ads?limitCount=15');
+             return data || { docs: [], hasMore: false, lastVisibleId: null };
+          },
+          initialPageParam: null,
           staleTime: 2 * 60 * 1000
         });
         break;
       case '/moj-profil/prijave':
         const appRole = role === 'majstor' || role === 'standard' ? 'applicant' : 'employer';
-        queryClient.prefetchQuery({
+        queryClient.prefetchInfiniteQuery({
           queryKey: [...factoryQueryKeys.jobs.userApplications(uid, appRole), ''],
-          queryFn: async () => (await apiClient.get<Record<string, unknown>[]>(`/applications/my-applications?role=${appRole}&limit=15`)) || [],
+          queryFn: async () => {
+             const data = await apiClient.get<Record<string, unknown>>(`/applications/my-applications?role=${appRole}&limit=15`);
+             return data || { items: [], hasMore: false, nextCursor: null };
+          },
+          initialPageParam: null,
           staleTime: 5 * 60 * 1000
         });
         break;
       case '/poruke':
-        queryClient.prefetchQuery({
+        queryClient.prefetchInfiniteQuery({
           queryKey: dashboardKeys.messages.inbox(uid),
-          queryFn: async () => (await apiClient.get<Record<string, unknown>[]>('/messages/inbox')) || [],
+          queryFn: async () => {
+            const data = await apiClient.get<{ items: Record<string, unknown>[]; hasMore: boolean; lastVisibleId: string | null }>('/messages/inbox');
+            return data;
+          },
+          initialPageParam: null,
           staleTime: 1 * 60 * 1000
         });
         break;
@@ -81,7 +93,7 @@ export function useDashboardNavigation() {
         queryClient.prefetchQuery({
           queryKey: factoryQueryKeys.user.businessProfile(uid),
           queryFn: async () => {
-             const data = await apiClient.get<{ businessProfile?: Record<string, unknown>; [key: string]: unknown }>('/auth/me');
+             const data = await apiClient.get<{ businessProfile?: Record<string, unknown>; [key: string]: unknown }>('/users/me');
              return data?.businessProfile || {};
           },
           staleTime: 30 * 60 * 1000
@@ -96,18 +108,20 @@ export function useDashboardNavigation() {
     switch (userRole) {
       case 'poslodavac':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
-          { label: 'PROFIL FIRME', path: '/moj-profil/firma', icon: 'business' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'NADZORNI CENTAR', path: '/moj-profil/gradiliste', icon: 'monitoring' },
-          { label: 'KANDIDATI', path: '/moj-profil/kandidati', icon: 'groups' },
-          { label: 'KALENDAR', path: '/moj-profil/kalendar', icon: 'calendar_month' },
-          { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
+          { label: 'KALENDAR', path: '/moj-profil/kalendar', icon: 'calendar_month' },
+          { label: 'KANDIDATI', path: '/moj-profil/kandidati', icon: 'groups' },
+          { label: 'PROFIL FIRME', path: '/moj-profil/firma', icon: 'business' },
+          { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
         ];
       case 'smestaj':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJI OBJEKTI', path: '/moj-profil/oglasi', icon: 'hotel' },
           { label: 'KAPACITETI', path: '/moj-profil/kapaciteti', icon: 'check_box' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
@@ -116,8 +130,8 @@ export function useDashboardNavigation() {
         ];
       case 'majstor':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
-          { label: 'MOJ PROFIL', path: '/podesavanja', icon: 'account_circle' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJE PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
           { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
@@ -125,7 +139,8 @@ export function useDashboardNavigation() {
         ];
       case 'ketering':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'DANAŠNJI MENI', path: '/moj-profil/oglasi', icon: 'restaurant_menu' },
           { label: 'NARUDŽBINE', path: '/moj-profil/narudzbine', icon: 'receipt_long' },
           { label: 'DOSTAVA', path: '/moj-profil/dostava', icon: 'delivery_dining' },
@@ -134,7 +149,8 @@ export function useDashboardNavigation() {
         ];
       case 'masine':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJA FLOTA', path: '/moj-profil/oglasi', icon: 'construction' },
           { label: 'REZERVACIJE', path: '/moj-profil/rezervacije', icon: 'event_available' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
@@ -142,7 +158,8 @@ export function useDashboardNavigation() {
         ];
       case 'placevi':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJI PLACEVI', path: '/moj-profil/oglasi', icon: 'landscape' },
           { label: 'UPITI KUPACA', path: '/moj-profil/upiti', icon: 'contact_support' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
@@ -150,7 +167,8 @@ export function useDashboardNavigation() {
         ];
       case 'partner':
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'AFFILIATE LINKOVI', path: '/moj-profil/affiliate', icon: 'link' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
@@ -158,7 +176,8 @@ export function useDashboardNavigation() {
       case 'standard':
       default:
         return [
-          { label: 'KONTROLNA TABLA', path: '/moj-profil', icon: 'dashboard' },
+          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJI UPITI', path: '/moj-profil/upiti', icon: 'mark_email_unread' },
           { label: 'MOJE PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
           { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },

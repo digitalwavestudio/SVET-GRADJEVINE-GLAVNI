@@ -37,7 +37,7 @@ export function useAdminAbuse() {
           nextPageParam: response?.lastVisibleId || null,
         };
       },
-      getNextPageParam: (lastPage) => lastPage.nextPageParam,
+      getNextPageParam: (lastPage) => lastPage?.nextPageParam,
       initialPageParam: null as string | null,
       staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: true,

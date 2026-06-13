@@ -51,20 +51,20 @@ export function AdminSidebar({
   const navItems = [
     { id: 'overview', label: 'PREGLED SISTEMA', icon: 'dashboard' },
     { id: 'moderation', label: 'MODERACIJA OGLASA', icon: 'rule', badge: pendingAds },
-    { id: 'magazine', label: 'MAGAZIN CMS', icon: 'newspaper' },
     { id: 'users', label: 'BAZA KORISNIKA', icon: 'groups' },
     { id: 'verify', label: 'VERIFIKACIJE', icon: 'verified' },
     { id: 'finances', label: 'FINANSIJE', icon: 'payments' },
+    { id: 'settings', label: 'GLOBALNA PODEŠAVANJA', icon: 'settings' },
+    { id: 'branding', label: 'PODEŠAVANJA BRENDA', icon: 'palette' },
+    { id: 'abuse', label: 'ZLOUPOTREBE', icon: 'gavel' },
     { id: 'marketing', label: 'MARKETING I PROMO', icon: 'campaign' },
     { id: 'broadcast', label: 'BROADCAST SISTEM', icon: 'podcasts' },
     { id: 'sync', label: 'ALGOLIA & SYNC', icon: 'sync_alt' },
     { id: 'support', label: 'SUPPORT & TIKETI', icon: 'support_agent' },
-    { id: 'abuse', label: 'ZLOUPOTREBE', icon: 'gavel' },
     { id: 'audit', label: 'AUDIT LOGOVI', icon: 'history' },
     { id: 'observability', label: 'MONITORING & DLQ', icon: 'monitor_heart' },
-    { id: 'resilience', label: 'REZILIJENCIJA', icon: 'shield_heart' },
-    { id: 'settings', label: 'GLOBALNA PODEŠAVANJA', icon: 'settings' },
-    { id: 'branding', label: 'PODEŠAVANJA BRENDA', icon: 'palette' },
+    { id: 'resilience', label: 'REZILIJENCIJA', icon: 'health_and_safety' },
+    { id: 'magazine', label: 'MAGAZIN CMS', icon: 'newspaper' },
   ];
 
   return (
@@ -129,35 +129,16 @@ export function AdminSidebar({
             ) : null}
           </motion.button>
         ))}
-        
-        <Link 
-          to="/" 
-          className="w-full flex items-center gap-4 px-6 py-4 rounded-[10px] transition-all group text-secondary hover:bg-secondary/10"
-        >
-          <span className="material-symbols-outlined text-2xl">home</span>
-          <span className="text-[11px] font-black uppercase tracking-widest">VRATI SE NA POČETNU</span>
-        </Link>
       </nav>
 
       <div className="mt-auto border-t border-white/5 pt-8 space-y-4">
-        <div className="bg-white/[0.03] border border-white/5 rounded-[10px] p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">LAUNCH MODE</span>
-            <div className={`w-2 h-2 rounded-full ${launchMode ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className={`text-[10px] font-black uppercase ${launchMode ? 'text-green-500' : 'text-red-500'}`}>
-              {launchMode ? 'AKTIVAN (FREE)' : 'LIMITIRAN'}
-            </span>
-            <button 
-              onClick={toggleLaunchMode}
-              disabled={isUpdatingLaunchMode}
-              className="text-[9px] font-black text-secondary uppercase tracking-widest hover:underline disabled:opacity-50"
-            >
-              {isUpdatingLaunchMode ? '...' : 'IZMENI'}
-            </button>
-          </div>
-        </div>
+        <Link 
+          to="/" 
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-[10px] text-xs font-black uppercase tracking-widest text-secondary hover:bg-secondary hover:text-slate-950 transition-all shadow-md active:scale-95"
+        >
+          <span className="material-symbols-outlined text-lg">home</span>
+          <span>VRATI SE NA POČETNU</span>
+        </Link>
 
         <div className="flex items-center gap-4 p-4 bg-white/[0.02] rounded-[10px] border border-white/5">
           <Avatar name={user?.name || 'A'} className="w-10 h-10 rounded-full" />

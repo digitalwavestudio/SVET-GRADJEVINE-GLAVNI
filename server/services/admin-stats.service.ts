@@ -287,35 +287,35 @@ export class AdminStatsService {
       console.warn("[AdminStatsService] Failed to read admin_stats document shield:", err);
     }
 
-    const cacheKey = "global_stats_shards";
-    const fastPathDoc = "metadata/global_stats_consolidated";
-
     const fallbackStats: any = {
-      totalJobs: 135,
-      companiesCount: 42,
-      machinesCount: 218,
-      accommodationsCount: 96,
-      mastersCount: 74,
-      realEstateCount: 165,
-      cateringCount: 58,
-      marketplaceCount: 112,
-      activeAds: 850,
-      pendingAds: 5,
-      premiumPartners: 15,
-      premiumAds: 34,
-      urgentAds: 20,
-      totalUsers: 914,
-      estimatedRevenue: 15850,
-      growthActiveAds: "+12% ove nedelje",
-      growthPremiumPartners: "+3 nova danas",
-      growthCompanies: "Odobreno i aktivno",
-      verifiedCompanies: 42
+      totalJobs: 0,
+      companiesCount: 0,
+      machinesCount: 0,
+      accommodationsCount: 0,
+      mastersCount: 0,
+      realEstateCount: 0,
+      cateringCount: 0,
+      marketplaceCount: 0,
+      activeAds: 0,
+      pendingAds: 0,
+      premiumPartners: 0,
+      premiumAds: 0,
+      urgentAds: 0,
+      totalUsers: 0,
+      estimatedRevenue: 0,
+      growthActiveAds: "0%",
+      growthPremiumPartners: "0",
+      growthCompanies: "0",
+      verifiedCompanies: 0
     };
 
-    // Cold Path Removal: Prohibiting sharded collection scans in runtime to protect Quota.
-    // Stats must be reconciled by background services, never by user request.
-    console.warn("[AdminStatsService] Cold-path sharded scan requested but prohibited. Returning fallback metrics.");
-    return fallbackStats;
+    try {
+      const liveStats = await this.reconcileGlobalStats();
+      return { ...fallbackStats, ...liveStats };
+    } catch (err) {
+      console.warn("[AdminStatsService] Reconcile failed, returning zeroes.", err);
+      return fallbackStats;
+    }
   }
 
   /**
@@ -325,13 +325,9 @@ export class AdminStatsService {
    */
   static async reconcileGlobalStats(): Promise<Record<string, any>> {
     this.logger.info("[AdminStatsService] Starting sharding baseline reconciliation...");
-    
-    // Safety boundaries to prevent massive read spikes
-    const BATCH_SIZE = 100;
-    const MAX_SAMPLING_DOCS = 300; 
 
     try {
-      // 1. Precise aggregations using count() (Safest & Cheapest - 1 read per 1k docs)
+      // Precise aggregations using count() (Safest & Cheapest - 1 read per 1k docs)
       const counts: Record<string, number> = {};
       const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace"];
       
@@ -340,17 +336,11 @@ export class AdminStatsService {
         counts[`total_${cat}s`] = snap.data().count;
       }
 
-      // 2. Revenue & Premium Sampling with strict BATCHING and LIMIT (PROMPT 9)
-      // Instead of an uncapped scan, we use limit(100) as requested.
-      const premiumSnap = await db.collection("listings")
-        .where("isPremium", "==", true)
-        .limit(BATCH_SIZE) // Strict limit(100) per read
-        .get();
-
-      this.logger.info(`[AdminStatsService] Reconciled baseline with limit(${BATCH_SIZE}) snapshot. Found ${premiumSnap.size} premium ads in sample.`);
-
-      // 3. Real Users Count
       const usersSnap = await db.collection("users").count().get();
+      const verifiedUsersSnap = await db.collection("users").where("isVerified", "==", true).count().get();
+      const premiumUsersSnap = await db.collection("users").where("businessProfile.isPremium", "==", true).count().get();
+      const activeAdsSnap = await db.collection("listings").where("status", "==", "active").count().get();
+      const pendingAdsSnap = await db.collection("listings").where("status", "==", "pending").count().get();
 
       const reconciledStats = {
         totalJobs: counts.total_jobs || 0,
@@ -360,10 +350,12 @@ export class AdminStatsService {
         realEstateCount: (counts.total_plots || 0),
         marketplaceCount: counts.total_marketplaces || 0,
         totalUsers: usersSnap.data().count,
-        premiumAds: premiumSnap.size, // Estimation based on safety sample
+        verifiedCompanies: verifiedUsersSnap.data().count,
+        premiumPartners: premiumUsersSnap.data().count,
+        activeAds: activeAdsSnap.data().count,
+        pendingAds: pendingAdsSnap.data().count,
         lastReconciled: new Date().toISOString(),
-        safetySwitch: "active",
-        reconcileWarning: premiumSnap.size >= BATCH_SIZE ? "Hard limit reached for premium scan. Use count() for full totals." : undefined
+        safetySwitch: "active"
       };
 
       // Consolidate to admin_stats document (L0 Shield)

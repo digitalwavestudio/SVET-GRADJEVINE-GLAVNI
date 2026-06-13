@@ -177,20 +177,13 @@ export default function AdminDashboardPage() {
                   <AdminChartsSkeleton />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="glass-card p-4">
-                    <OverviewTab 
-                      dynamicSectorData={(charts?.sectorData || []) as any as SectorData[]}
-                      dynamicRegistrationData={(charts?.registrationData || []) as any as RegistrationData[]}
-                      launchMode={launchMode}
-                      toggleLaunchMode={toggleLaunchMode}
-                      isUpdatingLaunchMode={isUpdatingLaunchMode}
-                    />
-                  </div>
-                  <div className="glass-card p-4">
-                    <AdminChartsSkeleton />
-                  </div>
-                </div>
+                <OverviewTab 
+                  dynamicSectorData={(charts?.sectorData || []) as any as SectorData[]}
+                  dynamicRegistrationData={(charts?.registrationData || []) as any as RegistrationData[]}
+                  launchMode={launchMode}
+                  toggleLaunchMode={toggleLaunchMode}
+                  isUpdatingLaunchMode={isUpdatingLaunchMode}
+                />
               )}
             </Suspense>
           )}

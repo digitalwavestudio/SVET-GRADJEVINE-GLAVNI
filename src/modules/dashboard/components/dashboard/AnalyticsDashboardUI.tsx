@@ -144,7 +144,7 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/2 blur-3xl -mr-32 -mt-32"></div>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 relative z-10">
           <div>
-            <h3 className="text-xl font-black text-white uppercase tracking-tight">Kanal i statistika poseta</h3>
+            <h3 className="text-xl font-black text-white uppercase tracking-tight">Analitika izvora saobraćaja</h3>
             <p className="text-xs text-white/40 uppercase font-black tracking-wider mt-1">Prikaz koliko vas ljudi pronalazi direktno na sajtu ili sa Google pretrage</p>
           </div>
           <div className="text-left md:text-right">

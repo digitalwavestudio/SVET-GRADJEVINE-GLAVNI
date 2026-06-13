@@ -7,7 +7,6 @@ import DashboardGuard from '@/src/modules/dashboard/components/dashboard/Dashboa
 import { useDashboardMetrics, useDashboardTrends } from '@/src/modules/dashboard/hooks/useDashboardStats';
 import ChartSkeleton from '@/src/modules/dashboard/components/dashboard/ChartSkeleton';
 import { SiteLogisticsPlanner } from '@/src/modules/dashboard/components/dashboard/SiteLogisticsPlanner';
-import { AvailabilityManager } from '@/src/modules/dashboard/components/dashboard/AvailabilityManager';
 import { SyncIndicator } from '@/src/modules/dashboard/components/dashboard/SyncIndicator';
 import { RecentAd, DashboardMetrics, ChartTrendData } from '../../types';
 
@@ -18,6 +17,12 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
   const { data: statsData } = useDashboardMetrics();
   const { data: trends = [] } = useDashboardTrends();
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<RecentAd | null>(null);
+  const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
+
+  const currentHour = new Date().getHours();
+  let greeting = 'DOBAR DAN';
+  if (currentHour < 12) greeting = 'DOBRO JUTRO';
+  else if (currentHour > 18) greeting = 'DOBRO VEČE';
 
   const recentAds: RecentAd[] = Array.isArray(statsData?.recentAds) 
     ? statsData.recentAds.map((ad) => ({
@@ -47,59 +52,83 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
       variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } }}}
       className="flex flex-col gap-12"
     >
-      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 md:p-16 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 blur-3xl -mr-32 -mt-32"></div>
-        <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-8">
-            <div className="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
-            <span className="text-xs font-black text-white uppercase tracking-widest">SISTEM AKTIVAN</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-7xl font-black text-white uppercase tracking-tighter mb-6 leading-none tracking-[-0.05em]">DOBRO VEČE, <span className="text-secondary">KOMANDNI CENTAR</span></h2>
-          <p className="text-white/40 text-sm md:text-base font-bold uppercase tracking-widest mb-12 leading-relaxed">
-            EVO KRATKOG PRESEKA UČINKA VAŠIH OGLASA ZA DANAS.
-          </p>
-          
-          <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
-            <Link to="/postavi-oglas" className="w-full md:w-auto px-10 py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-sm tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3">
-              <span className="material-symbols-outlined text-xl">add_circle</span>
-              POSTAVI OGLAS
-            </Link>
-            <Link to="/poslovi" className="w-full md:w-auto px-10 py-5 bg-white/5 border border-white/10 text-white font-black rounded-[10px] text-sm tracking-[0.2em] uppercase hover:bg-white/10 transition-all flex items-center justify-center gap-3">
-              <span className="material-symbols-outlined text-xl">explore</span>
-              POGLEDAJ SVE OGLASE
-            </Link>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="flex items-center gap-4">
-        <h3 className="text-2xl font-black text-white uppercase tracking-tight">LOGISTIKA & OPERATIVA</h3>
-        <div className="h-px flex-1 bg-white/5"></div>
-      </motion.div>
-
-      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}}>
-        <DashboardGuard variant="inline" title="Greška u Logističkom planeru">
-          <SiteLogisticsPlanner recentAds={recentAds} />
-        </DashboardGuard>
-      </motion.div>
-
-      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}}>
-        <DashboardGuard variant="inline" title="Greška u kalendaru dostupnosti">
-          <AvailabilityManager />
-        </DashboardGuard>
-      </motion.div>
-
       <div className="space-y-8">
+                <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="material-symbols-outlined text-secondary text-sm">monitoring</span>
+                        <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Statistika vaših oglasa</h4>
+                      </div>
+                      <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-sm">
+                        Pratite koliko radnika je pregledalo vaše objavljene poslove i koliko njih se prijavilo.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {!charts?.dailyAnalytics && (
+                        <span className="text-[8px] font-black text-[#FEBF0D]/75 bg-[#FEBF0D]/5 border border-[#FEBF0D]/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse">
+                          Privremeno nedostupno
+                        </span>
+                      )}
+                      <div className="flex p-1 bg-white/[0.02] border border-white/5 rounded-[8px]">
+                        <button 
+                          onClick={() => setTimeframe('day')}
+                          className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'day' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                        >
+                          Dan
+                        </button>
+                        <button 
+                          onClick={() => setTimeframe('week')}
+                          className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'week' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                        >
+                          7 Dana
+                        </button>
+                        <button 
+                          onClick={() => setTimeframe('month')}
+                          className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'month' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                        >
+                          30 Dana
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <DashboardGuard variant="inline" title="Greška u grafikonu poseta">
+                    <Suspense fallback={<ChartSkeleton />}>
+                      <DashboardCharts data={charts?.dailyAnalytics?.map(d => ({
+                        name: d.date,
+                        prijave: d.applications,
+                        pregledi: d.views
+                      }))} />
+                    </Suspense>
+                  </DashboardGuard>
+                </div>
+
+        <Suspense fallback={null}>
+          <PaymentInstructionsModal 
+            isOpen={!!selectedAdForPayment} 
+            onClose={() => setSelectedAdForPayment(null)} 
+            ad={selectedAdForPayment} 
+          />
+        </Suspense>
+
+        
+      </div>
+
         <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="flex items-center gap-4 mt-8">
-          <h3 className="text-2xl font-black text-white uppercase tracking-tight">MOJI OGLASI & POSLOVI</h3>
+          <span className="material-symbols-outlined text-secondary text-3xl">work</span>
+          <h3 className="text-2xl font-black text-white uppercase tracking-tight">UPRAVLJANJE VAŠIM OGLASIMA</h3>
           <div className="h-px flex-1 bg-white/5"></div>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="lg:col-span-2 space-y-8">
             <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 flex flex-col min-h-[450px]">
-              <div className="flex justify-between items-center mb-10 shrink-0">
-                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">NAJNOVIJI OGLASI (LIMIT 5)</h4>
+              <div className="flex justify-between items-start mb-10 shrink-0">
+                <div>
+                  <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">POSLEDNJI OBJAVLJENI OGLASI</h4>
+                  <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest max-w-sm">Brzi pregled vaših nedavnih poslova i broja prijavljenih radnika.</p>
+                </div>
                 {!statsData && (
                   <span className="text-[8px] font-black text-orange-400 bg-orange-400/5 border border-orange-400/10 px-2 py-1 rounded-full uppercase tracking-widest animate-pulse">
                     PODACI PRIVREMENO OGRANIČENI
@@ -137,7 +166,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                             <div className="flex-1 min-w-0">
                               <div className="text-white font-black text-sm uppercase tracking-tight group-hover/ad:text-secondary transition-colors truncate pr-2">{ad.title || ad.name}</div>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[9px] font-bold text-white/40 uppercase shrink-0">PRIJAVE: {ad.applicantsCount || 0}</span>
+                                <span className="text-[9px] font-bold text-white/40 uppercase shrink-0">PRIJAVLJENIH KANDIDATA: {ad.applicantsCount || 0}</span>
                                 <span className="text-white/20 text-[8px] shrink-0">•</span>
                                 <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shrink-0 ${
                                   ad.status === 'active' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
@@ -147,8 +176,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                                   'bg-white/5 text-white/40'
                                 }`}>
                                   {ad.status === 'active' ? 'AKTIVAN' :
-                                  ad.status === 'pending_payment' ? 'ČEKA UPLATU' :
-                                  ad.status === 'pending' ? 'MODERACIJA' :
+                                  ad.status === 'pending_payment' ? 'ZAHTEVA PLAĆANJE' :
+                                  ad.status === 'pending' ? 'NA ČEKANJU (PREGLED)' :
                                   ad.status === 'expired' ? 'ISTEKAO' :
                                   ad.status === 'rejected' ? 'ODBIJEN' : ad.status}
                                 </div>
@@ -160,7 +189,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                                     {ad.health && ad.health.status === 'poor' && (
                                       <div className="ml-2 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 flex items-center gap-1.5 animate-pulse group/tip relative">
                                         <span className="material-symbols-outlined text-[10px] text-red-500">warning</span>
-                                        <span className="text-[8px] font-black text-red-500 uppercase tracking-widest whitespace-nowrap">Potrebnija pažnja</span>
+                                        <span className="text-[8px] font-black text-red-500 uppercase tracking-widest whitespace-nowrap">💡 AI SAVET ZA BOLJI OGLAS</span>
                                         
                                         {/* AI Optimization Tip Tooltip */}
                                         {ad.health.suggestion && (
@@ -221,38 +250,21 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                 </div>
               )}
             </div>
-            
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
-              <div className="flex justify-between items-center mb-8">
-                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">STATISTIKA POSETA OGLASIMA</h4>
-                {!charts?.dailyAnalytics && (
-                  <span className="text-[9px] font-black text-[#FEBF0D]/75 bg-[#FEBF0D]/5 border border-[#FEBF0D]/10 px-3 py-1 rounded-full uppercase tracking-widest animate-pulse">
-                    Podaci o posetama su privremeno nedostupni
-                  </span>
-                )}
-              </div>
-              <DashboardGuard variant="inline" title="Greška u grafikonu poseta">
-                <Suspense fallback={<ChartSkeleton />}>
-                  <DashboardCharts data={charts?.dailyAnalytics?.map(d => ({
-                    name: d.date,
-                    prijave: d.applications,
-                    pregledi: d.views
-                  }))} />
-                </Suspense>
-              </DashboardGuard>
-            </div>
           </motion.div>
 
           <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="space-y-6">
-            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group hover:border-secondary/30 transition-all">
-               <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-4">VAŠI OGLASI</div>
-               <div className="text-5xl font-black text-white tracking-tighter mb-2 group-hover:text-secondary transition-colors">
-                 {activeMetrics?.totalAds !== undefined ? activeMetrics.totalAds : "N/A"}
-               </div>
-               {activeMetrics?.totalAds === undefined && (
-                 <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">Sistemske metrike privremeno nedostupne</div>
-               )}
-               <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">UKUPAN BROJ OBJAVA</div>
+            <div className="space-y-2">
+              <div className="text-5xl font-black text-white tracking-tighter mb-2 group-hover:text-secondary transition-colors">
+                {activeMetrics?.totalAds !== undefined ? activeMetrics.totalAds : "N/A"}
+              </div>
+              {activeMetrics?.totalAds === undefined && (
+                <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">
+                  Sistemske metrike privremeno nedostupne
+                </div>
+              )}
+              <div className="text-[9px] font-bold text-white/20 uppercase tracking-widest">
+                UKUPAN BROJ OBJAVA
+              </div>
             </div>
 
             <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group hover:border-emerald-500/30 transition-all">
@@ -304,15 +316,12 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
             </div>
           </motion.div>
         </div>
-      </div>
+      
 
-      <Suspense fallback={null}>
-        <PaymentInstructionsModal 
-          isOpen={!!selectedAdForPayment} 
-          onClose={() => setSelectedAdForPayment(null)} 
-          ad={selectedAdForPayment} 
-        />
-      </Suspense>
+
+
+
+
     </motion.div>
   );
 });

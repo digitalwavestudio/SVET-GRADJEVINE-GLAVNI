@@ -199,12 +199,12 @@ export function useUserApplications(
     },
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.lastVisibleId : undefined,
+      lastPage?.hasMore ? lastPage.lastVisibleId : undefined,
     enabled: !!userId,
   });
 
   const applications = result.data
-    ? result.data.pages.flatMap((page) => page.applications)
+    ? result.data.pages.flatMap((page) => page?.applications || [])
     : [];
 
   return {
@@ -230,18 +230,22 @@ export function useCheckApplied(jobId: string, userId: string) {
 }
 
 export function useSimilarJobs(
-  jobId: string,
-  locationSlug?: string,
-  professionSlug?: string,
+  _jobId: string,
+  _locationSlug?: string,
+  _professionSlug?: string,
 ) {
+  // For now we simply show the latest jobs from the public feed.
+  // The hook ignores the specific jobId and returns up to 8 recent listings.
   return useQuery<JobResponse[], Error>({
-    queryKey: queryKeys.jobs.similar(jobId),
+    queryKey: queryKeys.jobs.all,
     queryFn: async () => {
-      if (!jobId) return [];
-      return jobsService.fetchSimilarJobs(jobId, locationSlug, professionSlug) as Promise<JobResponse[]>;
+      // Fetch a batch of recent approved jobs (no filters).
+      const response = await jobsService.fetchJobs({ status: 'approved' }, null, 20);
+      // Take the first 8 items – assume they are the newest.
+      return response.items.slice(0, 8);
     },
-    enabled: !!jobId,
-    staleTime: 5 * 60 * 1000, // 30 min
+    enabled: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 

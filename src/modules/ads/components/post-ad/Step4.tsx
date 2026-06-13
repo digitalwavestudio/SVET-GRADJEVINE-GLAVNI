@@ -10,6 +10,7 @@ import {
 import { getPackagesByCategory } from "@/src/constants/adPackages";
 import { useAuth } from "@/src/context/AuthContext";
 import { useSystemConfig } from "@/src/hooks/useSystemConfig";
+import { useGlobalSettings } from "@/src/modules/admin/hooks/useGlobalSettings";
 
 export function Step4({
   selectedCategory,
@@ -39,14 +40,40 @@ export function Step4({
   const formData = watch();
   const { user } = useAuth();
   const { data: systemConfig } = useSystemConfig();
+  const { data: globalSettings } = useGlobalSettings();
   const walletBalance = user?.walletBalance || user?.partnerBalance || 0;
 
   const packages = useMemo(() => {
     const rawPackages = getPackagesByCategory(selectedCategory || "job");
 
+    // Override package prices dynamically with custom prices from globalSettings
+    const updatedPackages = rawPackages.map((pkg) => {
+      if (!globalSettings?.pricing) return pkg;
+
+      // Map categories
+      let catKey = selectedCategory || 'jobs';
+      if (catKey === 'job') catKey = 'jobs';
+      if (catKey === 'accommodation') catKey = 'accommodations';
+      if (catKey === 'catering') catKey = 'caterings';
+      if (catKey === 'real-estate' || catKey === 'plot') catKey = 'plots';
+
+      const pricingCategory = globalSettings.pricing[catKey as keyof typeof globalSettings.pricing];
+      if (pricingCategory && typeof pricingCategory === 'object') {
+        const customPrice = (pricingCategory as any)[pkg.id];
+        if (customPrice !== undefined) {
+          return {
+            ...pkg,
+            priceNum: customPrice,
+            price: customPrice === 0 ? "BESPLATNO" : `${customPrice.toLocaleString("sr-RS")} SG Kredita`
+          };
+        }
+      }
+      return pkg;
+    });
+
     // Apply dynamic discounts from system config
     if (systemConfig?.holidayModeActive) {
-      return rawPackages.map((pkg) => {
+      return updatedPackages.map((pkg) => {
         const applicable = systemConfig.applicablePackages || [];
         if (
           pkg.id !== "free" &&
@@ -71,8 +98,8 @@ export function Step4({
         return pkg;
       });
     }
-    return rawPackages;
-  }, [selectedCategory, systemConfig]);
+    return updatedPackages;
+  }, [selectedCategory, systemConfig, globalSettings]);
 
   const currentPackagePrice =
     packages.find((p) => p.id === formData.paket)?.priceNum || 0;

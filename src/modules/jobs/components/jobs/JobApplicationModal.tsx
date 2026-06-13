@@ -33,6 +33,12 @@ export function JobApplicationModal({
           </button>
         </div>
         <form onSubmit={onSubmit} className="p-6 space-y-4">
+          <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-[8px] flex items-start gap-2.5">
+            <span className="material-symbols-outlined text-emerald-400 text-lg">info</span>
+            <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider leading-relaxed">
+              Uz vašu poruku, poslodavcu će biti automatski prosleđen vaš CV sa profila ukoliko ste ga generisali.
+            </p>
+          </div>
           <div>
             <label className="block text-xs font-black text-on-surface-variant mb-2 uppercase tracking-wider">Vaša poruka poslodavcu</label>
             <textarea 

@@ -326,6 +326,9 @@ async function startServer() {
 
     process.on("SIGTERM", () => shutdown("SIGTERM"));
     process.on("SIGINT", () => shutdown("SIGINT"));
+    process.on("unhandledRejection", (reason) => {
+      console.error("⚠️ [Process] Unhandled Rejection intercepted to prevent crash:", reason);
+    });
 
   } catch (e) {
     if (e instanceof Error) {

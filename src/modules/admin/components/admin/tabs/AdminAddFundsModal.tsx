@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '@/src/context/AuthContext';
 
 import { auth } from '@/src/firebase';
+import { walletService } from '@/src/modules/checkout/services/walletService';
 
 interface AdminAddFundsModalProps {
   isOpen: boolean;
@@ -29,28 +30,8 @@ export function AdminAddFundsModal({ isOpen, onClose, targetUserId, targetUserNa
 
     try {
       setLoading(true);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error('Authorization required');
-      
-      const response = await fetch(`/api/admin/users/${targetUserId}/balance`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          amount,
-          type: 'add',
-          reason: description
-        })
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Došlo je do greške');
-      }
-
-      toast.success(data.message || 'Uspešno dodato.');
+      await walletService.adminAddFunds(targetUserId, amount, description);
+      toast.success(`Uspešno dodato ${amount} SG Kredita.`);
       onClose();
     } catch (err: any) {
       toast.error(err.message || 'Greška pri dodavanju sredstava');

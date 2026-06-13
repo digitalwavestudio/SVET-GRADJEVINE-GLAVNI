@@ -76,25 +76,8 @@ export const suspendUserSchema = z.object({
 });
 
 export const adminUserResponseSchema = z.object({
-  id: z.string(),
-  uid: z.string().optional(),
-  name: z.string().optional().nullable(),
-  email: z.string().optional().nullable(),
-  role: z.string().optional(),
-  company: z.string().optional(),
-  createdAt: z.union([z.string(), z.number(), z.record(z.string(), z.unknown())]).optional(),
-  isVerified: z.boolean().optional(),
-  walletBalance: z.number().optional(),
-  subscription: z.record(z.string(), z.unknown()).optional().nullable(),
-  skills: z.array(z.string()).optional(),
-  cities: z.array(z.string()).optional(),
-  city: z.string().optional(),
-  category: z.string().optional(),
-  categories: z.array(z.string()).optional(),
-  status: z.string().optional(),
-  claims: z.record(z.string(), z.unknown()).optional(),
-  // Strict schema strips all other undeclared properties, removing internal fields or any unneeded 'any' fields.
-});
+  id: z.string()
+}).passthrough();
 
 export const adminUserListResponseSchema = z.object({
   users: z.array(adminUserResponseSchema),

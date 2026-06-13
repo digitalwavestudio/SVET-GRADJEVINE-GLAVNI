@@ -8,24 +8,26 @@ interface VerificationModalProps {
 }
 
 export default function VerificationModal({ isOpen, onClose }: VerificationModalProps) {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, switchRole } = useAuth();
   const [step, setStep] = useState<'choice' | 'master' | 'firm'>('choice');
   const [niche, setNiche] = useState<BusinessNiche>('gradjevina');
   const [pib, setPib] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleMasterUpgrade = () => {
-    updateUser({ role: 'majstor' });
-    onClose();
+  const handleMasterUpgrade = async () => {
+    try {
+      await switchRole('majstor');
+      onClose();
+    } catch (err) {
+      console.error("Failed to upgrade to master:", err);
+    }
   };
 
-  const handleFirmUpgrade = () => {
+  const handleFirmUpgrade = async () => {
     setIsVerifying(true);
-    // Simulate API lookup
-    setTimeout(() => {
-      updateUser({ 
-        role: 'poslodavac',
+    try {
+      await updateUser({ 
         company: companyName,
         businessProfile: {
           niche,
@@ -34,9 +36,13 @@ export default function VerificationModal({ isOpen, onClose }: VerificationModal
           isPremium: false
         }
       });
+      await switchRole('poslodavac');
       setIsVerifying(false);
       onClose();
-    }, 2000);
+    } catch (err) {
+      console.error("Failed to upgrade to firm:", err);
+      setIsVerifying(false);
+    }
   };
 
   const niches: { id: BusinessNiche; label: string; icon: string }[] = [

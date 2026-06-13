@@ -76,7 +76,18 @@ export const switchRole = async (
     }
 
     const data = userSnap.data();
-    const newRole = data?.role === 'poslodavac' ? 'majstor' : 'poslodavac';
+    
+    // Dozvoli postavljanje specifične uloge (npr. tokom registracije/onboarding-a)
+    let newRole = req.body.role;
+    const allowedRoles = ['standard', 'majstor', 'poslodavac', 'smestaj', 'ketering', 'placevi', 'masine', 'partner'];
+    
+    if (newRole && !allowedRoles.includes(newRole)) {
+      return res.status(400).json({ error: 'Neispravna uloga.' });
+    }
+
+    if (!newRole) {
+      newRole = data?.role === 'poslodavac' ? 'majstor' : 'poslodavac';
+    }
 
     await db.collection('users').doc(uid).update({ role: newRole });
     
@@ -86,6 +97,10 @@ export const switchRole = async (
     await admin.auth().setCustomUserClaims(uid, { ...currentClaims, role: newRole });
 
     await CacheService.delete(`auth:claims:${uid}`);
+    await CacheService.delete(`user_me_${uid}:pub`);
+    await CacheService.delete(`user_me_${uid}:priv`);
+    await CacheService.delete(`auth_session:${uid}`).catch(() => {});
+    await CacheService.delete(`public_profile_${uid}`);
 
     // We should sync stats as role changed
     eventBus.emit(DomainEvents.USER_UPDATED, { userId: uid });

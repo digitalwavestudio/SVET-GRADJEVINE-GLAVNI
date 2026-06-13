@@ -21,7 +21,7 @@ export function useSavedSearches(userId: string | undefined) {
     queryFn: async () => {
       // In a real app, this would be an API call
       // For now, we might fetch from /auth/me or a dedicated endpoint
-      const response = await apiClient.get<{ savedSearches?: SavedSearch[] }>('/auth/me');
+      const response = await apiClient.get<{ savedSearches?: SavedSearch[] }>('/users/me');
       return (response?.savedSearches || []) as SavedSearch[];
     },
     enabled: !!userId,

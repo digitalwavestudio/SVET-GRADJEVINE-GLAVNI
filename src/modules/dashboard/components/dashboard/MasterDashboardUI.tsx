@@ -84,8 +84,8 @@ const MasterDashboardUI = memo(function MasterDashboardUI({ masterStatus, toggle
       variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } }}}
       className="space-y-8"
     >
-      {/* Principal Observability Layer - Visibility Restricted to Admin/Dev */}
-      {(user?.role === 'admin' || import.meta.env.DEV) && (
+      {/* Principal Observability Layer - Visibility Restricted to Admin */}
+      {user?.role === 'admin' && (
         <div className="mb-6">
           <FirestoreObservability />
         </div>
@@ -160,8 +160,8 @@ const MasterDashboardUI = memo(function MasterDashboardUI({ masterStatus, toggle
           )}
         </motion.div>
         
-        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="md:col-span-3">
-           <Card padding="lg" layout="flexColFull">
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="md:col-span-3 h-fit">
+           <Card padding="lg" layout="default" className="h-fit">
               <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center mb-10 shrink-0">
                 <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">VAŠE PRIJAVE I POSLOVI</h2>
                 <Link to="/moj-profil/prijave" className="bg-secondary text-slate-950 font-black px-8 py-3 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all text-center">POGLEDAJ SVE PRIJAVE</Link>
@@ -181,7 +181,7 @@ const MasterDashboardUI = memo(function MasterDashboardUI({ masterStatus, toggle
                   description="Sistem je parcijalno učitao kontrolnu tablu, ali lista vaših prijavnih dokumenata trenutno pati od kašnjenja u mreži."
                 />
               ) : recentApps.length > 0 ? (
-                <div ref={parentRef} className="flex-1 overflow-y-auto no-scrollbar scroll-smooth pr-2">
+                <div ref={parentRef} className="h-[380px] overflow-y-auto no-scrollbar scroll-smooth pr-2">
                   <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
                     {virtualizer.getVirtualItems().map((virtualItem) => {
                       const ad = recentApps[virtualItem.index];

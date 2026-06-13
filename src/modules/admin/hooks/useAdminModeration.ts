@@ -47,7 +47,7 @@ export function useAdminModeration(searchQuery?: string) {
     },
     initialPageParam: null,
     getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.nextCursor : undefined,
+      lastPage?.hasMore ? lastPage.nextCursor : undefined,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: true,
   });

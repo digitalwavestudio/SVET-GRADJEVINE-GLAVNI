@@ -23,7 +23,7 @@ interface PromoConfig {
 
 export function MarketingTab() {
   const { data: jobsData } = useJobs({});
-  const jobs = (jobsData?.pages.flatMap((page) => page.items) || []) as unknown as JobItem[];
+  const jobs = (jobsData?.pages.flatMap((page) => page?.items || []) || []) as unknown as JobItem[];
   const queryClient = useQueryClient();
 
   const { data: systemConfig, isLoading: configLoading } = useSystemConfig();

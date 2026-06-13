@@ -24,7 +24,7 @@ export const Sidebar = memo(({
 
   if (!user) return null;
 
-  const isAdmin = user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com';
+  const isAdmin = user.email === 'mancoresolution@gmail.com' || user.isAdmin;
   const role = user.role;
   const isEmployer = role === 'poslodavac';
   const isMaster = role === 'majstor';
@@ -36,15 +36,17 @@ export const Sidebar = memo(({
     if (!isAdmin) return;
 
     try {
-      // Cancel all active queries first to prevent race conditions from in-flight requests
       await queryClient.cancelQueries();
-      // Completely clear the query and mutation caches to prevent memory leaks/Ghost Sessions
       queryClient.clear();
+      
+      // Update locally in context & backend
+      await updateUser({ role: targetRole });
+      
+      // Force direct clean reload to primary profile path so it completely resets the layout and removes any route conflicts
+      window.location.href = '/kontrolna-tabla';
     } catch (err) {
       console.error('[Sidebar] Error resetting TanStack Query cache on role switch:', err);
     }
-
-    await updateUser({ role: targetRole });
   };
 
   const handlePrefetch = (path: string) => {
@@ -101,23 +103,29 @@ export const Sidebar = memo(({
         <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] px-4 mb-4">GLAVNI MENI</div>
         {navItems.map((item: NavItem) => {
           const isActive = location.pathname === item.path;
+          const isNadzorniCentar = item.label === 'NADZORNI CENTAR';
+          
+          const linkClassName = isNadzorniCentar
+            ? 'flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative bg-gradient-to-r from-[#0061a5] to-[#60a5fa] text-white hover:from-[#00518c] hover:to-[#5095ea] shadow-lg shadow-[#0061a5]/20 font-black'
+            : `flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative ${
+                isActive 
+                  ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
+                  : 'text-white/50 hover:text-white hover:bg-white/5'
+              } ${item.label === 'IZBOR ULOGE' && pulseRoleSelection ? 'animate-[pulse_1s_ease-in-out_3] ring-2 ring-secondary/50' : ''}`;
+
           return (
             <Link
               key={item.path}
               to={item.path}
               onMouseEnter={() => handlePrefetch(item.path)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative ${
-                isActive 
-                  ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
-              } ${item.label === 'IZBOR ULOGE' && pulseRoleSelection ? 'animate-[pulse_1s_ease-in-out_3] ring-2 ring-secondary/50' : ''}`}
+              className={linkClassName}
             >
-              <span className={`material-symbols-outlined text-xl ${isActive ? 'text-slate-950' : 'opacity-60 group-hover:opacity-100'}`}>
+              <span className={`material-symbols-outlined text-xl ${isNadzorniCentar ? 'text-white' : isActive ? 'text-slate-950' : 'opacity-60 group-hover:opacity-100'}`}>
                 {item.icon}
               </span>
-              <span className="text-[11px] font-black tracking-[0.1em] uppercase">{item.label}</span>
+              <span className={`text-[11px] font-black tracking-[0.1em] uppercase ${isNadzorniCentar ? 'text-white' : ''}`}>{item.label}</span>
               {item.badge && (
-                <span className={`ml-auto text-[10px] font-black px-2 py-0.5 rounded-full min-w-[20px] text-center ${isActive ? 'bg-slate-950 text-secondary' : 'bg-secondary text-slate-950'}`}>
+                <span className={`ml-auto text-[10px] font-black px-2 py-0.5 rounded-full min-w-[20px] text-center ${isNadzorniCentar ? 'bg-white text-[#0061a5]' : isActive ? 'bg-slate-950 text-secondary' : 'bg-secondary text-slate-950'}`}>
                   {item.badge}
                 </span>
               )}

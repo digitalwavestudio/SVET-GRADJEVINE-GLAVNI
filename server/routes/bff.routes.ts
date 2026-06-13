@@ -176,7 +176,7 @@ bffRouter.get(
     // 1. If Circuit Breaker is OPEN, serve fallback sandbox dataset immediately without hitting database
     if (state === "OPEN") {
       console.warn(`[CircuitBreaker] Circuit is OPEN. Serving STALE cache fallback for user: ${req.user?.uid || "unknown"}`);
-      const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}`, true)) || {};
+      const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
       return res.json({
          ...(typeof staleData === "object" ? staleData : {}),
          success: true,
@@ -214,7 +214,7 @@ bffRouter.get(
           const { checkQuotaStatus } = await import("../config/firebase.ts");
           if (currentState === "OPEN" || checkQuotaStatus()) {
             console.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active. Rendering cache fallback.");
-            const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}`, true)) || {};
+            const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
             if (!res.headersSent) {
               return res.json({
                  ...(typeof staleData === "object" ? staleData : {}),
@@ -231,7 +231,7 @@ bffRouter.get(
       const breakerTimeout = setTimeout(async () => {
         if (!res.headersSent) {
           console.warn(`[LatencyBreaker] Request exceeded 5000ms for user: ${req.user?.uid}. Serving L1 memory cache fallback.`);
-          const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}`, true)) || {};
+          const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
           // Temporarily disable the breaker success/failure recording for timeout response
           res.json({
             ...(typeof staleData === "object" ? staleData : {}),
@@ -254,7 +254,7 @@ bffRouter.get(
       const { checkQuotaStatus } = await import("../config/firebase.ts");
       if (currentState === "OPEN" || checkQuotaStatus()) {
         console.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active on catch. Rendering cache fallback.");
-        const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}`, true)) || {};
+        const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
         return res.json({
            ...(typeof staleData === "object" ? staleData : {}),
            success: true,

@@ -23,7 +23,7 @@ export interface AuthContextType {
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string, firstName: string, lastName: string, role: UserRole) => Promise<void>;
   logout: () => Promise<void>;
-  switchRole: () => void;
+  switchRole: (targetRole?: UserRole) => Promise<void>;
   updateUser: (data: Partial<User>) => Promise<void>;
   getIdToken: () => Promise<string | undefined>;
   toggleSavedJob: (jobId: string) => Promise<void>;

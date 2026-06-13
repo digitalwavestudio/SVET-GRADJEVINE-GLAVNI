@@ -77,47 +77,54 @@ function RootLayout() {
 
 import GlobalRouteError from '@/src/components/GlobalRouteError';
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route element={<RootLayout />} errorElement={<GlobalRouteError />}>
-      {/* MAIN LAYOUT (NavBar + Footer) */}
-      <Route element={<MainLayout />}>
-        {getCoreRouter()}
-        
-        {/* MODULES */}
-        {getJobsRouter()}
-        {getCompaniesRouter()}
-        {getRealEstateRouter()}
-        {getMachinesRouter()}
-        {getCateringRouter()}
-        {getAccommodationsRouter()}
-        {getMarketplaceRouter()}
-        {getMastersRouter()}
-        {getAdsRouter()}
-        {getCheckoutRouter()}
-        {/* {getMagazineRouter()} */}
-        {getSearchRouter()}
-        {getDashboardPublicRouter()}
-        {getToolsPublicRouter()}
-      </Route>
+let router: ReturnType<typeof createBrowserRouter> | null = null;
 
-      {/* AUTH LAYOUT (No NavBar/Footer) */}
-      {getAuthRouter()}
+function getRouter() {
+  if (!router) {
+    router = createBrowserRouter(
+      createRoutesFromElements(
+        <Route element={<RootLayout />} errorElement={<GlobalRouteError />}>
+          {/* MAIN LAYOUT (NavBar + Footer) */}
+          <Route element={<MainLayout />}>
+            {getCoreRouter()}
+            
+            {/* MODULES */}
+            {getJobsRouter()}
+            {getCompaniesRouter()}
+            {getRealEstateRouter()}
+            {getMachinesRouter()}
+            {getCateringRouter()}
+            {getAccommodationsRouter()}
+            {getMarketplaceRouter()}
+            {getMastersRouter()}
+            {getAdsRouter()}
+            {getCheckoutRouter()}
+            {/* {getMagazineRouter()} */}
+            {getSearchRouter()}
+            {getDashboardPublicRouter()}
+            {getToolsPublicRouter()}
+          </Route>
 
-      {/* DASHBOARD LAYOUT (Handled individually by pages) */}
-      {getDashboardRouter()}
-      {getAuthDashboardRouter()}
-      {getToolsDashboardRouter()}
-      {getCoreDashboardRouter()}
-      {getMarketplaceDashboardRouter()}
+          {/* AUTH LAYOUT (No NavBar/Footer) */}
+          {getAuthRouter()}
 
-      {/* NOT FOUND falls back to main layout to show footer over it or blank */}
-      <Route element={<MainLayout />}>
-        <Route path="*" element={<NotFoundPage />} />
-      </Route>
-    </Route>
-  )
-);
+          {/* DASHBOARD LAYOUT (Handled individually by pages) */}
+          {getDashboardRouter()}
+          {getAuthDashboardRouter()}
+          {getToolsDashboardRouter()}
+          {getCoreDashboardRouter()}
+          {getMarketplaceDashboardRouter()}
+
+          {/* NOT FOUND falls back to main layout to show footer over it or blank */}
+          <Route element={<MainLayout />}>
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Route>
+      )
+    );
+  }
+  return router;
+}
 
 import { Toaster } from 'react-hot-toast';
 import { AuthLoader } from '@/src/components/AuthLoader';
@@ -137,7 +144,7 @@ function App() {
           }}
         />
         <AuthLoader>
-          <RouterProvider router={router} />
+          <RouterProvider router={getRouter()} />
         </AuthLoader>
       </AppProviders>
     </ErrorBoundary>

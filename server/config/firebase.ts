@@ -154,7 +154,7 @@ import { MonitoringService } from "../services/monitoring.service.ts";
 let isQuotaExhausted = false;
 let quotaExhaustedAt = 0;
 // PROMPT 10: 24h Firebase (Daily Quota) cooldown instead of 5-min circuit breaker
-const QUOTA_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+const QUOTA_COOLDOWN_MS = 5 * 60 * 1000; // Smanjeno sa 24h na 5 minuta za plaćeni (Blaze) plan
 let lastRedisSync = 0;
 
 export function withTimeout<T>(promise: Promise<T>, ms: number, errMessage: string): Promise<T> {
@@ -174,7 +174,7 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, errMessage: stri
         clearTimeout(timer);
         reject(err);
       }
-    );
+    ).catch(() => {});
   });
 }
 
@@ -329,15 +329,15 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
     // If it's the user mock
     mockData = {
       id: docId,
-      name: "Svet Građevine",
-      firstName: "Svet",
-      lastName: "Građevine",
-      email: "sandbox@svetgradjevine.com",
-      role: "admin",
-      isAdmin: true,
-      walletBalance: 75000,
-      isVerified: true,
-      company: "KOMANDNI CENTAR SA",
+      name: "Standardni Korisnik",
+      firstName: "Korisnik",
+      lastName: "Svet Građevine",
+      email: "sandbox-user@svetgradjevine.com",
+      role: "standard",
+      isAdmin: false,
+      walletBalance: 1500,
+      isVerified: false,
+      company: "",
       photoURL: "https://svetgradjevine.com/favicon.ico",
       businessProfile: {
         logo: "https://svetgradjevine.com/favicon.ico",

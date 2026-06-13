@@ -54,7 +54,21 @@ const syncUserStats = async (role: string) => {
 export function useAuthNode() {
   const [user, setUser] = useState<User | null>(() => {
     const cached = safeStorage.getItem(CACHE_KEY);
-    return cached ? JSON.parse(cached) : null;
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed && (parsed.email === 'mancoresolution@gmail.com' || parsed.isAdmin)) {
+          const previewRole = safeStorage.getItem('admin_preview_role');
+          if (previewRole) {
+            parsed.role = previewRole as UserRole;
+          }
+        }
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   });
 
   const [loading, setLoading] = useState(true);
@@ -113,6 +127,9 @@ export function useAuthNode() {
          const tokenResult = await firebaseUser.getIdTokenResult();
          const claims = tokenResult.claims;
          
+         const isAdminUser = firebaseUser.email === 'mancoresolution@gmail.com' || !!claims.admin;
+         const previewRole = isAdminUser ? safeStorage.getItem('admin_preview_role') : null;
+         
          if (claims.role) {
             // We have enough to show the UI
             setUser(prev => {
@@ -122,7 +139,7 @@ export function useAuthNode() {
                   id: firebaseUser.uid, 
                   email: firebaseUser.email,
                   emailVerified: firebaseUser.emailVerified,
-                  role: claims.role,
+                  role: (previewRole || claims.role) as UserRole,
                   isVerified: !!claims.isVerified,
                   isAdmin: !!claims.admin,
                   status: claims.suspended ? 'suspended' : 'active',
@@ -146,7 +163,15 @@ export function useAuthNode() {
          try {
             const meData = await apiClient.get<User>('/users/me');
             if (meData) {
-               const combinedData = { ...meData, id: firebaseUser.uid, emailVerified: firebaseUser.emailVerified } as User;
+               const isMeAdmin = firebaseUser.email === 'mancoresolution@gmail.com' || meData.isAdmin || meData.role === 'admin';
+               const currentPreviewRole = isMeAdmin ? safeStorage.getItem('admin_preview_role') : null;
+               
+               const combinedData = { 
+                 ...meData, 
+                 id: firebaseUser.uid, 
+                 emailVerified: firebaseUser.emailVerified,
+                 role: (currentPreviewRole || meData.role) as UserRole
+               } as User;
                if (isMountedFn.current) {
                  setUser((prev) => {
                    const newStr = JSON.stringify(combinedData);
@@ -330,6 +355,7 @@ useEffect(() => {
     setUser(null);
     safeStorage.removeItem(CACHE_KEY);
     safeStorage.removeItem('svet_gradjevine_last_sync');
+    safeStorage.removeItem('admin_preview_role');
     
     // Explicit Targeted Garbage Collection for user memory space
     if (currentUserSnapshot && (currentUserSnapshot as User).id) {
@@ -340,18 +366,37 @@ useEffect(() => {
     }
   }, []);
 
-  const switchRole = useCallback(async () => {
-    if (!user) return;
+  const switchRole = useCallback(async (targetRole?: UserRole) => {
+    let userSnapshot: User | null = null;
+    setUser(prev => { userSnapshot = prev; return prev; });
+    if (!userSnapshot) return;
+
     try {
-      // Keep role switch via API (critical logic, handles balances/credits reset)
-      const data = await apiClient.post<{ success: boolean; newRole: UserRole }>(`/users/switch-role`);
+      const data = await apiClient.post<{ success: boolean; newRole: UserRole }>(
+        `/users/switch-role`,
+        targetRole ? { role: targetRole } : {}
+      );
       if (data.success && data.newRole) {
-        setUser(prev => prev ? { ...prev, role: data.newRole } : null);
+        if (auth.currentUser) {
+          await auth.currentUser.getIdToken(true);
+        }
+        const updatedUser = { ...(userSnapshot as User), role: data.newRole };
+        setUser(updatedUser);
+        safeStorage.setItem(CACHE_KEY, JSON.stringify(updatedUser));
+        safeStorage.removeItem('admin_preview_role');
+        queryClient.clear();
+        
+        if (window.location.pathname.includes('/izbor-uloge')) {
+          window.location.href = '/moj-profil';
+        } else {
+          window.location.reload();
+        }
       }
     } catch (error) {
-      console.error(error);
+      console.error("[switchRole] Failed to switch user role:", error);
+      throw error;
     }
-  }, [user]);
+  }, []);
 
   const updateUser = useCallback(async (data: Partial<User>) => {
     // Upotrebite ref ili updater da dobijete najnovijeg korisnika bez dependency-ja koji pravi petlje
@@ -367,6 +412,9 @@ useEffect(() => {
     const isAdmin = currentUser.role === 'admin' || currentUser.isAdmin || currentUser.email === 'mancoresolution@gmail.com';
 
     let finalData = { ...data };
+    if (isAdmin && data.role) {
+      safeStorage.setItem('admin_preview_role', data.role);
+    }
     if ((data.role === 'partner' || currentUser.role === 'partner') && (!currentUser.partnerCode && !data.partnerCode)) {
       const nameForInit = data.name || currentUser.name || currentUser.firstName || 'Partner';
       finalData = {

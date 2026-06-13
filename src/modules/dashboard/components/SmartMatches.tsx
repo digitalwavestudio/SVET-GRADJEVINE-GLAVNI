@@ -32,17 +32,6 @@ export default function SmartMatches({ type, matches = [] }: SmartMatchesProps) 
       animate={{ opacity: 1, y: 0 }}
       className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 group flex flex-col h-[500px]"
     >
-      <div className="flex items-center justify-between mb-8 shrink-0">
-        <div>
-          <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-1">PAMETNO SPAJANJE</h3>
-          <div className="text-2xl font-black text-white tracking-tighter uppercase">
-            PREPORUČENI <span className="text-secondary">{type === 'jobs' ? 'POSLOVI' : 'MAJSTORI'}</span>
-          </div>
-        </div>
-        <div className="w-10 h-10 bg-secondary/10 rounded-[10px] flex items-center justify-center">
-          <span className="material-symbols-outlined text-secondary">auto_awesome</span>
-        </div>
-      </div>
 
       <div 
         ref={parentRef}

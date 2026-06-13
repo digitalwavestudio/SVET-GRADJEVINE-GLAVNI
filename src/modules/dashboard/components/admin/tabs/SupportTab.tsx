@@ -34,6 +34,27 @@ export function SupportTab() {
                />
             </div>
          </div>
+         {/* FAQ Section */}
+         <div className="p-8 border-b border-white/5">
+           <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">ČESTO POSTAVLJENA PITANJA</h3>
+            <div className="space-y-4">
+              {[
+                { question: "Kako da izvršim uplatu za premium oglas?", answer: "U odeljku 'Premium Oglasi' izaberite paket, zatim pratite instrukcije za plaćanje putem kartice ili uplatnice." },
+                { question: "Kako da verifikujem moj poslovni nalog?", answer: "U sekciji 'Moj Profil' kliknite na 'Verifikacija' i pratite korake za unos potrebnih dokumenata." },
+                { question: "Koji su uslovi za otkazivanje oglasa?", answer: "Oglasi se mogu otkazati najkasnije 24h pre isteka roka, uz povrat sredstava u skladu sa pravilnikom." },
+                { question: "Kako da zaštitim podatke svojih klijenata?", answer: "Koristite enkripciju komunikacije i poštujte GDPR smernice; sve podatke čuvajte u sigurnom prostoru." },
+                { question: "Kako funkcionišu statistike poseta i konverzija?", answer: "U kontrolnoj tabli pregledajte grafikone poseta, klikova i konverzija po oglasu u realnom vremenu." },
+                { question: "Kako da podnesem prigovor na odluku podrške?", answer: "U sekciji 'Podrška' otvorite tiket, izaberite 'Prigovor' i priložite relevantnu dokumentaciju." },
+                { question: "Koju vrstu podrške mogu očekivati za urgentne zahteve?", answer: "Za urgentne slučajeve posetite 'Hitna Podrška' i očekujte odgovor u roku od 2 sata." },
+                { question: "Kako da pretražim istoriju mojih tiketa?", answer: "U 'Podrška' kartici koristite filtere po datumu i statusu da biste našli prethodne tikete." }
+              ].map((faq, idx) => (
+                <details key={idx} className="bg-white/5 rounded-[10px] p-4">
+                  <summary className="cursor-pointer font-black uppercase text-sm text-white/80">{faq.question}</summary>
+                  <p className="mt-2 text-xs text-white/60">{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+         </div>
          <div className="flex-1 overflow-y-auto no-scrollbar">
             {supportTickets.map((t: any) => (
                <button key={t.id} onClick={() => setActiveTicket(t)} className={`w-full text-left p-6 border-b border-white/5 hover:bg-white/[0.02] transition-colors ${activeTicket?.id === t.id ? 'bg-white/[0.02] border-l-2 border-l-secondary' : ''}`}>

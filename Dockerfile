@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-slim AS build
+FROM node:20 AS build
 WORKDIR /app
 COPY package*.json ./
 COPY packages/ ./packages/
@@ -8,7 +8,7 @@ COPY . .
 RUN npm run build
 
 # Run stage
-FROM node:20-slim
+FROM node:20
 WORKDIR /app
 COPY package*.json ./
 COPY packages/ ./packages/

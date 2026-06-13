@@ -62,7 +62,7 @@ export function useMyAds(userId: string | undefined, searchQuery?: string) {
     },
     initialPageParam: null,
     getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.lastVisibleId : undefined,
+      lastPage?.hasMore ? lastPage.lastVisibleId : undefined,
     enabled: !!userId,
     staleTime: 10 * 60 * 1000, // 10 minutes stale time
     gcTime: 10 * 60 * 1000,    // 10 minutes cache/gc time

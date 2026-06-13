@@ -140,7 +140,9 @@ export default function FavoritesPage() {
   const [sortBy, setBy] = useState('newest');
 
   const filteredAndSortedAds = useMemo(() => {
-    let result = [...ads];
+    if (!Array.isArray(ads)) return [];
+    // Filter out deleted, null, or incomplete mock/placeholder ads that have no real data
+    let result = ads.filter(ad => ad && ad.id && (ad.title || ad.name || ad.brand));
 
     // Search filter
     if (searchQuery.trim()) {
@@ -168,9 +170,6 @@ export default function FavoritesPage() {
         const titleB = (b.title || b.name || b.brand || '').toLowerCase();
         return titleA.localeCompare(titleB);
       });
-    } else {
-      // Default newest - assuming they come sorted from API, but we can reverse if needed or keep as is.
-      // If we had createdAt we would use it. Currently we just keep API order.
     }
 
     return result;

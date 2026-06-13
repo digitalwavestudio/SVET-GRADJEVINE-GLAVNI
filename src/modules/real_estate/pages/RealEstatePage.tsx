@@ -245,8 +245,8 @@ export default function RealEstatePage() {
       
       <StandardPageHero
         badge="Premijum Investicione Lokacije"
-        title="Pronađi Tlo."
-        titleAccent="Izgradi Viziju."
+        title="pametna odluka"
+        titleAccent="za pametne investitore"
         subtitle="Industrijska, građevinska i komercijalna zemljišta proverenog potencijala. Direktan kontakt, bez skrivenih troškova."
         stats={[
           { label: "Aktivne Lokacije", value: realEstateStats?.total?.toLocaleString() || "420", icon: "map" },

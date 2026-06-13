@@ -221,7 +221,7 @@ export default function CateringPage() {
       <DynamicSEO type="ketering" grad={grad} jsonLd={itemListSchema} itemCount={totalCateringsCount} />
       
       <StandardPageHero
-        badge="Industrial Food Solutions"
+        badge="Industrijska Rešenja za Ketering"
         title="Ketering"
         titleAccent="za radnike"
         subtitle="Sistemska rešenja za ishranu na gradilištima. Dnevni meni, kuvana jela i dostava sopstvenim vozilima."
@@ -340,12 +340,6 @@ export default function CateringPage() {
                 />
               </div>
             </FilterSection>
-
-            <div className="flex justify-center mt-8">
-              <ThemeToggle />
-            </div>
-            
-
 
             
           <FilterCTA 

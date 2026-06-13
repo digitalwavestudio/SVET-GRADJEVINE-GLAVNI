@@ -91,26 +91,28 @@ export default function StandardTrendChart({ trendLoading, trendData }: Standard
 
   const tooltipContentStyle = useMemo(() => ({
     borderRadius: "12px",
-    border: "none",
-    boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backgroundColor: "#0A0F14",
+    color: "#ffffff",
+    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.5)",
     padding: "12px",
   }), []);
 
   const hasData = memoizedData.length > 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <div className="bg-[#0A0F14] rounded-[10px] border border-white/5 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-lg font-bold text-gray-900">
+          <h3 className="text-lg font-black text-white uppercase tracking-tight">
             Analitika Pregleda
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-white/40 uppercase font-black tracking-wider mt-1">
             Ukupan broj pregleda vaših oglasa u zadnjih 30 dana
           </p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-400 rounded-full text-xs font-semibold border border-green-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
           Uživo
         </div>
       </div>
@@ -135,12 +137,12 @@ export default function StandardTrendChart({ trendLoading, trendData }: Standard
                 >
                   <stop
                     offset="5%"
-                    stopColor="#3b82f6"
-                    stopOpacity={0.1}
+                    stopColor="#febf0d"
+                    stopOpacity={0.15}
                   />
                   <stop
                     offset="95%"
-                    stopColor="#3b82f6"
+                    stopColor="#febf0d"
                     stopOpacity={0}
                   />
                 </linearGradient>
@@ -148,7 +150,7 @@ export default function StandardTrendChart({ trendLoading, trendData }: Standard
               <CartesianGrid
                 strokeDasharray={dimensions.width < 500 ? "2 2" : "3 3"}
                 vertical={false}
-                stroke="#f1f5f9"
+                stroke="rgba(255, 255, 255, 0.05)"
               />
               <XAxis
                 dataKey="name"
@@ -181,7 +183,7 @@ export default function StandardTrendChart({ trendLoading, trendData }: Standard
               <Area
                 type="monotone"
                 dataKey="pregledi"
-                stroke="#3b82f6"
+                stroke="#febf0d"
                 strokeWidth={dimensions.width < 640 ? 1.5 : 3}
                 fillOpacity={1}
                 fill="url(#colorViews)"
@@ -190,9 +192,9 @@ export default function StandardTrendChart({ trendLoading, trendData }: Standard
             </AreaChart>
           )
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-100">
-            <span className="text-gray-400 text-sm">
-              Još nema podataka za grafikone.
+          <div className="w-full h-full flex items-center justify-center bg-white/[0.01] rounded-[10px] border border-white/5">
+            <span className="text-white/20 text-xs font-black uppercase tracking-widest">
+              Još nema podataka za grafikone
             </span>
           </div>
         )}

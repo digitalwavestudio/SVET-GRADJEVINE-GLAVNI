@@ -58,13 +58,10 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
   const isMaster = user.role === 'majstor';
   const userName = user.name || `${user.firstName} ${user.lastName}` || 'Korisnik';
   const userInitial = userName.charAt(0);
-
   return (
     <header className="hidden md:flex h-20 border-b border-white/5 bg-[#070B0F] sticky top-0 z-40 w-full">
       <div className="w-full max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-full">
         <div className="flex items-center gap-4">
-           <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
-           <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">SISTEM AKTIVAN</span>
         </div>
 
         <div className="flex items-center gap-6">
@@ -72,13 +69,6 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
             <span className="material-symbols-outlined text-lg">add_circle</span>
             POSTAVI OGLAS
           </Link>
-
-          {/* Quick Search */}
-          <div className="hidden xl:flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-[10px] text-white/40 focus-within:border-secondary/50 transition-all">
-            <span className="material-symbols-outlined text-lg">search</span>
-            <input aria-label="Unos polja" type="text" placeholder="Pretraži..." className="bg-transparent border-none outline-none text-xs font-bold uppercase tracking-widest w-48 placeholder:text-white/20" />
-            <span className="text-[9px] border border-white/10 px-1.5 py-0.5 rounded uppercase">⌘K</span>
-          </div>
 
           <div className="flex items-center gap-2 relative">
             <input 

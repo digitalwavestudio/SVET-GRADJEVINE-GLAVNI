@@ -7,7 +7,27 @@ export default function GlobalRouteError() {
   const error: any = useRouteError();
   console.error("Global Route Error:", error);
   
-  const isQuota = getQuotaExceeded() || (error?.message || '').toLowerCase().includes('quota');
+  const errorMsg = error?.message || '';
+  const isQuota = getQuotaExceeded() || errorMsg.toLowerCase().includes('quota');
+  const isChunkError = errorMsg.toLowerCase().includes('dynamically imported module') || 
+                       errorMsg.toLowerCase().includes('chunkloaderror') || 
+                       errorMsg.toLowerCase().includes('failed to fetch dynamically');
+
+  if (isChunkError) {
+    const lastReload = sessionStorage.getItem('chunk_error_reload');
+    const now = Date.now();
+    // Ako nismo reload-ovali u poslednjih 10 sekundi, reload-uj ponovo
+    if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+      sessionStorage.setItem('chunk_error_reload', now.toString());
+      window.location.reload();
+      return (
+        <div className="min-h-screen bg-surface flex flex-col items-center justify-center text-center p-6">
+          <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-on-surface/70">Ažuriranje aplikacije u toku...</p>
+        </div>
+      );
+    }
+  }
 
   if (isQuota) {
     return (

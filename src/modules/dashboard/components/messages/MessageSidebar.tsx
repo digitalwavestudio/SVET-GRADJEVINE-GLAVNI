@@ -4,7 +4,7 @@ import { OnlineStatus } from '@/src/components/ui/OnlineStatus';
 import { Conversation } from '@/src/context/MessagesContext';
 
 interface MessageSidebarProps {
-  conversations: Conversation[];
+  conversations?: Conversation[];
   loadMoreConversations?: () => void;
   hasMoreConversations?: boolean;
   isFetchingNextPage?: boolean;
@@ -14,8 +14,8 @@ interface MessageSidebarProps {
 }
 
 export function MessageSidebar({
-  conversations,
-  loadMoreConversations,
+  conversations = [],
+  loadMoreConversations = () => {},
   hasMoreConversations,
   isFetchingNextPage,
   activeConversationId,
@@ -36,7 +36,7 @@ export function MessageSidebar({
     if (node) observer.current.observe(node);
   }, [isFetchingNextPage, hasMoreConversations, loadMoreConversations]);
 
-  const filteredConversations = conversations.filter(conv => {
+  const filteredConversations = (conversations ?? []).filter(conv => {
     const searchLower = searchTerm.toLowerCase();
     const partnerName = (conv.partnerName || 'Korisnik').toLowerCase();
     const adTitle = (conv.adTitle || '').toLowerCase();

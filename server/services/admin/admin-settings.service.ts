@@ -107,43 +107,90 @@ export class AdminSettingsService {
             primaryColor: "#0f172a",
             secondaryColor: "#3b82f6" 
           };
-          if (type === "global") return { maintenanceMode: false, currentVersion: "v1.2" };
 
           const doc = await db.collection("settings").doc(type).get();
           console.log("AdminSettings doc:", type, "exists:", doc.exists, "data:", doc.data?.());
           if (doc.exists && doc.data && doc.data()) {
-             return doc.data();
-          }
-          if (type === "branding") return { 
-            heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-            heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
-            primaryColor: "#0f172a",
-            secondaryColor: "#3b82f6" 
-          };
-          return null;
-        } catch (error: any) {
-          const err = error as Error & { details?: string; code?: number };
-          if (
-            err?.message?.includes("Quota limit exceeded") ||
-            err?.details?.includes("Quota limit exceeded") ||
-            err?.message?.includes("Trip Circuit Breaker") ||
-            err?.code === 4 || // DEADLINE_EXCEEDED
-            err?.code === 8    // RESOURCE_EXHAUSTED
-          ) {
-            console.warn(`[AdminSettingsService] Quota/Timeout fetching settings ${type}. Returning fallback.`);
-            throw new Error("QUOTA_EXHAUSTED");
-          }
-          throw error;
-        }
-      },
-      15 * 60 * 1000,
-      type === "branding" ? { 
-        heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-        heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
-        primaryColor: "#0f172a",
-        secondaryColor: "#3b82f6" 
-      } : null, // Fallback
-      timeoutMs
+             const data = doc.data();
+              if (type === "global") {
+                 return {
+                    pricing: {
+                       jobs: { standard: 0, premium: 50, urgent: 100 },
+                       accommodations: { standard: 0, premium: 50, urgent: 100 },
+                       caterings: { standard: 0, premium: 50, urgent: 100 },
+                       marketplace: { standard: 0, premium: 50, urgent: 100 },
+                       machines: { standard: 0, premium: 50, urgent: 100 },
+                       plots: { standard: 0, premium: 50, urgent: 100 },
+                       professional_monthly: 6000,
+                       ...data?.pricing
+                    },
+                    limits: { free_listings_per_month: 3, max_images_per_ad: 10, ...data?.limits },
+                    messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false, ...data?.messages },
+                    globalRateLimit: data?.globalRateLimit || 100,
+                    initialCredits: data?.initialCredits !== undefined ? data.initialCredits : 1500
+                 };
+              }
+              return data;
+           }
+           if (type === "branding") return { 
+             heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
+             heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
+             primaryColor: "#0f172a",
+             secondaryColor: "#3b82f6" 
+           };
+           if (type === "global") return {
+             pricing: {
+                jobs: { standard: 0, premium: 50, urgent: 100 },
+                accommodations: { standard: 0, premium: 50, urgent: 100 },
+                caterings: { standard: 0, premium: 50, urgent: 100 },
+                marketplace: { standard: 0, premium: 50, urgent: 100 },
+                machines: { standard: 0, premium: 50, urgent: 100 },
+                plots: { standard: 0, premium: 50, urgent: 100 },
+                professional_monthly: 6000
+             },
+             limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
+             messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
+             globalRateLimit: 100,
+             initialCredits: 1500
+           };
+           return null;
+         } catch (error: any) {
+           const err = error as Error & { details?: string; code?: number };
+           if (
+             err?.message?.includes("Quota limit exceeded") ||
+             err?.details?.includes("Quota limit exceeded") ||
+             err?.message?.includes("Trip Circuit Breaker") ||
+             err?.code === 4 || // DEADLINE_EXCEEDED
+             err?.code === 8    // RESOURCE_EXHAUSTED
+           ) {
+             console.warn(`[AdminSettingsService] Quota/Timeout fetching settings ${type}. Returning fallback.`);
+             throw new Error("QUOTA_EXHAUSTED");
+           }
+           throw error;
+         }
+       },
+       15 * 60 * 1000,
+       type === "branding" ? { 
+         heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
+         heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
+         primaryColor: "#0f172a",
+         secondaryColor: "#3b82f6" 
+       } : (type === "global" ? {
+         pricing: {
+            jobs: { standard: 0, premium: 50, urgent: 100 },
+            accommodations: { standard: 0, premium: 50, urgent: 100 },
+            caterings: { standard: 0, premium: 50, urgent: 100 },
+            marketplace: { standard: 0, premium: 50, urgent: 100 },
+            machines: { standard: 0, premium: 50, urgent: 100 },
+            plots: { standard: 0, premium: 50, urgent: 100 },
+            professional_monthly: 6000
+         },
+         limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
+         messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
+         globalRateLimit: 100,
+         initialCredits: 1500
+       } : null), // Fallback
+       timeoutMs
     ); // 15 minutes cache with SWR
   }
 }

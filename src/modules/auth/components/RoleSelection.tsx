@@ -1,156 +1,226 @@
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { COMPANY_TYPES } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
 
 export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
-  const { updateUser } = useAuth();
+  const { switchRole } = useAuth();
   const navigate = useNavigate();
 
-  const handleSelectRole = async (roleSlug: string) => {
-    // We removed skip_standard role selection here since we don't skip anymore
-    // Mapping taxonomy slugs to our internal UserRole types if they differ
-    let targetRole = roleSlug;
-    if (roleSlug === 'izvodjaci-radova') targetRole = 'poslodavac';
-    if (roleSlug === 'smestaj-za-radnike') targetRole = 'smestaj';
-    if (roleSlug === 'iznajmljivanje-masina') targetRole = 'masine';
-    if (roleSlug === 'ketering') targetRole = 'ketering';
-    if (roleSlug === 'inzenjering') targetRole = 'poslodavac'; // For now group with poslodavac
-    if (roleSlug === 'placevi') targetRole = 'placevi';
-    if (roleSlug === 'partner') targetRole = 'partner';
-
+  const handleSelectRole = async (targetRole: string) => {
     try {
-      await updateUser({ role: targetRole as any });
-      navigate('/moj-profil'); // Refresh view automatically via routing
+      console.log("Attempting to switch role to:", targetRole);
+      await switchRole(targetRole as any);
+      console.log("Successfully switched role to:", targetRole);
     } catch (error) {
       console.error("Failed to set role:", error);
+      alert("Došlo je do greške pri izmeni uloge. Molimo pokušajte ponovo.");
     }
   };
 
-  const rolesWithIcons = [
-    { slug: 'izvodjaci-radova', icon: 'business', color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { slug: 'smestaj-za-radnike', icon: 'home_pin', color: 'text-secondary', bg: 'bg-secondary/10' },
-    { slug: 'ketering', icon: 'restaurant', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-    { slug: 'iznajmljivanje-masina', icon: 'construction', color: 'text-yellow-600', bg: 'bg-yellow-600/10' },
-    { slug: 'placevi', icon: 'landscape', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+  const proRoles = [
+    {
+      slug: 'majstor',
+      title: 'JA SAM MAJSTOR / RADNIK',
+      subtitle: 'PRONAĐI POSAO & KLIJENTE',
+      description: 'Napravite digitalni profil, istaknite svoje veštine, CV i portfolio radova. Budite vidljivi poslodavcima u najvećoj bazi građevinskih radnika na Balkanu.',
+      icon: 'engineering',
+      color: 'text-amber-400 border-amber-500/20 hover:border-amber-400 hover:shadow-amber-500/10',
+      bgGlow: 'bg-amber-500/10',
+      tagColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      btnBg: 'bg-amber-400 text-slate-950 hover:bg-amber-300',
+      benefits: ['Lični online portfolio radova', 'Direktan kontakt sa firmama', 'Bez posrednika i provizija']
+    },
+    {
+      slug: 'poslodavac',
+      title: 'GRAĐEVINSKA FIRMA',
+      subtitle: 'ZAPOSLI EKIPU ILI MAJSTORE',
+      description: 'Objavite oglase za posao i građevinske projekte. Pretražite bazu slobodnih majstora i radnika, te direktno ugovorite saradnju i kooperaciju.',
+      icon: 'business',
+      color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
+      bgGlow: 'bg-emerald-500/10',
+      tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      btnBg: 'bg-emerald-400 text-slate-950 hover:bg-emerald-300',
+      benefits: ['Neograničeno postavljanje oglasa', 'Pristup bazi aktivnih radnika', 'Statistika pregleda i prijava']
+    },
+    {
+      slug: 'smestaj',
+      title: 'SMEŠTAJ ZA RADNIKE',
+      subtitle: 'IZNAJMI SMEŠTAJNE KAPACITETE',
+      description: 'Prikažite svoje stanove, pansione, hostele ili radničke kontejnere. Povežite se sa građevinskim firmama koje traže smeštaj za svoje terenske radnike.',
+      icon: 'home_pin',
+      color: 'text-sky-400 border-sky-500/20 hover:border-sky-400 hover:shadow-sky-500/10',
+      bgGlow: 'bg-sky-500/10',
+      tagColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+      btnBg: 'bg-sky-400 text-slate-950 hover:bg-sky-300',
+      benefits: ['Direktan kontakt sa firmama', 'Isticanje lokacije i kapaciteta', 'Popunjenost tokom cele godine']
+    },
+    {
+      slug: 'masine',
+      title: 'MAŠINE I OPREMA',
+      subtitle: 'NAJAM ILI PRODAJA MEHANIZACIJE',
+      description: 'Iznajmite ili prodajte bagere, dizalice, skele, oplate i prateću građevinsku opremu. Budite prvi izbor izvođačima radova u potrazi za opremom.',
+      icon: 'construction',
+      color: 'text-orange-400 border-orange-500/20 hover:border-orange-400 hover:shadow-orange-500/10',
+      bgGlow: 'bg-orange-500/10',
+      tagColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+      btnBg: 'bg-orange-400 text-slate-950 hover:bg-orange-300',
+      benefits: ['Pregledan katalog mašina', 'Cenovnik najma po danu/satu', 'Direktni upiti od izvođača']
+    },
+    {
+      slug: 'ketering',
+      title: 'KETERING & ISHRANA RADNIKA',
+      subtitle: 'DOSTAVA HRANE NA GRADILIŠTA',
+      description: 'Ponudite kuvana jela i organizovanu ishranu za radnike na gradilištima. Povežite se sa firmama koje brinu o ishrani svojih zaposlenih na terenu.',
+      icon: 'restaurant',
+      color: 'text-amber-500 border-amber-600/20 hover:border-amber-500 hover:shadow-amber-500/10',
+      bgGlow: 'bg-amber-600/10',
+      tagColor: 'bg-amber-600/10 text-amber-500 border-amber-600/20',
+      btnBg: 'bg-amber-500 text-slate-950 hover:bg-amber-400',
+      benefits: ['Kreiranje dnevnih menija', 'Dugoročni ugovori sa firmama', 'Povećanje obima porudžbina']
+    },
+    {
+      slug: 'placevi',
+      title: 'PLACEVI I ZONE',
+      subtitle: 'INDUSTRIJSKO ZEMLJIŠTE I PROSTORI',
+      description: 'Prodajte ili iznajmite građevinska zemljišta, skladišta, hale ili placeve u industrijskim zonama. Privucite investitore i izvođače radova.',
+      icon: 'landscape',
+      color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
+      bgGlow: 'bg-emerald-500/10',
+      tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+      btnBg: 'bg-emerald-400 text-slate-950 hover:bg-emerald-300',
+      benefits: ['Detaljne specifikacije zemljišta', 'Lokacijski prikaz i plan zone', 'Direktan kontakt sa investitorima']
+    },
+    {
+      slug: 'partner',
+      title: 'PARTNER AFFILIATE',
+      subtitle: 'PREPORUČI I ZARADI PROVIZIJU',
+      description: 'Promovišite našu platformu i ostvarite procenat od svake uplate Vaših preporučenih korisnika. Dobijate lični affiliate kod i detaljnu statistiku zarade.',
+      icon: 'handshake',
+      color: 'text-orange-500/50 border-orange-500/10 hover:border-orange-500/30 hover:shadow-orange-500/5',
+      bgGlow: 'bg-orange-500/5',
+      tagColor: 'bg-orange-500/5 text-orange-500/50 border-orange-500/10',
+      btnBg: 'bg-orange-600/30 text-white/50 cursor-not-allowed',
+      benefits: ['Automatsko praćenje preporuka', 'Isplate na tekući račun', 'Marketing materijali i podrška'],
+      isComingSoon: true
+    }
   ];
 
   return (
-    <div className="space-y-10">
-      <div className="text-center max-w-2xl mx-auto space-y-4">
-        <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">
+    <div className="space-y-16 py-8">
+      {/* Header */}
+      <div className="text-center max-w-3xl mx-auto space-y-6">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary/10 border border-secondary/20 rounded-full">
+          <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+          <span className="text-[10px] md:text-xs font-black text-secondary uppercase tracking-[0.25em]">AKTIVACIJA PREMIUM PROFILA</span>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
           IZABERITE VAŠU <span className="text-secondary">ULOGU</span> NA PORTALU
         </h2>
-        <p className="text-white/40 font-bold text-xs uppercase tracking-widest leading-relaxed">
-          DA BISTE AKTIVIRALI VAŠ SPECIFIČNI DASHBOARD I POČELI SA OGLAŠAVANJEM, MOLIMO IZABERITE JEDNU OD PONUĐENIH OPCIJA KOJA NAJBOLJE OPISUJE VAŠU DELATNOST.
+        <p className="text-white/40 font-bold text-sm uppercase tracking-widest leading-relaxed">
+          Aktivacijom specifične uloge otvarate potpuno novi set alata, kontrolnu tablu i mogućnosti prilagođene Vašoj delatnosti.
         </p>
       </div>
 
-      {/* TOP BANNER: Skip Selection */}
-      <motion.button
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        onClick={() => {
-          if (onSkip) onSkip();
-        }}
-        className="bg-white/5 border border-white/10 p-6 rounded-[10px] text-center hover:border-white/20 transition-all group w-full relative overflow-hidden"
-      >
-         <div className="relative z-10 flex flex-col items-center">
-           <h3 className="text-sm font-black text-white/60 uppercase tracking-[0.2em] group-hover:text-white transition-colors">ŽELIM DA OSTANEM STANDARDNI KORISNIK ZA SADA</h3>
-           <p className="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em] mt-2">OVO MOŽETE UVEK PROMENITI U SVAKOM TRENUTKU U MENIJU LEVO</p>
-         </div>
-         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-      </motion.button>
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {proRoles.map((role, index) => (
+          <motion.div
+            key={role.slug}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.05 }}
+            className={`relative flex flex-col bg-gradient-to-br from-[#0C1017] to-[#040609] border-2 ${role.color} rounded-[20px] p-8 md:p-10 overflow-hidden group transition-all duration-500 hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.5)]`}
+          >
+            {/* Background Glow */}
+            <div className={`absolute top-0 right-0 w-36 h-36 ${role.bgGlow} opacity-20 blur-[50px] -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700`}></div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {rolesWithIcons.map((roleInfo, index) => {
-          const taxonomyData = COMPANY_TYPES.find(t => t.slug === roleInfo.slug);
-          if (!taxonomyData) return null;
-
-          return (
-            <motion.button
-              key={roleInfo.slug}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              onClick={() => handleSelectRole(roleInfo.slug)}
-              className="bg-[#0A0F14] border border-white/5 p-8 rounded-[10px] text-left hover:border-secondary transition-all group flex flex-col h-full shadow-2xl hover:shadow-secondary/5 relative overflow-hidden"
-            >
-              <div className={`absolute top-0 right-0 w-24 h-24 ${roleInfo.bg} opacity-20 blur-[40px] -mr-12 -mt-12 group-hover:opacity-40 transition-opacity`}></div>
-              
-              <div className={`w-14 h-14 ${roleInfo.bg} ${roleInfo.color} rounded-[10px] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform relative z-10`}>
-                <span className="material-symbols-outlined text-3xl font-light">{roleInfo.icon}</span>
+            {/* Tooltip za Coming Soon ulogu na hover */}
+            {role.isComingSoon && (
+              <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <div className="bg-amber-500 text-slate-950 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-md shadow-lg border border-amber-400">
+                  STIŽE USKORO
+                </div>
               </div>
+            )}
 
-              <div className="relative z-10 space-y-2 mt-auto">
-                <h3 className="text-lg font-black text-white uppercase tracking-tight group-hover:text-secondary transition-colors line-clamp-2">
-                  {taxonomyData.name}
-                </h3>
-                <div className="flex items-center gap-2">
-                   <div className="w-1 h-1 rounded-full bg-secondary"></div>
-                   <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">AKTIVIRAJ DASHBOARD</span>
+            <div className="relative z-10 flex-1 flex flex-col justify-between space-y-10">
+              
+              {/* Top Section */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className={`w-16 h-16 rounded-[12px] ${role.bgGlow} ${role.color.split(' ')[0]} border border-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500`}>
+                    <span className="material-symbols-outlined text-4xl font-light">{role.icon}</span>
+                  </div>
+                  <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${role.tagColor}`}>
+                    {role.isComingSoon ? 'USKORO DOSTUPNO' : role.subtitle}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none">
+                    {role.title}
+                  </h3>
+                  <p className="text-xs md:text-sm text-white/40 font-bold uppercase tracking-wider leading-relaxed">
+                    {role.description}
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-8 flex items-center justify-between relative z-10 border-t border-white/5 pt-6">
-                 <span className="text-[9px] font-black text-white/20 uppercase tracking-widest group-hover:text-white/40">ZAPOČNI</span>
-                 <span className="material-symbols-outlined text-white/10 group-hover:text-secondary transition-all group-hover:translate-x-1">arrow_forward</span>
+              {/* Benefits Checklist */}
+              <div className="border-t border-white/5 pt-6 space-y-3">
+                {role.benefits.map((benefit, bIndex) => (
+                  <div key={bIndex} className="flex items-center gap-3">
+                    <span className={`material-symbols-outlined text-base shrink-0 ${role.color.split(' ')[0]}`}>check_circle</span>
+                    <span className="text-[10px] md:text-xs font-black text-white/70 uppercase tracking-wider leading-none">{benefit}</span>
+                  </div>
+                ))}
               </div>
-            </motion.button>
-          );
-        })}
 
-        {/* Specialized "Majstor" Option (Standard User default) */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          onClick={() => handleSelectRole('majstor')}
-          className="bg-[#0A0F14] border border-white/5 p-8 rounded-[10px] text-left hover:border-blue-500 transition-all group flex flex-col h-full shadow-2xl hover:shadow-blue-500/5 relative overflow-hidden col-span-1 md:col-span-2 lg:col-span-4 lg:py-12"
-        >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] -mr-32 -mt-32"></div>
-          
-          <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
-            <div className="w-20 h-20 bg-blue-500/10 text-blue-500 rounded-[10px] flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/10 group-hover:rotate-6 transition-transform">
-              <span className="material-symbols-outlined text-5xl">engineering</span>
-            </div>
-            <div className="flex-1 text-center md:text-left space-y-2">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter">JA SAM MAJSTOR / RADNIK</h3>
-              <p className="text-white/40 font-bold text-sm uppercase tracking-widest leading-relaxed max-w-2xl">
-                KREIRAJTE SVOJ DIGITALNI PROFIL, POSTAVITE VAŠ CV I PORFOLIO RADOVA. PRIDRUŽITE SE NAJVEĆOJ BAZI STRUČNIH RADNIKA I PRONAĐITE IDEALAN POSAO.
-              </p>
-            </div>
-            <div className="px-8 py-4 bg-blue-500 text-white font-black rounded-[10px] text-xs tracking-widest uppercase hover:bg-blue-400 transition-all shadow-xl shadow-blue-500/20">
-              KREIRAJ RADNI PROFIL
-            </div>
-          </div>
-        </motion.button>
+              {/* Action Button */}
+              {role.isComingSoon ? (
+                <div className="relative w-full group/btn">
+                  <button
+                    disabled
+                    className="w-full py-4 md:py-5 bg-white/5 text-white/20 border border-white/5 font-black text-xs md:text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    USKORO
+                    <span className="material-symbols-outlined text-lg">hourglass_empty</span>
+                  </button>
+                  {/* Hover popup stilizovan kao na footeru svetlog moda */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-amber-500 border border-amber-400 text-slate-950 rounded-lg shadow-2xl opacity-0 invisible group-hover/btn:opacity-100 group-hover/btn:visible transition-all duration-300 z-50 text-center pointer-events-none">
+                    <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-1">OBAVEŠTENJE</div>
+                    <p className="text-[10px] font-black uppercase tracking-wider leading-tight">
+                      Partner / Affiliate opcija stiže uskoro na platformu!
+                    </p>
+                    <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-500 border-r border-b border-amber-400 rotate-45"></div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleSelectRole(role.slug)}
+                  className={`w-full py-4 md:py-5 rounded-[12px] font-black text-xs md:text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} flex items-center justify-center gap-2`}
+                >
+                  AKTIVIRAJ PROFIL
+                  <span className="material-symbols-outlined text-lg transition-transform duration-300 group-hover:translate-x-1.5">arrow_forward</span>
+                </button>
+              )}
 
-        {/* BOTTOM OPTION: Affiliate Partner (Red Border) */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          onClick={() => handleSelectRole('partner')}
-          className="bg-[#100505] border border-red-500/30 p-8 rounded-[10px] text-left hover:border-red-500 transition-all group flex flex-col h-full shadow-2xl hover:shadow-red-500/10 relative overflow-hidden col-span-1 md:col-span-2 lg:col-span-4 lg:py-12"
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Footer Skip Selection */}
+      <div className="text-center pt-8">
+        <button
+          onClick={() => {
+            if (onSkip) onSkip();
+            else navigate('/moj-profil');
+          }}
+          className="px-8 py-4 bg-white/5 border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all rounded-[10px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em]"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-[80px] -mr-32 -mt-32"></div>
-          
-          <div className="flex flex-col md:flex-row items-center gap-10 relative z-10 text-center md:text-left">
-            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-[10px] flex items-center justify-center shrink-0 shadow-lg shadow-red-500/10 group-hover:rotate-6 transition-transform">
-              <span className="material-symbols-outlined text-5xl">handshake</span>
-            </div>
-            <div className="flex-1 space-y-2">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tighter">PARTNER AFFILIATE</h3>
-              <p className="text-white/40 font-bold text-sm uppercase tracking-widest leading-relaxed max-w-2xl">
-                ZARADITE PROMOVIŠUĆI NAJVEĆI GRAĐEVINSKI PORTAL. DOBIJATE PROVIZIJU OD SVAKE UPLATE VAŠIH PREPORUČENIH KORISNIKA. POSTANITE DEO NAŠEG TIMA.
-              </p>
-            </div>
-            <div className="px-8 py-4 bg-red-500 text-white font-black rounded-[10px] text-[10px] tracking-[0.2em] uppercase hover:bg-red-400 transition-all shadow-xl shadow-red-500/20 whitespace-nowrap">
-              POSTANI PARTNER
-            </div>
-          </div>
-        </motion.button>
+          ŽELIM DA OSTANEM STANDARDNI KORISNIK ZA SADA
+        </button>
       </div>
     </div>
   );

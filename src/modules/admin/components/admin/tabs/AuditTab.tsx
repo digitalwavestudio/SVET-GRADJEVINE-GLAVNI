@@ -36,7 +36,7 @@ export function AuditTab() {
         nextPageParam: response.lastVisibleId,
       };
     },
-    getNextPageParam: (lastPage) => lastPage.nextPageParam,
+    getNextPageParam: (lastPage) => lastPage?.nextPageParam,
     initialPageParam: null as string | null,
     staleTime: 5 * 60 * 1000, // 5 minuta
   });

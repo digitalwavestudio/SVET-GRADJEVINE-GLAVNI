@@ -26,8 +26,19 @@ export function useFavoritesList(userId: string | undefined) {
     queryKey: favoritesKeys.user(userId || "guest"),
     queryFn: async ({ signal }) => {
       if (!userId) return [];
-      const data = await apiClient.get<FavoriteItem[]>("/favorites/my", { signal });
-      return data.map((item) => ({ ...item, _type: item.type }));
+      try {
+        const data = await apiClient.get<FavoriteItem[]>("/favorites/my", { signal });
+        if (Array.isArray(data)) {
+          return data.map((item) => ({ ...item, _type: item.type || item._type }));
+        }
+        if (data && typeof data === 'object' && Array.isArray((data as any).favorites)) {
+          return (data as any).favorites.map((item: any) => ({ ...item, _type: item.type || item._type }));
+        }
+        return [];
+      } catch (err) {
+        console.error("Error fetching favorites:", err);
+        return [];
+      }
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,

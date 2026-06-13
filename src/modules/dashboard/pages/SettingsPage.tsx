@@ -14,12 +14,10 @@ import { toast } from 'react-hot-toast';
 import { apiClient } from '@/src/lib/apiClient';
 
 import { ProfileSettingsTab } from '../components/settings/ProfileSettingsTab';
-import { NotificationSettingsTab } from '../components/settings/NotificationSettingsTab';
-import { SecuritySettingsTab } from '../components/settings/SecuritySettingsTab';
 
 export default function SettingsPage() {
   const { user, updateUser } = useAuth();
-  const [activeSection, setActiveSection] = useState<'profile' | 'cv' | 'applications' | 'security' | 'notifications'>('profile');
+  const [activeSection, setActiveSection] = useState<'profile' | 'cv' | 'applications'>('profile');
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -246,19 +244,17 @@ export default function SettingsPage() {
           <p className="text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">UPRAVLJAJTE VAŠIM PODACIMA I BIOGRAFIJOM</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
+         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
           {/* Navigation Sidebar */}
           <div className="space-y-2">
             {[
               { id: 'profile', label: 'JAVNI PROFIL', icon: 'visibility' },
               { id: 'cv', label: 'MOJ CV', icon: 'description' },
               { id: 'applications', label: 'MOJE PRIJAVE', icon: 'assignment' },
-              { id: 'security', label: 'BEZBEDNOST', icon: 'lock' },
-              { id: 'notifications', label: 'NOTIFIKACIJE', icon: 'notifications' },
             ].map((section) => (
               <button
                 key={section.id}
-                onClick={() => setActiveSection(section.id as "profile" | "cv" | "applications" | "security" | "notifications")}
+                onClick={() => setActiveSection(section.id as "profile" | "cv" | "applications")}
                 className={`w-full flex items-center gap-4 px-6 py-4 rounded-[10px] transition-all text-[10px] font-black tracking-widest uppercase ${
                   activeSection === section.id 
                     ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
@@ -275,7 +271,7 @@ export default function SettingsPage() {
           <div className="lg:col-span-3 space-y-6">
             <ProfileHealth score={liveScore} hideButton={true} />
             
-            <div className={activeSection === 'profile' || activeSection === 'security' || activeSection === 'notifications' 
+            <div className={activeSection === 'profile'
               ? "bg-[#0A0F14] border border-white/5 rounded-[10px] p-4 md:p-10" 
               : "space-y-6"
             }>
@@ -323,15 +319,6 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </motion.div>
-              )}
-
-              {activeSection === 'security' && <SecuritySettingsTab />}
-
-              {activeSection === 'notifications' && (
-                <NotificationSettingsTab 
-                  notifications={notifications}
-                  toggleNotification={toggleNotification}
-                />
               )}
 
               <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-end gap-4">

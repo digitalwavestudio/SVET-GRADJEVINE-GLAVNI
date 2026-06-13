@@ -406,7 +406,7 @@ export const bffService = {
     reqUser: AuthUser,
     cacheControlHeader?: string
   ): Promise<DashboardDataResult> {
-    const cacheKey = `bff_cache_tiered:${userId}`;
+    const cacheKey = `bff_cache_tiered:${userId}:${role}`;
     const flightKey = `${userId}:${role}`;
 
     const { checkQuotaStatus } = await import("../config/firebase.ts");
@@ -463,7 +463,7 @@ export const bffService = {
 
           const { getRedis } = await import("../utils/redis.ts");
           const redis = getRedis();
-          const prewarmKey = `dashboard_stats_prewarm:${userId}`;
+          const prewarmKey = `dashboard_stats_prewarm:${userId}:${role}`;
           let baseData: any = null;
 
           // 1. Check L1 Memory Cache first

@@ -137,4 +137,32 @@ export const walletService = {
       }
     });
   },
+
+  /**
+   * Adds SG credits to a user's wallet (Admin only).
+   */
+  async adminAddFunds(
+    targetUserId: string,
+    amount: number,
+    description: string
+  ): Promise<void> {
+    return mutationGuard(
+      () =>
+        withRetry(async () => {
+          try {
+            return await apiClient.post<void>("/wallet/admin/add-funds", {
+              targetUserId,
+              amount,
+              description,
+            });
+          } catch (e: unknown) {
+            const err = e as Error;
+            throw new Error(
+              err.message || "Došlo je do greške pri dodavanju sredstava",
+            );
+          }
+        }),
+      { actionName: "adminAddFunds", context: { targetUserId, amount, description } },
+    );
+  },
 };

@@ -48,6 +48,7 @@ export default defineConfig(({mode}) => {
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
           navigateFallbackDenylist: [/^\/__/],
+          maximumFileSizeToCacheInBytes: 10000000,
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
@@ -120,6 +121,7 @@ export default defineConfig(({mode}) => {
     build: {
       outDir: 'dist',
       emptyOutDir: true,
+      minify: true,
       // Raise warning limit to avoid false alarms for large chunks after minification
       chunkSizeWarningLimit: 1000, // KB
       // Split vendor code into a separate chunk for better caching and size management

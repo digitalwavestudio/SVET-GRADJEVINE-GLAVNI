@@ -11,6 +11,7 @@ const FavoritesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkNa
 const SavedSearchesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-searches" */ './pages/SavedSearchesPage'));
 const MyAdsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-my-ads" */ './pages/MyAdsPage'));
 const SettingsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-settings" */ './pages/SettingsPage'));
+const AccountSettingsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-account-settings" */ './pages/AccountSettingsPage'));
 const WalletPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-wallet" */ './pages/WalletPage'));
 const VerificationCenterPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-verification" */ './pages/VerificationCenterPage'));
 const MyInquiriesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-inquiries" */ './pages/MyInquiriesPage'));
@@ -47,16 +48,27 @@ export const prefetchDashboard = () => {
   }
 };
 
+const MyAccommodationCapacitiesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-capacities" */ './pages/MyAccommodationCapacitiesPage'));
+const MyCateringOrdersPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-orders" */ './pages/MyCateringOrdersPage'));
+const MyCateringDeliveryPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-delivery" */ './pages/MyCateringDeliveryPage'));
+const MyMachinesReservationsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-reservations" */ './pages/MyMachinesReservationsPage'));
+
+
 export const getDashboardRouter = () => [
-  <Route key="moj-profil" path="/moj-profil" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />,
+  <Route key="moj-profil" path="/moj-profil" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />,
+  <Route key="kontrolna-tabla" path="/kontrolna-tabla" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />,
   <Route key="verifikacija" path="/moj-profil/verifikacija" element={<ProtectedRoute><VerificationCenterPage /></ProtectedRoute>} />,
   <Route key="oglasi" path="/moj-profil/oglasi" element={<ProtectedRoute><MyAdsPage /></ProtectedRoute>} />,
   <Route key="prijave" path="/moj-profil/prijave" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />,
   <Route key="omiljeni" path="/moj-profil/omiljeni" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />,
   <Route key="pretrage" path="/moj-profil/pretrage" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />,
   <Route key="upiti" path="/moj-profil/upiti" element={<ProtectedRoute><MyInquiriesPage /></ProtectedRoute>} />,
+  <Route key="kapaciteti" path="/moj-profil/kapaciteti" element={<ProtectedRoute><MyAccommodationCapacitiesPage /></ProtectedRoute>} />,
+  <Route key="narudzbine" path="/moj-profil/narudzbine" element={<ProtectedRoute><MyCateringOrdersPage /></ProtectedRoute>} />,
+  <Route key="dostava" path="/moj-profil/dostava" element={<ProtectedRoute><MyCateringDeliveryPage /></ProtectedRoute>} />,
+  <Route key="rezervacije" path="/moj-profil/rezervacije" element={<ProtectedRoute><MyMachinesReservationsPage /></ProtectedRoute>} />,
   <Route key="poruke" path="/poruke" element={<MessagesPage />} />,
-  <Route key="podesavanja" path="/podesavanja" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />,
+  <Route key="podesavanja" path="/podesavanja" element={<ProtectedRoute><AccountSettingsPage /></ProtectedRoute>} />,
   <Route key="novcanik" path="/novcanik" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />,
   <Route key="admin" path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboardPage /></ProtectedRoute>} />,
   <Route key="m-dashboard" path="/m/dashboard/*" element={<DashboardModule />} />

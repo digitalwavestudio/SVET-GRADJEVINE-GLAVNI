@@ -48,6 +48,11 @@ const submitApplicationSchema = z.object({
   phone: z.string().optional(),
 });
 
+export const switchRoleSchema = z.object({
+  role: z.enum(['standard', 'majstor', 'poslodavac', 'smestaj', 'ketering', 'placevi', 'masine', 'partner']).optional(),
+});
+
+
 const promoteSchema = z.object({
   entityId: z.string().min(1, "ID entiteta je obavezan"),
   collection: z.enum([
@@ -171,7 +176,8 @@ export const SCHEMA_KEYS = new Map<ZodSchema, string>([
   [processVerificationSchema, "processVerificationSchema"],
   [adminModerateListingSchema, "adminModerateListingSchema"],
   [adminEditListingSchema, "adminEditListingSchema"],
-  [adsSearchSchema, "adsSearchSchema"]
+  [adsSearchSchema, "adsSearchSchema"],
+  [switchRoleSchema, "switchRoleSchema"]
 ]);
 
 export interface MasterSearchDoc {
@@ -551,6 +557,8 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
        schema = z.record(z.string(), z.unknown()); 
     } else if (path.endsWith("/api/users/presence") || path.endsWith("/users/presence")) {
       schema = presenceSchema;
+    } else if (path.endsWith("/api/users/switch-role") || path.endsWith("/users/switch-role")) {
+      schema = switchRoleSchema;
     } else if (path.endsWith("/api/users/packages") || path.endsWith("/users/packages")) {
       schema = updatePackageSchema;
     } else if (path.endsWith("/api/users/profile") || path.endsWith("/users/profile")) {
@@ -709,20 +717,15 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
 };
 
 const globalSettingsUpdatesSchema = z.object({
-  pricing: z.object({
-    job_standard: z.number().nonnegative("Cena ne može biti negativna"),
-    job_premium: z.number().nonnegative("Cena ne može biti negativna"),
-    machine_premium: z.number().nonnegative("Cena ne može biti negativna"),
-    real_estate_premium: z.number().nonnegative("Cena ne može biti negativna"),
-    professional_monthly: z.number().nonnegative("Cena ne može biti negativna"),
-  }).optional(),
-
+  pricing: z.record(z.string(), z.any()).optional(),
+  limits: z.record(z.string(), z.any()).optional(),
   messages: z.object({
     welcome_text: z.string().optional(),
     maintenance_mode: z.boolean().optional(),
   }).optional(),
   globalRateLimit: z.number().int().nonnegative().optional(),
-});
+  initialCredits: z.number().nonnegative().optional(),
+}).passthrough();
 
 const platformSettingsUpdatesSchema = z.object({
   launchMode: z.boolean().optional(),

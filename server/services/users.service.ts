@@ -121,6 +121,7 @@ export class UsersService {
             
             isPremiumProfile: false,
             emailVerified: fallbackUser.emailVerified || false,
+            freeAdsCount: 3,
           };
           // Auto-init in Firestore on first Google login/signup
           try {
@@ -171,6 +172,7 @@ export class UsersService {
           
           isPremiumProfile: false,
           emailVerified: fallbackUser.emailVerified || false,
+          freeAdsCount: 3,
         };
       }
       return null;

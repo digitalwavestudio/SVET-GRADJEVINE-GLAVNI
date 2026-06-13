@@ -58,7 +58,22 @@ export class DashboardService {
         }
         if (role === "majstor" || role === "MASTER") {
           const smartMatches = await DashboardService.getSmartMatches(reqUser || { uid: userId, location: "Beograd", profession: "Sve" });
-          return { smartMatches };
+          let recentApplications = [];
+          try {
+            const appsSnap = await db
+              .collection("applications")
+              .where("candidateId", "==", userId)
+              .orderBy("createdAt", "desc")
+              .limit(5)
+              .get();
+            recentApplications = appsSnap.docs.map((d) => ({
+              id: d.id,
+              ...d.data(),
+            }));
+          } catch (err) {
+            console.warn("[DashboardService] Failed to fetch candidate applications:", err);
+          }
+          return { smartMatches, recentApplications };
         }
         return { role };
       })(),

@@ -46,33 +46,5 @@ export function AiPredictiveActionsSkeleton() {
   );
 }
 
-export function AiAssistantSkeleton() {
-  return (
-    <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] overflow-hidden flex flex-col h-[500px]">
-      <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-        <div className="flex items-center gap-4">
-          <Skeleton className="w-12 h-12 rounded-[10px] shrink-0" />
-          <div className="space-y-2">
-            <Skeleton className="w-32 h-4" />
-            <Skeleton className="w-24 h-2" />
-          </div>
-        </div>
-      </div>
-      <div className="flex-1 p-8 space-y-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex gap-4">
-            <Skeleton className="w-2 h-2 mt-2 rounded-full shrink-0" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="w-28 h-3" />
-              <Skeleton className="w-5/6 h-4" />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="p-4 border-t border-white/5 bg-white/[0.02]">
-        <Skeleton className="w-full h-12 rounded-[10px]" />
-      </div>
-    </div>
-  );
-}
+
 

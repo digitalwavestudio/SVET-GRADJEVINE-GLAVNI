@@ -3,12 +3,20 @@ import { motion } from 'motion/react';
 import { toast } from 'react-hot-toast';
 import { auth } from '@/src/firebase';
 
+interface PricingTier {
+  standard: number;
+  premium: number;
+  urgent: number;
+}
+
 interface SettingsState {
   pricing: {
-    job_standard: number;
-    job_premium: number;
-    machine_premium: number;
-    real_estate_premium: number;
+    jobs: PricingTier;
+    accommodations: PricingTier;
+    caterings: PricingTier;
+    marketplace: PricingTier;
+    machines: PricingTier;
+    plots: PricingTier;
     professional_monthly: number;
   };
   limits: {
@@ -19,6 +27,8 @@ interface SettingsState {
     welcome_text: string;
     maintenance_mode: boolean;
   };
+  globalRateLimit: number;
+  initialCredits: number;
 }
 
 export function GlobalSettingsTab() {
@@ -37,11 +47,30 @@ export function GlobalSettingsTab() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      setSettings(data || {
-          pricing: { job_standard: 0, job_premium: 2500, machine_premium: 1500, real_estate_premium: 3000, professional_monthly: 5000 },
-          limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
-          messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false }
-      });
+      
+      // Map/Ensure correct new schema is present with fallbacks
+      const mappedData: SettingsState = {
+        pricing: {
+          jobs: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.jobs || {}) },
+          accommodations: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.accommodations || {}) },
+          caterings: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.caterings || {}) },
+          marketplace: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.marketplace || {}) },
+          machines: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.machines || {}) },
+          plots: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.plots || {}) },
+          professional_monthly: data?.pricing?.professional_monthly !== undefined ? data.pricing.professional_monthly : 6000
+        },
+        limits: {
+          free_listings_per_month: data?.limits?.free_listings_per_month !== undefined ? data.limits.free_listings_per_month : 3,
+          max_images_per_ad: data?.limits?.max_images_per_ad !== undefined ? data.limits.max_images_per_ad : 10
+        },
+        messages: {
+          welcome_text: data?.messages?.welcome_text || 'Dobrodošli na Svet Građevine',
+          maintenance_mode: !!data?.messages?.maintenance_mode
+        },
+        globalRateLimit: data?.globalRateLimit || 100,
+        initialCredits: data?.initialCredits !== undefined ? data.initialCredits : 1500
+      };
+      setSettings(mappedData);
     } catch (err) {
       toast.error("Greška pri učitavanju podešavanja");
     } finally {
@@ -74,8 +103,31 @@ export function GlobalSettingsTab() {
     }
   };
 
+  const handlePricingChange = (category: keyof Omit<SettingsState['pricing'], 'professional_monthly'>, tier: keyof PricingTier, value: number) => {
+     if (!settings) return;
+     setSettings({
+        ...settings,
+        pricing: {
+           ...settings.pricing,
+           [category]: {
+              ...settings.pricing[category],
+              [tier]: value
+           }
+        }
+     });
+  };
+
   if (loading) return <div className="p-20 text-center uppercase font-black text-white/20">Učitavanje podešavanja...</div>;
   if (!settings) return null;
+
+  const categories = [
+    { key: 'jobs' as const, label: 'Poslovi' },
+    { key: 'accommodations' as const, label: 'Smeštaj' },
+    { key: 'caterings' as const, label: 'Ketering' },
+    { key: 'marketplace' as const, label: 'Alat i Oprema (Marketplace)' },
+    { key: 'machines' as const, label: 'Građevinske Mašine' },
+    { key: 'plots' as const, label: 'Placevi' }
+  ];
 
   return (
     <motion.div 
@@ -86,7 +138,7 @@ export function GlobalSettingsTab() {
       <div className="flex items-center justify-between">
         <div>
            <h2 className="text-3xl font-black uppercase tracking-tighter">Globalna Podešavanja</h2>
-           <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em]">KONFIGURACIJA CENA, LIMITA I SISTEMSKIH PARAMETARA</p>
+           <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em]">KONFIGURACIJA CENA U SG KREDITIMA I SISTEMSKIH PARAMETARA</p>
         </div>
         <button 
           onClick={handleSave}
@@ -97,61 +149,98 @@ export function GlobalSettingsTab() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Pricing Section */}
-        <section className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 space-y-8">
-           <div className="flex items-center gap-4 mb-4">
-              <span className="material-symbols-outlined text-secondary">payments</span>
-              <h3 className="text-sm font-black uppercase tracking-widest">MONETIZACIJA (RSD)</h3>
-           </div>
-           
-           <div className="grid grid-cols-1 gap-6">
-              {[
-                { key: 'job_standard', label: 'Standardni Oglas (Posao)' },
-                { key: 'job_premium', label: 'Premium Oglas (Posao)' },
-                { key: 'machine_premium', label: 'Premium Oglas (Mašine)' },
-                { key: 'real_estate_premium', label: 'Premium Oglas (Nekretnine)' },
-                { key: 'professional_monthly', label: 'Mesečna Pretplata (Majstori)' }
-              ].map(item => (
-                <div key={item.key}>
-                   <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">{item.label}</label>
-                   <input 
-                      type="number"
-                      value={(settings.pricing as any)[item.key]}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        pricing: { ...settings.pricing, [item.key]: Number(e.target.value) }
-                      })}
-                      className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
-                   />
-                </div>
-              ))}
-           </div>
-        </section>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        {/* Left Side: Pricing (Spans 2 columns on large screens) */}
+        <div className="xl:col-span-2 space-y-8">
+          <section className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 space-y-8">
+             <div className="flex items-center gap-4 mb-4">
+                <span className="material-symbols-outlined text-secondary">payments</span>
+                <h3 className="text-sm font-black uppercase tracking-widest">MONETIZACIJA I KATEGORIJE (CENE U SG KREDITIMA)</h3>
+             </div>
+             
+             <div className="space-y-8 divide-y divide-white/5">
+                {categories.map((cat, idx) => (
+                  <div key={cat.key} className={idx > 0 ? "pt-8" : ""}>
+                     <h4 className="text-xs font-black text-white uppercase tracking-wider mb-4">{cat.label}</h4>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                           <label className="block text-[9px] font-black text-white/40 uppercase tracking-widest mb-2 pl-2">Standardni oglas</label>
+                           <input 
+                              type="number"
+                              value={settings.pricing[cat.key]?.standard || 0}
+                              onChange={(e) => handlePricingChange(cat.key, 'standard', Number(e.target.value))}
+                              className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
+                           />
+                        </div>
+                        <div>
+                           <label className="block text-[9px] font-black text-white/40 uppercase tracking-widest mb-2 pl-2">Premium oglas</label>
+                           <input 
+                              type="number"
+                              value={settings.pricing[cat.key]?.premium || 0}
+                              onChange={(e) => handlePricingChange(cat.key, 'premium', Number(e.target.value))}
+                              className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
+                           />
+                        </div>
+                        <div>
+                           <label className="block text-[9px] font-black text-white/40 uppercase tracking-widest mb-2 pl-2">Hitan oglas</label>
+                           <input 
+                              type="number"
+                              value={settings.pricing[cat.key]?.urgent || 0}
+                              onChange={(e) => handlePricingChange(cat.key, 'urgent', Number(e.target.value))}
+                              className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
+                           />
+                        </div>
+                     </div>
+                  </div>
+                ))}
 
-        {/* Limits & Messages */}
+                <div className="pt-8">
+                   <h4 className="text-xs font-black text-white uppercase tracking-wider mb-2">Premium Partner (Građevinske Firme)</h4>
+                   <p className="text-[10px] text-white/40 mb-4 font-bold uppercase">Godišnja pretplata za firme (dodeljuje zlatni bedž - Premium Partner)</p>
+                   <div className="w-full md:w-1/3">
+                      <label className="block text-[9px] font-black text-white/40 uppercase tracking-widest mb-2 pl-2">Cena u RSD (Godišnje)</label>
+                      <input 
+                         type="number"
+                         value={settings.pricing.professional_monthly}
+                         onChange={(e) => setSettings({
+                            ...settings,
+                            pricing: {
+                               ...settings.pricing,
+                               professional_monthly: Number(e.target.value)
+                            }
+                         })}
+                         className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
+                      />
+                   </div>
+                </div>
+             </div>
+          </section>
+        </div>
+
+        {/* Right Side: Limits, Messages, Initial Credits */}
         <div className="space-y-8">
           <section className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 space-y-8">
              <div className="flex items-center gap-4 mb-4">
                 <span className="material-symbols-outlined text-blue-500">settings_suggest</span>
-                <h3 className="text-sm font-black uppercase tracking-widest">LIMITACIJE SISTEMA</h3>
+                <h3 className="text-sm font-black uppercase tracking-widest">LIMITACIJE I POČETNI KREDITI</h3>
              </div>
              
              <div className="space-y-6">
                 <div>
-                  <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">Besplatni Oglasi (Mesečno)</label>
-                  <input 
-                      type="number"
-                      value={settings.limits.free_listings_per_month}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        limits: { ...settings.limits, free_listings_per_month: Number(e.target.value) }
-                      })}
-                      className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
-                  />
+                   <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">Početni gratis SG Krediti (Registracija)</label>
+                   <input 
+                       type="number"
+                       value={settings.initialCredits || 0}
+                       onChange={(e) => setSettings({
+                         ...settings,
+                         initialCredits: Number(e.target.value)
+                       })}
+                       className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
+                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">Max Slika po Oglasu</label>
+                  <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">Maksimalan broj slika po oglasu</label>
                   <input 
                       type="number"
                       value={settings.limits.max_images_per_ad}
@@ -166,11 +255,11 @@ export function GlobalSettingsTab() {
                    <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">Globalni Rate Limit (Zahtevi/Min)</label>
                    <input 
                        type="number"
-                       value={(settings as any).globalRateLimit || 100}
+                       value={settings.globalRateLimit || 100}
                        onChange={(e) => setSettings({
                          ...settings,
                          globalRateLimit: Number(e.target.value)
-                       } as any)}
+                       })}
                        className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-white font-black outline-none focus:border-secondary transition-all"
                    />
                 </div>

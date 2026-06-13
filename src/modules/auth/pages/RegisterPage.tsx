@@ -28,6 +28,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Set page title for mobile view
   useEffect(() => {
@@ -298,7 +299,7 @@ export default function RegisterPage() {
                       value={formData.companyName}
                       onChange={handleInputChange}
                       required
-                      className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
+                      className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
                       placeholder="Npr. Građevinar d.o.o." 
                     />
                   </div>
@@ -310,7 +311,7 @@ export default function RegisterPage() {
                         name="mb"
                         value={formData.mb}
                         onChange={handleInputChange}
-                        className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
+                        className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
                         placeholder="MB firme" 
                       />
                     </div>
@@ -321,7 +322,7 @@ export default function RegisterPage() {
                         name="pib"
                         value={formData.pib}
                         onChange={handleInputChange}
-                        className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
+                        className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
                         placeholder="PIB firme" 
                       />
                     </div>
@@ -337,7 +338,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
+                  className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
                   placeholder="marko@email.com" 
                 />
               </div>
@@ -345,15 +346,18 @@ export default function RegisterPage() {
                 <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Lozinka</label>
                 <div className="relative">
                   <input 
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
+                    className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
                     placeholder="••••••••" 
                   />
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors text-[20px]">visibility</span>
+                  <span 
+                    className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors text-[20px]"
+                    onClick={() => setShowPassword(prev => !prev)}
+                  >{showPassword ? "visibility_off" : "visibility"}</span>
                 </div>
               </div>
               

@@ -147,6 +147,21 @@ usersRouter.post(
 );
 
 usersRouter.post("/switch-role", requireAuth, idempotency({ ttl: 5 }), switchRole);
+usersRouter.post("/deactivate", requireAuth, async (req, res, next) => {
+  try {
+    const uid = req.user?.uid;
+    if (!uid) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    await UsersService.updateProfile(uid, { status: "deleted" }, true);
+    const CacheService = (await import("../services/cache.service.ts")).CacheService;
+    await CacheService.delete(`auth:claims:${uid}`);
+    logDestructiveAction(req, uid, "PROFILE_DEACTIVATION", { type: "user_self_deactivation" });
+    res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+});
 usersRouter.post("/force-sync", requireAuth, idempotency({ ttl: 10 }), forceSync);
 usersRouter.put("/profile", requireAuth, idempotency({ ttl: 5 }), validateBody(userProfileSchema), updateProfile);
 usersRouter.post(

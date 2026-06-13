@@ -8,7 +8,17 @@ const ActivityFeed = memo(function ActivityFeed() {
   const { user } = useAuth();
   const { activities, loadMoreActivities, isLoading } = useActivitiesFeed(user?.id);
 
-  if (isLoading && activities.length === 0) {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const virtualizer = useVirtualizer({
+    count: activities?.length || 0,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 70,
+    overscan: 5,
+  });
+
+  if (isLoading && (!activities || activities.length === 0)) {
      return <div className="animate-pulse flex items-center justify-center p-12"><div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
@@ -34,17 +44,6 @@ const ActivityFeed = memo(function ActivityFeed() {
           </div>
       );
   }
-
-  const parentRef = useRef<HTMLDivElement>(null);
-
-  const virtualizer = useVirtualizer({
-    count: activities.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 70, // Estimated height per item (40px icon + padding/margin = ~70px)
-    overscan: 5,
-  });
-
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const el = parentRef.current;

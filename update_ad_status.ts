@@ -1,4 +1,4 @@
-import { db } from '../config/firebase.ts';
+import { db } from './server/config/firebase.ts';
 
 (async () => {
   try {

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "motion/react";
 
 import { DashboardLayout } from "@/src/modules/core";
 import { useAuth } from "@/src/context/AuthContext";
@@ -10,7 +11,7 @@ import { useDashboardUIStore } from "@/src/modules/dashboard/store/dashboardUISt
 
 import { SandboxBanner } from "@/src/modules/dashboard/components/dashboard/SandboxBanner";
 import { SyncIndicator } from "@/src/modules/dashboard/components/dashboard/SyncIndicator";
-import { HeaderSkeleton, AiPredictiveActionsSkeleton, AiAssistantSkeleton } from "@/src/modules/dashboard/components/dashboard/DashboardSkeletons";
+import { HeaderSkeleton, AiPredictiveActionsSkeleton } from "@/src/modules/dashboard/components/dashboard/DashboardSkeletons";
 import AnalyticsSkeleton from "@/src/modules/dashboard/components/dashboard/AnalyticsSkeleton";
 import DashboardSkeleton from "@/src/modules/dashboard/components/dashboard/DashboardSkeleton";
 import DashboardGuard from "@/src/modules/dashboard/components/dashboard/DashboardGuard";
@@ -25,9 +26,7 @@ const DashboardModals = lazy(
 const AiPredictiveActions = lazy(
   () => import("@/src/modules/dashboard/components/dashboard/AiPredictiveActions")
 );
-const AiAssistant = lazy(
-  () => import("@/src/modules/dashboard/components/dashboard/AiAssistant")
-);
+
 const PartnerHubUI = lazy(
   () => import("@/src/modules/dashboard/components/dashboard/PartnerHubUI")
 );
@@ -157,39 +156,7 @@ function DashboardContent() {
           </Suspense>
         </DashboardGuard>
 
-        <div className="flex flex-col gap-8">
-          <DashboardGuard variant="inline" title="Greška u AI akcijama">
-            <Suspense fallback={<AiPredictiveActionsSkeleton />}>
-              <AiPredictiveActions user={user} />
-            </Suspense>
-          </DashboardGuard>
-          <DashboardGuard variant="inline" title="Greška u AI asistentu">
-            <Suspense fallback={<AiAssistantSkeleton />}>
-              <AiAssistant user={user} />
-            </Suspense>
-          </DashboardGuard>
-        </div>
-
         <div className={`space-y-12 mt-8 transition-opacity duration-300 relative min-h-[800px] opacity-100`}>
-          {/* Analytics Section */}
-          <div className="space-y-8">
-            {!roles.isStandard ? (
-              <DashboardGuard variant="inline" title="Greška u analitici">
-                <Suspense fallback={<AnalyticsSkeleton />}>
-                  <AnalyticsDashboardUI userId={user.id} />
-                </Suspense>
-              </DashboardGuard>
-            ) : (
-              <DashboardGuard variant="inline" title="Greška u grafikonu trendova">
-                <Suspense fallback={<AnalyticsSkeleton />}>
-                  <StandardTrendChart trendLoading={trendLoading} trendData={trendData} />
-                </Suspense>
-              </DashboardGuard>
-            )}
-          </div>
-
-          <SyncIndicator isFetching={isFetching} isLoading={isLoading} />
-
           <>
             {roles.isStandard && (
               <DashboardGuard variant="inline" title="Greška u podacima korisnika">
@@ -212,11 +179,30 @@ function DashboardContent() {
             )}
 
             {roles.isEmployerRole && (
-              <DashboardGuard variant="inline" title="Greška u profilu poslodavca">
-                <Suspense fallback={<DashboardSkeleton />}>
-                  <EmployerDashboardUI />
-                </Suspense>
-              </DashboardGuard>
+              <>
+                <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }}} className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 md:p-16 relative overflow-hidden group mb-8">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 blur-3xl -mr-32 -mt-32"></div>
+                  <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto">
+                    <h2 className="text-3xl sm:text-4xl md:text-7xl font-black text-white uppercase tracking-tighter mb-6 leading-none tracking-[-0.05em]"><span className="text-secondary">KOMANDNI CENTAR</span></h2>
+                    <p className="text-white/40 text-sm md:text-base font-bold uppercase tracking-widest mb-4 leading-relaxed">
+                      VAŠ DETALJNI PREGLED OGLASA, PRIJAVLJENIH KANDIDATA I STATISTIKE POSLOVANJA NA PLATFORMI.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <DashboardGuard variant="inline" title="Greška u profilu poslodavca">
+                  <Suspense fallback={<DashboardSkeleton />}>
+                    <EmployerDashboardUI />
+                  </Suspense>
+                </DashboardGuard>
+                {!roles.isStandard && (
+                  <DashboardGuard variant="inline" title="Greška u analitici">
+                    <Suspense fallback={<AnalyticsSkeleton />}>
+                      <AnalyticsDashboardUI userId={user.id} />
+                    </Suspense>
+                  </DashboardGuard>
+                )}
+              </>
             )}
 
             {roles.isAccommodationRole && (
@@ -248,6 +234,28 @@ function DashboardContent() {
               </DashboardGuard>
             )}
           </>
+
+          <div className="flex flex-col gap-8">
+            <DashboardGuard variant="inline" title="Greška u AI akcijama">
+              <Suspense fallback={<AiPredictiveActionsSkeleton />}>
+                <AiPredictiveActions user={user} />
+              </Suspense>
+            </DashboardGuard>
+
+          </div>
+
+          {/* Analytics Section */}
+          <div className="space-y-8">
+            {!roles.isStandard && !roles.isEmployerRole ? (
+              <DashboardGuard variant="inline" title="Greška u analitici">
+                <Suspense fallback={<AnalyticsSkeleton />}>
+                  <AnalyticsDashboardUI userId={user.id} />
+                </Suspense>
+              </DashboardGuard>
+            ) : null}
+          </div>
+
+          <SyncIndicator isFetching={isFetching} isLoading={isLoading} />
         </div>
       </div>
     </DashboardLayout>

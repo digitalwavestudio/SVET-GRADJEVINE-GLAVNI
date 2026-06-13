@@ -263,7 +263,7 @@ export class OutboxWorker {
   /**
    * Pronalazi poruke u bazi koje su 'pending' i dodaje ih u BullMQ red.
    */
-  private static async scavengePending() {
+  public static async scavengePending() {
     const isProd = process.env.NODE_ENV === "production";
     const { CacheService } = await import("./cache.service.ts");
     const hasPending = await CacheService.get<boolean>("outbox_has_pending");
@@ -360,7 +360,7 @@ export class OutboxWorker {
   /**
    * Logika obrade jedne poruke.
    */
-  private static async processSingleMessage(msg: any) {
+  public static async processSingleMessage(msg: any) {
     await TraceContext.run(msg.traceId, async () => {
       await MonitoringService.tracePhase("sync_outbox", async () => {
         const iLogger = Logger.withContext(msg.correlationId);

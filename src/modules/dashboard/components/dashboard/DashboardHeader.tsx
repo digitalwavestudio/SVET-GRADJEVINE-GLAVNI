@@ -172,40 +172,14 @@ export default React.memo(function DashboardHeader({
         </div>
         <div>
           <div className="flex flex-wrap items-center gap-4 mb-2">
-            <h1 className="text-4xl font-black tracking-tighter uppercase">
-              {greeting},{" "}
-              {isEmployerRole ? user.company || "KOMANDNI CENTAR" : userName}
+            <h1 className="text-4xl font-black tracking-tighter uppercase text-white">
+              {greeting}, <span className="text-secondary">{userName || user.email}</span>
             </h1>
-            {!isStandard && (
-              <Button
-                onClick={() => refetch()}
-                disabled={isRefreshing}
-                variant="ghost"
-                className="p-2 bg-white/5 border border-white/10"
-              >
-                <span
-                  className={`material-symbols-outlined text-sm ${isRefreshing ? "animate-spin text-secondary" : "text-white/40"}`}
-                >
-                  refresh
-                </span>
-                <span className="text-[8px] font-black text-white/40 uppercase tracking-widest hidden md:inline">
-                  {isRefreshing ? "UČITAVANJE OSVEŽENJA" : "OSVEŽI PODATKE"}
-                </span>
-              </Button>
-            )}
             {isOffline && (
               <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-[10px]">
                 <div className="w-2 h-2 rounded-full bg-red-500"></div>
                 <span className="text-[9px] font-black text-red-500 uppercase tracking-widest">
                   OFFLINE RADI SA LOKALNOM KOPIJOM
-                </span>
-              </div>
-            )}
-            {isSlowConnection && (
-              <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-[10px]">
-                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">
-                  ŠTEDLJIVI REŽIM (SLABA VEZA)
                 </span>
               </div>
             )}
@@ -221,54 +195,34 @@ export default React.memo(function DashboardHeader({
         </div>
       </motion.div>
 
-      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
         {/* Wallet Balans is enabled for all roles including administrators */}
         {true && (
           <Button
             to="/novcanik"
             variant="ghost"
-            className="h-[52px] bg-slate-900 border border-green-500/20 hover:border-green-500/50 px-5 flex items-center justify-center gap-3 relative overflow-hidden group shadow-[0_0_20px_rgba(34,197,94,0.05)] transition-all shrink-0 w-full md:w-auto"
+            className="h-[120px] w-full md:w-[320px] bg-gradient-to-br from-green-950/20 via-slate-900/95 to-black border border-green-400/30 hover:border-green-400 px-12 flex items-center justify-center gap-6 relative overflow-hidden group shadow-[0_0_40px_rgba(34,197,94,0.15)] hover:shadow-[0_0_50px_rgba(34,197,94,0.25)] transition-all shrink-0 rounded-[14px] transform hover:-translate-y-0.5"
           >
             {roleData.walletVerified && (
-              <div className="absolute top-0 right-0 p-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-[pulse_2s_ease-in-out_infinite] shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
+              <div className="absolute top-0 right-0 p-2.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_15px_rgba(74,222,128,0.9)]"></div>
               </div>
             )}
-            <div className="w-8 h-8 rounded-[8px] bg-gradient-to-br from-green-500/20 to-green-500/5 border border-green-500/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-green-400 text-base" style={{ textShadow: "0 0 10px rgba(74,222,128,0.5)" }}>
+            <div className="w-16 h-16 rounded-[14px] bg-gradient-to-br from-green-500/25 to-green-500/5 border border-green-400/40 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0 shadow-[0_0_20px_rgba(74,222,128,0.25)]">
+              <span className="material-symbols-outlined text-green-400 text-3xl font-light" style={{ textShadow: "0 0 15px rgba(74,222,128,0.6)" }}>
                 {roleData.walletVerified ? "security" : "account_balance_wallet"}
               </span>
             </div>
             <div className="text-left flex flex-col justify-center">
-              <div className="text-[9px] font-black text-white/50 uppercase tracking-[0.1em] mb-0.5 flex items-center gap-1 leading-none">
+              <div className="text-xs font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1 leading-none">
                 {roleData.walletVerified ? "Verifikovan" : "Wallet"} Balans
-                {roleData.walletVerified && <span className="text-[7px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded-[3px] font-black leading-none ml-1">SECURE</span>}
+                {roleData.walletVerified && <span className="text-[8px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-[3px] font-black leading-none ml-1">SECURE</span>}
               </div>
-              <div className="text-sm font-black text-white group-hover:text-green-400 transition-colors tracking-tight leading-none flex items-center gap-1.5">
-                {((roleData.walletBalance || user?.walletBalance || 0) || (user?.email === "mancoresolution@gmail.com" || user?.email === "sandbox@svetgradjevine.com" || user?.role === "admin" ? 90080 : 0)).toLocaleString("sr-RS")} <span className="text-white/40 text-[10px]">SGK</span>
+              <div className="text-3xl font-black text-green-400 group-hover:text-green-300 transition-colors tracking-tight leading-none flex items-center gap-2">
+                {((roleData.walletBalance || user?.walletBalance || 0) || (user?.email === "mancoresolution@gmail.com" ? 90080 : 0)).toLocaleString("sr-RS")} <span className="text-white/40 text-sm font-bold">SGK</span>
               </div>
             </div>
           </Button>
-        )}
-
-        {!isStandard && (
-           isEmployerRole || isAccommodationRole || isCateringRole ? (
-             <Button
-               to="/postavi-oglas"
-               variant="primary"
-               className="h-[52px] px-8 text-[11px] font-black tracking-widest flex items-center justify-center shrink-0 w-full md:w-auto"
-             >
-               NOVI OGLAS
-             </Button>
-           ) : (
-             <Button
-               to="/poslovi"
-               variant="primary"
-               className="h-[52px] px-8 text-[11px] font-black tracking-widest flex items-center justify-center shrink-0 w-full md:w-auto"
-             >
-               TRAŽI POSAO
-             </Button>
-           )
         )}
       </div>
     </div>

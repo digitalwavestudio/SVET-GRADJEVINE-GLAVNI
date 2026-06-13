@@ -20,7 +20,7 @@ export class AdminFinanceService {
     await FinancialLedgerService.updateBalance(
       userId,
       delta,
-      TransactionType.ADJUSTMENT,
+      "ADJUSTMENT",
       reason || "Administratorska korekcija balansa",
       undefined,
       { adminId }
