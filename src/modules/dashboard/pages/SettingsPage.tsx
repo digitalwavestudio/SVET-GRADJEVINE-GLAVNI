@@ -21,6 +21,14 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const tabs = [
+    { id: 'profile', label: 'JAVNI PROFIL', icon: 'visibility' },
+    ...(user?.role === 'majstor' || user?.role === 'candidate' ? [
+      { id: 'cv', label: 'MOJ CV', icon: 'description' },
+      { id: 'applications', label: 'MOJE PRIJAVE', icon: 'assignment' }
+    ] : [])
+  ];
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -246,29 +254,27 @@ export default function SettingsPage() {
 
          <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
           {/* Navigation Sidebar */}
-          <div className="space-y-2">
-            {[
-              { id: 'profile', label: 'JAVNI PROFIL', icon: 'visibility' },
-              { id: 'cv', label: 'MOJ CV', icon: 'description' },
-              { id: 'applications', label: 'MOJE PRIJAVE', icon: 'assignment' },
-            ].map((section) => (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id as "profile" | "cv" | "applications")}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[10px] transition-all text-[10px] font-black tracking-widest uppercase ${
-                  activeSection === section.id 
-                    ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
-                    : 'text-white/40 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <span className="material-symbols-outlined text-lg">{section.icon}</span>
-                {section.label}
-              </button>
-            ))}
-          </div>
+          {tabs.length > 1 && (
+            <div className="space-y-2">
+              {tabs.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id as "profile" | "cv" | "applications")}
+                  className={`w-full flex items-center gap-4 px-6 py-4 rounded-[10px] transition-all text-[10px] font-black tracking-widest uppercase ${
+                    activeSection === section.id 
+                      ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
+                      : 'text-white/40 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-lg">{section.icon}</span>
+                  {section.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Content Area */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className={tabs.length > 1 ? "lg:col-span-3 space-y-6" : "lg:col-span-4 space-y-6"}>
             <ProfileHealth score={liveScore} hideButton={true} />
             
             <div className={activeSection === 'profile'

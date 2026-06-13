@@ -114,41 +114,45 @@ export function ProfileSettingsTab({
            </div>
         )}
 
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">KRATAK OPIS / O NAMA</label>
-          <textarea 
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={4}
-            placeholder="Opišite vaše iskustvo, misiju ili usluge koje nudite..."
-            className={`w-full bg-white/[0.03] border ${errors.description ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none resize-none`}
-          />
-          {errors.description && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.description}</p>}
-        </div>
+        {user?.role !== 'standard' && (
+          <>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">KRATAK OPIS / O NAMA</label>
+              <textarea 
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={4}
+                placeholder="Opišite vaše iskustvo, misiju ili usluge koje nudite..."
+                className={`w-full bg-white/[0.03] border ${errors.description ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none resize-none`}
+              />
+              {errors.description && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.description}</p>}
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-           <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">FACEBOOK PROFIL / STRANICA</label>
-              <input 
-                name="facebook"
-                value={formData.facebook}
-                onChange={handleInputChange}
-                placeholder="facebook.com/vas-profil"
-                className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-              />
-           </div>
-           <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">INSTAGRAM PROFIL</label>
-              <input 
-                name="instagram"
-                value={formData.instagram}
-                onChange={handleInputChange}
-                placeholder="@vas_profil"
-                className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-              />
-           </div>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">FACEBOOK PROFIL / STRANICA</label>
+                  <input 
+                    name="facebook"
+                    value={formData.facebook}
+                    onChange={handleInputChange}
+                    placeholder="facebook.com/vas-profil"
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
+                  />
+               </div>
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">INSTAGRAM PROFIL</label>
+                  <input 
+                    name="instagram"
+                    value={formData.instagram}
+                    onChange={handleInputChange}
+                    placeholder="@vas_profil"
+                    className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
+                  />
+               </div>
+            </div>
+          </>
+        )}
 
         {(user?.role === 'poslodavac' || user?.role === 'majstor') && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-white/5 pt-8 mt-8">
