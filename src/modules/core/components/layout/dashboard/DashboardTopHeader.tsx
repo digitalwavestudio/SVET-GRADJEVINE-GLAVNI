@@ -7,6 +7,25 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useActivities } from '@/src/hooks/useActivities';
 import { uploadImage } from '@/src/lib/imageUtils';
 
+const parseNotificationDate = (createdAt: any): Date => {
+  if (!createdAt) return new Date();
+  if (typeof createdAt.toDate === 'function') {
+    return createdAt.toDate();
+  }
+  if (typeof createdAt === 'string' || typeof createdAt === 'number') {
+    return new Date(createdAt);
+  }
+  if (createdAt && typeof createdAt === 'object') {
+    if (typeof createdAt._seconds === 'number') {
+      return new Date(createdAt._seconds * 1000);
+    }
+    if (typeof createdAt.seconds === 'number') {
+      return new Date(createdAt.seconds * 1000);
+    }
+  }
+  return new Date();
+};
+
 interface DashboardTopHeaderProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
 }
@@ -93,34 +112,44 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
                 <motion.div 
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  className="absolute top-full right-0 mt-4 w-96 bg-[#0A0F14] border border-white/10 rounded-[10px] shadow-2xl z-50 overflow-hidden"
+                  className="absolute top-full right-0 mt-4 w-96 bg-slate-950/95 backdrop-blur-md border border-white/10 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] z-50 overflow-hidden"
                 >
-                  <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                    <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">NOTIFIKACIJE</h4>
-                    <button onClick={markAllAsRead} className="text-[9px] font-black text-secondary uppercase tracking-widest hover:underline">Označi sve kao pročitano</button>
+                  <div className="p-5 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+                    <h4 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">Obaveštenja</h4>
+                    <button onClick={markAllAsRead} className="text-[10px] font-black text-secondary uppercase tracking-widest hover:text-yellow-400 transition-colors">Označi sve kao pročitano</button>
                   </div>
                   <div className="max-h-[400px] overflow-y-auto no-scrollbar divide-y divide-white/5">
                     {activities.length > 0 ? activities.map((n: any, index: number) => (
-                      <div key={`${n.id || 'no-id'}-${index}`} onClick={() => handleNotificationClick(n)} className={`p-6 hover:bg-white/[0.02] transition-all cursor-pointer group ${n.read === false ? 'bg-white/[0.03]' : ''}`}>
-                        <div className="flex gap-4">
-                          <div className={`w-10 h-10 rounded-[10px] ${n.read === false ? 'bg-secondary/20' : 'bg-white/5'} flex items-center justify-center shrink-0 group-hover:bg-white/10 transition-all`}>
-                            <span className={`material-symbols-outlined text-xl ${n.read === false ? 'text-secondary' : 'text-white/60'}`}>{n.type === 'NEW_MESSAGE' ? 'chat' : 'notifications'}</span>
+                      <div 
+                        key={`${n.id || 'no-id'}-${index}`} 
+                        onClick={() => handleNotificationClick(n)} 
+                        className={`p-5 hover:bg-white/[0.02] border-b border-white/5 transition-all cursor-pointer group flex gap-4 items-start ${n.read === false ? 'bg-secondary/[0.02] border-l-2 border-l-secondary pl-[18px]' : 'pl-5'}`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg ${n.read === false ? 'bg-secondary/15 text-secondary' : 'bg-white/5 text-white/60'} flex items-center justify-center shrink-0 group-hover:bg-white/10 transition-all`}>
+                          <span className="material-symbols-outlined text-lg">{n.type === 'NEW_MESSAGE' ? 'chat' : 'notifications'}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-baseline gap-2 mb-1">
+                            <h5 className={`text-xs font-bold truncate ${n.read === false ? 'text-white' : 'text-white/70'}`}>{n.title}</h5>
+                            <span className="text-[8px] font-medium text-white/30 whitespace-nowrap shrink-0">{n.createdAt ? formatDistanceToNow(parseNotificationDate(n.createdAt), { addSuffix: true, locale: srLatn }) : ''}</span>
                           </div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-1">
-                              <h5 className={`text-[11px] font-black uppercase tracking-tight ${n.read === false ? 'text-white' : 'text-white/70'}`}>{n.title}</h5>
-                              <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">{n.createdAt ? formatDistanceToNow(n.createdAt.toDate ? n.createdAt.toDate() : new Date(n.createdAt), { addSuffix: true, locale: srLatn }) : ''}</span>
-                            </div>
-                            <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider leading-relaxed line-clamp-2">{n.message}</p>
-                          </div>
+                          <p className="text-[10px] text-white/40 font-medium leading-normal line-clamp-2 uppercase tracking-wide">{n.message}</p>
                         </div>
                       </div>
                     )) : (
-                      <div className="p-6 text-center text-white/40 text-xs font-bold uppercase tracking-widest">Nema novih notifikacija</div>
+                      <div className="p-10 text-center flex flex-col items-center gap-3">
+                        <span className="material-symbols-outlined text-white/20 text-4xl">notifications_off</span>
+                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Trenutno nemate novih obaveštenja</p>
+                      </div>
                     )}
                   </div>
-                  <div className="p-4 bg-white/[0.02] border-t border-white/5">
-                    <button className="w-full py-3 text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-all">POGLEDAJ SVE NOTIFIKACIJE</button>
+                  <div className="p-4 bg-white/[0.01] border-t border-white/5">
+                    <button 
+                      onClick={() => { navigate('/moj-profil/obavestenja'); setShowNotifications(false); }}
+                      className="w-full py-3 text-[10px] font-black text-white/40 hover:text-white uppercase tracking-widest transition-all text-center"
+                    >
+                      PRIKAŽI SVA OBAVEŠTENJA
+                    </button>
                   </div>
                 </motion.div>
               </>
