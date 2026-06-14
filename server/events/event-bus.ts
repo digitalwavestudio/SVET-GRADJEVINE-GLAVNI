@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { getRedis } from "../utils/redis.ts";
 import { randomUUID } from "crypto";
-import { PaymentSagaContext } from "../services/sagas/payment.saga.ts";
+import { PaymentSagaContext } from "./payment.types.ts";
 import { 
   Job, 
   CateringOffer, 

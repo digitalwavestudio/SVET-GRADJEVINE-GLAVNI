@@ -1,3 +1,22 @@
+export interface CheckoutEvent {
+  id?: string;
+  userId: string;
+  packageId: string;
+  packageName: string;
+  amount: number;
+  currency: string;
+  partnerId: string | null;
+  status: 'initiated' | 'pending' | 'confirmed' | 'failed';
+  paymentMethod: string;
+  externalId?: string | null;
+  provider?: string | null;
+  providerMetadata?: any;
+  confirmedAt?: any;
+  failedAt?: any;
+  createdAt: any;
+  updatedAt: any;
+}
+
 export interface CreatePaymentSessionContract {
   checkoutId: string;
   amount: number;
@@ -18,7 +37,7 @@ export interface PaymentSessionResponse {
 }
 
 export interface PaymentWebhookContract {
-  provider: 'stripe' | 'paypal' | 'ips' | 'manual';
+  provider: 'paypal' | 'ips' | 'manual';
   externalId: string;
   status: 'confirmed' | 'failed' | 'refunded';
   amountRecieved?: number;

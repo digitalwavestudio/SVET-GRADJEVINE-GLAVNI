@@ -11,7 +11,7 @@ interface DepositModalProps {
 export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<number>(1000);
-  const [method, setMethod] = useState<'card' | 'invoice'>('card');
+  const [method, setMethod] = useState<'invoice'>('invoice');
   const [invoiceRequested, setInvoiceRequested] = useState<{referenceNumber: string, amount: number} | null>(null);
 
   const presetAmounts = [1000, 2000, 5000, 10000];
@@ -24,16 +24,9 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
     try {
       setLoading(true);
-      if (method === 'card') {
-        const { url } = await walletService.createDepositSession(amount);
-        if (url) {
-          window.location.href = url;
-        }
-      } else {
-        const res = await walletService.createManualDeposit(amount);
-        setInvoiceRequested(res);
-        toast.success("Uputstvo za uplatu je generisano!");
-      }
+      const res = await walletService.createManualDeposit(amount);
+      setInvoiceRequested(res);
+      toast.success("Uputstvo za uplatu je generisano!");
     } catch (err: any) {
       toast.error(err.message || 'Greška pri kreiranju uplate');
     } finally {
@@ -123,18 +116,9 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
               </div>
 
               <div className="mb-6 flex p-1 bg-white/5 rounded-[12px]">
-                <button
-                  className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${method === 'card' ? 'bg-white text-slate-950 shadow-md transform scale-[1.02]' : 'text-white/60 hover:text-white'}`}
-                  onClick={() => setMethod('card')}
-                >
-                  <span className="material-symbols-outlined text-[16px]">credit_card</span> Plati m‑bankingom
-                </button>
-                <button
-                  className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${method === 'invoice' ? 'bg-secondary text-slate-950 shadow-md transform scale-[1.02]' : 'text-white/60 hover:text-white'}`}
-                  onClick={() => setMethod('invoice')}
-                >
+                <div className="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 bg-secondary text-slate-950 shadow-md transform scale-[1.02]">
                   <span className="material-symbols-outlined text-[16px]">receipt_long</span> Faktura / uplatnica
-                </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 mb-6">
@@ -175,7 +159,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     : 'bg-secondary text-slate-950 hover:bg-yellow-400'
                 }`}
               >
-                {loading ? 'PRIČEKAJTE...' : (method === 'card' ? `PLATI ${amount.toLocaleString()} RSD KARTICOM` : `GENERIŠI UPLATNICU ZA ${amount.toLocaleString()} RSD`)}
+                {loading ? 'PRIČEKAJTE...' : `GENERIŠI UPLATNICU ZA ${amount.toLocaleString()} RSD`}
               </button>
 
               <button 

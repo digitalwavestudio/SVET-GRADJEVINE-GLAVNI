@@ -1,8 +1,5 @@
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
-import {
-  PaymentSaga,
-  PaymentSagaContext,
-} from "../services/sagas/payment.saga.ts";
+import type { PaymentSagaContext } from "../events/payment.types.ts";
 import { Logger } from "../utils/logger.ts";
 import { emailService } from "../services/emailService.ts";
 import { db, admin } from "../config/firebase.ts";
@@ -16,14 +13,12 @@ export const initPaymentSubscriber = () => {
     );
 
     try {
-      const saga = new PaymentSaga(payload);
-      await saga.run();
-
-      logger.info(
-        `[PaymentSubscriber] Saga completed successfully for ${payload.referenceId}`,
+      logger.warn(
+        `[PaymentSubscriber] PAYMENT_COMPLETED event received for ${payload.referenceId}, but payment saga processing is disabled in this branch.`,
       );
 
-      // Pre-aggregate payment stats inside user_stats collection
+      // In the current repo state, Stripe-specific checkout saga handling has been removed.
+      // Keep this listener present only for event compatibility and future payment flow replacement.
       try {
         const statsRef = db.collection("user_stats").doc(payload.userId);
         const statsUpdates: Record<string, unknown> = {

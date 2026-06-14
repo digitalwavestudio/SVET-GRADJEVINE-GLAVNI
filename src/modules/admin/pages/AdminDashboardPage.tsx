@@ -19,7 +19,7 @@ const AuditTab = lazy(() => import('@/src/modules/admin/components/admin/tabs/Au
 const GlobalSettingsTab = lazy(() => import('@/src/modules/admin/components/admin/tabs/GlobalSettingsTab').then(m => ({ default: m.GlobalSettingsTab })));
 const ObservabilityTab = lazy(() => import('@/src/modules/admin/components/admin/tabs/ObservabilityTab').then(m => ({ default: m.ObservabilityTab })));
 const ResilienceTab = lazy(() => import('@/src/modules/admin/components/admin/tabs/ResilienceTab').then(m => ({ default: m.ResilienceTab })));
-const MagazineTab = lazy(() => import('@/src/modules/admin/components/admin/tabs/MagazineTab').then(m => ({ default: m.MagazineTab })));
+
 
 import { AdminErrorBoundary } from '@/src/modules/admin/components/admin/AdminErrorBoundary';
 
@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.isAdmin || user?.email === 'mancoresolution@gmail.com';
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'users' | 'verify' | 'finances' | 'support' | 'abuse' | 'marketing' | 'broadcast' | 'branding' | 'sync' | 'audit' | 'settings' | 'observability' | 'housekeeping' | 'resilience' | 'magazine'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'users' | 'verify' | 'finances' | 'support' | 'abuse' | 'marketing' | 'broadcast' | 'branding' | 'sync' | 'audit' | 'settings' | 'observability' | 'housekeeping' | 'resilience'>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const {
@@ -263,11 +263,6 @@ export default function AdminDashboardPage() {
           {activeTab === 'branding' && (
             <Suspense fallback={<AdminTabLoading />}>
               <div className="glass-card p-4"><BrandingTab /></div>
-            </Suspense>
-          )}
-          {activeTab === 'magazine' && (
-            <Suspense fallback={<AdminTabLoading />}>
-              <div className="glass-card p-4"><MagazineTab /></div>
             </Suspense>
           )}
         </AnimatePresence>

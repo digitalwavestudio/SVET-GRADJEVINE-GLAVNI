@@ -64,7 +64,6 @@ export function AdminSidebar({
     { id: 'audit', label: 'AUDIT LOGOVI', icon: 'history' },
     { id: 'observability', label: 'MONITORING & DLQ', icon: 'monitor_heart' },
     { id: 'resilience', label: 'REZILIJENCIJA', icon: 'health_and_safety' },
-    { id: 'magazine', label: 'MAGAZIN CMS', icon: 'newspaper' },
   ];
 
   return (

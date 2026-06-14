@@ -220,40 +220,6 @@ adminRouter.post("/housekeeping/cleanup-audit-logs", adminTriggerLimiter, requir
 adminRouter.post("/broadcast", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), sendBroadcast);
 adminRouter.get("/broadcasts", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), getBroadcasts);
 
-// Magazine Management
-import { MagazineCrudService } from "../services/magazine/magazine-crud.service.ts";
-adminRouter.get("/magazine/articles", adminTriggerLimiter, async (req, res, next) => {
-  try {
-    const articles = await MagazineCrudService.getAllArticlesAdmin();
-    res.json(articles);
-  } catch (err) {
-    next(err);
-  }
-});
-
-adminRouter.patch("/magazine/articles/:id", adminTriggerLimiter, async (req, res, next) => {
-  try {
-    await MagazineCrudService.updateArticle(req.params.id, req.body);
-    res.json({ success: true });
-  } catch (err) {
-    next(err);
-  }
-});
-
-adminRouter.delete("/magazine/articles/:id", adminTriggerLimiter, async (req, res, next) => {
-  try {
-    await MagazineCrudService.deleteArticle(req.params.id);
-    res.json({ success: true });
-  } catch (err) {
-    next(err);
-  }
-});
-
-import { MagazineMigrationController } from "../controllers/magazine-migration.controller.ts";
-
-adminRouter.post("/magazine/migrate", adminTriggerLimiter, MagazineMigrationController.migrateFromLegacy);
-adminRouter.get("/magazine/migrate/preview", adminTriggerLimiter, MagazineMigrationController.previewMigration);
-
 adminRouter.get("/audit-logs", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), getAuditLogs);
 adminRouter.post(
   "/moderate/:collection/:id",

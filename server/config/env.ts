@@ -23,7 +23,7 @@ const envSchema = z.object({
   PORT: z.string().default("3000"),
   VITE_API_URL: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
-  ADMIN_EMAILS: z.string().optional().default('["mancoresolution@gmail.com"]'),
+  ADMIN_EMAILS: z.string().optional().default('[]'),
   ALGOLIA_APP_ID: z.string().optional(),
   ALGOLIA_API_KEY: z.string().optional(),
   ALGOLIA_INDEX_NAME: z.string().optional().default("listings"),
@@ -56,7 +56,7 @@ if (!_env.success) {
 export const env = _env.data;
 
 // Parse the ADMIN_EMAILS safely
-let parsedAdminEmails: string[] = ["mancoresolution@gmail.com"];
+let parsedAdminEmails: string[] = [];
 try {
   if (env.ADMIN_EMAILS) {
     parsedAdminEmails = JSON.parse(env.ADMIN_EMAILS);

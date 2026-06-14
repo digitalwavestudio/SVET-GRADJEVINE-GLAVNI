@@ -61,13 +61,14 @@ window.addEventListener('unhandledrejection', function(event) {
       `</div>`;
   }
 });
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import React, { StrictMode, useEffect, useState } from 'react';
+import { createRoot } from 'react-dom/client';
 // import { onCLS, onINP, onLCP } from 'web-vitals';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { HelmetProvider } from 'react-helmet-async';
-import { queryClient, persister } from '@/src/lib/queryClient';
+import { queryClient } from '@/src/lib/queryClient';
 import { initZodLocalization } from '@svet-gradjevine/shared';
 import { initFrontendTracing } from '@/src/lib/tracing';
 import { initErrorMonitor } from '@/src/lib/errorMonitor';
@@ -113,51 +114,86 @@ onLCP(reportWebVitals);
 
 console.log('[MAIN] Application starting...');
 
+function Root() {
+  const [persister, setPersister] = useState<any | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const p = createAsyncStoragePersister({
+          storage: {
+            getItem: async (key: string) => Promise.resolve(window.localStorage.getItem(key)),
+            setItem: async (key: string, value: string) => Promise.resolve(window.localStorage.setItem(key, value)),
+            removeItem: async (key: string) => Promise.resolve(window.localStorage.removeItem(key)),
+          },
+        });
+        if (mounted) setPersister(p);
+      } else {
+        if (mounted) setPersister(null);
+      }
+    } catch (e) {
+      console.warn('Query persister init failed:', e);
+      if (mounted) setPersister(null);
+    } finally {
+      if (mounted) setReady(true);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (!ready) return null;
+
+  const content = (
+    <ErrorBoundary>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </ErrorBoundary>
+  );
+
+  if (persister) {
+    return (
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+          persister,
+          maxAge: 1000 * 60 * 60 * 24,
+          dehydrateOptions: {
+            shouldDehydrateQuery: (query) => {
+              if (!query?.queryKey) return false;
+                  const keysToPersist = ['premium-partners', 'categories', 'static-config', 'configs'];
+              return keysToPersist.some((key) => {
+                const stringKey = typeof key === 'string' ? key : JSON.stringify(key);
+                return query.queryKey.some((qk) => {
+                  if (qk === null || qk === undefined) return false;
+                  const qkStr = typeof qk === 'string' ? qk : JSON.stringify(qk);
+                  return qkStr.includes(stringKey);
+                });
+              });
+            },
+          },
+        }}
+      >
+        {content}
+      </PersistQueryClientProvider>
+    );
+  }
+
+  return <QueryClientProvider client={queryClient}>{content}</QueryClientProvider>;
+}
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   console.error('[MAIN] Root element not found!');
 } else {
-  console.log('[MAIN] Rendering to root');
-  
   const root = createRoot(rootElement);
-  
   root.render(
     <StrictMode>
-      <ErrorBoundary>
-        {persister ? (
-          <PersistQueryClientProvider
-            client={queryClient}
-            persistOptions={{
-              persister,
-              maxAge: 1000 * 60 * 60 * 24, // 24 sata
-              dehydrateOptions: {
-                shouldDehydrateQuery: (query) => {
-                  if (!query?.queryKey) return false;
-                  const keysToPersist = ["premium-partners", "categories", "magazine", "static-config", "configs"];
-                  return keysToPersist.some((key) => {
-                    const stringKey = typeof key === "string" ? key : JSON.stringify(key);
-                    return query.queryKey.some((qk) => {
-                      if (qk === null || qk === undefined) return false;
-                      const qkStr = typeof qk === "string" ? qk : JSON.stringify(qk);
-                      return qkStr.includes(stringKey);
-                    });
-                  });
-                },
-              },
-            }}
-          >
-            <HelmetProvider>
-              <App />
-            </HelmetProvider>
-          </PersistQueryClientProvider>
-        ) : (
-          <QueryClientProvider client={queryClient}>
-            <HelmetProvider>
-              <App />
-            </HelmetProvider>
-          </QueryClientProvider>
-        )}
-      </ErrorBoundary>
+      <Root />
     </StrictMode>
   );
 }

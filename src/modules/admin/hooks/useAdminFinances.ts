@@ -3,7 +3,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { CheckoutEvent } from "@/src/modules/checkout/services/checkoutService";
+import { CheckoutEvent } from "@/src/modules/checkout/types/checkoutContracts";
 import { apiClient } from "@/src/lib/apiClient";
 import { dashboardKeys } from "@/src/lib/queryKeysFactory";
 

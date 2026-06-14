@@ -76,25 +76,6 @@ export default function Footer() {
               <li><Link to="/kontakt" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
               <li><Link to="/korisni-linkovi" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
               <li>
-                <div className="text-sm font-black tracking-widest flex items-center gap-1 uppercase relative group/magazine cursor-default">
-                  <span className="!text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_40%,#60a5fa_100%)]">Magazin</span>
-                  <span className="lg:hidden text-[9px] text-secondary font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
-                  
-                  {/* Tooltip Popup */}
-                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/magazine:opacity-100 transition-all duration-300 scale-90 group-hover/magazine:scale-100 z-50 transform-gpu">
-                    <div className="bg-[#0F1923] border border-secondary/50 p-3 rounded-md shadow-[0_10px_30px_rgba(0,0,0,0.5)] whitespace-nowrap">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="material-symbols-outlined text-secondary text-sm">construction</span>
-                        <span className="text-secondary font-black text-[10px] uppercase tracking-widest">Uskoro</span>
-                      </div>
-                      <p className="text-white text-[11px] font-medium">Magazin stiže uskoro!</p>
-                      {/* Arrow */}
-                      <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-[#0F1923]"></div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
                 <div className="text-[#b35b10]/50 text-[16px] leading-[20px] font-black tracking-widest flex flex-wrap items-center justify-center sm:justify-start gap-1 uppercase relative group/partner cursor-default">
                   Partner
                   <span className="lg:hidden text-[9px] text-[#b35b10] font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
@@ -139,12 +120,9 @@ export default function Footer() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">
             <ThemeToggle className="mt-0" />
-            <div className="flex items-center gap-2 text-on-surface-variant text-xs font-black uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 hover:border-secondary/50 hover:text-white transition-colors cursor-default">
-              <span className="material-symbols-outlined text-[16px]">public</span> Srbija (SRB)
-            </div>
-            <div className="flex items-center gap-2 text-on-surface-variant text-xs font-black uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 hover:border-secondary/50 hover:text-white transition-colors cursor-default">
-              <span className="material-symbols-outlined text-[16px] text-green-500">verified_user</span> Sigurna Platforma
-            </div>
+            <Link to="/" className="px-5 py-3 rounded-full bg-[#0061a5] text-white font-black uppercase tracking-widest text-xs hover:bg-[#2481ff] transition-all shadow-[0_8px_30px_rgba(0,97,165,0.25)]">
+              Magazin
+            </Link>
           </div>
           
           <div className="text-on-surface-variant text-xs font-medium uppercase tracking-widest text-center">

@@ -16,7 +16,6 @@ import { calendarRouter } from "./calendar.routes.ts";
 import { constructionRouter } from "./construction.routes.ts";
 import { partnersRouter } from "./partners.routes.ts";
 import { checkoutRouter } from "./checkout.routes.ts";
-import { stripeRouter } from "./stripe.routes.ts";
 import { walletRouter } from "./wallet.routes.ts";
 import { supportRouter } from "./support.routes.ts";
 import { notificationsRouter } from "./notifications.routes.ts";
@@ -88,8 +87,6 @@ import { statsRouter } from "./stats.routes.ts";
 import { aiRouter } from "./ai.routes.ts";
 import { autoValidateMiddleware, validateRequest } from "../middleware/validate.ts";
 
-// import { magazineRouter } from "./magazine.routes.ts";
-// import { magazineAdminRouter } from "./magazine.admin.routes.ts";
 
 import { SSEService } from "../services/sse.service.ts";
 
@@ -405,7 +402,6 @@ apiRouter.use("/dashboard", dashboardRouter);
 apiRouter.use("/bff", bffRouter);
 apiRouter.use("/ads", firestoreLimiter, heavyOperationsLimiter, adsRouter);
 apiRouter.use("/partners", partnersRouter);
-apiRouter.use("/stripe", stripeRouter);
 apiRouter.use("/checkout", checkoutRouter);
 apiRouter.use("/wallet", walletRouter);
 apiRouter.use("/support", supportRouter);
@@ -418,7 +414,6 @@ apiRouter.use("/favorites", favoritesRouter);
 apiRouter.use("/analytics", analyticsRouter);
 apiRouter.use("/telemetry", telemetryRouter);
 apiRouter.use("/system", systemRouter);
-// apiRouter.use("/magazine", magazineRouter);
 
 apiRouter.post("/logs", async (req, res) => {
   const { level, message, context, uid, url } = req.body;

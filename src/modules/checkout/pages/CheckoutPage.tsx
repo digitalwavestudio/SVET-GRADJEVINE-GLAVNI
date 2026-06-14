@@ -5,8 +5,10 @@ import Footer from '@/src/components/Footer';
 import Navbar from '@/src/components/Navbar';
 import { APP_CONFIG } from '@/src/constants/config';
 import { useAuth } from '@/src/context/AuthContext';
-import { checkoutService, CheckoutStatus } from '@/src/modules/checkout/services/checkoutService';
+import { auth } from '@/src/firebase';
 import { partnerService } from '@/src/services/partnerService';
+
+type CheckoutStatus = 'initiated' | 'pending' | 'confirmed' | 'failed';
 
 export default function CheckoutPage() {
   const location = useLocation();
@@ -27,7 +29,7 @@ export default function CheckoutPage() {
 
   const selectedPackage = packages[packageId] || packages.pro;
 
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'qr' | 'invoice'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'qr' | 'invoice'>('qr');
   const [promoCode, setPromoCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState(0);
   const [promoStatus, setPromoStatus] = useState<null | 'success' | 'error'>(null);
@@ -106,36 +108,35 @@ export default function CheckoutPage() {
     setCheckoutStatus('initiated');
     
     try {
-      if (paymentMethod === 'card') {
-        const { url } = await checkoutService.createStripeSession({
-          packageId: packageId,
-          packageName: selectedPackage.name,
-          amount: currentTotal,
-          type: paymentType,
-          adId: adId,
-        });
-        
-        if (url) {
-          window.location.href = url;
-          return;
-        }
-      }
-
       if (method === 'INVOICE/FAKTURA') {
-        const pdfBlob = await checkoutService.generateInvoice({
-          packageId: packageId,
-          packageName: selectedPackage.name,
-          amount: currentTotal,
-          customerInfo: {
-            name: invoiceForm.companyName,
-            email: invoiceForm.email,
-            pib: invoiceForm.pib,
-            address: invoiceForm.address
-          }
+        const token = await auth.currentUser?.getIdToken();
+        const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/checkout/generate-proforma`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: JSON.stringify({
+            packageId: packageId,
+            packageName: selectedPackage.name,
+            amount: currentTotal,
+            customerInfo: {
+              name: invoiceForm.companyName,
+              email: invoiceForm.email,
+              pib: invoiceForm.pib,
+              address: invoiceForm.address,
+            },
+          }),
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate invoice');
+        }
+
+        const pdfBlob = await response.blob();
 
         // Trigger download
-        const url = window.URL.createObjectURL(new Blob([pdfBlob as any]));
+        const url = window.URL.createObjectURL(new Blob([pdfBlob]));
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', `Predracun-${selectedPackage.name.replace(' ', '-')}.pdf`);
@@ -203,10 +204,6 @@ export default function CheckoutPage() {
           <div className="relative z-10">
             {/* Payment Method Selector */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-              <button onClick={() => setPaymentMethod('card')} className={`py-4 px-2 rounded-[10px] border-2 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === 'card' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-white/5 bg-white/5 text-on-surface-variant hover:bg-white/10'}`}>
-                <span className="material-symbols-outlined text-2xl">credit_card</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-center">Platna Kartica</span>
-              </button>
               <button onClick={() => setPaymentMethod('qr')} className={`py-4 px-2 rounded-[10px] border-2 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === 'qr' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-white/5 bg-white/5 text-on-surface-variant hover:bg-white/10'}`}>
                 <span className="material-symbols-outlined text-2xl">qr_code_scanner</span>
                 <span className="text-[10px] font-black uppercase tracking-widest text-center">mBanking / QR</span>
@@ -218,37 +215,29 @@ export default function CheckoutPage() {
             </div>
 
             {/* Dynamic Content */}
-            {paymentMethod === 'card' && (
+            {paymentMethod === 'invoice' && (
               <div className="space-y-8 py-4">
-                <div className="bg-secondary/5 border border-secondary/20 rounded-[10px] p-8 flex flex-col items-center text-center">
+                <div className="bg-white/10 border border-white/10 rounded-[10px] p-8 flex flex-col items-center text-center">
                   <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center text-secondary mb-4">
-                    <span className="material-symbols-outlined text-3xl">safe</span>
+                    <span className="material-symbols-outlined text-3xl">request_quote</span>
                   </div>
-                  <h3 className="text-lg font-black uppercase tracking-tight mb-2">Sigurno Plaćanje Karticom</h3>
+                  <h3 className="text-lg font-black uppercase tracking-tight mb-2">Faktura / Uplatnica</h3>
                   <p className="text-[10px] text-white/50 leading-relaxed font-bold max-w-sm uppercase tracking-widest">
-                    Bićete preusmereni na siguran Stripe Checkout portal za unos podataka. Podržavamo Visa, Mastercard, AMEX i DinaCard.
+                    Generišite predfakturu i uplatnicu. Plaćanje će se evidentirati nakon prijema uplate.
                   </p>
                 </div>
 
                 <div className="pt-4">
                   <button 
                     disabled={isProcessing}
-                    onClick={() => handleSuccessfulPayment('CARD')} 
-                    className="w-full bg-secondary hover:bg-yellow-400 text-slate-950 font-black py-6 rounded-[10px] transition-all flex items-center justify-center gap-3 relative overflow-hidden group shadow-[0_0_30px_rgba(254,191,13,0.2)] hover:shadow-[0_0_50px_rgba(254,191,13,0.4)] disabled:opacity-50"
+                    onClick={() => handleSuccessfulPayment('INVOICE/FAKTURA')} 
+                    className="w-full bg-white hover:bg-slate-200 text-slate-950 font-black py-6 rounded-[10px] transition-all flex items-center justify-center gap-3 relative overflow-hidden group disabled:opacity-50"
                   >
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    <span className="material-symbols-outlined relative z-10">{isProcessing ? 'sync' : 'payments'}</span>
+                    <span className="material-symbols-outlined relative z-10">{isProcessing ? 'sync' : 'receipt_long'}</span>
                     <span className="tracking-[0.2em] uppercase text-sm relative z-10">
-                      {isProcessing ? 'INICIJALIZACIJA...' : `NASTAVI NA PLAĆANJE (${(currentTotal).toFixed(2)} EUR)`}
+                      {isProcessing ? 'GENERISANJE...' : `GENERIŠI PREDRAČUN ZA ${currentTotal.toFixed(2)} EUR`}
                     </span>
                   </button>
-                </div>
-                
-                <div className="flex flex-wrap items-center justify-center gap-8 opacity-20 mt-8 grayscale mix-blend-screen">
-                   <div className="flex items-center gap-1 font-black text-xs italic tracking-tighter">VISA</div>
-                   <div className="flex items-center gap-1 font-black text-xs italic tracking-tighter">mastercard</div>
-                   <div className="flex items-center gap-1 font-black text-xs italic tracking-tighter">DinaCard</div>
-                   <div className="flex items-center gap-1 font-black text-xs italic tracking-tighter">AMEX</div>
                 </div>
               </div>
             )}

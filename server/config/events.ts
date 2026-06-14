@@ -10,7 +10,6 @@ import { setupBotAnalyticsSubscriber } from "../subscribers/bot-analytics.subscr
 import { setupSitemapQueueListeners } from "../services/sitemap.worker.ts";
 import { setupStatsSubscriber } from "../subscribers/stats.subscriber.ts";
 import { setupMediaSubscriber } from "../subscribers/media.subscriber.ts";
-import { setupMagazineSubscriber } from "../subscribers/magazine.subscriber.ts";
 import { setupRfqSubscriber } from "../subscribers/rfq.subscriber.ts";
 import { DashboardService } from "../services/dashboard.service.ts";
 import { DashboardPrewarmService } from "../services/dashboard-prewarm.service.ts";
@@ -28,7 +27,6 @@ export function initializeEventSubscribers() {
   setupSitemapQueueListeners();
   setupStatsSubscriber();
   setupMediaSubscriber();
-  setupMagazineSubscriber();
   setupRfqSubscriber();
   
   // Register dashboard cache eviction pub/sub

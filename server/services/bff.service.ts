@@ -19,7 +19,6 @@ import { db, checkQuotaStatus } from "../config/firebase.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { UnifiedAdsService } from "./unified-ads.service.ts";
 import { UnifiedSearchService } from "./unified-search.service.ts";
-import { MagazineCrudService } from "./magazine/magazine-crud.service.ts";
 import { DashboardService } from "./dashboard.service.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 
@@ -85,7 +84,6 @@ export const bffService = {
             realEstateData,
             accommodationsData,
             cateringsData,
-            magazineData,
           ] = await Promise.allSettled([
             withHomepageQueryTimeout(
               AdminStatsService.getGlobalStats(),
@@ -137,11 +135,6 @@ export const bffService = {
               ),
               bffSubTimeoutMs,
               { docs: [], lastVisibleId: null, hasMore: false },
-            ),
-            withHomepageQueryTimeout(
-              MagazineCrudService.getArticles({ limit: 4 }),
-              bffSubTimeoutMs,
-              [],
             ),
           ]);
 
@@ -242,8 +235,7 @@ export const bffService = {
           const latestRealEstate = buildMappedDocs<RealEstatePlot>(realEstateData);
           const latestAccommodations = buildMappedDocs<Accommodation>(accommodationsData);
           const latestCaterings = buildMappedDocs<CateringOffer>(cateringsData);
-          const latestArticles =
-            magazineData.status === "fulfilled" ? (magazineData.value as any[]) : [];
+          const latestArticles: any[] = [];
 
           return {
             success: true,

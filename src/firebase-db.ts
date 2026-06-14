@@ -1,16 +1,15 @@
-import { initializeFirestore } from 'firebase/firestore';
-import { app } from './firebase-app';
-import firebaseConfig from '../firebase-applet-config.json';
-const config = firebaseConfig;
+import firebaseLib from './lib/firebase';
+import * as legacyFirebase from './firebase';
 
-let dbInstance: any = null;
+export const getFirestoreSafe = firebaseLib.getFirestoreSafe;
+export const ensureFirebase = firebaseLib.ensureFirebase;
 
-try {
-  dbInstance = initializeFirestore(app, {}, config.firestoreDatabaseId);
-} catch (err: any) {
-  console.error('[FIREBASE_DB] Critical fallback Firestore initialization failed.', err);
-  // Do not throw. Falling back to null, handle softly later or retry in components.
-}
+// Prefer legacy `db` if available (keeps existing behavior), otherwise fallback
+export const db = (legacyFirebase as any).db ?? getFirestoreSafe();
 
-export const db = dbInstance;
+export default {
+	getFirestoreSafe,
+	ensureFirebase,
+	db,
+};
 

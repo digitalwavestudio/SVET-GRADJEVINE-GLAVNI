@@ -1,7 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { initGA, trackPageView } from '@/src/lib/analytics';
-import ErrorBoundary from '@/src/components/ErrorBoundary';
 import NetworkStatus from '@/src/components/NetworkStatus';
 import CookieConsent from '@/src/components/CookieConsent';
 import BackToTop from '@/src/components/BackToTop';
@@ -27,7 +26,6 @@ import { getMarketplaceRouter, getMarketplaceDashboardRouter } from '@/src/modul
 import { getAdsRouter } from '@/src/modules/ads/routes';
 import { getCheckoutRouter } from '@/src/modules/checkout/routes';
 import { getMastersRouter } from '@/src/modules/masters/routes';
-import { getMagazineRouter } from '@/src/modules/magazine/routes';
 import { getSearchRouter } from '@/src/modules/search/routes';
 
 const PageLoader = () => (
@@ -99,7 +97,6 @@ function getRouter() {
             {getMastersRouter()}
             {getAdsRouter()}
             {getCheckoutRouter()}
-            {/* {getMagazineRouter()} */}
             {getSearchRouter()}
             {getDashboardPublicRouter()}
             {getToolsPublicRouter()}
@@ -131,23 +128,21 @@ import { AuthLoader } from '@/src/components/AuthLoader';
 
 function App() {
   return (
-    <ErrorBoundary>
-      <AppProviders>
-        <Toaster 
-          position="top-right" 
-          toastOptions={{
-            style: {
-              background: '#0A0F14',
-              color: '#fff',
-              border: '1px solid rgba(255,173,58,0.2)',
-            },
-          }}
-        />
-        <AuthLoader>
-          <RouterProvider router={getRouter()} />
-        </AuthLoader>
-      </AppProviders>
-    </ErrorBoundary>
+    <AppProviders>
+      <Toaster 
+        position="top-right" 
+        toastOptions={{
+          style: {
+            background: '#0A0F14',
+            color: '#fff',
+            border: '1px solid rgba(255,173,58,0.2)',
+          },
+        }}
+      />
+      <AuthLoader>
+        <RouterProvider router={getRouter()} />
+      </AuthLoader>
+    </AppProviders>
   );
 }
 

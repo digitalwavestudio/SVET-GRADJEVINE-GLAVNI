@@ -1,0 +1,49 @@
+name: Terraform Plan (WIF)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Authenticate to GCP via Workload Identity
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }} # set to projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }} # deployer@PROJECT_ID.iam.gserviceaccount.com
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+      - name: Terraform Plan
+        working-directory: infra
+        run: terraform plan -out=tfplan
+
+  terraform-apply-dispatch:
+    name: Terraform Apply (manual)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Authenticate to GCP via Workload Identity
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+      - name: Terraform Apply
+        working-directory: infra
+        run: terraform apply -auto-approve tfplan || terraform apply -auto-approve

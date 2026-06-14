@@ -66,22 +66,6 @@ export const walletService = {
   },
 
   /**
-   * Creates a deposit checkout session.
-   */
-  async createDepositSession(amount: number): Promise<{ url: string }> {
-    return withRetry(async () => {
-      try {
-        return await apiClient.post<{ url: string }>("/stripe/create-checkout-session", {
-          amount,
-        });
-      } catch (e: unknown) {
-        const err = e as Error;
-        throw new Error(err.message || "Došlo je do greške");
-      }
-    });
-  },
-
-  /**
    * Creates a manual invoice deposit request.
    */
   async createManualDeposit(amount: number): Promise<{
