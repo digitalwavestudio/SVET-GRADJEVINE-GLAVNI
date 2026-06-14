@@ -1,12 +1,11 @@
-﻿// @ts-nocheck
-import { Request, Response, NextFunction } from "express";
+﻿import { Request, Response, NextFunction } from "express";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { env } from "../config/env.ts";
 import { getRedis } from "../utils/redis.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { MatrixRouter } from "../services/matrix-router.service.ts";
 import { eventBus } from "../events/event-bus.ts";
-import { SEORenderEngine } from "../services/seo/seo-render-engine.ts";
+import { SEORenderEngine, SEOMetaData } from "../services/seo/seo-render-engine.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 
 // Add all standard crawlers and AI bots
@@ -273,7 +272,7 @@ export const botPrerenderMiddleware = async (
               { path: "/majstori", coll: "users", alwaysListing: true },
             ];
             const parentRoute = adRoutes.find(
-              (r) => r.coll === meta.collectionName,
+              (r) => r.coll === meta!.collectionName,
             );
             const redirectUrl = parentRoute ? parentRoute.path : "/";
             return res.redirect(301, redirectUrl);
@@ -288,7 +287,8 @@ export const botPrerenderMiddleware = async (
         }
 
         // Korak 9.2: HTTP 304 Not Modified (ETag Caching via Render Engine)
-        const etagCheck = SEORenderEngine.evaluateETag(req, res, meta.updatedAt, meta.viewsCount);
+        const lastUpdated = meta.updatedAt ? new Date(meta.updatedAt).getTime() : undefined;
+        const etagCheck = SEORenderEngine.evaluateETag(req, res, lastUpdated, meta.viewsCount);
         if (etagCheck.matched) {
           console.log(
             `[SEO] ETag match! Sending 304 Not Modified for ${req.path}`,
@@ -307,7 +307,7 @@ export const botPrerenderMiddleware = async (
       const htmlContext = await SEORenderEngine.assembleHtml({
         reqPath: req.path,
         host: req.get("host") || "svetgradjevine.com",
-        meta,
+        meta: meta as unknown as SEOMetaData,
         pageNum,
         paginationTags,
         isBotPayload: true,

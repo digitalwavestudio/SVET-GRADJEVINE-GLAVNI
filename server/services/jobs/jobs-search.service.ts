@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AppError } from "../../utils/appError.ts";
 import { RateLimiterService } from "../rate-limiter.service.ts";
 
@@ -32,7 +31,7 @@ export class JobsSearchService {
       searchFilters,
       pageSize,
       lastVisibleId,
-    )) as { docs: any[]; lastVisibleId: string | null; hasMore: boolean };
+    )) as { docs: any[]; lastVisibleId: string | null; hasMore: boolean; totalHits?: number };
 
     // Maintain compatibility with JobsService specific response key 'lastVisible' instead of 'lastVisibleId'
     return {

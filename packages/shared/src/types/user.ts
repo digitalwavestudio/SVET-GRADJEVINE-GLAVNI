@@ -42,10 +42,10 @@ export interface CVData {
   email?: string;
   phone?: string;
   location?: string;
-  experience?: CVExperience[];
+  experience?: CVExperience[] | string;
   skills?: string[];
-  education?: CVEducation[];
-  languages?: CVLanguage[];
+  education?: CVEducation[] | string;
+  languages?: CVLanguage[] | string | any[];
   about?: string;
   portfolioImages?: string[];
   portfolioTitle?: string;
@@ -129,6 +129,10 @@ export interface User {
   partnerLeads?: number;
   partnerConversions?: number;
   partnerBalance?: number;
+  walletBalance?: number;
+  availableCredits?: number;
+  packageType?: string;
+  totalAds?: number;
   
   emailVerified: boolean;
   createdAt?: { _seconds: number; _nanoseconds: number } | string | number | Date | null;
@@ -142,4 +146,12 @@ export interface User {
   isVerified?: boolean;
   isAdmin?: boolean;
   lastSeen?: { _seconds: number; _nanoseconds: number } | string | number | Date | null;
+  mb?: string;
+  pib?: string;
+  licences?: string[];
+  events?: { date: string; status: 'free' | 'busy' | 'maintenance' }[];
+  stats?: {
+    unreadMessages?: number;
+    [key: string]: any;
+  };
 }

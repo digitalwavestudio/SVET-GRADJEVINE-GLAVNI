@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router } from "express";
 import { admin, db } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";

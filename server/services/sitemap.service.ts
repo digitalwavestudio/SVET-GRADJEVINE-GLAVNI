@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";

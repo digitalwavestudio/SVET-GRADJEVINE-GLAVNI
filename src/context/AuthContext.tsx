@@ -1,15 +1,7 @@
 import React, { createContext, useContext } from 'react';
-import { BusinessNiche, User as SharedUser, UserRole } from '@/src/modules/core/types/user';
+import { BusinessNiche, User, UserRole } from '@/src/modules/core/types/user';
 import { useAuthNode } from '@/src/modules/auth/hooks/useAuthNode';
 import { safeLocalStorage } from '@/src/lib/safeStorage';
-
-export interface User extends SharedUser {
-  availableCredits?: number;
-  packageType?: string;
-  viewsCount?: number;
-  totalAds?: number;
-  isVerified?: boolean;
-}
 
 export type { BusinessNiche, UserRole };
 

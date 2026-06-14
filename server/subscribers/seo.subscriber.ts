@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { getRedis } from "../utils/redis.ts";
@@ -67,7 +66,7 @@ const prerenderAndCache = async (category: string, id: string) => {
 
     // In a real scenario we might also need to generate slug but we can just cache by URL from meta
     if (meta.url) {
-      const urlObj = new URL(meta.url);
+      const urlObj = new URL(String(meta.url));
       const canonicalPath = urlObj.pathname.replace(/\/$/, "") || "/";
       const cacheKey = `seo:prerender:${canonicalPath}`;
       console.log(

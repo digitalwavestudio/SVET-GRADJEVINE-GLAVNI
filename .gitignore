@@ -53,3 +53,8 @@ firestore_indexes.md
 # Arhivi koda
 *.zip
 *.tar
+
+# Binaries and temporary Vite build assets
+*.exe
+*.timestamp-*.mjs
+vite.config.ts.timestamp-*

@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/src/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import logoImage from "@/src/assets/images/logo.png";
 
 export function AuthLoader({ children }: { children: React.ReactNode }) {
   const { loading, user } = useAuth();
+  const [forceHide, setForceHide] = useState(false);
+
+  useEffect(() => {
+    if (loading && !user) {
+      const timer = setTimeout(() => {
+        console.warn('[AUTH_LOADER] Loading timed out (3500ms). Unblocking UI to prevent white/dark screen lock.');
+        setForceHide(true);
+      }, 3500);
+      return () => clearTimeout(timer);
+    } else {
+      setForceHide(false);
+    }
+  }, [loading, user]);
+
+  const showSpinner = loading && !user && !forceHide;
   
   return (
     <>
       <AnimatePresence>
-        {loading && !user && (
+        {showSpinner && (
           <motion.div
   aria-label="Loading"
   role="status"

@@ -82,12 +82,6 @@ export function MyAdsHeader({
             >
               Aktivni
             </button>
-            <button 
-              onClick={() => setStatusFilter('pending')}
-              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'pending' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
-            >
-              Na čekanju
-            </button>
         </div>
       </div>
     </>

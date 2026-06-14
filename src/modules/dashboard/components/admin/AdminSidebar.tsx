@@ -44,9 +44,8 @@ export function AdminSidebar({
   const { data } = useAdminStats();
   const pendingAds = data?.pendingAds || 0;
 
-  const navItems = [
+  const navItems: { id: string; label: string; icon: string; badge?: number }[] = [
     { id: 'overview', label: 'PREGLED SISTEMA', icon: 'dashboard' },
-    { id: 'moderation', label: 'MODERACIJA OGLASA', icon: 'rule', badge: pendingAds },
     { id: 'users', label: 'BAZA KORISNIKA', icon: 'groups' },
     { id: 'verify', label: 'VERIFIKACIJE', icon: 'verified' },
     { id: 'finances', label: 'FINANSIJE', icon: 'payments' },

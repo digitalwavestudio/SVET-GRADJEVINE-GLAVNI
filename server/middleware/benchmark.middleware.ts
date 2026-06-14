@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Request, Response, NextFunction } from "express";
 import * as Sentry from "@sentry/node";
 
@@ -17,8 +16,8 @@ export const performanceBenchmark = (req: Request, res: Response, next: NextFunc
 
     if (durationMs > 100) {
       const user = req.user;
-      const uid = user?.uid || req.query?.userId || "anonymous";
-      const role = user?.role || user?.userType || "anonymous";
+      const uid = String(user?.uid || req.query?.userId || "anonymous");
+      const role = String(user?.role || user?.userType || "anonymous");
       const contentLength = res.get("Content-Length") || "unknown";
       
       // Determine cache level if header exists (standard practice in our CacheService)

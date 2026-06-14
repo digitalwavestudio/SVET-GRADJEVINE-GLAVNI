@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
 import DOMPurify from "isomorphic-dompurify";
 import { CacheService } from "../cache.service.ts";
@@ -260,6 +259,17 @@ export class JobsCoreService {
       return { id: jobId, jobData: safeJob };
     });
 
+    // Invalidate job caches to show the new job immediately on listings view
+    CacheService.invalidateByPrefix("public_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:public_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("jobs_public").catch(() => {});
+    CacheService.invalidateByPrefix("swr:jobs_public").catch(() => {});
+    CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
+
     return { success: true, jobId: resultData.id };
   }
 
@@ -397,6 +407,17 @@ export class JobsCoreService {
       });
     });
 
+    // Invalidate job caches to show the updated job immediately on listings view
+    CacheService.invalidateByPrefix("public_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:public_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("jobs_public").catch(() => {});
+    CacheService.invalidateByPrefix("swr:jobs_public").catch(() => {});
+    CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
+
     return { success: true };
   }
 
@@ -458,6 +479,17 @@ export class JobsCoreService {
         createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
       });
     });
+
+    // Invalidate job caches to show the deleted job immediately on listings view
+    CacheService.invalidateByPrefix("public_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:public_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("jobs_public").catch(() => {});
+    CacheService.invalidateByPrefix("swr:jobs_public").catch(() => {});
+    CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
+    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
 
     return { success: true };
   }

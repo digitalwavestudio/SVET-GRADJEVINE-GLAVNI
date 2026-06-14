@@ -373,6 +373,17 @@ export abstract class BaseAdStrategy {
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
 
+    if (this.category === "jobs") {
+      CacheService.invalidateByPrefix("public_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:public_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("jobs_public").catch(() => {});
+      CacheService.invalidateByPrefix("swr:jobs_public").catch(() => {});
+      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
+    }
+
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(() => {});
     }).catch(() => {});
@@ -445,6 +456,17 @@ export abstract class BaseAdStrategy {
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
+
+    if (this.category === "jobs") {
+      CacheService.invalidateByPrefix("public_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:public_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("jobs_public").catch(() => {});
+      CacheService.invalidateByPrefix("swr:jobs_public").catch(() => {});
+      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
+    }
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(() => {});
@@ -569,11 +591,22 @@ export abstract class BaseAdStrategy {
     
     if (result.outboxPayload?.payload?.uid) {
        const uid = result.outboxPayload.payload.uid;
-       CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
-       CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
-       CacheService.invalidateByPrefix("public_ads_").catch(() => {});
-       CacheService.invalidateByPrefix("search_ads_").catch(() => {});
-       CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
+    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
+    CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
+    CacheService.invalidateByPrefix("public_ads_").catch(() => {});
+    CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
+
+    if (this.category === "jobs") {
+      CacheService.invalidateByPrefix("public_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:public_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("jobs_public").catch(() => {});
+      CacheService.invalidateByPrefix("swr:jobs_public").catch(() => {});
+      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(() => {});
+      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
+    }
 
        import("../dashboard.service.ts").then(({ DashboardService }) => {
          DashboardService.clearEmployerStatsCache(uid).catch(() => {});

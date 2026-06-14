@@ -190,7 +190,15 @@ export class UnifiedSearchService {
         }
 
         if (filtersAny.search) {
-          return { docs: [], lastVisibleId: null, hasMore: false };
+          this.logger.warn(`[Search] Algolia failed or timed out. Falling back to in-memory Firestore search for: "${filtersAny.search}"`);
+          return await UnifiedSearchFirestore.executeFirestoreInMemorySearch(
+            category,
+            entityType,
+            filtersAny,
+            pageSize,
+            currentPage,
+            this.logger
+          );
         }
 
         return await UnifiedSearchFirestore.executeFirestoreSearch(

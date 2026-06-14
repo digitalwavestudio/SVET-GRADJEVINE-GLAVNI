@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
 import { AppError, BadRequestError, NotFoundError } from "../../utils/appError.ts";
 import { ApplicationsService } from "../applications.service.ts";
@@ -18,7 +17,7 @@ export class JobsApplicationsService {
       candidateId: uid,
       coverLetter,
       adTitle: (validatedData as { jobTitle?: string }).jobTitle || "Oglas za posao",
-      employerId: (validatedData as { employerId?: string }).employerId,
+      employerId: (validatedData as { employerId?: string }).employerId || "",
       candidateName: safeNameFromToken,
       candidateEmail: email,
       phone,
