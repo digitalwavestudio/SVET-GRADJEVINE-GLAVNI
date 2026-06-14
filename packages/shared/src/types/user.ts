@@ -42,10 +42,10 @@ export interface CVData {
   email?: string;
   phone?: string;
   location?: string;
-  experience?: CVExperience[];
+  experience?: CVExperience[] | string;
   skills?: string[];
-  education?: CVEducation[];
-  languages?: CVLanguage[];
+  education?: CVEducation[] | string;
+  languages?: CVLanguage[] | string[];
   about?: string;
   portfolioImages?: string[];
   portfolioTitle?: string;
@@ -111,6 +111,10 @@ export interface User {
   status?: 'active' | 'pending' | 'expired' | 'deleted';
   metadata?: Record<string, unknown> | null;
   roles?: UserRole[] | string[];
+  stats?: {
+    unreadMessages?: number;
+    [key: string]: unknown;
+  };
   syncStatus?: 'idle' | 'syncing' | 'failed';
   lastSyncedAt?: { _seconds: number; _nanoseconds: number } | string | number | Date | null;
   dashboardMetrics?: {
@@ -129,7 +133,11 @@ export interface User {
   partnerLeads?: number;
   partnerConversions?: number;
   partnerBalance?: number;
-  
+  walletBalance?: number;
+  availableCredits?: number;
+  packageType?: string;
+  totalAds?: number;
+
   emailVerified: boolean;
   createdAt?: { _seconds: number; _nanoseconds: number } | string | number | Date | null;
   availability?: 'slobodan' | 'zauzet' | 'uskoro' | string | null;
@@ -142,4 +150,8 @@ export interface User {
   isVerified?: boolean;
   isAdmin?: boolean;
   lastSeen?: { _seconds: number; _nanoseconds: number } | string | number | Date | null;
+  mb?: string;
+  pib?: string;
+  licences?: string[];
+  events?: { date: string; status: 'free' | 'busy' | 'maintenance' }[];
 }
