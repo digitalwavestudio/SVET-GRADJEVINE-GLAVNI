@@ -104,7 +104,7 @@ export function Step4({
   const currentPackagePrice =
     packages.find((p) => p.id === formData.paket)?.priceNum || 0;
   const isInsufficientFunds =
-    formData.paket !== "free" &&
+    !!formData.paket &&
     currentPackagePrice > 0 &&
     walletBalance < currentPackagePrice;
 
@@ -123,11 +123,11 @@ export function Step4({
               </span>
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tight font-headline">
-              Oblast pokrivenosti
+              Oblast pokrivenosti i paket
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="space-y-4">
               <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] mb-4">
                 Područje rada *
@@ -158,55 +158,177 @@ export function Step4({
                   </div>
                 </button>
               ))}
+
+              <div className="space-y-4 mt-6">
+                <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] mb-4">
+                  Unesite detalje lokacije
+                </label>
+                <textarea
+                  {...register("companyCoverageValue")}
+                  placeholder={
+                    formData.companyCoverage === "local"
+                      ? "Npr. Zemun, Novi Beograd..."
+                      : "Npr. Vojvodina, Moravički okrug ili specifične zemlje..."
+                  }
+                  rows={6}
+                  className="w-full bg-white/5 border-2 border-white/5 rounded-[10px] px-6 py-5 text-white focus:border-secondary/50 outline-none transition-all font-bold resize-none"
+                />
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] mb-4">
-                Unesite detalje lokacije
-              </label>
-              <textarea
-                {...register("companyCoverageValue")}
-                placeholder={
-                  formData.companyCoverage === "local"
-                    ? "Npr. Zemun, Novi Beograd..."
-                    : "Npr. Vojvodina, Moravički okrug ili specifične zemlje..."
-                }
-                rows={8}
-                className="w-full bg-white/5 border-2 border-white/5 rounded-[10px] px-6 py-5 text-white focus:border-secondary/50 outline-none transition-all font-bold resize-none"
-              />
+            <div className="space-y-6">
+              <div className="flex justify-between items-center ml-1 mb-2">
+                <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">
+                  Izaberite nivo vidljivosti
+                </span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 px-3 py-1 rounded-full text-white flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[14px]">
+                    account_balance_wallet
+                  </span>
+                  Stanje u Wallet-u: {walletBalance.toLocaleString("sr-RS")} SG Kredita
+                </span>
+              </div>
+              {formData.paket && currentPackagePrice > 0 && (
+                <p className="text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 ml-1 -mt-4">
+                  Nakon plaćanja: {(walletBalance - currentPackagePrice).toLocaleString("sr-RS")} SG Kredita
+                </p>
+              )}
+
+              <div className="space-y-4">
+                {packages.map((pkg) => {
+                  const isSelected = formData.paket === pkg.id;
+
+                  let borderBgClass = "border-white/5 bg-white/[0.02] hover:border-white/20";
+                  if (isSelected) {
+                    if (pkg.color === "secondary") borderBgClass = "border-secondary bg-secondary/5 shadow-xl";
+                    else if (pkg.color === "primary") borderBgClass = "border-primary bg-primary/5 shadow-xl";
+                    else borderBgClass = "border-white bg-white/5 shadow-xl";
+                  }
+
+                  let textClass = "text-white";
+                  if (isSelected) {
+                    if (pkg.color === "secondary") textClass = "text-secondary";
+                    else if (pkg.color === "primary") textClass = "text-primary";
+                  }
+
+                  let radioClass = "border-white/20";
+                  if (isSelected) {
+                    if (pkg.color === "secondary") radioClass = "border-secondary bg-secondary";
+                    else if (pkg.color === "primary") radioClass = "border-primary bg-primary";
+                    else radioClass = "border-white bg-white";
+                  }
+
+                  return (
+                    <label
+                      key={pkg.id}
+                      className={`block relative p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-500 group ${borderBgClass}`}
+                    >
+                      {pkg.recommended && (
+                        <div className="absolute -top-3 right-6 bg-secondary text-slate-950 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
+                          ★ PREPORUČENO
+                        </div>
+                      )}
+                      <div className="flex items-start gap-5">
+                        <div className="pt-1">
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${radioClass}`}>
+                            {isSelected && (
+                              <div className="w-2.5 h-2.5 bg-slate-950 rounded-full"></div>
+                            )}
+                          </div>
+                          <input
+                            aria-label="Unos polja"
+                            type="radio"
+                            value={pkg.id}
+                            checked={isSelected}
+                            onChange={(e) => setValue("paket", e.target.value)}
+                            className="hidden"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className={`font-black uppercase tracking-widest text-sm ${textClass}`}>
+                              {pkg.name}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              {pkg.oldPrice && (
+                                <span className="text-on-surface-variant line-through text-xs ml-2 opacity-60 font-bold">
+                                  {pkg.oldPrice}
+                                </span>
+                              )}
+                              <span className={`font-black text-white text-base ${pkg.isDiscounted ? "text-red-500" : "text-green-500"}`}>
+                                {pkg.price}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-on-surface-variant mb-4 font-bold uppercase tracking-widest opacity-60">
+                            {pkg.desc}
+                          </p>
+                          <ul className="grid grid-cols-1 gap-1.5">
+                            {pkg.features.map((f: string, i: number) => (
+                              <li key={i} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">
+                                <span className="material-symbols-outlined text-[14px]">check</span> {f}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="flex justify-between">
+          <div className="mt-16 pt-10 border-t border-white/5 flex flex-col-reverse md:flex-row justify-between items-center gap-8">
             <button
               type="button"
               onClick={prevStep}
-              className={UI_TOKENS.BTN_SECONDARY}
+              className="text-on-surface-variant font-black uppercase tracking-widest text-[10px] hover:text-white transition-colors"
             >
-              Nazad
+              ← Vrati se na izmene
             </button>
-            <button
-              type="submit"
-              disabled={isUploadingImages || isSubmitting || cooldown > 0}
-              className={
-                UI_TOKENS.BTN_POST_AD +
-                " bg-emerald-600 border-emerald-600 hover:bg-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)] disabled:opacity-50"
-              }
-            >
-              {(isUploadingImages || isSubmitting) && (
-                <span className="material-symbols-outlined animate-spin mr-2">
-                  progress_activity
-                </span>
+            <div className="flex flex-col items-center md:items-end gap-2 w-full md:w-auto">
+              <button
+                type="submit"
+                disabled={
+                  isUploadingImages ||
+                  isSubmitting ||
+                  cooldown > 0 ||
+                  !formData.paket ||
+                  isInsufficientFunds
+                }
+                className={
+                  UI_TOKENS.BTN_POST_AD + " px-16 w-full disabled:opacity-50"
+                }
+              >
+                {(isUploadingImages || isSubmitting) && (
+                  <span className="material-symbols-outlined animate-spin mr-2">
+                    progress_activity
+                  </span>
+                )}
+                {isUploadingImages
+                  ? "OTPREMANJE SLIKA..."
+                  : isSubmitting
+                    ? "SLANJE..."
+                    : cooldown > 0
+                      ? `SAČEKAJ ${cooldown}s`
+                      : !formData.paket
+                        ? "Izaberite paket"
+                        : isInsufficientFunds
+                          ? "Nedovoljno sredstava"
+                          : "Objavite oglas"}
+              </button>
+              {isInsufficientFunds && (
+                <p className="text-error text-xs font-bold uppercase tracking-wider text-center md:text-right mt-2 animate-bounce">
+                  Molimo dopunite wallet na profilu
+                </p>
               )}
-              {isUploadingImages
-                ? "OTPREMANJE SLIKA..."
-                : isSubmitting
-                  ? "SLANJE..."
-                  : "Objavi profil firme"}{" "}
-              {!isUploadingImages && !isSubmitting && (
-                <span className="material-symbols-outlined">rocket_launch</span>
+              {!formData.paket && !isUploadingImages && !isSubmitting && (
+                <p className="text-on-surface-variant/60 text-[9px] font-bold uppercase tracking-wider text-center md:text-right mt-2">
+                  Molimo izaberite paket iznad
+                </p>
               )}
-            </button>
+            </div>
           </div>
         </motion.div>
       )}
@@ -387,6 +509,11 @@ export function Step4({
                   Stanje u Wallet-u: {walletBalance.toLocaleString("sr-RS")} SG Kredita
                 </span>
               </div>
+              {formData.paket && currentPackagePrice > 0 && (
+                <p className="text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/60 ml-1 -mt-4">
+                  Nakon plaćanja: {(walletBalance - currentPackagePrice).toLocaleString("sr-RS")} SG Kredita
+                </p>
+              )}
 
               <div className="space-y-4">
                  {packages.map((pkg) => {
@@ -501,6 +628,7 @@ export function Step4({
                   isUploadingImages ||
                   isSubmitting ||
                   cooldown > 0 ||
+                  !formData.paket ||
                   isInsufficientFunds
                 }
                 className={
@@ -518,15 +646,20 @@ export function Step4({
                     ? "SLANJE..."
                     : cooldown > 0
                       ? `SAČEKAJ ${cooldown}s`
-                      : formData.paket === "free"
-                        ? "Objavi besplatno"
+                      : !formData.paket
+                        ? "Izaberite paket"
                         : isInsufficientFunds
                           ? "Nedovoljno sredstava"
-                          : "Plati i objavi"}
+                          : "Objavite oglas"}
               </button>
               {isInsufficientFunds && (
                 <p className="text-error text-xs font-bold uppercase tracking-wider text-center md:text-right mt-2 animate-bounce">
                   Molimo dopunite wallet na profilu
+                </p>
+              )}
+              {!formData.paket && !isUploadingImages && !isSubmitting && (
+                <p className="text-on-surface-variant/60 text-[9px] font-bold uppercase tracking-wider text-center md:text-right mt-2">
+                  Molimo izaberite paket iznad
                 </p>
               )}
             </div>

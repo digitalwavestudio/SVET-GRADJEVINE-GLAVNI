@@ -31,6 +31,22 @@ interface SettingsState {
   initialCredits: number;
 }
 
+const DEFAULT_SETTINGS: SettingsState = {
+  pricing: {
+    jobs: { standard: 500, premium: 1000, urgent: 1500 },
+    accommodations: { standard: 500, premium: 1000, urgent: 1500 },
+    caterings: { standard: 500, premium: 1000, urgent: 1500 },
+    marketplace: { standard: 500, premium: 1000, urgent: 1500 },
+    machines: { standard: 500, premium: 1000, urgent: 1500 },
+    plots: { standard: 500, premium: 1000, urgent: 1500 },
+    professional_monthly: 6000
+  },
+  limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
+  messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
+  globalRateLimit: 1000,
+  initialCredits: 1500
+};
+
 export function GlobalSettingsTab() {
   const [settings, setSettings] = useState<SettingsState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,12 +67,12 @@ export function GlobalSettingsTab() {
       // Map/Ensure correct new schema is present with fallbacks
       const mappedData: SettingsState = {
         pricing: {
-          jobs: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.jobs || {}) },
-          accommodations: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.accommodations || {}) },
-          caterings: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.caterings || {}) },
-          marketplace: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.marketplace || {}) },
-          machines: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.machines || {}) },
-          plots: { standard: 0, premium: 50, urgent: 100, ...(data?.pricing?.plots || {}) },
+          jobs: { standard: 500, premium: 1000, urgent: 1500, ...(data?.pricing?.jobs || {}) },
+          accommodations: { standard: 500, premium: 1000, urgent: 1500, ...(data?.pricing?.accommodations || {}) },
+          caterings: { standard: 500, premium: 1000, urgent: 1500, ...(data?.pricing?.caterings || {}) },
+          marketplace: { standard: 500, premium: 1000, urgent: 1500, ...(data?.pricing?.marketplace || {}) },
+          machines: { standard: 500, premium: 1000, urgent: 1500, ...(data?.pricing?.machines || {}) },
+          plots: { standard: 500, premium: 1000, urgent: 1500, ...(data?.pricing?.plots || {}) },
           professional_monthly: data?.pricing?.professional_monthly !== undefined ? data.pricing.professional_monthly : 6000
         },
         limits: {
@@ -67,12 +83,14 @@ export function GlobalSettingsTab() {
           welcome_text: data?.messages?.welcome_text || 'Dobrodošli na Svet Građevine',
           maintenance_mode: !!data?.messages?.maintenance_mode
         },
-        globalRateLimit: data?.globalRateLimit || 100,
+        globalRateLimit: data?.globalRateLimit ?? 1000,
         initialCredits: data?.initialCredits !== undefined ? data.initialCredits : 1500
       };
       setSettings(mappedData);
     } catch (err) {
-      toast.error("Greška pri učitavanju podešavanja");
+      console.error("Greška pri učitavanju podešavanja:", err);
+      // Ako fetch padne, inicijalizuj sa default vrednostima da forma i dalje radi
+      setSettings(DEFAULT_SETTINGS);
     } finally {
       setLoading(false);
     }
@@ -93,11 +111,14 @@ export function GlobalSettingsTab() {
       });
       if (res.ok) {
         toast.success("Podešavanja su sačuvana!");
+        fetchSettings(); // Osveži podatke sa servera posle uspešnog čuvanja
       } else {
-        throw new Error("Greška na serveru");
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || `Greška na serveru (${res.status})`);
       }
     } catch (err) {
-      toast.error("Greška pri čuvanju");
+      const msg = err instanceof Error ? err.message : "Greška pri čuvanju";
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -255,7 +276,7 @@ export function GlobalSettingsTab() {
                    <label className="block text-[10px] font-black text-white/20 uppercase tracking-widest mb-2 pl-2">Globalni Rate Limit (Zahtevi/Min)</label>
                    <input 
                        type="number"
-                       value={settings.globalRateLimit || 100}
+                       value={settings.globalRateLimit ?? 1000}
                        onChange={(e) => setSettings({
                          ...settings,
                          globalRateLimit: Number(e.target.value)

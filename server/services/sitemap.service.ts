@@ -229,7 +229,7 @@ export class SitemapService {
       .stream();
 
     return new Promise((resolve, reject) => {
-      queryStream.on("data", (docSnapshot: Record<string, unknown>) => {
+      queryStream.on("data", (docSnapshot: any) => {
         const data = docSnapshot.data();
         const rawTitle =
           data.title || data.name || (coll === "jobs" ? "Posao" : "Oglas");
@@ -284,7 +284,7 @@ export class SitemapService {
       .stream();
 
     return new Promise((resolve, reject) => {
-      queryStream.on("data", (docSnapshot: Record<string, unknown>) => {
+      queryStream.on("data", (docSnapshot: any) => {
         const url = `${domain}/profil/${docSnapshot.id}`;
         let entry = "  <url>\n";
         entry += `    <loc>${url}</loc>\n`;

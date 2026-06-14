@@ -7,7 +7,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   description?: string;
   icon?: string;
-  options: { value: string | number; label: string }[];
+  options: { value: string | number; label: string; className?: string }[];
   placeholder?: string;
 }
 
@@ -25,7 +25,7 @@ export function Select({ name, label, description, icon, options, required, ...p
         >
           <option value="" disabled className="bg-[#050f19]">{props.placeholder || 'Izaberite opciju'}</option>
           {options.map(opt => (
-            <option key={opt.value} value={opt.value} className="bg-[#050f19]">{opt.label}</option>
+            <option key={opt.value} value={opt.value} className={`bg-[#050f19] ${opt.className || ''}`}>{opt.label}</option>
           ))}
         </select>
         <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-[#a2acb9] pointer-events-none group-hover:text-[#ffad3a] transition-colors">

@@ -15,7 +15,7 @@ export function Step2Machines({ nextStep, prevStep }: { nextStep?: () => void; p
         <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20">
           <span className="material-symbols-outlined text-secondary">payments</span>
         </div>
-        <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Uslovi i Benefiti</h2>
+        <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Uslovi</h2>
       </div>
 
       <div className="space-y-10">

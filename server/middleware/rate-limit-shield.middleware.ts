@@ -183,7 +183,7 @@ export const rateLimitShield = async (
 
     const isStaticAsset = req.path.startsWith("/assets/") || req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|map|txt|xml)$/i);
 
-    if (!isStaticAsset) {
+    if (!isStaticAsset && !req.path.startsWith("/api/admin")) {
       const activeLimit = isWhitelistedBot ? botLimitBase : limitBase;
       const isAllowed = await RateLimiterService.isAllowed(
         `global:${hashedIp}`,

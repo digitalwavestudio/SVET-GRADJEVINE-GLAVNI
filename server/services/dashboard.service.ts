@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db } from "../config/firebase.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { CacheService } from "./cache.service.ts";
@@ -21,6 +20,7 @@ import { getErrorMessage } from "../utils/error-handler.ts";
 import { DashboardAdminService } from "./dashboard/dashboard-admin.service.ts";
 import { DashboardEmployerService } from "./dashboard/employer-dashboard.service.ts";
 import { DashboardSmartMatchService, UserMatchProfile } from "./dashboard/dashboard-matches.service.ts";
+import { ApplicationItemDTO } from "../dto/dashboard.dto.ts";
 
 // Proxy re-export for backward compatibility
 export { SimpleLRUCache };
@@ -58,7 +58,7 @@ export class DashboardService {
         }
         if (role === "majstor" || role === "MASTER") {
           const smartMatches = await DashboardService.getSmartMatches(reqUser || { uid: userId, location: "Beograd", profession: "Sve" });
-          let recentApplications = [];
+          let recentApplications: ApplicationItemDTO[] = [];
           try {
             const appsSnap = await db
               .collection("applications")

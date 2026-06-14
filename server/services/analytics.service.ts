@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { MetricsService } from "./metrics.service.ts";

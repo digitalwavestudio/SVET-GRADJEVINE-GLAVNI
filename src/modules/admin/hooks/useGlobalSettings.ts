@@ -27,6 +27,7 @@ export interface SettingsState {
     maintenance_mode: boolean;
   };
   globalRateLimit?: number;
+  initialCredits?: number;
 }
 export function useGlobalSettings() {
   return useQuery<SettingsState>({
@@ -35,17 +36,18 @@ export function useGlobalSettings() {
       const data = await apiClient.get<any>('/admin/settings/global');
       return data || {
         pricing: {
-          jobs: { standard: 0, premium: 50, urgent: 100 },
-          accommodations: { standard: 0, premium: 50, urgent: 100 },
-          caterings: { standard: 0, premium: 50, urgent: 100 },
-          marketplace: { standard: 0, premium: 50, urgent: 100 },
-          machines: { standard: 0, premium: 50, urgent: 100 },
-          plots: { standard: 0, premium: 50, urgent: 100 },
+          jobs: { standard: 500, premium: 1000, urgent: 1500 },
+          accommodations: { standard: 500, premium: 1000, urgent: 1500 },
+          caterings: { standard: 500, premium: 1000, urgent: 1500 },
+          marketplace: { standard: 500, premium: 1000, urgent: 1500 },
+          machines: { standard: 500, premium: 1000, urgent: 1500 },
+          plots: { standard: 500, premium: 1000, urgent: 1500 },
           professional_monthly: 6000
         },
         limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
         messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
         globalRateLimit: 100,
+        initialCredits: 1500,
       };
     },
     staleTime: 5 * 60 * 1000,

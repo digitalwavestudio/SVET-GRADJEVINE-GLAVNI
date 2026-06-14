@@ -3,8 +3,8 @@ import { z } from 'zod';
 export const jobSchema = z.object({
   sector: z.string().min(1, "Sektor je obavezan").optional(),
   profession: z.string().min(1, "Zanimanje je obavezno").optional(),
-  tipAngazmana: z.string().min(1, "Tip angažmana je obavezan").optional(),
-  iskustvo: z.string().min(1, "Radno iskustvo je obavezno").optional(),
+  tipAngazmana: z.string().optional(),
+  iskustvo: z.string().optional(),
   dinamikaIsplate: z.string().min(1, "Dinamika isplate je obavezna").optional(),
   phone: z.string()
     .min(6, "Neispravan format telefona")
@@ -30,7 +30,7 @@ export const jobSchema = z.object({
   viber: z.union([z.string(), z.boolean(), z.null()]).optional(),
   whatsapp: z.union([z.string(), z.boolean(), z.null()]).optional(),
   images: z.array(z.string()).optional(),
-  tacnaLokacija: z.string().min(1).optional(),
+  tacnaLokacija: z.string().optional(),
   benefits: z.array(z.string()).optional(),
   email: z.string().email().or(z.literal('')).optional(),
   status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
@@ -224,7 +224,7 @@ export const masterSearchSchema = z.object({
 
 export const adBaseSchema = z.object({
   opis: z.string().min(10, "Opis mora imati barem 10 karaktera").optional(),
-  tacnaLokacija: z.string().min(1).optional(),
+  tacnaLokacija: z.string().optional(),
   title: z.string().max(200).optional(),
   description: z.string().max(10000).optional(),
   location: z.string().min(1),

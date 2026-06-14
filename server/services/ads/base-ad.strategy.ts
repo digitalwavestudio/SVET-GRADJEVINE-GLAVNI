@@ -14,12 +14,12 @@ export abstract class BaseAdStrategy {
   abstract get entityType(): string;
 
   protected resolvePackagePrice(pkgId: string): number {
-    if (!pkgId) return 500;
+    if (!pkgId || pkgId === "free") return 0;
     if (pkgId === "premium_partner") return 6000;
     if (pkgId === "urgent") return 1500;
     if (pkgId === "standard") return 500;
     if (pkgId === "premium") return 1000;
-    return 500;
+    return 0;
   }
 
   protected async afterAdCreated(transaction: FirebaseFirestore.Transaction, adId: string, rawData: any, userData: any, adData: any): Promise<void> {

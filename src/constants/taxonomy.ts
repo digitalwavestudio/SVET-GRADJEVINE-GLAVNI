@@ -139,10 +139,7 @@ export const PROFESSIONS: Record<string, TaxonomyItem[]> = {
 
 export const EXPERIENCE_LEVELS: TaxonomyItem[] = [
   { id: 'bez-iskustva', slug: 'bez-iskustva', name: 'Može i bez iskustva' },
-  { id: 'samostalni-majstor', slug: 'samostalni-majstor', name: 'Samostalni majstor' },
-  { id: 'iskustvo-5-plus', slug: 'iskustvo-5-plus', name: 'Višegodišnje iskustvo 5+ godina' },
-  { id: 'iskustvo-10-plus', slug: 'iskustvo-10-plus', name: 'Višegodišnje iskustvo 10+ godina' },
-  { id: 'vodja-smene', slug: 'vodja-smene', name: 'Vođa smene / poslovođa' },
+  { id: 'potrebno-iskustvo', slug: 'potrebno-iskustvo', name: 'Potrebno iskustvo' },
 ];
 
 export const PAYMENT_DYNAMICS: TaxonomyItem[] = [
@@ -155,12 +152,13 @@ export const PAYMENT_DYNAMICS: TaxonomyItem[] = [
 
 export const BENEFITS: TaxonomyItem[] = [
   { id: 'smestaj', slug: 'smestaj', name: 'Smeštaj' },
-  { id: 'topli-obrok', slug: 'topli-obrok', name: 'Topli obrok' },
-  { id: 'pauza-za-kafu', slug: 'pauza-za-kafu', name: 'Pauza za kafu' },
   { id: 'prevoz', slug: 'prevoz', name: 'Prevoz do posla i nazad' },
+  { id: 'topli-obrok', slug: 'topli-obrok', name: 'Hrana' },
+  { id: 'pauza-za-kafu', slug: 'pauza-za-kafu', name: 'Pauza za kafu' },
   { id: 'htz-oprema', slug: 'htz-oprema', name: 'Radno odelo i HTZ' },
-  { id: 'prijava-ugovor', slug: 'prijava-ugovor', name: 'Prijava/ugovor obavezna' },
-  { id: 'placen-prekovremeni', slug: 'placen-prekovremeni', name: 'Plaćen prekovremeni' },
+  { id: 'alat-za-rad', slug: 'alat-za-rad', name: 'Obezbeđen alat' },
+  { id: 'prijava-ugovor', slug: 'prijava-ugovor', name: 'Prijava' },
+  { id: 'placen-prekovremeni', slug: 'placen-prekovremeni', name: 'Plaćen prekovremeni rad' },
   { id: 'pomoc-pri-vizi', slug: 'pomoc-pri-vizi', name: 'Pomoć pri vizi / radnoj dozvoli' },
 ];
 

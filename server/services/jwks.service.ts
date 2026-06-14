@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";

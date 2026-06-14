@@ -36,7 +36,7 @@ export function FormField({ name, label, description, children, required }: Form
       </AnimatePresence>
 
       {description && !error && (
-        <p className="text-[10px] text-[#a2acb9]/60 font-medium mt-2 ml-1">
+        <p className="text-sm text-[#a2acb9]/60 font-medium mt-2 ml-1">
           {description}
         </p>
       )}

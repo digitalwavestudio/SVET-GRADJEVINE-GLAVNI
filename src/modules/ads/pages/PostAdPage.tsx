@@ -70,7 +70,7 @@ function PostAdContent() {
   const launchMode = settings?.launchMode ?? true;
 
   const searchParams = new URLSearchParams(location.search);
-  const initialPackage = searchParams.get("paket") || "free";
+  const initialPackage = searchParams.get("paket") || "";
   const editType = searchParams.get("type");
   const editId = searchParams.get("id");
 
@@ -88,6 +88,7 @@ function PostAdContent() {
     isSubmitting,
     setIsSubmitted,
     isSubmitted,
+    submittedPackage,
     cooldown,
     showDepositPrompt,
     setShowDepositPrompt,
@@ -103,21 +104,9 @@ function PostAdContent() {
   const autoTitle = getAutoTitle(formData, selectedCategory, user);
 
   if (isSubmitted) {
-    if (formData.paket === "free") {
-      return (
-        <SuccessState
-          type="free"
-          onReset={() => {
-            setIsSubmitted(false);
-            setStep(1);
-            setSelectedCategory(null);
-          }}
-        />
-      );
-    }
     const currentPackage = getPackageById(
       selectedCategory || "job",
-      formData.paket
+      submittedPackage || formData.paket
     );
     return (
       <SuccessState

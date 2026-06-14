@@ -265,7 +265,7 @@ export interface AdFormData {
 
 export function usePostAdController({ initialPackage, editId, editType, editFlag, launchMode }: UsePostAdControllerProps) {
   const { showSuccess, showError } = useToast();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   
   const selectedCategory = usePostAdStore((state) => state.selectedCategory);
   const setSelectedCategory = usePostAdStore((state) => state.setSelectedCategory);
@@ -282,6 +282,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedPackage, setSubmittedPackage] = useState<string | null>(null);
   const [createdAdId, setCreatedAdId] = useState<string | null>(null);
   const [paymentTab, setPaymentTab] = useState<'uplatnica' | 'faktura'>('uplatnica');
   const [editItem, setEditItem] = useState<AdItemData | null>(null);
@@ -596,10 +597,19 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         }
       }
 
+      setSubmittedPackage(result.sData?.paket || null);
       setIsSubmitted(true);
       showSuccess(editId ? 'Oglas uspešno izmenjen!' : 'Oglas uspešno postavljen!');
       reset();
       resetFormStore();
+
+      // Osveži wallet balance nakon uspešne objave
+      apiClient.get('/users/me').then((freshUser: any) => {
+        if (freshUser && typeof freshUser.walletBalance === 'number' && updateUser) {
+          updateUser({ walletBalance: freshUser.walletBalance });
+        }
+      }).catch(() => {});
+
       // Optimizacija: Uklonjen queryClient.invalidateQueries({ queryKey: ['ads'] }) kako bi izbegli masovni refetch.
       // Lista će se refetch-ovati prirodno kada joj istekne stale time ili putem optimistic updates.
     },
@@ -719,28 +729,28 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         3: ['companySubCats', 'companyReferences', 'companyTeamSpecialties', 'companyLicenses', 'companyCertifications', 'companyEquipmentSummary', 'companyPortfolioImages']
       },
       machines: {
-        1: ['machCategory', 'machSubCategory', 'machBrand', 'machModel', 'location', 'tacnaLokacija'],
+        1: ['machCategory', 'machSubCategory', 'machBrand', 'machModel', 'location'],
         2: ['machAdType', 'machPrice', 'machPricePerDay', 'machYear', 'machHours', 'machOperator', 'machPower', 'machFuel', 'machWeight', 'machWeightKg', 'machLengthMm', 'machWidthMm', 'machHeightMm', 'machLoadCapacityKg', 'machBucketCapacityM3', 'machMaxDigDepthMm', 'machMaxReachMm']
       },
       accommodation: {
-        1: ['accType', 'location', 'tacnaLokacija'],
+        1: ['accType', 'location'],
         2: ['totalBeds', 'availableBeds', 'price', 'priceType', 'accDistanceToSiteKm', 'accMinStayDays']
       },
       catering: {
-        1: ['catKitchenType', 'location', 'tacnaLokacija'],
+        1: ['catKitchenType', 'location'],
         2: ['catMinOrder', 'catPricePerMeal', 'catDeliveryZone', 'catDailyCapacityMeals']
       },
       plot: {
-        1: ['plotPurpose', 'location', 'tacnaLokacija'],
+        1: ['plotPurpose', 'location'],
         2: ['plotArea', 'plotAreaUnit', 'plotPrice', 'plotCurrency', 'plotAccessRoad', 'plotOccupancy', 'plotCadastralNumber', 'plotCadastralMunicipality', 'plotBuildabilityIndex', 'plotMaxFloors', 'plotMinParcelSize', 'plotMaxParcelSize', 'plotBuildingHeight', 'plotParkingStandard', 'plotProductionParkingStandard', 'plotParcelNumbers', 'plotMunicipalityName', 'plotPopulationEstimate', 'plotAverageSalary', 'plotMarketValueEstimate', 'plotDevelopmentFeeBusiness', 'plotDevelopmentFeeResidential']
       },
       marketplace: {
-        1: ['marketCategory', 'title', 'location', 'tacnaLokacija'],
+        1: ['marketCategory', 'title', 'location'],
         2: ['marketCondition', 'marketValue']
       },
       job: {
-        1: ['sector', 'profession', 'location', 'tacnaLokacija'],
-        2: ['plataMin', 'plataMax', 'iskustvo', 'tipAngazmana', 'dinamikaIsplate']
+        1: ['sector', 'profession', 'location'],
+         2: ['plataMin', 'plataMax', 'dinamikaIsplate']
       }
     };
 
@@ -792,6 +802,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     step, setStep, nextStep, prevStep,
     isUploadingImages, isSubmitting, setIsSubmitting,
     isSubmitted, setIsSubmitted,
+    submittedPackage,
     createdAdId,
     sessionRefId,
     paymentTab, setPaymentTab,

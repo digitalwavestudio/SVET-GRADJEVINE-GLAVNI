@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db, admin } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { BigQueryService } from "./bigquery.service.ts";

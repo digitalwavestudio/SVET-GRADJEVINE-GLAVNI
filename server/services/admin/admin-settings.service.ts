@@ -52,18 +52,22 @@ export class AdminSettingsService {
 
     // Sync with DynamicConfigService if global settings changed
     if (type === "global") {
-      if (updates.globalRateLimit !== undefined) {
-        await DynamicConfigService.set(
-          "globalRateLimit",
-          updates.globalRateLimit,
-        );
-      }
+      try {
+        if (updates.globalRateLimit !== undefined) {
+          await DynamicConfigService.set(
+            "globalRateLimit",
+            updates.globalRateLimit,
+          );
+        }
 
-      if ((updates.messages as { maintenance_mode?: boolean })?.maintenance_mode !== undefined) {
-        await DynamicConfigService.set(
-          "isMaintenanceMode",
-          (updates.messages as { maintenance_mode: boolean }).maintenance_mode,
-        );
+        if ((updates.messages as { maintenance_mode?: boolean })?.maintenance_mode !== undefined) {
+          await DynamicConfigService.set(
+            "isMaintenanceMode",
+            (updates.messages as { maintenance_mode: boolean }).maintenance_mode,
+          );
+        }
+      } catch (err) {
+        console.error("[AdminSettingsService] DynamicConfigService sync failed (non-blocking):", err);
       }
     }
 
@@ -112,18 +116,18 @@ export class AdminSettingsService {
           console.log("AdminSettings doc:", type, "exists:", doc.exists, "data:", doc.data?.());
           if (doc.exists && doc.data && doc.data()) {
              const data = doc.data();
-              if (type === "global") {
-                 return {
-                    pricing: {
-                       jobs: { standard: 0, premium: 50, urgent: 100 },
-                       accommodations: { standard: 0, premium: 50, urgent: 100 },
-                       caterings: { standard: 0, premium: 50, urgent: 100 },
-                       marketplace: { standard: 0, premium: 50, urgent: 100 },
-                       machines: { standard: 0, premium: 50, urgent: 100 },
-                       plots: { standard: 0, premium: 50, urgent: 100 },
-                       professional_monthly: 6000,
-                       ...data?.pricing
-                    },
+               if (type === "global") {
+                  return {
+                     pricing: {
+                        jobs: { standard: 500, premium: 1000, urgent: 1500 },
+                        accommodations: { standard: 500, premium: 1000, urgent: 1500 },
+                        caterings: { standard: 500, premium: 1000, urgent: 1500 },
+                        marketplace: { standard: 500, premium: 1000, urgent: 1500 },
+                        machines: { standard: 500, premium: 1000, urgent: 1500 },
+                        plots: { standard: 500, premium: 1000, urgent: 1500 },
+                        professional_monthly: 6000,
+                        ...data?.pricing
+                     },
                     limits: { free_listings_per_month: 3, max_images_per_ad: 10, ...data?.limits },
                     messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false, ...data?.messages },
                     globalRateLimit: data?.globalRateLimit || 100,
@@ -138,16 +142,16 @@ export class AdminSettingsService {
              primaryColor: "#0f172a",
              secondaryColor: "#3b82f6" 
            };
-           if (type === "global") return {
-             pricing: {
-                jobs: { standard: 0, premium: 50, urgent: 100 },
-                accommodations: { standard: 0, premium: 50, urgent: 100 },
-                caterings: { standard: 0, premium: 50, urgent: 100 },
-                marketplace: { standard: 0, premium: 50, urgent: 100 },
-                machines: { standard: 0, premium: 50, urgent: 100 },
-                plots: { standard: 0, premium: 50, urgent: 100 },
-                professional_monthly: 6000
-             },
+            if (type === "global") return {
+              pricing: {
+                 jobs: { standard: 500, premium: 1000, urgent: 1500 },
+                 accommodations: { standard: 500, premium: 1000, urgent: 1500 },
+                 caterings: { standard: 500, premium: 1000, urgent: 1500 },
+                 marketplace: { standard: 500, premium: 1000, urgent: 1500 },
+                 machines: { standard: 500, premium: 1000, urgent: 1500 },
+                 plots: { standard: 500, premium: 1000, urgent: 1500 },
+                 professional_monthly: 6000
+              },
              limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
              messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
              globalRateLimit: 100,
@@ -175,16 +179,16 @@ export class AdminSettingsService {
          heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
          primaryColor: "#0f172a",
          secondaryColor: "#3b82f6" 
-       } : (type === "global" ? {
-         pricing: {
-            jobs: { standard: 0, premium: 50, urgent: 100 },
-            accommodations: { standard: 0, premium: 50, urgent: 100 },
-            caterings: { standard: 0, premium: 50, urgent: 100 },
-            marketplace: { standard: 0, premium: 50, urgent: 100 },
-            machines: { standard: 0, premium: 50, urgent: 100 },
-            plots: { standard: 0, premium: 50, urgent: 100 },
-            professional_monthly: 6000
-         },
+        } : (type === "global" ? {
+          pricing: {
+             jobs: { standard: 500, premium: 1000, urgent: 1500 },
+             accommodations: { standard: 500, premium: 1000, urgent: 1500 },
+             caterings: { standard: 500, premium: 1000, urgent: 1500 },
+             marketplace: { standard: 500, premium: 1000, urgent: 1500 },
+             machines: { standard: 500, premium: 1000, urgent: 1500 },
+             plots: { standard: 500, premium: 1000, urgent: 1500 },
+             professional_monthly: 6000
+          },
          limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
          messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
          globalRateLimit: 100,

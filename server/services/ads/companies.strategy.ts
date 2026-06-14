@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { BaseAdStrategy } from "./base-ad.strategy.ts";
 import { admin as firebaseAdmin } from "../../config/firebase.ts";
 

@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { UnifiedSearchService } from "./unified-search.service.js";
+import { UnifiedSearchService, UnifiedSearchResult } from "./unified-search.service.js";
 import { CacheService } from "./cache.service.js";
 
 export class MatrixRouter {
@@ -75,14 +74,13 @@ export class MatrixRouter {
     cacheKey: string
   ): Promise<void> {
     try {
-      const result: { hits?: unknown[]; data?: unknown[]; length?: number } | unknown[] | null = await UnifiedSearchService.search(
+      const result = await UnifiedSearchService.search(
         category,
         { query: queryStr, skipCount: true },
         3,
       );
 
-      const count =
-        (result as { hits?: unknown[] })?.hits?.length || (result as { data?: unknown[] })?.data?.length || (Array.isArray(result) ? result.length : (result as { length?: number })?.length) || 0;
+      const count = result.docs?.length || result.totalHits || 0;
 
       const isIndexable = count >= 3;
 

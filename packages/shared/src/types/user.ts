@@ -154,4 +154,5 @@ export interface User {
     unreadMessages?: number;
     [key: string]: any;
   };
+  fcmTokens?: string[];
 }

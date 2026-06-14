@@ -1,7 +1,6 @@
-﻿// @ts-nocheck
-import { db } from "../../config/firebase.ts";
+﻿import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
-import { SEOSchemaService } from "./seo-schema.service.ts";
+import { SEOSchemaService, SEOEntityData } from "./seo-schema.service.ts";
 
 export class SEOMetaService {
   static async getAdMetaData(
@@ -82,13 +81,13 @@ export class SEOMetaService {
 
       const collectionName = typeToCollection[baseEntity] || baseEntity;
       
-      const cachedDoc = await CacheService.getOrSet<{ exists: boolean; data: any }>(
+      const cachedDoc = await CacheService.getOrSet<{ exists: boolean; data: SEOEntityData | null }>(
         `seo_meta:${collectionName}:${rawId}`,
         async () => {
           const doc = await db.collection(collectionName).doc(rawId).get();
           return {
             exists: doc.exists,
-            data: doc.exists ? doc.data() : null
+            data: doc.exists ? doc.data() as SEOEntityData : null
           };
         },
         6 * 60 * 60 * 1000 // 6 sati TTL
@@ -136,10 +135,10 @@ export class SEOMetaService {
         description,
         image,
         url,
-        updatedAt: data?.updatedAt?.toMillis
-          ? data.updatedAt.toMillis()
-          : data?.createdAt?.toMillis
-            ? data.createdAt.toMillis()
+        updatedAt: data?.updatedAt && typeof data.updatedAt === "object"
+          ? (data.updatedAt as { toMillis: () => number }).toMillis()
+          : data?.createdAt && typeof data.createdAt === "object"
+            ? (data.createdAt as { toMillis: () => number }).toMillis()
             : Date.now(),
         viewsCount:
           data?.viewsCount ||
@@ -165,7 +164,7 @@ export class SEOMetaService {
     }
   }
 
-  static generateRagSummary(type: string, data: any): string {
+  static generateRagSummary(type: string, data: SEOEntityData): string {
     const title = data.title || data.name || data.adTitle || "Entitet";
     const loc =
       data.location || data.locationSlug || data.city || data.loc || "Srbiji";
@@ -177,8 +176,8 @@ export class SEOMetaService {
     const id = data.id || "nepoznatom ID-u";
     const date = data.createdAt
       ? new Date(
-          data.createdAt.toMillis
-            ? data.createdAt.toMillis()
+          data.createdAt && typeof data.createdAt === "object"
+            ? (data.createdAt as { toMillis: () => number }).toMillis()
             : typeof data.createdAt === "number"
               ? data.createdAt
               : Date.now(),
@@ -297,7 +296,7 @@ export class SEOMetaService {
 
   static generateBotHtml(
     type: string,
-    data: Record<string, unknown>,
+    data: SEOEntityData,
     fullPath?: string,
   ): string {
     const title = data.title || data.name || data.adTitle || "Oglas";
@@ -388,7 +387,7 @@ export class SEOMetaService {
 
   static generateInternalLinkingMatrix(
     type: string,
-    data: Record<string, unknown>,
+    data: SEOEntityData,
   ): string {
     let links = "";
     const loc = data.location || data.locationSlug || data.city || data.loc;

@@ -1,6 +1,82 @@
-// @ts-nocheck
 import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
+
+export interface SEOEntityData {
+  [key: string]: unknown;
+  id?: string;
+  uid?: string;
+  title?: string;
+  name?: string;
+  adTitle?: string;
+  description?: string;
+  kategorija?: string;
+  zanimanje?: string;
+  category?: string;
+  subcategory?: string;
+  namena?: string;
+  location?: string;
+  locationSlug?: string;
+  city?: string;
+  grad?: string;
+  loc?: string;
+  companyId?: string;
+  comp?: string;
+  companyName?: string;
+  tipAngazmana?: string;
+  iskustvo?: string;
+  salary?: string | number;
+  plataMin?: number;
+  plataMax?: number;
+  logo?: string;
+  images?: string[];
+  photoURL?: string;
+  photo?: string;
+  avatar?: string;
+  website?: string;
+  socialLinks?: { facebook?: string; instagram?: string; linkedin?: string };
+  pib?: string;
+  services?: string[];
+  isVerified?: boolean;
+  verified?: boolean;
+  stats?: { averageRating?: number; totalReviews?: number; views?: number | string };
+  averageRating?: number;
+  reviewCount?: number;
+  reviewsCount?: number;
+  profileScore?: number;
+  price?: string | number;
+  currency?: string;
+  tip?: string;
+  type?: string;
+  tacnaLokacija?: string;
+  address?: string;
+  telefon?: string;
+  contactPhone?: string;
+  phone?: string;
+  profession?: string;
+  about?: string;
+  skills?: string[];
+  role?: string;
+  email?: string;
+  contact?: string;
+  employeeCount?: string | number;
+  industry?: string;
+  status?: string;
+  viewsCount?: number;
+  createdAt?: { toDate?: () => Date; toMillis?: () => number } | number | string;
+  updatedAt?: { toDate?: () => Date; toMillis?: () => number } | number | string;
+}
+
+interface GraphEntity {
+  "@type"?: string;
+  name?: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+  address?: { addressLocality?: string };
+  offers?: { price?: string | number; priceCurrency?: string };
+  baseSalary?: { currency?: string; value?: { value?: number; minValue?: number } };
+}
 
 export class SEOSchemaService {
   /**
@@ -43,7 +119,7 @@ export class SEOSchemaService {
 
   public static async generateStructuredData(
     type: string,
-    data: Record<string, unknown>,
+    data: SEOEntityData,
     fullPath?: string,
   ) {
     const rawId = data?.id || data?.uid || "generic";
@@ -104,16 +180,16 @@ export class SEOSchemaService {
           item: locationPath,
         });
       }
-      breadcrumbItems.push({ name: data.title, item: canonicalEntityUrl });
+      breadcrumbItems.push({ name: data.title || "", item: canonicalEntityUrl });
       const companyId = data.companyId || data.comp;
       const schema: Record<string, unknown> = {
         "@context": "https://schema.org/",
         "@type": "JobPosting",
         "@id": `${canonicalEntityUrl}#posting`,
-        title: data.title,
-        description: data.description,
+        title: data.title || "",
+        description: data.description || "",
         datePosted:
-          data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          (data.createdAt as { toDate?: () => Date })?.toDate?.()?.toISOString() || new Date().toISOString(),
         validThrough: new Date(
           Date.now() + 60 * 24 * 60 * 60 * 1000,
         ).toISOString(),
@@ -167,12 +243,12 @@ export class SEOSchemaService {
           item: `https://svetgradjevine.com/firme/${this.slugify(data.city)}`,
         });
       }
-      breadcrumbItems.push({ name: data.name, item: canonicalEntityUrl });
+      breadcrumbItems.push({ name: data.name || "", item: canonicalEntityUrl });
 
       const schema: Record<string, unknown> = {
         "@context": "https://schema.org",
         "@type": "ConstructionBusiness",
-        name: data.name,
+        name: data.name || "",
         image: data.images?.[0] || data.logo,
         description: data.description,
         address: {
@@ -229,8 +305,8 @@ export class SEOSchemaService {
     }
 
     if (type === "machines" || type === "marketplace" || type === "plots") {
-      const catMapping: Record<string, string> = {
-        machines: ["MaÅ¡ine", "gradjevinske-masine"],
+      const catMapping: Record<string, string[]> = {
+        machines: ["Mašine", "gradjevinske-masine"],
         marketplace: ["Alat i Oprema", "alat-i-oprema"],
         plots: ["Placevi", "placevi"],
       };
@@ -252,9 +328,9 @@ export class SEOSchemaService {
       }
 
       if (data.grad || data.city || data.location) {
-        const loc = data.grad || data.city || data.location;
+        const loc = data.grad || data.city || data.location || "";
         const locPath = subCategory
-          ? `https://svetgradjevine.com/${catPath}/${this.slugify(subCategory)}/${this.slugify(loc)}`
+          ? `https://svetgradjevine.com/${catPath}/${this.slugify(subCategory || "")}/${this.slugify(loc)}`
           : `https://svetgradjevine.com/${catPath}/lokacija/${this.slugify(loc)}`;
         breadcrumbItems.push({
           name: loc,
@@ -263,7 +339,7 @@ export class SEOSchemaService {
       }
 
       breadcrumbItems.push({
-        name: data.title || data.name || data.adTitle,
+        name: data.title || data.name || data.adTitle || "",
         item: canonicalEntityUrl,
       });
 
@@ -305,11 +381,11 @@ export class SEOSchemaService {
         breadcrumbItems.push({ name: city, item: cityPath });
       }
 
-      breadcrumbItems.push({ name: data.title, item: canonicalEntityUrl });
+      breadcrumbItems.push({ name: data.title || "", item: canonicalEntityUrl });
       schemas.push({
         "@context": "https://schema.org",
         "@type": "LodgingBusiness",
-        name: data.title,
+        name: data.title || "",
         description: data.description,
         image: data.images?.[0] || "",
         address: {
@@ -340,13 +416,13 @@ export class SEOSchemaService {
       }
 
       breadcrumbItems.push({
-        name: data.title || data.name,
+        name: data.title || data.name || "",
         item: canonicalEntityUrl,
       });
       schemas.push({
         "@context": "https://schema.org",
         "@type": "FoodEstablishment",
-        name: data.title || data.name,
+        name: data.title || data.name || "",
         description: data.description,
         image: data.images?.[0] || "",
         address: {
@@ -385,14 +461,14 @@ export class SEOSchemaService {
       }
 
       breadcrumbItems.push({
-        name: data.name || data.title,
+        name: data.name || data.title || "",
         item: canonicalEntityUrl,
       });
 
       const schema: Record<string, unknown> = {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
-        name: data.name || data.title,
+        name: data.name || data.title || "",
         image: data.photo || data.avatar || data.images?.[0] || "",
         description:
           data.description?.substring(0, 300) ||
@@ -484,7 +560,7 @@ export class SEOSchemaService {
       const cached = await CacheService.get<Record<string, unknown>[]>(cacheKey);
       if (cached) return cached;
 
-      const graph: Record<string, unknown>[] = [];
+      const graph: GraphEntity[] = [];
       const collections = [
         { name: "jobs", type: "JobPosting" },
         { name: "machines", type: "Product" },
@@ -543,7 +619,7 @@ export class SEOSchemaService {
   static async generateKnowledgeGraphXML() {
     const feed = await this.generateKnowledgeGraph();
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<knowledgeGraph xmlns="https://schema.org/">\n`;
-    const items = (feed as { "@graph"?: Record<string, unknown>[] })["@graph"] || [];
+    const items = (feed as { "@graph"?: GraphEntity[] })["@graph"] || [];
 
     for (const item of items) {
       xml += `  <entity type="${item["@type"]}">\n`;

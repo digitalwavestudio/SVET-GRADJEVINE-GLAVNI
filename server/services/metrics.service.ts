@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { db, admin as firebaseAdmin } from "../config/firebase.ts";
 import { env } from "../config/env.ts";
@@ -246,7 +245,7 @@ export class MetricsService {
       )
         return;
 
-      const processInChunks = async (items: any[], redisKey: string, processor: (batch: import("firebase-admin/firestore").WriteBatch, key: string, count: number) => void, onSuccess?: () => void) => {
+      const processInChunks = async (items: any[], redisKey: string, processor: (batch: import("firebase-admin/firestore").WriteBatch, key: string, count: number) => void, onSuccess?: (keys: string[]) => void) => {
         if (!items || items.length === 0) return;
         const chunkSize = 400;
         for (let i = 0; i < items.length; i += chunkSize) {
@@ -367,7 +366,7 @@ export class MetricsService {
   private static flushInterval: NodeJS.Timeout;
 
   static init() {
-    if (env.NODE_ENV === "production" && env.NODE_ENV !== "test") {
+    if (env.NODE_ENV === "production") {
       if (!this.flushInterval) {
         this.flushInterval = setInterval(
           () => this.flushMetrics(),
@@ -429,7 +428,7 @@ export class MetricsService {
             .limit(365)
             .get();
 
-          const snapshot = await Promise.race([queryPromise, timeoutPromise]);
+          const snapshot = await Promise.race([queryPromise, timeoutPromise]) as Awaited<typeof queryPromise>;
 
           const statsMap: Record<string, any> = {};
           snapshot.docs.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
