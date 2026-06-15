@@ -219,7 +219,7 @@ export default React.memo(function DashboardHeader({
                 {roleData.walletVerified && <span className="text-[8px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-[3px] font-black leading-none ml-1">SECURE</span>}
               </div>
               <div className="text-3xl font-black text-green-400 group-hover:text-green-300 transition-colors tracking-tight leading-none flex items-center gap-2">
-                {((roleData.walletBalance || user?.walletBalance || 0) || (user?.email === "mancoresolution@gmail.com" ? 90080 : 0)).toLocaleString("sr-RS")} <span className="text-white/40 text-sm font-bold">Kredita</span>
+                {(roleData.walletBalance ?? user?.walletBalance ?? 0).toLocaleString("sr-RS")} <span className="text-white/40 text-sm font-bold">Kredita</span>
               </div>
             </div>
           </Button>

@@ -1,4 +1,4 @@
-import React, { memo, useState, Suspense, lazy, useRef } from 'react';
+import React, { memo, useState, useMemo, Suspense, lazy, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -23,11 +23,6 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
   const profileScore = calculateProfileScore(user);
 
-  const currentHour = new Date().getHours();
-  let greeting = 'DOBAR DAN';
-  if (currentHour < 12) greeting = 'DOBRO JUTRO';
-  else if (currentHour > 18) greeting = 'DOBRO VEČE';
-
   const recentAds: RecentAd[] = Array.isArray(statsData?.recentAds) 
     ? statsData.recentAds.map((ad) => ({
         id: ad.id,
@@ -35,10 +30,21 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
         status: ad.status || "active",
         applicantsCount: (ad as { applicantsCount?: number }).applicantsCount ?? 0,
         type: ad.postType,
+        health: (ad as { health?: RecentAd['health'] }).health,
         createdAt: ad.createdAt ? String(ad.createdAt) : undefined,
       }) as RecentAd)
     : [];
-  const charts = { dailyAnalytics: Array.isArray(trends) ? (trends as ChartTrendData[]) : [] };
+
+  const filteredTrends = useMemo(() => {
+    const days = timeframe === 'day' ? 1 : timeframe === 'week' ? 7 : 30;
+    const now = Date.now();
+    return (trends as ChartTrendData[]).filter(t => {
+      const d = new Date(t.date);
+      return now - d.getTime() <= days * 86400000;
+    });
+  }, [trends, timeframe]);
+
+  const charts = { dailyAnalytics: Array.isArray(filteredTrends) ? (filteredTrends as ChartTrendData[]) : [] };
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -153,7 +159,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                   {statsData?.activePackage || "NEMA PAKETA"}
                 </div>
                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
-                  {statsData?.pendingApplications ? "AKTIVAN PAKET" : "PREMIUM PROMOCIJE"}
+                  {statsData?.activePackage && statsData.activePackage !== "Nema paketa" ? "AKTIVAN PAKET" : "PREMIUM PROMOCIJE"}
                </div>
              </div>
           </div>
@@ -209,15 +215,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                 )}
               </div>
 
-              {recentAds === undefined || recentAds === null ? (
-                <div className="flex-1 bg-white/[0.01] border border-dashed border-white/5 rounded-[10px] p-12 flex flex-col items-center justify-center gap-4 text-center">
-                  <span className="material-symbols-outlined text-white/10 text-4xl">cloud_off</span>
-                  <div className="space-y-1">
-                    <h5 className="text-white/60 text-xs font-black uppercase tracking-wider">Spisak oglasa je privremeno nedostupan</h5>
-                    <p className="text-white/20 text-[9px] uppercase tracking-widest max-w-xs mx-auto">Sistem je parcijalno uspeo da učita profil, ali ne i listu oglasa.</p>
-                  </div>
-                </div>
-              ) : recentAds.length > 0 ? (
+              {recentAds.length > 0 ? (
                 <div ref={parentRef} className="flex-1 overflow-y-auto no-scrollbar scroll-smooth pr-2">
                   <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
                     {virtualizer.getVirtualItems().map((virtualItem) => {

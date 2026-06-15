@@ -110,12 +110,12 @@ export function useDashboardNavigation() {
         return [
           { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
-          { label: 'NADZORNI CENTAR', path: '/moj-profil/gradiliste', icon: 'monitoring' },
-          { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
-          { label: 'KALENDAR', path: '/moj-profil/kalendar', icon: 'calendar_month' },
-          { label: 'KANDIDATI', path: '/moj-profil/kandidati', icon: 'groups' },
-          { label: 'PROFIL FIRME', path: '/moj-profil/firma', icon: 'business' },
           { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
+          { label: 'PRIJAVE', path: '/moj-profil/prijave', icon: 'assignment' },
+          { label: 'UPITI', path: '/moj-profil/upiti', icon: 'mark_email_unread' },
+          { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
+          { label: 'OBAVEŠTENJA', path: '/moj-profil/obavestenja', icon: 'notifications' },
+          { label: 'VERIFIKACIJA', path: '/moj-profil/verifikacija', icon: 'verified' },
           { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
         ];

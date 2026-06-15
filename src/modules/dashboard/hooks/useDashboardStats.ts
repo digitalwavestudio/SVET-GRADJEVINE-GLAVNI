@@ -159,6 +159,7 @@ export const BffDashboardResponseSchema = z.object({
     z.object({
       name: z.string(),
       pregledi: z.number(),
+      prijave: z.number().optional(),
     })
   ).optional().catch((ctx) => {
     logZodFieldFailure("trends", ctx.error);
@@ -551,7 +552,7 @@ const selectApplicationsCount = (res: BffDashboardResponse): number => res?.stat
 const selectTrends = (res: BffDashboardResponse): { date: string; views: number; applications: number; }[] => (res?.trends || []).map(t => ({
   date: t.name,
   views: t.pregledi,
-  applications: 0
+  applications: t.prijave ?? 0
 }));
 const selectMetrics = (res: BffDashboardResponse): Required<BffDashboardResponse>["stats"] => res?.stats || {};
 const selectRecentAds = (res: BffDashboardResponse): z.infer<typeof DashboardAdSchema>[] => res?.stats?.recentAds || [];
