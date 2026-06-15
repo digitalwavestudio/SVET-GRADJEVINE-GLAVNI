@@ -273,11 +273,28 @@ useEffect(() => {
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
       try {
-        // Attempt popup login first
-        await signInWithPopup(auth, googleProvider);
+        const result = await signInWithPopup(auth, googleProvider);
+        if (result.user) {
+          const token = await result.user.getIdToken();
+          await fetch('/api/users/init', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              email: result.user.email,
+              uid: result.user.uid,
+              name: result.user.displayName || '',
+              role: defaultRole || 'standard',
+              status: 'active',
+              isPremiumProfile: false,
+              photoURL: result.user.photoURL || '',
+              walletBalance: 1500,
+              viewsCount: 0,
+              freeAdsCount: 0
+            })
+          });
+        }
       } catch (err: any) {
         console.warn('[AUTH] Popup login failed, falling back to redirect:', err);
-        // Fallback to redirect for environments where popups are blocked (incognito, Brave, etc.)
         try {
           await signInWithRedirect(auth, googleProvider);
         } catch (redirectErr) {

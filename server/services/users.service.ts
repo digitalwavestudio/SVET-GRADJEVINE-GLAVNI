@@ -189,7 +189,7 @@ export class UsersService {
     const result = await db.runTransaction(async (transaction) => {
       const userSnap = await transaction.get(userRef);
       
-      let newRole = payload.role || 'private';
+      let newRole = payload.role || 'standard';
       const isNew = !userSnap.exists;
 
       const baseData: Record<string, unknown> = {

@@ -2,7 +2,7 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth, UserRole } from '@/src/context/AuthContext';
+import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.png';
 import { useToast } from '@/src/context/ToastContext';
@@ -16,14 +16,10 @@ export default function RegisterPage() {
   const { loginWithGoogle, user, loading: authLoading } = useAuth();
   const { addToast } = useToast();
   const { logoUrl } = useBrandLogo();
-  const [role, setRole] = useState<UserRole>('standard');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    confirmPassword: '', // Polje za potvrdu lozinke
-    companyName: '', // Novo za firme
-    mb: '',
-    pib: '',
+    confirmPassword: '',
     termsAccepted: false,
     _honeypot: ''
   });
@@ -32,22 +28,9 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Set page title for mobile view
   useEffect(() => {
     document.title = "Registracija - Svet Građevine";
   }, []);
-
-  // Initial credits logic based on role
-  const getInitialStats = (selectedRole: UserRole) => {
-    return {
-      availableCredits: 0, 
-      walletBalance: 1500, // 1500 SG Kredita gratis
-      packageType: 'free',
-      profileScore: 0,
-      viewsCount: 0,
-      totalAds: 0
-    };
-  };
 
   // Handle redirect after registration
   const from = location.state?.from?.pathname || '/kontrolna-tabla';
@@ -88,6 +71,10 @@ export default function RegisterPage() {
       setError('Bot detected.');
       return;
     }
+    if (!formData.termsAccepted) {
+      setError('Morate prihvatiti uslove korišćenja.');
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError('Lozinke se ne podudaraju. Molimo proverite ponovni unos.');
       return;
@@ -104,26 +91,22 @@ export default function RegisterPage() {
       const user = userCred.user;
       const emailPrefix = formData.email.split('@')[0];
       const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-      const stats = getInitialStats(role);
       
       const userDoc = {
         firstName: '',
         lastName: '',
-        name: role !== 'standard' ? formData.companyName || defaultName : defaultName,
-        role: role,
+        name: defaultName,
+        role: 'standard',
         isVerified: false,
-        mb: formData.mb,
-        pib: formData.pib,
-        licences: [],
-        ...stats,
-        // Send fields expected by API /init:
-        displayName: role !== 'standard' ? formData.companyName || defaultName : defaultName,
+        displayName: defaultName,
         email: user.email,
         uid: user.uid,
         status: 'active',
         isPremiumProfile: false,
         photoURL: '',
-        freeAdsCount: stats.availableCredits
+        walletBalance: 1500,
+        viewsCount: 0,
+        freeAdsCount: 0
       };
 
       const token = await user.getIdToken();
@@ -177,7 +160,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      await loginWithGoogle(role);
+      await loginWithGoogle('standard');
     } catch (error: any) {
       console.error(error);
       if (error?.code === 'auth/popup-blocked') {
@@ -303,47 +286,6 @@ export default function RegisterPage() {
             />
 
             <form onSubmit={handleRegister} className="space-y-5">
-              {role === 'kompanija' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Naziv firme</label>
-                    <input 
-                      type="text"
-                      name="companyName"
-                      value={formData.companyName}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                      placeholder="Npr. Građevinar d.o.o." 
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Matični Broj (MB)</label>
-                      <input 
-                        type="text"
-                        name="mb"
-                        value={formData.mb}
-                        onChange={handleInputChange}
-                        className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                        placeholder="MB firme" 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">PIB</label>
-                      <input 
-                        type="text"
-                        name="pib"
-                        value={formData.pib}
-                        onChange={handleInputChange}
-                        className="w-full bg-white border border-outline-variant/20 text-black placeholder:text-gray-500 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                        placeholder="PIB firme" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Email adresa</label>
                 <input 
@@ -394,9 +336,18 @@ export default function RegisterPage() {
                 </div>
               </div>
               
-              <p className="text-xs text-on-surface-variant leading-relaxed py-2">
-                Registracijom prihvatate <Link to="/uslovi-koriscenja" className="text-primary hover:underline font-bold">Uslove korišćenja</Link> i <Link to="/politika-privatnosti" className="text-primary hover:underline font-bold">Politiku privatnosti</Link>.
-              </p>
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  name="termsAccepted"
+                  checked={formData.termsAccepted}
+                  onChange={handleInputChange}
+                  className="mt-1 h-4 w-4 rounded border-outline-variant/40 text-primary focus:ring-primary cursor-pointer"
+                />
+                <span className="text-xs text-on-surface-variant leading-relaxed select-none">
+                  Prihvatam <Link to="/uslovi-koriscenja" className="text-primary hover:underline font-bold">Uslove korišćenja</Link> i <Link to="/politika-privatnosti" className="text-primary hover:underline font-bold">Politiku privatnosti</Link>.
+                </span>
+              </label>
 
               <button 
                 type="submit"
