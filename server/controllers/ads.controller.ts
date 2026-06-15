@@ -76,6 +76,13 @@ export const getMyAds = async (
         const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
         const { myAdsResponseSchema } = await import("../dto/ads.dto.ts");
         const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum, cursor as string, searchQ as string);
+
+        // Dijagnostika: ako je prazno, proveri da li uopste postoje dokumenti za ovog usera
+        if (resPayload.docs.length === 0) {
+          const countSnap = await db.collection("listings").where("authorId", "==", user.uid).count().get().catch(() => null);
+          console.log(`[ADS] getMyAds DIAG: uid=${user.uid}, limit=${limitNum}, totalDocsForUser=${countSnap?.data()?.count || 'ERROR'}, sampleAuthorId=null`);
+        }
+
         resultPayload = myAdsResponseSchema.parse(resPayload);
         await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch(() => {});
       } catch (quotaError: any) {
