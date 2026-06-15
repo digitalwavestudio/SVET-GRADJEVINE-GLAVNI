@@ -40,6 +40,13 @@ async function startServer() {
           @keyframes spin { to { transform: rotate(360deg); } }
           .container { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px; }
         </style>
+        <script>
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              regs.forEach(function(reg) { reg.unregister(); });
+            });
+          }
+        </script>
       </head>
       <body>
         <div class="container">
@@ -242,7 +249,7 @@ async function startServer() {
     if (process.env.NODE_ENV !== "production" && !isCompiledBundle) {
       const { createServer: createViteServer } = await import("vite");
       const vite = await createViteServer({
-        server: { middlewareMode: true, hmr: false },
+        server: { middlewareMode: true, hmr: process.env.DISABLE_HMR !== 'true' },
         appType: "spa",
       });
       app.use(vite.middlewares);

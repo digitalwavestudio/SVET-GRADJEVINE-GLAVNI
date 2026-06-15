@@ -96,6 +96,12 @@
           }
         }
       })();
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(reg) { reg.unregister(); });
+        });
+      }
     </script>
     <script type="module" src="/src/main.tsx"></script>
     <style>
