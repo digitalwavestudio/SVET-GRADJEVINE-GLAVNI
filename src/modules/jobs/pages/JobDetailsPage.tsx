@@ -87,7 +87,7 @@ export default function JobDetailsPage() {
   const displayDescription = jobData?.description || jobData?.body || jobData?.content || jobData?.opis || 'Opis posla nije dostupan.';
 
   const isOwner = user?.id === jobData?.authorId;
-  const phoneNumber = jobData.phone || jobData.telefon || '';
+  const phoneNumber = jobData?.phone || jobData?.telefon || '';
 
   const cleanDescription = useMemo(() => {
     if (!jobData?.description) return '';
