@@ -161,6 +161,10 @@ export default function ConstructionSitePage() {
       setNewProjectStep(1);
       setNewSiteName('');
       queryClient.invalidateQueries({ queryKey: ['construction', 'all-data'] });
+    },
+    onError: () => {
+      setIsNewProjectModalOpen(false);
+      setNewProjectStep(1);
     }
   });
 

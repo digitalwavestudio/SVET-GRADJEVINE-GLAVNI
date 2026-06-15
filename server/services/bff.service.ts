@@ -340,7 +340,7 @@ export const bffService = {
           }
           
           walletData = {
-            balance: wallet ? (wallet.balance || 0) : 0,
+            balance: wallet ? (wallet.balance || 0) : (uData.walletBalance || 0),
             lastAuditPassed: wallet ? (wallet.lastAuditPassed === true) : false,
             activeRoles: fetchedRoles
           };
