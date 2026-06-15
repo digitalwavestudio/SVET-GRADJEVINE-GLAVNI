@@ -130,7 +130,6 @@ export interface User {
   partnerConversions?: number;
   partnerBalance?: number;
   walletBalance?: number;
-  availableCredits?: number;
   packageType?: string;
   totalAds?: number;
   

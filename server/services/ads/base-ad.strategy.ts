@@ -54,7 +54,6 @@ export abstract class BaseAdStrategy {
       }
 
       const currentWalletBalance = userData.walletBalance || userData.partnerBalance || 0;
-      const availableCredits = userData.availableCredits || 0;
       
       if (isPaidPackage && packagePrice > 0) {
         if (currentWalletBalance < packagePrice) {
@@ -156,16 +155,9 @@ export abstract class BaseAdStrategy {
           ...(rawData.paket === "premium_partner" ? { isPremiumPartner: true, "businessProfile.premiumPartner": true } : {})
         });
       } else {
-        if (availableCredits > 0) {
-          transaction.update(userRef, {
-            availableCredits: firebaseAdmin.firestore.FieldValue.increment(-1),
-            totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
-          });
-        } else {
-          transaction.update(userRef, {
-            totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
-          });
-        }
+        transaction.update(userRef, {
+          totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
+        });
       }
 
       const outboxRef = db.collection("outbox").doc();

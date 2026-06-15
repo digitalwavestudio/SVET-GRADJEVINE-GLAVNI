@@ -134,7 +134,6 @@ export default function MyAdsPage() {
     <DashboardLayout>
       <div className="space-y-10">
         <MyAdsHeader 
-          userCredits={user?.availableCredits ?? 0}
           loading={loading}
           onRefetch={refetch}
           localQuery={localQuery}

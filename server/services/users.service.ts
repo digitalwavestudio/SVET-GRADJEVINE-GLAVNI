@@ -490,24 +490,5 @@ export class UsersService {
     return { success: true };
   }
 
-  static async consumeCredit(uid: string) {
-    const userRef = db.collection("users").doc(uid);
-    await db.runTransaction(async (transaction) => {
-      const snap = await transaction.get(userRef);
-      if (!snap.exists) throw new NotFoundError("Korisnik nije pronađen");
-      const data = snap.data()!;
-      if ((data.availableCredits || 0) <= 0) {
-        throw new AppError("Nemate dovoljno kredita.", 400);
-      }
-      transaction.update(userRef, {
-        availableCredits: (data.availableCredits || 0) - 1,
-        totalAds: (data.totalAds || 0) + 1,
-      });
-    });
-    await CacheService.delete(`user_me_${uid}:pub`);
-    await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch(() => {});
-    await CacheService.delete(`public_profile_${uid}`);
-    return { success: true };
-  }
+
 }

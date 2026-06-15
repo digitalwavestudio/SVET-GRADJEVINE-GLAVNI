@@ -288,19 +288,6 @@ usersRouter.post(
   },
 );
 
-usersRouter.post("/consume-credit", requireAuth, async (req, res, next) => {
-  try {
-    const uid = req.user?.uid;
-    if (!uid) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    const result = await UsersService.consumeCredit(uid);
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // ─── Premium Package Activation ───────────────────────────────────────────────
 const PREMIUM_PACKAGE_PRICE = 6000; // SG Krediti
 

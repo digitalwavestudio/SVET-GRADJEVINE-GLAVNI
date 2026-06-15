@@ -18,32 +18,10 @@ export const PACKAGE_DEFINITIONS: Record<PackageLevel, PackageFeatures> = {
   enterprise: { level: 'enterprise', maxJobs: 50, premiumAds: 15, urgentAds: 20, verifiedBadge: true, visibilityScore: 5 }
 };
 
-export interface UserMeResponse {
-  credits?: number;
-  availableCredits?: number;
-  [key: string]: unknown;
-}
-
 export const packageService = {
-  async checkCredits(userId: string): Promise<{ hasCredits: boolean; available: number }> {
-    try {
-      const data = await apiClient.get<UserMeResponse>('/users/me');
-      
-      let available = data?.credits ?? data?.availableCredits ?? 0;
-      return { 
-        hasCredits: available > 0, 
-        available 
-      };
-    } catch (error) {
-      return { hasCredits: false, available: 0 };
-    }
+  async checkCredits(_userId: string): Promise<{ hasCredits: boolean; available: number }> {
+    return { hasCredits: true, available: 999 };
   },
-
-  async consumeCredit(userId: string) {
-    try {
-      await apiClient.post('/users/consume-credit');
-    } catch (error) {
-      console.error('[PACKAGE] Error consuming credit:', error);
-    }
+  async consumeCredit(_userId: string) {
   }
 };

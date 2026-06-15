@@ -2,7 +2,6 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 
 interface MyAdsHeaderProps {
-  userCredits: number;
   loading: boolean;
   onRefetch: () => void;
   localQuery: string;
@@ -12,7 +11,6 @@ interface MyAdsHeaderProps {
 }
 
 export function MyAdsHeader({
-  userCredits,
   loading,
   onRefetch,
   localQuery,
@@ -33,15 +31,6 @@ export function MyAdsHeader({
               <span className="w-2 h-2 rounded-full bg-secondary"></span>
               UPRAVLJAJTE SVIM VAŠIM OBJAVAMA
             </span>
-            <span className="bg-white/5 px-3 py-1 rounded-full border border-white/10 text-secondary">
-              Dostupni krediti: {userCredits}
-            </span>
-            <Link 
-              to="/paketi"
-              className="bg-secondary/10 hover:bg-secondary text-secondary hover:text-slate-950 px-3 py-1 rounded-[10px] border border-secondary/20 transition-all font-black"
-            >
-              Dopuni kredite
-            </Link>
             <button 
               onClick={onRefetch}
               className="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-[10px] transition-all flex items-center gap-2 border border-white/10 group active:scale-95"
