@@ -1,16 +1,13 @@
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { useDashboardMetrics } from '@/src/modules/dashboard/hooks/useDashboardStats';
 import { useAuth } from '@/src/context/AuthContext';
 import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
 import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 import DashboardGuard from './DashboardGuard';
 
 const StandardDashboardUI = memo(function StandardDashboardUI() {
-  const { data: activeMetrics } = useDashboardMetrics();
   const { user } = useAuth();
-  const data = activeMetrics;
   const profileScore = calculateProfileScore(user);
 
   return (
@@ -23,9 +20,9 @@ const StandardDashboardUI = memo(function StandardDashboardUI() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 blur-3xl -mr-32 -mt-32"></div>
         <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-8">
-            <div className={`w-2 h-2 rounded-full ${!data ? 'bg-orange-400 animate-pulse' : 'bg-secondary'}`}></div>
+            <div className="w-2 h-2 rounded-full bg-secondary"></div>
             <span className="text-xs font-black text-white uppercase tracking-widest">
-              {!data ? 'Sistemski podaci su privremeno isključeni' : 'DOBRODOŠLI NA PLATFORMU'}
+              DOBRODOŠLI NA PLATFORMU
             </span>
           </div>
           <h2 className="text-4xl md:text-7xl font-black text-white uppercase tracking-tighter mb-6 leading-none tracking-[-0.05em]">KONTROLNA TABLA, <span className="text-secondary text-nowrap">VAŠ POČETAK</span></h2>

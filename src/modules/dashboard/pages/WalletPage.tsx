@@ -287,8 +287,6 @@ export default function WalletPage() {
 
   const walletBalance = user?.walletBalance || 0;
   const isPremium = (user as any)?.isPremium || false;
-  const role = (user as any)?.role || '';
-  const isPoslodavac = role === 'poslodavac';
 
 
 
@@ -316,20 +314,18 @@ export default function WalletPage() {
             >
               NOVČANIK
             </button>
-            {isPoslodavac && (
-              <button
-                onClick={() => setActiveTab('premium')}
-                className={`px-5 py-2.5 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all flex items-center gap-1.5 ${
-                  activeTab === 'premium'
-                    ? 'bg-gradient-to-r from-amber-500/30 to-amber-600/20 text-amber-400 border border-amber-500/30'
-                    : 'text-white/30 hover:text-amber-400/60'
-                }`}
-              >
-                <span className="material-symbols-outlined text-sm">workspace_premium</span>
-                PREMIUM
-                {isPremium && <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />}
-              </button>
-            )}
+            <button
+              onClick={() => setActiveTab('premium')}
+              className={`px-5 py-2.5 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all flex items-center gap-1.5 ${
+                activeTab === 'premium'
+                  ? 'bg-gradient-to-r from-amber-500/30 to-amber-600/20 text-amber-400 border border-amber-500/30'
+                  : 'text-white/30 hover:text-amber-400/60'
+              }`}
+            >
+              <span className="material-symbols-outlined text-sm">workspace_premium</span>
+              PREMIUM
+              {isPremium && <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />}
+            </button>
           </div>
         </header>
 
@@ -390,8 +386,8 @@ export default function WalletPage() {
                   </div>
                 </div>
 
-                {/* Quick Premium CTA - samo za poslodavce */}
-                {!isPremium && isPoslodavac && (
+                {/* Quick Premium CTA */}
+                {!isPremium && (
                   <div
                     className="bg-[#0A0F14] border border-amber-500/20 rounded-3xl p-6 relative overflow-hidden cursor-pointer group hover:border-amber-500/40 transition-all"
                     onClick={() => setActiveTab('premium')}

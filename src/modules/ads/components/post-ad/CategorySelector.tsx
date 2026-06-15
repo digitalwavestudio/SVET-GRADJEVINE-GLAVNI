@@ -29,14 +29,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   const navigate = useNavigate();
 
   const handleCategoryClick = (id: string) => {
-    if (id === "machines") {
-      const allowedRoles: string[] = ["poslodavac", "masine", "admin"];
-      if (userRole && !allowedRoles.includes(userRole)) {
-        alert("Samo nalozi sa ulogom 'Građevinska firma' ili 'Mašine i Transport' mogu dodavati građevinske mašine. Molimo nadogradite svoj profil.");
-        navigate("/moj-profil/izbor-uloge");
-        return;
-      }
-    }
     onSelect(id);
   };
 

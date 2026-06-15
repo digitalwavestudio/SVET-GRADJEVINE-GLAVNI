@@ -106,7 +106,7 @@ export default function RegisterPage() {
         photoURL: '',
         walletBalance: 1500,
         viewsCount: 0,
-        freeAdsCount: 0
+        freeAdsCount: 3
       };
 
       const token = await user.getIdToken();

@@ -207,6 +207,7 @@ export class UsersService {
          baseData.createdAt = firebaseAdmin.firestore.FieldValue.serverTimestamp();
          baseData.viewsCount = 0;
          baseData.walletBalance = 1500; // 1500 SG Kredita gratis za prve oglase
+         baseData.freeAdsCount = 3;
          baseData.isPremiumProfile = false;
          transaction.set(userRef, baseData, { merge: true });
       } else {

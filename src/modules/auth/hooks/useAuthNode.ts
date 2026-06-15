@@ -289,7 +289,7 @@ useEffect(() => {
               photoURL: result.user.photoURL || '',
               walletBalance: 1500,
               viewsCount: 0,
-              freeAdsCount: 0
+              freeAdsCount: 3
             })
           });
         }

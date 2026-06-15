@@ -158,26 +158,41 @@ export default function SettingsPage() {
       const score = calculateScore(formData);
       const updateData: Record<string, unknown> = {
         name: formData.name,
-        company: formData.company,
         phone: formData.phone,
-        profession: formData.profession,
-        description: formData.description,
-        facebook: formData.facebook,
-        instagram: formData.instagram,
-        mb: formData.mb,
-        pib: formData.pib,
-        licences: formData.licences,
         profileScore: score
       };
 
       if (user.role === 'poslodavac') {
+        updateData.company = formData.company;
+        updateData.description = formData.description;
+        updateData.facebook = formData.facebook;
+        updateData.instagram = formData.instagram;
+        updateData.mb = formData.mb;
+        updateData.pib = formData.pib;
+        updateData.licences = formData.licences;
         // Za firme, photoURL u formi se koristi kao logo
         updateData.businessProfile = {
           ...user.businessProfile,
           logo: formData.photoURL
         };
-        // Ne dupliramo photoURL ako već imamo logo, da ne pređemo 1MB
+      } else if (user.role === 'majstor') {
+        updateData.profession = formData.profession;
+        updateData.description = formData.description;
+        updateData.facebook = formData.facebook;
+        updateData.instagram = formData.instagram;
+        updateData.mb = formData.mb;
+        updateData.pib = formData.pib;
+        updateData.licences = formData.licences;
+        updateData.photoURL = formData.photoURL;
+      } else if (user.role !== 'standard') {
+        // smestaj, ketering, masine, placevi, etc.
+        updateData.profession = formData.profession;
+        updateData.description = formData.description;
+        updateData.facebook = formData.facebook;
+        updateData.instagram = formData.instagram;
+        updateData.photoURL = formData.photoURL;
       } else {
+        // standard — samo osnovni podaci
         updateData.photoURL = formData.photoURL;
       }
 
