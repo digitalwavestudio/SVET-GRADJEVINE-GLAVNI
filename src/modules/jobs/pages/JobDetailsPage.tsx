@@ -439,7 +439,7 @@ export default function JobDetailsPage() {
                 { key: 'placen-prekovremeni', name: 'Plaćen prekovremeni rad', icon: 'more_time' },
                 { key: 'pomoc-pri-vizi', name: 'Pomoć pri vizi / radnoj dozvoli', icon: 'public' }
               ].map(benefit => {
-                const isProvided = jobData.benefiti?.includes(benefit.key) || jobData.rawBenefits?.includes(benefit.key);
+                const isProvided = jobData.benefits?.includes(benefit.key) || jobData.benefiti?.includes(benefit.key) || jobData.rawBenefits?.includes(benefit.key);
                 return (
                   <div
                     key={benefit.key}
