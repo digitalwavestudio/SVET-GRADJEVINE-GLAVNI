@@ -18,6 +18,7 @@ const MyInquiriesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunk
 const DashboardModule = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-module" */ './index.tsx'));
 const StatsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-stats" */ './pages/StatsPage'));
 const PublicProfilePage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-public-profile" */ './pages/PublicProfilePage'));
+const NotificationsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-notifications" */ './pages/NotificationsPage'));
 
 /**
  * Enterprise Prefetching Strategy:
@@ -57,6 +58,7 @@ const MyMachinesReservationsPage = lazy(() => import(/* webpackPrefetch: true, w
 export const getDashboardRouter = () => [
   <Route key="moj-profil" path="/moj-profil" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />,
   <Route key="kontrolna-tabla" path="/kontrolna-tabla" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />,
+  <Route key="obavestenja" path="/moj-profil/obavestenja" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />,
   <Route key="verifikacija" path="/moj-profil/verifikacija" element={<ProtectedRoute><VerificationCenterPage /></ProtectedRoute>} />,
   <Route key="oglasi" path="/moj-profil/oglasi" element={<ProtectedRoute><MyAdsPage /></ProtectedRoute>} />,
   <Route key="prijave" path="/moj-profil/prijave" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />,
