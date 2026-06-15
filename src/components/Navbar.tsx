@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/src/context/AuthContext";
 import { useBrandLogo } from "@/src/context/BrandContext";
@@ -34,6 +34,15 @@ export default function Navbar() {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  const [imgError, setImgError] = useState(false);
+  const profileSrc = user?.businessProfile?.logo || user?.photoURL || "";
+  const userInitial = ((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "") || "UP").toUpperCase();
+
+  // Reset imgError when URL changes
+  useEffect(() => {
+    setImgError(false);
+  }, [profileSrc]);
 
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
@@ -124,15 +133,22 @@ export default function Navbar() {
           {!isBot && isDesktop && (
             <div className="flex items-center justify-center min-w-[60px] mx-4">
               {user ? (
-                <Button
+                <Link
                   to="/moj-profil"
-                  variant="ghost"
-                  className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg"
+                  className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden"
                   title="Moj Profil"
                 >
-                  {(user.firstName?.[0] || "") + (user.lastName?.[0] || "") ||
-                    "UP"}
-                </Button>
+                  {profileSrc && !imgError ? (
+                    <img
+                      src={profileSrc}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      onError={() => setImgError(true)}
+                    />
+                  ) : (
+                    <span className="text-sm font-black text-slate-950">{userInitial}</span>
+                  )}
+                </Link>
               ) : (
                 <Button
                   to="/prijava"

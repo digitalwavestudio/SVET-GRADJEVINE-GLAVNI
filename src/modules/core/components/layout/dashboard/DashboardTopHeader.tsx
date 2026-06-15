@@ -132,6 +132,9 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
   const isMaster = user.role === 'majstor';
   const userName = user.name || `${user.firstName} ${user.lastName}` || 'Korisnik';
   const userInitial = userName.charAt(0);
+  const [imgError, setImgError] = React.useState(false);
+  const profileSrc = user?.businessProfile?.logo || user?.photoURL;
+  React.useEffect(() => { setImgError(false); }, [profileSrc]);
   return (
     <header className="hidden md:flex h-20 border-b border-white/5 bg-[#070B0F] sticky top-0 z-40 w-full">
       <div className="w-full max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-full">
@@ -240,11 +243,11 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
             <div 
               className="w-10 h-10 rounded-[10px] bg-white flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-secondary transition-all shrink-0 p-1 shadow-lg shadow-black/20 relative cursor-pointer"
             >
-               {user.businessProfile?.logo || user.photoURL ? (
-                  <img width="800" height="600" decoding="async" src={user?.businessProfile?.logo || user?.photoURL} alt="Profile" className="w-full h-full object-contain" referrerPolicy="no-referrer" loading="lazy" /> 
-                ) : (
-                  <span className="font-black text-slate-950 text-lg">{userInitial}</span>
-                )}
+               {profileSrc && !imgError ? (
+                   <img width="800" height="600" decoding="async" src={profileSrc} alt="Profile" className="w-full h-full object-contain" referrerPolicy="no-referrer" loading="lazy" onError={() => setImgError(true)} /> 
+                 ) : (
+                   <span className="font-black text-slate-950 text-lg">{userInitial}</span>
+                 )}
                 {/* Subtle upload indicator */}
                 <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   {isUploading ? (
