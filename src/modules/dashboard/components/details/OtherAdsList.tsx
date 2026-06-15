@@ -56,7 +56,7 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                 }}
                 className="p-4 md:p-8 flex flex-col md:grid md:grid-cols-6 gap-4 md:items-center border-b border-white/5 md:border-0 hover:bg-white/[0.02] transition-all group"
               >
-              <div className="md:col-span-2 flex items-center gap-4 md:gap-6">
+              <div className="md:col-span-2 flex flex-row items-start gap-4 md:gap-6">
                 <div className="w-12 h-12 md:w-14 md:h-14 bg-white/5 rounded-[10px] flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-secondary/30 transition-all font-black text-white/20 text-xl group-hover:bg-secondary/10 group-hover:text-secondary shrink-0">
                   {ad.logo ? (
                     <OptimizedImage 
@@ -70,8 +70,8 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                     (ad.title || ad.adTitle || ad.name)?.charAt(0) || 'O'
                   )}
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-black text-white uppercase tracking-tight mb-1 group-hover:text-secondary transition-colors truncate">{ad.title || ad.adTitle || ad.name}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-black text-white uppercase tracking-tight mb-1 group-hover:text-secondary transition-colors whitespace-pre-wrap break-words leading-tight">{ad.title || ad.adTitle || ad.name}</h3>
                   <div className="flex items-center gap-3">
                     <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{ad.typeLabel}</p>
                     {ad.collName === 'companies' && (

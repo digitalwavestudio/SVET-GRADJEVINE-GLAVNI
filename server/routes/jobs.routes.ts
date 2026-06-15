@@ -29,7 +29,10 @@ const createJobSchema = jobSchema;
 
 export const jobsRouter = express.Router();
 
-jobsRouter.get("/", cacheMiddleware(30000, "jobs_public"), getPublicJobs);
+jobsRouter.get("/", (req, res, next) => {
+  console.log("[JOBS_ROUTE] GET /api/jobs called, originalUrl:", req.originalUrl);
+  next();
+}, getPublicJobs);
 jobsRouter.get("/applications/user/:role", authMiddleware, getUserApplications);
 jobsRouter.get("/applications/:jobId", authMiddleware, getApplications);
 jobsRouter.patch(

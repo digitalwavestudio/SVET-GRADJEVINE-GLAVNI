@@ -1,5 +1,5 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
-import { admin as firebaseAdmin, db } from "../config/firebase.ts";
+import { admin as firebaseAdmin, db, getDb } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { AuditService, AuditAction } from "./audit.service.ts";
@@ -113,10 +113,10 @@ export class UnifiedAdsService {
   }
 
   static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
-    // Simple query — only .where("authorId") to avoid needing composite index
-    // Sorting and pagination done in-memory
+    // Use raw Firestore directly to bypass proxy timeout/circuit-breaker
+    const rawDb = getDb();
     const fetchLimit = searchQ ? 150 : Math.max(limitNum * 2, 50);
-    const snap = await db.collection("listings")
+    const snap = await rawDb.collection("listings")
       .where("authorId", "==", uid)
       .limit(fetchLimit)
       .get();

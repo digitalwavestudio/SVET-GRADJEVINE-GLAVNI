@@ -16,7 +16,7 @@ interface PromoteModalProps {
 export default function PromoteModal({ isOpen, onClose, entityId, collection, isUrgentCheck, onSuccess }: PromoteModalProps) {
   const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  const currentBalance = user?.partnerBalance || 0;
+  const currentBalance = user?.walletBalance ?? user?.partnerBalance ?? 0;
 
   const packages = [
     { days: 7, cost: 500, title: 'Brzi rezultat' },
@@ -39,7 +39,7 @@ export default function PromoteModal({ isOpen, onClose, entityId, collection, is
         cost,
         promoteType: isUrgentCheck ? 'urgent' : 'premium' 
       });
-      await updateUser({ partnerBalance: currentBalance - cost });
+      await updateUser({ walletBalance: currentBalance - cost });
       toast.success('Oglas je uspešno promovisan!');
       onSuccess();
       onClose();

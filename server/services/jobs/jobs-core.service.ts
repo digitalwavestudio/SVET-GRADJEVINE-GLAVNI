@@ -1,4 +1,4 @@
-import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
+import { db, getDb, admin as firebaseAdmin } from "../../config/firebase.ts";
 import DOMPurify from "isomorphic-dompurify";
 import { CacheService } from "../cache.service.ts";
 import { Job, jobSchema, User } from "@svet-gradjevine/shared";
@@ -16,15 +16,18 @@ export class JobsCoreService {
     if (cached) return cached;
 
     try {
+      // Bypass proxy to avoid circuit-breaker returning empty wrapped data
+      const rawDb = getDb();
+
       // Fetch from Firestore
-      let q = db
+      let q = rawDb
         .collection("listings")
         .where("type", "==", "job")
         .where("status", "==", "active")
         .orderBy("createdAt", "desc");
         
       if (cursor) {
-        const cursorDoc = await db.collection("listings").doc(cursor).get();
+        const cursorDoc = await rawDb.collection("listings").doc(cursor).get();
         if (cursorDoc.exists) {
             q = q.startAfter(cursorDoc);
         }
@@ -50,6 +53,11 @@ export class JobsCoreService {
 
       const docs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
 
+      console.log(`[JOBS] getPublicJobs: Fetched ${docs.length} docs from Firestore`);
+      if (docs.length > 0) {
+        console.log("[JOBS] First doc keys:", Object.keys(docs[0]));
+      }
+
       const response = {
         docs,
         lastVisible: docs.length === limit ? docs[docs.length - 1].id : null,
@@ -61,18 +69,27 @@ export class JobsCoreService {
       return response;
     } catch (error: any) {
       const err = error as Error & { details?: string; code?: number };
+      const errMsg = err?.message || "";
       const isQuotaError = 
-        err?.message?.includes("Quota limit exceeded") || 
+        errMsg.includes("Quota limit exceeded") || 
+        errMsg.includes("RESOURCE_EXHAUSTED") ||
         err?.details?.includes("Quota limit exceeded") ||
         err?.code === 8;
+
+      // Check for missing composite index
+      const isIndexError = errMsg.includes("The query requires an index");
         
-      if (isQuotaError) {
+      if (isIndexError) {
+        console.error("[JOBS] MISSING COMPOSITE INDEX! Create index for: type↑, status↑, createdAt↓");
+        console.error("[JOBS] Index link (from error):", errMsg.match(/https:\/\/console\.firebase[^\s]*/)?.[0] || "N/A");
+      } else if (isQuotaError) {
         console.error("[JOBS] Firestore QUOTA EXCEEDED. Serving fallback/stale data.");
       } else {
-        console.error("[JOBS] Firestore error:", error);
+        console.error("[JOBS] Firestore error:", errMsg);
       }
       
       // Try to return stale cache if database is down or quota hit
+      console.log("[JOBS] getPublicJobs returning empty - cached:", !!cached, "error:", isIndexError ? "INDEX_MISSING" : isQuotaError ? "QUOTA" : "OTHER");
       return cached || { docs: [], lastVisible: null, hasMore: false, warning: isQuotaError ? "Quota hit" : undefined };
     }
   }

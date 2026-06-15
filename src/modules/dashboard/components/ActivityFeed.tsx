@@ -18,6 +18,29 @@ const ActivityFeed = memo(function ActivityFeed() {
     overscan: 5,
   });
 
+  useEffect(() => {
+    const el = parentRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+          loadMoreActivities();
+        }, 300);
+      }
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      el.removeEventListener('scroll', handleScroll);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [loadMoreActivities]);
+
   if (isLoading && (!activities || activities.length === 0)) {
      return <div className="animate-pulse flex items-center justify-center p-12"><div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div></div>;
   }
@@ -44,29 +67,6 @@ const ActivityFeed = memo(function ActivityFeed() {
           </div>
       );
   }
-
-  useEffect(() => {
-    const el = parentRef.current;
-    if (!el) return;
-
-    const handleScroll = () => {
-      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50) {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          loadMoreActivities();
-        }, 300);
-      }
-    };
-
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    
-    return () => {
-      el.removeEventListener('scroll', handleScroll);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [loadMoreActivities]);
 
   return (
     <div 

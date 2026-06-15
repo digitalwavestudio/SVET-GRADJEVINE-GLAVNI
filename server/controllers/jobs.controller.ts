@@ -14,12 +14,7 @@ export const getPublicJobs = async (
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;
 
-    // Server-side cache check
-    const { CacheService } = await import("../services/cache.service.ts");
-    const cacheKey = cursor ? `public_jobs_${platform || "web"}_${cursor}` : `public_jobs_${platform || "web"}`;
-    const cached = await CacheService.get(cacheKey);
-    if (cached) return res.json(cached);
-
+    console.log("[JOBS_CTRL] getPublicJobs called, calling JobsService.getPublicJobs...");
     const result = await JobsService.getPublicJobs(limit, cursor);
 
     let finalResult: {
@@ -38,8 +33,6 @@ export const getPublicJobs = async (
       };
     }
 
-    // Cache for 15 minutes
-    await CacheService.set(cacheKey, finalResult, 900000);
     res.json(finalResult);
   } catch (error) {
     next(error);

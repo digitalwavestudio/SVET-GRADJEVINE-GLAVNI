@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UnifiedSearchService } from "../services/unified-search.service.ts";
 import { UnifiedAdsService } from "../services/unified-ads.service.ts";
-import { db } from "../config/firebase.ts";
+import { db, getDb } from "../config/firebase.ts";
 import { admin as firebaseAdmin } from "../config/firebase.ts";
 import { ImageTransformer } from "../utils/image.transformer.ts";
 import type { AuthenticatedRequest } from "../types/auth.ts";
@@ -79,16 +79,27 @@ export const getMyAds = async (
 
         // Dijagnostika: ako je prazno, proveri da li uopste postoje dokumenti za ovog usera
         if (resPayload.docs.length === 0) {
-          const countSnap = await db.collection("listings").where("authorId", "==", user.uid).count().get().catch(() => null);
+          const rawDb = getDb();
+          const countSnap = await rawDb.collection("listings").where("authorId", "==", user.uid).count().get().catch(() => null);
           console.log(`[ADS] getMyAds DIAG: uid=${user.uid}, limit=${limitNum}, totalDocsForUser=${countSnap?.data()?.count || 'ERROR'}, sampleAuthorId=null`);
         }
 
-        resultPayload = myAdsResponseSchema.parse(resPayload);
+        const parseResult = myAdsResponseSchema.safeParse(resPayload);
+        if (!parseResult.success) {
+          console.error("[ADS] getMyAds Zod validation failed:", JSON.stringify(parseResult.error.issues, null, 2));
+          console.error("[ADS] getMyAds raw first doc keys:", resPayload.docs?.[0] ? Object.keys(resPayload.docs[0]) : 'NO_DOCS');
+          console.error("[ADS] getMyAds sample createdAt:", JSON.stringify(resPayload.docs?.[0]?.createdAt));
+          console.error("[ADS] getMyAds sample lastVisibleId:", JSON.stringify(resPayload.lastVisibleId));
+          // Return raw data anyway so user can see their ads
+          resultPayload = resPayload;
+        } else {
+          resultPayload = parseResult.data;
+        }
         await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch(() => {});
       } catch (quotaError: any) {
          console.error("[ADS] getMyAds error:", quotaError?.message || quotaError);
          if (quotaError?.stack) console.error("[ADS] getMyAds stack:", quotaError.stack);
-         resultPayload = { docs: [], lastVisibleId: null, hasMore: false };
+         return res.status(503).json({ error: "Servis trenutno nedostupan. Molimo pokušajte kasnije.", docs: [], lastVisibleId: null, hasMore: false });
       }
     }
 

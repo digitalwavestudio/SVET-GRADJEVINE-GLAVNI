@@ -96,7 +96,9 @@ export const jobsService = {
       
       if (isEmptyFilter && !lastVisible && !filters?.searchQuery) {
           try {
+              console.log("[JOBS_CLIENT] Calling GET /api/jobs...");
               const data = await apiClient.get<JobSearchApiResponse>('/jobs');
+              console.log("[JOBS_CLIENT] GET /api/jobs response:", data ? `ok (${data.docs?.length || 0} docs)` : "null/undefined");
               if (data && data.docs) {
                   // Moguće da backend vraća više docova, sečemo na pageSize. Paginate on client za primer feed brzinu.
                   const items = validateList(jobExtendedSchema, data.docs.slice(0, validPageSize));
