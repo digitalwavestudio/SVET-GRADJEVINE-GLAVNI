@@ -115,53 +115,31 @@ export class UnifiedAdsService {
   static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
     let q = db.collection("listings")
       .where("authorId", "==", uid)
-      .where("status", "in", ["active", "pending", "pending_payment", "inactive", "draft", "rejected"])
       .orderBy("createdAt", "desc");
       
     if (cursor) {
-      if (cursor.includes("|")) {
-        const [timeStr, id] = cursor.split("|");
-        const ts = firebaseAdmin.firestore.Timestamp.fromMillis(parseInt(timeStr, 10));
-        q = q.startAfter(ts, id);
-      } else if (cursor.match(/^\d+$/)) {
-         q = q.startAfter(firebaseAdmin.firestore.Timestamp.fromMillis(parseInt(cursor, 10)));
-      } else {
-         const cursorDoc = await db.collection("listings").doc(cursor).get();
-         if (cursorDoc.exists) {
-            q = q.startAfter(cursorDoc);
-         }
+      const cursorDoc = await db.collection("listings").doc(cursor).get();
+      if (cursorDoc.exists) {
+        q = q.startAfter(cursorDoc);
       }
     }
     
     const snap = await q
-      .orderBy(firebaseAdmin.firestore.FieldPath.documentId(), "desc")
-      .limit(searchQ ? 150 : limitNum) // Fetch more if searching
+      .limit(searchQ ? 150 : limitNum)
       .select(
-        "title",
-        "price",
-        "location",
-        "type",
-        "status",
-        "createdAt",
-        "images",
-        "isPremium",
-        "isUrgent",
-        "comp",
-        "salary",
-        "logo",
-        "thumbnail",
-        "authorId",
-        "viewsCount",
-        "applicantsCount",
-        "category",
-        "grad",
-        "company"
+        "title", "price", "location", "type", "status", "createdAt",
+        "images", "isPremium", "isUrgent", "comp", "salary", "logo",
+        "thumbnail", "authorId", "viewsCount", "applicantsCount",
+        "category", "grad", "company"
       )
       .get();
 
+    const excludeStatuses = new Set(["deleted"]);
     const { ImageTransformer } = await import("../utils/image.transformer.ts");
 
-    let docs: (Listing & { typeLabel: string; postType: string })[] = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
+    let docs: (Listing & { typeLabel: string; postType: string })[] = snap.docs
+      .filter(doc => !excludeStatuses.has(doc.data().status))
+      .map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
       const data = doc.data() as Listing;
       let typeLabel = '';
       let postType = data.type || '';
@@ -196,7 +174,7 @@ export class UnifiedAdsService {
 
     return {
       docs,
-      lastVisibleId: docs.length === limitNum ? `${(docs[docs.length - 1] as any).createdAt?.toDate ? (docs[docs.length - 1] as any).createdAt.toDate().getTime() : ((docs[docs.length - 1] as any).createdAt || Date.now())}|${(docs[docs.length - 1] as any).id}` : null,
+      lastVisibleId: docs.length === limitNum ? docs[docs.length - 1].id : null,
       hasMore: docs.length === limitNum
     };
   }

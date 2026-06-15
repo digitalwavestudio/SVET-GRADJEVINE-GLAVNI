@@ -72,9 +72,9 @@ export const getMyAds = async (
         const { myAdsResponseSchema } = await import("../dto/ads.dto.ts");
         const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum, cursor as string, searchQ as string);
         resultPayload = myAdsResponseSchema.parse(resPayload);
-        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000); // 2 min cache
-      } catch (quotaError) {
-         console.error("[ADS] getMyAds quota error:", quotaError);
+        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000);
+      } catch (quotaError: any) {
+         console.error("[ADS] getMyAds error:", quotaError?.message || quotaError);
          resultPayload = { docs: [], lastVisibleId: null, hasMore: false };
       }
     }
