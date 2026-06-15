@@ -88,6 +88,13 @@ export function useDashboardNavigation() {
           staleTime: 5 * 60 * 1000
         });
         break;
+      case '/moj-profil/gradiliste':
+        queryClient.prefetchQuery({
+          queryKey: ['construction-site', uid],
+          queryFn: async () => (await apiClient.get<Record<string, unknown>>(`/construction-site/${uid}`)) || {},
+          staleTime: 5 * 60 * 1000
+        });
+        break;
       case '/moj-profil/firma':
         // Prefetches business profile data if necessary
         queryClient.prefetchQuery({
@@ -109,6 +116,7 @@ export function useDashboardNavigation() {
       case 'poslodavac':
         return [
           { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
+          { label: 'NADZORNI CENTAR', path: '/moj-profil/gradiliste', icon: 'monitoring' },
           { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
           { label: 'PRIJAVE', path: '/moj-profil/prijave', icon: 'assignment' },
