@@ -37,6 +37,7 @@ export default function ConstructionSitePage() {
   const diaryLogs = React.useMemo(() => constructionData?.diaryLogs || {}, [constructionData]);
   const siteWorkers = React.useMemo(() => constructionData?.siteWorkers || {}, [constructionData]);
   const siteResources = React.useMemo(() => constructionData?.siteResources || {}, [constructionData]);
+  const siteMetrics = React.useMemo(() => constructionData?.siteMetrics || {}, [constructionData]);
 
   const [editingSiteId, setEditingSiteId] = useState<string | null>(null);
   const [editSiteName, setEditSiteName] = useState('');
@@ -218,7 +219,7 @@ export default function ConstructionSitePage() {
 
   const updateMetricsMutation = useMutation({
     mutationFn: async (metrics: any) => {
-      return apiClient.post('/construction/metrics', metrics);
+      return apiClient.post('/construction/metrics', { ...metrics, siteId: activeSiteId });
     }
   });
 
@@ -420,37 +421,27 @@ export default function ConstructionSitePage() {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isNewProjectModalOpen, isModalOpen, isPayrollModalOpen, isHistoryModalOpen]);
 
-  // HISTORICAL DATA - Simuliramo prošle dane za toplotnu mapu
+  // HISTORICAL DATA — stvarni podaci sa servera
   const historicalData = React.useMemo(() => {
     const data: Record<number, { cost: number, hours: number, isAnomaly: boolean, isMilestone: boolean, workerCount: number }> = {};
-    for (let i = 1; i < today.getDate(); i++) {
-        const dayOfWeek = new Date(today.getFullYear(), today.getMonth(), i).getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        
-        // Deterministic generation
-        const hash = ((i + 1) * 12345) % 997; // Deterministic generator
-        
-        let cost = 0; let hours = 0; let isAnomaly = false; let workerCount = 0;
-        const isMilestone = i === 10 || i === 22; 
-        
-        if (!isWeekend) {
-            workerCount = 6 + (hash % 5); // 6-10 ljudi
-            hours = workerCount * 8 + (hash % 5); // ~8h po coveku
-            cost = hours * 8 + (hash % 50);
-            if (hours > 70) isAnomaly = true;
-        } else {
-            // Povremeni vikend rad
-            if (hash > 800) { // Condition that replaced Math.random() > 0.8
-                workerCount = 2 + (hash % 3);
-                hours = workerCount * 7 + (hash % 5);
-                cost = hours * 10;
-                isAnomaly = true; // Rad vikendom je anomalija cene
-            }
-        }
-        data[i] = { cost, hours, isAnomaly, isMilestone, workerCount };
+    const metrics = activeSiteId && activeSiteId !== 'ALL' ? (siteMetrics[activeSiteId] || []) : [];
+    const todayDate = today.getDate();
+    for (let i = 1; i < todayDate; i++) {
+      const metric = metrics.find((m: any) => m.day === i);
+      if (metric && metric.dailyCost != null) {
+        data[i] = {
+          cost: metric.dailyCost,
+          hours: metric.totalHours || 0,
+          isAnomaly: metric.isAnomaly || false,
+          isMilestone: metric.isMilestone || false,
+          workerCount: metric.activeWorkers || 0,
+        };
+      } else {
+        data[i] = { cost: 0, hours: 0, isAnomaly: false, isMilestone: false, workerCount: 0 };
+      }
     }
     return data;
-  }, [today.getDate()]); // Zavisi samo od trenutnog dana kako se podaci ne bi gubili
+  }, [siteMetrics, activeSiteId, today]);
 
   const pastSum = Object.values(historicalData).reduce((acc: number, curr: DayData) => acc + curr.cost, 0);
   const avgDailyCost = today.getDate() > 1 ? Math.round(pastSum / (today.getDate() - 1)) : totalDailyCost;

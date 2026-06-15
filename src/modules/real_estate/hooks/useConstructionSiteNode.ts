@@ -17,6 +17,7 @@ interface AllDataResponse {
   diaryLogs: Record<number, string>;
   siteWorkers: Record<string, WorkerStatus[]>;
   siteResources: Record<string, ResourceStatus[]>;
+  siteMetrics?: Record<string, any[]>;
 }
 
 export function useConstructionSite(user: User | null, activeSiteId?: string) {
