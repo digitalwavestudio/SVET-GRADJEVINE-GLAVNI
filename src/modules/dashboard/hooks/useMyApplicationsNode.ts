@@ -33,7 +33,7 @@ function deepEqual(a: unknown, b: unknown): boolean {
 export function useMyApplicationsNode(searchQuery?: string) {
   const { user } = useAuth();
   
-  const role = user?.role === 'majstor' ? 'applicant' : user?.role === 'poslodavac' ? 'employer' : 'both';
+  const role = user?.role === 'poslodavac' ? 'employer' : 'applicant';
   
   const applicationsQuery = useUserApplications(user?.id, role, searchQuery);
   

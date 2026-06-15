@@ -29,7 +29,7 @@ export const Sidebar = memo(({
   const isEmployer = role === 'poslodavac';
   const isMaster = role === 'majstor';
   
-  const userName = user.name || `${user.firstName} ${user.lastName}` || 'Korisnik';
+  const userName = user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Korisnik';
   const navItems = getNavItems(role);
 
   const handleAdminRoleSwitch = async (targetRole: UserRole) => {

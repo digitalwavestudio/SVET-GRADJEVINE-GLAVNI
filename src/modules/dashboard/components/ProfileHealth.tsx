@@ -51,7 +51,7 @@ export default function ProfileHealth({ score, hideButton }: ProfileHealthProps)
 
       {!hideButton && (
         <Link 
-          to="/podesavanja" 
+          to="/moj-profil" 
           className="w-full mt-8 py-4 bg-blue-500/10 text-blue-500 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined text-sm">edit</span>

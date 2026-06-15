@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { DashboardLayout } from '@/src/modules/core';
 import { useAuth } from '@/src/context/AuthContext';
 import { apiClient } from '@/src/lib/apiClient';
@@ -19,15 +19,19 @@ export default function NotificationsPage() {
   const { user } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
+  const fetchActivities = useCallback(() => {
     if (!user) return;
     setLoading(true);
+    setError(false);
     apiClient.get<{ activities: Activity[] }>('/notifications/history?limit=50')
       .then(res => setActivities(res.activities || []))
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [user]);
+
+  useEffect(() => { fetchActivities(); }, [fetchActivities]);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -61,6 +65,13 @@ export default function NotificationsPage() {
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <span className="material-symbols-outlined text-red-500/40 text-5xl mb-4">error_outline</span>
+              <p className="text-sm font-black text-white/30 uppercase tracking-widest">Greška pri učitavanju</p>
+              <p className="text-[11px] text-white/20 font-medium mt-2 mb-6">Pokušajte ponovo.</p>
+              <button onClick={fetchActivities} className="px-6 py-3 bg-secondary/10 text-secondary text-[10px] font-black rounded-[10px] uppercase tracking-widest hover:bg-secondary hover:text-slate-950 transition-all">POKUŠAJ PONOVO</button>
             </div>
           ) : activities.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">

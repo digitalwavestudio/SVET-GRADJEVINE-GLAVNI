@@ -130,7 +130,7 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
 
   const isEmployer = user.role === 'poslodavac';
   const isMaster = user.role === 'majstor';
-  const userName = user.name || `${user.firstName} ${user.lastName}` || 'Korisnik';
+  const userName = user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Korisnik';
   const userInitial = userName.charAt(0);
   const [imgError, setImgError] = React.useState(false);
   const profileSrc = user?.businessProfile?.logo || user?.photoURL;
