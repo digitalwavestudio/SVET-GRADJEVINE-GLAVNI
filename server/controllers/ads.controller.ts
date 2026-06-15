@@ -64,7 +64,12 @@ export const getMyAds = async (
     const cacheKey = `myAds_${user.uid}_${limitNum}_${cursor || 'initial'}_${searchQ || 'none'}`;
     const { CacheService } = await import("../services/cache.service.ts");
 
-    let resultPayload: any | null = await CacheService.get(cacheKey);
+    let resultPayload: any | null;
+    try {
+      resultPayload = await CacheService.get(cacheKey);
+    } catch {
+      resultPayload = null;
+    }
 
     if (!resultPayload) {
       try {
@@ -72,9 +77,10 @@ export const getMyAds = async (
         const { myAdsResponseSchema } = await import("../dto/ads.dto.ts");
         const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum, cursor as string, searchQ as string);
         resultPayload = myAdsResponseSchema.parse(resPayload);
-        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000);
+        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch(() => {});
       } catch (quotaError: any) {
          console.error("[ADS] getMyAds error:", quotaError?.message || quotaError);
+         if (quotaError?.stack) console.error("[ADS] getMyAds stack:", quotaError.stack);
          resultPayload = { docs: [], lastVisibleId: null, hasMore: false };
       }
     }

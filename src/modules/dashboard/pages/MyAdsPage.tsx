@@ -27,7 +27,9 @@ export default function MyAdsPage() {
     isFetchingNextPage, 
     hasNextPage, 
     fetchNextPage, 
-    refetch 
+    refetch,
+    isError,
+    error
   } = useMyAds(user?.id, debouncedQuery);
   const adsData = ads as MachineAdData[];
   const { deleteAd, approveAd } = useMyAdsMutations(user?.id);
@@ -142,9 +144,22 @@ export default function MyAdsPage() {
           setStatusFilter={setStatusFilter}
         />
 
+        {isError && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-[10px] p-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-red-500">error_outline</span>
+              <div>
+                <p className="text-[11px] font-black text-red-500 uppercase tracking-widest">Greška pri učitavanju oglasa</p>
+                <p className="text-[10px] text-red-400/70 mt-1">{error instanceof Error ? error.message : 'API greška'}</p>
+              </div>
+            </div>
+            <button onClick={() => refetch()} className="px-4 py-2 bg-red-500/20 text-red-500 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">POKUŠAJ PONOVO</button>
+          </div>
+        )}
+
         {loading && <AdsListSkeleton />}
 
-        {!loading && filteredAds.length === 0 && (
+        {!loading && !isError && filteredAds.length === 0 && (
           <EmptyState 
             icon={Megaphone}
             title={statusFilter === 'all' ? "Nemate aktivnih oglasa" : (statusFilter === 'active' ? "Nemate aktivnih oglasa u ovoj kategoriji" : "Nemate oglasa na čekanju")}

@@ -84,6 +84,8 @@ export function useMyAds(userId: string | undefined, searchQuery?: string) {
     hasNextPage: result.hasNextPage,
     fetchNextPage: result.fetchNextPage,
     refetch: result.refetch,
+    isError: result.isError,
+    error: result.error,
   };
 }
 
