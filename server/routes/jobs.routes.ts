@@ -23,7 +23,6 @@ import {
   applicationActionSchema,
 } from "@svet-gradjevine/shared";
 
-
 const createJobSchema = jobSchema;
 const updateJobSchema = jobSchema.partial();
 

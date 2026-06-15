@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import { trackEvent } from '@/src/lib/analytics';
 
 interface SimilarJobsSliderProps {
-  jobData: { cat?: string; tacnaLokacija?: string };
-  displaySimilarJobs: Array<Record<string, unknown>>;
-  buildJobUrl: (job: Record<string, unknown>) => string;
+  jobData: any;
+  displaySimilarJobs: any[];
+  buildJobUrl: (job: any) => string;
 }
 
 export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: SimilarJobsSliderProps) {
@@ -24,12 +24,11 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
   const handleTouchStart = () => trackControls.stop();
   const handleTouchEnd = () => handleMouseLeave();
 
-  // Start animation on mount
   React.useEffect(() => {
     handleMouseLeave();
   }, []);
 
-  const renderBadge = (job: Record<string, unknown>) => {
+  const renderBadge = (job: any) => {
     if (job.isUrgent) return <span className="badge-urgent">Hitno</span>;
     // Example: New badge for recent jobs (posted within 3 days)
     if (job.createdAt) {

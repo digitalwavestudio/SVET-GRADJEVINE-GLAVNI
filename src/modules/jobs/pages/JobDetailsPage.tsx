@@ -285,7 +285,7 @@ export default function JobDetailsPage() {
                   ) : (
                     <span className="flex items-center gap-2">
                       <Building2 size={16} />
-                      <span>{jobData.companyName || 'Privatni Poslodavac'}</span>
+                      <span>{jobData.comp || jobData.companyName || 'Privatni Poslodavac'}</span>
                     </span>
                   )}
                   {jobData.location && (
