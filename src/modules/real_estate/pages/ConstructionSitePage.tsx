@@ -333,7 +333,6 @@ export default function ConstructionSitePage() {
   const handleAddSite = () => {
     setIsNewProjectModalOpen(true);
     setNewProjectStep(1);
-    setActiveSiteId('ALL'); // Optionally force back to ALL view
   };
 
   const confirmAddSite = async () => {
@@ -688,22 +687,29 @@ export default function ConstructionSitePage() {
           />
         )}
 
-        {isAllSites ? (
-          <div className="flex flex-col xl:flex-row gap-6 mt-4">
-             {/* LEVA STRANA - PROJEKTI (KARTICE) */}
-             <PortfolioGridWidget 
-                sites={sites}
-                siteWorkers={siteWorkers}
-                siteResources={siteResources}
-                setActiveSiteId={(id) => setActiveSiteId(id || '')}
-                handleAddSite={handleAddSite}
-                getHours={getHours}
-             />
+        {/* PORTFOLIO GRID + LIVE FEED - uvek vidljivi */}
+        <div className="flex flex-col xl:flex-row gap-6 mt-4">
+           <PortfolioGridWidget 
+              sites={sites}
+              siteWorkers={siteWorkers}
+              siteResources={siteResources}
+              setActiveSiteId={(id) => setActiveSiteId(id || '')}
+              handleAddSite={handleAddSite}
+              getHours={getHours}
+           />
 
-             {/* DESNA STRANA - LIVE FEED */}
-             <LiveFeedWidget setIsHistoryModalOpen={setIsHistoryModalOpen} />
-          </div>
-        ) : (
+           <LiveFeedWidget 
+              setIsHistoryModalOpen={setIsHistoryModalOpen}
+              sites={sites}
+              siteWorkers={siteWorkers}
+              diaryLogs={diaryLogs}
+              events={events}
+              today={today}
+           />
+        </div>
+
+        {/* Site-specific widgets */}
+        {!isAllSites && (
           <>
             <DigitalDiaryWidget 
                workers={workers}
