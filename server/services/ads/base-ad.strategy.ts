@@ -217,6 +217,7 @@ export abstract class BaseAdStrategy {
 
     CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
+    CacheService.invalidateByPrefix("promoted_").catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
@@ -361,6 +362,7 @@ export abstract class BaseAdStrategy {
 
     CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
+    CacheService.invalidateByPrefix("promoted_").catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
@@ -445,6 +447,7 @@ export abstract class BaseAdStrategy {
 
     CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
+    CacheService.invalidateByPrefix("promoted_").catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
@@ -585,6 +588,7 @@ export abstract class BaseAdStrategy {
        const uid = result.outboxPayload.payload.uid;
     CacheService.invalidateByPrefix(`myAds_${uid}`).catch(() => {});
     CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
+    CacheService.invalidateByPrefix("promoted_").catch(() => {});
     CacheService.invalidateByPrefix("public_ads_").catch(() => {});
     CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
@@ -600,7 +604,7 @@ export abstract class BaseAdStrategy {
       CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(() => {});
     }
 
-       import("../dashboard.service.ts").then(({ DashboardService }) => {
+    import("../dashboard.service.ts").then(({ DashboardService }) => {
          DashboardService.clearEmployerStatsCache(uid).catch(() => {});
        }).catch(() => {});
     }
