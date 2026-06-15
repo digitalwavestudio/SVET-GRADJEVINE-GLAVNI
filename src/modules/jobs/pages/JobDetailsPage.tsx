@@ -35,6 +35,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import Avatar from '@/src/components/ui/Avatar';
+import { toast } from 'react-hot-toast';
 
 const getEngagementLabel = (slug?: string, customVal?: string) => {
   if (slug === 'upisi') return customVal || 'Radno vreme';
@@ -142,7 +143,7 @@ export default function JobDetailsPage() {
       setShowApplicationModal(false);
     } catch (e) {
       console.error(e);
-      alert('Greška prilikom prijave na oglas. Pokušajte ponovo.');
+      toast.error('Greška prilikom prijave na oglas. Pokušajte ponovo.');
     } finally {
       setIsApplying(false);
     }
@@ -198,6 +199,18 @@ export default function JobDetailsPage() {
     }
   };
 
+  const getDatePosted = () => {
+    try {
+      return jobData.createdAt?.toDate
+        ? jobData.createdAt.toDate().toISOString()
+        : typeof jobData.createdAt === 'string'
+          ? jobData.createdAt
+          : new Date().toISOString();
+    } catch {
+      return new Date().toISOString();
+    }
+  };
+
   const handleApply = () => {
     if (!user) {
       navigate('/prijava');
@@ -211,7 +224,7 @@ export default function JobDetailsPage() {
       <SeoHead
         title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : `${displayTitle} ${jobData.location ? `- ${jobData.location}` : ''} - Svet Građevine`}
         description={cleanDescription.substring(0, 160)}
-        image={jobData?.companyLogo || APP_CONFIG.OG_IMAGE_DEFAULT}
+        image={jobData?.logo || jobData?.companyLogo || APP_CONFIG.OG_IMAGE_DEFAULT}
         url={buildJobUrl(jobData)}
         type="job"
         jsonLd={[seoSchema, breadcrumbSchema].filter(Boolean)}
@@ -267,7 +280,7 @@ export default function JobDetailsPage() {
                   {jobData.companyId ? (
                     <Link to={`/firma/${jobData.companyId}`} className="flex items-center gap-2 text-secondary hover:text-white transition-colors">
                       <Building2 size={16} />
-                      <span>{jobData.companyName || 'Privatni Poslodavac'}</span>
+                      <span>{jobData.comp || jobData.companyName || 'Privatni Poslodavac'}</span>
                     </Link>
                   ) : (
                     <span className="flex items-center gap-2">
@@ -332,7 +345,7 @@ export default function JobDetailsPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12" itemScope itemType="https://schema.org/JobPosting">
         <meta itemProp="title" content={displayTitle} />
-        <meta itemProp="datePosted" content={jobData.createdAt?.toDate ? jobData.createdAt.toDate().toISOString() : new Date().toISOString()} />
+        <meta itemProp="datePosted" content={getDatePosted()} />
 
         <article className="lg:col-span-8 space-y-12">
           <MediaGallery images={jobData.images || []} title={displayTitle} imageStatus={jobData.imageStatus} />
@@ -523,12 +536,12 @@ export default function JobDetailsPage() {
               <div className="relative z-10 space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-[10px] bg-secondary/10 flex items-center justify-center border border-secondary/20 overflow-hidden shadow-inner">
-                    <Avatar name={jobData.companyName || jobData.authorName || 'Anonimni Korisnik'} url={jobData.companyLogo} className="w-full h-full object-cover" />
+                    <Avatar name={jobData.comp || jobData.companyName || jobData.authorName || 'Anonimni Korisnik'} url={jobData.logo || jobData.companyLogo} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <span className="text-[9px] font-black text-white/30 uppercase tracking-widest block mb-1">OGLAŠAVAČ</span>
                     <h3 className="text-base font-black text-white tracking-tight uppercase leading-snug">
-                      {jobData.companyName || jobData.authorName || 'Privatni poslodavac'}
+                      {jobData.comp || jobData.companyName || jobData.authorName || 'Privatni poslodavac'}
                     </h3>
                     {jobData.isCompanyVerified && (
                       <div className="flex items-center gap-1.5 mt-1 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-[4px] w-fit">
@@ -656,7 +669,7 @@ export default function JobDetailsPage() {
       />
 
       <StickyDetailCTABar
-        phone={jobData.phone || jobData.applicationPhone || ''}
+        phone={jobData.phone || jobData.telefon || jobData.applicationPhone || ''}
         onMessage={handleStartChat}
         price={jobData.plataMin != null ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''}` : undefined}
         currency="EUR"

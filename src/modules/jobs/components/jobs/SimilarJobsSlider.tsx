@@ -1,18 +1,17 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion, useAnimation } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '@/src/lib/analytics';
 
 interface SimilarJobsSliderProps {
-  jobData: any;
-  displaySimilarJobs: any[];
-  buildJobUrl: (job: any) => string;
+  jobData: { cat?: string; tacnaLokacija?: string };
+  displaySimilarJobs: Array<Record<string, unknown>>;
+  buildJobUrl: (job: Record<string, unknown>) => string;
 }
 
 export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: SimilarJobsSliderProps) {
   const trackControls = useAnimation();
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleMouseEnter = () => trackControls.stop();
   const handleMouseLeave = () => {
@@ -30,7 +29,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
     handleMouseLeave();
   }, []);
 
-  const renderBadge = (job: any) => {
+  const renderBadge = (job: Record<string, unknown>) => {
     if (job.isUrgent) return <span className="badge-urgent">Hitno</span>;
     // Example: New badge for recent jobs (posted within 3 days)
     if (job.createdAt) {
@@ -58,7 +57,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
           className="similar-jobs-track"
           animate={trackControls}
         >
-          {displaySimilarJobs.map((job, index) => (
+          {(displaySimilarJobs || []).map((job, index) => (
             <Link
               key={index}
               to={buildJobUrl(job)}
@@ -127,9 +126,6 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
             </Link>
           ))}
         </motion.div>
-        {(/* loading indicator */ false) && (
-          <div className="carousel-spinner"><div className="spinner"></div></div>
-        )}
       </div>
     </section>
   );

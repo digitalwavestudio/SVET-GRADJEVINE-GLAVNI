@@ -220,11 +220,11 @@ export class UnifiedAdsService {
     await CacheService.invalidateByPrefix("public_ads_");
     await CacheService.invalidateByPrefix("search_ads_"); 
     const { PredictiveAnalyticsService } = await import("./predictive.service.ts");
-    await PredictiveAnalyticsService.forceRefresh(id).catch(() => {});
+    await PredictiveAnalyticsService.forceRefresh(id).catch((e: unknown) => console.error("[Ads] operation error:", e));
 
     // Invalidate employer dashboard stats cache to resolve "Ghost" ads immediately
     const { DashboardService } = await import("./dashboard.service.ts");
-    await DashboardService.clearEmployerStatsCache(adData.authorId).catch(() => {});
+    await DashboardService.clearEmployerStatsCache(adData.authorId).catch((e: unknown) => console.error("[Ads] operation error:", e));
 
     return { success: true };
   }
@@ -295,7 +295,7 @@ export class UnifiedAdsService {
         db.doc(fastPathDoc).set({
           partners: sanitizedFinalData,
           updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).catch(() => {});
+        }, { merge: true }).catch((e: unknown) => console.error("[Ads] operation error:", e));
 
         return finalData;
       }, fallbackPartners);
@@ -396,7 +396,7 @@ export class UnifiedAdsService {
           db.doc(fastPathDoc).set({
             [fastPathField]: sanitizedResults,
             updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-          }, { merge: true }).catch(() => {});
+          }, { merge: true }).catch((e: unknown) => console.error("[Ads] operation error:", e));
 
           return results;
       }, finalFallback);

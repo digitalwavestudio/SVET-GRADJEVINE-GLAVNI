@@ -14,7 +14,7 @@ import {
   checkApplied,
 } from "../controllers/jobs.controller.ts";
 import { validateRequest } from "../middleware/validate.ts";
-import { authMiddleware, requireAuth } from "../middleware/auth.middleware.ts";
+import { authMiddleware } from "../middleware/auth.middleware.ts";
 import { validateApplicationOwnership } from "../middleware/ownership.middleware.ts";
 import {
   jobSearchSchema,
@@ -22,10 +22,10 @@ import {
   jobSchema,
   applicationActionSchema,
 } from "@svet-gradjevine/shared";
-import { z } from "zod";
-import { cacheMiddleware } from "../middleware/cache.middleware.ts";
+
 
 const createJobSchema = jobSchema;
+const updateJobSchema = jobSchema.partial();
 
 export const jobsRouter = express.Router();
 
@@ -48,5 +48,5 @@ jobsRouter.get("/:id", getJobById);
 jobsRouter.post("/search", validateRequest(jobSearchSchema), searchJobs);
 jobsRouter.post("/create", authMiddleware, adCreationLimiter, validateRequest(createJobSchema), createJob);
 jobsRouter.post("/apply", authMiddleware, validateRequest(applicationSchema), applyJob);
-jobsRouter.patch("/:id", authMiddleware, validateRequest(jobSchema), updateJob);
+jobsRouter.patch("/:id", authMiddleware, validateRequest(updateJobSchema), updateJob);
 jobsRouter.delete("/:id", authMiddleware, deleteJob);

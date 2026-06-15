@@ -3,6 +3,7 @@ import { JobsService } from "../services/jobs.service.ts";
 import { env } from "../config/env.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
+import { CacheService } from "../services/cache.service.ts";
 
 export const getPublicJobs = async (
   req: Request,
@@ -63,7 +64,6 @@ export const searchJobs = async (
       validated?.pageSize === 6 &&
       !validated?.searchQuery;
 
-    const { CacheService } = await import("../services/cache.service.ts");
     let cacheKey = null;
 
     if (isPremiumHomepage)
@@ -126,12 +126,6 @@ export const getJobById = async (
     const jobId = req.params.id;
     const platform = req.headers["x-client-platform"];
 
-    // Server-side cache check
-    const { CacheService } = await import("../services/cache.service.ts");
-    const cacheKey = `job_${jobId}_${platform || "web"}`;
-    const cached = await CacheService.get(cacheKey);
-    if (cached) return res.json(cached);
-
     const job = await JobsService.getJobById(jobId);
     let result: unknown = job;
 
@@ -139,8 +133,6 @@ export const getJobById = async (
       result = JobTransformer.toMobile(job as unknown as RawJobInput);
     }
 
-    // Cache for 15 minutes
-    await CacheService.set(cacheKey, result, 900000);
     res.json(result);
   } catch (error) {
     next(error);

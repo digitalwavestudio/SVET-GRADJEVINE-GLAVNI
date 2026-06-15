@@ -22,6 +22,7 @@ export const StickyDetailCTABar: React.FC<StickyDetailCTABarProps> = ({
   onCtaClick
 }) => {
   const handleCall = () => {
+    if (!phone) return;
     window.location.href = `tel:${phone}`;
   };
 
@@ -29,7 +30,7 @@ export const StickyDetailCTABar: React.FC<StickyDetailCTABarProps> = ({
     <div className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-lg border-t border-white/10 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
       <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
         {/* Left Side: Price or Secondary CTA */}
-        {price ? (
+        {price != null && price !== '' ? (
           <div className="flex flex-col justify-center min-w-[80px]">
             <span className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none mb-1">
               {priceLabel || 'CENA'}

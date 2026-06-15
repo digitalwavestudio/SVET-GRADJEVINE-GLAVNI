@@ -5,9 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { jobsService, JobsListResponse } from "@/src/modules/jobs/services/jobsService";
-import { jobSearchSchema } from "@svet-gradjevine/shared";
 import { JobResponse, JobApplication } from "@/src/modules/jobs/types/models";
-import { z } from "zod";
 import { queryKeys } from "@/src/lib/queryKeysFactory";
 
 interface InitialStatePayload {
@@ -239,10 +237,8 @@ export function useSimilarJobs(
   return useQuery<JobResponse[], Error>({
     queryKey: queryKeys.jobs.all,
     queryFn: async () => {
-      // Fetch a batch of recent approved jobs (no filters).
-      const response = await jobsService.fetchJobs({ status: 'approved' }, null, 20);
-      // Take the first 8 items – assume they are the newest.
-      return response.items.slice(0, 8);
+      const response = await jobsService.fetchJobs({ status: 'active' }, null, 20);
+      return (response.items || []).slice(0, 8);
     },
     enabled: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
