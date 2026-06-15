@@ -113,31 +113,18 @@ export class UnifiedAdsService {
   }
 
   static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
-    let q = db.collection("listings")
+    // Simple query — only .where("authorId") to avoid needing composite index
+    // Sorting and pagination done in-memory
+    const fetchLimit = searchQ ? 150 : Math.max(limitNum * 2, 50);
+    const snap = await db.collection("listings")
       .where("authorId", "==", uid)
-      .orderBy("createdAt", "desc");
-      
-    if (cursor) {
-      const cursorDoc = await db.collection("listings").doc(cursor).get();
-      if (cursorDoc.exists) {
-        q = q.startAfter(cursorDoc);
-      }
-    }
-    
-    const snap = await q
-      .limit(searchQ ? 150 : limitNum)
-      .select(
-        "title", "price", "location", "type", "status", "createdAt",
-        "images", "isPremium", "isUrgent", "comp", "salary", "logo",
-        "thumbnail", "authorId", "viewsCount", "applicantsCount",
-        "category", "grad", "company"
-      )
+      .limit(fetchLimit)
       .get();
 
     const excludeStatuses = new Set(["deleted"]);
     const { ImageTransformer } = await import("../utils/image.transformer.ts");
 
-    let docs: (Listing & { typeLabel: string; postType: string })[] = snap.docs
+    let docs = snap.docs
       .filter(doc => !excludeStatuses.has(doc.data().status))
       .map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
       const data = doc.data() as Listing;
@@ -164,18 +151,39 @@ export class UnifiedAdsService {
       }) as Listing & { typeLabel: string; postType: string };
     });
 
+    // Sort by createdAt descending in-memory
+    docs.sort((a, b) => {
+      const aVal: any = a.createdAt;
+      const bVal: any = b.createdAt;
+      const aTime = aVal?.toDate?.()?.getTime() ?? Number(aVal) ?? 0;
+      const bTime = bVal?.toDate?.()?.getTime() ?? Number(bVal) ?? 0;
+      return bTime - aTime;
+    });
+
+    // Handle cursor-based offset
+    if (cursor) {
+      const cursorIdx = docs.findIndex(d => d.id === cursor);
+      if (cursorIdx >= 0) {
+        docs = docs.slice(cursorIdx + 1);
+      }
+    }
+
+    // Apply search filter
     if (searchQ) {
       const lowQ = searchQ.toLowerCase();
       docs = docs.filter(d => 
         (d.title && d.title.toLowerCase().includes(lowQ)) || 
         (d.comp && d.comp.toLowerCase().includes(lowQ))
-      ).slice(0, limitNum);
+      );
     }
 
+    const hasMore = docs.length > limitNum;
+    const pageDocs = docs.slice(0, limitNum);
+
     return {
-      docs,
-      lastVisibleId: docs.length === limitNum ? docs[docs.length - 1].id : null,
-      hasMore: docs.length === limitNum
+      docs: pageDocs,
+      lastVisibleId: pageDocs.length > 0 ? pageDocs[pageDocs.length - 1].id : null,
+      hasMore,
     };
   }
 
