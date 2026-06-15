@@ -20,7 +20,6 @@ export const getCoreRouter = () => [
   <Route key="links" path="/korisni-linkovi" element={<UsefulLinksPage />} />,
   <Route key="community" path="/zajednica" element={<CommunityPage />} />,
   <Route key="tools" path="/digitalni-alati" element={<DigitalToolsPage />} />,
-,
   <Route key="kontakt" path="/kontakt" element={<ContactPage />} />,
   <Route key="o-nama" path="/o-nama" element={<AboutPage />} />,
   <Route key="uslovi" path="/uslovi-koriscenja" element={<TermsPage />} />,

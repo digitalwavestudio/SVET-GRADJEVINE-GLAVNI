@@ -6,9 +6,8 @@ import ActivityFeed from '@/src/modules/dashboard/components/ActivityFeed';
 import DashboardGuard from '@/src/modules/dashboard/components/dashboard/DashboardGuard';
 import { useDashboardMetrics, useDashboardTrends } from '@/src/modules/dashboard/hooks/useDashboardStats';
 import ChartSkeleton from '@/src/modules/dashboard/components/dashboard/ChartSkeleton';
-import { SiteLogisticsPlanner } from '@/src/modules/dashboard/components/dashboard/SiteLogisticsPlanner';
 import { SyncIndicator } from '@/src/modules/dashboard/components/dashboard/SyncIndicator';
-import { RecentAd, DashboardMetrics, ChartTrendData } from '../../types';
+import { RecentAd, ChartTrendData } from '../../types';
 import { useAuth } from '@/src/context/AuthContext';
 import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
 import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
@@ -39,7 +38,6 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
         createdAt: ad.createdAt ? String(ad.createdAt) : undefined,
       }) as RecentAd)
     : [];
-  const activeMetrics = (statsData as unknown as Partial<DashboardMetrics>) || ({} as Partial<DashboardMetrics>);
   const charts = { dailyAnalytics: Array.isArray(trends) ? (trends as ChartTrendData[]) : [] };
 
   const parentRef = useRef<HTMLDivElement>(null);
@@ -71,7 +69,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
             </div>
 
             <div className="flex items-center gap-3">
-              {!charts?.dailyAnalytics && (
+              {(!charts?.dailyAnalytics || charts.dailyAnalytics.length === 0) && (
                 <span className="text-[8px] font-black text-[#FEBF0D]/75 bg-[#FEBF0D]/5 border border-[#FEBF0D]/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse">
                   Privremeno nedostupno
                 </span>
@@ -138,9 +136,9 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">UKUPAN BROJ OBJAVA</div>
              <div>
                <div className="text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-secondary transition-colors">
-                 {activeMetrics?.totalAds !== undefined ? activeMetrics.totalAds : "N/A"}
-               </div>
-               {activeMetrics?.totalAds === undefined && (
+                  {statsData?.totalAds !== undefined ? statsData.totalAds : "N/A"}
+                </div>
+                {statsData?.totalAds === undefined && (
                  <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">
                    Nedostupno
                  </div>
@@ -152,10 +150,10 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">AKTIVNI PAKET</div>
              <div>
                <div className="text-xl lg:text-2xl font-black text-emerald-400 tracking-tight uppercase">
-                 {activeMetrics?.activePackage || "NEMA PAKETA"}
-               </div>
-               <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
-                 {activeMetrics?.packageExpiry ? "LIMITIRAN DO REVIZIJE" : "PREMIUM PROMOCIJE"}
+                  {statsData?.activePackage || "NEMA PAKETA"}
+                </div>
+                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
+                  {statsData?.pendingApplications ? "AKTIVAN PAKET" : "PREMIUM PROMOCIJE"}
                </div>
              </div>
           </div>
@@ -164,7 +162,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">PREMIUM OGLASI</div>
              <div>
                <div className="text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter">
-                 {activeMetrics?.premiumAdsCount !== undefined ? activeMetrics.premiumAdsCount : "0"}
+                  {statsData?.premiumAdsCount !== undefined ? statsData.premiumAdsCount : "0"}
                </div>
                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KUPLJENI ARTIKLI</div>
              </div>
@@ -174,7 +172,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">INVESTIRANO (RSD)</div>
              <div>
                <div className="text-2xl lg:text-3xl font-black text-amber-500 tracking-tighter">
-                 {activeMetrics?.totalSpend !== undefined ? (activeMetrics?.totalSpend || 0).toLocaleString() : "N/A"}
+                  {statsData?.totalSpend !== undefined ? (statsData.totalSpend || 0).toLocaleString() : "N/A"}
                </div>
                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">BEZBEDNI BUDŽET</div>
              </div>
@@ -184,9 +182,9 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">NEOBRAĐENE PRIJAVE</div>
              <div>
                <div className="text-3xl lg:text-4xl font-black text-blue-400 tracking-tighter">
-                 {activeMetrics?.pendingApplications !== undefined ? activeMetrics.pendingApplications : "N/A"}
-               </div>
-               {activeMetrics?.pendingApplications === undefined ? (
+                  {statsData?.pendingApplications !== undefined ? statsData.pendingApplications : "N/A"}
+                </div>
+                {statsData?.pendingApplications === undefined ? (
                  <div className="text-[8px] font-mono font-bold text-red-500/80 uppercase mt-1 tracking-wider">NEDOSTUPNO</div>
                ) : (
                  <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KANDIDATI NA ČEKANJU</div>

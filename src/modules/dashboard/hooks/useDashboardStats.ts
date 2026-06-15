@@ -93,6 +93,12 @@ export const BffDashboardResponseSchema = z.object({
     pendingAds: z.number().optional(),
     totalViews: z.number().optional(),
     applicationsCount: z.number().optional(),
+    // Server actually returns these field names
+    totalAds: z.number().optional(),
+    pendingApplications: z.number().optional(),
+    totalSpend: z.number().optional(),
+    activePackage: z.string().optional(),
+    premiumAdsCount: z.number().optional(),
     recentAds: z.array(DashboardAdSchema).optional(),
     recentApplications: z.array(DashboardApplicationSchema).optional(),
     // Admin specific properties
