@@ -155,16 +155,12 @@ export default function ConstructionSitePage() {
         site: { name: siteName, address: '', description: '' }
       });
     },
-    onSuccess: (data) => {
-      setActiveSiteId(data.id);
+    onSettled: (data) => {
+      if (data?.id) setActiveSiteId(data.id);
       setIsNewProjectModalOpen(false);
       setNewProjectStep(1);
       setNewSiteName('');
       queryClient.invalidateQueries({ queryKey: ['construction', 'all-data'] });
-    },
-    onError: () => {
-      setIsNewProjectModalOpen(false);
-      setNewProjectStep(1);
     }
   });
 
