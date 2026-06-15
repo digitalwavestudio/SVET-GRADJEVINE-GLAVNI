@@ -10,6 +10,12 @@ export const seoRouter = Router();
 
 // Middleware to inject meta tags
 const injectMetaTags = async (req: import("express").Request & { CacheService?: typeof import("../services/cache.service.ts").CacheService }, res: import("express").Response, next: import("express").NextFunction) => {
+  if (process.env.NODE_ENV === "development") {
+    const userAgent = (req.headers["user-agent"] || "").toLowerCase();
+    const isBot = /googlebot|bingbot|yandex|baidu|slurp|duckduckbot|sogou|spider|crawl|bot|gptbot|claudebot/i.test(userAgent);
+    if (!isBot) return next();
+  }
+
   const { type, id } = req.params;
 
   // Only handle specific ad-detail routes

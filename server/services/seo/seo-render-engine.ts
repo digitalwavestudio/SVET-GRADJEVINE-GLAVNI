@@ -29,10 +29,15 @@ export class SEORenderEngine {
       return this.cachedIndexHtml;
     }
 
-    const possiblePaths = [
-      path.join(process.cwd(), "dist", "index.html"),
-      path.join(process.cwd(), "index.html"),
-    ];
+    const possiblePaths = process.env.NODE_ENV === "development"
+      ? [
+          path.join(process.cwd(), "index.html"),
+          path.join(process.cwd(), "dist", "index.html"),
+        ]
+      : [
+          path.join(process.cwd(), "dist", "index.html"),
+          path.join(process.cwd(), "index.html"),
+        ];
 
     for (const p of possiblePaths) {
       try {
