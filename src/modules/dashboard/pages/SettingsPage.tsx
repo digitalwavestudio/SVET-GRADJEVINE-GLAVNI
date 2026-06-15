@@ -344,7 +344,7 @@ export default function SettingsPage() {
               )}
 
               <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-end gap-4">
-                <button className="w-full md:w-auto px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase text-white/40 hover:text-white transition-all">ODUSTANI</button>
+                <button onClick={() => window.location.href = '/kontrolna-tabla'} className="w-full md:w-auto px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase text-white/40 hover:text-white transition-all">ODUSTANI</button>
                 <button 
                   onClick={handleSave}
                   disabled={isSaving || user?.syncStatus === 'syncing'}

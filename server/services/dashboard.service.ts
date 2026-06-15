@@ -75,7 +75,22 @@ export class DashboardService {
           }
           return { smartMatches, recentApplications };
         }
-        return { role };
+        // Standard users — vrati osnovne podatke
+        try {
+          const userSnap = await db.collection("users").doc(userId).get();
+          const userData = userSnap.data() || {};
+          return {
+            role,
+            walletBalance: userData.walletBalance || 0,
+            freeAdsCount: userData.freeAdsCount || 0,
+            profileScore: userData.profileScore || 0,
+            isPremium: userData.isPremiumProfile || false,
+            recentViews: userData.viewsCount || 0,
+          };
+        } catch (err) {
+          console.warn("[DashboardService] Failed to fetch standard user data:", err);
+          return { role };
+        }
       })(),
       MetricsService.getUserAnalytics(userId, 30),
     ]);
