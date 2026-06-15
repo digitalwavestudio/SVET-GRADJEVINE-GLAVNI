@@ -7,9 +7,11 @@ interface NewProjectWizardProps {
   step: number;
   setStep: (step: number) => void;
   onConfirm: () => void;
+  siteName: string;
+  onSiteNameChange: (name: string) => void;
 }
 
-export const NewProjectWizard = React.memo(function NewProjectWizard({ isOpen, onClose, step, setStep, onConfirm }: NewProjectWizardProps) {
+export const NewProjectWizard = React.memo(function NewProjectWizard({ isOpen, onClose, step, setStep, onConfirm, siteName, onSiteNameChange }: NewProjectWizardProps) {
   if (!isOpen) return null;
 
   return (
@@ -74,7 +76,7 @@ export const NewProjectWizard = React.memo(function NewProjectWizard({ isOpen, o
               <div className="space-y-8">
                 <div>
                   <label className="text-xs font-black text-white/50 uppercase tracking-[0.2em] mb-3 block">Radni Naziv Gradilišta</label>
-                  <input aria-label="Unos polja" type="text" placeholder="Npr. BW VISTA Faza 2" className="w-full bg-[#070B0F] border border-white/10 rounded-[10px] px-6 py-5 text-lg font-black text-white uppercase tracking-wider outline-none focus:border-secondary focus:bg-white/[0.02] focus:shadow-[0_0_30px_rgba(255,204,0,0.05)] transition-all" />
+                  <input aria-label="Unos polja" type="text" value={siteName} onChange={(e) => onSiteNameChange(e.target.value)} placeholder="Npr. BW VISTA Faza 2" className="w-full bg-[#070B0F] border border-white/10 rounded-[10px] px-6 py-5 text-lg font-black text-white uppercase tracking-wider outline-none focus:border-secondary focus:bg-white/[0.02] focus:shadow-[0_0_30px_rgba(255,204,0,0.05)] transition-all" />
                 </div>
                 <div>
                   <label className="text-xs font-black text-white/50 uppercase tracking-[0.2em] mb-3 block">Tačna Lokacija / Parcela</label>

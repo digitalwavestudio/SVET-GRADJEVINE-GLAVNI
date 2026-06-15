@@ -31,7 +31,7 @@ export default function ConstructionSitePage() {
   const { user } = useAuth();
   const [activeSiteId, setActiveSiteId] = useState('');
   
-  const { data: constructionData, isLoading: loading, refetch } = useConstructionSite(user, activeSiteId);
+  const { data: constructionData, isLoading: loading, error: fetchError, refetch } = useConstructionSite(user, activeSiteId);
   const sites = React.useMemo(() => constructionData?.sites || [], [constructionData]);
   const events = React.useMemo(() => constructionData?.events || [], [constructionData]);
   const diaryLogs = React.useMemo(() => constructionData?.diaryLogs || {}, [constructionData]);
@@ -40,7 +40,6 @@ export default function ConstructionSitePage() {
 
   const [editingSiteId, setEditingSiteId] = useState<string | null>(null);
   const [editSiteName, setEditSiteName] = useState('');
-  const [aiShift, setAiShift] = useState(0);
 
   useEffect(() => {
     if (sites.length > 0 && !activeSiteId) {
@@ -146,18 +145,20 @@ export default function ConstructionSitePage() {
     }
   });
 
+  const [newSiteName, setNewSiteName] = useState('');
+
   const addSiteMutation = useMutation({
     mutationFn: async () => {
-      const siteName = `NOVA LOKACIJA ${sites.length + 1}`;
-      return apiClient.post<any>(`/construction`, {
-        name: siteName,
-        location: 'Nepoznato',
+      const siteName = newSiteName.trim() || `NOVA LOKACIJA ${sites.length + 1}`;
+      return apiClient.post<any>(`/construction/sites`, {
+        site: { name: siteName, address: '', description: '' }
       });
     },
     onSuccess: (data) => {
       setActiveSiteId(data.id);
       setIsNewProjectModalOpen(false);
       setNewProjectStep(1);
+      setNewSiteName('');
       queryClient.invalidateQueries({ queryKey: ['construction', 'all-data'] });
     }
   });
@@ -181,8 +182,8 @@ export default function ConstructionSitePage() {
     mutationFn: async ({ day, content }: { day: number, content: string }) => {
       return apiClient.post(`/calendar/diary`, {
         day,
-        month: date.getMonth(),
-        year: date.getFullYear(),
+        month: today.getMonth(),
+        year: today.getFullYear(),
         content
       });
     }
@@ -220,11 +221,6 @@ export default function ConstructionSitePage() {
       return apiClient.post('/construction/metrics', metrics);
     }
   });
-
-  const getShiftedDay = React.useCallback((day: number) => {
-    if (day > 15) return day + aiShift;
-    return day;
-  }, [aiShift]);
 
   // Moving state
   const [workerToMove, setWorkerToMove] = useState<string | null>(null);
@@ -386,9 +382,10 @@ export default function ConstructionSitePage() {
   };
 
   // Mesečna projekcija i arhiviranje (Kapacitet prošlih dana)
-  const date = new Date();
-  const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  const [selectedDay, setSelectedDay] = useState<number>(date.getDate());
+  const today = new Date();
+  const [viewDate, setViewDate] = useState(new Date());
+  const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+  const [selectedDay, setSelectedDay] = useState<number>(today.getDate());
   
   const [localDiaryText, setLocalDiaryText] = useState('');
   const typingRef = useRef<NodeJS.Timeout | null>(null);
@@ -412,7 +409,7 @@ export default function ConstructionSitePage() {
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [newProjectStep, setNewProjectStep] = useState(1);
   const [rangeStart, setRangeStart] = useState<number>(1);
-  const [rangeEnd, setRangeEnd] = useState<number>(date.getDate());
+  const [rangeEnd, setRangeEnd] = useState<number>(today.getDate());
 
   useEffect(() => {
     if (isNewProjectModalOpen || isModalOpen || isPayrollModalOpen || isHistoryModalOpen) {
@@ -426,8 +423,8 @@ export default function ConstructionSitePage() {
   // HISTORICAL DATA - Simuliramo prošle dane za toplotnu mapu
   const historicalData = React.useMemo(() => {
     const data: Record<number, { cost: number, hours: number, isAnomaly: boolean, isMilestone: boolean, workerCount: number }> = {};
-    for (let i = 1; i < date.getDate(); i++) {
-        const dayOfWeek = new Date(date.getFullYear(), date.getMonth(), i).getDay();
+    for (let i = 1; i < today.getDate(); i++) {
+        const dayOfWeek = new Date(today.getFullYear(), today.getMonth(), i).getDay();
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         
         // Deterministic generation
@@ -453,17 +450,18 @@ export default function ConstructionSitePage() {
         data[i] = { cost, hours, isAnomaly, isMilestone, workerCount };
     }
     return data;
-  }, [date.getDate()]); // Zavisi samo od trenutnog dana kako se podaci ne bi gubili
+  }, [today.getDate()]); // Zavisi samo od trenutnog dana kako se podaci ne bi gubili
 
   const pastSum = Object.values(historicalData).reduce((acc: number, curr: DayData) => acc + curr.cost, 0);
-  const estimatedMonthly = pastSum + totalDailyCost + ((daysInMonth - date.getDate()) * 280); // 280 roughly avg daily
+  const avgDailyCost = today.getDate() > 1 ? Math.round(pastSum / (today.getDate() - 1)) : totalDailyCost;
+  const estimatedMonthly = pastSum + totalDailyCost + (avgDailyCost * (daysInMonth - today.getDate()));
 
   // Formatiranje dana za "TROŠAK"
   const daysSrFull = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
-  const dateStr = `${daysSrFull[date.getDay()]} ${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+  const dateStr = `${daysSrFull[today.getDay()]} ${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}`;
 
   // Kalendar Mreža Logic
-  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  const firstDayOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
   const startDayIndex = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // Ponedeljak = 0
   const emptyStartDays = React.useMemo(() => Array.from({ length: startDayIndex }, (_, i) => null), [startDayIndex]);
   const daysArray = React.useMemo(() => Array.from({ length: daysInMonth }, (_, i) => i + 1), [daysInMonth]);
@@ -477,37 +475,53 @@ export default function ConstructionSitePage() {
     addWorkerMutation.mutate();
   };
 
-  // Deterministic Chart Data
-  const getSimulatedActual = (d1: number, d2: number) => isAllSites ? (d1 + d2) : (activeSiteId === '1' ? d1 : d2);
-  const getSimulatedPlanned = () => isAllSites ? 500 : 250;
-  const chartData = [
-    { day: 'Pon', planned: getSimulatedPlanned(), actual: getSimulatedActual(240, 180) },
-    { day: 'Uto', planned: getSimulatedPlanned(), actual: getSimulatedActual(260, 190) },
-    { day: 'Sre', planned: getSimulatedPlanned(), actual: getSimulatedActual(300, 200) },
-    { day: 'Čet', planned: getSimulatedPlanned(), actual: getSimulatedActual(250, 210) },
-    { day: 'Pet', planned: getSimulatedPlanned(), actual: getSimulatedActual(245, 170) },
-    { day: 'Sub', planned: 0, actual: getSimulatedActual(120, 0) },
-    { day: 'Ned', planned: 0, actual: getSimulatedActual(0, 0) },
-  ];
+  // Real chart data izračunat iz stvarnih radnika i resursa
+  const avgHourlyRate = activeWorkersArray.reduce((acc, w) => acc + (w.hourlyRate || 0), 0) / (activeWorkersArray.length || 1);
+  const plannedDaily = Math.round(8 * activeWorkersArray.length * avgHourlyRate);
+  const currentDayOfWeek = today.getDay(); // 0=Ned, 1=Pon... 6=Sub
+  const dayNames = ['Ned', 'Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub'];
+  const chartData = dayNames.map((day, i) => ({
+    day,
+    planned: (i === 0 || i === 6) ? 0 : plannedDaily,
+    actual: i === currentDayOfWeek ? totalDailyCost : 0,
+  }));
 
-  // AI Smart Insights
-  const smartInsights = isAllSites ? [
-    { id: 6, type: 'info', text: 'Globalna potrošnja je u savršenom balansu sa planiranim budžetom cele firme.', icon: 'account_balance', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
-    { id: 4, type: 'critical', text: 'Kasni isporuka Glet mase (Kuća na Vračaru).', icon: 'error', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' },
-    { id: 1, type: 'warning', text: 'Zabeleženi prekovremeni sati (Sektor 3).', icon: 'warning', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
-  ] : activeSiteId === '1' ? [
-    { id: 1, type: 'warning', text: 'Zabeleženi prekovremeni sati u Sredu.', icon: 'warning', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
-    { id: 2, type: 'good', text: 'Potrošnja je 4% ispod plana za radnu nedelju.', icon: 'trending_down', color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' },
-    { id: 3, type: 'info', text: 'Faza "Grubi radovi" je na 85% gotovosti.', icon: 'info', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
-  ] : [
-    { id: 4, type: 'critical', text: 'Kasni isporuka Glet mase na lokaciju.', icon: 'error', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' },
-    { id: 5, type: 'warning', text: 'Samo 2 radnika prisutna na gradilištu danas.', icon: 'group_off', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
-  ];
+  // AI Smart Insights — računati iz stvarnih podataka
+  const smartInsights = React.useMemo(() => {
+    const insights: { id: number; type: string; text: string; icon: string; color: string; bg: string; border: string; }[] = [];
+    const totalHours = activeWorkersArray.reduce((acc, w) => acc + (w.isPresent && w.checkIn && w.checkOut ? getHours(w.checkIn, w.checkOut) : 0), 0);
+    if (totalDailyCost > plannedDaily && plannedDaily > 0) {
+      insights.push({ id: 1, type: 'warning', text: `Današnja potrošnja (${totalDailyCost} rsd) premašuje plan (${plannedDaily} rsd).`, icon: 'warning', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' });
+    }
+    if (totalHours > activeWorkersArray.length * 10) {
+      insights.push({ id: 2, type: 'warning', text: `Zabeleženi prekovremeni sati (${Math.round(totalHours)}h za ${activeWorkersArray.length} radnika).`, icon: 'schedule', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' });
+    }
+    if (activeWorkersArray.length === 0 && !isAllSites) {
+      insights.push({ id: 3, type: 'critical', text: 'Nema radnika na gradilištu danas.', icon: 'group_off', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' });
+    }
+    if (totalDailyCost > 0 && totalDailyCost <= plannedDaily) {
+      insights.push({ id: 4, type: 'good', text: `Potrošnja je u okviru plana (${totalDailyCost} rsd od ${plannedDaily} rsd).`, icon: 'trending_down', color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' });
+    }
+    if (insights.length === 0) {
+      insights.push({ id: 5, type: 'info', text: 'Sistem radi normalno. Nema odstupanja za prikaz.', icon: 'info', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' });
+    }
+    return insights;
+  }, [activeWorkersArray, totalDailyCost, plannedDaily, isAllSites, getHours]);
 
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-8 pb-10">
         
+        {fetchError && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-[10px] p-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-red-500">error_outline</span>
+              <p className="text-[11px] font-black text-red-500 uppercase tracking-widest">Nismo mogli da učitamo podatke. Pokušaj ponovo.</p>
+            </div>
+            <button onClick={() => refetch()} className="px-4 py-2 bg-red-500/20 text-red-500 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">POKUŠAJ PONOVO</button>
+          </div>
+        )}
+
         {/* Header section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
@@ -737,9 +751,9 @@ export default function ConstructionSitePage() {
             </div>
 
             <div className="flex items-center gap-4 bg-[#0A0F14] border border-white/5 rounded-[10px] p-2 shrink-0">
-              <button className="p-2 hover:bg-white/5 rounded-[10px] transition-all flex"><span className="material-symbols-outlined text-[20px]">chevron_left</span></button>
-              <span className="text-xs font-black tracking-widest uppercase px-4">{date.toLocaleString('sr-Latn', { month: 'long', year: 'numeric' })}</span>
-              <button className="p-2 hover:bg-white/5 rounded-[10px] transition-all flex"><span className="material-symbols-outlined text-[20px]">chevron_right</span></button>
+              <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))} className="p-2 hover:bg-white/5 rounded-[10px] transition-all flex"><span className="material-symbols-outlined text-[20px]">chevron_left</span></button>
+              <span className="text-xs font-black tracking-widest uppercase px-4">{viewDate.toLocaleString('sr-Latn', { month: 'long', year: 'numeric' })}</span>
+              <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))} className="p-2 hover:bg-white/5 rounded-[10px] transition-all flex"><span className="material-symbols-outlined text-[20px]">chevron_right</span></button>
             </div>
           </div>
 
@@ -748,31 +762,31 @@ export default function ConstructionSitePage() {
             <CalendarWidget
               emptyStartDays={emptyStartDays}
               daysArray={daysArray}
-              date={date}
+              date={viewDate}
               selectedDay={selectedDay || 0}
               workers={workers}
               historicalData={historicalData}
               totalDailyCost={totalDailyCost}
               totalHours={totalHours}
               events={events}
-              getShiftedDay={getShiftedDay}
+              getShiftedDay={(day: number) => day}
               estimatedMonthly={estimatedMonthly}
-              isPast={React.useCallback((day: number) => day < date.getDate(), [date])}
-              isFuture={React.useCallback((day: number) => day > date.getDate(), [date])}
-              isToday={React.useCallback((day: number) => day === date.getDate(), [date])}
+              isPast={React.useCallback((day: number) => day < today.getDate(), [today])}
+              isFuture={React.useCallback((day: number) => day > today.getDate(), [today])}
+              isToday={React.useCallback((day: number) => day === today.getDate(), [today])}
               handleDayClick={React.useCallback((day: number, dayData: any, dayEvents: any[]) => {
-                const isPast = day < date.getDate();
-                const isToday = day === date.getDate();
+                const isPast = day < today.getDate();
+                const isToday = day === today.getDate();
                 if (!isPast && !isToday && dayEvents.length === 0) return;
                 if (!dayData?.cost && !isToday && dayEvents.length === 0) return; 
                 setSelectedDay(day);
                 setIsModalOpen(true);
-              }, [date])}
+              }, [today])}
             />
 
             {/* DESNA STRANA: OBRAČUN PLATA */}
             <PayrollWidget 
-               date={date}
+               date={viewDate}
                rangeStart={rangeStart}
                setRangeStart={setRangeStart}
                rangeEnd={rangeEnd}
@@ -794,9 +808,9 @@ export default function ConstructionSitePage() {
           isOpen={isModalOpen} 
           onClose={() => setIsModalOpen(false)} 
           selectedDay={selectedDay} 
-          date={date} 
+          date={viewDate} 
           events={events} 
-          getShiftedDay={getShiftedDay} 
+          getShiftedDay={(day: number) => day} 
           totalDailyCost={totalDailyCost} 
           historicalData={historicalData} 
           activeWorkersArray={activeWorkersArray} 
@@ -809,7 +823,7 @@ export default function ConstructionSitePage() {
           onClose={() => setIsPayrollModalOpen(false)} 
           rangeStart={rangeStart} 
           rangeEnd={rangeEnd} 
-          date={date} 
+          date={viewDate} 
           activeWorkersArray={activeWorkersArray} 
         />
 
@@ -822,7 +836,9 @@ export default function ConstructionSitePage() {
           onClose={() => setIsNewProjectModalOpen(false)} 
           step={newProjectStep} 
           setStep={setNewProjectStep} 
-          onConfirm={confirmAddSite} 
+          onConfirm={confirmAddSite}
+          siteName={newSiteName}
+          onSiteNameChange={setNewSiteName}
         />
 
       </AnimatePresence>
