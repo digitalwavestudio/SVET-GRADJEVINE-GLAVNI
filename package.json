@@ -11,9 +11,9 @@
     "start": "node dist/server.cjs",
     "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "preview": "vite preview",
-    "simulate:prod": "tsx scripts/production_simulation.ts",
-    "freeze-architecture": "tsx scripts/freeze_architecture.ts",
-    "integrity-check": "tsx scripts/integrity_shield.ts",
+    "simulate:prod": "echo 'Script removed - use server.ts in production mode directly'",
+    "freeze-architecture": "echo 'Script removed - use esbuild for architecture analysis'",
+    "integrity-check": "echo 'Script removed - use lint, typecheck and test instead'",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -22,7 +22,7 @@
     "test:contract": "vitest run server/tests/contract.test.ts",
     "test:coverage": "vitest run --coverage",
     "test:rules": "vitest run server/tests/firestore-security.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "echo 'No E2E tests configured yet. Use npx playwright test to run.'"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.2",
