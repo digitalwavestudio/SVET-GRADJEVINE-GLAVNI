@@ -303,10 +303,52 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
           premium: "premiumPartners",
         };
 
+        const typeMap: Record<string, string> = {
+          jobs: "job",
+          machines: "machine",
+          accommodations: "accommodation",
+          caterings: "catering",
+          plots: "plot",
+          marketplace: "marketplace",
+        };
+
         const countKey = fieldMap[collectionName];
         const total = countKey ? reconciled[countKey] || 0 : 0;
-        const today = 0;
         const premium = reconciled.premiumPartners || 0;
+
+        let today = 0;
+        const targetType = typeMap[collectionName];
+        if (targetType) {
+          try {
+            const todayStart = admin.firestore.Timestamp.fromDate(
+              (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
+            );
+            const snap = await db
+              .collection("listings")
+              .where("type", "==", targetType)
+              .where("createdAt", ">=", todayStart)
+              .count()
+              .get();
+            today = snap.data().count;
+          } catch (err) {
+            console.warn(`[stats] Failed to count today's ${collectionName}:`, err);
+          }
+        } else if (collectionName === "companies") {
+          try {
+            const todayStart = admin.firestore.Timestamp.fromDate(
+              (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
+            );
+            const snap = await db
+              .collection("users")
+              .where("role", "==", "poslodavac")
+              .where("createdAt", ">=", todayStart)
+              .count()
+              .get();
+            today = snap.data().count;
+          } catch (err) {
+            console.warn(`[stats] Failed to count today's companies:`, err);
+          }
+        }
 
         return { total, today, premium };
       },
