@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Step1 } from "@/src/modules/ads/components/post-ad/Step1";
 import { Step2 } from "@/src/modules/ads/components/post-ad/Step2";

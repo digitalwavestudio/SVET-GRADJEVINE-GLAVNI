@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getQuotaExceeded } from '@/src/lib/errorUtils';
 import { Breadcrumbs } from '@/src/components/Breadcrumbs';

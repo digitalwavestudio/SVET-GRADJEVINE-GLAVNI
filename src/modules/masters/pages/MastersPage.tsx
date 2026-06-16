@@ -3,7 +3,7 @@ import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { HardHat } from 'lucide-react';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { AnimatePresence, motion } from 'motion/react';
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { generateProfessionalServiceListSchema } from '@/src/lib/seoSchema';
 import DynamicSEO from '@/src/components/DynamicSEO';

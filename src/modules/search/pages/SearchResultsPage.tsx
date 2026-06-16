@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { DashboardLayout } from '@/src/modules/core';
 import LoadingState from '@/src/components/LoadingState';

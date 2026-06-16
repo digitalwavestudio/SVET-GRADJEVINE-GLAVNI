@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { OnlineStatus } from '@/src/components/ui/OnlineStatus';
 import { Conversation } from '@/src/context/MessagesContext';

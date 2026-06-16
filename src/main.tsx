@@ -65,7 +65,7 @@ window.addEventListener('unhandledrejection', function(event) {
     }
   });
 });
-import React, { StrictMode, useEffect, useState } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 // import { onCLS, onINP, onLCP } from 'web-vitals';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -83,8 +83,6 @@ initZodLocalization();
 // initFrontendTracing();
 // initErrorMonitor();
 import './index.css';
-
-const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
 
 declare global {
   interface Window {

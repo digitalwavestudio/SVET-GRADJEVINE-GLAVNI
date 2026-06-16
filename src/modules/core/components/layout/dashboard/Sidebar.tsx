@@ -1,4 +1,4 @@
-import React, { useRef, memo } from 'react';
+import { useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, UserRole } from '@/src/context/AuthContext';
 import { useDashboardNavigation, NavItem } from '@/src/modules/dashboard/hooks/useDashboardNavigation';

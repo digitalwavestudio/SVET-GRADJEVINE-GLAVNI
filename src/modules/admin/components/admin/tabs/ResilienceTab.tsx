@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { auth } from '@/src/firebase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

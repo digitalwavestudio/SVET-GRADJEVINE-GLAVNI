@@ -203,9 +203,9 @@ export function useAuthNode() {
       unsubUserRef.current = () => {};
     } catch (err) {
       console.error('[AUTH_NODE] Failed to subscribe to user info', err);
-      if (isMountedFn.current) { setLoading(false); setIsInitializing(false); setIsInitializing(false); }
+      if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
     }
-  }, []); // REMOVED [user] to prevent infinite loop
+  }, []); // State setters are stable; refs prevent stale closures
 
   useEffect(() => {
     if (isBotRef.current) return;

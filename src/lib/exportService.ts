@@ -11,17 +11,22 @@ class ExportService {
   private batch: TelemetryItem[] = [];
   private static instance: ExportService;
   private sessionId: string;
+  private flushInterval: ReturnType<typeof setInterval> | null = null;
+  private beforeUnloadHandler: (() => void) | null = null;
+  private visibilityHandler: (() => void) | null = null;
 
   private constructor() {
     this.sessionId = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', () => this.flushSync());
-      window.addEventListener('visibilitychange', () => {
+      this.beforeUnloadHandler = () => this.flushSync();
+      this.visibilityHandler = () => {
         if (document.visibilityState === 'hidden') {
           this.flushSync();
         }
-      });
-      setInterval(() => this.flush(), 5000); // Batched: Flush every 5 seconds
+      };
+      window.addEventListener('beforeunload', this.beforeUnloadHandler);
+      window.addEventListener('visibilitychange', this.visibilityHandler);
+      this.flushInterval = setInterval(() => this.flush(), 5000);
     }
   }
 
@@ -122,6 +127,18 @@ class ExportService {
     } catch (e) {
       // Restore batch if failed, so next attempts can try
       this.batch = [...currentBatch, ...this.batch].slice(0, 500);
+    }
+  }
+
+  public dispose() {
+    if (this.beforeUnloadHandler) {
+      window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+    }
+    if (this.visibilityHandler) {
+      window.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
+    if (this.flushInterval !== null) {
+      clearInterval(this.flushInterval);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
 
 const AnimatedCounter = ({ end, duration = 2.5 }: { end: number, duration?: number }) => {

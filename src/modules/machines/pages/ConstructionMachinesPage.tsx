@@ -2,7 +2,7 @@ import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { Tractor } from 'lucide-react';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { AnimatePresence, motion } from 'motion/react';
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import DynamicSEO from '@/src/components/DynamicSEO';

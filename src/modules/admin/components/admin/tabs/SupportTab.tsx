@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useAdminSupport } from '@/src/modules/admin/hooks/useAdminSupport';
 import { useDebounce } from '@/src/hooks/useDebounce';

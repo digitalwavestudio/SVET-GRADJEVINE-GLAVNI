@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMastersList } from '@/src/modules/masters/hooks/useMasters';
 import { useMachinesList } from '@/src/modules/machines';

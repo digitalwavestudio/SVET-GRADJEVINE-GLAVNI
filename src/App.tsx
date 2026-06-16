@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route, Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { initGA, trackPageView } from '@/src/lib/analytics';
 import NetworkStatus from '@/src/components/NetworkStatus';

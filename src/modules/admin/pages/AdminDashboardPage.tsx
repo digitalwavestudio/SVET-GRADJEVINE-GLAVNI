@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'motion/react';
-import React, { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { getQuotaExceeded } from '@/src/lib/errorUtils';

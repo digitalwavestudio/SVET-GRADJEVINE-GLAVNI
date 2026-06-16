@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 

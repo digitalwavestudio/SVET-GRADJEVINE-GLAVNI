@@ -168,7 +168,8 @@ export const algoliaSearch = async (
       nbPages?: number;
       nbHits?: number;
     }
-    const result = response.results[0] as unknown as AlgoliaSearchFrontendResult; // Cast from library type
+    const result = response.results?.[0] as unknown as AlgoliaSearchFrontendResult | undefined;
+    if (!result) return { docs: [], lastVisibleId: null, hasMore: false };
     
     if (result && result.hits) {
       const docs = result.hits.map((h) => ({

@@ -1,6 +1,6 @@
 import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { Briefcase } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import { generateJobPostingListSchema } from '@/src/lib/seoSchema';

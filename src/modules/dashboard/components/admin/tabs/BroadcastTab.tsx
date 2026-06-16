@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useAdminBroadcast, BroadcastCampaign } from '@/src/modules/admin/hooks/useAdminBroadcast';
 import { toast } from 'react-hot-toast';

@@ -1,7 +1,7 @@
 import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { Map } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { Breadcrumbs } from '@/src/components/Breadcrumbs';

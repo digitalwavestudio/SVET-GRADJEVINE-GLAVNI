@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { APP_CONFIG } from '@/src/constants/config';
 import { useAuth } from '@/src/context/AuthContext';
 

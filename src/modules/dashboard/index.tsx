@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Button, Card, Badge } from '@svet-gradjevine/ui';
 import { 
   XAxis, 

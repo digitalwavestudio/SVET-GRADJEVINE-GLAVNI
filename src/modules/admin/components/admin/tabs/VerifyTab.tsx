@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { OptimizedImage } from "@/src/components/OptimizedImage";
 import { apiClient } from "@/src/lib/apiClient";

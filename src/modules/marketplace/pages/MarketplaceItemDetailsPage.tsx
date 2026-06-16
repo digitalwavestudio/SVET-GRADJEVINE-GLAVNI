@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MarketplaceItem } from '@/src/modules/marketplace/types/models';
 import { OptimizedImage } from '@/src/components/OptimizedImage';

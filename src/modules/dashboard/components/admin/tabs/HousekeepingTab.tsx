@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { apiClient } from '@/src/lib/apiClient';
 import { toast } from 'react-hot-toast';

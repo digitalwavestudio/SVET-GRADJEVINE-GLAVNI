@@ -17,12 +17,12 @@ const OUTBOX_KEY = 'svet_gradevine_offline_outbox';
 
 class OfflineSyncManager {
   private isSyncing = false;
+  private onlineHandler: (() => void) | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
-      window.addEventListener('online', () => {
-        this.flushOutbox();
-      });
+      this.onlineHandler = () => { this.flushOutbox(); };
+      window.addEventListener('online', this.onlineHandler);
       // Initial check on load
       setTimeout(() => {
         if (navigator.onLine) {
@@ -169,6 +169,12 @@ class OfflineSyncManager {
           letterSpacing: '0.05em'
         }
       });
+    }
+  }
+
+  public dispose() {
+    if (this.onlineHandler) {
+      window.removeEventListener('online', this.onlineHandler);
     }
   }
 }

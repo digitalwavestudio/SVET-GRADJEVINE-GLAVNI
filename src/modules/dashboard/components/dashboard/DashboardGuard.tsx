@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Component, ErrorInfo, ReactNode } from "react";
 import { queryClient } from "@/src/lib/queryClient";
 import {
   WifiOff,

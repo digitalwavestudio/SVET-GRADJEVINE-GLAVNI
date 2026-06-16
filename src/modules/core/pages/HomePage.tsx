@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import React, { useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CtaSection from '@/src/components/CtaSection';
 import SeoHead from '@/src/components/SeoHead';

@@ -278,8 +278,7 @@ class ClientCircuitBreaker {
    * Checks if service group is tripped (OPEN)
    */
   public isTripped(url: string): boolean {
-    // Disabled client-side blocking breaker to allow continuous instant rendering
-    return false;
+    return this.states.get(this.classifyUrl(url)) === "OPEN";
   }
 
   /**

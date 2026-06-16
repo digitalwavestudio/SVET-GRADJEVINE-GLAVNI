@@ -86,7 +86,6 @@ export function useActivities() {
       return payload;
     },
     enabled: !!user,
-    refetchOnWindowFocus: true,
     staleTime: 50 * 1000,
   });
 

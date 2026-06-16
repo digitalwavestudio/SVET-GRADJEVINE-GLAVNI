@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { walletService } from '@/src/modules/checkout/services/walletService';
 import { useAuth } from '@/src/context/AuthContext';

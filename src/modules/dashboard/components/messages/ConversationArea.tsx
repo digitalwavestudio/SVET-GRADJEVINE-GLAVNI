@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { OnlineStatus } from '@/src/components/ui/OnlineStatus';
 import { Conversation, Message } from '@/src/context/MessagesContext';

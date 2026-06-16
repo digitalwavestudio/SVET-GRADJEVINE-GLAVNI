@@ -1,5 +1,7 @@
 import { sanitizeInput } from '@/src/lib/sanitize';
 
+const BASE_URL = 'https://www.svetgradjevine.com';
+
 const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
   beograd: { lat: 44.7866, lng: 20.4489 },
   "novi-sad": { lat: 45.2671, lng: 19.8335 },
@@ -133,12 +135,12 @@ export interface MenuItemInput {
 }
 
 export const generateJobSchema = (jobData: JobPostingSchema) => {
-  const companyUrl = jobData.companyId ? `https://www.svetgradjevine.com/firma/${jobData.companyId}` : "https://www.svetgradjevine.com";
+  const companyUrl = jobData.companyId ? `${BASE_URL}/firma/${jobData.companyId}` : BASE_URL;
   const organizationId = `${companyUrl}#organization`;
   const locationSlug = jobData.locationSlug || jobData.location?.toLowerCase().replace(/ /g, '-') || "srbija";
   const branchId = `${companyUrl}#branch-${locationSlug}`;
-  const placeId = `https://www.svetgradjevine.com/poslovi/${locationSlug}#place`;
-  const jobUrl = `https://www.svetgradjevine.com/posao/${jobData.id}`;
+  const placeId = `${BASE_URL}/poslovi/${locationSlug}#place`;
+  const jobUrl = `${BASE_URL}/posao/${jobData.id}`;
   const productId = `${jobUrl}#perk-equipment`;
 
   const coords = CITY_COORDS[locationSlug] || CITY_COORDS['beograd'];
@@ -236,10 +238,10 @@ export const generateJobSchema = (jobData: JobPostingSchema) => {
 };
 
 export const generateLocalBusinessSchema = (companyData: LocalBusinessSchema) => {
-  const companyUrl = companyData.website || companyData.id ? `https://www.svetgradjevine.com/firma/${companyData.id}` : "https://www.svetgradjevine.com";
+  const companyUrl = companyData.website || companyData.id ? `${BASE_URL}/firma/${companyData.id}` : BASE_URL;
   const organizationId = `${companyUrl}#organization`;
   const locationSlug = companyData.locationSlug || companyData.city?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `https://www.svetgradjevine.com/firme/${locationSlug}#place`;
+  const placeId = `${BASE_URL}/firme/${locationSlug}#place`;
 
   return {
     "@context": "https://schema.org",
@@ -280,7 +282,7 @@ export const generateLocalBusinessSchema = (companyData: LocalBusinessSchema) =>
 
 export const generateProfessionalServiceSchema = (masterData: ProfessionalServiceInput, url: string) => {
   const locationSlug = masterData.location?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `https://www.svetgradjevine.com/majstori/${locationSlug}#place`;
+  const placeId = `${BASE_URL}/majstori/${locationSlug}#place`;
   const personId = `${url}#person`;
 
   return {
@@ -331,10 +333,10 @@ export const generateProductSchema = (productData: ProductInput, category: strin
 };
 
 export const generateMachineSchema = (machineData: MachineInput, locationName: string, categoryName: string, url: string) => {
-  const companyUrl = machineData.companyId ? `https://www.svetgradjevine.com/firma/${machineData.companyId}` : "https://www.svetgradjevine.com";
+  const companyUrl = machineData.companyId ? `${BASE_URL}/firma/${machineData.companyId}` : BASE_URL;
   const organizationId = `${companyUrl}#organization`;
   const locationSlug = locationName?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `https://www.svetgradjevine.com/gradjevinske-masine/${locationSlug}#place`;
+  const placeId = `${BASE_URL}/gradjevinske-masine/${locationSlug}#place`;
   const productId = `${url}#product`;
 
   return {
@@ -376,7 +378,7 @@ export const generateMachineSchema = (machineData: MachineInput, locationName: s
 
 export const generateRealEstateSchema = (plotData: RealEstateInput, locationName: string, purposeName: string, url: string) => {
   const locationSlug = locationName?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `https://www.svetgradjevine.com/placevi/${locationSlug}#place`;
+  const placeId = `${BASE_URL}/placevi/${locationSlug}#place`;
   const realEstateId = `${url}#realestate`;
 
   return {
@@ -415,7 +417,7 @@ export const generateRealEstateSchema = (plotData: RealEstateInput, locationName
 
 export const generateLodgingSchema = (accommodationData: LodgingInput, locationName: string, url: string, additionalFeatures?: Record<string, unknown>) => {
   const locationSlug = locationName?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `https://www.svetgradjevine.com/smestaj/${locationSlug}#place`;
+  const placeId = `${BASE_URL}/smestaj/${locationSlug}#place`;
   const lodgingId = `${url}#lodgingbusiness`;
 
   return {
@@ -456,7 +458,7 @@ export const generateLodgingSchema = (accommodationData: LodgingInput, locationN
 
 export const generateFoodEstablishmentSchema = (cateringData: FoodEstablishmentInput, locationName: string, url: string) => {
   const locationSlug = locationName?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `https://www.svetgradjevine.com/ketering/${locationSlug}#place`;
+  const placeId = `${BASE_URL}/ketering/${locationSlug}#place`;
   const cateringId = `${url}#foodestablishment`;
 
   return {
@@ -519,7 +521,7 @@ export const generateCollectionSchema = (
   metadata?: { name?: string; description?: string; url?: string },
   parent?: { name: string; url: string }
 ) => {
-  const collectionUrl = sanitizeInput(metadata?.url || 'https://www.svetgradjevine.com');
+  const collectionUrl = sanitizeInput(metadata?.url || BASE_URL);
   const collectionName = sanitizeInput(metadata?.name || 'Kolekcija');
   
   return {
@@ -527,8 +529,8 @@ export const generateCollectionSchema = (
     "@graph": [
       {
         "@type": "WebSite",
-        "@id": "https://www.svetgradjevine.com/#website",
-        "url": "https://www.svetgradjevine.com",
+        "@id": `${BASE_URL}/#website`,
+        "url": BASE_URL,
         "name": "Svet Građevine",
         "description": "Najveći građevinski oglasnik i platforma u regionu"
       },
@@ -538,7 +540,7 @@ export const generateCollectionSchema = (
         "url": collectionUrl,
         "name": collectionName,
         "description": sanitizeInput(metadata?.description || ""),
-        "isPartOf": { "@id": "https://www.svetgradjevine.com/#website" },
+        "isPartOf": { "@id": `${BASE_URL}/#website` },
         ...(parent && {
           "breadcrumb": {
             "@id": `${collectionUrl}#breadcrumb`

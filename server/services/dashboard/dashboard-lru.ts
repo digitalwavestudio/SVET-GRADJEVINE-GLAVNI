@@ -64,6 +64,10 @@ export class SimpleLRUCache<K, V> {
   clear(): void {
     this.cache.clear();
   }
+
+  destroy(): void {
+    clearInterval(this.gcInterval);
+  }
 }
 
 export const jobTokensLRU = new SimpleLRUCache<string, { title: Uint32Array; requirements: Uint32Array; city: Uint32Array; location: Uint32Array }>(500);

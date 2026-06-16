@@ -2,61 +2,14 @@
 import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { trackMutationError } from "@/src/utils/telemetry";
-import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { safeLocalStorage } from "./safeStorage";
 
-const asyncSafeStorage = {
-  getItem: async (key: string): Promise<string | null | undefined> => {
-    try {
-      if (typeof window === "undefined") return null;
-      return safeLocalStorage.getItem(key);
-    } catch (e) {
-      console.warn("[AsyncStorage] Error reading", e);
-      return null;
-    }
-  },
-  setItem: async (key: string, value: string): Promise<void> => {
-    try {
-      if (typeof window === "undefined") return;
-      safeLocalStorage.setItem(key, value);
-    } catch (e: unknown) {
-      console.warn("[AsyncStorage] Error writing (QuotaExceededError?)", e);
-      // Fallback ako pukne ls zbog kvote - ocisti
-      let isQuota = false;
-      if (e instanceof Error) {
-        if (e.name === "QuotaExceededError") isQuota = true;
-      } else if (e && typeof e === 'object') {
-        const errObj = e as Record<string, unknown>;
-        if (errObj.name === "QuotaExceededError" || errObj.code === 22 || errObj.name === "NS_ERROR_DOM_QUOTA_REACHED" || errObj.code === 1014) {
-          isQuota = true;
-        }
-      }
-      if (isQuota || e instanceof DOMException) {
-        console.warn("[AsyncStorage] Quota exceeded. Clearing storage as safe fallback.");
-        try {
-          safeLocalStorage.clear();
-        } catch (err) {
-           console.error("[AsyncStorage] Failed to clear storage", err);
-        }
-      }
-    }
-  },
-  removeItem: async (key: string): Promise<void> => {
-    try {
-      if (typeof window === "undefined") return;
-      safeLocalStorage.removeItem(key);
-    } catch (e) {
-      console.warn("[AsyncStorage] Error removing", e);
-    }
-  },
-};
-
-export const persister = typeof window !== "undefined"
-  ? createAsyncStoragePersister({
-      storage: asyncSafeStorage,
-      key: "SVET_GRADJEVINE_OFFLINE_CACHE",
-    })
-  : undefined;
+// Persister is created locally in main.tsx — this export is unused
+// export const persister = typeof window !== "undefined"
+//   ? createAsyncStoragePersister({
+//       storage: asyncSafeStorage,
+//       key: "SVET_GRADJEVINE_OFFLINE_CACHE",
+//     })
+//   : undefined;
 
 function getFormattedErrorMessage(error: unknown, fallbackMessage: string): string {
   // Safe extraction of network/status errors

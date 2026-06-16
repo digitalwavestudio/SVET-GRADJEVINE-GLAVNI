@@ -1,4 +1,4 @@
-import React, { memo, Suspense, lazy } from 'react';
+import { memo, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
