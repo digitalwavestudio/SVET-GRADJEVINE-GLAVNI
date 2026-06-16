@@ -6,9 +6,7 @@ import path from "path";
 try {
   const envPath = path.resolve(process.cwd(), ".env");
   if (fs.existsSync(envPath)) {
-    // @ts-expect-error - process.loadEnvFile may not be available in all Node versions
     if (typeof process.loadEnvFile === "function") {
-      // @ts-expect-error - process.loadEnvFile may not be available in all Node versions
       process.loadEnvFile(envPath);
     }
   }

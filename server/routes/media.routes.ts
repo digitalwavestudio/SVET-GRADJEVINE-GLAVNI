@@ -26,7 +26,8 @@ mediaRouter.post(
   async (req, res, next) => {
     try {
       const user = (req as any)?.user;
-      const { contentType = "image/webp", folder = "media", customFileName } = req.body;
+      const { contentType = "image/webp", folder: folderParam = "media", customFileName } = req.body;
+      let folder = folderParam;
 
       // DOMAIN 5: Security Hardening (Path Traversal/Spoofing protection)
       // Force users to ONLY upload within safe paths

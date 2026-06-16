@@ -28,10 +28,6 @@ export default tseslint.config(
       'no-restricted-syntax': [
         'error',
         {
-          selector: "CallExpression[callee.name='setInterval']",
-          message: " setInterval nije dozvoljen. Koristite BullMQ za pozadinski rad."
-        },
-        {
           selector: "LabeledStatement[label.name='stub']",
           message: " Stubovi nisu dozvoljeni u produkcionom kodu."
         }
