@@ -171,7 +171,7 @@ bffRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     const state = await breaker.getState();
     const role = req.user?.role || req.user?.userType || "";
-    const isAdmin = role === "admin" || !req.user?.isAdmin;
+    const isAdmin = role === "admin" || req.user?.isAdmin === true;
 
     // 1. If Circuit Breaker is OPEN, serve fallback sandbox dataset immediately without hitting database
     if (state === "OPEN") {

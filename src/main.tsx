@@ -20,15 +20,17 @@ window.onerror = function(message, source, lineno, colno, error) {
     }).catch(() => {});
   } catch (e) {}
 
-  const root = document.getElementById('root');
-  if (root) {
-    root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
-      `<h2>Global Error Caught!</h2>` +
-      `<p><strong>Message:</strong> ${message}</p>` +
-      `<p><strong>Source:</strong> ${source}:${lineno}:${colno}</p>` +
-      `<pre>${error?.stack || ''}</pre>` +
-      `</div>`;
-  }
+  import('./lib/sanitize.ts').then(({ sanitizeInput }) => {
+    const root = document.getElementById('root');
+    if (root) {
+      root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
+        `<h2>Global Error Caught!</h2>` +
+        `<p><strong>Message:</strong> ${sanitizeInput(message)}</p>` +
+        `<p><strong>Source:</strong> ${sanitizeInput(source as string)}:${sanitizeInput(lineno as string)}:${sanitizeInput(colno as string)}</p>` +
+        `<pre>${sanitizeInput(error?.stack || '')}</pre>` +
+        `</div>`;
+    }
+  });
 };
 window.addEventListener('unhandledrejection', function(event) {
   const reasonStr = String(event.reason?.message || event.reason || '').toLowerCase();
@@ -53,13 +55,15 @@ window.addEventListener('unhandledrejection', function(event) {
     }).catch(() => {});
   } catch (e) {}
 
-  const root = document.getElementById('root');
-  if (root) {
-    root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
-      `<h2>Unhandled Promise Rejection!</h2>` +
-      `<pre>${event.reason?.stack || String(event.reason)}</pre>` +
-      `</div>`;
-  }
+  import('./lib/sanitize.ts').then(({ sanitizeInput }) => {
+    const root = document.getElementById('root');
+    if (root) {
+      root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
+        `<h2>Unhandled Promise Rejection!</h2>` +
+        `<pre>${sanitizeInput(event.reason?.stack || String(event.reason))}</pre>` +
+        `</div>`;
+    }
+  });
 });
 import React, { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';

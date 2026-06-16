@@ -43,7 +43,7 @@ export default function CateringDetailPage() {
 
   const { isTrackedInSession } = useTrackView(id, 'listings', catering?.authorId);
 
-  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com' || user.email === 'mika.iz.pavlovaca@gmail.com'));
+  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin));
 
   const handleStartChat = useCallback(async () => {
     if (!user) {

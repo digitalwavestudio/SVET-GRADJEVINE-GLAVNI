@@ -95,7 +95,7 @@ export default function Footer() {
                 </div>
               </li>
               <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-sm flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Predaj oglas"><span className="material-symbols-outlined text-[16px]">add_circle</span> Predaj oglas</Link></li>
-              {user && (user.email === 'mancoresolution@gmail.com' || user.email === 'sandbox@svetgradjevine.com' || user.role === 'admin' || user.isAdmin) && (
+              {user && (user.role === 'admin' || user.isAdmin) && (
                 <li><Link to="/admin" className="text-red-400 hover:text-red-300 font-black transition-colors text-sm flex items-center gap-1 mt-2 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Admin Hub"><span className="material-symbols-outlined text-[16px]">terminal</span> Admin Hub</Link></li>
               )}
             </ul>

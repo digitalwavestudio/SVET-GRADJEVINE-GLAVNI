@@ -14,7 +14,7 @@ interface HousekeepingStats {
 
 export function HousekeepingTab() {
   const { user, getIdToken } = useAuth();
-  const isAdmin = (user?.role === 'admin' || user?.isAdmin || user?.email === 'mancoresolution@gmail.com');
+  const isAdmin = (user?.role === 'admin' || user?.isAdmin);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);

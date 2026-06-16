@@ -110,7 +110,7 @@ export const authMiddleware = async (
               }
             }
             
-            if (decodedToken.email === "mancoresolution@gmail.com") {
+            if (decodedToken.admin || decodedToken.role === "admin") {
               resolvedRole = "admin";
               resolvedPermissions = ["*"];
             } else {

@@ -56,7 +56,7 @@ const PageLoader = () => (
 
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.isAdmin || user?.email === 'mancoresolution@gmail.com';
+  const isAdmin = user?.role === 'admin' || user?.isAdmin;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'users' | 'verify' | 'finances' | 'support' | 'abuse' | 'marketing' | 'broadcast' | 'branding' | 'sync' | 'audit' | 'settings' | 'observability' | 'housekeeping' | 'resilience'>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

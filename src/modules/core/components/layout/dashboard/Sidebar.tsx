@@ -24,7 +24,7 @@ export const Sidebar = memo(({
 
   if (!user) return null;
 
-  const isAdmin = user.email === 'mancoresolution@gmail.com' || user.isAdmin;
+  const isAdmin = user.isAdmin;
   const role = user.role;
   const isEmployer = role === 'poslodavac';
   const isMaster = role === 'majstor';

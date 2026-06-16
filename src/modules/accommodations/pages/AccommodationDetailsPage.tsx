@@ -49,7 +49,7 @@ export default function AccommodationDetailsPage() {
 
   const { isTrackedInSession } = useTrackView(id, 'listings', accommodation?.authorId);
 
-  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com'));
+  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin));
 
   const handleAdminAction = async (action: 'approve' | 'premium' | 'urgent' | 'delete') => {
     if (!isAdmin || !accommodation || !id) return;

@@ -37,8 +37,8 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (user && !authLoading) {
-      if (user.emailVerified || user.email === 'mancoresolution@gmail.com') {
-        const isAdmin = user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com';
+      if (user.emailVerified) {
+        const isAdmin = user.role === 'admin' || user.isAdmin;
         if (isAdmin && from === '/moj-profil') {
           navigate('/admin', { replace: true });
         } else {

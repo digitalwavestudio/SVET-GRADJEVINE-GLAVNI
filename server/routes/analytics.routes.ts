@@ -10,7 +10,8 @@ analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
     if (res.headersSent) return this as unknown as import("express").Response;
     return _origJson.call(this, body);
   };
-  const userId = (req as import("express").Request & { user: { uid: string } }).user.uid;
+  const userId = (req as any)?.user?.uid;
+  if (!userId) return res.status(401).json({ error: "Niste autentifikovani" });
   const { days } = req.query;
 
   const breakerTimeout = setTimeout(async () => {

@@ -57,7 +57,7 @@ export function useAuthNode() {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (parsed && (parsed.email === 'mancoresolution@gmail.com' || parsed.isAdmin)) {
+        if (parsed && parsed.isAdmin) {
           const previewRole = safeStorage.getItem('admin_preview_role');
           if (previewRole) {
             parsed.role = previewRole as UserRole;
@@ -127,7 +127,7 @@ export function useAuthNode() {
          const tokenResult = await firebaseUser.getIdTokenResult();
          const claims = tokenResult.claims;
          
-         const isAdminUser = firebaseUser.email === 'mancoresolution@gmail.com' || !!claims.admin;
+          const isAdminUser = !!claims.admin;
          const previewRole = isAdminUser ? safeStorage.getItem('admin_preview_role') : null;
          
          if (claims.role) {
@@ -163,7 +163,7 @@ export function useAuthNode() {
          try {
             const meData = await apiClient.get<User>('/users/me');
             if (meData) {
-               const isMeAdmin = firebaseUser.email === 'mancoresolution@gmail.com' || meData.isAdmin || meData.role === 'admin';
+               const isMeAdmin = meData.isAdmin || meData.role === 'admin';
                const currentPreviewRole = isMeAdmin ? safeStorage.getItem('admin_preview_role') : null;
                
                const combinedData = { 
@@ -426,7 +426,7 @@ useEffect(() => {
     if (!userSnapshot) return;
     
     const currentUser = userSnapshot as User;
-    const isAdmin = currentUser.role === 'admin' || currentUser.isAdmin || currentUser.email === 'mancoresolution@gmail.com';
+    const isAdmin = currentUser.role === 'admin' || currentUser.isAdmin;
 
     let finalData = { ...data };
     if (isAdmin && data.role) {

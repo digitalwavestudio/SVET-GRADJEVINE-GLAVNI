@@ -73,7 +73,7 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
       }
 
       const userData = userDoc.data()!;
-      const currentBalance = userData.walletBalance || userData.partnerBalance || 0; // fallback to partnerBalance if walletBalance doesn't exist yet
+      const currentBalance = userData.walletBalance ?? userData.partnerBalance ?? 0;
 
       if (currentBalance < cost) {
         throw new Error("Nedovoljno sredstava u novčaniku");

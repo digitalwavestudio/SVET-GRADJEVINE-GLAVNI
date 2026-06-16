@@ -6,7 +6,7 @@ import { AdminStatsService } from "../services/admin-stats.service.ts";
 export const statsRouter = Router();
 
 statsRouter.get("/finance", requireAuth, async (req, res, next) => {
-  if (!(req as any)?.user.isAdmin)
+  if (!(req as any)?.user?.isAdmin)
     return res.status(403).json({ error: "Forbidden" });
   try {
     const stats = await AdminStatsService.getGlobalStats();

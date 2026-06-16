@@ -5,7 +5,6 @@ import { validateRequest } from "../middleware/validate.ts";
 import { checkoutSchema } from "@svet-gradjevine/shared";
 import { generateProformaInvoice } from "../utils/invoiceGenerator.ts";
 import { CacheService } from "../services/cache.service.ts";
-import nodemailer from "nodemailer";
 
 export const checkoutRouter = Router();
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MarketplaceItem } from '@/src/modules/marketplace/types/models';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
+import { sanitizeRichText } from '@/src/lib/sanitize';
 import { Button, Card, Badge } from '@svet-gradjevine/ui';
 import { 
   MapPin, 
@@ -178,7 +179,7 @@ const MarketplaceItemDetailsPage = () => {
                 </h2>
                 <div 
                   className="prose prose-invert prose-slate max-w-none text-slate-300 font-medium leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: item.description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichText(item.description) }}
                 />
               </div>
 

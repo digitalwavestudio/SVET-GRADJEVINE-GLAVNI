@@ -48,7 +48,7 @@ export default function PublicProfilePage() {
   const { user } = useAuth();
   const { startConversation } = useMessages();
   
-  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com'));
+  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin));
 
   const nodeData = usePublicProfileNode(id, isAdmin);
   const profile = nodeData.profile as unknown as PublicProfileData | null;

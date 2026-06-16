@@ -60,8 +60,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user && !authLoading) {
-      if (user.emailVerified || user.email === 'mancoresolution@gmail.com') {
-        const isAdmin = user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com';
+      if (user.emailVerified) {
+        const isAdmin = user.role === 'admin' || user.isAdmin;
         if (isAdmin && from === '/moj-profil') {
           navigate('/admin', { replace: true });
         } else {
@@ -258,9 +258,9 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required={email !== 'mancoresolution@gmail.com'}
+                  required
                   className="w-full bg-surface border border-outline-variant/20 text-on-surface placeholder:text-on-surface-variant/50 px-4 py-4 rounded-[10px] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" 
-                  placeholder={email === 'mancoresolution@gmail.com' ? "Lozinka nije potrebna za bypass" : "••••••••"} 
+                  placeholder="••••••••" 
                 />
                 <button className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface" type="button">
                   <span className="material-symbols-outlined text-[20px]">visibility</span>

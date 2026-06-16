@@ -283,7 +283,7 @@ adsRouter.get("/:id/optimization-suggestion", authMiddleware, async (req, res, n
     const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
     const ad = await UnifiedAdsService.getAdById("", id);
     if (!ad) {
-      return res.status(444).json({ error: "Oglas nije pronađen." });
+      return res.status(404).json({ error: "Oglas nije pronađen." });
     }
 
     // Ensure user owns the ad or is admin for security (Ad Contract Alignment)

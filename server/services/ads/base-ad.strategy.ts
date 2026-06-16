@@ -55,7 +55,7 @@ export abstract class BaseAdStrategy {
 
       const currentWalletBalance = userData.walletBalance || userData.partnerBalance || 0;
       
-      if (isPaidPackage && packagePrice <= 0) {
+      if (isPaidPackage && packagePrice <= 0 && rawData.paket !== "free") {
         throw new BadRequestError(`Nepoznat paket: "${rawData.paket}". Dozvoljeni paketi su: standard, premium, urgent, premium_partner.`);
       }
       if (currentWalletBalance < packagePrice) {

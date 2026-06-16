@@ -68,7 +68,7 @@ export default function CompanyProfilePage() {
 
   const { isTrackedInSession } = useTrackView(company?.id, 'companies', company?.id);
 
-  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin || user.email === 'mancoresolution@gmail.com'));
+  const isAdmin = Boolean(user?.email && (user.role === 'admin' || user.isAdmin));
 
   const handleAdminAction = async (action: 'approve' | 'premium' | 'delete') => {
     if (!isAdmin || !company) return;
