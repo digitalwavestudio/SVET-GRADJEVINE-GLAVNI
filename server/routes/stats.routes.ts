@@ -15,7 +15,6 @@ statsRouter.get("/finance", requireAuth, async (req, res, next) => {
       confirmedCount: stats.activeAds || 0,
       failedCount: 0,
       initiatedCount: stats.pendingAds || 0,
-      conversionRate: 1,
       lastUpdated: new Date().toISOString(),
     });
   } catch (err) {

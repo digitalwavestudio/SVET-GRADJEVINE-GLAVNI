@@ -497,11 +497,15 @@ export const db = new Proxy(
                 return Promise.resolve(true);
               }
             }
-            if (prop === 'collection' || prop === 'doc') {
+            if (prop === 'collection' || prop === 'doc' || prop === 'collectionGroup') {
               return wrapFirestoreObject({ id: args[0], path: args[0] });
             }
             if (prop === 'batch') {
               return wrapBatch({});
+            }
+            if (prop === 'stream') {
+              const { Readable } = require('stream');
+              return function() { return Readable.from([]); };
             }
           }
 
@@ -529,12 +533,15 @@ export const db = new Proxy(
               if (prop === 'runTransaction') {
                 return Promise.resolve(true);
               }
-              if (prop === 'collection' || prop === 'doc') {
+              if (prop === 'collection' || prop === 'doc' || prop === 'collectionGroup') {
                 return wrapFirestoreObject({ id: args[0], path: args[0] });
               }
               if (prop === 'batch') {
                 return wrapBatch({});
               }
+            }
+            if (prop === 'stream') {
+              return function() { return require('stream').Readable.from([]); };
             }
             throw syncErr;
           }
@@ -653,6 +660,10 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
         }
         if (prop === 'id' || prop === 'path') {
           return targetObj[prop as string] || "mock_id_or_path";
+        }
+        if (prop === 'stream') {
+          const { Readable } = require('stream');
+          return () => Readable.from([]);
         }
       }
 

@@ -55,10 +55,11 @@ export abstract class BaseAdStrategy {
 
       const currentWalletBalance = userData.walletBalance || userData.partnerBalance || 0;
       
-      if (isPaidPackage && packagePrice > 0) {
-        if (currentWalletBalance < packagePrice) {
-          throw new BadRequestError(`Nemate dovoljno sredstava u Wallet-u za izabrani paket. Cena je ${packagePrice} SG Kredita (sa uračunatim popustom), a vaš balans iznosi ${currentWalletBalance} SG Kredita. Molimo dopunite wallet.`);
-        }
+      if (isPaidPackage && packagePrice <= 0) {
+        throw new BadRequestError(`Nepoznat paket: "${rawData.paket}". Dozvoljeni paketi su: standard, premium, urgent, premium_partner.`);
+      }
+      if (currentWalletBalance < packagePrice) {
+        throw new BadRequestError(`Nemate dovoljno sredstava u Wallet-u za izabrani paket. Cena je ${packagePrice} SG Kredita, a vaš balans iznosi ${currentWalletBalance} SG Kredita. Molimo dopunite wallet.`);
       }
 
       if (Array.isArray(rawData.images)) {
