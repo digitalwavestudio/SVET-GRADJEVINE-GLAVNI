@@ -285,8 +285,10 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
     const result = await CacheService.getOrSetSWR(
       cacheKey,
       async () => {
-        // Get pre-aggregated stats from global stats service (cheaper than live count)
-        const globalStats = await AdminStatsService.getGlobalStats();
+        const { getRedis } = await import("../utils/redis.ts");
+        const redis = getRedis();
+        if (redis) redis.del("admin_global_metrics:cache").catch(() => {});
+        const reconciled = await AdminStatsService.reconcileGlobalStats();
 
         const fieldMap: Record<string, string> = {
           jobs: "totalJobs",
@@ -302,12 +304,9 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
         };
 
         const countKey = fieldMap[collectionName];
-        const total = countKey ? globalStats[countKey] || 0 : 0;
-
-        // For "today" stats, we use a broad estimate or fallback if not critical
-        // to avoid expensive where(createdAt > 24h) queries.
-        const today = Math.round(total * 0.05) || 5;
-        const premium = globalStats.premiumPartners || 0;
+        const total = countKey ? reconciled[countKey] || 0 : 0;
+        const today = 0;
+        const premium = reconciled.premiumPartners || 0;
 
         return { total, today, premium };
       },

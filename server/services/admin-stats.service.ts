@@ -339,11 +339,13 @@ export class AdminStatsService {
       const usersSnap = await db.collection("users").count().get();
       const verifiedUsersSnap = await db.collection("users").where("isVerified", "==", true).count().get();
       const premiumUsersSnap = await db.collection("users").where("businessProfile.isPremium", "==", true).count().get();
+      const employersSnap = await db.collection("users").where("role", "==", "poslodavac").count().get();
       const activeAdsSnap = await db.collection("listings").where("status", "==", "active").count().get();
       const pendingAdsSnap = await db.collection("listings").where("status", "==", "pending").count().get();
 
       const reconciledStats = {
         totalJobs: counts.total_jobs || 0,
+        companiesCount: employersSnap.data().count,
         machinesCount: counts.total_machines || 0,
         accommodationsCount: counts.total_accommodations || 0,
         cateringCount: counts.total_caterings || 0,
