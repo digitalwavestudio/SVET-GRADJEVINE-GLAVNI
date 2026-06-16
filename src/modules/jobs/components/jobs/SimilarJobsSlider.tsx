@@ -29,6 +29,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
   }, []);
 
   const renderBadge = (job: any) => {
+    if (job.isPremium) return <span className="flex items-center gap-1 px-2.5 py-1 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-[8px] text-[9px] font-black uppercase tracking-widest shadow-[0_0_12px_rgba(234,179,8,0.2)]"><span className="material-symbols-outlined text-[11px]" style={{fontVariationSettings:"'FILL' 1"}}>hotel_class</span>Premium</span>;
     if (job.isUrgent) return <span className="badge-urgent">Hitno</span>;
     // Example: New badge for recent jobs (posted within 3 days)
     if (job.createdAt) {
@@ -60,11 +61,11 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
             <Link
               key={index}
               to={buildJobUrl(job)}
-              className="group similar-job-card relative bg-surface-container rounded-[20px] overflow-hidden border border-white/5 hover:border-secondary/30 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,107,0,0.1)] block w-[350px]"
+              className={`group similar-job-card relative bg-surface-container rounded-[20px] overflow-hidden border transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,107,0,0.1)] block w-[350px] ${job.isPremium ? 'border-secondary/30 bg-secondary/[0.03] shadow-[0_0_40px_rgba(254,191,13,0.08)]' : 'border-white/5 hover:border-secondary/30'}`}
               onClick={() => trackEvent('job', 'similar_job_click', job.id)}
             >
               {/* Top Accent Line */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-white/5 group-hover:bg-secondary transition-colors duration-500"></div>
+              <div className={`absolute top-0 left-0 w-full h-1 transition-colors duration-500 ${job.isPremium ? 'bg-secondary/50' : 'bg-white/5 group-hover:bg-secondary'}`}></div>
 
               {/* Badge */}
               {renderBadge(job)}
