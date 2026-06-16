@@ -41,7 +41,13 @@ const envSchema = z.object({
   SLACK_WEBHOOK_URL: z.string().optional(),
   DISCORD_WEBHOOK_URL: z.string().optional(),
   DISABLE_FIRESTORE_QUOTA_CHECK: z.string().optional(),
-  // Add more env variables as needed globally
+  SECURITY_IP_PEPPER: z.string().optional(),
+  TURNSTILE_SECRET_KEY: z.string().optional(),
+  BILLING_SERVICE_URL: z.string().optional().default("http://localhost:4001"),
+  GEMINI_API_KEY: z.string().optional(),
+  BIGQUERY_PROJECT_ID: z.string().optional(),
+  BIGQUERY_DATASET_ID: z.string().optional().default("telemetry_analytics"),
+  RECAPTCHA_SECRET_KEY: z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

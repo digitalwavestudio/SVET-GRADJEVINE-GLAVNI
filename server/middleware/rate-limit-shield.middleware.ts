@@ -4,6 +4,7 @@ import { TraceContext } from "../utils/trace.ts";
 import { DynamicConfigService } from "../services/dynamic-config.service.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { AuditService, AuditAction } from "../services/audit.service.ts";
+import { env } from "../config/env.ts";
 import crypto from "crypto";
 
 const BAD_BOTS = [
@@ -47,7 +48,7 @@ export const rateLimitShield = async (
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
 
     // Privacy-Safe SHA-256 IP Hashing to prevent reverse engineering using a pepper
-    const pepper = process.env.SECURITY_IP_PEPPER || "g5s9!d@2#ksl19$m82%";
+    const pepper = env.SECURITY_IP_PEPPER || "g5s9!d@2#ksl19$m82%";
     const hashedIp = crypto.createHash("sha256").update(ipStr + pepper).digest("hex");
 
     const ua = (req.headers["user-agent"] || "").toLowerCase();
