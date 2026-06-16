@@ -151,7 +151,7 @@ export const createJob = async (
     const validatedJob = req.body;
     const uid = req.user.uid;
     const result = await UnifiedAdsService.createAd("jobs", validatedJob, uid);
-    res.json({ id: result.id, jobData: result.data });
+    res.json({ id: result.id, jobData: (result as any).data });
   } catch (err) {
     next(err);
   }

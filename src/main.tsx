@@ -26,7 +26,7 @@ window.onerror = function(message, source, lineno, colno, error) {
       root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
         `<h2>Global Error Caught!</h2>` +
         `<p><strong>Message:</strong> ${sanitizeInput(message)}</p>` +
-        `<p><strong>Source:</strong> ${sanitizeInput(source as string)}:${sanitizeInput(lineno as string)}:${sanitizeInput(colno as string)}</p>` +
+        `<p><strong>Source:</strong> ${sanitizeInput(String(source))}:${sanitizeInput(String(lineno))}:${sanitizeInput(String(colno))}</p>` +
         `<pre>${sanitizeInput(error?.stack || '')}</pre>` +
         `</div>`;
     }

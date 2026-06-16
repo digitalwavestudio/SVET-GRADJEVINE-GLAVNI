@@ -296,9 +296,8 @@ export function formatZodErrorSerbian(error: ZodError): LocalizedError[] {
     const isGeneric = rawMessage.toLowerCase().includes("invalid") || rawMessage.toLowerCase().includes("expected");
     
     // Explicit Serbian translation fallback using standard shared error map
-    const localizedMessage = isGeneric && zodSerbianErrorMap
-      ? zodSerbianErrorMap(issue)
-      : rawMessage;
+    const errMap = isGeneric && zodSerbianErrorMap ? zodSerbianErrorMap(issue as any) : undefined;
+    const localizedMessage = errMap ? (typeof errMap === 'string' ? errMap : errMap.message) : rawMessage;
 
     return {
       field: cleanPath || "global",
