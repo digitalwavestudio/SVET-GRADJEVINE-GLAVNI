@@ -117,7 +117,7 @@ export abstract class BaseAdStrategy {
         isCompanyVerified: (userData as { isVerified?: boolean })?.isVerified || false,
         status: "active" as AdStatus,
         moderationStatus: "approved",
-        isPremium: isPaidPackage && rawData.paket !== "urgent",
+        isPremium: rawData.paket === "premium" || rawData.paket === "premium_partner",
         isUrgent: rawData.paket === "urgent",
         ...(premiumUntil ? { premiumUntil } : {}),
         createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
