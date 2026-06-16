@@ -174,7 +174,7 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, errMessage: stri
         clearTimeout(timer);
         reject(err);
       }
-    ).catch(() => {});
+    ).catch(err => console.error("[Firebase] withTimeout promise catch:", err));
   });
 }
 
@@ -204,7 +204,7 @@ async function syncQuotaStatusWithRedis() {
       }
     }
   } catch (err) {
-    // Silent catch
+    console.error("[Firebase] syncQuotaStatusWithRedis failed:", err);
   }
 }
 
@@ -223,8 +223,8 @@ export function checkQuotaStatus(): boolean {
       // Auto-clear Redis circuit breaker status
       import("../utils/redis.ts").then(({ getRedis }) => {
         const redis = getRedis();
-        if (redis) redis.del("circuit_breaker:firestore_quota:exhausted").catch(() => {});
-      }).catch(() => {});
+        if (redis) redis.del("circuit_breaker:firestore_quota:exhausted").catch(err => console.error("[Firebase] redis.del circuit_breaker failed:", err));
+      }).catch(err => console.error("[Firebase] import redis for circuit breaker cleanup failed:", err));
       return false;
     }
     return true;
@@ -298,9 +298,9 @@ export function triggerQuotaProtection(error: FirestoreQuotaError | unknown): bo
             JSON.stringify({ isExhausted: true, exhaustedAt: quotaExhaustedAt }),
             "PX",
             QUOTA_COOLDOWN_MS
-          ).catch(() => {});
+          ).catch(err => console.error("[Firebase] redis.set circuit_breaker failed:", err));
         }
-      }).catch(() => {});
+      }).catch(err => console.error("[Firebase] import redis for circuit breaker set failed:", err));
     }
     return true;
   }
@@ -335,7 +335,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
       email: "sandbox-user@svetgradjevine.com",
       role: "standard",
       isAdmin: false,
-      walletBalance: 1500,
+      walletBalance: 0,
       isVerified: false,
       company: "",
       photoURL: "https://svetgradjevine.com/favicon.ico",
@@ -785,8 +785,8 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
             if (isDocumentRef && targetPath) {
               import("../utils/redis.ts").then(({ getRedis }) => {
                 const redis = getRedis();
-                if (redis) redis.del(`fs_cache:${targetPath}`).catch(() => {});
-              }).catch(() => {});
+                if (redis) redis.del(`fs_cache:${targetPath}`).catch(err => console.error("[Firebase] redis.del fs_cache failed:", err));
+              }).catch(err => console.error("[Firebase] import redis for cache cleanup failed:", err));
             }
           }
 
@@ -1009,8 +1009,8 @@ function wrapBatch(batch: admin.firestore.WriteBatch | Record<string, unknown>):
               if (docPath) {
                 import("../utils/redis.ts").then(({ getRedis }) => {
                   const redis = getRedis();
-                  if (redis) redis.del(`fs_cache:${docPath}`).catch(() => {});
-                }).catch(() => {});
+                  if (redis) redis.del(`fs_cache:${docPath}`).catch(err => console.error("[Firebase] redis.del fs_cache in batch failed:", err));
+                }).catch(err => console.error("[Firebase] import redis in batch failed:", err));
               }
             } catch (err) {}
           }
@@ -1094,10 +1094,10 @@ function wrapTransaction(transaction: admin.firestore.Transaction | Record<strin
               const docRef = args[0] as any;
               const docPath = docRef?.path;
               if (docPath) {
-                import("../utils/redis.ts").then(({ getRedis }) => {
+                    import("../utils/redis.ts").then(({ getRedis }) => {
                   const redis = getRedis();
-                  if (redis) redis.del(`fs_cache:${docPath}`).catch(() => {});
-                }).catch(() => {});
+                  if (redis) redis.del(`fs_cache:${docPath}`).catch(err => console.error("[Firebase] redis.del fs_cache in tx failed:", err));
+                }).catch(err => console.error("[Firebase] import redis in tx failed:", err));
               }
             } catch (err) {}
           }

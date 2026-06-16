@@ -64,25 +64,7 @@ export class DashboardAdminService {
           }
 
           if (!isFirestoreHealthy || Object.keys(history).length === 0) {
-            return {
-              registrationData: Array.from({ length: 14 }).map((_, i) => {
-                const d = new Date();
-                d.setDate(d.getDate() - (13 - i));
-                return {
-                  name: d.toLocaleDateString("sr-RS", { day: "2-digit", month: "2-digit" }),
-                  korisnici: Math.floor(Math.random() * 5) + 2,
-                  oglasi: Math.floor(Math.random() * 8) + 4,
-                  prihodi: Math.floor(Math.random() * 200) + 100,
-                  transakcije: Math.floor(Math.random() * 3) + 1,
-                };
-              }),
-              sectorData: [
-                { name: "ROBUSNI MAŠINSKI RADOVI", value: 35 },
-                { name: "ZAVRŠNI UNUTRAŠNJI RADOVI", value: 28 },
-                { name: "ELEKTRIČNE INSTALACIJE", value: 20 },
-                { name: "ARHITEKTONSKO PROJEKTOVANJE", value: 17 },
-              ]
-            };
+            return { registrationData: [], sectorData: [] };
           }
 
           const trend: Record<

@@ -564,7 +564,7 @@ export default function JobDetailsPage() {
                             e.preventDefault();
                             setShowPhone(true);
                             if (navigator.clipboard) {
-                              navigator.clipboard.writeText(phoneNumber).catch(() => {});
+                              navigator.clipboard.writeText(phoneNumber).catch(() => console.warn('[JobDetails] Clipboard write failed'));
                             }
                           }
                         }}

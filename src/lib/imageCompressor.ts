@@ -136,7 +136,7 @@ export const uploadImageDirectly = async (file: File): Promise<string> => {
         message: `[UPLOAD FAIL] ${errorMsg}`,
         context: { fileName: file.name, fileSize: file.size, fileType: file.type }
       })
-    }).catch(() => {});
+    }).catch(() => console.warn('[ImageCompressor] Log upload failure failed'));
     
     throw error;
   }

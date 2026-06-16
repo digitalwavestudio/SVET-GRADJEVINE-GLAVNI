@@ -104,13 +104,16 @@ export class AdminSettingsService {
       cacheKey,
       async () => {
         try {
-          // PROMPT 8: Zbog optimizacije, brending i globalna podešavanja su premeštena iz Firestore-a u JSON fallback
-          if (type === "branding") return { 
-            heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-            heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
-            primaryColor: "#0f172a",
-            secondaryColor: "#3b82f6" 
-          };
+          if (type === "branding") {
+            const doc = await db.collection("settings").doc("branding").get();
+            if (doc.exists) return doc.data();
+            return {
+              heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
+              heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
+              primaryColor: "#0f172a",
+              secondaryColor: "#3b82f6"
+            };
+          }
 
           const doc = await db.collection("settings").doc(type).get();
           console.log("AdminSettings doc:", type, "exists:", doc.exists, "data:", doc.data?.());

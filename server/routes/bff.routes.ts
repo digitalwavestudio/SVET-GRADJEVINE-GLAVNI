@@ -207,7 +207,7 @@ bffRouter.get(
         if (err) {
           const error = err as Error;
           console.error("[CircuitBreaker] Intercepted database/BFF error:", error.message || err);
-          await breaker.recordFailure().catch(() => {});
+          await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure in customNext failed:", err));
 
           // If the breaker tripped or if quota is exceeded, serve Sandbox fallback immediately
           const currentState = await breaker.getState();
@@ -238,7 +238,7 @@ bffRouter.get(
             success: true,
             _metaWarning: "Sistem je trenutno opterećen (latencija > 5000ms), prikazujemo poslednju sačuvanu verziju podataka."
           });
-          breaker.recordFailure().catch(() => {});
+          breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure in breakerTimeout failed:", err));
         }
       }, 5000);
 
@@ -248,7 +248,7 @@ bffRouter.get(
       await getDashboardBff(req as any, res, customNext);
     } catch (err: unknown) {
       console.error("[CircuitBreaker] Controller thrown exception:", getErrorMessage(err));
-      await breaker.recordFailure().catch(() => {});
+      await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure at catch block failed:", err));
 
       const currentState = await breaker.getState();
       const { checkQuotaStatus } = await import("../config/firebase.ts");
@@ -341,7 +341,7 @@ bffRouter.get(
     try {
         await getHomepageBff(req, res, next);
     } catch (err: unknown) {
-        await breaker.recordFailure().catch(() => {});
+        await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure in homepage failed:", err));
         next(err);
     }
   }

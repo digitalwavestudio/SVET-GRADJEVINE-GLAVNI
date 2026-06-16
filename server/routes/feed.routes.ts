@@ -50,7 +50,7 @@ router.get("/", async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error("[Feed] Unified feed error:", error);
-    res.json({ ads: [], news: [], error: "Feed temporarily unavailable" });
+    res.status(503).json({ ads: [], news: [], error: "Feed temporarily unavailable" });
   }
 });
 

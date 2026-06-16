@@ -104,7 +104,6 @@ export default function RegisterPage() {
         status: 'active',
         isPremiumProfile: false,
         photoURL: '',
-        walletBalance: 1500,
         viewsCount: 0,
         freeAdsCount: 3
       };

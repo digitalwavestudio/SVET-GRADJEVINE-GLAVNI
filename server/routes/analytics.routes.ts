@@ -17,7 +17,7 @@ analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
   const breakerTimeout = setTimeout(async () => {
     if (!res.headersSent) {
       console.warn(`[LatencyBreaker] Analytics my-trends exceeded 500ms for user: ${userId}.`);
-      res.json([]);
+      res.status(503).json({ error: "Request timeout", _degraded: true });
     }
   }, 500);
 
@@ -50,7 +50,7 @@ analyticsRouter.get("/ad/:adId", requireAuth, async (req, res) => {
   const breakerTimeout = setTimeout(async () => {
     if (!res.headersSent) {
       console.warn(`[LatencyBreaker] Analytics ad exceeded 500ms for ad: ${adId}.`);
-      res.json([]);
+      res.status(503).json({ error: "Request timeout", _degraded: true });
     }
   }, 500);
 

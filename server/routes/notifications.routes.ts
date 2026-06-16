@@ -71,7 +71,7 @@ notificationsRouter.get("/poll", requireAuth, async (req, res, next) => {
 
           // Sinhronizujemo precalculated sate na osnovu stvarnog unreadCount-a
           const statusVal = unreadCount === 0 ? "0" : "1";
-          await CacheService.set(`notifications_pending_count:${uid}`, statusVal, 30 * 24 * 60 * 60 * 1000).catch(() => {});
+          await CacheService.set(`notifications_pending_count:${uid}`, statusVal, 30 * 24 * 60 * 60 * 1000).catch(err => console.error("[Notifications] CacheService.set failed:", err));
         }
       } catch (err: any) {
         if (
@@ -203,7 +203,7 @@ notificationsRouter.post("/read-all", requireAuth, async (req, res, next) => {
       await batch.commit();
       await CacheService.delete(`notifications_payload_${uid}`);
     }
-    await CacheService.set(`notifications_pending_count:${uid}`, "0", 30 * 24 * 60 * 60 * 1000).catch(() => {});
+    await CacheService.set(`notifications_pending_count:${uid}`, "0", 30 * 24 * 60 * 60 * 1000).catch(err => console.error("[Notifications] CacheService.set failed:", err));
 
     res.json({ success: true });
   } catch (error) {

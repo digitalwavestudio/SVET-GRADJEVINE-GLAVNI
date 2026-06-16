@@ -111,7 +111,7 @@ export class AdminCleanupService {
         });
 
         if (oldStatus === "active") {
-          await AdminStatsService.updateUserStats(targetUserId, { activeAds: -1 }, transaction).catch(() => {});
+          await AdminStatsService.updateUserStats(targetUserId, { activeAds: -1 }, transaction).catch(err => console.error("[AdminCleanup] updateUserStats failed:", err));
         }
 
         // Outbox event for Algolia and Search syncing (deletes ad from Algolia)
@@ -166,18 +166,18 @@ export class AdminCleanupService {
           JobType.OUTBOX_PROCESS,
           { id: doc.id, ...doc.data() },
           { jobId: `outbox-${doc.id}`, priority: JobPriority.HIGH },
-        ).catch(() => {});
+        ).catch(err => console.error("[AdminCleanup] QueueService.addJob failed:", err));
       }
     } catch (e: unknown) {
       this.logger.error("Failed to add immediate outbox jobs after user cleanup", e instanceof Error ? e.message : String(e));
     }
 
     // 6. Evict caches to prevent stale data
-    await CacheService.delete(`user_me_${targetUserId}:pub`).catch(() => {});
-    await CacheService.delete(`user_me_${targetUserId}:priv`).catch(() => {});
-    await CacheService.delete(`auth_session:${targetUserId}`).catch(() => {});
-    await CacheService.invalidateByPrefix(`myAds_${targetUserId}`).catch(() => {});
-    await CacheService.invalidateByPrefix(`publicProfileAds_${targetUserId}`).catch(() => {});
+    await CacheService.delete(`user_me_${targetUserId}:pub`).catch(err => console.error("[AdminCleanup] cache operation failed:", err));
+    await CacheService.delete(`user_me_${targetUserId}:priv`).catch(err => console.error("[AdminCleanup] cache operation failed:", err));
+    await CacheService.delete(`auth_session:${targetUserId}`).catch(err => console.error("[AdminCleanup] cache operation failed:", err));
+    await CacheService.invalidateByPrefix(`myAds_${targetUserId}`).catch(err => console.error("[AdminCleanup] cache operation failed:", err));
+    await CacheService.invalidateByPrefix(`publicProfileAds_${targetUserId}`).catch(err => console.error("[AdminCleanup] cache operation failed:", err));
 
     // 7. Revoke session refresh tokens in Firebase Auth so they are logged out instantly
     await firebaseAdmin.auth().revokeRefreshTokens(targetUserId).catch((err) => {

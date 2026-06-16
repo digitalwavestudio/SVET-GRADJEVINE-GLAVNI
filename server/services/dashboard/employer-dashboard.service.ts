@@ -119,27 +119,8 @@ export class DashboardEmployerService {
             isFirestoreHealthy = false;
           }
 
-          if (!isFirestoreHealthy || (process.env.NODE_ENV !== "production" && totalAds === 0)) {
-            console.log("🛡️ [DashboardService] Launching Sandbox Cache Strategy for Employer Dashboard to save Quota.");
-            totalAds = 12;
-            pendingAppsCount = 3;
-            totalViews = 1540;
-            allAds = [
-              { id: "mock_ad_1", title: "Rukovodilac građevinskih mašina", status: "active", type: "job", viewsCount: 430, createdAt: { _seconds: Math.floor(now/1000) - 3600 } },
-              { id: "mock_ad_2", title: "Mlađi arhitekta", status: "active", type: "job", viewsCount: 1110, createdAt: { _seconds: Math.floor(now/1000) - 86400 } }
-            ];
-            recentApplications = [
-              { id: "mock_app_1", applicantName: "Marko Petrović", jobTitle: "Rukovodilac građevinskih mašina", status: "pending", createdAt: new Date().toISOString() }
-            ];
-            trends = Array.from({ length: 7 }).map((_, i) => {
-              const d = new Date();
-              d.setDate(d.getDate() - (6 - i));
-              return {
-                name: d.toLocaleDateString("sr-RS", { day: "2-digit", month: "2-digit" }),
-                prijave: i % 3,
-                pregledi: 15 + i * 5
-              };
-            });
+          if (!isFirestoreHealthy) {
+            console.warn("[DashboardService] Firestore unhealthy, returning empty state.");
           }
 
           const res = {

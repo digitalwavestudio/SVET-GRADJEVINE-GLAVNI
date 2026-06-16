@@ -75,7 +75,7 @@ export const logZodFieldFailure = (fieldName: string, error: unknown) => {
               : String(error)) 
       },
       source: "DashboardBFF"
-    }).catch(() => {});
+    }).catch(() => console.warn('[DashboardStats] Log Zod field failure post failed'));
   } catch (e) {
     console.error("Failed to log Zod field failure inside bypass:", e);
   }
@@ -499,7 +499,7 @@ export function useDashboardStats<TData = BffDashboardResponse>(select?: (data: 
               errorMsg: error instanceof Error ? error.message : String(error),
             },
             source: "DashboardBFF",
-        }).catch(() => {});
+        }).catch(() => console.warn('[DashboardStats] Log dashboard fetch error failed'));
 
         // Fallback to offline cache upon connection retry/request failure (non-auth errors)
         if (!isAuthError && typeof window !== "undefined" && uid) {

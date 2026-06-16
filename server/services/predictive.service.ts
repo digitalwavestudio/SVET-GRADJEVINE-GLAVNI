@@ -12,14 +12,7 @@ interface AdHealthScore {
 }
 
 export class PredictiveAnalyticsService {
-  private static EXPECTED_APPS_MAP: Record<string, number> = {
-    "job": 5,
-    "machines": 2,
-    "accommodations": 3,
-    "caterings": 10,
-    "plots": 1,
-    "marketplace": 4
-  };
+  private static EXPECTED_APPS_MAP: Record<string, number> = {};
 
   /**
    * Calculates health score for an ad based on its performance in the first 48h

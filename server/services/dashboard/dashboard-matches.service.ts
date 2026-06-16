@@ -84,15 +84,8 @@ export class DashboardSmartMatchService {
             }
           }
 
-          // Fallback Mock Builder
-          if (!isFirestoreHealthy || (process.env.NODE_ENV !== "production" && (!availableJobs || availableJobs.length === 0))) {
-            availableJobs = [
-              { id: "mock_job_1", title: "Zidar / Tesar", type: "job", status: "active", location: "Beograd", city: "Beograd", requirements: "Zidar", createdAt: new Date() },
-              { id: "mock_job_2", title: "Armirač", type: "job", status: "active", location: "Novi Sad", city: "Novi Sad", requirements: "Armirač", createdAt: new Date() }
-            ];
-            recentApplications = [
-              { id: "mock_app_m_1", jobTitle: "Zidar / Tesar", status: "pending", createdAt: new Date().toISOString() }
-            ];
+          if (!isFirestoreHealthy) {
+            return { smartMatches: [], recentApplications: [] };
           }
 
           // 3. High-Performance Token Inverted Index Matching Algorithm

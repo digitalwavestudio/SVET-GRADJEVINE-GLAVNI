@@ -440,7 +440,7 @@ messagesRouter.get(
             uid,
             chatId: id
           });
-        }).catch(() => {});
+          }).catch(err => console.error("[Messages] CriticalAlertService.triggerResourceAlert failed:", err));
         return res.status(403).json({ error: "Access denied to this chat" });
       }
 
@@ -535,7 +535,7 @@ messagesRouter.get(
             uid,
             chatId: id
           });
-        }).catch(() => {});
+        }).catch(err => console.error("[Messages] CriticalAlertService.triggerResourceAlert failed:", err));
         return res.status(403).json({ error: "Access denied to this chat media" });
       }
 

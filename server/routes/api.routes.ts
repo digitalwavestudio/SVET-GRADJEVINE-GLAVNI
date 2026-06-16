@@ -320,8 +320,7 @@ apiRouter.get(
       });
     } catch (err: any) {
       logger.error(`[Firebase Health Check] Exception caught: ${err.message || err}`);
-      // Vraćamo uspešan odgovor 200 sa fallback informacijom kako bismo očuvali stabilnost kontejnera
-      res.json({
+      res.status(503).json({
         status: "fallback",
         error: err.message || String(err),
         usersFound: 0,

@@ -152,7 +152,7 @@ export function useAuthNode() {
          try {
            const tracked = sessionStorage.getItem('sg_device_tracked');
            if (!tracked) {
-             apiClient.post('/auth/devices/track', {}).catch(() => {});
+              apiClient.post('/auth/devices/track', {}).catch(() => console.warn('[Auth] Device tracking failed'));
              sessionStorage.setItem('sg_device_tracked', 'true');
            }
          } catch(e) {}
@@ -287,7 +287,6 @@ useEffect(() => {
               status: 'active',
               isPremiumProfile: false,
               photoURL: result.user.photoURL || '',
-              walletBalance: 1500,
               viewsCount: 0,
               freeAdsCount: 3
             })
@@ -310,18 +309,18 @@ useEffect(() => {
     return traceAsync('auth_login_email', async () => {
       try {
         const result = await signInWithEmailAndPassword(auth, email, pass);
-        apiClient.post('/telemetry/auth', {
+          apiClient.post('/telemetry/auth', {
           userId: result.user.uid,
           authMethod: 'email',
           eventType: 'login',
           status: 'success'
-        }).catch(() => {});
+        }).catch(() => console.warn('[Auth] Telemetry login success post failed'));
       } catch (err) {
         apiClient.post('/telemetry/auth', {
           authMethod: 'email',
           eventType: 'login',
           status: 'failed'
-        }).catch(() => {});
+        }).catch(() => console.warn('[Auth] Telemetry login failure post failed'));
         throw err;
       }
     });
@@ -338,7 +337,7 @@ useEffect(() => {
         authMethod: 'email',
         eventType: 'register',
         status: 'success'
-      }).catch(() => {});
+      }).catch(() => console.warn('[Auth] Telemetry register post failed'));
 
       await updateProfile(firebaseUser, { displayName: `${firstName} ${lastName}` });
 
@@ -364,7 +363,7 @@ useEffect(() => {
          userId: (currentUserSnapshot as User).id,
          eventType: 'logout',
          status: 'success'
-       }).catch(() => {});
+       }).catch(() => console.warn('[Auth] Telemetry logout post failed'));
     }
 
     sessionStorage.removeItem('admin_promoted');

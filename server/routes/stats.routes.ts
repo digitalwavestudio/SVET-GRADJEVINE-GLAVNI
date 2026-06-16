@@ -286,7 +286,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
       async () => {
         const { getRedis } = await import("../utils/redis.ts");
         const redis = getRedis();
-        if (redis) redis.del("admin_global_metrics:cache").catch(() => {});
+        if (redis) redis.del("admin_global_metrics:cache").catch(err => console.error("[Stats] Redis del failed:", err));
         const reconciled = await AdminStatsService.reconcileGlobalStats();
 
         const fieldMap: Record<string, string> = {

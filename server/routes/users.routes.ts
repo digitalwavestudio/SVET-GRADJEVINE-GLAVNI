@@ -125,7 +125,7 @@ usersRouter.post(
       if (sessions.length > sessionLimit) {
         sessions = sessions.slice(0, sessionLimit);
         // Automatically evict older active token sets by revoking all refresh tokens for this user
-        await admin.auth().revokeRefreshTokens(uid).catch(() => {});
+        await admin.auth().revokeRefreshTokens(uid).catch(err => console.error("[Users] revokeRefreshTokens failed:", err));
       }
 
       await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60);

@@ -60,15 +60,15 @@ adminRouter.get("/monitoring", async (req, res) => {
     const bypass = req.query.bypassCache === "true";
     const stats = await MonitoringService.getStats(bypass);
     if (stats && (stats as { status?: string }).status !== "error") {
-      breaker.recordSuccess().catch(() => {});
+      breaker.recordSuccess().catch(err => console.error("[CircuitBreaker] recordSuccess failed:", err));
     } else {
-      breaker.recordFailure().catch(() => {});
+      breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure failed:", err));
     }
     res.json(stats);
   } catch (err) {
     console.error("[CircuitBreaker] Admin /monitoring failed", err);
-    await breaker.recordFailure().catch(() => {});
-    res.json({
+    await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure failed:", err));
+    res.status(503).json({
       status: "warning",
       message: "Platforma radi u bezbednosnom (Sandbox) režimu zbog preopterećenja ili iscrpljene kvote.",
       quotaProtectionActive: true,
