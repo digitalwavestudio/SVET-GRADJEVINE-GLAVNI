@@ -71,6 +71,7 @@ export interface RealEstatePlot extends BaseEntity {
   urbanized?: boolean;
   isPremium?: boolean;
   isUrgent?: boolean;
+  paket?: string;
   viewsCount?: number;
   status?: string;
   authorId?: string;

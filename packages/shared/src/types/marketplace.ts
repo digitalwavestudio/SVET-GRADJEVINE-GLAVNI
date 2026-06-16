@@ -30,6 +30,7 @@ export interface MarketplaceItem extends BaseEntity {
   viewsCount?: number;
   isPremium?: boolean;
   isUrgent?: boolean;
+  paket?: string;
 }
 
 export interface MarketplaceFilters {

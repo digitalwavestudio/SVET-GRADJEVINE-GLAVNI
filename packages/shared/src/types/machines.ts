@@ -72,6 +72,7 @@ export interface Machine extends BaseEntity {
   status?: string;
   isPremium?: boolean;
   isUrgent?: boolean;
+  paket?: string;
   viewsCount?: number;
   createdAt?: string | number | Date | null | { _seconds: number; _nanoseconds: number };
   

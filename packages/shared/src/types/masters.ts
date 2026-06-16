@@ -12,6 +12,7 @@ export interface Master extends BaseEntity {
   availability: 'slobodan' | 'zauzet' | 'uskoro';
   premium?: boolean;
   isPremiumProfile?: boolean;
+  paket?: string;
   portfolioImages?: string[];
   profileScore?: number;
   sector?: string;

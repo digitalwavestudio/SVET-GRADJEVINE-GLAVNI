@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const zodSerbianErrorMap: any = (issue: any) => {
+export const zodSerbianErrorMap: z.ZodErrorMap = (issue) => {
   let message: string;
   switch (issue.code) {
     case 'invalid_type':
@@ -11,16 +11,17 @@ export const zodSerbianErrorMap: any = (issue: any) => {
       }
       break;
     case 'invalid_value':
-      message = "Neispravna vrednost";
+      if ('values' in issue) {
+        message = "Neispravna opcija";
+      } else {
+        message = "Neispravna vrednost";
+      }
       break;
     case 'unrecognized_keys':
       message = `Nepoznati ključevi: ${issue.keys.join(", ")}`;
       break;
     case 'invalid_union':
       message = "Neispravan unos";
-      break;
-    case 'invalid_enum_value':
-      message = "Neispravna opcija";
       break;
     case 'invalid_format':
       if (issue.format === 'email') message = "Neispravna email adresa";
@@ -55,7 +56,7 @@ export const zodSerbianErrorMap: any = (issue: any) => {
     default:
       message = "Neispravan unos";
   }
-  return message;
+  return { message };
 };
 
 export const initZodLocalization = () => {

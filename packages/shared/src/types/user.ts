@@ -131,6 +131,7 @@ export interface User {
   partnerBalance?: number;
   walletBalance?: number;
   packageType?: string;
+  paket?: string;
   totalAds?: number;
   
   emailVerified: boolean;

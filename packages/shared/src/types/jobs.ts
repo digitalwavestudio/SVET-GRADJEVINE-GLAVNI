@@ -40,6 +40,7 @@ export interface Job extends BaseEntity {
   app?: number;
   isUrgent?: boolean;
   isPremium?: boolean;
+  paket?: string;
   logo?: string;
   viewsCount?: number;
   applicantsCount?: number;

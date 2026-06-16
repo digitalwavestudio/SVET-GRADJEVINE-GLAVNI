@@ -25,6 +25,7 @@ export interface Accommodation extends BaseEntity {
   // Legacy UI fields
   price?: number;
   priceType?: string;
+  paket?: string;
   companyLogo?: string;
   companyName?: string;
   isCompanyVerified?: boolean;

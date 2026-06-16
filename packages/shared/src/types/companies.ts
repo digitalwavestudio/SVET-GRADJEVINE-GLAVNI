@@ -23,6 +23,7 @@ export interface Company extends BaseEntity {
   isPremium?: boolean;
   isPremiumPartner?: boolean;
   isUrgent?: boolean;
+  paket?: string;
   viewsCount?: number;
   images: string[];
   

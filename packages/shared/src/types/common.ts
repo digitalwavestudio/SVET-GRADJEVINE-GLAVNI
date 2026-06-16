@@ -1,5 +1,3 @@
-import { Timestamp } from 'firebase/firestore';
-
 export enum EntityStatus {
   ACTIVE = 'active',
   PENDING = 'pending',

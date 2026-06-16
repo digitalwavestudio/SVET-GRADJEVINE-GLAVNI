@@ -238,6 +238,7 @@ export const adBaseSchema = z.object({
   paket: z.string().optional(),
 });
 
+// TODO: Schema keys need to be mapped to interface keys (e.g., machBrand→brand) in the adapter layer
 export const machineSchema = adBaseSchema.extend({
   machBrand: z.string().min(1, "Marka je obavezna"),
   machModel: z.string().min(1, "Model je obavezan"),
@@ -252,6 +253,7 @@ export const machineSchema = adBaseSchema.extend({
   currency: z.string().default('EUR'),
 });
 
+// TODO: accType needs to be mapped to type in the adapter layer
 export const accommodationSchema = adBaseSchema.extend({
   accType: z.string().min(1, "Tip smeštaja je obavezan"),
   price: z.coerce.number().min(1, "Cena mora biti veća od 0"),
@@ -263,6 +265,7 @@ export const accommodationSchema = adBaseSchema.extend({
   address: z.string().optional(),
 });
 
+// TODO: catKitchenType has no matching field in CateringOffer interface — map in adapter layer
 export const cateringSchema = adBaseSchema.extend({
   catKitchenType: z.string().min(1, "Tip kuhinje je obavezan"),
   catMinOrder: z.coerce.number().min(1, "Minimalna porudžbina je obavezna"),
@@ -312,6 +315,7 @@ export const realEstateSchema = adBaseSchema.extend({
   plotAccessRoad: z.string().optional(),
 });
 
+// TODO: marketCategory, marketCondition, marketValue don't match MarketplaceItem interface fields — map in adapter layer
 export const marketplaceSchema = adBaseSchema.extend({
   marketCategory: z.string().min(1, "Kategorija je obavezna"),
   marketCondition: z.string().min(1, "Stanje je obavezno"),

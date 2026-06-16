@@ -27,6 +27,7 @@ export interface CateringOffer extends BaseEntity {
   amenities?: string[];
   isPremium?: boolean;
   isUrgent?: boolean;
+  paket?: string;
   viewsCount?: number;
   invoiceAvailable?: boolean;
   haccpCertified?: boolean;
