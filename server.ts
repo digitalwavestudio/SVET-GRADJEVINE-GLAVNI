@@ -2,10 +2,11 @@ import { Server } from "http";
 import express from "express";
 import path from "path";
 import fs from "fs";
+import { env } from "./server/config/env.ts";
 
 async function startServer() {
-  const mode = process.env.APP_MODE || "full";
-  const PORT = parseInt(process.env.PORT || "3000", 10);
+  const mode = env.APP_MODE;
+  const PORT = parseInt(env.PORT, 10);
   let server: Server;
   const app = express();
 
