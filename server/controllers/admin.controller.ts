@@ -464,7 +464,7 @@ export const getDlqItems = async (req: Request, res: Response, next: NextFunctio
     }
 
     const limitFromQuery = basePaginationQuerySchema.parse(req.query).limit;
-    const limitCount = limitFromQuery || 20;
+    const limitCount = limitFromQuery ?? 20;
     const items = await AdminDlqService.getDlqItems(limitCount);
     const response = { items };
 

@@ -257,7 +257,7 @@ messagesRouter.post(
               participants,
               adData: adData || null,
               lastMessage: "",
-              lastMessageAt: new Date(),
+              lastMessageAt: admin.firestore.FieldValue.serverTimestamp(),
               unreadCount: { [partnerId]: 0, [uid]: 0 },
             },
             { merge: true },
