@@ -551,7 +551,7 @@ export const db = new Proxy(
             });
           }
 
-          if (prop === 'collection' || prop === 'doc') {
+          if (prop === 'collection' || prop === 'doc' || prop === 'collectionGroup') {
             return wrapFirestoreObject(result as object);
           }
           if (prop === 'batch') {

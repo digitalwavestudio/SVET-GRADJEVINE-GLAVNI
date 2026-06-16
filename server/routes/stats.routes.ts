@@ -200,10 +200,11 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
       }
     }
 
+    const queryListings = (type: string) =>
+      db.collection("listings").where("type", "==", type).where("status", "in", ["approved", "active"]);
+
     const promises = [
-      db
-        .collection("jobs")
-        .where("status", "in", ["approved", "active"])
+      queryListings("job")
         .where(
           companyId ? "companyId" : "authorId",
           "==",
@@ -212,30 +213,22 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
         .count()
         .get()
         .catch(() => ({ data: () => ({ count: 0 }) })),
-      db
-        .collection("machines")
-        .where("status", "in", ["approved", "active"])
+      queryListings("machine")
         .where("authorId", "==", authorId)
         .count()
         .get()
         .catch(() => ({ data: () => ({ count: 0 }) })),
-      db
-        .collection("accommodations")
-        .where("status", "in", ["approved", "active"])
+      queryListings("accommodation")
         .where("authorId", "==", authorId)
         .count()
         .get()
         .catch(() => ({ data: () => ({ count: 0 }) })),
-      db
-        .collection("caterings")
-        .where("status", "in", ["approved", "active"])
+      queryListings("catering")
         .where("authorId", "==", authorId)
         .count()
         .get()
         .catch(() => ({ data: () => ({ count: 0 }) })),
-      db
-        .collection("plots")
-        .where("status", "in", ["approved", "active"])
+      queryListings("real_estate")
         .where("authorId", "==", authorId)
         .count()
         .get()

@@ -216,8 +216,9 @@ export class JobsCoreService {
       safeJob.status = jobPayload.status === "draft" ? "draft" : "active";
       safeJob.viewsCount = 0;
       safeJob.applicantsCount = 0;
-      safeJob.isPremium = false;
-      safeJob.isUrgent = false;
+      const isPaidPackage = !!jobPayload.paket;
+      safeJob.isPremium = isPaidPackage && jobPayload.paket !== "urgent";
+      safeJob.isUrgent = jobPayload.paket === "urgent";
 
       const jobDocRef = db.collection("listings").doc();
       transaction.set(jobDocRef, {

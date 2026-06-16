@@ -80,7 +80,8 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
       }
 
       // 2. Fetch Entity (ad to be promoted)
-      const entityRef = db.collection(collection).doc(entityId);
+      const collName = collection === "companies" ? "users" : "listings";
+      const entityRef = db.collection(collName).doc(entityId);
       const entityDoc = await transaction.get(entityRef);
 
       if (!entityDoc.exists) {
