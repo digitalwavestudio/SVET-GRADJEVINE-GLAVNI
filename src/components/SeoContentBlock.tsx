@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, MessageSquare, TrendingUp, HelpCircle, BarChart3 } from 'lucide-react';
+import { APP_CONFIG } from '@/src/constants/config';
 import { MACHINE_CATEGORIES } from '@/src/constants/machineTaxonomy';
 import { LOCATIONS, PROFESSIONS, MARKETPLACE_CATEGORIES, ACCOMMODATION_TYPES, KITCHEN_TYPES, REAL_ESTATE_PURPOSES, TaxonomyItem } from '@/src/constants/taxonomy';
 import Accordion from '@/src/components/Accordion';
@@ -187,19 +188,19 @@ export default function SeoContentBlock({ type, locationSlug, grad, zanimanje, i
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Naslovna",
-                "item": "https://www.svetgradjevine.com"
+                "item": APP_CONFIG.BASE_URL
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": type.charAt(0).toUpperCase() + type.slice(1),
-                "item": `https://www.svetgradjevine.com/${type}`
+                "item": `${APP_CONFIG.BASE_URL}/${type}`
               },
               (zanimanjeName || gradName) ? {
                 "@type": "ListItem",
                 "position": 3,
                 "name": zanimanjeName || gradName,
-                "item": `https://www.svetgradjevine.com${getModuleUrl(type, locationSlug, zanimanje)}`
+                "item": `${APP_CONFIG.BASE_URL}${getModuleUrl(type, locationSlug, zanimanje)}`
               } : null
             ].filter(Boolean)
           }
