@@ -80,7 +80,7 @@ export default function JobDetailsPage() {
 
   useEffect(() => {
     if (user?.isAdmin && jobData) {
-      console.log('[ADMIN_DEBUG] RAW JOB DATA:', jobData);
+      if (import.meta.env.DEV) console.log('[ADMIN_DEBUG] RAW JOB DATA:', jobData);
     }
   }, [user?.isAdmin, jobData]);
 

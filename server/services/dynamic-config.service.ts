@@ -42,7 +42,7 @@ export class DynamicConfigService {
             if (channel === REDIS_CONFIG_CHANNEL) {
               try {
                 this.config = JSON.parse(message);
-                console.log(
+                if (process.env.NODE_ENV !== "production") console.log(
                   "🔄 DynamicConfig: Updated across all instances in runtime",
                 );
               } catch (err) {

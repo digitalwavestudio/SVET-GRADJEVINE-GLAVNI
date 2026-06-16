@@ -160,7 +160,7 @@ export class DashboardService {
       this.msgHandler = (channel: string, message: string) => {
         if (channel === REDIS_EVICTION_CHANNEL) {
           try {
-            console.log(`[DashboardService Pub/Sub] Cache eviction signal for user: ${message}`);
+            if (process.env.NODE_ENV !== "production") console.log(`[DashboardService Pub/Sub] Cache eviction signal for user: ${message}`);
             this.evictLocalMemoryCache(message);
           } catch (err: unknown) {
             console.error("[DashboardService Pub/Sub] Error handling message:", getErrorMessage(err));
@@ -170,7 +170,7 @@ export class DashboardService {
 
       subRedis.subscribe(REDIS_EVICTION_CHANNEL)
         .then(() => {
-          console.log(`[DashboardService] Subscribed to Redis channel: ${REDIS_EVICTION_CHANNEL}`);
+          if (process.env.NODE_ENV !== "production") console.log(`[DashboardService] Subscribed to Redis channel: ${REDIS_EVICTION_CHANNEL}`);
         })
         .catch((err: unknown) => {
           const errMsg = getErrorMessage(err);

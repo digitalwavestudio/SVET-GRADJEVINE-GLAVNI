@@ -348,7 +348,7 @@ export default class DashboardGuard extends Component<Props, State> {
       );
 
       failedQueries.forEach((q) => {
-        console.log(
+        if (import.meta.env.DEV) console.log(
           "[DashboardErrorBoundary] Resubmitting/Resetting Errored Query:",
           q.queryKey,
         );
@@ -357,7 +357,7 @@ export default class DashboardGuard extends Component<Props, State> {
 
       // Force remove and invalidate queries
       keysToInvalidate.forEach((key) => {
-        console.log(
+        if (import.meta.env.DEV) console.log(
           "[DashboardErrorBoundary] Force Invalidation & Clear:",
           key,
         );

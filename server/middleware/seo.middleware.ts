@@ -8,6 +8,8 @@ import { eventBus } from "../events/event-bus.ts";
 import { SEORenderEngine, SEOMetaData } from "../services/seo/seo-render-engine.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 
+const DEV = process.env.NODE_ENV !== "production";
+
 // Add all standard crawlers and AI bots
 const BOT_AGENTS = [
   "googlebot",
@@ -48,7 +50,7 @@ export const canonicalHostMiddleware = (
     host !== APP_CONFIG.DOMAIN &&
     host !== `www.${APP_CONFIG.DOMAIN}`
   ) {
-    console.log(
+    if (DEV) console.log(
       `[SEO] Redirecting non-canonical host ${host} to ${APP_CONFIG.BASE_URL}`,
     );
     return res.redirect(301, APP_CONFIG.BASE_URL + req.originalUrl);
@@ -78,7 +80,7 @@ export const botPrerenderMiddleware = async (
     try {
       const cachedHtml = await redis.get(`seo_render_cache:${req.path}`);
       if (cachedHtml) {
-        console.log(`[SEO Bot L1 Cache] Serving cached HTML for bot on path ${req.path}`);
+        if (DEV) console.log(`[SEO Bot L1 Cache] Serving cached HTML for bot on path ${req.path}`);
         res.setHeader("Content-Type", "text/html");
         res.setHeader("Cache-Control", "public, max-age=172800"); // 48h
         res.setHeader("X-Prerender-Cache-Hit", "L1-Redis");
@@ -154,7 +156,7 @@ export const botPrerenderMiddleware = async (
       // Ako IP bot-a pogaÄ‘a preko 200 req per minute, smatramo ga eksplozivnim (moÅ¾emo da smanjimo ako treba)
       // I zaustavljamo request sa 429 Too Many Requests
       if (hits > 200) {
-        console.log(
+        if (DEV) console.log(
           `[Crawl Defense] Banning overly aggressive bot IP ${ip} (${botName}) for hitting > 200req/min.`,
         );
         res.setHeader("Retry-After", "120"); // tell bot to wait 2 mins
@@ -169,7 +171,7 @@ export const botPrerenderMiddleware = async (
   }
 
   if (isFilterTrap) {
-    console.log(
+    if (DEV) console.log(
       `[SEO] Crawl budget guard triggered for bot on ${req.originalUrl} (Depth > 2)`,
     );
     const canonicalBase = `https://${req.get("host")}${req.path.replace(/\/$/, "") || "/"}`;
@@ -203,7 +205,7 @@ export const botPrerenderMiddleware = async (
 
     if (cachedHtml) {
       await redis.incr(CacheKeys.seoEdgeHits());
-      console.log(
+      if (DEV) console.log(
         `[SEO] Serving Edge Pre-rendered HTML for BOT on ${req.path}`,
       );
       res.setHeader("Content-Type", "text/html");
@@ -221,7 +223,7 @@ export const botPrerenderMiddleware = async (
 
     if (pathParts[0] === "statistika") {
       // KORAK 10.2: Entity Aggregation Hubs
-      console.log(`[SEO] Generating AI/Bot Statistical Hub for ${req.path}`);
+      if (DEV) console.log(`[SEO] Generating AI/Bot Statistical Hub for ${req.path}`);
       const statData = SEOMetaService.generateStatisticalHub(req.path);
       res.setHeader("Content-Type", "text/html");
       res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day cache
@@ -255,7 +257,7 @@ export const botPrerenderMiddleware = async (
       if (meta) {
         if (meta.isDead) {
           // Korak 8.2: SEO kolaps spreÄavanje
-          console.log(`[SEO] Bot encountered dead listing on ${req.path}`);
+          if (DEV) console.log(`[SEO] Bot encountered dead listing on ${req.path}`);
           if (meta.hasTraffic) {
             const adRoutes = [
               { path: "/poslovi", coll: "jobs", alwaysListing: true },
@@ -290,7 +292,7 @@ export const botPrerenderMiddleware = async (
         const lastUpdated = meta.updatedAt ? new Date(meta.updatedAt).getTime() : undefined;
         const etagCheck = SEORenderEngine.evaluateETag(req, res, lastUpdated, meta.viewsCount);
         if (etagCheck.matched) {
-          console.log(
+          if (DEV) console.log(
             `[SEO] ETag match! Sending 304 Not Modified for ${req.path}`,
           );
           return res.status(304).end();
@@ -300,7 +302,7 @@ export const botPrerenderMiddleware = async (
 
     // 2. Fallback: Dynamically generate the payload on the fly without React
     if (meta && !meta.isDead) {
-      console.log(
+      if (DEV) console.log(
         `[SEO] Dynamically generating SEO payload for BOT on ${req.path}`,
       );
 

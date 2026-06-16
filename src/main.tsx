@@ -114,7 +114,7 @@ onLCP(reportWebVitals);
 // when configured with injectRegister: 'auto' in vite.config.ts.
 // We remove the unregister logic so the PWA can be installed.
 
-console.log('[MAIN] Application starting...');
+if (import.meta.env.DEV) console.log('[MAIN] Application starting...');
 
 function Root() {
   const [persister, setPersister] = useState<any | null>(null);

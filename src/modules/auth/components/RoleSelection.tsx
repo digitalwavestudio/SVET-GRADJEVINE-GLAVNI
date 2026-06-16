@@ -8,9 +8,9 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
 
   const handleSelectRole = async (targetRole: string) => {
     try {
-      console.log("Attempting to switch role to:", targetRole);
+      if (import.meta.env.DEV) console.log("Attempting to switch role to:", targetRole);
       await switchRole(targetRole as any);
-      console.log("Successfully switched role to:", targetRole);
+      if (import.meta.env.DEV) console.log("Successfully switched role to:", targetRole);
     } catch (error) {
       console.error("Failed to set role:", error);
       alert("Došlo je do greške pri izmeni uloge. Molimo pokušajte ponovo.");

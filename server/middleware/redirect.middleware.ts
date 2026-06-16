@@ -20,7 +20,7 @@ export const redirectMiddleware = (
   const redirectPath = RedirectService.getRedirectPath(path);
 
   if (redirectPath) {
-    console.log(`[SEO-Redirect] Redirecting legacy path ${path} to ${redirectPath} (301)`);
+    if (process.env.NODE_ENV !== "production") console.log(`[SEO-Redirect] Redirecting legacy path ${path} to ${redirectPath} (301)`);
     
     // Preserve query strings if any
     const queryString = req.url.includes("?") ? req.url.split("?")[1] : "";

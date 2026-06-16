@@ -99,7 +99,7 @@ export const sendMessage = async (
                   ? `${uData.firstName} ${uData.lastName}`
                   : "Korisnik";
 
-              console.log(`[EMAIL DISPATCH] Sending email to ${pData.email} from ${senderName}`);
+              if (process.env.NODE_ENV !== "production") console.log(`[EMAIL DISPATCH] Sending email to ${pData.email} from ${senderName}`);
             }
           }
         }).catch(err => console.error("Non-blocking email retrieval error", err));

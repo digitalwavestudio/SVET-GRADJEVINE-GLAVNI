@@ -359,7 +359,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
         if (hasConfigMethod(client)) {
           await client.config("SET", "maxmemory-policy", "allkeys-lru");
         }
-        console.log(`[Redis] Konektovan (${isMain ? 'Main' : 'Regional'}).`);
+        if (process.env.NODE_ENV !== "production") console.log(`[Redis] Konektovan (${isMain ? 'Main' : 'Regional'}).`);
       } catch (err: unknown) {}
     });
 
@@ -654,7 +654,7 @@ export function getRedis(): ResilientRedis {
     if (url) {
       try {
         const redisUrl = new URL(url);
-        console.log(
+        if (process.env.NODE_ENV !== "production") console.log(
           `[Redis] Connecting to ${redisUrl.hostname}:${redisUrl.port || 6379}...`,
         );
       } catch (e) {
@@ -786,7 +786,7 @@ export function getStreamRedis(): ResilientRedis {
 }
 
 export async function shutdownRedis() {
-  console.log("[Redis] Graceful shutdown initiated...");
+  if (process.env.NODE_ENV !== "production") console.log("[Redis] Graceful shutdown initiated...");
   const cleanupClient = async (c: ResilientRedis | null | Redis) => {
     if (!c) return;
     try {

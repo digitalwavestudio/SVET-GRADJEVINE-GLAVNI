@@ -45,7 +45,7 @@ export class RedisLockManager {
             `⚠️ [RedisLockManager] Lock Release Denied for key: "${key}". Current owner is "${currentOwner}", but process requested release with ID "${lockId}". This indicates a potential lock lease timeout/race condition!`
           );
         } else {
-          console.log(`ℹ️ [RedisLockManager] Lock for key: "${key}" was already expired or released before.`);
+          if (process.env.NODE_ENV !== "production") console.log(`ℹ️ [RedisLockManager] Lock for key: "${key}" was already expired or released before.`);
         }
       }
       return success;

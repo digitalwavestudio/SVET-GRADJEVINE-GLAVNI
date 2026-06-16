@@ -42,7 +42,7 @@ export function createQueue(name: string) {
     );
     return null;
   }
-  console.log(`[Queue] Initializing queue: ${name}`);
+  if (process.env.NODE_ENV !== "production") console.log(`[Queue] Initializing queue: ${name}`);
   return new Queue(name, {
     connection: connectionOptions,
     defaultJobOptions: {

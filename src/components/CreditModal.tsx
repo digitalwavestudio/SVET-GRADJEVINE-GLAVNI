@@ -29,7 +29,7 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
     
     if (user) {
       // In a real app, we would update credits in DB
-      console.log(`Purchased ${selectedPackage.ads} credits`);
+      if (import.meta.env.DEV) console.log(`Purchased ${selectedPackage.ads} credits`);
     }
     
     setIsLoading(false);

@@ -198,7 +198,7 @@ export default function ApplicationsPage() {
                                  // Add an initial message logic or similar if backend supports it
                                  navigate('/poruke');
                                  } catch(err) {
-                                   console.log(err);
+                                    if (import.meta.env.DEV) console.log(err);
                                  }
                               }}>
                                 <span className="material-symbols-outlined text-sm">chat</span> Započni konverzaciju

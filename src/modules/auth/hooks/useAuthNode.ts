@@ -260,7 +260,7 @@ export function useAuthNode() {
 useEffect(() => {
   getRedirectResult(auth)
     .then((result) => {
-      console.log('[AUTH] getRedirectResult result:', result);
+      if (import.meta.env.DEV) console.log('[AUTH] getRedirectResult result:', result);
       if (result?.user) {
         currentFbUser.current = result.user;
         subscribeToUser(result.user);
