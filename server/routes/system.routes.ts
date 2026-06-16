@@ -49,7 +49,14 @@ systemRouter.post("/config", requireAuth, async (req, res) => {
       { merge: true }
     );
 
-    // TODO: Ako imaš Redis cache, ovde ga možeš invalidirati
+    // Invalidate cached settings so changes take effect immediately
+    try {
+      const { CacheService } = await import("../services/cache.service.ts");
+      await Promise.allSettled([
+        CacheService.delete("settings_swr_global"),
+        CacheService.delete("settings_swr_branding"),
+      ]);
+    } catch (_) { /* non-critical */ }
 
     res.json({ success: true, message: "Sistemska konfiguracija ažurirana" });
   } catch (err: any) {
