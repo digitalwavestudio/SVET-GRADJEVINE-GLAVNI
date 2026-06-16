@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { CacheService } from "../services/cache.service.ts";
+import { AdminSettingsService } from "../services/admin/admin-settings.service.ts";
 import { z } from "zod";
 
 export const walletRouter = Router();
@@ -53,15 +54,9 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
 
     const { entityId, collection, durationDays, promoteType } = parsed;
 
-    // Import dynamically so it works in tsx context without issues
-    const { getPackageById } =
-      await import("../../src/constants/adPackages.ts");
-    const matchedPackage = getPackageById(collection, promoteType);
-
-    if (!matchedPackage) {
-      return res.status(400).json({ error: "Nevažeći tip promocije" });
-    }
-    const cost = matchedPackage.priceNum;
+    const settings = await AdminSettingsService.getSettings("global");
+    const pricing = (settings as any)?.pricing?.[collection] ?? {};
+    const cost: number = pricing[promoteType] ?? pricing.premium ?? 1000;
 
     await db.runTransaction(async (transaction) => {
       // 1. Fetch User (wallet check)
