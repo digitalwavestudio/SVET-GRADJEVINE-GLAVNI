@@ -2,7 +2,6 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import {defineConfig, loadEnv} from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import Sitemap from 'vite-plugin-sitemap';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { LOCATIONS } from './src/constants/taxonomy';
