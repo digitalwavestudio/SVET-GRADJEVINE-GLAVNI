@@ -55,6 +55,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/rss/:category", async (req, res) => {
+  const baseUrl = req.protocol + '://' + req.get('host');
   const { category } = req.params;
   const validCategories = [
     "jobs",
@@ -113,7 +114,7 @@ router.get("/rss/:category", async (req, res) => {
         marketplace: "alat-i-oprema",
       };
       const mappedType = typeMapping[category] || category;
-      const url = `https://svetgradjevine.com/${mappedType}/${id}`;
+      const url = `${baseUrl}/${mappedType}/${id}`;
 
       itemsXml += `
         <item>
@@ -129,10 +130,10 @@ router.get("/rss/:category", async (req, res) => {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
     <title>Svet GraÄ‘evine - ${category.toUpperCase()}</title>
-    <link>https://svetgradjevine.com</link>
+    <link>${baseUrl}</link>
     <description>Najnoviji oglasi iz kategorije ${category}</description>
     <language>sr</language>
-    <atom:link href="https://svetgradjevine.com/feed/rss/${category}" rel="self" type="application/rss+xml" />
+    <atom:link href="${baseUrl}/feed/rss/${category}" rel="self" type="application/rss+xml" />
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     ${itemsXml}
 </channel>

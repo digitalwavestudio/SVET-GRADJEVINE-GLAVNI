@@ -29,7 +29,7 @@ const updateJobSchema = jobSchema.partial();
 export const jobsRouter = express.Router();
 
 jobsRouter.get("/", (req, res, next) => {
-  console.log("[JOBS_ROUTE] GET /api/jobs called, originalUrl:", req.originalUrl);
+  if (process.env.NODE_ENV !== "production") { console.log("[JOBS_ROUTE] GET /api/jobs called, originalUrl:", req.originalUrl); }
   next();
 }, getPublicJobs);
 jobsRouter.get("/applications/user/:role", authMiddleware, getUserApplications);

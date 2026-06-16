@@ -8,6 +8,7 @@ coverage/
 *.txt
 fix_*.ts
 firebase-service-account.json
+firebase-applet-config.json
 
 
 # Build outputs

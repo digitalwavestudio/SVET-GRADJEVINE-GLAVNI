@@ -289,7 +289,7 @@ usersRouter.post(
 );
 
 // ─── Premium Package Activation ───────────────────────────────────────────────
-const PREMIUM_PACKAGE_PRICE = 6000; // SG Krediti
+const PREMIUM_PACKAGE_PRICE = 6000; // TODO: Read from AdminService.getSettings("pricing")
 
 usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
   try {

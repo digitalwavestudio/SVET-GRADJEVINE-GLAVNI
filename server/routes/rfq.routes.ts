@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, admin } from "../config/firebase.ts";
 import { z } from "zod";
 import { validateRequest } from "../middleware/validate.ts";
+import { heavyOperationsLimiter } from "../middleware/rate-limit.middleware.ts";
 
 export const rfqRouter = Router();
 
@@ -19,7 +20,7 @@ const rfqSchema = z.object({
   ).min(1, "Specifikacija ne može biti prazna")
 });
 
-rfqRouter.post("/", validateRequest(rfqSchema), async (req, res, next) => {
+rfqRouter.post("/", heavyOperationsLimiter, validateRequest(rfqSchema), async (req, res, next) => {
   try {
     const { regionId, phone, category, specification } = req.body;
 

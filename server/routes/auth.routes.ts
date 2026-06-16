@@ -201,7 +201,7 @@ authRouter.post(
           lastName: lastName || "",
           role: defaultRole.name,
           isVerified: false,
-          walletBalance: 1500, // 1500 SG Kredita for new users
+          walletBalance: 1500, // TODO: Read from system settings/config doc instead of hardcoding
           permissions: defaultRole.permissions,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),

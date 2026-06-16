@@ -25,10 +25,7 @@ export class AdminAdsService {
       lastEditedByAdmin: adminId,
     });
 
-    const updatedSnap = await docRef.get();
-    const updatedData = updatedSnap.data() as Record<string, unknown>;
-
-    await SyncManager.syncAd(collection, id, updatedData, oldData);
+    await SyncManager.syncAd(collection, id, updates, oldData);
 
     // Invalidate cache for ad detail and related listings
     try {

@@ -3,12 +3,14 @@ import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { supportSchema } from "@svet-gradjevine/shared";
+import { apiLimiter } from "../middleware/rate-limit.middleware.ts";
 
 export const supportRouter = Router();
 
 // Create ticket (public or auth)
 supportRouter.post(
   "/tickets",
+  apiLimiter,
   validateRequest(supportSchema),
   async (req, res, next) => {
     try {

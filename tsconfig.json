@@ -25,7 +25,8 @@
       "@svet-gradjevine/shared/*": ["./packages/shared/src/*"],
       "@svet-gradjevine/api/*": ["./packages/api/src/*"],
       "@/*": [
-        "./*"
+        "./src/*",
+        "./server/*"
       ]
     },
     "allowImportingTsExtensions": true,
