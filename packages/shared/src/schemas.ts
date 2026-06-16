@@ -34,7 +34,8 @@ export const jobSchema = z.object({
   benefits: z.array(z.string()).optional(),
   email: z.string().email().or(z.literal('')).optional(),
   status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
-  companyId: z.string().nullable().optional()
+  companyId: z.string().nullable().optional(),
+  paket: z.string().optional()
 });
 
 export const jobSearchSchema = z.object({
@@ -234,6 +235,7 @@ export const adBaseSchema = z.object({
   viber: z.boolean().optional(),
   whatsapp: z.boolean().optional(),
   status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
+  paket: z.string().optional(),
 });
 
 export const machineSchema = adBaseSchema.extend({
