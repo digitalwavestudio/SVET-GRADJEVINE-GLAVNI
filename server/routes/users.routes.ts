@@ -8,6 +8,7 @@ import {
   registerFcmToken,
 } from "../controllers/users.controller.ts";
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
+import { AdminSettingsService } from "../services/admin/admin-settings.service.ts";
 import { validateRequest, validateBody } from "../middleware/validate.ts";
 import {
   userProfileSchema,
@@ -289,13 +290,21 @@ usersRouter.post(
 );
 
 // ─── Premium Package Activation ───────────────────────────────────────────────
-const PREMIUM_PACKAGE_PRICE = 6000; // TODO: Read from AdminService.getSettings("pricing")
+async function getPremiumPrice(): Promise<number> {
+  try {
+    const settings = await AdminSettingsService.getSettings("global");
+    return (settings as any)?.pricing?.professional_monthly ?? 6000;
+  } catch {
+    return 6000;
+  }
+}
 
 usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
   try {
     const uid = req.user?.uid;
     if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
+    const premiumPrice = await getPremiumPrice();
     const db = admin.firestore();
     const userRef = db.collection("users").doc(uid);
     const userSnap = await userRef.get();
@@ -313,9 +322,9 @@ usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
     }
 
     // Check balance
-    if (currentBalance < PREMIUM_PACKAGE_PRICE) {
+    if (currentBalance < premiumPrice) {
       return res.status(400).json({
-        error: `Nemate dovoljno kredita. Potrebno: ${PREMIUM_PACKAGE_PRICE} SGK, dostupno: ${currentBalance} SGK.`,
+        error: `Nemate dovoljno kredita. Potrebno: ${premiumPrice} SGK, dostupno: ${currentBalance} SGK.`,
       });
     }
 
@@ -324,7 +333,7 @@ usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
 
     // Deduct from wallet
     batch.update(userRef, {
-      walletBalance: admin.firestore.FieldValue.increment(-PREMIUM_PACKAGE_PRICE),
+      walletBalance: admin.firestore.FieldValue.increment(-premiumPrice),
       isPremium: true,
       premiumBadge: "gold",
       premiumActivatedAt: now,
@@ -336,7 +345,7 @@ usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
       userId: uid,
       type: "PREMIUM_AKTIVACIJA",
       description: "Aktivacija Premium paketa – Zlatni bedž",
-      amount: -PREMIUM_PACKAGE_PRICE,
+      amount: -premiumPrice,
       status: "completed",
       createdAt: now,
     });
@@ -352,7 +361,7 @@ usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
     return res.json({
       success: true,
       message: "Premium paket je uspešno aktiviran. Zlatni bedž je dodat na vaš profil!",
-      newBalance: currentBalance - PREMIUM_PACKAGE_PRICE,
+      newBalance: currentBalance - premiumPrice,
     });
   } catch (error) {
     next(error);
