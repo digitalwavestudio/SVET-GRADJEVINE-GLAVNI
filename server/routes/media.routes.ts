@@ -26,7 +26,7 @@ mediaRouter.post(
   async (req, res, next) => {
     try {
       const user = (req as any)?.user;
-      let { contentType = "image/webp", folder = "media", customFileName } = req.body;
+      const { contentType = "image/webp", folder = "media", customFileName } = req.body;
 
       // DOMAIN 5: Security Hardening (Path Traversal/Spoofing protection)
       // Force users to ONLY upload within safe paths
@@ -62,7 +62,7 @@ mediaRouter.post(
       let safeCustomFileName = "";
       if (customFileName) {
         const baseName = customFileName.split('/').pop() || "";
-        safeCustomFileName = baseName.replace(/[^a-zA-Z0-9_\-\.]/g, ''); 
+        safeCustomFileName = baseName.replace(/[^a-zA-Z0-9_.-]/g, ''); 
         if (!safeCustomFileName) safeCustomFileName = uuidv4();
       } else {
         safeCustomFileName = `${Date.now()}_${uuidv4()}.webp`;

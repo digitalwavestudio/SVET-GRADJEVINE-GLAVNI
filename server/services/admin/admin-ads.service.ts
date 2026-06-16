@@ -155,7 +155,7 @@ export class AdminAdsService {
   .orderBy("createdAt", "desc")
   .limit(queryLimit);
 
-    let mastersQuery = db.collection("users")
+    const mastersQuery = db.collection("users")
       .where("role", "==", "majstor")
       .where("status", "==", "pending")
       .limit(queryLimit);

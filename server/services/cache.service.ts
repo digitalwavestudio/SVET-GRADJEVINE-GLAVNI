@@ -170,7 +170,7 @@ export class CacheService {
 
     const executeSWR = async (): Promise<T> => {
       // 1. Provera postojanja SWR koverte u L1 / L2 kešu
-      let envelope = await this.get<SWREnvelope<T>>(swrKey);
+      const envelope = await this.get<SWREnvelope<T>>(swrKey);
       const now = Date.now();
 
       if (envelope && envelope.isSWR) {

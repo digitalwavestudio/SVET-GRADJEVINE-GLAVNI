@@ -197,7 +197,7 @@ export default React.memo(function DashboardHeader({
 
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
         {/* Wallet Balans is enabled for all roles including administrators */}
-        {true && (
+        {(
           <Button
             to="/novcanik"
             variant="ghost"

@@ -10,8 +10,8 @@ export const initGA = (measurementId: string | undefined) => {
 
     (window as any).dataLayer = (window as any).dataLayer || [];
     // eslint-disable-next-line prefer-rest-params
-    (window as any).gtag = function() {
-      (window as any).dataLayer.push(arguments);
+    (window as any).gtag = function(...args: unknown[]) {
+      (window as any).dataLayer.push(args);
     };
     (window as any).gtag('js', new Date());
   }

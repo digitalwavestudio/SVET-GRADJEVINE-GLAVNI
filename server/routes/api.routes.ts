@@ -69,7 +69,7 @@ const firestoreLimiter = rateLimit({
   message: { error: "Sačekajte trenutak, server je pod velikim opterećenjem." },
   // Optional: Skip Redis if it's down to prevent hangs
   store: new RedisStore({
-    //@ts-ignore
+    //@ts-expect-error - RedisStore expects specific sendCommand signature
     sendCommand: async (...args: string[]) => {
         try {
             const [command, ...rest] = args;

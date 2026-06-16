@@ -185,7 +185,7 @@ export class OutboxWorker {
         await new Promise((resolve) => setTimeout(resolve, this.currentBackoffMs));
       }
 
-      let messages: any[] = [];
+      const messages: any[] = [];
 
       if (this.isRedisFallbackActive) {
         const redis = getRedis();
@@ -284,7 +284,7 @@ export class OutboxWorker {
         await new Promise((resolve) => setTimeout(resolve, this.currentBackoffMs));
       }
 
-      let messages: any[] = [];
+      const messages: any[] = [];
 
       if (this.isRedisFallbackActive) {
         const redis = getRedis();

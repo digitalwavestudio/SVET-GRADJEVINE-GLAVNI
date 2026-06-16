@@ -143,7 +143,7 @@ export class AlgoliaRedisBatcher {
               if (parsed && typeof parsed === "object") {
                 data = parsed as Record<string, unknown>;
               }
-            } catch (e: unknown) {}
+            } catch (e: unknown) { /* intentionally empty */ }
           }
         }
         

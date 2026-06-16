@@ -206,7 +206,7 @@ export class DashboardService {
           await subRedis.unsubscribe(REDIS_EVICTION_CHANNEL).catch(() => {});
           console.log(`[DashboardService] Unsubscribed from channel.`);
         }
-      } catch (err: unknown) {}
+      } catch (err: unknown) { /* intentionally empty */ }
     }
     this.subRegistered = false;
   }

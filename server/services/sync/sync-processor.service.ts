@@ -130,7 +130,7 @@ export class SyncProcessor {
           const algoliaUpdatesByBatch: {
             [index: string]: { id: string; data: Record<string, unknown> }[];
           } = {};
-          let promises: Promise<unknown>[] = [];
+          const promises: Promise<unknown>[] = [];
 
           stream.on("data", (docSnap: import("firebase-admin/firestore").QueryDocumentSnapshot) => {
             const data = docSnap.data();
@@ -164,7 +164,7 @@ export class SyncProcessor {
               opCount = 0;
 
               const currentAlgolia = { ...algoliaUpdatesByBatch };
-              for (let k in algoliaUpdatesByBatch)
+              for (const k in algoliaUpdatesByBatch)
                 delete algoliaUpdatesByBatch[k];
 
               const p = currentBatch
@@ -219,7 +219,7 @@ export class SyncProcessor {
     await new Promise<void>((resolve, reject) => {
       let batch = db.batch();
       let opCount = 0;
-      let promises: Promise<unknown>[] = [];
+      const promises: Promise<unknown>[] = [];
 
       stream.on("data", (docSnap: import("firebase-admin/firestore").QueryDocumentSnapshot) => {
         const appUpdates: Record<string, unknown> = {};
@@ -282,7 +282,7 @@ export class SyncProcessor {
       const stream = collRef.stream();
       await new Promise<void>((resolve, reject) => {
         let algoliaBatch: { id: string; data: Record<string, unknown> }[] = [];
-        let promises: Promise<unknown>[] = [];
+        const promises: Promise<unknown>[] = [];
 
         stream.on("data", (docSnap: import("firebase-admin/firestore").QueryDocumentSnapshot) => {
           algoliaBatch.push({ id: docSnap.id, data: docSnap.data() });

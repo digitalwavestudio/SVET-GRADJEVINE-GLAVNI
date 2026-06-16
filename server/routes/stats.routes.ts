@@ -80,7 +80,7 @@ statsRouter.get("/pseo-insights", async (req, res, next) => {
           .limit(10)
           .get();
 
-        let count = snapshot.size;
+        const count = snapshot.size;
         let avgPrice = 0;
 
         if (count > 0) {

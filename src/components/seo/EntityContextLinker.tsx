@@ -7,8 +7,8 @@ import { Building2, Briefcase, Wrench, Bed, Utensils, Tractor } from 'lucide-rea
 function slugify(text: string) {
   return text.toString().toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
     .replace(/^-+/, '')
     .replace(/-+$/, '');
 }

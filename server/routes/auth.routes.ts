@@ -90,7 +90,7 @@ authRouter.post('/devices/track', requireAuth, async (req, res, next) => {
     const userAgent = req.headers['user-agent'] || 'Unknown Browser';
     
     const CacheService = (await import("../services/cache.service.ts")).CacheService;
-    let sessions = await getSessions(uid);
+    const sessions = await getSessions(uid);
     
     const now = Date.now();
     // Update or add the session

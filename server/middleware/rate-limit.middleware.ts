@@ -15,7 +15,7 @@ const getStore = (prefix: string) => {
   const redisClient = getRedis();
   if (redisClient) {
     return new RedisStore({
-      // @ts-ignore - ioredis call signature is compatible with what rate-limit-redis expects at runtime
+      // @ts-expect-error - ioredis call signature is compatible with what rate-limit-redis expects at runtime
       sendCommand: async (...args: unknown[]) => {
         try {
             const isObjectArg = typeof args[0] === 'object' && args[0] !== null && 'command' in args[0];

@@ -159,7 +159,7 @@ let lastRedisSync = 0;
 
 export function withTimeout<T>(promise: Promise<T>, ms: number, errMessage: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    let timer = setTimeout(() => {
+    const timer = setTimeout(() => {
       const timeoutErr = new Error(errMessage) as FirestoreQuotaError;
       timeoutErr.code = 8; // Simulate RESOURCE_EXHAUSTED code so it triggers the protection layer
       reject(timeoutErr);
@@ -764,7 +764,7 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
                   } else {
                     MonitoringService.recordFirestoreAudit(collection, targetPath, 1, 0);
                   }
-                } catch (auditErr) {}
+                } catch (auditErr) { /* intentionally empty */ }
 
                 return res;
               } catch (err: any) {

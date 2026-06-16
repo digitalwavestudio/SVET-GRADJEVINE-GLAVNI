@@ -253,7 +253,7 @@ export class SEODbService {
                 let urlId = doc.id;
 
                 switch (coll) {
-                  case "jobs":
+                  case "jobs": {
                     path = "posao";
                     const t = data.title || data.name || "bez-naslova";
                     const l = data.location || data.loc || "";
@@ -261,6 +261,7 @@ export class SEODbService {
                     const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
                     urlId = `${slug}~${doc.id}`;
                     break;
+                  }
                   case "companies":
                     path = "firma";
                     break;

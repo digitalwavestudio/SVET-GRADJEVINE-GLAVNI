@@ -360,7 +360,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
           await client.config("SET", "maxmemory-policy", "allkeys-lru");
         }
         if (process.env.NODE_ENV !== "production") console.log(`[Redis] Konektovan (${isMain ? 'Main' : 'Regional'}).`);
-      } catch (err: unknown) {}
+      } catch (err: unknown) { /* intentionally empty */ }
     });
 
     client.on("error", (err: Error & { code?: string | number }) => {
@@ -606,7 +606,7 @@ export function getRawRedis(): Redis | null {
       isRedisDown = false;
       try {
         await client.config("SET", "maxmemory-policy", "allkeys-lru");
-      } catch (err: unknown) {}
+      } catch (err: unknown) { /* intentionally empty */ }
     });
 
     client.on("error", (err: Error & { code?: string | number }) => {

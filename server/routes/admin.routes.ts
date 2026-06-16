@@ -130,7 +130,7 @@ adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, requireScope(AppS
     const aiScraperShare = totalBotCount > 0 ? (aiScraperCount / totalBotCount) * 100 : 0;
 
     let totalDurationMs = 0;
-    let totalDurationSamples = 0;
+    const totalDurationSamples = 0;
     if (botPaths) {
       for (const [key, valStr] of Object.entries(botPaths)) {
         if (key.includes(":duration")) {

@@ -55,7 +55,7 @@ export const cacheMiddleware = (
     // Overajdujemo res.json da hvatamo rezultat i keširamo ga
     const originalJson = res.json.bind(res);
 
-    // @ts-ignore
+    // @ts-expect-error - overriding res.json for caching
     res.json = (body: unknown) => {
       // Ignorišemo keširanje error responsa
       if (res.statusCode >= 200 && res.statusCode < 300) {

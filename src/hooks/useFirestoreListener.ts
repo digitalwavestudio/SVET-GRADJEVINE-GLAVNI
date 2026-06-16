@@ -75,7 +75,7 @@ class FirestoreListenerManager {
     const key = this.getRegistryKey(target, options.key);
     const listenerName = options.name || ( 'path' in target ? `doc_${(target as any).path}` : `query_${key}` );
 
-    let sub = this.subscriptions.get(key);
+    const sub = this.subscriptions.get(key);
 
     if (!sub) {
       // Create new connection if none exists

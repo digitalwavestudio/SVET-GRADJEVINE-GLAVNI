@@ -162,7 +162,7 @@ export class SEORenderEngine {
     isBotPayload?: boolean;
   }): Promise<string> {
     const { reqPath, host, meta, pageNum = 1, isBotPayload = false } = options;
-    let baseHtml = await this.getBaseTemplate();
+    const baseHtml = await this.getBaseTemplate();
 
     const pathWithoutQuery = reqPath.split("?")[0].replace(/\/$/, "") || "/";
     const canonicalBaseUrl = `https://${host}${pathWithoutQuery}`;

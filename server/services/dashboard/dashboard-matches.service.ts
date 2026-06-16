@@ -95,7 +95,7 @@ export class DashboardSmartMatchService {
           const normalize = (text: string) => {
             return (text || "")
               .toLowerCase()
-              .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ")
+              .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, " ")
               .split(/\s+/)
               .filter(t => t.length > 2);
           };

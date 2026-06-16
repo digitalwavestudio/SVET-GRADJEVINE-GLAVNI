@@ -34,7 +34,7 @@ export class RedirectService {
    */
   static getRedirectPath(path: string): string | null {
     // Normalization: strip protocol, host (if any), and ensure trailing slash handled
-    let target = path.toLowerCase();
+    const target = path.toLowerCase();
     
     // Exact matches (including with/without trailing slash)
     const exactMatch = this.MAPPINGS[target] || this.MAPPINGS[target + "/"];

@@ -152,7 +152,7 @@ export const getPublicProfile = async (
     }
 
     // Import CacheService locally or at top
-    let cachedAds = await CacheService.get<CachedAds>(cacheKey);
+    const cachedAds = await CacheService.get<CachedAds>(cacheKey);
 
     let machines: AdDocument[] = [];
     let accommodations: AdDocument[] = [];

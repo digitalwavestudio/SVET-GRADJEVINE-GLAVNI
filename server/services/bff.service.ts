@@ -354,9 +354,9 @@ export const bffService = {
         let myAdsCount = 0;
         let unreadMessagesCount = 0;
         let unreadActivitiesCount = 0;
-        let walletBalance = walletData.balance;
-        let walletVerified = walletData.lastAuditPassed;
-        let activeRoles: string[] = walletData.activeRoles || [];
+        const walletBalance = walletData.balance;
+        const walletVerified = walletData.lastAuditPassed;
+        const activeRoles: string[] = walletData.activeRoles || [];
 
         if (userData) {
           const stats = userData.stats || {};

@@ -51,7 +51,7 @@ export function useDashboardNavigation() {
           staleTime: 2 * 60 * 1000
         });
         break;
-      case '/moj-profil/prijave':
+      case '/moj-profil/prijave': {
         const appRole = role === 'majstor' || role === 'standard' ? 'applicant' : 'employer';
         queryClient.prefetchInfiniteQuery({
           queryKey: [...factoryQueryKeys.jobs.userApplications(uid, appRole), ''],
@@ -63,6 +63,7 @@ export function useDashboardNavigation() {
           staleTime: 5 * 60 * 1000
         });
         break;
+      }
       case '/poruke':
         queryClient.prefetchInfiniteQuery({
           queryKey: dashboardKeys.messages.inbox(uid),

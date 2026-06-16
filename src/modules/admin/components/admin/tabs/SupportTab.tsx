@@ -3,9 +3,11 @@ import { motion } from 'motion/react';
 import { useAdminSupport } from '@/src/modules/admin/hooks/useAdminSupport';
 import { useDebounce } from '@/src/hooks/useDebounce';
 
-interface SupportTabProps {}
+interface SupportTabProps {
+  [key: string]: never;
+}
 
-export function SupportTab({}: SupportTabProps) {
+export function SupportTab(_props: SupportTabProps) {
   const [localQuery, setLocalQuery] = useState('');
   const debouncedQuery = useDebounce(localQuery, 400);
 

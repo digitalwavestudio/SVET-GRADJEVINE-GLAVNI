@@ -25,7 +25,7 @@ export const viewStatsService = {
       if (saved) {
         this.queue = JSON.parse(saved);
       }
-    } catch {}
+    } catch { /* intentionally empty */ }
 
     setInterval(() => this.flush(), FLUSH_INTERVAL_MS);
     
@@ -49,7 +49,7 @@ export const viewStatsService = {
   saveQueue() {
     try {
       safeLocalStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(this.queue));
-    } catch {}
+    } catch { /* intentionally empty */ }
   },
 
   async flush() {

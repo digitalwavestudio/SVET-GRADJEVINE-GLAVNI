@@ -14,7 +14,7 @@ interface FetchResult<T> {
  * Use this in pages to fetch and paginate lists of data, 
  * keeping global context clean.
  */
-export function useDataFetching<T, F extends any = any>(
+export function useDataFetching<T, F = any>(
   fetcher: (filters: F, last: any, pageSize?: number) => Promise<FetchResult<T>>,
   defaultPageSize: number = 20,
   cacheKey?: string

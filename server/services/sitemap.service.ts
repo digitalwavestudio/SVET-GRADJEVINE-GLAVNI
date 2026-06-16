@@ -386,7 +386,7 @@ export class SitemapService {
           "gipsar",
         ];
 
-        let urls: string[] = [];
+        const urls: string[] = [];
 
         // Combinations for Jobs
         for (const city of topCities) {

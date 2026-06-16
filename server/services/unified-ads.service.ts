@@ -155,8 +155,8 @@ export class UnifiedAdsService {
     docs.sort((a, b) => {
       const aVal: any = a.createdAt;
       const bVal: any = b.createdAt;
-      const aTime = aVal?.toDate?.()?.getTime() ?? Number(aVal) ?? 0;
-      const bTime = bVal?.toDate?.()?.getTime() ?? Number(bVal) ?? 0;
+      const aTime = aVal?.toDate?.()?.getTime() ?? 0;
+      const bTime = bVal?.toDate?.()?.getTime() ?? 0;
       return bTime - aTime;
     });
 

@@ -212,7 +212,7 @@ async function backgroundPreRenderDetailPage(
          </main>
        `;
 
-    let structuredDataList: Record<string, unknown>[] = [];
+    const structuredDataList: Record<string, unknown>[] = [];
 
     structuredDataList.push({
       "@context": "https://schema.org",

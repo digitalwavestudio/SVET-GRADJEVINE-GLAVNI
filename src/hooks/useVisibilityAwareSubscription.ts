@@ -30,5 +30,5 @@ export function useVisibilityAwareSubscription(
       clearTimeout(timeoutId);
       if (unsubscribe) unsubscribe();
     };
-  }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
+  }, dependencies);
 }

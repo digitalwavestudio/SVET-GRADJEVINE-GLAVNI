@@ -7,7 +7,7 @@ self.onmessage = (e) => {
     const start = performance.now();
     let totalViews = 0;
     let totalSaves = 0;
-    let matchScores: number[] = [];
+    const matchScores: number[] = [];
 
     // Simulate heavy array transformation
     if (Array.isArray(payload)) {

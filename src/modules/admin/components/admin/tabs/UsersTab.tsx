@@ -6,9 +6,11 @@ import { useDebounce } from '@/src/hooks/useDebounce';
 import { AdminAddFundsModal } from './AdminAddFundsModal';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 
-interface UsersTabProps {}
+interface UsersTabProps {
+  [key: string]: never;
+}
 
-export function UsersTab({}: UsersTabProps) {
+export function UsersTab(_props: UsersTabProps) {
   const [localQuery, setLocalQuery] = useState('');
   const [fundingUser, setFundingUser] = useState<{ id: string, name: string } | null>(null);
   

@@ -67,17 +67,13 @@ export const authMiddleware = async (
           timeoutId = setTimeout(() => reject(new Error("Admin SDK verification timeout (3000ms limit achieved)")), 3000);
         });
 
-        try {
-          decodedToken = await Promise.race([
-            admin.auth().verifyIdToken(idToken, true),
-            timeoutPromise
-          ]);
-        } catch (adminErr: unknown) {
-          throw adminErr;
-        } finally {
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-          }
+        decodedToken = await Promise.race([
+          admin.auth().verifyIdToken(idToken, true),
+          timeoutPromise
+        ]);
+
+        if (timeoutId) {
+          clearTimeout(timeoutId);
         }
       }
 

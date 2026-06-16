@@ -16,8 +16,8 @@ import { getErrorMessage } from "../utils/error-handler.ts";
 export const bffRouter = Router();
 
 // Strict validation patterns for user IDs and roles to prevent injections
-const firebaseUidPattern = /^[a-zA-Z0-9_\-]+$/;
-const rolePattern = /^[a-zA-Z0-9_\-]+$/;
+const firebaseUidPattern = /^[a-zA-Z0-9_-]+$/;
+const rolePattern = /^[a-zA-Z0-9_-]+$/;
 
 const bffParamsSchema = z.object({
   userId: z.string().min(5).max(128).regex(firebaseUidPattern, "Neispravan format za userId").optional(),
