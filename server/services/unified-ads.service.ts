@@ -285,7 +285,7 @@ export class UnifiedAdsService {
         const sanitizedFinalData = JSON.parse(JSON.stringify(finalData));
         
         // Sync back to Fast-Path
-        db.doc(fastPathDoc).set({
+        await db.doc(fastPathDoc).set({
           partners: sanitizedFinalData,
           updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).catch((e: unknown) => console.error("[Ads] operation error:", e));
@@ -338,7 +338,7 @@ export class UnifiedAdsService {
           const sanitizedResults = JSON.parse(JSON.stringify(results));
 
           // Self-heal Fast-Path
-          db.doc(fastPathDoc).set({
+          await db.doc(fastPathDoc).set({
             [fastPathField]: sanitizedResults,
             updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
           }, { merge: true }).catch((e: unknown) => console.error("[Ads] operation error:", e));

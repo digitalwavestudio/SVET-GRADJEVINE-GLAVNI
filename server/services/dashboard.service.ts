@@ -154,7 +154,7 @@ export class DashboardService {
       if (this.msgHandler) {
         try {
           subRedis.off("message", this.msgHandler);
-        } catch (e) {}
+        } catch (e) { console.error("[DashboardService] Message handler unregister error:", e); }
       }
 
       this.msgHandler = (channel: string, message: string) => {
@@ -197,7 +197,7 @@ export class DashboardService {
           if (subRedis.status !== "end") {
             subRedis.off("message", this.msgHandler);
           }
-        } catch (e) {}
+        } catch (e) { console.error("[DashboardService] Message handler cleanup error:", e); }
         this.msgHandler = null;
       }
 
@@ -259,7 +259,7 @@ export class DashboardService {
 
         const cacheTtl = EMPLOYER_STATS_TTL;
         employerStatsMemoryCache.set(uid, cachedStats);
-        await CacheService.set(CacheKeys.employerStats(uid), cachedStats, cacheTtl).catch(() => {});
+        await CacheService.set(CacheKeys.employerStats(uid), cachedStats, cacheTtl).catch(err => console.error("[Cache] invalidation error:", err));
 
         const redis = getRedis();
         if (redis) {
@@ -274,7 +274,7 @@ export class DashboardService {
     }
 
     this.evictLocalMemoryCache(uid);
-    await db.collection("metadata").doc(`dashboard_prewarm_${uid}`).delete().catch(() => {});
+    await db.collection("metadata").doc(`dashboard_prewarm_${uid}`).delete().catch(err => console.error("[Cache] invalidation error:", err));
 
     const redis = getRedis();
     if (redis) {
@@ -294,9 +294,9 @@ export class DashboardService {
         this.evictLocalMemoryCache(uid);
       }
     } else {
-      await CacheService.delete(CacheKeys.employerStats(uid)).catch(() => {});
-      await CacheService.delete(CacheKeys.smartMatches(uid)).catch(() => {});
-      await CacheService.delete(CacheKeys.employerTrends(uid)).catch(() => {});
+      await CacheService.delete(CacheKeys.employerStats(uid)).catch(err => console.error("[Cache] invalidation error:", err));
+      await CacheService.delete(CacheKeys.smartMatches(uid)).catch(err => console.error("[Cache] invalidation error:", err));
+      await CacheService.delete(CacheKeys.employerTrends(uid)).catch(err => console.error("[Cache] invalidation error:", err));
     }
 
     this.getEmployerStats(uid).catch(() => {});

@@ -114,6 +114,7 @@ export class AuditService {
   ) {
     try {
       const adminDoc = await db.collection("users").doc(adminId).get();
+      if (!adminDoc.exists) return;
       const adminEmail = adminDoc.data()?.email || "unknown";
 
       return this.log({

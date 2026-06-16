@@ -44,7 +44,7 @@ async function startServer() {
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(regs) {
               regs.forEach(function(reg) { reg.unregister(); });
-            });
+            }).catch(err => console.warn('[SW] Registration error:', err));
           }
         </script>
       </head>

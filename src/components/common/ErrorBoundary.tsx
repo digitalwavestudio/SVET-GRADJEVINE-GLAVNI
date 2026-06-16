@@ -44,7 +44,7 @@ class ErrorBoundary extends Component<Props, State> {
           componentStack: errorInfo.componentStack
         })
       }).catch(() => console.warn('[ErrorBoundary] Log error failed'));
-    } catch(e) {}
+    } catch(e) { console.error("[ErrorBoundary] Error-reporting error:", e); }
     
     // Remote Telemetry Export
     /*

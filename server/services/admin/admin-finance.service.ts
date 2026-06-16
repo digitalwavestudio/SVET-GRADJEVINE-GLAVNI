@@ -14,6 +14,7 @@ export class AdminFinanceService {
     let delta = amount;
     if (type === "set") {
       const userSnap = await db.collection("users").doc(userId).get();
+      if (!userSnap.exists) throw new Error(`User ${userId} not found`);
       delta = amount - (userSnap.data()?.walletBalance || 0);
     }
 

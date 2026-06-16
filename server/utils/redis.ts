@@ -8,30 +8,30 @@ class MockPipeline {
     this.fallback = fallback;
   }
   hincrby(key: string, field: string, increment: number | string) {
-    this.fallback.hincrby(key, field, increment).catch(() => {});
+    this.fallback.hincrby(key, field, increment).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
   incrby(key: string, increment: number | string) {
-    this.fallback.incrby(key, increment).catch(() => {});
+    this.fallback.incrby(key, increment).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
   set(key: string, value: string, ...args: (string | number)[]) {
-    this.fallback.set(key, value, ...args).catch(() => {});
+    this.fallback.set(key, value, ...args).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
   get(key: string) {
     return this;
   }
   del(...keys: string[]) {
-    this.fallback.del(...keys).catch(() => {});
+    this.fallback.del(...keys).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
   expire(key: string, seconds: number) {
-    this.fallback.expire(key, seconds).catch(() => {});
+    this.fallback.expire(key, seconds).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
   sadd(key: string, ...members: string[]) {
-    this.fallback.sadd(key, ...members).catch(() => {});
+    this.fallback.sadd(key, ...members).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
   async exec() {
@@ -799,7 +799,7 @@ export async function shutdownRedis() {
           (clientObj.disconnect as () => void)();
         }
       }
-    } catch (e) {}
+    } catch (e) { console.error("[Redis] Cleanup/disconnect error:", e); }
   };
 
   await cleanupClient(subRedis);

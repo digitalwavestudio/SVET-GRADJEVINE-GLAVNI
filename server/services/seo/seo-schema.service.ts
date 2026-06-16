@@ -644,7 +644,7 @@ export class SEOSchemaService {
       if (item.baseSalary) {
         try {
           xml += `    <salary currency="${item.baseSalary.currency}">${item.baseSalary.value?.value || item.baseSalary.value?.minValue}</salary>\n`;
-        } catch (e) {}
+        } catch (e) { console.error("[Schema] Salary XML error:", e); }
       }
       xml += `  </entity>\n`;
     }

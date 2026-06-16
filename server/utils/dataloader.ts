@@ -168,7 +168,7 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
 
             fetchedUsers.set(doc.id, profile as UserDTO);
             // REDUCED TTL: 60 SECONDS (Short-lived aggregation to protect quotas without stale state)
-            CacheService.set(`public_profile_${doc.id}`, profile, 60000).catch(() => {});
+            CacheService.set(`public_profile_${doc.id}`, profile, 60000).catch(err => console.error("[Cache] invalidation error:", err));
           });
         }),
       );
@@ -222,7 +222,7 @@ export const internalUserLoader = new DataLoader<string, UserDTO | null>(
             const data = { id: doc.id, uid: doc.id, ...doc.data() } as UserDTO;
             fetchedUsers.set(doc.id, data);
             // REDUCED TTL: 60 SECONDS
-            CacheService.set(`user_full_${doc.id}`, data, 60000).catch(() => {});
+            CacheService.set(`user_full_${doc.id}`, data, 60000).catch(err => console.error("[Cache] invalidation error:", err));
           });
         }),
       );
@@ -296,7 +296,7 @@ export const listingsLoader = new DataLoader<string, ListingDTO | null>(
             const data = { id: doc.id, ...doc.data() } as ListingDTO;
             fetchedListings.set(doc.id, data);
             // REDUCED TTL: 120 SECONDS -> INCREASED TO 30 MINUTES (1,800,000 ms) for SEO crawlers and performance
-            CacheService.set(CacheKeys.adDetail(doc.id), data, 1800000).catch(() => {});
+            CacheService.set(CacheKeys.adDetail(doc.id), data, 1800000).catch(err => console.error("[Cache] invalidation error:", err));
           });
         }),
       );
@@ -350,7 +350,7 @@ export const userStatsLoader = new DataLoader<string, UserStatsDTO | null>(
             const data = { id: doc.id, ...doc.data() } as UserStatsDTO;
             fetchedStats.set(doc.id, data);
             // REDUCED TTL: 120 SECONDS
-            CacheService.set(`user_stats_${doc.id}`, data, 120000).catch(() => {});
+            CacheService.set(`user_stats_${doc.id}`, data, 120000).catch(err => console.error("[Cache] invalidation error:", err));
           });
         }),
       );

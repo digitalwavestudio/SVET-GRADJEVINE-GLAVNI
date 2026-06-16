@@ -45,7 +45,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
       res.setHeader("X-Cache", "HIT");
       return res.send(cachedHtml);
     }
-  } catch (e) {}
+  } catch (e) { console.error("[SEO] Cached HTML read error:", e); }
 
   try {
     let meta: import("../services/seo/seo-render-engine.js").SEOMetaData | null = null;

@@ -52,7 +52,7 @@ process.on('SIGTERM', () => {
   if (sdk) {
     sdk.shutdown()
       .then(() => logger.info('Tracing terminated'))
-      .catch((error: any) => logger.error('Error terminating tracing', error));
+      .catch((err: any) => console.warn('[Tracing] Terminate error:', err));
   }
 });
 

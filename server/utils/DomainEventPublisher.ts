@@ -43,14 +43,14 @@ export class DomainEventPublisher {
       (transactionOrBatch as FirebaseFirestore.WriteBatch).set(outboxRef, outboxPayloadObj);
     }
 
-    CacheService.set("outbox_has_pending", true, 30 * 60 * 1000).catch(() => {});
+    CacheService.set("outbox_has_pending", true, 30 * 60 * 1000).catch(err => console.error("[Cache] invalidation error:", err));
     
     import("./redis.ts").then(({ getRedis }) => {
       const redis = getRedis();
       if (redis) {
-        redis.incr("metrics:outbox_stats:pending").catch(() => {});
+        redis.incr("metrics:outbox_stats:pending").catch(err => console.error("[Cache] invalidation error:", err));
       }
-    }).catch(() => {});
+    }).catch(err => console.error("[Cache] invalidation error:", err));
     
     return {
       outboxDocId: outboxRef.id,

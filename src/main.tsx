@@ -18,7 +18,7 @@ window.onerror = function(message, source, lineno, colno, error) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'window.onerror', message, source, lineno, colno, stack: error?.stack })
     }).catch(() => console.warn('[Main] window.onerror log fetch failed'));
-  } catch (e) {}
+  } catch (e) { console.error("[Main] window.onerror handler error:", e); }
 
   import('./lib/sanitize.ts').then(({ sanitizeInput }) => {
     const root = document.getElementById('root');
@@ -53,7 +53,7 @@ window.addEventListener('unhandledrejection', function(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'unhandledrejection', reason: event.reason?.message || String(event.reason), stack: event.reason?.stack })
     }).catch(() => console.warn('[Main] unhandledrejection log fetch failed'));
-  } catch (e) {}
+  } catch (e) { console.error("[Main] unhandledrejection handler error:", e); }
 
   import('./lib/sanitize.ts').then(({ sanitizeInput }) => {
     const root = document.getElementById('root');

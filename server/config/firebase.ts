@@ -734,7 +734,7 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
                   path: targetPath,
                   queryParams
                 });
-              } catch (err) {}
+              } catch (err) { console.error("[Context] Error:", err); }
 
               try {
                 const resultPromise = value.apply(target, unwrappedArgs) as Promise<unknown>;
@@ -1012,7 +1012,7 @@ function wrapBatch(batch: admin.firestore.WriteBatch | Record<string, unknown>):
                   if (redis) redis.del(`fs_cache:${docPath}`).catch(err => console.error("[Firebase] redis.del fs_cache in batch failed:", err));
                 }).catch(err => console.error("[Firebase] import redis in batch failed:", err));
               }
-            } catch (err) {}
+            } catch (err) { console.error("[Firestore] Batch commit error:", err); }
           }
           if (prop === 'commit') {
             trackFirestoreOp('write', writeCount);
@@ -1099,7 +1099,7 @@ function wrapTransaction(transaction: admin.firestore.Transaction | Record<strin
                   if (redis) redis.del(`fs_cache:${docPath}`).catch(err => console.error("[Firebase] redis.del fs_cache in tx failed:", err));
                 }).catch(err => console.error("[Firebase] import redis in tx failed:", err));
               }
-            } catch (err) {}
+            } catch (err) { console.error("[Firestore] Transaction get error:", err); }
           }
 
           let result: unknown;

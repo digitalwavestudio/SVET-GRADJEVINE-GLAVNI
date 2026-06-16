@@ -97,7 +97,7 @@ export const moderateImage = async (imageUrl: string) => {
       arrayBuffer.then((buffer) => {
         const base64 = Buffer.from(buffer).toString("base64");
         resolve(base64);
-      });
+      }).catch(err => console.warn('[AI] ArrayBuffer extraction error:', err));
     });
 
     const ai = getGenAI();

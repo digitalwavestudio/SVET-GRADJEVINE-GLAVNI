@@ -77,6 +77,7 @@ export const initPaymentSubscriber = () => {
       // Send confirmation email
       try {
         const userDoc = await db.collection("users").doc(payload.userId).get();
+        if (!userDoc.exists) return;
         const email = userDoc.data()?.email;
         if (email) {
           await emailService.sendEmail({

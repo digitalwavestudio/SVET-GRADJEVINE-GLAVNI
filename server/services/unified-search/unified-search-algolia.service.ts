@@ -176,7 +176,7 @@ export class UnifiedSearchAlgolia {
         const fallbackKey = `fallback_search_${category}`;
         const fallbackData = await CacheService.get<UnifiedSearchResult>(fallbackKey);
         if (fallbackData) return fallbackData;
-      } catch (err) {}
+      } catch (err) { console.error("[Algolia] Fallback cache error:", err); }
       
       return null;
     }

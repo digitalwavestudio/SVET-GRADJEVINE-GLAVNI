@@ -185,7 +185,7 @@ export class UnifiedSearchService {
             const fallbackKey = `fallback_search_${category}`;
             const fallbackData = await CacheService.get<UnifiedSearchResult>(fallbackKey);
             if (fallbackData) return fallbackData;
-          } catch (err) {}
+          } catch (err) { console.error("[Search] Algolia fallback cache error:", err); }
           return { docs: [], lastVisibleId: null, hasMore: false };
         }
 

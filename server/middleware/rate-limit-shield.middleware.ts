@@ -140,7 +140,7 @@ export const rateLimitShield = async (
             res.setHeader("X-Cache", "HIT-BOT-EDGE");
             return res.send(cachedHtml);
           }
-        } catch (e) {}
+        } catch (e) { console.error("[RateLimit] Bot cache HIT path error:", e); }
       }
 
       // If no cache, continue but skip global rate limiting

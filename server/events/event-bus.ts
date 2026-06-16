@@ -90,7 +90,7 @@ class EventBus implements IEventBus {
   private constructor() {
     this.initializeStreamGroup().then(() => {
         this.startListening();
-    });
+    }).catch(err => console.warn('[EventBus] Init error:', err));
   }
 
   private async initializeStreamGroup() {

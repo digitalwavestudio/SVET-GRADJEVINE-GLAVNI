@@ -112,8 +112,8 @@ export class ReconciliationService {
       
       const redis = (await import("../utils/redis.ts")).getRedis();
       if (redis) {
-        await redis.set(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":pending", systemOutboxPending.toString()).catch(() => {});
-        await redis.set(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":failed", systemOutboxDlq.toString()).catch(() => {});
+        await redis.set(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":pending", systemOutboxPending.toString()).catch(err => console.error("[Cache] invalidation error:", err));
+        await redis.set(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":failed", systemOutboxDlq.toString()).catch(err => console.error("[Cache] invalidation error:", err));
       }
       
       const newStats = {

@@ -482,7 +482,7 @@ export function useDashboardStats<TData = BffDashboardResponse>(select?: (data: 
             await queryClient.cancelQueries();
             // Perform deep-clearing of in-memory query client cache to prevent ghost sessions
             queryClient.removeQueries({ queryKey: dashboardKeys.all });
-          } catch (_) {}
+          } catch (_) { console.error("[DashboardStats] QueryClient cache cleanup error:", _); }
         }
 
         // Capture via local /api/logs with maximum contextual parameters
@@ -512,7 +512,7 @@ export function useDashboardStats<TData = BffDashboardResponse>(select?: (data: 
                 return cacheEnvelope.data;
               }
             }
-          } catch (_) {}
+          } catch (_) { console.error("[DashboardStats] Offline localStorage cache parse error:", _); }
         }
 
         throw error;

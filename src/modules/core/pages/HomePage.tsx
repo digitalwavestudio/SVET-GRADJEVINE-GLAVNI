@@ -29,7 +29,7 @@ export default function HomePage() {
         prefetchDashboard();
       })
       .catch((err) => {
-        console.warn('Dashboard prefetch failed:', err);
+        console.warn('[Home] Prefetch error:', err);
       });
   }, []);
   

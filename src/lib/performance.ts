@@ -30,6 +30,10 @@ const logger = {
   }
 };
 
+function safePerf<T>(label: string, fn: () => T): T | undefined {
+  try { return fn(); } catch (e) { console.warn(`[Perf] ${label}:`, e); return undefined; }
+}
+
 /**
  * Executes an async function and records its duration to Firebase Performance & OTel
  */
@@ -43,7 +47,7 @@ export const traceAsync = async <T,>(name: string, fn: () => Promise<T>): Promis
   return tracer.startActiveSpan(name, async (span: Span) => {
     try {
       const result = await fn();
-      try { customTrace.stop(); } catch (e) {}
+      safePerf('customTrace.stop', () => customTrace.stop());
       const end = performance.now();
       const duration = end - start;
       
@@ -60,7 +64,7 @@ export const traceAsync = async <T,>(name: string, fn: () => Promise<T>): Promis
       return result;
     } catch (error: any) {
       span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
-      try { customTrace.stop(); } catch (e) {}
+      safePerf('customTrace.stop', () => customTrace.stop());
       logger.error(`${name} failed`, error);
       
       exportService.reportError(error, {
@@ -114,16 +118,16 @@ export const trackApiCall = async <T,>(method: string, url: string, fn: () => Pr
         // Rough estimation of egress (headers + body)
         const size = JSON.stringify(result)?.length || 0;
         infraTelemetry.recordEgress(size + 500); 
-      });
+      }).catch(err => console.warn('[Perf] Infra load error:', err));
 
-      try { customTrace.stop(); } catch (e) {}
+      safePerf('customTrace.stop', () => customTrace.stop());
       span.setStatus({ code: SpanStatusCode.OK });
       return result;
     } catch (error: any) {
-      try {
+      safePerf('customTrace.putAttribute+stop', () => {
         customTrace.putAttribute('error', 'true');
         customTrace.stop();
-      } catch (e) {}
+      });
       span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
 
       exportService.reportError(error, {
@@ -178,9 +182,7 @@ export const usePerformanceNavigation = () => {
     if (!perf) return;
 
     if (currentTrace.current) {
-      try {
-        currentTrace.current.trace.stop();
-      } catch (e) {}
+      safePerf('trace.stop', () => currentTrace.current!.trace.stop());
       currentTrace.current = null;
     }
 
@@ -195,18 +197,18 @@ export const usePerformanceNavigation = () => {
 
       const timer = setTimeout(() => {
         if (currentTrace.current && currentTrace.current.trace === t) {
-          try { t.stop(); } catch (e) {}
+          safePerf('t.stop', () => t.stop());
           currentTrace.current = null;
         }
       }, 3000);
 
-      return () => {
-        clearTimeout(timer);
-        if (currentTrace.current && currentTrace.current.trace === t) {
-          try { t.stop(); } catch (e) {}
-          currentTrace.current = null;
-        }
-      };
+        return () => {
+          clearTimeout(timer);
+          if (currentTrace.current && currentTrace.current.trace === t) {
+            safePerf('t.stop', () => t.stop());
+            currentTrace.current = null;
+          }
+        };
     } catch (err) {
       logger.error(`Failed to manage navigation trace ${traceName}`, err);
     }
@@ -231,10 +233,10 @@ export const trackAction = (name: string, attributes?: Record<string, string>) =
     t.start();
     if (attributes) {
       Object.entries(attributes).forEach(([k, v]) => {
-        try { t.putAttribute(k, v); } catch (e) {}
+        safePerf('t.putAttribute', () => t.putAttribute(k, v));
       });
     }
-    try { t.stop(); } catch (e) {}
+    safePerf('t.stop', () => t.stop());
     
     // Export to BigQuery & OTel
     const span = tracer.startSpan(name);

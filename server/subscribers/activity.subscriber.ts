@@ -60,6 +60,7 @@ export function setupActivitySubscriber() {
           `fcm_tokens:${employerId}`,
           async () => {
             const userDoc = await db.collection("users").doc(employerId).get();
+            if (!userDoc.exists) return [];
             const userData = userDoc.data();
             return (userData?.fcmTokens && Array.isArray(userData.fcmTokens))
               ? userData.fcmTokens.filter((token: any) => typeof token === "string" && token.length > 0)

@@ -32,12 +32,12 @@ const safeStorage = {
   setItem: (key: string, value: string): void => {
     try {
       localStorage.setItem(key, value);
-    } catch (e) {}
+    } catch (e) { console.error("[Auth] localStorage.setItem error:", e); }
   },
   removeItem: (key: string): void => {
     try {
       localStorage.removeItem(key);
-    } catch (e) {}
+    } catch (e) { console.error("[Auth] localStorage.removeItem error:", e); }
   }
 };
 
@@ -155,7 +155,7 @@ export function useAuthNode() {
               apiClient.post('/auth/devices/track', {}).catch(() => console.warn('[Auth] Device tracking failed'));
              sessionStorage.setItem('sg_device_tracked', 'true');
            }
-         } catch(e) {}
+         } catch(e) { console.error("[Auth] Device tracking error:", e); }
 
          // 2. SLOW PATH: Sync full profile from server
          const now = Date.now();
