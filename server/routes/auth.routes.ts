@@ -1,4 +1,5 @@
 import { AuditService, AuditAction } from '../services/audit.service.ts';
+import { AdminSettingsService } from '../services/admin/admin-settings.service.ts';
 import { Router } from "express";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
@@ -152,6 +153,15 @@ authRouter.post('/devices/revoke-others', requireAuth, async (req, res, next) =>
   }
 });
 
+async function getInitialCredits(): Promise<number> {
+  try {
+    const settings = await AdminSettingsService.getSettings("global");
+    return (settings as any)?.initialCredits ?? 1500;
+  } catch {
+    return 1500;
+  }
+}
+
 // Endpoint for atomic user provisioning
 authRouter.post(
   "/complete-first-login",
@@ -165,6 +175,7 @@ authRouter.post(
       }
       const { email, firstName, lastName, idempotencyKey } = req.body;
 
+      const defaultCredits = await getInitialCredits();
       const responsePayload = await db.runTransaction(async (transaction) => {
         const idempotencyRef = db
           .collection("idempotency_logs")
@@ -201,7 +212,7 @@ authRouter.post(
           lastName: lastName || "",
           role: defaultRole.name,
           isVerified: false,
-          walletBalance: 1500, // TODO: Read from system settings/config doc instead of hardcoding
+          walletBalance: defaultCredits,
           permissions: defaultRole.permissions,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
