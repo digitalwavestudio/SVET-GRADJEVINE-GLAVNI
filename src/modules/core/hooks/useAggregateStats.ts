@@ -13,14 +13,14 @@ export interface AggregateStats {
 }
 
 const fallbackStats: AggregateStats = {
-  totalJobs: 15430,
-  totalMachines: 840,
-  totalAccommodations: 310,
-  totalCaterings: 120,
-  totalRealEstate: 240,
-  totalCompanies: 460,
-  premiumJobs: 140,
-  urgentJobs: 42,
+  totalJobs: 0,
+  totalMachines: 0,
+  totalAccommodations: 0,
+  totalCaterings: 0,
+  totalRealEstate: 0,
+  totalCompanies: 0,
+  premiumJobs: 0,
+  urgentJobs: 0,
 };
 
 export function useAggregateStats() {

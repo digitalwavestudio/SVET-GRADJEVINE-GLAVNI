@@ -93,12 +93,19 @@ export abstract class BaseAdStrategy {
       };
 
       let premiumUntil = null;
+      let urgentUntil = null;
       if (isPaidPackage) {
-         const expiry = new Date();
-         if (rawData.paket === "premium_partner") expiry.setFullYear(expiry.getFullYear() + 10);
-         else if (packagePrice >= 3000) expiry.setMonth(expiry.getMonth() + 3);
-         else expiry.setDate(expiry.getDate() + 30);
-         premiumUntil = firebaseAdmin.firestore.Timestamp.fromDate(expiry);
+        if (rawData.paket === "urgent") {
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + 7);
+          urgentUntil = firebaseAdmin.firestore.Timestamp.fromDate(expiry);
+        } else {
+          const expiry = new Date();
+          if (rawData.paket === "premium_partner") expiry.setFullYear(expiry.getFullYear() + 10);
+          else if (packagePrice >= 3000) expiry.setMonth(expiry.getMonth() + 3);
+          else expiry.setDate(expiry.getDate() + 30);
+          premiumUntil = firebaseAdmin.firestore.Timestamp.fromDate(expiry);
+        }
       }
 
       const adData: any = {
@@ -120,6 +127,7 @@ export abstract class BaseAdStrategy {
         isPremium: rawData.paket === "premium" || rawData.paket === "premium_partner",
         isUrgent: rawData.paket === "urgent",
         ...(premiumUntil ? { premiumUntil } : {}),
+        ...(urgentUntil ? { urgentUntil } : {}),
         createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         viewsCount: 0,

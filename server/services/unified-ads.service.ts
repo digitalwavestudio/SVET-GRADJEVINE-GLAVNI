@@ -255,14 +255,7 @@ export class UnifiedAdsService {
     const cacheKey = "premium_partners_v2";
     const fastPathDoc = "metadata/premium_partners_fastpath";
 
-    const fallbackPartners = [
-      { id: "f1", name: "ENERGOPROJEKT", logo: "" },
-      { id: "f2", name: "STRABAG", logo: "" },
-      { id: "f3", name: "NAPRED", logo: "" },
-      { id: "f4", name: "KARIN KOMERC", logo: "" },
-      { id: "f5", name: "MILLENNIUM TEAM", logo: "" },
-      { id: "f6", name: "PUTEVI SRBIJE", logo: "" }
-    ];
+    const fallbackPartners: { id: string; name: string; logo: string }[] = [];
 
     try {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {

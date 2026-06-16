@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { JobsService } from "../services/jobs.service.ts";
+import { UnifiedAdsService } from "../services/unified-ads.service.ts";
 import { env } from "../config/env.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
@@ -149,8 +150,8 @@ export const createJob = async (
   try {
     const validatedJob = req.body;
     const uid = req.user.uid;
-    const result = await JobsService.createJob(validatedJob, uid);
-    res.json(result);
+    const result = await UnifiedAdsService.createAd("jobs", validatedJob, uid);
+    res.json({ id: result.id, jobData: result.data });
   } catch (err) {
     next(err);
   }

@@ -1,4 +1,4 @@
-import { admin as firebaseAdmin, db } from "../config/firebase.ts";
+import { admin as firebaseAdmin, db, getDb } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 import { Logger } from "../utils/logger.ts";
 
@@ -324,24 +324,26 @@ export class AdminStatsService {
    * PROMPT 9: Hard limits and small batches to prevent Quota Exhaustion.
    */
   static async reconcileGlobalStats(): Promise<Record<string, any>> {
-    this.logger.info("[AdminStatsService] Starting sharding baseline reconciliation...");
+      this.logger.info("[AdminStatsService] Starting sharding baseline reconciliation...");
 
     try {
+      const rawDb = getDb();
+
       // Precise aggregations using count() (Safest & Cheapest - 1 read per 1k docs)
       const counts: Record<string, number> = {};
       const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace"];
       
       for (const cat of categories) {
-        const snap = await db.collection("listings").where("type", "==", cat).count().get();
+        const snap = await rawDb.collection("listings").where("type", "==", cat).count().get();
         counts[`total_${cat}s`] = snap.data().count;
       }
 
-      const usersSnap = await db.collection("users").count().get();
-      const verifiedUsersSnap = await db.collection("users").where("isVerified", "==", true).count().get();
-      const premiumUsersSnap = await db.collection("users").where("businessProfile.isPremium", "==", true).count().get();
-      const employersSnap = await db.collection("users").where("role", "==", "poslodavac").count().get();
-      const activeAdsSnap = await db.collection("listings").where("status", "==", "active").count().get();
-      const pendingAdsSnap = await db.collection("listings").where("status", "==", "pending").count().get();
+      const usersSnap = await rawDb.collection("users").count().get();
+      const verifiedUsersSnap = await rawDb.collection("users").where("isVerified", "==", true).count().get();
+      const premiumUsersSnap = await rawDb.collection("users").where("businessProfile.isPremium", "==", true).count().get();
+      const employersSnap = await rawDb.collection("users").where("role", "==", "poslodavac").count().get();
+      const activeAdsSnap = await rawDb.collection("listings").where("status", "==", "active").count().get();
+      const pendingAdsSnap = await rawDb.collection("listings").where("status", "==", "pending").count().get();
 
       const reconciledStats = {
         totalJobs: counts.total_jobs || 0,
@@ -361,7 +363,7 @@ export class AdminStatsService {
       };
 
       // Consolidate to admin_stats document (L0 Shield)
-      await db.collection("metadata").doc("admin_stats").set(reconciledStats, { merge: true });
+      await rawDb.collection("metadata").doc("admin_stats").set(reconciledStats, { merge: true });
       
       return reconciledStats;
     } catch (error) {

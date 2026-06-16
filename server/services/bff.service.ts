@@ -160,8 +160,7 @@ export const bffService = {
             totalJobs +
             totalMachines +
             totalAccommodations +
-            totalCaterings +
-            120;
+            totalCaterings;
 
           const stats: HomepageStats = {
             totalJobs,
@@ -170,14 +169,14 @@ export const bffService = {
             totalCaterings,
             totalRealEstate: gStats.realEstateCount || 0,
             totalCompanies: gStats.companiesCount || 0,
-            premiumJobs: gStats.premiumPartners || 150,
-            urgentJobs: gStats.urgentAds || 45,
+            premiumJobs: gStats.premiumPartners || 0,
+            urgentJobs: gStats.urgentAds || 0,
             totalAdsCount: calculatedAdsCount,
-            dynamicFirmsCount: 450 + Math.floor(totalJobs / 2),
-            dynamicWorkersCount: 12500 + totalJobs * 10,
-            dynamicMachineryCount: 800 + totalMachines,
-            dynamicRealEstateCount: 300 + totalAccommodations,
-            dynamicViewsCount: 850000 + calculatedAdsCount * 12,
+            dynamicFirmsCount: 0,
+            dynamicWorkersCount: 0,
+            dynamicMachineryCount: 0,
+            dynamicRealEstateCount: 0,
+            dynamicViewsCount: 0,
           };
 
           const premiumJobsRaw =

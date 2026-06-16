@@ -128,7 +128,7 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
 
       // A. Subtract balance
       transaction.update(userRef, {
-        walletBalance: currentBalance - cost,
+        walletBalance: admin.firestore.FieldValue.increment(-cost),
       });
 
       // B. Create ledger entry
@@ -233,7 +233,7 @@ walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
 
       // Update User
       transaction.update(userRef, {
-        walletBalance: currentBalance + amount,
+        walletBalance: admin.firestore.FieldValue.increment(amount),
       });
 
       // Create Ledger Entry "Wire Transfer"
@@ -420,7 +420,7 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
         const currentBalance = uData.walletBalance || uData.partnerBalance || 0; // Fallback to partnerBalance if wallet doesn't exist yet
 
         transaction.update(userRef, {
-          walletBalance: currentBalance + txData.amount,
+          walletBalance: admin.firestore.FieldValue.increment(txData.amount),
         });
 
         // Ažuriramo transakciju
