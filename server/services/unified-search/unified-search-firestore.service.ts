@@ -84,6 +84,7 @@ export class UnifiedSearchFirestore {
       q = q.where("isPremiumPartner", "==", true);
     if (filtersAny.isVerified) q = q.where("isVerified", "==", true);
     if (filtersAny.isUrgent) q = q.where("isUrgent", "==", true);
+    if (filtersAny.isPremium) q = q.where("isPremium", "==", true);
 
     if (filtersAny.mainCategory)
       q = q.where("mainCategories", "array-contains", filtersAny.mainCategory);
@@ -350,6 +351,7 @@ export class UnifiedSearchFirestore {
       q = q.where("isPremiumPartner", "==", true);
     if (filtersAny.isVerified) q = q.where("isVerified", "==", true);
     if (filtersAny.isUrgent) q = q.where("isUrgent", "==", true);
+    if (filtersAny.isPremium) q = q.where("isPremium", "==", true);
 
     if (filtersAny.mainCategory)
       q = q.where("mainCategories", "array-contains", filtersAny.mainCategory);

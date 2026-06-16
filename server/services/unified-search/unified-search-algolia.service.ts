@@ -63,6 +63,7 @@ export class UnifiedSearchAlgolia {
       }
       if (filters.isVerified) facetFilters.push(`isVerified:true`);
       if (filters.isUrgent) facetFilters.push(`isUrgent:true`);
+      if (filters.isPremium) facetFilters.push(`isPremium:true`);
 
       const extraParams: Record<string, unknown> = {
         typoTolerance: "min",

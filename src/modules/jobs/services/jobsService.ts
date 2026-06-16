@@ -91,8 +91,10 @@ export const jobsService = {
   ): Promise<JobsListResponse> {
     const validPageSize = typeof pageSize === 'number' && pageSize > 0 ? pageSize : 20;
     return withRetry(async () => {
-      // Optimizacija: Ako nema filtera osim status:approved (ili nema pretrage), povucite iz in-memory javnog feed-a
-      const isEmptyFilter = !filters || Object.keys(filters).length === 0 || (Object.keys(filters).length === 2 && filters.status === 'approved' && filters.isPremium !== undefined);
+      // Optimizacija: Ako nema filtera (osim status/pageSize), povucite iz in-memory javnog feed-a
+      const metaKeys = ['status', 'pageSize', 'lastVisibleId'];
+      const filterKeys = Object.keys(filters || {}).filter(k => !metaKeys.includes(k));
+      const isEmptyFilter = !filters || filterKeys.length === 0;
       
       if (isEmptyFilter && !lastVisible && !filters?.searchQuery) {
           try {
