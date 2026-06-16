@@ -30,7 +30,7 @@ export class ReconciliationService {
     try {
       await db.collection("metadata").doc("sync_status").set({
         status: "reconciling",
-        startedAt: new Date().toISOString(),
+        startedAt: admin.firestore.FieldValue.serverTimestamp(),
         region: RegionService.getRegion()
       }, { merge: true });
 
@@ -43,7 +43,7 @@ export class ReconciliationService {
 
       await db.collection("metadata").doc("sync_status").set({
         status: "idle",
-        lastFinishedAt: new Date().toISOString()
+        lastFinishedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
 
       Logger.withContext().info("[Reconciliation] <<< Reconciliation cycle finished successfully.");
@@ -127,7 +127,7 @@ export class ReconciliationService {
         premiumPartners: premiumPartnersSnap.data().count,
         systemOutboxPending,
         systemOutboxDlq,
-        updatedAt: new Date().toISOString()
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
       };
 
       await db.collection("metadata").doc("admin_stats").set(newStats, { merge: true });
@@ -176,7 +176,7 @@ export class ReconciliationService {
 
     await db.collection("metadata").doc("global_stats").set({
       ...stats,
-      lastReconciledAt: new Date().toISOString(),
+      lastReconciledAt: admin.firestore.FieldValue.serverTimestamp(),
       version: "2.0"
     }, { merge: true });
 

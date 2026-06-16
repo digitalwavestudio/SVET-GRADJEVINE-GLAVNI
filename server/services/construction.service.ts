@@ -1,4 +1,4 @@
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 import { 
   constructionSiteSchema, 
   constructionWorkerSchema, 
@@ -19,7 +19,7 @@ export class ConstructionService {
     const siteData = {
       ...validated,
       authorId: uid,
-      createdAt: new Date().toISOString(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       status: "active"
     };
     await siteRef.set(siteData);
@@ -48,7 +48,7 @@ export class ConstructionService {
 
     const updateData = {
       ...validated,
-      updatedAt: new Date().toISOString(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
     await docRef.update(updateData);
     return { id: siteId, ...updateData };
@@ -64,7 +64,7 @@ export class ConstructionService {
 
     await docRef.update({
       status: "deleted",
-      updatedAt: new Date().toISOString(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     return { id: siteId, success: true };
   }
@@ -117,7 +117,7 @@ export class ConstructionService {
     const metricsData = {
       ...validated,
       authorId: uid,
-      lastUpdate: new Date().toISOString(),
+      lastUpdate: admin.firestore.FieldValue.serverTimestamp(),
     };
     await db.collection("metrics").doc(metricsId).set(metricsData, { merge: true });
     return { success: true };

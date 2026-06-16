@@ -59,7 +59,7 @@ export class HousekeepingOutbox {
         if (task.retryCount && task.retryCount >= 3) {
           await doc.ref.update({
             status: "permanently_failed",
-            updatedAt: new Date().toISOString(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
           continue;
         }
@@ -67,7 +67,7 @@ export class HousekeepingOutbox {
         try {
           await doc.ref.update({
             status: "processing",
-            updatedAt: new Date().toISOString(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
 
           if (task.type === "FAN_OUT_PROFILE_UPDATE") {
@@ -77,7 +77,7 @@ export class HousekeepingOutbox {
 
           await doc.ref.update({
             status: "completed",
-            updatedAt: new Date().toISOString(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
         } catch (error: any) {
           const currentRetry = (task.retryCount || 0) + 1;
@@ -89,7 +89,7 @@ export class HousekeepingOutbox {
             status: "failed",
             error: error.message || "Unknown error",
             retryCount: currentRetry,
-            updatedAt: new Date().toISOString(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
         }
       }

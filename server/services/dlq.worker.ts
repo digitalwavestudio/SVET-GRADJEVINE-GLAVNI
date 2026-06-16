@@ -1,4 +1,4 @@
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { AlertingService } from "./alerting.service.ts";
 import { QueueService, JobType, JobPriority } from "./queue.service.ts";
@@ -278,7 +278,7 @@ export class DLQRecoveryWorker {
             await doc.ref.update({
               status: "pending_review",
               recoveries: 0,
-              requeuedAt: new Date().toISOString(),
+              requeuedAt: admin.firestore.FieldValue.serverTimestamp(),
               note: "Deep Auto-Fallback Replay"
             });
             if (data.jobType && data.payload) {
@@ -308,7 +308,7 @@ export class DLQRecoveryWorker {
       await doc.ref.update({
         status: "pending_review",
         recoveries: recoveries + 1,
-        requeuedAt: new Date().toISOString(),
+        requeuedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
     return pureDlqSnap.size;

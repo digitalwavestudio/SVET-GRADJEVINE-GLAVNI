@@ -1,4 +1,4 @@
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 
 export interface Migration {
   id: string; // e.g. '001_initial_setup'
@@ -46,7 +46,7 @@ export const runPendingMigrations = async (): Promise<{
 
           await db.collection(MIGRATIONS_COLLECTION).doc("status").set({
             executed: executedIds,
-            lastRun: new Date(),
+            lastRun: admin.firestore.FieldValue.serverTimestamp(),
           });
           console.log(`[Migrations] Completed migration: ${migration.id}`);
         } catch (mErr: any) {

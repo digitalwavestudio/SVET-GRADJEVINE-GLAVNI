@@ -358,7 +358,7 @@ export class AdminStatsService {
         premiumPartners: premiumUsersSnap.data().count,
         activeAds: activeAdsSnap.data().count,
         pendingAds: pendingAdsSnap.data().count,
-        lastReconciled: new Date().toISOString(),
+        lastReconciled: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         safetySwitch: "active"
       };
 

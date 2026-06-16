@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema, ZodError, z } from "zod";
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 import { zodSerbianErrorMap } from "@svet-gradjevine/shared";
 import {
   createAdSchema,
@@ -316,7 +316,7 @@ async function logToDLQ(error: string, req: Request, details: unknown) {
     await db.collection("dlq").add({
       jobType: "payload_validation_failure",
       status: "pending_review",
-      createdAt: new Date().toISOString(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       error,
       payload: {
         url: req.originalUrl,
@@ -325,7 +325,7 @@ async function logToDLQ(error: string, req: Request, details: unknown) {
         uid,
         body: req.body || null,
         validationErrors: details,
-        timestamp: new Date().toISOString(),
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
       }
     });
   } catch (err) {

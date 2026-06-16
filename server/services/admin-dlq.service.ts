@@ -1,4 +1,4 @@
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 import { QueueService, JobPriority } from "./queue.service.ts";
 import { admin as firebaseAdmin } from "../config/firebase.ts";
 
@@ -83,7 +83,7 @@ export class AdminDlqService {
         status: "pending",
         attempts: 0,
         lastError: null,
-        updatedAt: new Date(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
       return { success: true, message: "Outbox item reset to pending", jobType: data?.type || "unknown" };
     }
@@ -106,7 +106,7 @@ export class AdminDlqService {
 
     await docRef.update({
       status: "retried",
-      retriedAt: new Date().toISOString(),
+      retriedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     
     return { success: true, jobType: data.jobType };
@@ -131,7 +131,7 @@ export class AdminDlqService {
         });
         batch.update(doc.ref, {
           status: "retried",
-          retriedAt: new Date().toISOString(),
+          retriedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         retriedCount++;
       }
@@ -151,7 +151,7 @@ export class AdminDlqService {
           status: "pending",
           attempts: 0,
           lastError: null,
-          updatedAt: new Date(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         retriedCount++;
       }

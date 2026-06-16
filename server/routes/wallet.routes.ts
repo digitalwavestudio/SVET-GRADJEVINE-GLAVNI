@@ -14,11 +14,11 @@ async function logToDLQ(error: string, actionType: string, payload: any) {
     await db.collection("dlq").add({
       jobType: "wallet_failure",
       status: "pending_review",
-      createdAt: new Date().toISOString(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       error,
       payload: {
         walletActionType: actionType,
-        timestamp: new Date().toISOString(),
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
         ...payload
       }
     });

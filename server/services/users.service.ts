@@ -468,7 +468,7 @@ export class UsersService {
       db.collection("users").doc(uid),
       {
         currentPackage: packageId,
-        packageExpiresAt: expiresAt,
+        packageExpiresAt: firebaseAdmin.firestore.Timestamp.fromDate(expiresAt),
         // If package is professional, set role
         role: role,
       },

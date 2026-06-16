@@ -36,7 +36,7 @@ export class AdminModerationService {
       status,
       resolutionNote: note,
       resolvedBy,
-      resolvedAt: new Date(),
+      resolvedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     return { success: true };
   }

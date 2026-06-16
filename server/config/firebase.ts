@@ -490,22 +490,26 @@ export const db = new Proxy(
 
           if (checkQuotaStatus()) {
             if (prop === 'runTransaction') {
-              const updateFunction = args[0] as (transaction: admin.firestore.Transaction) => Promise<unknown>;
-              try {
-                return Promise.resolve(updateFunction(wrapTransaction({})));
-              } catch (txErr) {
-                return Promise.resolve(true);
-              }
+              throw new Error('QUOTA_EXHAUSTED: Firestore quota exceeded, cannot run transaction');
             }
             if (prop === 'collection' || prop === 'doc' || prop === 'collectionGroup') {
               return wrapFirestoreObject({ id: args[0], path: args[0] });
             }
             if (prop === 'batch') {
-              return wrapBatch({});
+              throw new Error('QUOTA_EXHAUSTED: Firestore quota exceeded, cannot start batch');
             }
             if (prop === 'stream') {
               const { Readable } = require('stream');
               return function() { return Readable.from([]); };
+            }
+            if (prop === 'getAll') {
+              throw new Error('QUOTA_EXHAUSTED: Firestore quota exceeded, cannot run getAll');
+            }
+            if (prop === 'recursiveDelete') {
+              throw new Error('QUOTA_EXHAUSTED: Firestore quota exceeded, cannot run recursiveDelete');
+            }
+            if (prop === 'listCollections') {
+              return Promise.resolve([]);
             }
           }
 

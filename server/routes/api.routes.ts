@@ -256,7 +256,7 @@ apiRouter.use((req, res, next) => {
           db.collection("dlq").add({
             jobType: "slow_query",
             status: "pending_review",
-            createdAt: new Date().toISOString(),
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
             error: "Slow query detected (>2000ms)",
             payload: {
               url: req.originalUrl,
@@ -424,7 +424,7 @@ apiRouter.post("/logs", async (req, res) => {
       const payload = {
         jobType: "frontend_error_sentry_fallback",
         error: message,
-        createdAt: new Date().toISOString(),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
         payload: { context, uid, url, level },
         status: "pending_review",
         source: "frontend",

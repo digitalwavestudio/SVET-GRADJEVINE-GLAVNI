@@ -20,7 +20,7 @@ export class ChatService {
       await convRef.set({
         participants,
         lastMessage: "",
-        lastMessageAt: new Date(),
+        lastMessageAt: admin.firestore.FieldValue.serverTimestamp(),
         unreadCount: { [partnerId]: 0, [senderId]: 0 },
       }, { merge: true });
     }
@@ -57,7 +57,7 @@ export class ChatService {
       chatId,
       reporterId,
       reason,
-      createdAt: new Date(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
       status: "pending"
     });
     return { success: true };

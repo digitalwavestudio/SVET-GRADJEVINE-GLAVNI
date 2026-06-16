@@ -1,5 +1,5 @@
 import { Job } from "bullmq";
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { TraceContext } from "../utils/trace.ts";
 
@@ -33,7 +33,7 @@ export class DLQService {
           attemptsMade: job.attemptsMade,
           metadata: {
             traceId,
-            finishedAt: new Date().toISOString(),
+            finishedAt: admin.firestore.FieldValue.serverTimestamp(),
           },
           status: "pending_review",
         });

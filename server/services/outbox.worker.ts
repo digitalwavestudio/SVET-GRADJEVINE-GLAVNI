@@ -1,6 +1,6 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { Worker, Job } from "bullmq";
-import { db } from "../config/firebase.ts";
+import { db, admin } from "../config/firebase.ts";
 import { MonitoringService } from "./monitoring.service.ts";
 import { eventBus } from "../events/event-bus.ts";
 import { SchemaRegistry } from "./schema-registry.service.ts";
@@ -460,7 +460,7 @@ export class OutboxWorker {
               );
               await db.collection("outbox").doc(msg.id!).update({
                 status: "processed",
-                processedAt: new Date(),
+                processedAt: admin.firestore.FieldValue.serverTimestamp(),
                 note: "Skipped - pure volatile update",
               });
               return; // EARLY EXIT! Saver za 80% writes!
@@ -473,7 +473,7 @@ export class OutboxWorker {
           // 3. Update statusa u bazi
           await db.collection("outbox").doc(msg.id!).update({
             status: "processed",
-            processedAt: new Date(),
+            processedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
 
           const redis = getRedis();
