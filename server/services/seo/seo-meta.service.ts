@@ -160,7 +160,7 @@ export class SEOMetaService {
     } catch (err) {
       console.error("[SEO-Background] Failed background compilation:", err);
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch(() => {});
+      await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[SEOMeta] lock release error:", e?.message));
     }
   }
 

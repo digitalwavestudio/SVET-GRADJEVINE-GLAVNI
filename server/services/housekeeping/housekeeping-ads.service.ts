@@ -31,29 +31,66 @@ export class HousekeepingAds {
   }
 
   static async expirePremiums() {
-    this.logger.info("Starting Housekeeping: Audit Expire Premiums skipped iteration");
-    const result = { totalExpired: 0 };
+    this.logger.info("Starting Housekeeping: Expire Premiums");
+    const result = { totalExpired: 0, totalErrors: 0 };
+    const now = admin.firestore.Timestamp.now();
 
     try {
-      const collectionsToCheck = [
-        "listings",
-        "companies",
-        "caterings",
-        "jobs",
-        "machines",
-        "accommodations",
-        "marketplace",
-        "plots",
-        "real_estate",
-        "users"
-      ];
+      const batch = db.batch();
+      let batchCount = 0;
 
-      for (const coll of collectionsToCheck) {
-        const snap = await db.collection(coll).where("isPremium", "==", true).count().get();
-        result.totalExpired += snap.data().count;
+      const snap = await db.collection("listings")
+        .where("isPremium", "==", true)
+        .where("premiumUntil", "<", now)
+        .limit(400)
+        .get();
+
+      snap.docs.forEach((doc) => {
+        batch.update(doc.ref, {
+          isPremium: false,
+          premiumUntil: null,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        batchCount++;
+      });
+
+      if (batchCount > 0) {
+        await batch.commit();
+        result.totalExpired = batchCount;
+        this.logger.info(`Expired ${batchCount} premium listings`);
+      }
+
+      // Also expire premium profile status on users collection
+      try {
+        const userBatch = db.batch();
+        let userBatchCount = 0;
+
+        const userSnap = await db.collection("users")
+          .where("isPremiumProfile", "==", true)
+          .where("premiumUntil", "<", now)
+          .limit(400)
+          .get();
+
+        userSnap.docs.forEach((doc) => {
+          userBatch.update(doc.ref, {
+            isPremiumProfile: false,
+            premiumUntil: null,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          userBatchCount++;
+        });
+
+        if (userBatchCount > 0) {
+          await userBatch.commit();
+          result.totalExpired += userBatchCount;
+          this.logger.info(`Expired ${userBatchCount} premium user profiles`);
+        }
+      } catch (err) {
+        result.totalErrors++;
+        this.logger.error(`Error expiring user premium profiles`, err);
       }
     } catch (error) {
-      this.logger.error(`Error counting premiums`, error);
+      this.logger.error(`Error in expirePremiums`, error);
     }
 
     await HousekeepingUtils.updateStatus("expirePremiums", result);

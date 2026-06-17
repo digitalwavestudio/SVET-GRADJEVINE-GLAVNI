@@ -6,6 +6,7 @@ import { packageService } from '@/src/services/packageService';
 import { isLaunchModeActive } from '@/src/services/platformService';
 import { withRetry } from '@/src/lib/retry';
 import { apiClient } from '@/src/lib/apiClient';
+import { safeRedirect } from '@/src/lib/urlUtils';
 
 export interface Machine extends SharedMachine {
   searchKeywords?: string[];
@@ -52,7 +53,7 @@ export const machinesService = {
   async getById(id: string) {
     try {
       const data = await apiClient.get<Machine | { redirect?: string; }>(`/ads/${id}`);
-      if (data && 'redirect' in data && data.redirect) {
+      if (data && 'redirect' in data && data.redirect && safeRedirect(data.redirect)) {
           window.location.href = data.redirect;
           return null;
       }
@@ -76,7 +77,7 @@ export const machinesService = {
         }
       }
       
-      if (errorData?.redirect) {
+      if (errorData?.redirect && safeRedirect(errorData.redirect)) {
           window.location.href = errorData.redirect;
       }
       return null;

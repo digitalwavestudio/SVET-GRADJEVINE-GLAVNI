@@ -113,20 +113,25 @@ export class UnifiedAdsService {
   }
 
   static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
-    // Use raw Firestore directly to bypass proxy timeout/circuit-breaker
     const rawDb = getDb();
-    const fetchLimit = searchQ ? 150 : Math.max(limitNum * 2, 50);
-    const snap = await rawDb.collection("listings")
+    let q = rawDb.collection("listings")
       .where("authorId", "==", uid)
-      .limit(fetchLimit)
-      .get();
+      .where("status", "!=", "deleted")
+      .orderBy("createdAt", "desc")
+      .limit(limitNum + 1);
 
-    const excludeStatuses = new Set(["deleted"]);
+    if (cursor) {
+      const cursorDoc = await rawDb.collection("listings").doc(cursor).get();
+      if (cursorDoc.exists) q = q.startAfter(cursorDoc);
+    }
+
+    const snap = await q.get();
     const { ImageTransformer } = await import("../utils/image.transformer.ts");
 
-    let docs = snap.docs
-      .filter(doc => !excludeStatuses.has(doc.data().status))
-      .map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
+    const hasMore = snap.docs.length > limitNum;
+    const pageDocs = hasMore ? snap.docs.slice(0, limitNum) : snap.docs;
+
+    let docs = pageDocs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
       const data = doc.data() as Listing;
       let typeLabel = '';
       let postType = data.type || '';
@@ -136,7 +141,7 @@ export class UnifiedAdsService {
         case 'accommodation': typeLabel = 'Smeštaj'; break;
         case 'machine': typeLabel = 'Mašina'; break;
         case 'catering': typeLabel = 'Ketering'; break;
-        case 'plot': 
+        case 'plot':
         case 'real_estate':
           typeLabel = 'Plac'; break;
         case 'company': typeLabel = 'Firma'; break;
@@ -151,37 +156,16 @@ export class UnifiedAdsService {
       }) as Listing & { typeLabel: string; postType: string };
     });
 
-    // Sort by createdAt descending in-memory
-    docs.sort((a, b) => {
-      const aVal: any = a.createdAt;
-      const bVal: any = b.createdAt;
-      const aTime = aVal?.toDate?.()?.getTime() ?? 0;
-      const bTime = bVal?.toDate?.()?.getTime() ?? 0;
-      return bTime - aTime;
-    });
-
-    // Handle cursor-based offset
-    if (cursor) {
-      const cursorIdx = docs.findIndex(d => d.id === cursor);
-      if (cursorIdx >= 0) {
-        docs = docs.slice(cursorIdx + 1);
-      }
-    }
-
-    // Apply search filter
     if (searchQ) {
       const lowQ = searchQ.toLowerCase();
-      docs = docs.filter(d => 
-        (d.title && d.title.toLowerCase().includes(lowQ)) || 
+      docs = docs.filter(d =>
+        (d.title && d.title.toLowerCase().includes(lowQ)) ||
         (d.comp && d.comp.toLowerCase().includes(lowQ))
       );
     }
 
-    const hasMore = docs.length > limitNum;
-    const pageDocs = docs.slice(0, limitNum);
-
     return {
-      docs: pageDocs,
+      docs,
       lastVisibleId: pageDocs.length > 0 ? pageDocs[pageDocs.length - 1].id : null,
       hasMore,
     };
@@ -215,10 +199,14 @@ export class UnifiedAdsService {
     const { CacheService } = await import("./cache.service.ts");
     const { CacheKeys } = await import("../constants/cache-keys.ts");
     await CacheService.delete(CacheKeys.adDetail(id));
+    const { invalidateAdOwnershipCache } = await import("../middleware/ownership.middleware.ts");
+    invalidateAdOwnershipCache(id);
     await CacheService.invalidateByPrefix(`myAds_${adData.authorId}`);
     await CacheService.invalidateByPrefix(`publicProfileAds_${adData.authorId}`);
     await CacheService.invalidateByPrefix("public_ads_");
-    await CacheService.invalidateByPrefix("search_ads_"); 
+    await CacheService.invalidateByPrefix("swr:public_ads_");
+    await CacheService.invalidateByPrefix("search_ads_");
+    await CacheService.invalidateByPrefix("swr:search_ads_"); 
     const { PredictiveAnalyticsService } = await import("./predictive.service.ts");
     await PredictiveAnalyticsService.forceRefresh(id).catch((e: unknown) => console.error("[Ads] operation error:", e));
 

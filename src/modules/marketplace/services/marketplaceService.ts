@@ -5,6 +5,7 @@ import { viewStatsService } from '@/src/services/viewStatsService';
 import { packageService } from '@/src/services/packageService';
 import { withRetry } from '@/src/lib/retry';
 import { apiClient } from '@/src/lib/apiClient';
+import { safeRedirect } from '@/src/lib/urlUtils';
 
 export interface MarketplaceItem extends SharedMarketplaceItem {
   searchKeywords?: string[];
@@ -60,7 +61,7 @@ export const marketplaceService = {
   async getItemById(id: string): Promise<MarketplaceItem | null> {
     try {
       const data = await apiClient.get<MarketplaceItem | { redirect?: string }>(`/ads/${id}`);
-      if (data && 'redirect' in data && data.redirect) {
+      if (data && 'redirect' in data && data.redirect && safeRedirect(data.redirect)) {
           window.location.href = data.redirect;
           return null;
       }
@@ -83,7 +84,7 @@ export const marketplaceService = {
            errorData = errObj as { redirect?: string };
         }
       }
-      if (errorData?.redirect) {
+      if (errorData?.redirect && safeRedirect(errorData.redirect)) {
           window.location.href = errorData.redirect;
       }
       return null;

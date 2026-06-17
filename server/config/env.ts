@@ -59,6 +59,8 @@ const envSchema = z.object({
   FORCE_REDIS_OFFLINE: z.string().optional(),
   INDEXNOW_KEY: z.string().optional(),
   SANDBOX_WORKERS_ENABLED: z.string().optional(),
+  RUN_CRONS: z.string().optional(),
+  USE_ALGOLIA: z.string().optional(),
   DISABLE_HMR: z.string().optional(),
   VITE_ALGOLIA_APP_ID: z.string().optional(),
   VITE_ALGOLIA_SEARCH_KEY: z.string().optional(),

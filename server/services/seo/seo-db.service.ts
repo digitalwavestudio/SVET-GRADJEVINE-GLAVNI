@@ -187,7 +187,7 @@ export class SEODbService {
     } catch (err) {
       console.error("[SEO-Background] Failed compiler compiling for hub:", err);
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch(() => {});
+      await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[SEODb] lock release error:", e?.message));
     }
   }
 

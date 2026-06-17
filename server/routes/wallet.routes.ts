@@ -121,10 +121,14 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
 
       // --- WRITES ---
 
-      // A. Subtract balance
+      // A. Subtract balance (dual: users + wallets)
       transaction.update(userRef, {
         walletBalance: admin.firestore.FieldValue.increment(-cost),
       });
+      transaction.set(db.collection("wallets").doc(userId), {
+        balance: admin.firestore.FieldValue.increment(-cost),
+        lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
 
       // B. Create ledger entry
       const transactionRef = db.collection("transactions").doc();
@@ -224,10 +228,14 @@ walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
         throw new Error("Korisnik nije pronađen");
       }
 
-      // Update User
+      // Update User (dual: users + wallets)
       transaction.update(userRef, {
         walletBalance: admin.firestore.FieldValue.increment(amount),
       });
+      transaction.set(db.collection("wallets").doc(targetUserId), {
+        balance: admin.firestore.FieldValue.increment(amount),
+        lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
 
       // Create Ledger Entry "Wire Transfer"
       const transactionRef = db.collection("transactions").doc();
@@ -415,6 +423,10 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
         transaction.update(userRef, {
           walletBalance: admin.firestore.FieldValue.increment(txData.amount),
         });
+        transaction.set(db.collection("wallets").doc(txData.userId), {
+          balance: admin.firestore.FieldValue.increment(txData.amount),
+          lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
 
         // Ažuriramo transakciju
         transaction.update(txRef, {
@@ -499,5 +511,17 @@ walletRouter.get("/transactions", requireAuth, async (req, res, next) => {
   } catch (error) {
     console.error("Fetch Transactions Error:", error);
     res.status(500).json({ error: "Greška prilikom dohvatanja transakcija" });
+  }
+});
+
+walletRouter.get("/balance", requireAuth, async (req, res, next) => {
+  try {
+    const userId = (req as any)?.user.uid;
+    const { FinancialLedgerService } = await import("../services/ledger.service.ts");
+    const balance = await FinancialLedgerService.getBalance(userId);
+    res.json({ balance });
+  } catch (error) {
+    console.error("Fetch Balance Error:", error);
+    res.status(500).json({ error: "Greška prilikom dohvatanja balansa" });
   }
 });

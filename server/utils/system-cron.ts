@@ -58,7 +58,7 @@ export const SystemCron = {
    * @param task Funkcija koja se izvrsava
    */
   async register(name: string, repeatOptions: { pattern?: string; every?: number }, task: () => any) {
-    if (process.env.NODE_ENV !== "production" && !process.env.RUN_CRONS) {
+    if (process.env.NODE_ENV !== "production" && !env.RUN_CRONS) {
       LoggerService.info(`[SystemCron] Skipping registration of ${name} in non-production mode.`);
       return;
     }

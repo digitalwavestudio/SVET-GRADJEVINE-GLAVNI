@@ -83,6 +83,11 @@ export class FinancialLedgerService {
       lastAuditPassed: walletDoc.exists ? (walletDoc.data()?.lastAuditPassed ?? true) : true
     }, { merge: true });
 
+    // 1b. Sync redundant user-level balance (atomic with wallet update)
+    transaction.update(db.collection("users").doc(uid), {
+      walletBalance: FieldValue.increment(amount),
+    });
+
     // 2. Create Transaction Record (Immutable)
     transaction.set(transRef, {
       uid,

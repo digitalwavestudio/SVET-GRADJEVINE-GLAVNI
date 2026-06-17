@@ -30,13 +30,15 @@ constructionRouter.post("/sites", requireAuth, validateRequest(constructionSiteS
     } else {
       const id = site.id;
       delete site.id;
-      await db
-        .collection("construction_sites")
-        .doc(id)
-        .update({
-          ...site,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+      const siteRef = db.collection("construction_sites").doc(id);
+      const existingDoc = await siteRef.get();
+      if (!existingDoc.exists || existingDoc.data()?.authorId !== uid) {
+        return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
+      }
+      await siteRef.update({
+        ...site,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
       return res.json({ id, success: true });
     }
   } catch (error) {
@@ -53,8 +55,11 @@ constructionRouter.patch("/:siteId", requireAuth, async (req, res, next) => {
 
     const docRef = db.collection("construction_sites").doc(siteId);
     const docSnap = await docRef.get();
-    if (!docSnap.exists || docSnap.data()?.authorId !== uid) {
+    if (!docSnap.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (docSnap.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     await docRef.update({
@@ -75,8 +80,11 @@ constructionRouter.delete("/:siteId", requireAuth, async (req, res, next) => {
 
     const docRef = db.collection("construction_sites").doc(siteId);
     const docSnap = await docRef.get();
-    if (!docSnap.exists || docSnap.data()?.authorId !== uid) {
+    if (!docSnap.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (docSnap.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     await docRef.update({
@@ -202,8 +210,11 @@ constructionRouter.post("/:siteId/workers", requireAuth, async (req, res, next) 
     const data = req.body;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
-    if (!siteDoc.exists || siteDoc.data()?.authorId !== uid) {
+    if (!siteDoc.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (siteDoc.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     const workerRef = db.collection("construction_sites").doc(siteId).collection("workers").doc();
@@ -222,8 +233,11 @@ constructionRouter.put("/:siteId/workers/:workerId", requireAuth, async (req, re
     const data = req.body;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
-    if (!siteDoc.exists || siteDoc.data()?.authorId !== uid) {
+    if (!siteDoc.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (siteDoc.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     await db.collection("construction_sites").doc(siteId).collection("workers").doc(workerId).update({
@@ -243,8 +257,11 @@ constructionRouter.delete("/:siteId/workers/:workerId", requireAuth, async (req,
     const { siteId, workerId } = req.params;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
-    if (!siteDoc.exists || siteDoc.data()?.authorId !== uid) {
+    if (!siteDoc.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (siteDoc.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     await db.collection("construction_sites").doc(siteId).collection("workers").doc(workerId).delete();
@@ -264,8 +281,11 @@ constructionRouter.post("/:siteId/resources", requireAuth, async (req, res, next
     const data = req.body;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
-    if (!siteDoc.exists || siteDoc.data()?.authorId !== uid) {
+    if (!siteDoc.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (siteDoc.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     const resRef = db.collection("construction_sites").doc(siteId).collection("resources").doc();
@@ -284,8 +304,11 @@ constructionRouter.put("/:siteId/resources/:resourceId", requireAuth, async (req
     const data = req.body;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
-    if (!siteDoc.exists || siteDoc.data()?.authorId !== uid) {
+    if (!siteDoc.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (siteDoc.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     await db.collection("construction_sites").doc(siteId).collection("resources").doc(resourceId).update({
@@ -305,8 +328,11 @@ constructionRouter.delete("/:siteId/resources/:resourceId", requireAuth, async (
     const { siteId, resourceId } = req.params;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
-    if (!siteDoc.exists || siteDoc.data()?.authorId !== uid) {
+    if (!siteDoc.exists) {
       return res.status(404).json({ error: "Nije pronađeno" });
+    }
+    if (siteDoc.data()?.authorId !== uid) {
+      return res.status(403).json({ error: "Nemate dozvolu za pristup ovim podacima" });
     }
 
     await db.collection("construction_sites").doc(siteId).collection("resources").doc(resourceId).update({ status: "deleted" });
@@ -339,7 +365,12 @@ constructionRouter.post("/metrics", requireAuth, async (req, res, next) => {
     // Store under construction_sites if activeSiteId is known, or in a global collection
     const siteId = data.siteId;
     if (siteId) {
-      const docRef = db.collection("construction_sites").doc(siteId).collection("metrics").doc(dayKey);
+      const siteRef = db.collection("construction_sites").doc(siteId);
+      const siteDoc = await siteRef.get();
+      if (siteDoc.exists && siteDoc.data()?.authorId !== uid) {
+        return res.status(403).json({ error: "Nemate dozvolu za pristup ovom gradilištu" });
+      }
+      const docRef = siteRef.collection("metrics").doc(dayKey);
       await docRef.set(metricsData, { merge: true });
     }
 

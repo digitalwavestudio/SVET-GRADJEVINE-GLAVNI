@@ -2,6 +2,12 @@ import type { Request, Response, NextFunction } from "express";
 import { db } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
 
+export const AD_OWNERSHIP_CACHE_PREFIX = "ad_ownership:";
+
+export function invalidateAdOwnershipCache(adId: string) {
+  CacheService.delete(`${AD_OWNERSHIP_CACHE_PREFIX}${adId}`).catch((e: any) => console.warn("[Ownership] cache invalidation error:", e?.message));
+}
+
 export const validateAdOwnership = async (
   req: Request,
   res: Response,
@@ -31,7 +37,7 @@ export const validateAdOwnership = async (
     }
 
     // Implement L2 Cache Shield for ownership checks (5 min) to prevent repeated FS lookups
-    const ownershipCacheKey = `ad_ownership:${adId}`;
+    const ownershipCacheKey = `${AD_OWNERSHIP_CACHE_PREFIX}${adId}`;
     const cachedAuthorId = await CacheService.get<string>(ownershipCacheKey);
 
     if (cachedAuthorId) {

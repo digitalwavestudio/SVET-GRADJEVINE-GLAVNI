@@ -19,8 +19,14 @@ export const PACKAGE_DEFINITIONS: Record<PackageLevel, PackageFeatures> = {
 };
 
 export const packageService = {
-  async checkCredits(_userId: string): Promise<{ hasCredits: boolean; available: number }> {
-    return { hasCredits: true, available: 999 };
+  async checkCredits(userId: string): Promise<{ hasCredits: boolean; available: number }> {
+    try {
+      const data = await apiClient.get<{ balance: number }>("/wallet/balance");
+      const available = Math.max(0, data?.balance || 0);
+      return { hasCredits: available > 0, available };
+    } catch {
+      return { hasCredits: false, available: 0 };
+    }
   },
   async consumeCredit(_userId: string) {
   }

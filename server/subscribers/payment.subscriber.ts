@@ -13,12 +13,35 @@ export const initPaymentSubscriber = () => {
     );
 
     try {
-      logger.warn(
-        `[PaymentSubscriber] PAYMENT_COMPLETED event received for ${payload.referenceId}, but payment saga processing is disabled in this branch.`,
+      logger.info(
+        `[PaymentSubscriber] Processing PAYMENT_COMPLETED for ${payload.referenceId}. Crediting wallet...`,
       );
 
-      // In the current repo state, Stripe-specific checkout saga handling has been removed.
-      // Keep this listener present only for event compatibility and future payment flow replacement.
+      // Credit wallet atomically (wallets collection + users.walletBalance)
+      if (payload.amount && payload.amount > 0) {
+        try {
+          await db.runTransaction(async (transaction) => {
+            const walletRef = db.collection("wallets").doc(payload.userId);
+            const userRef = db.collection("users").doc(payload.userId);
+            const walletDoc = await transaction.get(walletRef);
+            const currentBalance = walletDoc.exists ? (walletDoc.data()?.balance || 0) : 0;
+            transaction.set(walletRef, {
+              balance: currentBalance + payload.amount,
+              lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              status: walletDoc.exists ? (walletDoc.data()?.status || "active") : "active",
+            }, { merge: true });
+            transaction.update(userRef, {
+              walletBalance: admin.firestore.FieldValue.increment(payload.amount),
+            });
+          });
+          logger.info(`[PaymentSubscriber] Credited ${payload.amount} ${payload.currency || "RSD"} to wallet for ${payload.userId}`);
+        } catch (walletErr: unknown) {
+          const error = walletErr as Error;
+          logger.error(`[PaymentSubscriber] Wallet credit failed for ${payload.userId}`, { error: error.message });
+          throw walletErr;
+        }
+      }
+
       try {
         const statsRef = db.collection("user_stats").doc(payload.userId);
         const statsUpdates: Record<string, unknown> = {

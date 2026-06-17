@@ -27,11 +27,7 @@ export class AdminFinanceService {
       { adminId }
     );
 
-    // Sync redundant field for faster frontend access
-    await db.collection("users").doc(userId).update({
-      walletBalance: firebaseAdmin.firestore.FieldValue.increment(delta),
-      updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-    });
+    // Note: users.walletBalance is synced atomically inside FinancialLedgerService.applyBalanceInTransaction
 
     return { success: true };
   }

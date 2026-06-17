@@ -21,7 +21,7 @@ export class UnifiedSearchAlgolia {
     logger: Logger,
     lastVisibleId?: string
   ): Promise<UnifiedSearchResult | null> {
-    if (!(env.ALGOLIA_APP_ID && env.ALGOLIA_API_KEY && process.env.USE_ALGOLIA !== "false")) {
+    if (!(env.ALGOLIA_APP_ID && env.ALGOLIA_API_KEY && env.USE_ALGOLIA !== "false")) {
       return null;
     }
 

@@ -15,7 +15,7 @@ import {
 } from "../controllers/jobs.controller.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { authMiddleware } from "../middleware/auth.middleware.ts";
-import { validateApplicationOwnership } from "../middleware/ownership.middleware.ts";
+import { validateAdOwnership, validateApplicationOwnership } from "../middleware/ownership.middleware.ts";
 import {
   jobSearchSchema,
   applicationSchema,
@@ -47,5 +47,5 @@ jobsRouter.get("/:id", getJobById);
 jobsRouter.post("/search", validateRequest(jobSearchSchema), searchJobs);
 jobsRouter.post("/create", authMiddleware, adCreationLimiter, validateRequest(createJobSchema), createJob);
 jobsRouter.post("/apply", authMiddleware, validateRequest(applicationSchema), applyJob);
-jobsRouter.patch("/:id", authMiddleware, validateRequest(updateJobSchema), updateJob);
-jobsRouter.delete("/:id", authMiddleware, deleteJob);
+jobsRouter.patch("/:id", authMiddleware, validateAdOwnership, validateRequest(updateJobSchema), updateJob);
+jobsRouter.delete("/:id", authMiddleware, validateAdOwnership, deleteJob);

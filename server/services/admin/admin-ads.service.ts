@@ -54,7 +54,7 @@ export class AdminAdsService {
       console.error("[Cache Invalidation Error]:", cacheErr);
     }
     // Ensure moderation queue cache is refreshed
-    await CacheService.invalidateByPrefix("admin_moderation_queue_").catch(() => {});
+    await CacheService.invalidateByPrefix("admin_moderation_queue_").catch((e: any) => console.warn("[AdminAds] cache invalidation error:", e?.message));
 
     await AuditService.logAction(
       adminId,

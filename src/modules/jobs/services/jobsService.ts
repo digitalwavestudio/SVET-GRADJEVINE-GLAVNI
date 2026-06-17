@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { viewStatsService } from '@/src/services/viewStatsService';
 import { packageService } from '@/src/services/packageService';
 import { apiClient } from '@/src/lib/apiClient';
+import { safeRedirect } from '@/src/lib/urlUtils';
 import { JobApplicationContract } from '@/src/modules/jobs/types/jobContracts';
 
 export interface Job extends JobResponse {
@@ -249,7 +250,7 @@ export const jobsService = {
         const data = await apiClient.get<JobResponse & { redirect?: string }>(`/jobs/${id}`);
         // If the API returns a smooth error with redirect (200 OK wrapped, or handled by apiClient), 
         // handle it before zod validation
-        if (data?.redirect) {
+        if (data?.redirect && safeRedirect(data.redirect)) {
            window.location.href = data.redirect;
            return null;
         }
@@ -259,7 +260,7 @@ export const jobsService = {
         // Sometimes the error object carries the response body from the API
         const errObj = e as { response?: { data?: { redirect?: string } }; data?: { redirect?: string } };
         const errorData = errObj?.response?.data || errObj?.data || errObj;
-        if (errorData && typeof errorData === 'object' && 'redirect' in errorData && typeof errorData.redirect === 'string') {
+        if (errorData && typeof errorData === 'object' && 'redirect' in errorData && typeof errorData.redirect === 'string' && safeRedirect(errorData.redirect)) {
             window.location.href = errorData.redirect;
         }
         return null;

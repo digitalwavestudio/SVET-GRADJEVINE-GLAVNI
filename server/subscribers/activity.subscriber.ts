@@ -15,14 +15,14 @@ export function setupActivitySubscriber() {
         applicantName,
       } = payload;
       try {
-        console.log(
+        console.info(
           `[EventSubscriber] Sending notification for APPLICATION_SUBMITTED: ${applicationId}`,
         );
 
         // 1. Deduplication key (60 seconds) to prevent duplicate triggers
         const dedupKey = `dedup:activity:${employerId}:JOB_APPLICATION:${jobId || ""}`;
         if (await CacheService.get<boolean>(dedupKey)) {
-          console.log(`[EventSubscriber] Duplicate JOB_APPLICATION bypassed for user ${employerId}`);
+          console.info(`[EventSubscriber] Duplicate JOB_APPLICATION bypassed for user ${employerId}`);
           return;
         }
 
@@ -42,7 +42,7 @@ export function setupActivitySubscriber() {
         // 2. Active Session (SSE) Check - Bypass Firestore write if user holds an active SSE channel
         const isActive = SSEService.hasActiveConnection(employerId);
         if (isActive) {
-          console.log(`[EventSubscriber] User ${employerId} has active SSE channel. Publishing notification instead of raw DB write.`);
+          console.info(`[EventSubscriber] User ${employerId} has active SSE channel. Publishing notification instead of raw DB write.`);
           await SSEService.publish(employerId, "notification", {
             ...activityPayload,
             createdAt: new Date().toISOString()
@@ -97,14 +97,14 @@ export function setupActivitySubscriber() {
       const safeUid = uid || userId;
       if (!safeUid) return;
       try {
-        console.log(
+        console.info(
           `[EventSubscriber] Sending notifications for AD_CREATED: ${id}`,
         );
 
         // 1. Deduplication key (60 seconds)
         const dedupKey = `dedup:activity:${safeUid}:ad_created:${id}`;
         if (await CacheService.get<boolean>(dedupKey)) {
-          console.log(`[EventSubscriber] Duplicate AD_CREATED bypassed for user ${safeUid}`);
+          console.info(`[EventSubscriber] Duplicate AD_CREATED bypassed for user ${safeUid}`);
           return;
         }
 
@@ -122,7 +122,7 @@ export function setupActivitySubscriber() {
         // 2. Active Session SSE Check
         const isActive = SSEService.hasActiveConnection(safeUid);
         if (isActive) {
-          console.log(`[EventSubscriber] User ${safeUid} has active SSE channel. Publishing notification instead of raw DB write.`);
+          console.info(`[EventSubscriber] User ${safeUid} has active SSE channel. Publishing notification instead of raw DB write.`);
           await SSEService.publish(safeUid, "notification", {
             ...activityPayload,
             createdAt: new Date().toISOString()
@@ -135,7 +135,7 @@ export function setupActivitySubscriber() {
         // Set deduplication cache
         await CacheService.set(dedupKey, true, 60000);
 
-        console.log(
+        console.info(
           `[Notification] Ad created notified to user ${safeUid} for ad ${id}`,
         );
       } catch (err) {
@@ -152,14 +152,14 @@ export function setupActivitySubscriber() {
     async (payload) => {
       const { userId } = payload;
       try {
-        console.log(
+        console.info(
           `[EventSubscriber] Sending notifications for USER_VERIFIED: ${userId}`,
         );
 
         // 1. Deduplication key (60 seconds)
         const dedupKey = `dedup:activity:${userId}:USER_VERIFIED:constant`;
         if (await CacheService.get<boolean>(dedupKey)) {
-          console.log(`[EventSubscriber] Duplicate USER_VERIFIED bypassed for user ${userId}`);
+          console.info(`[EventSubscriber] Duplicate USER_VERIFIED bypassed for user ${userId}`);
           return;
         }
 
@@ -175,7 +175,7 @@ export function setupActivitySubscriber() {
         // 2. Active Session SSE Check
         const isActive = SSEService.hasActiveConnection(userId);
         if (isActive) {
-          console.log(`[EventSubscriber] User ${userId} has active SSE channel. Publishing notification instead of raw DB write.`);
+          console.info(`[EventSubscriber] User ${userId} has active SSE channel. Publishing notification instead of raw DB write.`);
           await SSEService.publish(userId, "notification", {
             ...activityPayload,
             createdAt: new Date().toISOString()
@@ -188,7 +188,7 @@ export function setupActivitySubscriber() {
         // Set deduplication cache
         await CacheService.set(dedupKey, true, 60000);
 
-        console.log(
+        console.info(
           `[Notification] User verified notified for user ${userId}`,
         );
       } catch (err) {

@@ -125,6 +125,11 @@ export class UnifiedSearchFirestore {
     if (filtersAny.profession)
       q = q.where("professionSlug", "==", filtersAny.profession);
 
+    if (filtersAny.minPrice != null)
+      q = q.where("price", ">=", Number(filtersAny.minPrice));
+    if (filtersAny.maxPrice != null)
+      q = q.where("price", "<=", Number(filtersAny.maxPrice));
+
     if (filtersAny.cateringType)
       q = q.where("cateringType", "==", filtersAny.cateringType);
     if (filtersAny.kitchenType)
@@ -390,6 +395,11 @@ export class UnifiedSearchFirestore {
 
     if (filtersAny.profession)
       q = q.where("professionSlug", "==", filtersAny.profession);
+
+    if (filtersAny.minPrice != null)
+      q = q.where("price", ">=", Number(filtersAny.minPrice));
+    if (filtersAny.maxPrice != null)
+      q = q.where("price", "<=", Number(filtersAny.maxPrice));
 
     if (filtersAny.cateringType)
       q = q.where("cateringType", "==", filtersAny.cateringType);
