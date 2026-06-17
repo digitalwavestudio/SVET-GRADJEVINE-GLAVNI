@@ -7,7 +7,6 @@ import DepositModal from '../components/DepositModal';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { queryKeys } from '@/src/lib/queryKeysFactory';
-import { useFinanceSummary } from '../hooks/useFinanceStats';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiClient } from '@/src/lib/apiClient';
 
@@ -241,8 +240,6 @@ export default function WalletPage() {
   const queryClient = useQueryClient();
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'novcanik' | 'premium'>('novcanik');
-
-  const { data: financeStats, isLoading: statsLoading } = useFinanceSummary();
 
   const { data: transactions = [], isLoading: txLoading, refetch } = useQuery({
     queryKey: queryKeys.wallet.transactions(user?.id || 'guest'),
