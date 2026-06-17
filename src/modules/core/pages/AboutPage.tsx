@@ -1,12 +1,16 @@
 import { motion } from 'motion/react';
-import { Activity, Building, Home, Users } from 'lucide-react';
+import { Building, Home, Users, Briefcase } from 'lucide-react';
 import SeoHead from '@/src/components/SeoHead';
+import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 
 export default function AboutPage() {
-  const stats = [
-    { icon: Building, label: 'Registrovanih firmi', value: '1.2M+' },
-    { icon: Users, label: 'Radnika', value: '500k+' },
-    { icon: Activity, label: 'Aktivnih projekata', value: '3,000+' }
+  const { data: bffData } = useHomepageData();
+  const stats = bffData?.stats;
+
+  const statCards = [
+    { icon: Building, label: 'Registrovanih firmi', value: stats?.totalCompanies ?? 0 },
+    { icon: Users, label: 'Korisnika na platformi', value: stats?.totalUsers ?? 0 },
+    { icon: Briefcase, label: 'Aktivnih oglasa', value: stats?.totalAdsCount ?? 0 },
   ];
 
   return (
@@ -35,7 +39,7 @@ export default function AboutPage() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {stats.map((stat, i) => (
+          {statCards.map((stat, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
@@ -46,7 +50,7 @@ export default function AboutPage() {
               <div className="w-20 h-20 rounded-[10px] bg-[#0F1923] flex items-center justify-center mb-6 border border-white/5">
                 <stat.icon className="w-10 h-10 text-secondary" />
               </div>
-              <div className="text-4xl font-black text-white mb-2">{stat.value}</div>
+              <div className="text-4xl font-black text-white mb-2">{stat.value.toLocaleString()}+</div>
               <div className="text-slate-400 font-bold uppercase tracking-widest text-sm">{stat.label}</div>
             </motion.div>
           ))}

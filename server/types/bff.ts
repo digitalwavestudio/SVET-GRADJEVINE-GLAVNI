@@ -19,6 +19,7 @@ export interface HomepageStats {
   totalCaterings: number;
   totalRealEstate: number;
   totalCompanies: number;
+  totalUsers: number;
   premiumJobs: number;
   urgentJobs: number;
   totalAdsCount: number;

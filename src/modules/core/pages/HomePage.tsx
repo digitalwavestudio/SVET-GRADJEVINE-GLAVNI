@@ -45,12 +45,12 @@ export default function HomePage() {
 
   // Dynamic Statistics from BFF Aggregated Data
   const statsValues = useMemo(() => ({
-    totalAdsCount: stats?.totalAdsCount ?? 15000,
-    dynamicFirmsCount: stats?.dynamicFirmsCount ?? 9500,
-    dynamicWorkersCount: stats?.dynamicWorkersCount ?? 350000,
-    dynamicMachineryCount: stats?.dynamicMachineryCount ?? 1600,
-    dynamicRealEstateCount: stats?.dynamicRealEstateCount ?? 550,
-    dynamicViewsCount: stats?.dynamicViewsCount ?? 954000,
+    totalAdsCount: stats?.totalAdsCount || 15000,
+    dynamicFirmsCount: stats?.dynamicFirmsCount || 9500,
+    dynamicWorkersCount: stats?.dynamicWorkersCount || 350000,
+    dynamicMachineryCount: stats?.dynamicMachineryCount || 1600,
+    dynamicRealEstateCount: stats?.dynamicRealEstateCount || 550,
+    dynamicViewsCount: stats?.dynamicViewsCount || 954000,
   }), [stats]);
 
   const {

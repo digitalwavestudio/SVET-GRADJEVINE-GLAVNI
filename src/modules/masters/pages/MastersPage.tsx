@@ -22,7 +22,6 @@ import { useCollectionStats, useRoleStats, useFilteredCount } from '@/src/hooks/
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
 import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
-import heroImage from '@/src/assets/images/hero-masters.jpg';
 
 export default function MastersPage() {
   const { user } = useAuth();
@@ -211,7 +210,6 @@ export default function MastersPage() {
         title="PRONAĐI"
         titleAccent="MAJSTORA."
         subtitle="Pretražite bazu od preko 2.800 verifikovanih profesionalaca i angažujte najbolje za vaš projekat."
-        backgroundImage={heroImage}
         stats={[
           { label: "VERIFIKOVANI", value: masterCount?.toLocaleString() || "2.8K+", icon: "verified" },
           { label: "NA MREŽI", value: onlineCount?.toLocaleString() || "140", icon: "sensors" },

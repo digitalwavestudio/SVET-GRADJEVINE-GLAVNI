@@ -27,7 +27,6 @@ import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { generateCompanyListSchema } from '@/src/lib/seoSchema';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
-import heroImage from '@/src/assets/images/regenerated_image_1777747109528.jpg';
 import { useCollectionStats, useCount, useFilteredCount } from '@/src/hooks/useCollectionStats';
 
 function CompaniesPage() {
@@ -205,7 +204,6 @@ function CompaniesPage() {
         title="GRAĐEVINSKE"
         titleAccent="KOMPANIJE"
         subtitle="Baza verifikovanih firmi, inženjerskih biroa i specijalizovanih izvođača radova u Srbiji."
-        backgroundImage={heroImage}
         stats={[
           { label: "Verifikovanih firmi", value: companyCount?.toLocaleString() || "840", icon: "verified" },
           { label: "Novi partneri", value: `+${companyStats?.today?.toLocaleString() || "10"}`, icon: "add_business" },

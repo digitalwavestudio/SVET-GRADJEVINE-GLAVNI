@@ -148,6 +148,7 @@ export const bffService = {
             cateringCount?: number,
             realEstateCount?: number,
             companiesCount?: number,
+            totalUsers?: number,
             premiumPartners?: number,
             urgentAds?: number
           };
@@ -170,13 +171,14 @@ export const bffService = {
             totalCaterings,
             totalRealEstate: gStats.realEstateCount || 0,
             totalCompanies: gStats.companiesCount || 0,
+            totalUsers: gStats.totalUsers || 0,
             premiumJobs: gStats.premiumPartners || 0,
             urgentJobs: gStats.urgentAds || 0,
             totalAdsCount: calculatedAdsCount,
-            dynamicFirmsCount: 0,
-            dynamicWorkersCount: 0,
-            dynamicMachineryCount: 0,
-            dynamicRealEstateCount: 0,
+            dynamicFirmsCount: gStats.companiesCount || 0,
+            dynamicWorkersCount: gStats.totalUsers || 0,
+            dynamicMachineryCount: gStats.machinesCount || 0,
+            dynamicRealEstateCount: gStats.realEstateCount || 0,
             dynamicViewsCount: 0,
           };
 
@@ -259,6 +261,7 @@ export const bffService = {
             totalCaterings: 0,
             totalRealEstate: 0,
             totalCompanies: 0,
+            totalUsers: 0,
             premiumJobs: 0,
             urgentJobs: 0,
             totalAdsCount: 0,
