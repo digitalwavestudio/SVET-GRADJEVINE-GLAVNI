@@ -92,6 +92,7 @@ export function useAuthNode() {
   const isMountedFn = useRef(true);
   const currentFbUser = useRef<FirebaseUser | null>(null);
   const unsubUserRef = useRef<(() => void) | null>(null);
+  const autoInitAttempted = useRef(false);
 
   // O-O (Oauth-Obfuscation) Check
   const isBotRef = useRef<boolean>(false);
@@ -203,6 +204,34 @@ export function useAuthNode() {
                console.warn("User profile fetch rejected (Quota Exceeded or Forbidden)");
             } else {
                console.error("Error fetching user profile:", error);
+            }
+            // Ako user ne postoji (redirect flow nije stigao da pozove /users/init),
+            // kreiramo ga odmah da prekinemo redirect loop na mobilnom
+            if (!claims?.role && firebaseUser && !autoInitAttempted.current) {
+               autoInitAttempted.current = true;
+               try {
+                  const token = await firebaseUser.getIdToken();
+                  await fetch('/api/users/init', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                     body: JSON.stringify({
+                        email: firebaseUser.email,
+                        uid: firebaseUser.uid,
+                        name: firebaseUser.displayName || '',
+                        role: 'standard',
+                        status: 'active',
+                        isPremiumProfile: false,
+                        photoURL: firebaseUser.photoURL || '',
+                        viewsCount: 0,
+                        freeAdsCount: 3
+                     })
+                  });
+                  // Ponovo fetch-ujemo profil
+                  fetchUserData();
+                  return;
+               } catch (initErr) {
+                  console.warn("[AUTH] Auto-init after redirect failed:", initErr);
+               }
             }
             if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
          }
