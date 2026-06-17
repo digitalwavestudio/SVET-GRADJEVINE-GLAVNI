@@ -320,7 +320,7 @@ useEffect(() => {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
           const token = await result.user.getIdToken();
-          await fetch('/api/users/init', {
+          const initRes = await fetch('/api/users/init', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({
@@ -335,6 +335,9 @@ useEffect(() => {
               freeAdsCount: 3
             })
           });
+          if (!initRes.ok) {
+            console.warn('[AUTH] Init failed after popup:', initRes.status, await initRes.text().catch(() => ''));
+          }
         }
       } catch (err: any) {
         console.warn('[AUTH] Popup login failed, falling back to redirect:', err);
