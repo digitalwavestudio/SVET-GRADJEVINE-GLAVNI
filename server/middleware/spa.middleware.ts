@@ -44,7 +44,7 @@ async function backgroundPreRenderListingHub(
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")
         : "oglas";
-      const canonicalUrl = `${APP_CONFIG.BASE_URL}${matchedRoute.path.replace("poslovi", "posao")}${slug}~${id}`;
+      const canonicalUrl = `${APP_CONFIG.BASE_URL}${matchedRoute.path.replace("poslovi", "posao").replace(/\/+$/, "")}/${slug}~${id}`;
       itemsHtml += `<li><a href="${canonicalUrl}">${data.title || data.name || "Oglas"}</a> - ${data.city || "Srbija"}</li>`;
 
       itemListElements.push({

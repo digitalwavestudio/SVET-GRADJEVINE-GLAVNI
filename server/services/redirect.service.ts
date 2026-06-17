@@ -50,12 +50,10 @@ export class RedirectService {
       }
     }
 
-    // Special case for old job detail: /poslovi/some-slug/
-    // Since we don't have a 1:1 ID mapping for old ads, we redirect them to the general list
-    // to preserve PageRank but avoid 404s for the 30 ads that might be gone.
-    if (target.startsWith("/poslovi/") && target.length > 9) {
-        // If it's not a known P-SEO pattern (handled by Prefix mappings if they matched, but /poslovi/ is not in prefix)
-        // we redirect old deep links to the main hub.
+    // Special case for old job detail: /poslovi/some-old-slug~ID123
+    // Redirect legacy WP detail URLs (containing ~) to preserve PageRank.
+    // P-SEO hub pages (/poslovi/zidar, /poslovi/moler/beograd) are NOT redirected.
+    if (target.startsWith("/poslovi/") && target.includes("~")) {
         return "/poslovi";
     }
 

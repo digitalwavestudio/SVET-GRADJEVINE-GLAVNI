@@ -58,13 +58,20 @@ export class MatrixRouter {
       .map((part) => part.replace(/-/g, " "));
     const queryStr = querySegments.join(" ");
 
-    // Non-blocking background evaluation to prevent database/search-engine latency during SSR
-    MatrixRouter.backgroundEvaluateHubIndexability(path, category, queryStr, cacheKey).catch(err => {
-      console.error(`[MatrixRouter-Background] Error caching hub indexability:`, err);
-    });
-
-    // Fail-open: immediately allow indexing on cache miss to avoid blocking the crawler
-    return true;
+    try {
+      const result = await UnifiedSearchService.search(
+        category,
+        { query: queryStr, skipCount: true },
+        3,
+      );
+      const count = result.docs?.length || 0;
+      const isIndexable = count >= 3;
+      await CacheService.set(cacheKey, isIndexable, 12 * 60 * 60 * 1000).catch(() => {});
+      return isIndexable;
+    } catch (err) {
+      console.error(`[MatrixRouter] Error evaluating hub indexability for ${path}:`, err);
+      return true;
+    }
   }
 
   static async backgroundEvaluateHubIndexability(
