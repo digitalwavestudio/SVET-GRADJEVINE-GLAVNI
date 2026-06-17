@@ -440,7 +440,7 @@ export const validateBody = (schema: ZodSchema) => {
       const isAdminUser = user?.isAdmin || false;
 
       if (req.body) {
-        const sensitiveFields = ["role", "isAdmin", "userRole", "privilege", "status", "claims"];
+        const sensitiveFields = ["role", "isAdmin", "userRole", "privilege", "claims"];
         
         if (!isAdminUser) {
           for (const field of sensitiveFields) {
