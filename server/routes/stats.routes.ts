@@ -353,7 +353,8 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
 
         return { total, today, premium };
       },
-      3600000 // 1 hour cache
+      3600000, // 1 hour cache
+      { total: 0, today: 0, premium: 0 } // fallback when cache cold + quota exhausted
     );
 
     res.json(result);
