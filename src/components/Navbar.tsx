@@ -134,9 +134,9 @@ export default function Navbar() {
             <div className="flex items-center justify-center min-w-[60px] mx-4">
               {user ? (
                 <Link
-                  to="/moj-profil"
+                  to="/kontrolna-tabla"
                   className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden"
-                  title="Moj Profil"
+                  title="Kontrolna Tabla"
                 >
                   {profileSrc && !imgError ? (
                     <img
@@ -267,12 +267,12 @@ export default function Navbar() {
               <>
                 {user ? (
                   <Link
-                    to="/moj-profil"
+                    to="/kontrolna-tabla"
                     onClick={() => setIsOpen(false)}
                     className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-sm">person</span>
-                    Moj Profil ({user.firstName || 'Korisnik'})
+                    <span className="material-symbols-outlined text-sm">dashboard</span>
+                    Dashboard ({user.firstName || 'Korisnik'})
                   </Link>
                 ) : (
                   <Link
