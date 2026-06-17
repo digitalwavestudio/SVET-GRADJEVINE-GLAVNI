@@ -56,7 +56,7 @@ export function useDashboardNavigation() {
         queryClient.prefetchInfiniteQuery({
           queryKey: [...factoryQueryKeys.jobs.userApplications(uid, appRole), ''],
           queryFn: async () => {
-             const data = await apiClient.get<Record<string, unknown>>(`/applications/my-applications?role=${appRole}&limit=15`);
+             const data = await apiClient.get<Record<string, unknown>>(`/jobs/applications/user/${appRole}?limit=15`);
              return data || { items: [], hasMore: false, nextCursor: null };
           },
           initialPageParam: null,
