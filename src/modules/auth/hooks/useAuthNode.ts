@@ -180,11 +180,12 @@ export function useAuthNode() {
                const currentPreviewRole = isMeAdmin ? safeStorage.getItem('admin_preview_role') : null;
                
                const combinedData = { 
-                 ...meData, 
-                 id: firebaseUser.uid, 
-                 emailVerified: firebaseUser.emailVerified,
-                 role: (currentPreviewRole || meData.role) as UserRole
-               } as User;
+                  ...meData, 
+                  id: firebaseUser.uid, 
+                  emailVerified: firebaseUser.emailVerified,
+                  role: (currentPreviewRole || meData.role) as UserRole,
+                  isAdmin: isMeAdmin || !!claims.admin,
+                } as User;
                if (isMountedFn.current) {
                  setUser((prev) => {
                    const newStr = JSON.stringify(combinedData);
