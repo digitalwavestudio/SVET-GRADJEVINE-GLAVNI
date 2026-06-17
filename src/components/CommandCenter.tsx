@@ -31,7 +31,7 @@ export default function CommandCenter() {
 
   const commands: CommandItem[] = useMemo(() => [
     // Navigacija
-    { id: '1', label: 'KONTROLNA TABLA', category: 'NAVIGACIJA', path: '/moj-profil', icon: 'dashboard' },
+    { id: '1', label: 'KONTROLNA TABLA', category: 'NAVIGACIJA', path: '/kontrolna-tabla', icon: 'dashboard' },
     { id: '2', label: 'PORUKE', category: 'KOMUNIKACIJA', path: '/poruke', icon: 'chat' },
     { id: '3', label: 'PODEŠAVANJA', category: 'SISTEM', path: '/podesavanja', icon: 'settings' },
     
