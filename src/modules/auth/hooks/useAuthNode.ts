@@ -333,12 +333,12 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
 
 useEffect(() => {
   getRedirectResult(auth)
-    .then(async (result) => {
+    .then((result) => {
       if (import.meta.env.DEV) console.log('[AUTH] getRedirectResult result:', result);
       if (result?.user && !redirectProcessed.current) {
         redirectProcessed.current = true;
         currentFbUser.current = result.user;
-        await initUser(result.user);
+        initUser(result.user);
         subscribeToUser(result.user);
       }
     })
@@ -348,29 +348,19 @@ useEffect(() => {
 }, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
-      const isMobile = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
       if (isMobile) {
-        try {
-          await signInWithRedirect(auth, googleProvider);
-        } catch (redirectErr) {
-          console.error('[AUTH] Redirect login failed:', redirectErr);
-          throw redirectErr;
-        }
+        signInWithRedirect(auth, googleProvider).catch(console.error);
         return;
       }
       try {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
-          await initUser(result.user, defaultRole);
+          initUser(result.user, defaultRole);
         }
       } catch (err: any) {
         if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {
-          try {
-            await signInWithRedirect(auth, googleProvider);
-          } catch (redirectErr) {
-            console.error('[AUTH] Redirect login also failed:', redirectErr);
-            throw redirectErr;
-          }
+          signInWithRedirect(auth, googleProvider).catch(console.error);
         } else {
           console.error('[AUTH] Popup login failed:', err);
           throw err;
