@@ -113,12 +113,7 @@ export class OutboxWorker {
         }
       },
       {
-        connection: {
-          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
-          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
-          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
-          maxRetriesPerRequest: null
-        },
+        connection: defaultConnection,
         concurrency: 5, // Procesiraj uporedo 5 poruka
         lockDuration: 300000, // 5 minutes default
         lockRenewTime: 30000,  // Proactive auto-renew every 30s

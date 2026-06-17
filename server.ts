@@ -311,6 +311,11 @@ async function startServer() {
       const { MetricsService } = await import("./server/services/metrics.service.ts");
       const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
       const { DLQMonitoringService } = await import("./server/services/dlq-monitoring.service.ts");
+      const { SystemCron } = await import("./server/utils/system-cron.ts");
+      const { ImageWorker } = await import("./server/services/image.worker.ts");
+      const { ChatBufferService } = await import("./server/services/chat-buffer.service.ts");
+      const { AlgoliaRedisBatcher } = await import("./server/services/algolia-redis-batcher.service.ts");
+      const { shutdownSitemapWorker } = await import("./server/services/sitemap.worker.ts");
       
       try {
         if (mode === "worker" || mode === "full") {
@@ -318,6 +323,11 @@ async function startServer() {
           await GoogleIndexingWorker.gracefulShutdown();
           DLQRecoveryWorker.stop();
           await SyncManager.gracefulShutdown();
+          await SystemCron.gracefulShutdown();
+          await ImageWorker.gracefulShutdown();
+          await ChatBufferService.gracefulShutdown();
+          await AlgoliaRedisBatcher.gracefulShutdown();
+          await shutdownSitemapWorker();
         }
         await MetricsService.gracefulShutdown();
         await DynamicConfigService.gracefulShutdown();

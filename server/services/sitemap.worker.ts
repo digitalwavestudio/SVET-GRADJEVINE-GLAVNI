@@ -188,9 +188,22 @@ export class SitemapWorkerService {
       );
     }
   }
+
+  async shutdown() {
+    if (this.worker) {
+      await this.worker.close();
+    }
+    if (SitemapWorkerService.sharedQueue) {
+      await SitemapWorkerService.sharedQueue.close();
+    }
+  }
 }
 
 export const sitemapWorkerService = new SitemapWorkerService();
+
+export async function shutdownSitemapWorker() {
+  await sitemapWorkerService.shutdown();
+}
 
 export function setupSitemapQueueListeners() {
   // ENTERPRISE BLUEPRINT WAVE 2:

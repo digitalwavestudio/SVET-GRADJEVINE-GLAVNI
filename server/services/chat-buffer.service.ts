@@ -45,7 +45,7 @@ export class ChatBufferService {
     }
 
     if (defaultConnection) {
-      logger.info(`[ChatBuffer] Starting worker on queue: chat (Host: ${defaultConnection.host})`);
+      logger.info(`[ChatBuffer] Starting worker on queue: chat (Host: ${(defaultConnection as any)?.options?.host || 'unknown'})`);
       this.worker = new Worker(
         "chat",
         async (job: Job) => {
