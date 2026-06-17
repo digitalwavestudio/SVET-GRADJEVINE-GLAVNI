@@ -104,6 +104,20 @@ constructionRouter.delete("/:siteId", requireAuth, async (req, res, next) => {
   }
 });
 
+// Get user's construction site
+constructionRouter.get("/user-site", requireAuth, async (req, res, next) => {
+  try {
+    const uid = getReqUser(req).uid;
+    const sitesSnap = await db.collection("construction_sites").where("authorId", "==", uid).limit(1).get();
+    if (sitesSnap.docs.length === 0) {
+      return res.json({ site: null });
+    }
+    res.json({ site: { id: sitesSnap.docs[0].id, ...sitesSnap.docs[0].data() } });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get all construction data (Sites, Events, Diaries)
 constructionRouter.get("/all-data", requireAuth, async (req, res, next) => {
   try {

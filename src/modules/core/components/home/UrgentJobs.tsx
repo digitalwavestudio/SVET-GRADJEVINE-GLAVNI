@@ -103,7 +103,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         {ad.isCompanyVerified && (
                           <div className="flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-1.5 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)] shrink-0">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                            <span className="text-[7.5px] font-black tracking-[0.15em] uppercase text-green-400">APR Verifikovan</span>
+                            <span className="text-[7.5px] font-black tracking-[0.15em] uppercase text-green-400">Verifikovan</span>
                           </div>
                         )}
                       </div>

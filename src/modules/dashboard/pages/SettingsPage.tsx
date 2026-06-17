@@ -40,9 +40,7 @@ export default function SettingsPage() {
     description: '',
     facebook: '',
     instagram: '',
-    mb: '',
-    pib: '',
-    licences: [] as string[],
+
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
@@ -60,9 +58,7 @@ export default function SettingsPage() {
         description: user.description || '',
         facebook: user.facebook || '',
         instagram: user.instagram || '',
-        mb: user.mb || '',
-        pib: user.pib || '',
-        licences: user.licences || [],
+
         // Prioritet dajemo logotipu firme ako je u pitanju poslodavac
         photoURL: user.role === 'poslodavac' 
           ? (user.businessProfile?.logo || '') 
@@ -167,9 +163,6 @@ export default function SettingsPage() {
         updateData.description = formData.description;
         updateData.facebook = formData.facebook;
         updateData.instagram = formData.instagram;
-        updateData.mb = formData.mb;
-        updateData.pib = formData.pib;
-        updateData.licences = formData.licences;
         // Za firme, photoURL u formi se koristi kao logo
         updateData.businessProfile = {
           ...user.businessProfile,
@@ -180,9 +173,6 @@ export default function SettingsPage() {
         updateData.description = formData.description;
         updateData.facebook = formData.facebook;
         updateData.instagram = formData.instagram;
-        updateData.mb = formData.mb;
-        updateData.pib = formData.pib;
-        updateData.licences = formData.licences;
         updateData.photoURL = formData.photoURL;
       } else if (user.role !== 'standard') {
         // smestaj, ketering, masine, placevi, etc.

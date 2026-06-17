@@ -73,12 +73,12 @@ export const submitVerificationRequest = async (
   res: Response,
 ) => {
   try {
-    const { documentUrls } = req.body;
+    const { documentUrls, pib } = req.body;
     const uid = req.user.uid;
 
     if (!uid) throw new BadRequestError("Niste autentifikovani");
 
-    const result = await VerificationService.submitRequest(uid, documentUrls);
+    const result = await VerificationService.submitRequest(uid, documentUrls, pib);
     res.status(201).json(result);
   } catch (error: unknown) {
     const err = error as { statusCode?: number; message: string };

@@ -546,7 +546,7 @@ export default function JobDetailsPage() {
                     {jobData.isCompanyVerified && (
                       <div className="flex items-center gap-1.5 mt-1 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-[4px] w-fit">
                         <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
-                        <span className="text-[7.5px] font-black tracking-widest uppercase text-green-400">Verifikovan APR</span>
+                        <span className="text-[7.5px] font-black tracking-widest uppercase text-green-400">Verifikovan</span>
                       </div>
                     )}
                   </div>

@@ -23,7 +23,6 @@ import { User } from '@svet-gradjevine/shared';
 interface PublicProfileData extends Omit<User, 'cvData' | 'availability'> {
   availability?: string;
   events?: CalendarEvent[];
-  licences?: string[];
   cvData?: {
     about?: string;
     title?: string;
@@ -189,35 +188,7 @@ export default function PublicProfilePage() {
                    </div>
                    <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none w-full break-words max-w-full overflow-hidden text-ellipsis px-1">{displayName}</h1>
                    
-                   {profile.isVerified && (
-                      <div className="flex flex-wrap items-center gap-2 mt-4 justify-center md:justify-start">
-                        <div className="flex items-center gap-2 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-3 py-1.5 rounded-[6px] shadow-[0_0_20px_rgba(34,197,94,0.15)]">
-                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
-                          <span className="text-[10px] font-black tracking-[0.15em] uppercase text-green-400">APR Verifikovan</span>
-                        </div>
-                        
-                        {profile.licences && profile.licences.length > 0 && (
-                          <div className="relative z-20 group/badges">
-                            <div className="flex items-center gap-2 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-3 py-1.5 rounded-[6px] shadow-[0_0_20px_rgba(34,197,94,0.15)] cursor-help peer">
-                              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)] delay-75"></span>
-                              <span className="text-[10px] font-black tracking-[0.15em] uppercase text-green-400">Licenciran Izvođač</span>
-                            </div>
-                            <div className="absolute top-full left-0 mt-2 w-max min-w-[200px] max-w-[300px] bg-slate-900 border border-green-500/30 p-3 rounded-lg shadow-2xl opacity-0 invisible peer-hover:opacity-100 peer-hover:visible transition-all pointer-events-none z-50">
-                              <div className="text-[10px] text-green-400 font-bold uppercase mb-2 border-b border-green-500/20 pb-2">Unete Licence:</div>
-                              <div className="text-[10px] text-white/90 flex flex-col gap-1.5">
-                                {profile.licences.map((l: string, i: number) => (
-                                  <span key={i} className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 bg-green-500/50 rounded-full"></span>
-                                    {l}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                   {companyId && (
+                    {companyId && (
                       <div className="flex justify-center md:justify-start">
                         <Link 
                           to={`/firma/${companyId}`}

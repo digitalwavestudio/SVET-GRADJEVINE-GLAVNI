@@ -32,9 +32,7 @@ export const userProfileSchema = z.object({
   businessProfile: userBusinessProfileSchema.partial().optional(),
   isVerified: z.boolean().optional(),
   verifiedAt: z.any().optional(), // Firebase timestamp or ISO string
-  mb: z.string().optional(),
-  pib: z.string().optional(),
-  licences: z.array(z.string()).optional()
+  pib: z.string().optional()
 });
 
 export type UserBusinessProfileValues = z.infer<typeof userBusinessProfileSchema>;

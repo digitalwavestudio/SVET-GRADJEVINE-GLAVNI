@@ -154,66 +154,6 @@ export function ProfileSettingsTab({
           </>
         )}
 
-        {(user?.role === 'poslodavac' || user?.role === 'majstor') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-white/5 pt-8 mt-8">
-            <div className="md:col-span-2">
-              <h4 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary">verified_user</span>
-                APR Verifikacija i Licence
-              </h4>
-              <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-relaxed mb-6">
-                Unesite vaše poslovne podatke i licence kako biste dobili "TRUST ENGINE" bedž na vašem profilu. Ovi podaci se verifikuju od strane administracije.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Matični Broj (MB)</label>
-              <input 
-                name="mb"
-                value={formData.mb}
-                onChange={handleInputChange}
-                placeholder="npr. 12345678"
-                className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">PIB</label>
-              <input 
-                name="pib"
-                value={formData.pib}
-                onChange={handleInputChange}
-                placeholder="npr. 101234567"
-                className="w-full bg-white/[0.03] border border-white/5 rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none"
-              />
-            </div>
-            <div className="md:col-span-2 space-y-2">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">Selektor Inženjerskih i Izvođačkih Licenci</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                {['Licenca 300', 'Licenca 310', 'Licenca 410', 'Licenca 411', 'Licenca 800', 'Majstorsko pismo', 'Sertifikat ISO', 'Ostale komorske licence'].map((lic) => (
-                  <label key={lic} className="flex items-center gap-3 cursor-pointer group bg-white/[0.02] border border-white/5 p-4 rounded-[10px] hover:border-secondary transition-colors">
-                    <input 
-                      type="checkbox"
-                      className="w-4 h-4 rounded-[4px] border-white/20 bg-transparent text-secondary focus:ring-secondary/20 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
-                      checked={formData.licences.includes(lic)}
-                      onChange={(e) => {
-                        const evt = {
-                          target: {
-                            name: 'licences',
-                            value: e.target.checked 
-                              ? [...formData.licences, lic]
-                              : formData.licences.filter((l: string) => l !== lic)
-                          }
-                        } as any;
-                        handleInputChange(evt);
-                      }}
-                    />
-                    <span className="text-[11px] font-bold text-white/70 group-hover:text-white transition-colors uppercase tracking-wider">{lic}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-        
         <div className="pt-6 border-t border-white/5">
           <div className="space-y-2 max-w-md">
             <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">EMAIL ADRESA (PRIVATNO)</label>

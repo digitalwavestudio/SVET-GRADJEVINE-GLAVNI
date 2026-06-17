@@ -23,7 +23,7 @@ export const calculateProfileScore = (user: Partial<User> | null): number => {
     if (user.profession || user.cvData?.profession) score += 15;
     if ((user.description && user.description.length > 10) || (user.cvData?.about && user.cvData.about.length > 10)) score += 20;
     if (user.hasCV || user.cvData) score += 20;
-    if ((user.licences && user.licences.length > 0) || user.availability) score += 15;
+    if (user.availability) score += 15;
     return Math.min(score, 100);
   }
 
@@ -50,8 +50,8 @@ export const calculateProfileScore = (user: Partial<User> | null): number => {
   const address = user.location || user.businessProfile?.address;
   if (address) score += 15;
   
-  // PIB / MB / identifikacija za pravna lica (ili automatska verifikacija za partnere/admine)
-  const hasPib = user.pib || user.mb || user.businessProfile?.pib || user.isVerified || role === 'admin';
+  // PIB / identifikacija za pravna lica (ili automatska verifikacija za partnere/admine)
+  const hasPib = user.pib || user.businessProfile?.pib || user.isVerified || role === 'admin';
   if (hasPib) score += 15;
 
   return Math.min(score, 100);

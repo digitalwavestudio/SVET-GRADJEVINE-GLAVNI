@@ -8,11 +8,10 @@ interface StickyContactCardProps {
   email?: string;
   authorName?: string;
   isVerified?: boolean;
-  licences?: string[];
   avatar?: string;
   price?: string | number;
   currency?: string;
-  profileUrl?: string; // ADDED: URL to cross-link
+  profileUrl?: string;
   onMessage?: () => void;
 }
 
@@ -21,7 +20,6 @@ export default function StickyContactCard({
   email, 
   authorName, 
   isVerified, 
-  licences,
   avatar,
   price,
   currency = 'EUR',
@@ -86,31 +84,9 @@ export default function StickyContactCard({
                 <h3 className="text-lg font-bold text-white tracking-tight">{authorName || 'Anonimni Korisnik'}</h3>
               )}
               {isVerified && (
-                <div className="flex flex-col gap-1.5 mt-2 group/badges">
-                  <div className="flex items-center gap-1.5 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] w-fit shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                    <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">APR Verifikovan</span>
-                  </div>
-                  
-                  {licences && licences.length > 0 && (
-                    <div className="relative z-20">
-                      <div className="flex items-center gap-1.5 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] w-fit shadow-[0_0_15px_rgba(34,197,94,0.1)] cursor-help peer">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)] delay-75"></span>
-                        <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">Licenciran Izvođač</span>
-                      </div>
-                      <div className="absolute top-10 left-0 w-max min-w-[150px] max-w-[220px] bg-slate-900 border border-green-500/30 p-2.5 rounded-md shadow-2xl opacity-0 invisible peer-hover:opacity-100 peer-hover:visible transition-all pointer-events-none">
-                        <div className="text-[9.5px] text-green-400 font-bold uppercase mb-1.5 border-b border-green-500/20 pb-1.5">Unete Licence:</div>
-                        <div className="text-[8.5px] text-white/80 flex flex-col gap-1">
-                          {licences.map((l: string, i: number) => (
-                            <span key={i} className="flex items-center gap-1.5">
-                              <span className="w-1 h-1 bg-green-500/50 rounded-full"></span>
-                              {l}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                <div className="flex items-center gap-1.5 mt-2 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] w-fit shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
+                  <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">Verifikovan</span>
                 </div>
               )}
             </div>

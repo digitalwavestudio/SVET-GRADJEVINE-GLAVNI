@@ -107,7 +107,7 @@ export const authMiddleware = async (
               }
             }
             
-            if (decodedToken.admin || decodedToken.role === "admin") {
+            if (decodedToken.admin || decodedToken.role === "admin" || userData?.isAdmin) {
               resolvedRole = "admin";
               resolvedPermissions = ["*"];
             } else {

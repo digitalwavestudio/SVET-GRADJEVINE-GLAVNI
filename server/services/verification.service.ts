@@ -25,13 +25,7 @@ export class VerificationService {
   /**
    * Submits a new verification request for a user.
    */
-  static async submitRequest(userId: string, documentUrls: string[]) {
-    if (!documentUrls || documentUrls.length === 0) {
-      throw new BadRequestError(
-        "Morate priložiti dokumentaciju za verifikaciju.",
-      );
-    }
-
+  static async submitRequest(userId: string, documentUrls: string[] = [], pib?: string) {
     try {
       return await db.runTransaction(async (transaction) => {
         const userRef = db.collection("users").doc(userId);
@@ -43,7 +37,7 @@ export class VerificationService {
 
         const userData = userSnap.data()!;
 
-        // Check if there is already a pending request using the correct transaction boundary
+        // Check if there is already a pending request
         const pendingQuery = db
           .collection("verification_requests")
           .where("userId", "==", userId)
@@ -56,6 +50,11 @@ export class VerificationService {
           throw new BadRequestError(
             "Već imate zahtev za verifikaciju na čekanju.",
           );
+        }
+
+        // Save PIB to user doc
+        if (pib) {
+          transaction.update(userRef, { pib, updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp() });
         }
 
         const requestId = db.collection("verification_requests").doc().id;

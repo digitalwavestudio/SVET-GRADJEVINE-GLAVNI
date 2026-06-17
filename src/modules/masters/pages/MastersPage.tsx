@@ -455,31 +455,9 @@ export default function MastersPage() {
                     </div>
 
                     {candidate.verified && (
-                      <div className="flex flex-wrap gap-1.5 mb-4 group/badges relative">
-                        <div className="hidden md:flex items-center gap-1.5 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                          <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">APR Verifikovan</span>
-                        </div>
-                        
-                        {candidate.licences && candidate.licences.length > 0 && (
-                          <div className="relative z-20">
-                            <div className="flex items-center gap-1.5 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)] cursor-help peer">
-                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)] delay-75"></span>
-                              <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">Licenciran Izvođač</span>
-                            </div>
-                            <div className="absolute top-full left-0 mt-1 w-max min-w-[120px] max-w-[200px] bg-slate-900 border border-green-500/30 p-2 rounded-md shadow-2xl opacity-0 invisible peer-hover:opacity-100 peer-hover:visible transition-all pointer-events-none">
-                              <div className="text-[9px] text-green-400 font-bold uppercase mb-1 border-b border-green-500/20 pb-1">Unete Licence:</div>
-                              <div className="text-[8px] text-white/80 flex flex-col gap-0.5">
-                                {candidate.licences.map((l: string, i: number) => (
-                                  <span key={i} className="flex items-center gap-1">
-                                    <span className="w-1 h-1 bg-green-500/50 rounded-full"></span>
-                                    {l}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                      <div className="flex items-center gap-1.5 mb-4 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] w-fit shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
+                        <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">Verifikovan</span>
                       </div>
                     )}
 

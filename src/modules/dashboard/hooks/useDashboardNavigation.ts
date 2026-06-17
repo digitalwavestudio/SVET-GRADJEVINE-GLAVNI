@@ -92,7 +92,7 @@ export function useDashboardNavigation() {
       case '/moj-profil/gradiliste':
         queryClient.prefetchQuery({
           queryKey: ['construction-site', uid],
-          queryFn: async () => (await apiClient.get<Record<string, unknown>>(`/construction-site/${uid}`)) || {},
+          queryFn: async () => (await apiClient.get<Record<string, unknown>>(`/construction/user-site`)) || {},
           staleTime: 5 * 60 * 1000
         });
         break;

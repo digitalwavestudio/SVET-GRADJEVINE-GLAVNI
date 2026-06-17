@@ -28,7 +28,8 @@ import {
 } from "@svet-gradjevine/shared";
 
 export const submitVerificationSchema = z.object({
-  documentUrls: z.array(z.string().url("Neispravna URL adresa dokumenta")).min(1, "Morate poslati najmanje jedan dokument"),
+  documentUrls: z.array(z.string().url("Neispravna URL adresa dokumenta")).optional(),
+  pib: z.string().min(1, "PIB je obavezan"),
 });
 
 export const processVerificationSchema = z.object({
