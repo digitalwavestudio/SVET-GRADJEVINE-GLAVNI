@@ -42,11 +42,11 @@ export function useMessagesNode(
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        console.log("⏸️ [useMessagesNode] Tab hidden, suspending polling.");
+        if (import.meta.env.DEV) console.log("⏸️ [useMessagesNode] Tab hidden, suspending polling.");
         setIsVisible(false);
         setIsTabSuspended(true);
       } else {
-        console.log("▶️ [useMessagesNode] Tab visible, resuming polling.");
+        if (import.meta.env.DEV) console.log("▶️ [useMessagesNode] Tab visible, resuming polling.");
         setIsTabSuspended(false);
         setIsVisible(true);
       }

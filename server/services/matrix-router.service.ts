@@ -1,5 +1,6 @@
 import { UnifiedSearchService, UnifiedSearchResult } from "./unified-search.service.js";
 import { CacheService } from "./cache.service.js";
+import { Logger, logger } from "../utils/logger.ts";
 
 export class MatrixRouter {
   /**
@@ -96,12 +97,12 @@ export class MatrixRouter {
       await CacheService.set(cacheKey, isIndexable, 12 * 60 * 60 * 1000);
 
       if (!isIndexable) {
-        console.log(
+        logger.debug(
           `[MatrixRouter-Background] Thin Content: Cached No-indexing decision for ${path} (Count: ${count})`,
         );
       }
     } catch (err) {
-      console.error(`[MatrixRouter-Background] Error caching thin content for ${path}:`, err);
+      logger.error(`[MatrixRouter-Background] Error caching thin content for ${path}:`, err);
     }
   }
 }

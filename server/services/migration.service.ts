@@ -1,5 +1,5 @@
 import { db, admin } from "../config/firebase.ts";
-import { logger } from "../utils/logger.ts";
+import { logger, Logger } from "../utils/logger.ts";
 
 export interface Migration {
   id: string; // e.g. '001_initial_setup'
@@ -39,7 +39,7 @@ export const runPendingMigrations = async (): Promise<{
 
     for (const migration of availableMigrations) {
       if (!executedIds.includes(migration.id)) {
-        console.log(`[Migrations] Running migration: ${migration.id}`);
+        logger.debug(`[Migrations] Running migration: ${migration.id}`);
         try {
           await migration.up();
           executedIds.push(migration.id);
@@ -49,7 +49,7 @@ export const runPendingMigrations = async (): Promise<{
             executed: executedIds,
             lastRun: admin.firestore.FieldValue.serverTimestamp(),
           });
-          console.log(`[Migrations] Completed migration: ${migration.id}`);
+          logger.debug(`[Migrations] Completed migration: ${migration.id}`);
         } catch (mErr: any) {
           if (mErr?.message?.includes("RESOURCE_EXHAUSTED") || mErr?.code === 8) {
             logger.warn(`[Migrations] Migration ${migration.id} paused due to Firestore Quota Exceeded.`);

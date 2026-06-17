@@ -6,7 +6,7 @@ import { checkQuotaStatus } from "../config/firebase.ts";
 import { AdaptiveQosService } from "./adaptive-qos.service.ts";
 import { CACHE_PREFIXES, CacheKeys } from "../constants/cache-keys.ts";
 import zlib from "zlib";
-import { logger } from "../utils/logger.ts";
+import { Logger, logger } from "../utils/logger.ts";
 
 /**
  * Centralizovani servis za keširanje.
@@ -186,7 +186,7 @@ export class CacheService {
           try {
             const backoff = await this.get<{ errorCount: number; retryAfter: number }>(backoffKey);
             if (backoff && now < backoff.retryAfter) {
-              console.log(`[CacheService SWR] Background revalidation backoff active for ${key}. Skipping retry for another ${Math.round((backoff.retryAfter - now) / 1000)}s.`);
+              logger.debug(`[CacheService SWR] Background revalidation backoff active for ${key}. Skipping retry for another ${Math.round((backoff.retryAfter - now) / 1000)}s.`);
               return envelope.data;
             }
           } catch (err) {
@@ -198,7 +198,7 @@ export class CacheService {
 
           if (lockId) {
             // Ovaj zahtev je pobednik i preuzima revalidaciju
-            console.log(`[CacheService SWR] Acquired background lock for ${key}. Revalidating...`);
+            logger.debug(`[CacheService SWR] Acquired background lock for ${key}. Revalidating...`);
             
             // ADR 003: Provera Throughput-a
             AdaptiveQosService.recordReadIntent().then((isThroughputSafe) => {
@@ -218,7 +218,7 @@ export class CacheService {
                 await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
                 // Clear current backoff upon successful revalidation
                 await this.delete(backoffKey).catch((e: any) => logger.warn("[CacheService] SWR delete backoff key:", e));
-                console.log(`[CacheService SWR] Successfully refreshed SWR cache for key: ${key}`);
+                logger.debug(`[CacheService SWR] Successfully refreshed SWR cache for key: ${key}`);
               })
               .catch(async (err) => {
                 console.error(`[CacheService SWR] Background revalidation failed for key: ${key}`, err);
@@ -229,7 +229,7 @@ export class CacheService {
                   const delay = Math.min(1000 * Math.pow(2, errorCount - 1), 300000); // 1s, 2s, 4s, 8s, up to 5 min
                   const retryAfter = Date.now() + delay;
                   await this.set(backoffKey, { errorCount, retryAfter }, delay + 60000);
-                  console.log(`[CacheService SWR] Exponential backoff registered for ${key}. Attempts: ${errorCount}, delay: ${delay / 1000}s.`);
+                  logger.debug(`[CacheService SWR] Exponential backoff registered for ${key}. Attempts: ${errorCount}, delay: ${delay / 1000}s.`);
                 } catch (e) {
                   console.error("[CacheService SWR] Failed to update backoff metadata:", e);
                 }
@@ -243,7 +243,7 @@ export class CacheService {
           } else {
             // Lock je zauzet, neko drugi već radi revalidaciju. 
             // Serviramo trenutni 'stale' podatak
-            console.log(`[CacheService SWR] Revalidation lock holds. Serving stale data for key: ${key}`);
+            logger.debug(`[CacheService SWR] Revalidation lock holds. Serving stale data for key: ${key}`);
             return envelope.data;
           }
         }
@@ -277,7 +277,7 @@ export class CacheService {
       }
 
       try {
-        console.log(`[CacheService SWR] Cold-start block-fetch for key: ${key}`);
+        logger.debug(`[CacheService SWR] Cold-start block-fetch for key: ${key}`);
         
         // ADR 003: Provera Throughput-a
         const isThroughputSafe = await AdaptiveQosService.recordReadIntent();
@@ -641,7 +641,7 @@ export class CacheService {
         }
 
         this.isListenerRunning = true;
-        console.log(`🚀 [CacheService] Pokrenut ne-blokirajući Redis Stream listener: ${this.STREAM_NAME}`);
+        logger.debug(`🚀 [CacheService] Pokrenut ne-blokirajući Redis Stream listener: ${this.STREAM_NAME}`);
 
         let lastId = "$"; // Čitamo samo nove zapise od trenutka pokretanja kontejnera
 

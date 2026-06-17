@@ -23,7 +23,7 @@ export const notificationService = {
 
     try {
       await apiClient.post('/notifications', { activity });
-      console.log('✅ Aktivnost/notifikacija poslata serveru.');
+      console.info('✅ Aktivnost/notifikacija poslata serveru.');
     } catch (err) {
       console.error('[NOTIFY] Error:', err);
       return false;

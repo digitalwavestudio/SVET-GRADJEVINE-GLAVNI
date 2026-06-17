@@ -2,6 +2,7 @@ import { env } from "../config/env.ts";
 import { db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 import { getRedis } from "../utils/redis.ts";
+import { Logger, logger } from "../utils/logger.ts";
 
 export class PresenceService {
   private static intervalId: NodeJS.Timeout | null = null;
@@ -86,7 +87,7 @@ export class PresenceService {
         }
       }
 
-      console.log(`[PresenceService] Uspešno upisan batch presence za ${entries.length} korisnika.`);
+      logger.debug(`[PresenceService] Uspešno upisan batch presence za ${entries.length} korisnika.`);
     } catch (error) {
       console.error("[PresenceService] Greška tokom flushPendingPresence:", error);
     } finally {
@@ -104,7 +105,7 @@ export class PresenceService {
       if (!this.intervalId) {
         // Svaka 5 minuta (5 * 60 * 1000 = 300000 ms)
         this.intervalId = setInterval(() => this.flushPendingPresence(), 300000);
-        console.log("[PresenceService] Inicijalizovan periodični batch flush za prisustvo korisnika (svakih 5 minuta).");
+        logger.debug("[PresenceService] Inicijalizovan periodični batch flush za prisustvo korisnika (svakih 5 minuta).");
       }
     }
   }

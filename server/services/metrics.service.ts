@@ -6,7 +6,7 @@ import { LockManager } from "./lock.service.ts";
 import { CacheService } from "./cache.service.ts";
 import { ViewStatsService } from "./viewStatsService.ts";
 import { CACHE_PREFIXES, CacheKeys } from "../constants/cache-keys.ts";
-import { logger } from "../utils/logger.ts";
+import { logger, Logger } from "../utils/logger.ts";
 
 const REDIS_KEY_PENDING = CACHE_PREFIXES.METRICS_VIEW_BUFFER;
 const REDIS_KEY_USER_STATS = CACHE_PREFIXES.METRICS_USER_STATS;
@@ -356,7 +356,7 @@ export class MetricsService {
           }
       });
 
-      console.log(`[MetricsService] Flushed metrics fully via chunks`);
+      logger.debug(`[MetricsService] Flushed metrics fully via chunks`);
     } catch (err) {
       console.error("[MetricsService] Flush failed:", err);
     } finally {

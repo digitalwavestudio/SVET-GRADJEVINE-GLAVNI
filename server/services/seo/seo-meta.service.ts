@@ -1,7 +1,7 @@
 ﻿import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { SEOSchemaService, SEOEntityData } from "./seo-schema.service.ts";
-import { logger } from "../../utils/logger.ts";
+import { logger, Logger } from "../../utils/logger.ts";
 
 export class SEOMetaService {
   static async getAdMetaData(
@@ -21,7 +21,7 @@ export class SEOMetaService {
       if (redis) {
         const isDead = await redis.get(deadPathKey);
         if (isDead) {
-          console.log(`ðŸ›¡ï¸ [SEO Shield] Dead path hit for ${resolvedPath}. Blocking re-fetch.`);
+          logger.debug(`ðŸ›¡ï¸ [SEO Shield] Dead path hit for ${resolvedPath}. Blocking re-fetch.`);
           return { isDead: true };
         }
       }
@@ -54,7 +54,7 @@ export class SEOMetaService {
     const lockKey = `lock:seo_meta:${cacheKey}`;
     const lockId = await RedisLockManager.acquire(lockKey, 30000);
     if (!lockId) {
-       console.log(`[SEO-Background] Background compilation already in progress for ${resolvedPath}. Skipping concurrent Firestore read.`);
+       logger.debug(`[SEO-Background] Background compilation already in progress for ${resolvedPath}. Skipping concurrent Firestore read.`);
        return;
     }
     

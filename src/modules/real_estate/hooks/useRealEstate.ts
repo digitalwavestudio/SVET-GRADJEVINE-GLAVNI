@@ -42,7 +42,7 @@ export function useRealEstateList(filters: RealEstateFilters, options?: Partial<
           state &&
           (Array.isArray(state.docs) || Array.isArray(state.items))
         ) {
-          console.log("[useRealEstateList] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useRealEstateList] Using hydrated INITIAL_STATE");
           const payload = {
             items: state.docs || state.items || [],
             lastVisible: state.lastVisibleId || state.lastVisible || null,

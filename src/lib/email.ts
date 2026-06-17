@@ -47,7 +47,7 @@ export const sendJobApplicationEmail = async (
     };
 
     await emailjs.send(serviceId, templateId, templateParams, publicKey);
-    console.log('EmailJS: Obaveštenje uspešno poslato.');
+    console.info('EmailJS: Obaveštenje uspešno poslato.');
   } catch (error) {
     console.error('EmailJS Error:', error);
   }
@@ -79,7 +79,7 @@ export const sendChatMessageEmail = async (
     };
 
     await emailjs.send(serviceId, templateId, templateParams, publicKey);
-    console.log('EmailJS: Chat obaveštenje uspešno poslato.');
+    console.info('EmailJS: Chat obaveštenje uspešno poslato.');
   } catch (error) {
     console.error('EmailJS Chat Error:', error);
   }

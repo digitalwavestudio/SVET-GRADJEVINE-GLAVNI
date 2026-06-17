@@ -1,6 +1,7 @@
 import { getRedis } from "../utils/redis.ts";
 import { v4 as uuidv4 } from "uuid";
 import { CacheKeys } from "../constants/cache-keys.ts";
+import { Logger, logger } from "../utils/logger.ts";
 
 export class LockManager {
   private static activeLocks: Map<string, string> = new Map(); // ResourceId -> LockId
@@ -88,7 +89,7 @@ export class LockManager {
 
   static async gracefulCleanup(): Promise<void> {
     if (this.activeLocks.size === 0) return;
-    console.log(`[LockManager] Shutdown cleanup: Releasing ${this.activeLocks.size} locks...`);
+    logger.debug(`[LockManager] Shutdown cleanup: Releasing ${this.activeLocks.size} locks...`);
 
     for (const [id, lockId] of this.activeLocks.entries()) {
       await this.release(id, lockId);

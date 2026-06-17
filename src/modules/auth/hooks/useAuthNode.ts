@@ -511,7 +511,7 @@ useEffect(() => {
 
          // Ako menjamo SAMO ulogu kao admin (preview mod), ne šaljemo API poziv za profil
          if (isAdmin && Object.keys(finalData).length === 1 && finalData.role) {
-            console.log('[AUTH] Admin switching role preview, skipping backend profile sync');
+            if (import.meta.env.DEV) console.log('[AUTH] Admin switching role preview, skipping backend profile sync');
             return;
          }
 

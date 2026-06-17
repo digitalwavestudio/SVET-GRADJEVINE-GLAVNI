@@ -30,7 +30,7 @@ export function useMastersList(
           state &&
           (Array.isArray(state.docs) || Array.isArray(state.items))
         ) {
-          console.log("[useMastersList] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useMastersList] Using hydrated INITIAL_STATE");
           const payload = {
             docs: (state.docs || state.items || []) as Master[],
             lastVisibleId: (state.lastVisibleId || state.lastVisible || null) as string | null,

@@ -48,7 +48,7 @@ export function useCompaniesList(
           state &&
           (Array.isArray(state.docs) || Array.isArray(state.items))
         ) {
-          console.log("[useCompaniesList] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useCompaniesList] Using hydrated INITIAL_STATE");
           const payload = {
             items: (state.docs || state.items || []) as Company[],
             lastVisible: (state.lastVisibleId || state.lastVisible || null) as string | null,

@@ -35,7 +35,7 @@ export const usePrefetch = () => {
     if (id) {
       const staleTime = 30 * 1000; // 30 seconds staleTime
       try {
-        console.log(`⚡ [SmartPrefetch] Background prefetching query for group "${type}" (ID: "${id}")`);
+        if (import.meta.env.DEV) console.log(`⚡ [SmartPrefetch] Background prefetching query for group "${type}" (ID: "${id}")`);
         
         switch (type) {
           case 'job': {

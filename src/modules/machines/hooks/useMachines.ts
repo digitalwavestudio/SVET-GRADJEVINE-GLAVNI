@@ -35,7 +35,7 @@ export function useMachinesList(
           state &&
           (Array.isArray(state.docs) || Array.isArray(state.items))
         ) {
-          console.log("[useMachinesList] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useMachinesList] Using hydrated INITIAL_STATE");
           const payload = {
             items: (state.docs || state.items || []) as Machine[],
             lastVisible: (state.lastVisibleId || state.lastVisible || null) as string | null,

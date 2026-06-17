@@ -44,7 +44,7 @@ export const moderationService = {
   async moderateImageAI(imageUrl: string): Promise<{ isSafe: boolean; reason?: string; confidence?: number }> {
     try {
       const result = await apiClient.post<{ isSafe: boolean; reason?: string; confidence?: number }>('/ai/moderate-image', { imageUrl });
-      console.log(`🤖 [AI_MODERATION] Analysis complete for ${imageUrl}:`, result);
+      console.info(`🤖 [AI_MODERATION] Analysis complete for ${imageUrl}:`, result);
       return result;
     } catch (error) {
       console.error("❌ [AI_MODERATION] Error scanning image:", error);
@@ -92,7 +92,7 @@ export const moderationService = {
    */
   async executeModerationAction(contract: ModerationActionContract, itemData?: ModerationItem): Promise<void> {
     return withRetry(async () => {
-      console.log(`🛡️ [BACKEND] Moderate Action:`, contract);
+      console.info(`🛡️ [BACKEND] Moderate Action:`, contract);
 
       const status = contract.action === 'approve' ? 'approved' : 'rejected';
       
@@ -123,7 +123,7 @@ export const moderationService = {
         );
       }
 
-      console.log(`✅ [MODERATION] Action ${contract.action} successfully processed`);
+      console.info(`✅ [MODERATION] Action ${contract.action} successfully processed`);
     });
   },
 
@@ -158,7 +158,7 @@ export const moderationService = {
   async verifyUser(targetUserId: string, isVerified: boolean): Promise<void> {
     return withRetry(async () => {
       await apiClient.post('/admin/verify-user', { targetUserId, isVerified });
-      console.log(`✅ [VERIFICATION] User ${targetUserId} status updated to ${isVerified}`);
+      console.info(`✅ [VERIFICATION] User ${targetUserId} status updated to ${isVerified}`);
     });
   }
 };

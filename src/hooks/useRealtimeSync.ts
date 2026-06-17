@@ -50,7 +50,7 @@ export function useRealtimeSync() {
         eventSource.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log('[SSE] Received event:', data);
+            if (import.meta.env.DEV) console.log('[SSE] Received event:', data);
             if (data.type === 'NEW_MESSAGE' || data.type === 'MESSAGE_READ' || data.type === 'ping') {
               queryClient.invalidateQueries({ queryKey: ['activities'] });
             }
@@ -71,7 +71,7 @@ export function useRealtimeSync() {
             isFallbackActive = true;
             fallbackInterval = setInterval(() => {
               if (document.visibilityState === 'visible') {
-                console.log('[QoS Polling Fallback] Syncing...');
+                if (import.meta.env.DEV) console.log('[QoS Polling Fallback] Syncing...');
                 queryClient.invalidateQueries({ queryKey: ['activities'] });
               }
             }, 600000);

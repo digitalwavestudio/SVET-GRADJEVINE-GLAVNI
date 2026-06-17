@@ -26,7 +26,7 @@ export function useAccommodationsList(filters: any, options?: any) {
           state &&
           (Array.isArray(state.docs) || Array.isArray(state.items))
         ) {
-          console.log("[useAccommodationsList] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useAccommodationsList] Using hydrated INITIAL_STATE");
           const payload = {
             items: state.docs || state.items || [],
             lastVisible: state.lastVisibleId || state.lastVisible,

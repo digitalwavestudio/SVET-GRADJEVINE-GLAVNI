@@ -137,7 +137,7 @@ class FirestoreListenerManager {
       const timeSinceLastDisconnect = Date.now() - this.lastDisconnectTime;
       if (timeSinceLastDisconnect < this.CONNECTION_DEBOUNCE_MS) {
         const delay = this.CONNECTION_DEBOUNCE_MS - timeSinceLastDisconnect;
-        console.log(`⏳ [FirestoreListenerManager] Safe-Delay: Odlaganje konekcije za ${listenerName} za ${delay}ms...`);
+        if (import.meta.env.DEV) console.log(`⏳ [FirestoreListenerManager] Safe-Delay: Odlaganje konekcije za ${listenerName} za ${delay}ms...`);
         connectionTimeout = setTimeout(performSubscribe, delay);
       } else {
         performSubscribe();
@@ -186,7 +186,7 @@ class FirestoreListenerManager {
         // Remove from queryRegistry
         this.queryRegistry = this.queryRegistry.filter(entry => entry.key !== key);
         
-        console.log(`🔌 [FirestoreListenerManager] Uspšno uništena neiskorišćena konekcija za ključ: ${key}. Preostalo aktivnih: ${this.activeCount}`);
+        if (import.meta.env.DEV) console.log(`🔌 [FirestoreListenerManager] Uspšno uništena neiskorišćena konekcija za ključ: ${key}. Preostalo aktivnih: ${this.activeCount}`);
       }
     };
   }

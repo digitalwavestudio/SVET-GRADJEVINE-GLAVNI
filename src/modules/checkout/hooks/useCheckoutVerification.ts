@@ -28,7 +28,7 @@ export const useCheckoutVerification = (
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
         suspendTimeoutId = setTimeout(() => {
-          console.log("[useCheckoutVerification] Idle timeout exceeded. Disconnecting checkout subscription to save counts.");
+          if (import.meta.env.DEV) console.log("[useCheckoutVerification] Idle timeout exceeded. Disconnecting checkout subscription to save counts.");
           setIsTabSuspended(true);
         }, 180000);
       } else {
@@ -37,7 +37,7 @@ export const useCheckoutVerification = (
           suspendTimeoutId = null;
         }
         setIsTabSuspended(false); // Sigurno stanje bez referenciranja same sebe za proveru
-        console.log("[useCheckoutVerification] Active state restored. Resuming checkout subscription.");
+        if (import.meta.env.DEV) console.log("[useCheckoutVerification] Active state restored. Resuming checkout subscription.");
       }
     };
 

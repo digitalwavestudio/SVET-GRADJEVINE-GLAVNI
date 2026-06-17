@@ -125,5 +125,5 @@ export const initErrorMonitor = () => {
     originalError.apply(console, args);
   };
 
-  console.log('[Reliability] Global Error Monitoring Active');
+  if (import.meta.env.DEV) console.log('[Reliability] Global Error Monitoring Active');
 };

@@ -63,31 +63,31 @@ async function startServer() {
   // Bind the port immediately so Cloud Run/Kubernetes respects liveness
   if (mode === "api" || mode === "full") {
     server = app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 [Server] Phase 0: Liveness server active on port ${PORT} (mode: ${mode})`);
+      if (env.NODE_ENV !== "production") console.log(`[Server] Phase 0: Liveness server active on port ${PORT} (mode: ${mode})`);
     });
   }
 
   try {
     // Phase 1: Heavy lazy imports and observability foundation
-    console.log("[Server] Starting Phase 1 initialization");
+    if (env.NODE_ENV !== "production") console.log("[Server] Starting Phase 1 initialization");
     let ensureInitialized: any;
     try {
       const { initTracing } = await import("./server/utils/tracing.ts");
-      console.log("[Server] Tracing imported");
+      if (env.NODE_ENV !== "production") console.log("[Server] Tracing imported");
       try { initTracing(); } catch (e) { console.warn("[Tracing] Failed, continuing."); }
   
       const { MonitoringService } = await import("./server/services/monitoring.service.ts");
       console.log("[Server] MonitoringService imported");
       MonitoringService.init();
       
-      console.log("[Server] Phase 1 initialization almost complete");
+      if (env.NODE_ENV !== "production") console.log("[Server] Phase 1 initialization almost complete");
       const firebaseModule = await import("./server/config/firebase.ts");
       ensureInitialized = firebaseModule.ensureInitialized;
-      console.log("[Server] Firebase imported");
+      if (env.NODE_ENV !== "production") console.log("[Server] Firebase imported");
       
       const { initZodLocalization } = await import("@svet-gradjevine/shared");
       initZodLocalization();
-      console.log("[Server] Phase 1 initialization complete");
+      if (env.NODE_ENV !== "production") console.log("[Server] Phase 1 initialization complete");
     } catch (e) {
       console.error("[Server] Phase 1 initialization error:", e);
     }
@@ -296,11 +296,11 @@ async function startServer() {
     app.use(globalErrorHandler);
 
     isReady = true;
-    console.log(`🚀 [Server] Phase 4: Application fully initialized and traffic unlocked.`);
+    if (env.NODE_ENV !== "production") console.log(`[Server] Phase 4: Application fully initialized and traffic unlocked.`);
 
     // Shutdown Handler
     const shutdown = async (signal: string) => {
-      console.log(`\n[Server] Received ${signal}. Starting shutdown.`);
+      console.log(`[Server] Received ${signal}. Starting shutdown.`);
       const { LoggerService } = await import("./server/services/logger.service.ts");
       const { LockManager } = await import("./server/services/lock.service");
       const { shutdownRedis } = await import("./server/utils/redis.ts");
@@ -344,8 +344,13 @@ async function startServer() {
 
     process.on("SIGTERM", () => shutdown("SIGTERM"));
     process.on("SIGINT", () => shutdown("SIGINT"));
+    process.on("uncaughtException", (err) => {
+      console.error("[Process] Uncaught Exception — force exiting:", err);
+      process.exit(1);
+    });
     process.on("unhandledRejection", (reason) => {
-      console.error("⚠️ [Process] Unhandled Rejection intercepted to prevent crash:", reason);
+      console.error("[Process] Unhandled Rejection — force exiting:", reason);
+      process.exit(1);
     });
 
   } catch (e) {

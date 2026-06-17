@@ -255,7 +255,7 @@ class ClientCircuitBreaker {
       }
     } else {
       if (this.states.get(group) === 'OPEN') {
-        console.log(`🛡️ [CircuitBreaker] Group "${group}" recovered. Circuit CLOSED.`);
+        console.info(`🛡️ [CircuitBreaker] Group "${group}" recovered. Circuit CLOSED.`);
         this.states.set(group, 'CLOSED');
         toast.success(`Modul ${group.toUpperCase()} se uspešno sinhronizovao i vratio na online rad!`, {
           duration: 4000,
@@ -328,7 +328,7 @@ class ClientCircuitBreaker {
       this.history.set(group, []);
       this.states.set(group, 'CLOSED');
     }
-    console.log('🛡️ [CircuitBreaker] Manually reset all circuits.');
+    console.info('🛡️ [CircuitBreaker] Manually reset all circuits.');
   }
 
   public getCircuitStatus() {

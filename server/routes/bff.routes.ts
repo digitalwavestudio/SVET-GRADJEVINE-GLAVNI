@@ -125,7 +125,7 @@ class BffDashboardCircuitBreaker {
     if (this.localState === "OPEN" && now - this.localLastStateChange > this.COOLING_PERIOD_MS) {
       this.localState = "HALF_OPEN";
       this.localLastStateChange = now;
-      console.log("[CircuitBreaker] Transitioned to HALF_OPEN (distributed). Probing connection with next request.");
+      logger.debug("[CircuitBreaker] Transitioned to HALF_OPEN (distributed). Probing connection with next request.");
       await this.writeToRedis();
     }
   }
@@ -136,7 +136,7 @@ class BffDashboardCircuitBreaker {
       this.localState = "CLOSED";
       this.localFailures = [];
       this.localLastStateChange = Date.now();
-      console.log("[CircuitBreaker] Transitioned to CLOSED (distributed). Connection is healthy.");
+      logger.debug("[CircuitBreaker] Transitioned to CLOSED (distributed). Connection is healthy.");
       await this.writeToRedis();
     }
   }

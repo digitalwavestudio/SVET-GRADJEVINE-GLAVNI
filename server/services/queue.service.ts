@@ -1,7 +1,7 @@
 import { createQueue } from "../utils/queue.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { getRedis } from "../utils/redis.ts";
-import { logger } from "../utils/logger.ts";
+import { logger, Logger } from "../utils/logger.ts";
 
 /**
  * Tipi zadataka podržani u sistemu.
@@ -68,11 +68,11 @@ export class QueueService {
   private static queues = new Map<string, import("bullmq").Queue>();
 
   private static getQueue(name: string) {
-    console.log(`[QueueService] getQueue requested: ${name}`);
+    logger.debug(`[QueueService] getQueue requested: ${name}`);
     if (!this.queues.has(name)) {
       const queue = createQueue(name);
       if (queue) {
-        console.log(`[QueueService] Queue ${name} created successfully.`);
+        logger.debug(`[QueueService] Queue ${name} created successfully.`);
         this.queues.set(name, queue);
       } else {
         logger.warn(`[QueueService] Queue ${name} could not be created.`);

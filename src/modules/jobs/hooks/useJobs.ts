@@ -37,7 +37,7 @@ export function useJobs(filters: Record<string, unknown>, options?: Record<strin
         const state = customWindow.INITIAL_STATE.searchResult;
         // Verify it looks like jobs payload
         if (state && (Array.isArray(state.docs) || Array.isArray(state.items))) {
-          console.log("[useJobs] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useJobs] Using hydrated INITIAL_STATE");
           const payload: JobsListResponse = {
             items: (state.docs || state.items || []) as JobResponse[],
             lastVisible: (state.lastVisibleId || state.lastVisible || null) as string | null,

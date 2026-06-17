@@ -16,14 +16,14 @@ export const partnerService = {
   async executePartnerConversion(contract: PartnerConversionContract): Promise<void> {
     try {
       // 1. BACKEND HANDOFF LOGGING
-      console.log(`🤝 [BACKEND_HANDOFF] Verifying Partner Conversion (${BACKEND_TASKS.VERIFY_PARTNER_CONVERSION}):`, contract);
+      console.info(`🤝 [BACKEND_HANDOFF] Verifying Partner Conversion (${BACKEND_TASKS.VERIFY_PARTNER_CONVERSION}):`, contract);
 
       // 2. CLIENT-SIDE DATA WRITE (To be moved to server-side authoritative logic)
       const { partnerId, amount, commissionAmount } = contract;
       
       await apiClient.post('/partners/conversion', { partnerId, amount, commissionAmount });
 
-      console.log(`✅ [PARTNERS] Conversion recorded for partner ${partnerId} on checkout ${contract.checkoutId}`);
+      console.info(`✅ [PARTNERS] Conversion recorded for partner ${partnerId} on checkout ${contract.checkoutId}`);
     } catch (error) {
       console.error("Error executing partner conversion:", error);
       throw error;

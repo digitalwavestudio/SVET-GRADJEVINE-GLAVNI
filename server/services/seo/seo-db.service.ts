@@ -2,7 +2,7 @@ import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { UnifiedSearchService } from "../unified-search.service.ts";
 import { SEOSchemaService } from "./seo-schema.service.ts";
-import { logger } from "../../utils/logger.ts";
+import { logger, Logger } from "../../utils/logger.ts";
 
 export class SEODbService {
   static async getHubMetaData(hubType: string, params: Record<string, unknown>) {
@@ -150,7 +150,7 @@ export class SEODbService {
     const lockKey = `lock:seo_hub:${cacheKey}`;
     const lockId = await RedisLockManager.acquire(lockKey, 30000);
     if (!lockId) {
-      console.log(`[SEO-Background] Background compilation already in progress for hub ${url}. Skipping concurrent Firestore read.`);
+      logger.debug(`[SEO-Background] Background compilation already in progress for hub ${url}. Skipping concurrent Firestore read.`);
       return;
     }
 

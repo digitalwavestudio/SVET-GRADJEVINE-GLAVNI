@@ -53,7 +53,7 @@ export function useMarketplaceList(filters: MarketplaceFilters, options?: Partia
           state &&
           (Array.isArray(state.docs) || Array.isArray(state.items))
         ) {
-          console.log("[useMarketplaceList] Using hydrated INITIAL_STATE");
+          if (import.meta.env.DEV) console.log("[useMarketplaceList] Using hydrated INITIAL_STATE");
           const payload = {
             items: (state.docs || state.items || []) as MarketplaceItem[],
             lastVisible: (state.lastVisibleId || state.lastVisible || null) as { id: string } | string | null,

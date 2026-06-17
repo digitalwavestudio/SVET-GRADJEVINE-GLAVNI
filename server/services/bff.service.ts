@@ -21,7 +21,7 @@ import { UnifiedAdsService } from "./unified-ads.service.ts";
 import { UnifiedSearchService } from "./unified-search.service.ts";
 import { DashboardService } from "./dashboard.service.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
-import { logger } from "../utils/logger.ts";
+import { logger, Logger } from "../utils/logger.ts";
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
 const L1_HOMEPAGE_TTL = 15 * 1000; // 15s in-memory Shield cache
@@ -66,7 +66,7 @@ export const bffService = {
 
     // 2. SingleFlight Implementation for Homepage
     if (homepageSingleFlightMap.has(cacheKey)) {
-      console.log(`✈️ [SingleFlight] Coalescing concurrent homepage request: ${cacheKey}`);
+      logger.debug(`✈️ [SingleFlight] Coalescing concurrent homepage request: ${cacheKey}`);
       return homepageSingleFlightMap.get(cacheKey) as Promise<HomepageDataResult>;
     }
 
@@ -463,7 +463,7 @@ export const bffService = {
           const l1PrewarmCached = l1DashboardPrewarmCache.get(prewarmKey);
           if (l1PrewarmCached && now < l1PrewarmCached.expiry) {
             baseData = l1PrewarmCached.data;
-            console.log(`[BFF L1 Prewarm] Served pre-calculated stats from L1 RAM cache: ${prewarmKey}`);
+            logger.debug(`[BFF L1 Prewarm] Served pre-calculated stats from L1 RAM cache: ${prewarmKey}`);
           }
 
           if (!baseData && redis) {
@@ -471,7 +471,7 @@ export const bffService = {
               const cachedStr = await redis.get(prewarmKey);
               if (cachedStr) {
                 baseData = JSON.parse(cachedStr);
-                console.log(`[BFF Prewarm] Served pre-calculated dashboard stats from ${prewarmKey}`);
+                logger.debug(`[BFF Prewarm] Served pre-calculated dashboard stats from ${prewarmKey}`);
                 
                 // Write into L1 cache for extremely fast subsequent reads
                 l1DashboardPrewarmCache.set(prewarmKey, {

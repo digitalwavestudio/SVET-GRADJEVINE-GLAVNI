@@ -1,5 +1,6 @@
 import { GoogleIndexingService } from "./google-indexing.service.ts";
 import { env } from "../config/env.ts";
+import { Logger, logger } from "../utils/logger.ts";
 
 export class IndexingService {
   private static INDEXNOW_KEY =
@@ -8,7 +9,7 @@ export class IndexingService {
 
   /** Pushes URL updates to major search engines in real-time. */
   static async pushToIndex(url: string, action: "URL_UPDATED" | "URL_DELETED") {
-    console.log(`[IndexingService] Pushing to indexers: ${url} (${action})`);
+    logger.debug(`[IndexingService] Pushing to indexers: ${url} (${action})`);
 
     // Fire and forget, we don't want to block
     Promise.allSettled([
@@ -39,7 +40,7 @@ export class IndexingService {
           `[IndexingService] IndexNow failed with status ${res.status}`
         );
       } else {
-        console.log(`[IndexingService] IndexNow notification sent for ${url}`);
+        logger.debug(`[IndexingService] IndexNow notification sent for ${url}`);
       }
     } catch (e) {
       console.error("[IndexingService] Error calling IndexNow:", e);

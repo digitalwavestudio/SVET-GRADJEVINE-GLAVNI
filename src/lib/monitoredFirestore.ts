@@ -421,7 +421,7 @@ if (typeof document !== 'undefined') {
       // Cleanup existing timer if any
       if (suspendTimer) clearTimeout(suspendTimer);
       
-      console.log("⏳ [CentralizedRealtimeManager] Tab neaktivan. Priprema za Hard Kill svih Firestore stream-ova (TCP) za 20s...");
+      if (import.meta.env.DEV) console.log("⏳ [CentralizedRealtimeManager] Tab neaktivan. Priprema za Hard Kill svih Firestore stream-ova (TCP) za 20s...");
       
       suspendTimer = setTimeout(() => {
         if (!isTabVisible) {
@@ -438,7 +438,7 @@ if (typeof document !== 'undefined') {
       
       const streamCount = activeSubscriptions.size;
       if (streamCount > 0) {
-        console.log(`♻️ [CentralizedRealtimeManager] Tab ponovo aktivan. Obnavljam i sinkujem ${streamCount} Firestore konekcija (Hard Reconnect).`);
+        if (import.meta.env.DEV) console.log(`♻️ [CentralizedRealtimeManager] Tab ponovo aktivan. Obnavljam i sinkujem ${streamCount} Firestore konekcija (Hard Reconnect).`);
         resumeAllSubscriptions();
       }
     }
