@@ -10,7 +10,7 @@ export const MobileBottomNav: React.FC = () => {
   const isAuthPage = location.pathname === '/prijava' || location.pathname === '/registracija';
   if (isAuthPage) return null;
 
-  const profilePath = user ? '/moj-profil' : '/prijava';
+  const dashboardPath = user ? '/kontrolna-tabla' : '/prijava';
   const messagesPath = user ? '/poruke' : '/prijava';
 
   return (
@@ -27,7 +27,7 @@ export const MobileBottomNav: React.FC = () => {
         </NavLink>
 
         <NavLink 
-          to="/poslovi" 
+          to="/pretraga" 
           className={({ isActive }) => 
             `flex flex-col items-center justify-center w-12 h-12 transition-colors ${isActive ? 'text-secondary' : 'text-white/40 hover:text-white/70'}`
           }
@@ -57,13 +57,13 @@ export const MobileBottomNav: React.FC = () => {
         </NavLink>
 
         <NavLink 
-          to={profilePath} 
+          to={dashboardPath} 
           className={({ isActive }) => 
             `flex flex-col items-center justify-center w-12 h-12 transition-colors ${isActive ? 'text-secondary' : 'text-white/40 hover:text-white/70'}`
           }
         >
-          <span className="material-symbols-outlined text-2xl">person</span>
-          <span className="text-[8px] font-black uppercase tracking-widest mt-1">Profil</span>
+          <span className="material-symbols-outlined text-2xl">dashboard</span>
+          <span className="text-[8px] font-black uppercase tracking-widest mt-1">Dashboard</span>
         </NavLink>
       </div>
     </div>
