@@ -206,10 +206,10 @@ async function startServer() {
     app.use(
       helmet({
         contentSecurityPolicy: false,
-        crossOriginEmbedderPolicy: { policy: "credentialless" },
-        crossOriginResourcePolicy: { policy: "same-site" },
-        crossOriginOpenerPolicy: { policy: "same-origin" },
-        xFrameOptions: { action: "deny" },
+        crossOriginEmbedderPolicy: false,
+        crossOriginResourcePolicy: false,
+        crossOriginOpenerPolicy: false,
+        xFrameOptions: false,
         referrerPolicy: { policy: "strict-origin-when-cross-origin" },
       }),
     );
