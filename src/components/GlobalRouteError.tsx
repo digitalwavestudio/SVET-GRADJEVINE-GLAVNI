@@ -18,6 +18,7 @@ export default function GlobalRouteError() {
   React.useEffect(() => {
     if (!isChunkError) return;
 
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     try {
       const raw = sessionStorage.getItem(CHUNK_RELOAD_KEY);
       const now = Date.now();
@@ -31,13 +32,14 @@ export default function GlobalRouteError() {
         record.count += 1;
         record.lastTime = now;
         sessionStorage.setItem(CHUNK_RELOAD_KEY, JSON.stringify(record));
-        setTimeout(() => window.location.reload(), 300 + record.count * 200);
+        timeoutId = setTimeout(() => window.location.reload(), 300 + record.count * 200);
       } else {
         console.warn('Exceeded chunk reload attempts; not reloading further.');
       }
     } catch (e) {
       console.warn('Chunk reload logic failed:', e);
     }
+    return () => { if (timeoutId) clearTimeout(timeoutId); };
   }, [isChunkError]);
 
   if (isChunkError) {

@@ -118,7 +118,13 @@ export function setupSeoSubscriber() {
       const redis = getRedis();
       if (redis) {
         // Very naive cleanup. Can be better if we know the slug
-        const keys = await redis.keys(`seo:prerender:/*${id}`);
+        const keys: string[] = [];
+        let cursor = '0';
+        do {
+          const result = await (redis as any).scan(cursor, 'MATCH', `seo:prerender:/*${id}*`, 'COUNT', '100');
+          cursor = result[0];
+          keys.push(...result[1]);
+        } while (cursor !== '0');
         for (const key of keys) {
           await redis.del(key);
         }

@@ -39,7 +39,7 @@ try {
   }
 
   if (fs.existsSync(configPath)) {
-    console.log(`[FIREBASE] Loading configuration from: ${configPath}`);
+    console.info(`[FIREBASE] Loading configuration from: ${configPath}`);
     firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
   } else {
     logger.warn(
@@ -60,7 +60,7 @@ export function ensureInitialized() {
 
   try {
     if (admin.apps.length === 0) {
-      console.log(
+      console.info(
         "[FIREBASE] Initializing Admin SDK for project: " +
           firebaseConfig.projectId,
       );
@@ -71,7 +71,7 @@ export function ensureInitialized() {
       const localKeyPath = path.resolve(process.cwd(), "firebase-service-account.json");
       if (fs.existsSync(localKeyPath)) {
         try {
-          console.log("[FIREBASE] Using service account key from local file: firebase-service-account.json");
+          console.info("[FIREBASE] Using service account key from local file: firebase-service-account.json");
           serviceAccountKey = JSON.parse(fs.readFileSync(localKeyPath, "utf-8"));
         } catch (fileErr) {
           console.error("[FIREBASE] Failed to read/parse local firebase-service-account.json:", fileErr);
@@ -81,7 +81,7 @@ export function ensureInitialized() {
       // 2. Fallback to env key if not loaded from file
       if (!serviceAccountKey && env.FIREBASE_SERVICE_ACCOUNT_KEY) {
         try {
-          console.log("[FIREBASE] Using service account key from environment.");
+          console.info("[FIREBASE] Using service account key from environment.");
           let keyString = env.FIREBASE_SERVICE_ACCOUNT_KEY;
           const trimmed = keyString.trim();
           if (fs.existsSync(trimmed)) {
@@ -102,7 +102,7 @@ export function ensureInitialized() {
       if (serviceAccountKey) {
         credential = admin.credential.cert(serviceAccountKey);
       } else {
-        console.log("[FIREBASE] Using applicationDefault credentials.");
+        console.info("[FIREBASE] Using applicationDefault credentials.");
         try {
           credential = admin.credential.applicationDefault();
         } catch (appDefaultErr) {
@@ -120,7 +120,7 @@ export function ensureInitialized() {
         projectId: firebaseConfig.projectId,
         storageBucket: firebaseConfig.storageBucket,
       });
-      console.log("[FIREBASE] Admin SDK initialized.");
+      console.info("[FIREBASE] Admin SDK initialized.");
     }
     _initialized = true;
   } catch (err) {
@@ -134,7 +134,7 @@ export function getDb() {
   ensureInitialized();
   if (!_db) {
     try {
-      console.log(
+      console.info(
         "[FIREBASE] Getting Firestore instance for database: " +
           (firebaseConfig.firestoreDatabaseId || "(default)"),
       );
@@ -200,7 +200,7 @@ async function syncQuotaStatusWithRedis() {
       } else {
         if (isQuotaExhausted) {
           isQuotaExhausted = false;
-          console.log("🛡️ [Firestore Quota Protection] Circuit breaker reset by Redis.");
+          console.info("🛡️ [Firestore Quota Protection] Circuit breaker reset by Redis.");
         }
       }
     }
@@ -219,7 +219,7 @@ export function checkQuotaStatus(): boolean {
     // Check if cooldown has passed
     if (timeSinceExhaustion > QUOTA_COOLDOWN_MS) {
       isQuotaExhausted = false;
-      console.log(`🛡️ [Firestore Quota Protection] Cooldown period (${QUOTA_COOLDOWN_MS / (1000 * 60 * 60)}h) passed. Resetting Firestore access.`);
+      console.info(`🛡️ [Firestore Quota Protection] Cooldown period (${QUOTA_COOLDOWN_MS / (1000 * 60 * 60)}h) passed. Resetting Firestore access.`);
       
       // Auto-clear Redis circuit breaker status
       import("../utils/redis.ts").then(({ getRedis }) => {
@@ -247,7 +247,7 @@ async function tryResolveFromRedis(docPath: string): Promise<admin.firestore.Doc
       if (cached) {
         const data = JSON.parse(cached);
         const docId = docPath.split("/").pop() || "unknown";
-        console.log(`🛡️ [Firestore Quota] Served ${docPath} from Redis L2 Shield Cache.`);
+        console.info(`🛡️ [Firestore Quota] Served ${docPath} from Redis L2 Shield Cache.`);
         return {
           id: docId,
           exists: true,

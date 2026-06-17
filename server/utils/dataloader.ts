@@ -54,7 +54,7 @@ function checkReadBudget(requestedCount: number): boolean {
   }
   
   if (globalReadCount + requestedCount > READ_BUDGET_LIMIT) {
-    console.error(`[Dataloader] [CRITICAL] QuotaBudgetExceeded: Current process reached ${globalReadCount} reads. Blocking additional ${requestedCount} reads.`);
+    logger.error("[Dataloader] QuotaBudgetExceeded", { globalReadCount, requestedCount });
     return false;
   }
   

@@ -21,7 +21,7 @@ export const emailService = {
     try {
       // Simulation when SMTP credentials are missing
       if (!env.SMTP_USER || !env.SMTP_PASS) {
-        console.log(`[EMAIL SIMULACIJA]\nPrima: ${to}\nNaslov: ${subject}\nSadržaj: (HTML sadržaj generisan)`);
+        if (env.NODE_ENV !== "production") console.log(`[EMAIL SIMULACIJA] To: ${to} | Subject: ${subject}`);
         return { success: true, simulated: true };
       }
 

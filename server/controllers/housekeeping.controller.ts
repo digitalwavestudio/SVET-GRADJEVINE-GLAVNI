@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HousekeepingService } from "../services/housekeeping.service.ts";
 import { sitemapWorkerService } from "../services/sitemap.worker.ts";
+import { env } from "../config/env.ts";
 
 export const runCleanup = async (
   req: Request,
@@ -8,8 +9,9 @@ export const runCleanup = async (
   next: NextFunction,
 ) => {
   try {
-    // Provera ključa (opciono, za security ako se poziva spolja)
-    // if (req.headers['x-cron-key'] !== process.env.CRON_KEY) { ... }
+    if (env.CRON_KEY && req.headers['x-cron-key'] !== env.CRON_KEY) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
 
     const archiveResult = await HousekeepingService.archiveDeletedAds();
     await HousekeepingService.cleanupAuditLogs();

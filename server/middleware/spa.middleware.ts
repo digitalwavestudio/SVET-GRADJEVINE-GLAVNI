@@ -160,7 +160,8 @@ async function backgroundPreRenderDetailPage(
       return;
     }
 
-    const adData = adDoc.data()!;
+    const adData = adDoc.data();
+    if (!adData) return;
     adData.id = adDoc.id;
 
     if (adData.status === "deleted" || adData.status === "inactive") {

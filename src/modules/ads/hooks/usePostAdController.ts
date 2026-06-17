@@ -608,7 +608,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         if (freshUser && typeof freshUser.walletBalance === 'number' && updateUser) {
           updateUser({ walletBalance: freshUser.walletBalance });
         }
-      }).catch(() => {});
+      }).catch(() => console.warn("[usePostAdController] Failed to refresh wallet balance after ad creation"));
 
       // Optimizacija: Uklonjen queryClient.invalidateQueries({ queryKey: ['ads'] }) kako bi izbegli masovni refetch.
       // Lista će se refetch-ovati prirodno kada joj istekne stale time ili putem optimistic updates.

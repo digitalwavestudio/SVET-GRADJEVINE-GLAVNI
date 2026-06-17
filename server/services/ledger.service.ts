@@ -62,7 +62,8 @@ export class FinancialLedgerService {
 
     let currentBalance = 0;
     if (walletDoc.exists) {
-      const data = walletDoc.data()!;
+      const data = walletDoc.data();
+      if (!data) throw new Error("Wallet data not found");
       if (data.status === "suspended") {
         throw new Error("Wallet is suspended due to security audit failure.");
       }

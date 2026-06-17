@@ -66,7 +66,7 @@ export class OutboxWorker {
       // Bypass threshold
       if (this.consecutiveContentionFailures >= 3 && !this.isRedisFallbackActive) {
         this.isRedisFallbackActive = true;
-        console.error(`🚨 [OutboxWorker] Highly increased lock-contention detected in Firestore. Diverting scavenger runs to local regional Redis lists to prevent database scan overhead.`);
+        Logger.withContext().error(`[OutboxWorker] Highly increased lock-contention detected in Firestore. Diverting scavenger runs to local regional Redis lists to prevent database scan overhead.`);
       }
     }
   }
@@ -77,7 +77,7 @@ export class OutboxWorker {
       this.currentBackoffMs = 0;
       if (this.isRedisFallbackActive) {
         this.isRedisFallbackActive = false;
-        console.log("🛡️ [OutboxWorker] Firestore lock-contention resolved. Resuming generic database scanning.");
+        Logger.withContext().info("[OutboxWorker] Firestore lock-contention resolved. Resuming generic database scanning.");
       }
     }
   }
@@ -93,9 +93,9 @@ export class OutboxWorker {
       
       const intervalMs = isProd ? 15 * 60 * 1000 : 3000; // 15 min u prod, 3 sekunde u dev za brzi odziv
       this.scavengerInterval = setInterval(() => {
-        this.scavengePendingLocal().catch((err) =>
-          console.error("[OutboxWorker] Local scavenger interval error:", err),
-        );
+        this.scavengePendingLocal().catch((err) => {
+          Logger.withContext().error("[OutboxWorker] Local scavenger interval error:", err);
+        });
       }, intervalMs);
       return;
     }
@@ -177,7 +177,7 @@ export class OutboxWorker {
       
       // Apply stepped back-off throttling delay before the processing run under lock contention
       if (this.currentBackoffMs > 0) {
-        console.log(`[OutboxWorker] Throttled run local: sleeping for ${this.currentBackoffMs}ms back-off delay before processing...`);
+        Logger.withContext().warn(`[OutboxWorker] Throttled run local: sleeping for ${this.currentBackoffMs}ms back-off delay before processing...`);
         await new Promise((resolve) => setTimeout(resolve, this.currentBackoffMs));
       }
 
@@ -187,7 +187,7 @@ export class OutboxWorker {
         const redis = getRedis();
         if (redis) {
           try {
-            console.log(`⚡ [OutboxWorker] Local fallback: Bypassing Firestore scan. Popping pending outbox items from regional local Redis lists.`);
+            Logger.withContext().info(`[OutboxWorker] Local fallback: Bypassing Firestore scan. Popping pending outbox items from regional local Redis lists.`);
             for (let i = 0; i < 10; i++) {
               const raw = await redis.lpop("outbox:local_queue");
               if (!raw) break;
@@ -199,7 +199,7 @@ export class OutboxWorker {
               }
             }
           } catch (rErr: any) {
-            console.error("[OutboxWorker] Local fallback Redis pop error:", rErr?.message);
+            Logger.withContext().error("[OutboxWorker] Local fallback Redis pop error:", rErr?.message);
           }
         }
       }
@@ -248,7 +248,7 @@ export class OutboxWorker {
       ) {
         logger.warn("[OutboxScavengerLocal] Quota exceeded, preskačem...");
       } else {
-        console.error("[OutboxScavengerLocal] Error:", err.message);
+        Logger.withContext().error("[OutboxScavengerLocal] Error:", err.message);
       }
     } finally {
       const { LockManager } = await import("./lock.service");
@@ -276,7 +276,7 @@ export class OutboxWorker {
 
       // Apply stepped back-off throttling delay before the processing run under lock contention
       if (this.currentBackoffMs > 0) {
-        console.log(`[OutboxWorker] Throttled run: sleeping for ${this.currentBackoffMs}ms back-off delay before processing...`);
+        Logger.withContext().warn(`[OutboxWorker] Throttled run: sleeping for ${this.currentBackoffMs}ms back-off delay before processing...`);
         await new Promise((resolve) => setTimeout(resolve, this.currentBackoffMs));
       }
 
@@ -286,7 +286,7 @@ export class OutboxWorker {
         const redis = getRedis();
         if (redis) {
           try {
-            console.log(`⚡ [OutboxWorker] Scavenger: Bypassing Firestore scan. Popping pending outbox items from regional local Redis lists.`);
+            Logger.withContext().info(`[OutboxWorker] Scavenger: Bypassing Firestore scan. Popping pending outbox items from regional local Redis lists.`);
             for (let i = 0; i < 20; i++) {
               const raw = await redis.lpop("outbox:local_queue");
               if (!raw) break;
@@ -298,7 +298,7 @@ export class OutboxWorker {
               }
             }
           } catch (rErr: any) {
-            console.error("[OutboxWorker] Scavenger Redis pop error:", rErr?.message);
+            Logger.withContext().error("[OutboxWorker] Scavenger Redis pop error:", rErr?.message);
           }
         }
       }
@@ -345,7 +345,7 @@ export class OutboxWorker {
       ) {
         logger.warn("[OutboxScavenger] Quota exceeded, preskačem...");
       } else {
-        console.error("[OutboxScavenger] Error:", err.message);
+        Logger.withContext().error("[OutboxScavenger] Error:", err.message);
       }
     } finally {
       const { LockManager } = await import("./lock.service");

@@ -68,7 +68,8 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
         throw new Error("User not found");
       }
 
-      const userData = userDoc.data()!;
+      const userData = userDoc.data();
+      if (!userData) throw new Error("User data not found");
       const currentBalance = userData.walletBalance ?? userData.partnerBalance ?? 0;
 
       if (currentBalance < cost) {
@@ -84,7 +85,8 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
         throw new Error("Oglas nije pronađen");
       }
 
-      const entityData = entityDoc.data()!;
+      const entityData = entityDoc.data();
+      if (!entityData) throw new Error("Entity data not found");
 
       let isOwner = false;
       if (entityData.authorId === userId) isOwner = true;
@@ -405,7 +407,8 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
         throw new Error("Transakcija nije pronađena");
       }
 
-      const txData = txDoc.data()!;
+      const txData = txDoc.data();
+      if (!txData) throw new Error("Transaction data not found");
       txDataForDLQ = txData as { userId?: string; amount?: number; referenceNumber?: string; description?: string }; // Save for DLQ tracking
       if (txData.status !== "pending_approval") {
         throw new Error("Transakcija više nije na čekanju");
@@ -418,7 +421,8 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
         if (!userDoc.exists) {
            throw new Error("Korisnik nije pronađen");
         }
-        const uData = userDoc.data()!;
+        const uData = userDoc.data();
+        if (!uData) throw new Error("User data not found");
         const currentBalance = uData.walletBalance || uData.partnerBalance || 0; // Fallback to partnerBalance if wallet doesn't exist yet
 
         transaction.update(userRef, {

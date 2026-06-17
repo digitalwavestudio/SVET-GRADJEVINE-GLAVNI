@@ -66,7 +66,8 @@ export class MatrixRouter {
       );
       const count = result.docs?.length || 0;
       const isIndexable = count >= 3;
-      await CacheService.set(cacheKey, isIndexable, 12 * 60 * 60 * 1000).catch(() => {});
+      // Cache write failure is non-blocking — the next visit will re-evaluate
+      await CacheService.set(cacheKey, isIndexable, 12 * 60 * 60 * 1000);
       return isIndexable;
     } catch (err) {
       console.error(`[MatrixRouter] Error evaluating hub indexability for ${path}:`, err);

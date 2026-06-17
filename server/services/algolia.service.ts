@@ -267,7 +267,8 @@ export const searchAdsIndex = async (
       ],
     });
 
-    const result = response.results[0];
+    const result = response.results?.[0];
+    if (!result) return { hits: [], page: 0, nbPages: 0, nbHits: 0 };
     return {
       hits: (result.hits || []) as AlgoliaHit[],
       page: (result.page || 0) as number,

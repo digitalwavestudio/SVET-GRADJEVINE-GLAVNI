@@ -53,11 +53,6 @@ export class JobsCoreService {
 
       const docs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
 
-      console.log(`[JOBS] getPublicJobs: Fetched ${docs.length} docs from Firestore`);
-      if (docs.length > 0) {
-        console.log("[JOBS] First doc keys:", Object.keys(docs[0]));
-      }
-
       const response = {
         docs,
         lastVisible: docs.length === limit ? docs[docs.length - 1].id : null,

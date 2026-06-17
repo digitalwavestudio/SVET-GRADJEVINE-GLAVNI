@@ -58,6 +58,7 @@ const envSchema = z.object({
   OTEL_EXPORTER_OTLP_ENDPOINT: z.string().optional(),
   FORCE_REDIS_OFFLINE: z.string().optional(),
   INDEXNOW_KEY: z.string().optional(),
+  CRON_KEY: z.string().optional(),
   SANDBOX_WORKERS_ENABLED: z.string().optional(),
   RUN_CRONS: z.string().optional(),
   USE_ALGOLIA: z.string().optional(),
