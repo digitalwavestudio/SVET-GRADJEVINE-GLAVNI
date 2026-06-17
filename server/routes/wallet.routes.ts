@@ -485,37 +485,82 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
 walletRouter.get("/transactions", requireAuth, async (req, res, next) => {
   try {
     const userId = getReqUser(req).uid;
-    const limit = parseInt(req.query.limit as string) || 50;
+    const limit = Math.min(parseInt(req.query.limit as string) || 500, 1000);
+    const type = req.query.type as string | undefined;
+    const status = req.query.status as string | undefined;
 
-    const cacheKey = "wallet_tx_" + userId;
-    const transactions = await CacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const snap = await db
-          .collection("transactions")
-          .where("userId", "==", userId)
-          .orderBy("createdAt", "desc")
-          .limit(limit)
-          .get();
+    const snap = await db
+      .collection("transactions")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .limit(limit)
+      .get();
 
-        return snap.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate
-              ? data.createdAt.toDate()
-              : data.createdAt,
-          };
-        });
-      },
-      30000 // 30 sekundi TTL
-    );
+    let transactions = snap.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate
+          ? data.createdAt.toDate()
+          : data.createdAt,
+      };
+    });
+
+    if (type) transactions = transactions.filter((t: any) => t.type === type);
+    if (status) transactions = transactions.filter((t: any) => t.status === status);
 
     res.json(transactions);
   } catch (error) {
     console.error("Fetch Transactions Error:", error);
     res.status(500).json({ error: "Greška prilikom dohvatanja transakcija" });
+  }
+});
+
+walletRouter.delete("/transactions", requireAuth, async (req, res, next) => {
+  try {
+    const userId = getReqUser(req).uid;
+    const type = req.query.type as string | undefined;
+    const status = req.query.status as string | undefined;
+
+    const snap = await db
+      .collection("transactions")
+      .where("userId", "==", userId)
+      .get();
+
+    let docs = snap.docs;
+    if (type) docs = docs.filter((d) => d.data().type === type);
+    if (status) docs = docs.filter((d) => d.data().status === status);
+
+    if (docs.length === 0) {
+      return res.json({ deletedCount: 0 });
+    }
+
+    const BATCH_SIZE = 500;
+    let batch = db.batch();
+    let count = 0;
+    let ops = 0;
+
+    for (const doc of docs) {
+      batch.delete(doc.ref);
+      count++;
+      ops++;
+
+      if (ops >= BATCH_SIZE) {
+        await batch.commit();
+        batch = db.batch();
+        ops = 0;
+      }
+    }
+
+    if (ops > 0) await batch.commit();
+
+    CacheService.delete("wallet_tx_" + userId).catch(() => {});
+
+    res.json({ deletedCount: count });
+  } catch (error) {
+    console.error("Delete Transactions Error:", error);
+    res.status(500).json({ error: "Greška prilikom brisanja transakcija" });
   }
 });
 

@@ -55,14 +55,48 @@ export const walletService = {
   /**
    * Fetches the transaction ledger for the current user.
    */
-  async fetchTransactions(_userId: string): Promise<WalletTransaction[]> {
+  async fetchTransactions(_userId: string, params?: {
+    type?: string;
+    status?: string;
+    limit?: number;
+  }): Promise<WalletTransaction[]> {
     return withRetry(async () => {
       try {
-        return await apiClient.get<WalletTransaction[]>("/wallet/transactions");
+        const qp = new URLSearchParams();
+        if (params?.type) qp.set("type", params.type);
+        if (params?.status) qp.set("status", params.status);
+        if (params?.limit) qp.set("limit", String(params.limit));
+        const qs = qp.toString();
+        return await apiClient.get<WalletTransaction[]>(`/wallet/transactions${qs ? `?${qs}` : ""}`);
       } catch (e: unknown) {
         throw new Error("Došlo je do greške pri dohvatanju transakcija");
       }
     });
+  },
+
+  /**
+   * Deletes transactions for the current user.
+   * Ako se prosledi type/status, briše samo one koji matchiraju.
+   */
+  async deleteAllTransactions(params?: {
+    type?: string;
+    status?: string;
+  }): Promise<{ deletedCount: number }> {
+    return mutationGuard(
+      () => withRetry(async () => {
+        try {
+          const qp = new URLSearchParams();
+          if (params?.type) qp.set("type", params.type);
+          if (params?.status) qp.set("status", params.status);
+          const qs = qp.toString();
+          return await apiClient.delete<{ deletedCount: number }>(`/wallet/transactions${qs ? `?${qs}` : ""}`);
+        } catch (e: unknown) {
+          const err = e as Error;
+          throw new Error(err.message || "Došlo je do greške pri brisanju transakcija");
+        }
+      }),
+      { actionName: "deleteAllTransactions" },
+    );
   },
 
   /**

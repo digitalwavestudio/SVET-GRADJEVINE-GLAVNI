@@ -241,15 +241,34 @@ export default function WalletPage() {
   const queryClient = useQueryClient();
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'novcanik' | 'premium'>('novcanik');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [visibleCount, setVisibleCount] = useState(25);
+  const PAGE_STEP = 25;
 
   const { data: financeStats, isLoading: statsLoading } = useFinanceSummary();
 
-  const { data: transactions = [], isLoading: txLoading, refetch } = useQuery({
-    queryKey: queryKeys.wallet.transactions(user?.id || 'guest'),
-    queryFn: () => walletService.fetchTransactions(user?.id as string),
+  const queryKey = useMemo(
+    () => [...queryKeys.wallet.transactions(user?.id || 'guest'), statusFilter, typeFilter],
+    [user?.id, statusFilter, typeFilter],
+  );
+
+  const { data: allTransactions = [], isLoading: txLoading, refetch } = useQuery({
+    queryKey,
+    queryFn: () => walletService.fetchTransactions(user?.id as string, {
+      type: typeFilter || undefined,
+      status: statusFilter || undefined,
+    }),
     enabled: !!user?.id,
     staleTime: 60 * 1000,
   });
+
+  const visibleTransactions = allTransactions.slice(0, visibleCount);
+  const hasMore = visibleCount < allTransactions.length;
+
+  useEffect(() => {
+    setVisibleCount(PAGE_STEP);
+  }, [statusFilter, typeFilter]);
 
   // Premium activation mutation
   const activatePremiumMutation = useMutation({
@@ -269,6 +288,35 @@ export default function WalletPage() {
       toast.error(msg);
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (params?: { type?: string; status?: string }) => walletService.deleteAllTransactions(params),
+    onSuccess: (data) => {
+      toast.success(`Obrisano ${data.deletedCount} transakcija`);
+      queryClient.invalidateQueries({ queryKey: queryKeys.wallet.transactions(user?.id || '') });
+      setVisibleCount(PAGE_STEP);
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Greška pri brisanju transakcija');
+    },
+  });
+
+  const handleDeleteAll = () => {
+    let msg = `Da li ste sigurni da želite da obrišete ${allTransactions.length} transakcija`;
+    if (typeFilter || statusFilter) {
+      const parts = [];
+      if (typeFilter) parts.push(`tip "${typeFilter}"`);
+      if (statusFilter) parts.push(`status "${statusFilter}"`);
+      msg += ` (${parts.join(', ')})`;
+    }
+    msg += '? Ova radnja je nepovratna.';
+    if (window.confirm(msg)) {
+      deleteMutation.mutate({
+        type: typeFilter || undefined,
+        status: statusFilter || undefined,
+      });
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -410,14 +458,42 @@ export default function WalletPage() {
               {/* Transaction History */}
               <div className="lg:col-span-8">
                 <div className="bg-[#0A0F14] border border-white/5 rounded-3xl p-8 flex flex-col h-full">
-                  <div className="flex justify-between items-center mb-8">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-8">
                     <h3 className="text-[11px] font-black text-white tracking-[0.25em] uppercase">ISTORIJA TRANSAKCIJA</h3>
-                    <div className="flex gap-2">
-                      <button className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/10 transition-all">
-                        <span className="material-symbols-outlined text-sm">filter_alt</span>
-                      </button>
-                      <button className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/10 transition-all">
-                        <span className="material-symbols-outlined text-sm">download</span>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-lg text-[9px] font-black text-white/50 tracking-wider uppercase px-2.5 py-1.5 outline-none cursor-pointer hover:bg-white/10 transition-all appearance-none"
+                      >
+                        <option value="">SVI STATUSI</option>
+                        <option value="completed">PROCESUIRANO</option>
+                        <option value="pending_approval">NA ČEKANJU</option>
+                        <option value="pending">NA ČEKANJU</option>
+                        <option value="cancelled">OTKAZANO</option>
+                        <option value="failed">OTKAZANO</option>
+                      </select>
+                      <select
+                        value={typeFilter}
+                        onChange={e => setTypeFilter(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-lg text-[9px] font-black text-white/50 tracking-wider uppercase px-2.5 py-1.5 outline-none cursor-pointer hover:bg-white/10 transition-all appearance-none"
+                      >
+                        <option value="">SVI TIPOVI</option>
+                        <option value="deposit">DOPUNA</option>
+                        <option value="ad_payment_wallet">SG KREDITI</option>
+                        <option value="payment">PLAĆANJE</option>
+                        <option value="PREMIUM_AKTIVACIJA">PREMIUM</option>
+                        <option value="wire_transfer">VIRMAN</option>
+                      </select>
+                      <button
+                        onClick={handleDeleteAll}
+                        disabled={deleteMutation.isPending}
+                        className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center hover:bg-red-500/20 transition-all disabled:opacity-50"
+                        title="Obriši istoriju transakcija"
+                      >
+                        <span className="material-symbols-outlined text-sm text-red-400">
+                          {deleteMutation.isPending ? 'progress_activity animate-spin' : 'delete'}
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -427,7 +503,7 @@ export default function WalletPage() {
                       <div className="h-full flex items-center justify-center text-white/20 min-h-[300px]">
                         <span className="material-symbols-outlined animate-spin text-4xl">progress_activity</span>
                       </div>
-                    ) : transactions.length === 0 ? (
+                    ) : allTransactions.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
                         <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mb-6">
                           <span className="material-symbols-outlined text-3xl text-white/20">receipt_long</span>
@@ -438,21 +514,36 @@ export default function WalletPage() {
                         </div>
                       </div>
                     ) : (
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="border-b border-white/5">
-                            <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">TRANSAKCIJA</th>
-                            <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">OPIS</th>
-                            <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">STATUS</th>
-                            <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase text-right">IZNOS</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                          {transactions.map((t: any) => (
-                            <TransactionRow key={t.id} transaction={t} />
-                          ))}
-                        </tbody>
-                      </table>
+                      <>
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-white/5">
+                              <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">TRANSAKCIJA</th>
+                              <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">OPIS</th>
+                              <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">STATUS</th>
+                              <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase text-right">IZNOS</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                            {visibleTransactions.map((t: any) => (
+                              <TransactionRow key={t.id} transaction={t} />
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6">
+                          <div className="text-[9px] font-bold text-white/20 tracking-wider">
+                            PRIKAZANO {visibleTransactions.length} OD {allTransactions.length} TRANSAKCIJA
+                          </div>
+                          {hasMore && (
+                            <button
+                              onClick={() => setVisibleCount(c => c + PAGE_STEP)}
+                              className="bg-white/5 border border-white/10 rounded-xl px-6 py-3 text-[9px] font-black text-white/50 tracking-widest uppercase hover:bg-white/10 hover:text-white transition-all"
+                            >
+                              UČITAJ JOŠ {Math.min(PAGE_STEP, allTransactions.length - visibleCount)}
+                            </button>
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>

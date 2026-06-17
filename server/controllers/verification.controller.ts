@@ -89,8 +89,7 @@ export const submitVerificationRequest = async (
 
 export const getVerificationRequests = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Only admins can see all requests
-    if (req.user.role !== "admin" && req.user.role !== "superadmin") {
+    if (req.user.role !== "admin" && req.user.role !== "superadmin" && !req.user.isAdmin) {
       return res.status(403).json({ error: "Niste admin" });
     }
 
@@ -113,7 +112,7 @@ export const processVerificationRequest = async (
     const adminId = req.user.uid;
 
     if (!adminId) throw new BadRequestError("Niste autentifikovani");
-    if (req.user.role !== "admin" && req.user.role !== "superadmin") {
+    if (req.user.role !== "admin" && req.user.role !== "superadmin" && !req.user.isAdmin) {
       return res.status(403).json({ error: "Niste admin" });
     }
 
