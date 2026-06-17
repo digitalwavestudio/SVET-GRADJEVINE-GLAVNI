@@ -77,8 +77,8 @@ export const Sidebar = memo(({
          </button>
       </div>
 
-      {/* Admin Role Switcher */}
-      {isAdmin && (
+      {/* Admin Role Switcher — only in dev mode */}
+      {import.meta.env.DEV && isAdmin && (
         <div className="px-6 mb-6 space-y-2">
           <div className="text-[9px] font-black text-secondary uppercase tracking-widest px-2 mb-1">ADMIN: PREGLED ULOGA</div>
           <select 
