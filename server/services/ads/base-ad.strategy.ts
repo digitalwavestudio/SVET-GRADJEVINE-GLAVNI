@@ -33,6 +33,7 @@ export abstract class BaseAdStrategy {
   public async createAd(rawData: any, uid: string) {
     const result = await db.runTransaction(async (transaction) => {
       const userRef = db.collection("users").doc(uid);
+      const walletRef = db.collection("wallets").doc(uid);
       const userSnap = await transaction.get(userRef);
       if (!userSnap.exists) throw new BadRequestError("Korisnik nije pronađen");
       const userData = userSnap.data() as any;
@@ -162,6 +163,9 @@ export abstract class BaseAdStrategy {
           walletBalance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
           totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
           ...(rawData.paket === "premium_partner" ? { isPremiumPartner: true, "businessProfile.premiumPartner": true } : {})
+        });
+        transaction.update(walletRef, {
+          balance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
         });
       } else {
         transaction.update(userRef, {
