@@ -16,13 +16,11 @@ import { ConstructionStatsGrid } from '@/src/modules/real_estate/components/cons
 import { WeatherConditionsWidget } from '@/src/modules/real_estate/components/construction/WeatherConditionsWidget';
 import { MapRadarWidget } from '@/src/modules/real_estate/components/construction/MapRadarWidget';
 import { DigitalDiaryWidget } from '@/src/modules/real_estate/components/construction/DigitalDiaryWidget';
-import { MachineryWidget } from '@/src/modules/real_estate/components/construction/MachineryWidget';
-import { ZonePlanAndNotesWidget } from '@/src/modules/real_estate/components/construction/ZonePlanAndNotesWidget';
 import { PayrollWidget } from '@/src/modules/real_estate/components/construction/PayrollWidget';
 import { PortfolioGridWidget } from '@/src/modules/real_estate/components/construction/PortfolioGridWidget';
 import { LiveFeedWidget } from '@/src/modules/real_estate/components/construction/LiveFeedWidget';
 
-import { WorkerStatus, ResourceStatus, CalendarEvent, DayData } from '@/src/modules/real_estate/components/construction/types';
+import { WorkerStatus, CalendarEvent, DayData } from '@/src/modules/real_estate/components/construction/types';
 
 export default function ConstructionSitePage() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -74,68 +72,6 @@ export default function ConstructionSitePage() {
     }
   });
 
-  const updateResourceMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string, data: Partial<ResourceStatus> }) => {
-      return apiClient.put(`/construction/${activeSiteId}/resources/${id}`, data);
-    },
-    onSuccess: (responseData: any, variables) => {
-      updateQueryCache((old) => {
-        const resources = old.siteResources[activeSiteId] || [];
-        const updatedResources = resources.map((r: any) => r.id === variables.id ? { ...r, ...variables.data } : r);
-        return {
-          ...old,
-          siteResources: {
-            ...old.siteResources,
-            [activeSiteId]: updatedResources
-          }
-        };
-      });
-    }
-  });
-
-  const addResourceMutation = useMutation({
-    mutationFn: async () => {
-      return apiClient.post(`/construction/${activeSiteId}/resources`, {
-        type: 'MEHANIZACIJA',
-        name: 'NOVI RESURS',
-        amount: 1,
-        unit: 'h',
-        unitPrice: 0
-      });
-    },
-    onSuccess: (newResource: any) => {
-      updateQueryCache((old) => {
-        const resources = old.siteResources[activeSiteId] || [];
-        return {
-          ...old,
-          siteResources: {
-            ...old.siteResources,
-            [activeSiteId]: [...resources, newResource]
-          }
-        };
-      });
-    }
-  });
-
-  const removeResourceMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return apiClient.delete(`/construction/${activeSiteId}/resources/${id}`);
-    },
-    onSuccess: (responseData: any, id) => {
-      updateQueryCache((old) => {
-        const resources = old.siteResources[activeSiteId] || [];
-        const filteredResources = resources.filter((r: any) => r.id !== id);
-        return {
-          ...old,
-          siteResources: {
-            ...old.siteResources,
-            [activeSiteId]: filteredResources
-          }
-        };
-      });
-    }
-  });
-
   const deleteSiteMutation = useMutation({
     mutationFn: async (id: string) => {
       return apiClient.delete(`/construction/${id}`);
@@ -175,17 +111,6 @@ export default function ConstructionSitePage() {
           ...old,
           sites: updatedSites
         };
-      });
-    }
-  });
-
-  const saveDiaryMutation = useMutation({
-    mutationFn: async ({ day, content }: { day: number, content: string }) => {
-      return apiClient.post(`/calendar/diary`, {
-        day,
-        month: today.getMonth(),
-        year: today.getFullYear(),
-        content
       });
     }
   });
@@ -230,19 +155,6 @@ export default function ConstructionSitePage() {
   const workers = siteWorkers[activeSiteId] || [];
   const resources = siteResources[activeSiteId] || [];
 
-  const updateResource = async (id: string, field: keyof ResourceStatus, value: unknown) => {
-    if (!activeSiteId) return;
-    updateResourceMutation.mutate({ id, data: { [field]: value } });
-  };
-
-  const handleAddResource = async () => {
-    addResourceMutation.mutate();
-  };
-  
-  const handleRemoveResource = async (id: string) => {
-    removeResourceMutation.mutate(id);
-  };
-  
   // Računanje sati ... (Ovo ostaje isto)
   const getHours = (inTime?: string, outTime?: string) => {
     if (!inTime || !outTime) return 0;
@@ -377,31 +289,12 @@ export default function ConstructionSitePage() {
     return () => clearTimeout(handler);
   }, [totalWorkersCount, activeCount, totalDailyCost, user]);
 
-  const saveDiaryEntry = async (day: number, content: string) => {
-    saveDiaryMutation.mutate({ day, content });
-  };
-
   // Mesečna projekcija i arhiviranje (Kapacitet prošlih dana)
   const today = new Date();
   const [viewDate, setViewDate] = useState(new Date());
   const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
   const [selectedDay, setSelectedDay] = useState<number>(today.getDate());
   
-  const [localDiaryText, setLocalDiaryText] = useState('');
-  const typingRef = useRef<NodeJS.Timeout | null>(null);
-  
-  useEffect(() => {
-    setLocalDiaryText(diaryLogs[selectedDay] || '');
-  }, [selectedDay, diaryLogs]);
-
-  const handleDiaryChange = (val: string) => {
-    setLocalDiaryText(val);
-    if (typingRef.current) clearTimeout(typingRef.current);
-    typingRef.current = setTimeout(() => {
-      saveDiaryEntry(selectedDay, val);
-    }, 1000);
-  };
-
   // MODAL I RASPON (OBRAČUN) STATE
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPayrollModalOpen, setIsPayrollModalOpen] = useState(false);
@@ -718,23 +611,8 @@ export default function ConstructionSitePage() {
                handleAddWorker={handleAddWorker}
             />
 
-            <MachineryWidget 
-               resources={resources}
-               resourcesCost={resourcesCost}
-               updateResource={updateResource}
-               handleRemoveResource={handleRemoveResource}
-               handleAddResource={handleAddResource}
-            />
           </>
         )}
-
-        {/* SECKCIJA ZONA GRADILISTA (PLAN I BELESKE) */}
-        <ZonePlanAndNotesWidget 
-           activeCount={activeCount}
-           activeResourcesArray={activeResourcesArray}
-           localDiaryText={localDiaryText}
-           handleDiaryChange={handleDiaryChange}
-        />
 
          {/* WIDGETI: KALENDAR I OBRAČUN */}
         <div className="space-y-8">
