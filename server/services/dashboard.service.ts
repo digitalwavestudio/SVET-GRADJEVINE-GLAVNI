@@ -203,7 +203,7 @@ export class DashboardService {
 
       try {
         if (isConnected) {
-          await subRedis.unsubscribe(REDIS_EVICTION_CHANNEL).catch(() => {});
+          await subRedis.unsubscribe(REDIS_EVICTION_CHANNEL).catch((e: any) => console.warn("[DashboardService] Unsubscribe from Redis channel:", e));
           console.log(`[DashboardService] Unsubscribed from channel.`);
         }
       } catch (err: unknown) { /* intentionally empty */ }
@@ -299,7 +299,7 @@ export class DashboardService {
       await CacheService.delete(CacheKeys.employerTrends(uid)).catch(err => console.error("[Cache] invalidation error:", err));
     }
 
-    this.getEmployerStats(uid).catch(() => {});
+    this.getEmployerStats(uid).catch((e: any) => console.warn("[DashboardService] Refresh employer stats:", e));
   }
 
   // --- Proxied Methods ---

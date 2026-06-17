@@ -72,7 +72,7 @@ export class NotificationService {
 
       // Invalidate cache
       await CacheService.delete(`notifications_payload_${payload.userId}`);
-      await CacheService.set(`notifications_pending_count:${payload.userId}`, "1", 30 * 24 * 60 * 60 * 1000).catch(() => {});
+      await CacheService.set(`notifications_pending_count:${payload.userId}`, "1", 30 * 24 * 60 * 60 * 1000).catch((e: any) => console.warn("[NotificationService] Cache set pending count:", e));
 
       // 2. Send External Email if requested
       const { UsersService } = await import("./users.service.ts");

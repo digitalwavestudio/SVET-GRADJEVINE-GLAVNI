@@ -127,7 +127,7 @@ export class CacheService {
         return val;
       } finally {
         if (acquired && lockId) {
-          await RedisLockManager.release(key, lockId).catch(() => {});
+          await RedisLockManager.release(key, lockId).catch((e: any) => console.warn("[CacheService] Redis lock release:", e));
         }
       }
     };
@@ -216,7 +216,7 @@ export class CacheService {
                 };
                 await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
                 // Clear current backoff upon successful revalidation
-                await this.delete(backoffKey).catch(() => {});
+                await this.delete(backoffKey).catch((e: any) => console.warn("[CacheService] SWR delete backoff key:", e));
                 console.log(`[CacheService SWR] Successfully refreshed SWR cache for key: ${key}`);
               })
               .catch(async (err) => {
@@ -234,7 +234,7 @@ export class CacheService {
                 }
               })
               .finally(async () => {
-                await RedisLockManager.release(lockKey, lockId).catch(() => {});
+                await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[CacheService] SWR lock release after revalidation:", e));
               });
 
             // Pobednik takođe odmah dobija stale podatak da ne bi čekao na spori DB odziv (UX <5ms)
@@ -294,8 +294,8 @@ export class CacheService {
         };
         await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
         // Cold-start success should also clear any existing backoff
-        await this.delete(backoffKey).catch(() => {});
-        return freshData;
+                await this.delete(backoffKey).catch((e: any) => console.warn("[CacheService] Cold-start delete backoff key:", e));
+                return freshData;
       } catch (err: unknown) {
         // CRITICAL FALLBACK: If cold start fails, check if we have ANY stale data to return
         const backup = await this.get<SWREnvelope<T>>(swrKey).catch(() => null);
@@ -314,7 +314,7 @@ export class CacheService {
         throw err;
       } finally {
         if (lockId) {
-          await RedisLockManager.release(lockKey, lockId).catch(() => {});
+          await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[CacheService] Cold-start lock release:", e));
         }
       }
     };

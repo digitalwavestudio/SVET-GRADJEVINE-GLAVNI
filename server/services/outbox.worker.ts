@@ -1,6 +1,7 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { Worker, Job } from "bullmq";
 import { db, admin } from "../config/firebase.ts";
+import { env } from "../config/env.ts";
 import { MonitoringService } from "./monitoring.service.ts";
 import { eventBus } from "../events/event-bus.ts";
 import { SchemaRegistry } from "./schema-registry.service.ts";
@@ -113,9 +114,9 @@ export class OutboxWorker {
       },
       {
         connection: {
-          host: process.env.REDIS_HOST || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).hostname : 'localhost'),
-          port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : (process.env.REDIS_URL ? parseInt(new URL(process.env.REDIS_URL).port || '6379') : 6379),
-          password: process.env.REDIS_PASSWORD || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).password : undefined) || undefined,
+          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
+          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
+          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
           maxRetriesPerRequest: null
         },
         concurrency: 5, // Procesiraj uporedo 5 poruka
@@ -478,7 +479,7 @@ export class OutboxWorker {
 
           const redis = getRedis();
           if (redis) {
-            redis.decr("metrics:outbox_stats:pending").catch(() => {});
+            redis.decr("metrics:outbox_stats:pending").catch((e: any) => console.warn("[Outbox] Redis decr pending metric:", e?.message));
           }
 
           this.handleContentionSuccess();
@@ -502,8 +503,8 @@ export class OutboxWorker {
           const redis = getRedis();
           if (redis) {
             if (isTerminalFailure) {
-              redis.decr("metrics:outbox_stats:pending").catch(() => {});
-              redis.incr("metrics:outbox_stats:failed").catch(() => {});
+            redis.decr("metrics:outbox_stats:pending").catch((e: any) => console.warn("[Outbox] Redis decr pending metric:", e?.message));
+              redis.incr("metrics:outbox_stats:failed").catch((e: any) => console.warn("[Outbox] Redis incr failed metric:", e?.message));
             }
           }
 

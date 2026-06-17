@@ -50,7 +50,7 @@ export class MetricsService {
 
           // We will let the pipeline do the throttling checks, but to be 100% accurate we would need a multi or separate get.
           // PROMPT 7: In-memory baferisanje umesto Redis I/O
-          ViewStatsService.incrementView(collectionName, targetId).catch(() => {});
+          ViewStatsService.incrementView(collectionName, targetId).catch((e: any) => console.warn("[MetricsService] Increment view stats:", e));
           
           if (authorId) pipeline.hincrby(REDIS_KEY_USER_STATS, authorId, 1);
 
@@ -106,7 +106,7 @@ export class MetricsService {
         // Wait, ViewStatsService.incrementView does a separate REDIS call (hincrby). To truly pipeline, we can just do it here:
         if (type === "view") {
           // PROMPT 7: Koristimo in-memory baferisanje iz ViewStatsService umesto Redis-a da bi smanjili I/O
-          ViewStatsService.incrementView(collectionName, targetId).catch(() => {});
+          ViewStatsService.incrementView(collectionName, targetId).catch((e: any) => console.warn("[MetricsService] Increment view stats in pipeline:", e));
           
           if (authorId) {
             pipeline.hincrby(REDIS_KEY_USER_STATS, authorId, 1);

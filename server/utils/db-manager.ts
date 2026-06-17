@@ -113,7 +113,7 @@ export class DatabaseManager {
       } finally {
         this.warmInProgress.delete(region);
       }
-    }).catch(() => {});
+    }).catch((e: any) => console.warn("[DBManager] Region pre-warm fire-and-forget:", e?.message));
   }
 
   /**

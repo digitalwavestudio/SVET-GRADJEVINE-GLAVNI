@@ -138,7 +138,7 @@ async function startServer() {
 
           setTimeout(async () => {
             try {
-              if (RegionService.isLeaderRegion() || process.env.SANDBOX_WORKERS_ENABLED === "true") {
+              if (RegionService.isLeaderRegion() || env.SANDBOX_WORKERS_ENABLED === "true") {
                 await SyncManager.init();
                 await OutboxWorker.start();
                 await GoogleIndexingWorker.init();
@@ -206,10 +206,10 @@ async function startServer() {
     app.use(
       helmet({
         contentSecurityPolicy: false,
-        crossOriginEmbedderPolicy: false,
-        crossOriginResourcePolicy: false,
-        crossOriginOpenerPolicy: false,
-        xFrameOptions: false,
+        crossOriginEmbedderPolicy: { policy: "credentialless" },
+        crossOriginResourcePolicy: { policy: "same-site" },
+        crossOriginOpenerPolicy: { policy: "same-origin" },
+        xFrameOptions: { action: "deny" },
         referrerPolicy: { policy: "strict-origin-when-cross-origin" },
       }),
     );
@@ -250,7 +250,7 @@ async function startServer() {
     if (process.env.NODE_ENV !== "production" && !isCompiledBundle) {
       const { createServer: createViteServer } = await import("vite");
       const vite = await createViteServer({
-        server: { middlewareMode: true, hmr: process.env.DISABLE_HMR !== 'true' },
+        server: { middlewareMode: true, hmr: env.DISABLE_HMR !== 'true' },
         appType: "spa",
       });
       app.use(vite.middlewares);
@@ -278,11 +278,11 @@ async function startServer() {
           }
           
           let html = cachedHtml;
-          html = html.replace("%VITE_ALGOLIA_APP_ID%", process.env.VITE_ALGOLIA_APP_ID || process.env.ALGOLIA_APP_ID || "");
-          html = html.replace("%VITE_ALGOLIA_SEARCH_KEY%", process.env.VITE_ALGOLIA_SEARCH_KEY || process.env.ALGOLIA_API_KEY || "");
-          html = html.replace("%VITE_ALGOLIA_INDEX_NAME%", process.env.VITE_ALGOLIA_INDEX_NAME || process.env.ALGOLIA_INDEX_NAME || "listings");
-          html = html.replace("%VITE_EMAILJS_PUBLIC_KEY%", process.env.VITE_EMAILJS_PUBLIC_KEY || "");
-          html = html.replace("%VITE_EMAILJS_SERVICE_ID%", process.env.VITE_EMAILJS_SERVICE_ID || "");
+          html = html.replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "");
+          html = html.replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "");
+          html = html.replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings");
+          html = html.replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "");
+          html = html.replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
           
           res.status(200).set({ "Content-Type": "text/html" }).end(html);
         } catch (err) {

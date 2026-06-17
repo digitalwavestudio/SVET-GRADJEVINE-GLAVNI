@@ -1,5 +1,6 @@
 import { GoogleAuth } from "google-auth-library";
 import { Logger } from "../utils/logger.ts";
+import { env } from "../config/env.ts";
 
 export class GoogleIndexingService {
   private static authInstance: GoogleAuth | null = null;
@@ -9,7 +10,7 @@ export class GoogleIndexingService {
       return this.authInstance;
     }
 
-    const keyPath = process.env.GOOGLE_INDEXING_CREDENTIALS_PATH;
+    const keyPath = env.GOOGLE_INDEXING_CREDENTIALS_PATH;
     if (!keyPath) {
       Logger.withContext().warn("[GoogleIndexing] GOOGLE_INDEXING_CREDENTIALS_PATH environment variable is not set. Google Indexing API will skip actual calls (Simulation Fallback Mode).");
       return null;

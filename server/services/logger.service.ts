@@ -1,4 +1,5 @@
 import winston from "winston";
+import { env } from "../config/env.ts";
 
 const { combine, timestamp, json, errors, label, printf } = winston.format;
 
@@ -18,7 +19,7 @@ const consoleFormat = printf(
 
 // Configure the Winston Logger
 export const Logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info", // 'debug', 'info', 'warn', 'error'
+  level: env.LOG_LEVEL || "info", // 'debug', 'info', 'warn', 'error'
   exitOnError: false,
   format: combine(
     errors({ stack: true }), // Automatically log error stacks

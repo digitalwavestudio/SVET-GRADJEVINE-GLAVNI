@@ -22,7 +22,7 @@ export class DashboardPrewarmService {
     }
     const timeout = setTimeout(() => {
       this.prewarmDebounceMap.delete(uid);
-      this.prewarmUser(uid, role).catch(() => {});
+      this.prewarmUser(uid, role).catch((e: any) => console.warn("[DashboardPrewarmService] Prewarm user dashboard:", e));
     }, 3000);
     this.prewarmDebounceMap.set(uid, timeout);
   }
@@ -303,7 +303,7 @@ export class DashboardPrewarmService {
             await DashboardPrewarmService.prewarmGlobalFastPaths();
             await DashboardPrewarmService.prewarmPremiumUsers();
           } finally {
-            await RedisLockManager.release("dashboard_prewarm_lock", lockId).catch(() => {});
+            await RedisLockManager.release("dashboard_prewarm_lock", lockId).catch((e: any) => console.warn("[DashboardPrewarmService] Release prewarm lock:", e));
           }
         }).catch(err => logger.error("[Prewarm Cron] Failed to register repeatable job", err));
       })
@@ -316,7 +316,7 @@ export class DashboardPrewarmService {
         if (uid) {
           logger.info(`[Prewarm] Event PAYMENT_COMPLETED caught for user: ${uid}. Prewarming dashboard...`);
           const role = payload?.role;
-          DashboardPrewarmService.prewarmUser(uid, role).catch(() => {});
+          DashboardPrewarmService.prewarmUser(uid, role).catch((e: any) => console.warn("[DashboardPrewarmService] Prewarm user on payment event:", e));
         }
       } catch (e: any) {
         logger.error(`[Prewarm] Reaction to PAYMENT_COMPLETED failed`, { error: e.message });

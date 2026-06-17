@@ -1,8 +1,9 @@
 import { GoogleIndexingService } from "./google-indexing.service.ts";
+import { env } from "../config/env.ts";
 
 export class IndexingService {
   private static INDEXNOW_KEY =
-    process.env.INDEXNOW_KEY || "svetgradjevine-default-key";
+    env.INDEXNOW_KEY || "svetgradjevine-default-key";
   private static INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
 
   /** Pushes URL updates to major search engines in real-time. */

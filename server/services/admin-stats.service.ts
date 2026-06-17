@@ -79,7 +79,7 @@ export class AdminStatsService {
              db.doc(fastPathDoc).set({
                stats: res,
                updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-             }, { merge: true }).catch(() => {});
+              }, { merge: true }).catch((e: any) => console.warn("[AdminStatsService] Firestore save stats:", e));
              
              return res;
           },

@@ -95,7 +95,7 @@ export const getMyAds = async (
         } else {
           resultPayload = parseResult.data;
         }
-        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch(() => {});
+        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch((e: any) => console.warn("[AdsController] Cache set for ads list:", e));
       } catch (quotaError: any) {
          console.error("[ADS] getMyAds error:", quotaError?.message || quotaError);
          if (quotaError?.stack) console.error("[ADS] getMyAds stack:", quotaError.stack);
@@ -299,7 +299,7 @@ export const getAdsBatch = async (
 
       // Update cache
       fetchedDocs.forEach((doc) => {
-        CacheService.set(CacheKeys.adDetail(doc.id), doc, 1800000).catch(() => {});
+        CacheService.set(CacheKeys.adDetail(doc.id), doc, 1800000).catch((e: any) => console.warn("[AdsController] Cache set for ad detail:", e));
         results.push(doc);
       });
     }

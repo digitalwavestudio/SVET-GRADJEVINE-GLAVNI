@@ -1,4 +1,5 @@
 import express from "express";
+import { env } from "../config/env.ts";
 import {
   forceSync,
   updateProfile,
@@ -50,12 +51,12 @@ usersRouter.post(
 
       // 1. reCAPTCHA v3 Pre-flight Verification Check
       const recaptchaToken = req.body.recaptchaToken || req.headers['x-recaptcha-token'];
-      if (process.env.RECAPTCHA_SECRET_KEY) {
+      if (env.RECAPTCHA_SECRET_KEY) {
         if (!recaptchaToken) {
           return res.status(400).json({ error: "Missing reCAPTCHA token." });
         }
         try {
-          const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`;
+          const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`;
           const rcRes = await fetch(verifyUrl, { method: "POST" });
           const rcData = await rcRes.json() as { success: boolean; score: number };
           if (!rcData.success || rcData.score < 0.5) {

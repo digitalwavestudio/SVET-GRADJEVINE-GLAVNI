@@ -206,7 +206,7 @@ const adminFundSchema = z.object({
 walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
   try {
     const user = (req as any)?.user;
-    if (!user.isAdmin) {
+    if (user?.isAdmin !== true) {
       await logToDLQ("Access Denied for Non-Admin on Add Funds", "add_funds_unauthorized", { userId: user?.uid, body: req.body });
       return res.status(403).json({ error: "Nedozvoljen pristup" });
     }
@@ -223,8 +223,6 @@ walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
       if (!userDoc.exists) {
         throw new Error("Korisnik nije pronađen");
       }
-
-      const currentBalance = userDoc.data()?.walletBalance || 0;
 
       // Update User
       transaction.update(userRef, {

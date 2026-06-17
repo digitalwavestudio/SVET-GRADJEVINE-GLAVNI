@@ -46,7 +46,7 @@ export function useActivities() {
       !hasRequestedPermissionRef.current
     ) {
       hasRequestedPermissionRef.current = true;
-      Notification.requestPermission().catch(() => {});
+      Notification.requestPermission().catch((e: any) => console.warn("[useActivities] Notification permission request:", e));
     }
   }, [user]);
 

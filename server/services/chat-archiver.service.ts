@@ -54,7 +54,7 @@ export class ChatArchiverService {
   static startInterval() {
     if (process.env.NODE_ENV === "production") {
       setTimeout(() => {
-        this.archiveOldChats().catch(() => {});
+        this.archiveOldChats().catch((e: any) => console.warn("[ChatArchiverService] Archive old chats:", e));
       }, 10000);
     }
 

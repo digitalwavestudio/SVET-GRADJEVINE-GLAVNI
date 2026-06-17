@@ -1,5 +1,6 @@
 import { BigQuery } from '@google-cloud/bigquery';
 import { Logger } from '../utils/logger';
+import { env } from '../config/env.ts';
 
 let bqClient: BigQuery | null = null;
 const logger = new Logger({ service: "BigQueryService" });
@@ -7,7 +8,7 @@ const logger = new Logger({ service: "BigQueryService" });
 export class BigQueryService {
   private static getClient(): BigQuery | null {
     if (!bqClient) {
-      const projectId = process.env.BIGQUERY_PROJECT_ID;
+      const projectId = env.BIGQUERY_PROJECT_ID;
       if (!projectId) {
         logger.warn("BIGQUERY_PROJECT_ID not set. BigQuery export disabled.");
         return null;
@@ -18,7 +19,7 @@ export class BigQueryService {
   }
 
   private static getDatasetId(): string {
-    return process.env.BIGQUERY_DATASET_ID || 'telemetry_analytics';
+    return env.BIGQUERY_DATASET_ID || 'telemetry_analytics';
   }
 
   /**

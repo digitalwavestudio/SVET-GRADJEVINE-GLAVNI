@@ -78,9 +78,9 @@ export class AdminSystemService {
     const { CacheService } = await import("./cache.service.ts");
 
     await DashboardService.clearEmployerStatsCache(uid);
-    await CacheService.delete(`bff_cache:${uid}`).catch(() => {});
-    await CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(() => {});
-    await CacheService.invalidateByPrefix(`metrics:user_analytics:${uid}`).catch(() => {});
+    await CacheService.delete(`bff_cache:${uid}`).catch((e: any) => console.warn("[AdminSystemService] Cache delete bff cache:", e));
+    await CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch((e: any) => console.warn("[AdminSystemService] Cache invalidate public profile ads:", e));
+    await CacheService.invalidateByPrefix(`metrics:user_analytics:${uid}`).catch((e: any) => console.warn("[AdminSystemService] Cache invalidate user analytics:", e));
     
     return { success: true };
   }

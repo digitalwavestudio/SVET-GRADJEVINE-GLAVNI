@@ -495,7 +495,7 @@ export const retryDlqItem = async (req: Request, res: Response, next: NextFuncti
         redis.del("admin:monitoring:dlq_items:v1"),
         redis.del("admin:monitoring:diagnostics:v1"),
         redis.del("admin:monitoring:stats:v1")
-      ]).catch(() => {});
+      ]).catch((e: any) => console.warn("[AdminController] Redis cache invalidation after retry:", e));
     }
 
     logDestructiveAction(req, id, source === 'outbox' ? "ADMIN_RETRY_OUTBOX_ITEM" : "ADMIN_RETRY_DLQ_ITEM", { source, jobType: (result as { jobType?: string }).jobType });
@@ -519,7 +519,7 @@ export const retryDlqBulk = async (req: Request, res: Response, next: NextFuncti
         redis.del("admin:monitoring:dlq_items:v1"),
         redis.del("admin:monitoring:diagnostics:v1"),
         redis.del("admin:monitoring:stats:v1")
-      ]).catch(() => {});
+      ]).catch((e: any) => console.warn("[AdminController] Redis cache invalidation after bulk retry:", e));
     }
 
     logDestructiveAction(req, "system", "ADMIN_RETRY_DLQ_BULK", { retriedCount });

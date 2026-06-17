@@ -36,7 +36,7 @@ export function performanceMiddleware(
             const durationMs = Number(end - start) / 1_000_000;
 
             // Globalne metrike
-            MonitoringService.recordResponseTime(durationMs).catch(() => {});
+            MonitoringService.recordResponseTime(durationMs).catch((e: any) => console.warn("[PerformanceMiddleware] Record response time:", e));
 
             // Log status tag for the active span if possible
             try {

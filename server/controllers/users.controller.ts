@@ -99,7 +99,7 @@ export const switchRole = async (
     await CacheService.delete(`auth:claims:${uid}`);
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch(() => {});
+    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[UsersController] Cache delete auth session:", e));
     await CacheService.delete(`public_profile_${uid}`);
 
     // We should sync stats as role changed

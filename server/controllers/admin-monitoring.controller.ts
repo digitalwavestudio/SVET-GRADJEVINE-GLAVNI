@@ -279,7 +279,7 @@ export class AdminMonitoringController {
           redis.del("admin:monitoring:dlq:v1"),
           redis.del("admin:monitoring:diagnostics:v1"),
           redis.del("admin:monitoring:stats:v1")
-        ]).catch(() => {});
+        ]).catch((e: any) => console.warn("[AdminMonitoringController] Redis cache invalidation after retry:", e));
       }
 
       this.logger.info(`Message ${id} queued for retry`);
@@ -305,7 +305,7 @@ export class AdminMonitoringController {
           redis.del("admin:monitoring:dlq:v1"),
           redis.del("admin:monitoring:diagnostics:v1"),
           redis.del("admin:monitoring:stats:v1")
-        ]).catch(() => {});
+        ]).catch((e: any) => console.warn("[AdminMonitoringController] Redis cache invalidation after delete:", e));
       }
 
       res.json({ success: true });

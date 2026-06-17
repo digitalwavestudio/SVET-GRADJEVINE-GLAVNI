@@ -1,14 +1,15 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { env } from "../config/env.ts";
 
 let aiInstance: GoogleGenAI | null = null;
 
 export const getGenAI = () => {
   if (!aiInstance) {
-    if (!process.env.GEMINI_API_KEY) {
+    if (!env.GEMINI_API_KEY) {
       console.warn("[AI] GEMINI_API_KEY missing, AI services disabled.");
       return null;
     }
-    aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    aiInstance = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
   }
   return aiInstance;
 };

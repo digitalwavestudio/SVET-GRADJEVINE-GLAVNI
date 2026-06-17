@@ -1,4 +1,5 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
+import { env } from "../config/env.ts";
 import { logger } from "../utils/logger.ts";
 import { Router } from "express";
 import { adminRouter } from "./admin.routes.ts";
@@ -157,7 +158,7 @@ apiRouter.use(async (req, res, next) => {
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
 
     try {
-      const secretKey = process.env.TURNSTILE_SECRET_KEY;
+      const secretKey = env.TURNSTILE_SECRET_KEY;
       if (!secretKey) {
         console.warn(
           "[Turnstile] TURNSTILE_SECRET_KEY is not configured on server.",
@@ -355,7 +356,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 apiRouter.use(
   "/proxy/billing",
   createProxyMiddleware({
-    target: process.env.BILLING_SERVICE_URL || "http://localhost:4001",
+    target: env.BILLING_SERVICE_URL || "http://localhost:4001",
     changeOrigin: true,
     pathRewrite: { "^/api/proxy/billing": "" },
   }) as unknown as import("express").RequestHandler,

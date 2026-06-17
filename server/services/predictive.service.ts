@@ -1,6 +1,7 @@
 import { db } from "../config/firebase.ts";
 import { GoogleGenAI } from "@google/genai";
 import { Logger } from "../utils/logger.ts";
+import { env } from "../config/env.ts";
 
 const logger = new Logger({ service: "PredictiveAnalyticsService" });
 
@@ -91,7 +92,7 @@ export class PredictiveAnalyticsService {
    */
   public static async getAiOptimizationSuggestion(ad: any, status: string): Promise<string> {
     try {
-      if (!process.env.GEMINI_API_KEY) return "Aktivirajte Premium paket za veću vidljivost.";
+      if (!env.GEMINI_API_KEY) return "Aktivirajte Premium paket za veću vidljivost.";
       
       const optCacheKey = `ad_opt_suggestion:${ad.id || "unknown"}:${ad.applicantsCount || 0}`;
       const { CacheService } = await import("./cache.service.ts");
@@ -100,7 +101,7 @@ export class PredictiveAnalyticsService {
         return cachedOpt;
       }
       
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 
       const prompt = `Analiziraj oglas na portalu "Svet Građevine" koji ima slabe performanse (${status}).
       Naslov: "${ad.title}"

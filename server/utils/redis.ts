@@ -285,7 +285,7 @@ class InMemoryFallback {
 }
 
 const fallbackMap = new InMemoryFallback();
-let isRedisDown = process.env.FORCE_REDIS_OFFLINE === "true";
+let isRedisDown = env.FORCE_REDIS_OFFLINE === "true";
 
 export function isClusterOffline(): boolean {
   return isRedisDown;
@@ -407,7 +407,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
           if (getDownState()) {
             if ((client.status as string) === "end") {
               if (typeof client.connect === "function") {
-                client.connect().catch(() => {});
+                client.connect().catch((e: any) => console.warn("[Redis] Reconnect attempt failed:", e?.message));
               }
             } else if (client.status === "ready") {
               if (typeof client.ping === "function") {

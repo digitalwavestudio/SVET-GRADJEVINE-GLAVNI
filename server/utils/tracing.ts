@@ -1,9 +1,10 @@
 
 import { Logger } from './logger';
+import { env } from "../config/env.ts";
 
 const logger = new Logger({ service: "Tracing" });
 
-const isTracingEnabled = process.env.ENABLE_TRACING === "true" || !!process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+const isTracingEnabled = env.ENABLE_TRACING === "true" || !!env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
 /**
  * Svet Gradjevine - Distributed Tracing Initialization
@@ -29,10 +30,10 @@ export const initTracing = async () => {
     sdk = new NodeSDK({
       resource: resourceFromAttributes({
         [serviceNameAttr]: 'svet-gradjevine-backend',
-        [envAttr]: process.env.NODE_ENV || 'development',
+        [envAttr]: env.NODE_ENV || 'development',
       }),
       traceExporter: new OTLPTraceExporter({
-        url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318/v1/traces',
+        url: env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318/v1/traces',
       }),
       instrumentations: [
         getNodeAutoInstrumentations({

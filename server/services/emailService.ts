@@ -1,14 +1,15 @@
 // Email service with simulation fallback
 import nodemailer from "nodemailer";
+import { env } from "../config/env.ts";
 
 // Transport configuration (use .env in production)
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.example.com",
-  port: parseInt(process.env.SMTP_PORT || "587"),
+  host: env.SMTP_HOST || "smtp.example.com",
+  port: parseInt(env.SMTP_PORT || "587"),
   secure: false, // true for 465, false for other ports
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: env.SMTP_USER,
+    pass: env.SMTP_PASS,
   },
 });
 
@@ -19,7 +20,7 @@ export const emailService = {
   async sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
     try {
       // Simulation when SMTP credentials are missing
-      if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      if (!env.SMTP_USER || !env.SMTP_PASS) {
         console.log(`[EMAIL SIMULACIJA]\nPrima: ${to}\nNaslov: ${subject}\nSadržaj: (HTML sadržaj generisan)`);
         return { success: true, simulated: true };
       }
@@ -49,7 +50,7 @@ export const emailService = {
         <p>Imate novu prijavu za poziciju: <strong>${jobTitle}</strong>.</p>
         <p>Kandidat: <strong>${applicantName}</strong></p>
         <div style="margin-top: 30px;">
-          <a href="${process.env.APP_URL}/dashboard/jobs" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px;">Pregledaj aplikaciju</a>
+          <a href="${env.APP_URL}/dashboard/jobs" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px;">Pregledaj aplikaciju</a>
         </div>
         <p style="font-size: 12px; color: #888; margin-top: 40px;">Ovo je automatska poruka sa portala Svet Građevine.</p>
       </div>
@@ -68,7 +69,7 @@ export const emailService = {
         <p>Naš tim je pregledao Vašu dokumentaciju i sa zadovoljstvom Vas obaveštavamo da je Vaš profil dobio status <strong>Proveren Profesionalac</strong> (Plava Kvačica).</p>
         <p>Verifikovan status Vam omogućava veće poverenje klijenata i bolju poziciju u pretrazi.</p>
         <div style="margin-top: 30px; text-align: center;">
-          <a href="${process.env.APP_URL}/dashboard" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;">Poseti Profil</a>
+          <a href="${env.APP_URL}/dashboard" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;">Poseti Profil</a>
         </div>
         <p style="font-size: 12px; color: #64748b; margin-top: 40px;">Tim Svet Građevine</p>
       </div>
@@ -86,7 +87,7 @@ export const emailService = {
         <p>Poštovani,</p>
         <p>Vaš oglas "<strong>${adTitle}</strong>" je prošao moderatorsku proveru i sada je vidljiv svim korisnicima na portalu.</p>
         <div style="margin-top: 30px;">
-          <a href="${process.env.APP_URL}/marketplace" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px;">Pogledaj na sajtu</a>
+          <a href="${env.APP_URL}/marketplace" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px;">Pogledaj na sajtu</a>
         </div>
       </div>
     `;
@@ -104,7 +105,7 @@ export const emailService = {
         <p><strong>Razlog:</strong> ${reason}</p>
         <p>Možete izmeniti oglas i poslati ga ponovo na proveru.</p>
         <div style="margin-top: 30px;">
-          <a href="${process.env.APP_URL}/dashboard/my-ads" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px;">Izmeni oglas</a>
+          <a href="${env.APP_URL}/dashboard/my-ads" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px;">Izmeni oglas</a>
         </div>
       </div>
     `;

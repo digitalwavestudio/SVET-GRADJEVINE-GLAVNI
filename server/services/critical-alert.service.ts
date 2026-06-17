@@ -1,7 +1,8 @@
 import { logger } from '../utils/logger';
+import { env } from '../config/env.ts';
 
 // Optional: Set these from environment variables in production
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
+const DISCORD_WEBHOOK_URL = env.DISCORD_WEBHOOK_URL || '';
 
 export class CriticalAlertService {
   /**

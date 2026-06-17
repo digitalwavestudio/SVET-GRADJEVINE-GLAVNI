@@ -1,4 +1,5 @@
 import { Worker, Job } from "bullmq";
+import { env } from "../config/env.ts";
 import { getRawRedis } from "../utils/redis.ts";
 import { Logger } from "../utils/logger.ts";
 import { JobType } from "./queue.service.ts";
@@ -27,9 +28,9 @@ export class GoogleIndexingWorker {
       },
       {
         connection: {
-          host: process.env.REDIS_HOST || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).hostname : 'localhost'),
-          port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : (process.env.REDIS_URL ? parseInt(new URL(process.env.REDIS_URL).port || '6379') : 6379),
-          password: process.env.REDIS_PASSWORD || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).password : undefined) || undefined,
+          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
+          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
+          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
           maxRetriesPerRequest: null
         },
         concurrency: 5, // Process up to 5 pings in parallel

@@ -79,7 +79,7 @@ export const authMiddleware = async (
 
       // Clear login attempts on successful token verification
       const attemptsKey = `login_attempts:${ip}`;
-      await CacheService.delete(attemptsKey).catch(() => {});
+      await CacheService.delete(attemptsKey).catch((e: any) => console.warn("[AuthMiddleware] Cache delete login attempts:", e));
 
       // ADR 003: Always use Custom JWT Claims. No local caching or Redis for security logic!
       let resolvedRole = decodedToken.role as string;
@@ -102,7 +102,7 @@ export const authMiddleware = async (
               const userDoc = await db.collection("users").doc(decodedToken.uid).get();
               userData = userDoc.exists ? userDoc.data() : null;
               if (userData) {
-                await CacheService.set(authSessionKey, userData, 5 * 60 * 1000).catch(() => {}); // 5 minute profile cache shield
+                await CacheService.set(authSessionKey, userData, 5 * 60 * 1000).catch((e: any) => console.warn("[AuthMiddleware] Cache set auth session:", e)); // 5 minute profile cache shield
               }
             }
             
@@ -115,7 +115,7 @@ export const authMiddleware = async (
             }
             
             // Keširamo u Redisu na 24 sata (24 * 60 * 60 * 1000 milisekundi)
-            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 24 * 60 * 60 * 1000).catch(() => {});
+            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 24 * 60 * 60 * 1000).catch((e: any) => console.warn("[AuthMiddleware] Cache set user profile:", e));
           }
           
           // Upisujemo Custom Claims, tako da svaki SLEDEĆI token koji klijent pošalje već nosi role & permissions

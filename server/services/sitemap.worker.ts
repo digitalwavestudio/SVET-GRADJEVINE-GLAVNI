@@ -41,9 +41,9 @@ export class SitemapWorkerService {
       },
       {
         connection: {
-          host: process.env.REDIS_HOST || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).hostname : 'localhost'),
-          port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : (process.env.REDIS_URL ? parseInt(new URL(process.env.REDIS_URL).port || '6379') : 6379),
-          password: process.env.REDIS_PASSWORD || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).password : undefined) || undefined,
+          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
+          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
+          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
           maxRetriesPerRequest: null
         },
         concurrency: 1, // To avoid too frequent storage updates overlapping
@@ -181,9 +181,9 @@ export class SitemapWorkerService {
         const { Queue } = await import("bullmq");
         SitemapWorkerService.sharedQueue = new Queue(SITEMAP_QUEUE_NAME, {
           connection: {
-          host: process.env.REDIS_HOST || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).hostname : 'localhost'),
-          port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : (process.env.REDIS_URL ? parseInt(new URL(process.env.REDIS_URL).port || '6379') : 6379),
-          password: process.env.REDIS_PASSWORD || (process.env.REDIS_URL ? new URL(process.env.REDIS_URL).password : undefined) || undefined,
+          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
+          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
+          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
           maxRetriesPerRequest: null
         },
         });

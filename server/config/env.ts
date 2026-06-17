@@ -48,6 +48,23 @@ const envSchema = z.object({
   BIGQUERY_PROJECT_ID: z.string().optional(),
   BIGQUERY_DATASET_ID: z.string().optional().default("telemetry_analytics"),
   RECAPTCHA_SECRET_KEY: z.string().optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional().default("587"),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  APP_URL: z.string().optional().default("https://svet-gradjevine.com"),
+  GOOGLE_INDEXING_CREDENTIALS_PATH: z.string().optional(),
+  ENABLE_TRACING: z.string().optional(),
+  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().optional(),
+  FORCE_REDIS_OFFLINE: z.string().optional(),
+  INDEXNOW_KEY: z.string().optional(),
+  SANDBOX_WORKERS_ENABLED: z.string().optional(),
+  DISABLE_HMR: z.string().optional(),
+  VITE_ALGOLIA_APP_ID: z.string().optional(),
+  VITE_ALGOLIA_SEARCH_KEY: z.string().optional(),
+  VITE_ALGOLIA_INDEX_NAME: z.string().optional(),
+  VITE_EMAILJS_PUBLIC_KEY: z.string().optional(),
+  VITE_EMAILJS_SERVICE_ID: z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

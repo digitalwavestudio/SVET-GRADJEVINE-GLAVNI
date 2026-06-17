@@ -30,7 +30,7 @@ export class FinancialLedgerService {
     const walletSnap = await db.collection("wallets").doc(uid).get();
     const balance = walletSnap.exists ? (walletSnap.data()?.balance || 0) : 0;
     if (redis) {
-      await redis.set(redisBalanceKey, balance.toString(), "EX", 86400).catch(() => {});
+      await redis.set(redisBalanceKey, balance.toString(), "EX", 86400).catch((e: any) => console.warn("[LedgerService] Cache set balance:", e));
     }
     return balance;
   }

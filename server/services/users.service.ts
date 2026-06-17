@@ -375,7 +375,7 @@ export class UsersService {
     }
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch(() => {});
+    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[Users] Invalidate auth_session:", e?.message));
     await CacheService.delete(`public_profile_${uid}`);
     await CacheService.delete(`user_events_${uid}`);
 
@@ -416,7 +416,7 @@ export class UsersService {
       await CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000);
       await CacheService.delete(`user_me_${uid}:pub`);
       await CacheService.delete(`user_me_${uid}:priv`);
-      await CacheService.delete(`auth_session:${uid}`).catch(() => {});
+      await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[Users] Invalidate auth_session on update:", e?.message));
       await CacheService.delete(`public_profile_${uid}`);
     }
 
@@ -485,7 +485,7 @@ export class UsersService {
     await AdminService.syncClaims(uid);
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch(() => {});
+    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[Users] Invalidate auth_session on role change:", e?.message));
     await CacheService.delete(`public_profile_${uid}`);
     return { success: true };
   }

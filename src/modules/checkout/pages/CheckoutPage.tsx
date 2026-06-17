@@ -1,4 +1,3 @@
-import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Footer from '@/src/components/Footer';
@@ -68,13 +67,6 @@ export default function CheckoutPage() {
 
   const applyPromoCode = async (codeToApply = promoCode) => {
     const code = codeToApply.trim().toUpperCase();
-    
-    // VIP Hardcoded codes (30%)
-    if (code === 'MARKO30' || code === 'ŽIKA30') {
-      setDiscountApplied(0.3);
-      setPromoStatus('success');
-      return;
-    } 
     
     // Check dynamic partners via DB
     if (code) {
@@ -246,13 +238,9 @@ export default function CheckoutPage() {
               <div className="space-y-6">
                 <div className="bg-white/5 border border-white/10 rounded-[10px] p-8 flex flex-col items-center text-center">
                   <div className="w-48 h-48 bg-white p-2 rounded-[10px] mb-6 shadow-[0_0_40px_rgba(255,255,255,0.1)] relative">
-                    <OptimizedImage 
-                      src="" 
-                      fallbackType="company" 
-                      alt="IPS QR" 
-                      className="w-full h-full object-cover opacity-30 grayscale" 
-                      containerClassName="w-full h-full"
-                    />
+                    <div className="w-full h-full flex items-center justify-center opacity-30">
+                      <span className="material-symbols-outlined text-[120px] text-white">qr_code_scanner</span>
+                    </div>
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg border border-slate-200">
                       <span className="text-slate-900 font-black text-[10px]">IPS</span>
                     </div>
