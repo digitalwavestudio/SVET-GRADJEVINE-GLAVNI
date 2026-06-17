@@ -116,12 +116,12 @@ export class UsersService {
             firstName: "",
             lastName: "",
             role: (fallbackUser.role as UserRole) || "standard",
-            isVerified: fallbackUser.emailVerified || fallbackUser.isVerified || false,
+            isVerified: fallbackUser.isVerified || (fallbackUser as any).email_verified || false,
             photoURL: fallbackUser.photoURL || "",
             status: "active",
             
             isPremiumProfile: false,
-            emailVerified: fallbackUser.emailVerified || false,
+            emailVerified: (fallbackUser as any).email_verified || false,
             freeAdsCount: 3,
           };
           // Auto-init in Firestore on first Google login/signup
@@ -167,12 +167,12 @@ export class UsersService {
           firstName: "",
           lastName: "",
           role: (fallbackUser.role as UserRole) || "standard",
-          isVerified: fallbackUser.emailVerified || fallbackUser.isVerified || false,
+          isVerified: fallbackUser.isVerified || (fallbackUser as any).email_verified || false,
           photoURL: fallbackUser.photoURL || "",
           status: "active",
           
           isPremiumProfile: false,
-          emailVerified: fallbackUser.emailVerified || false,
+          emailVerified: (fallbackUser as any).email_verified || false,
           freeAdsCount: 3,
         };
       }
