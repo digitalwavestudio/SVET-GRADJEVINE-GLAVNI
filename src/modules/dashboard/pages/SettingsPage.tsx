@@ -137,7 +137,8 @@ export default function SettingsPage() {
         description: formData.description,
         photoURL: formData.photoURL,
         facebook: formData.facebook,
-        instagram: formData.instagram
+        instagram: formData.instagram,
+        company: formData.company
       };
 
       const result = userProfileSchema.safeParse(validationData);
