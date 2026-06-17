@@ -5,6 +5,7 @@ import { useAdminFinances } from "@/src/modules/admin/hooks/useAdminFinances";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { useAdminStats } from "@/src/modules/admin/hooks/useAdminStats";
 import { walletService, PendingDeposit } from "@/src/modules/checkout/services/walletService";
+import { apiClient } from "@/src/lib/apiClient";
 import { ServerStats, ChartItem } from "@/src/modules/dashboard/services/dashboardService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -119,6 +120,57 @@ export function FinancesTab({ stats }: FinancesTabProps) {
       )
     ) {
       confirmPayment.mutate(id);
+    }
+  };
+
+  const [topupEmail, setTopupEmail] = useState("");
+  const [searchedUser, setSearchedUser] = useState<any | null>(null);
+  const [searchError, setSearchError] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [topupAmount, setTopupAmount] = useState(1000);
+  const [topupDesc, setTopupDesc] = useState("Ručna uplata od strane admina");
+  const [topupLoading, setTopupLoading] = useState(false);
+
+  const searchUser = async () => {
+    if (!topupEmail.trim()) return;
+    setSearchError("");
+    setSearchedUser(null);
+    setSearching(true);
+    try {
+      const q = topupEmail.trim().toLowerCase();
+      const data = await apiClient.get<any>(`/admin/users?searchQ=${encodeURIComponent(q)}&limit=5`);
+      const users = data?.users || [];
+      const found = users.find((u: any) => u.email?.toLowerCase() === q);
+      if (found) {
+        setSearchedUser(found);
+      } else if (users.length === 1 && users[0].email?.toLowerCase().includes(q)) {
+        setSearchedUser(users[0]);
+      } else {
+        setSearchError("Korisnik nije pronađen. Proverite email.");
+      }
+    } catch (e: any) {
+      setSearchError(e?.response?.data?.error || e.message || "Greška pri pretrazi.");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleTopup = async () => {
+    if (!searchedUser || topupAmount <= 0) return;
+    if (!window.confirm(`Da li ste sigurni da želite da dodate ${topupAmount} RSD korisniku ${searchedUser.email}?`)) return;
+    setTopupLoading(true);
+    try {
+      await walletService.adminAddFunds(searchedUser.id, topupAmount, topupDesc);
+      toast.success(`Uspešno dodato ${topupAmount} RSD korisniku ${searchedUser.email}`);
+      setSearchedUser(null);
+      setTopupEmail("");
+      setTopupAmount(1000);
+      setTopupDesc("Ručna uplata od strane admina");
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.pendingDeposits });
+    } catch (e: any) {
+      toast.error(e.message || "Greška pri dodavanju sredstava");
+    } finally {
+      setTopupLoading(false);
     }
   };
 
@@ -242,6 +294,117 @@ export function FinancesTab({ stats }: FinancesTabProps) {
         </div>
 
         <div className="flex flex-col gap-8">
+          {/* Manual Top-up */}
+          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
+            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+              <span className="material-symbols-outlined text-secondary">currency_exchange</span>
+              MANUALNA UPLATA
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">
+                  Email korisnika
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={topupEmail}
+                    onChange={(e) => { setTopupEmail(e.target.value); setSearchedUser(null); }}
+                    placeholder="pera@email.com"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-[10px] px-4 py-3 text-xs font-bold text-white placeholder-white/20 focus:outline-none focus:border-secondary transition-all"
+                  />
+                  <button
+                    onClick={searchUser}
+                    disabled={searching || !topupEmail.trim()}
+                    className="bg-secondary text-slate-950 px-4 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center gap-1"
+                  >
+                    {searching ? (
+                      <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <span className="material-symbols-outlined text-sm">search</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {searchedUser && (
+                <div className="bg-white/[0.03] border border-white/10 rounded-[10px] p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary text-sm font-black uppercase">
+                        {(searchedUser.firstName?.[0] || '?')}{(searchedUser.lastName?.[0] || '')}
+                      </div>
+                      <div>
+                        <div className="text-xs font-black text-white uppercase tracking-tight">
+                          {searchedUser.firstName || ''} {searchedUser.lastName || ''}
+                        </div>
+                        <div className="text-[9px] font-bold text-white/40">{searchedUser.email}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-black text-green-400">
+                        {searchedUser.walletBalance?.toLocaleString('sr-RS') || 0} RSD
+                      </div>
+                      <div className="text-[8px] font-black text-white/30 uppercase tracking-widest">Balans</div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">
+                        Iznos (RSD)
+                      </label>
+                      <input
+                        type="number"
+                        min="100"
+                        step="100"
+                        value={topupAmount}
+                        onChange={(e) => setTopupAmount(Number(e.target.value))}
+                        className="w-full bg-white/5 border border-white/10 rounded-[8px] px-4 py-2.5 text-sm font-black text-white focus:outline-none focus:border-secondary transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[9px] font-black text-white/40 uppercase tracking-widest mb-1">
+                      Opis
+                    </label>
+                    <input
+                      type="text"
+                      value={topupDesc}
+                      onChange={(e) => setTopupDesc(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-[8px] px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-secondary transition-all"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleTopup}
+                    disabled={topupLoading || topupAmount <= 0}
+                    className="w-full bg-secondary text-slate-950 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {topupLoading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                        OBRADA...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-sm">paid</span>
+                        DODAJ {topupAmount.toLocaleString('sr-RS')} RSD
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {searchError && (
+                <div className="text-[10px] font-black text-red-500 bg-red-500/10 border border-red-500/20 rounded-[8px] px-4 py-2">
+                  {searchError}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Pending Wallet Deposits List */}
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
             <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center justify-between">
