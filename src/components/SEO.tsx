@@ -44,7 +44,7 @@ export function SEO({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
       
-      {noindex && <meta name="robots" content="noindex, nofollow" />}
+      <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
       
       {jsonLd && (
         <script type="application/ld+json">

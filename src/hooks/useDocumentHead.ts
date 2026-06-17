@@ -51,13 +51,13 @@ export function useDocumentHead({
     setMeta('twitter:title', ogTitle || title);
     setMeta('twitter:description', ogDescription || description);
     
+    const robotsEl = document.querySelector('meta[name="robots"]');
     if (noindex) {
+      if (robotsEl) robotsEl.remove();
       setMeta('robots', 'noindex, nofollow');
-    } else {
-      const robots = document.querySelector('meta[name="robots"]');
-      if (robots && robots.getAttribute('content') === 'noindex, nofollow') {
-        robots.remove();
-      }
+    } else if (robotsEl) {
+      robotsEl.remove();
+      setMeta('robots', 'index, follow');
     }
 
     let jsonLdScript = document.getElementById('dynamic-json-ld') as HTMLScriptElement;

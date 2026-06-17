@@ -53,7 +53,7 @@ export default function SeoHead({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
       
-      {noindex && <meta name="robots" content="noindex, nofollow" />}
+      <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
       
       {ldJsonTags}
     </Helmet>

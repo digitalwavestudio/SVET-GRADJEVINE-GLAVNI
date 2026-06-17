@@ -81,7 +81,7 @@ export default function DynamicSEO({ type, grad, zanimanje, jsonLd }: Props) {
   
   const isFilterTrap = useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
-    const hasActiveFilters = Array.from(searchParams.keys()).filter(k => !['page', 'sort', 'q', 'view'].includes(k)).length > 0;
+    const hasActiveFilters = Array.from(searchParams.keys()).filter(k => k !== 'page').length > 0;
     return hasActiveFilters;
   }, [location.search]);
 
