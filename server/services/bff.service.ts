@@ -344,7 +344,7 @@ export const bffService = {
             lastAuditPassed: wallet ? (wallet.lastAuditPassed === true) : false,
             activeRoles: fetchedRoles
           };
-          await CacheService.set(walletCacheKey, walletData, 86400000); // 24h fallback cache
+          await CacheService.set(walletCacheKey, walletData, 300000); // 5min fallback cache
         }
         
         let userData: { totalUnreadMessages?: number; stats?: { totalMyAds?: number; unreadMessages?: number; unreadActivities?: number } } | null = null;
