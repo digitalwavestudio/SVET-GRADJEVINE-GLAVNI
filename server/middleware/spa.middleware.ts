@@ -1,4 +1,5 @@
-﻿import express from "express";
+﻿import { env } from "../config/env.ts";
+import express from "express";
 import path from "path";
 import fs from "fs";
 import { db } from "../config/firebase.ts";
@@ -391,7 +392,7 @@ export const createSpaMiddleware = () => {
            if (!cachedIndexHtml) {
              cachedIndexHtml = await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
            }
-           if (process.env.NODE_ENV !== "production") console.log(`ðŸ›¡ï¸ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
+           if (env.NODE_ENV !== "production") console.info(`ðŸ›¡ï¸ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
            return res.send(cachedIndexHtml);
         }
       }

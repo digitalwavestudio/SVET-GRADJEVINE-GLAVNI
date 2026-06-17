@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { Request, Response, NextFunction } from "express";
 import { RedirectService } from "../services/redirect.service.ts";
 
@@ -20,7 +21,7 @@ export const redirectMiddleware = (
   const redirectPath = RedirectService.getRedirectPath(path);
 
   if (redirectPath) {
-    if (process.env.NODE_ENV !== "production") console.log(`[SEO-Redirect] Redirecting legacy path ${path} to ${redirectPath} (301)`);
+    if (env.NODE_ENV !== "production") console.info(`[SEO-Redirect] Redirecting legacy path ${path} to ${redirectPath} (301)`);
     
     // Preserve query strings if any
     const queryString = req.url.includes("?") ? req.url.split("?")[1] : "";

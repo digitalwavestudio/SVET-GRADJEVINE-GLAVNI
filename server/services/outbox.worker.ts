@@ -5,7 +5,7 @@ import { env } from "../config/env.ts";
 import { MonitoringService } from "./monitoring.service.ts";
 import { eventBus } from "../events/event-bus.ts";
 import { SchemaRegistry } from "./schema-registry.service.ts";
-import { Logger } from "../utils/logger.ts";
+import { Logger, logger } from "../utils/logger.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { defaultConnection } from "../utils/queue.ts";
 import { QueueService, JobType, JobPriority } from "./queue.service.ts";
@@ -61,7 +61,7 @@ export class OutboxWorker {
       this.consecutiveContentionFailures++;
       this.currentBackoffMs = Math.min(30000, this.consecutiveContentionFailures * 2000);
       
-      console.warn(`[OutboxWorker] Lock contention/load error detected! Back-off delay set to ${this.currentBackoffMs}ms. Consecutive errors: ${this.consecutiveContentionFailures}`);
+      logger.warn(`[OutboxWorker] Lock contention/load error detected! Back-off delay set to ${this.currentBackoffMs}ms. Consecutive errors: ${this.consecutiveContentionFailures}`);
 
       // Bypass threshold
       if (this.consecutiveContentionFailures >= 3 && !this.isRedisFallbackActive) {
@@ -83,7 +83,7 @@ export class OutboxWorker {
   }
 
   static async start() {
-    const isProd = process.env.NODE_ENV === "production";
+    const isProd = env.NODE_ENV === "production";
     const sharedClient = getRawRedis();
 
     if (!defaultConnection || !sharedClient) {
@@ -166,7 +166,7 @@ export class OutboxWorker {
    * Lokalni fallback koji odmah procesuira 'pending' poruke bez BullMQ reda (za dev / env bez Redis-a).
    */
   private static async scavengePendingLocal() {
-    const isProd = process.env.NODE_ENV === "production";
+    const isProd = env.NODE_ENV === "production";
     const { CacheService } = await import("./cache.service.ts");
     const hasPending = await CacheService.get<boolean>("outbox_has_pending");
     if (hasPending === false || (!isProd && hasPending === null)) {
@@ -251,7 +251,7 @@ export class OutboxWorker {
         err?.message?.includes("Quota limit exceeded") ||
         err?.details?.includes("Quota limit exceeded")
       ) {
-        console.warn("[OutboxScavengerLocal] Quota exceeded, preskačem...");
+        logger.warn("[OutboxScavengerLocal] Quota exceeded, preskačem...");
       } else {
         console.error("[OutboxScavengerLocal] Error:", err.message);
       }
@@ -265,7 +265,7 @@ export class OutboxWorker {
    * Pronalazi poruke u bazi koje su 'pending' i dodaje ih u BullMQ red.
    */
   public static async scavengePending() {
-    const isProd = process.env.NODE_ENV === "production";
+    const isProd = env.NODE_ENV === "production";
     const { CacheService } = await import("./cache.service.ts");
     const hasPending = await CacheService.get<boolean>("outbox_has_pending");
     if (hasPending === false || (!isProd && hasPending === null)) {
@@ -348,7 +348,7 @@ export class OutboxWorker {
         err?.message?.includes("Quota limit exceeded") ||
         err?.details?.includes("Quota limit exceeded")
       ) {
-        console.warn("[OutboxScavenger] Quota exceeded, preskačem...");
+        logger.warn("[OutboxScavenger] Quota exceeded, preskačem...");
       } else {
         console.error("[OutboxScavenger] Error:", err.message);
       }
@@ -479,7 +479,7 @@ export class OutboxWorker {
 
           const redis = getRedis();
           if (redis) {
-            redis.decr("metrics:outbox_stats:pending").catch((e: any) => console.warn("[Outbox] Redis decr pending metric:", e?.message));
+            redis.decr("metrics:outbox_stats:pending").catch((e: any) => logger.warn("[Outbox] Redis decr pending metric:", e?.message));
           }
 
           this.handleContentionSuccess();
@@ -503,8 +503,8 @@ export class OutboxWorker {
           const redis = getRedis();
           if (redis) {
             if (isTerminalFailure) {
-            redis.decr("metrics:outbox_stats:pending").catch((e: any) => console.warn("[Outbox] Redis decr pending metric:", e?.message));
-              redis.incr("metrics:outbox_stats:failed").catch((e: any) => console.warn("[Outbox] Redis incr failed metric:", e?.message));
+            redis.decr("metrics:outbox_stats:pending").catch((e: any) => logger.warn("[Outbox] Redis decr pending metric:", e?.message));
+              redis.incr("metrics:outbox_stats:failed").catch((e: any) => logger.warn("[Outbox] Redis incr failed metric:", e?.message));
             }
           }
 

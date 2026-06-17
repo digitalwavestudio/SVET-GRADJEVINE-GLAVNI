@@ -12,6 +12,7 @@ import {
   Master, 
   MarketplaceItem 
 } from "@svet-gradjevine/shared";
+import { logger } from "../utils/logger.ts";
 
 export type UnifiedAdEntity = 
   | Job 
@@ -90,7 +91,7 @@ class EventBus implements IEventBus {
   private constructor() {
     this.initializeStreamGroup().then(() => {
         this.startListening();
-    }).catch(err => console.warn('[EventBus] Init error:', err));
+    }).catch(err => logger.warn('[EventBus] Init error:', err));
   }
 
   private async initializeStreamGroup() {
@@ -103,7 +104,7 @@ class EventBus implements IEventBus {
             console.error("[EventBus] XGROUP CREATE error", error);
         }
       });
-      console.log(`✅ EventBus: Dynamic Group initialized (${GROUP_NAME})`);
+      console.info(`✅ EventBus: Dynamic Group initialized (${GROUP_NAME})`);
     } catch (err) {
       console.error("[EventBus] Stream initialization failed", err);
     }
@@ -113,7 +114,7 @@ class EventBus implements IEventBus {
     if (!this.redis || this.isListening) return;
     this.isListening = true;
     
-    console.log(`📡 EventBus: Persistent Stream listening (Consumer: ${this.consumerName})`);
+    console.info(`📡 EventBus: Persistent Stream listening (Consumer: ${this.consumerName})`);
 
     while (this.isListening) {
         try {

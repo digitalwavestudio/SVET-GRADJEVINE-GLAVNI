@@ -1,6 +1,7 @@
 import { db, admin } from "../config/firebase.ts";
 import { NotificationService, NotificationType } from "./notification.service.ts";
 import { User } from "@svet-gradjevine/shared";
+import { logger } from "../utils/logger.ts";
 
 export class AdminSystemService {
   static async sendBroadcast(audience: string, title: string, body: string) {
@@ -78,9 +79,9 @@ export class AdminSystemService {
     const { CacheService } = await import("./cache.service.ts");
 
     await DashboardService.clearEmployerStatsCache(uid);
-    await CacheService.delete(`bff_cache:${uid}`).catch((e: any) => console.warn("[AdminSystemService] Cache delete bff cache:", e));
-    await CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch((e: any) => console.warn("[AdminSystemService] Cache invalidate public profile ads:", e));
-    await CacheService.invalidateByPrefix(`metrics:user_analytics:${uid}`).catch((e: any) => console.warn("[AdminSystemService] Cache invalidate user analytics:", e));
+    await CacheService.delete(`bff_cache:${uid}`).catch((e: any) => logger.warn("[AdminSystemService] Cache delete bff cache:", e));
+    await CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch((e: any) => logger.warn("[AdminSystemService] Cache invalidate public profile ads:", e));
+    await CacheService.invalidateByPrefix(`metrics:user_analytics:${uid}`).catch((e: any) => logger.warn("[AdminSystemService] Cache invalidate user analytics:", e));
     
     return { success: true };
   }

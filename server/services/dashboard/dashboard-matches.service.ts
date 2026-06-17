@@ -7,6 +7,7 @@ import {
   SmartMatchItemDTO,
   ApplicationItemDTO 
 } from "../../dto/dashboard.dto.ts";
+import { logger } from "../../utils/logger.ts";
 import { 
   smartMatchesMemoryCache, 
   jobTokensLRU, 
@@ -62,7 +63,7 @@ export class DashboardSmartMatchService {
               await CacheService.set(poolKey, availableJobs, 30 * 60 * 1000); // 30 min Index cache
             }
           } catch (err: unknown) {
-            console.warn("[DashboardService] Failed to load smart matches pool:", (err as Error).message);
+            logger.warn("[DashboardService] Failed to load smart matches pool:", (err as Error).message);
             isFirestoreHealthy = false;
           }
 
@@ -80,7 +81,7 @@ export class DashboardSmartMatchService {
                 ...d.data(),
               })) as ApplicationItemDTO[];
             } catch (err: unknown) {
-              console.warn("[DashboardService] Failed to fetch candidate applications:", (err as Error).message);
+              logger.warn("[DashboardService] Failed to fetch candidate applications:", (err as Error).message);
             }
           }
 

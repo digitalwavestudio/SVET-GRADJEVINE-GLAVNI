@@ -112,7 +112,7 @@ adsRouter.post(
 
         url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
-        console.log(`[ADS STORAGE INFO] Direct local media stream active.`);
+        console.info(`[ADS STORAGE INFO] Direct local media stream active.`);
         
         const uploadsDir = path.join(process.cwd(), "uploads", "ads", "gallery", user.uid);
         if (!fs.existsSync(uploadsDir)) {

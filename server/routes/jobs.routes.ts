@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import express from "express";
 import { adCreationLimiter } from "../middleware/rate-limit.middleware.ts";
 import {
@@ -29,7 +30,7 @@ const updateJobSchema = jobSchema.partial();
 export const jobsRouter = express.Router();
 
 jobsRouter.get("/", (req, res, next) => {
-  if (process.env.NODE_ENV !== "production") { console.log("[JOBS_ROUTE] GET /api/jobs called, originalUrl:", req.originalUrl); }
+  if (env.NODE_ENV !== "production") { console.info("[JOBS_ROUTE] GET /api/jobs called, originalUrl:", req.originalUrl); }
   next();
 }, getPublicJobs);
 jobsRouter.get("/applications/user/:role", authMiddleware, getUserApplications);

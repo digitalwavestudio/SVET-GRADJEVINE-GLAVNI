@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { UnifiedFavoritesService } from "../services/unified-favorites.service.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { Logger } from "../utils/logger.ts";
@@ -17,7 +18,7 @@ const toggleFavoriteSchema = z.object({
 favoritesRouter.post("/toggle", requireAuth, validateRequest(toggleFavoriteSchema), async (req, res) => {
   try {
     const { adId, adType } = req.body;
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
 
     if (!adId || !adType) {
       return res.status(400).json({ error: "Missing adId or adType" });
@@ -38,7 +39,7 @@ favoritesRouter.post("/toggle", requireAuth, validateRequest(toggleFavoriteSchem
 // 2. Get User Favorites
 favoritesRouter.get("/my", requireAuth, async (req, res) => {
   try {
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
     const { limit, lastId } = req.query;
 
     const favorites = await UnifiedFavoritesService.getUserFavorites(
@@ -57,7 +58,7 @@ favoritesRouter.get("/my", requireAuth, async (req, res) => {
 // 3. Check Status
 favoritesRouter.get("/status/:adId", requireAuth, async (req, res) => {
   try {
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
     const { adId } = req.params;
 
     const isSaved = await UnifiedFavoritesService.isFavorited(userId, adId);

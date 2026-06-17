@@ -2,6 +2,7 @@ import express from "express";
 import { AdminMonitoringController } from "../controllers/admin-monitoring.controller.ts";
 import { MonitoringService } from "../services/monitoring.service.ts";
 import { performanceBenchmark } from "../middleware/benchmark.middleware.ts";
+import { logger } from "../utils/logger.ts";
 import {
   verifyUser,
   syncClaims,
@@ -46,7 +47,7 @@ adminRouter.get("/monitoring", async (req, res) => {
 
   const currentState = await breaker.getState();
   if (currentState === "OPEN" || checkQuotaStatus()) {
-    console.warn("[CircuitBreaker] Admin /monitoring serving sandbox admin data due to OPEN state or active Quota protection.");
+    logger.warn("[CircuitBreaker] Admin /monitoring serving sandbox admin data due to OPEN state or active Quota protection.");
     return res.json({
       status: "warning",
       message: "Platforma radi u bezbednosnom (Sandbox) režimu zbog preopterećenja ili iscrpljene kvote.",

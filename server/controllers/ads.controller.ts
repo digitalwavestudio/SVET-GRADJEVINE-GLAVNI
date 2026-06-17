@@ -5,6 +5,7 @@ import { db, getDb } from "../config/firebase.ts";
 import { admin as firebaseAdmin } from "../config/firebase.ts";
 import { ImageTransformer } from "../utils/image.transformer.ts";
 import type { AuthenticatedRequest } from "../types/auth.ts";
+import { logger } from "../utils/logger.ts";
 
 export const getPublicAds = async (
   req: Request,
@@ -81,7 +82,7 @@ export const getMyAds = async (
         if (resPayload.docs.length === 0) {
           const rawDb = getDb();
           const countSnap = await rawDb.collection("listings").where("authorId", "==", user.uid).count().get().catch(() => null);
-          console.log(`[ADS] getMyAds DIAG: uid=${user.uid}, limit=${limitNum}, totalDocsForUser=${countSnap?.data()?.count || 'ERROR'}, sampleAuthorId=null`);
+          console.info(`[ADS] getMyAds DIAG: uid=${user.uid}, limit=${limitNum}, totalDocsForUser=${countSnap?.data()?.count || 'ERROR'}, sampleAuthorId=null`);
         }
 
         const parseResult = myAdsResponseSchema.safeParse(resPayload);
@@ -95,7 +96,7 @@ export const getMyAds = async (
         } else {
           resultPayload = parseResult.data;
         }
-        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch((e: any) => console.warn("[AdsController] Cache set for ads list:", e));
+        await CacheService.set(cacheKey, resultPayload, 2 * 60 * 1000).catch((e: any) => logger.warn("[AdsController] Cache set for ads list:", e));
       } catch (quotaError: any) {
          console.error("[ADS] getMyAds error:", quotaError?.message || quotaError);
          if (quotaError?.stack) console.error("[ADS] getMyAds stack:", quotaError.stack);
@@ -299,7 +300,7 @@ export const getAdsBatch = async (
 
       // Update cache
       fetchedDocs.forEach((doc) => {
-        CacheService.set(CacheKeys.adDetail(doc.id), doc, 1800000).catch((e: any) => console.warn("[AdsController] Cache set for ad detail:", e));
+        CacheService.set(CacheKeys.adDetail(doc.id), doc, 1800000).catch((e: any) => logger.warn("[AdsController] Cache set for ad detail:", e));
         results.push(doc);
       });
     }

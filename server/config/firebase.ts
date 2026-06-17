@@ -4,6 +4,7 @@ import { getFirestore, QuerySnapshot, DocumentSnapshot } from "firebase-admin/fi
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { logger } from "../utils/logger.ts";
 
 let currentDirname = "";
 try {
@@ -41,7 +42,7 @@ try {
     console.log(`[FIREBASE] Loading configuration from: ${configPath}`);
     firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
   } else {
-    console.warn(
+    logger.warn(
       "[FIREBASE] firebase-applet-config.json missing. Using defaults.",
     );
   }
@@ -105,7 +106,7 @@ export function ensureInitialized() {
         try {
           credential = admin.credential.applicationDefault();
         } catch (appDefaultErr) {
-          console.warn("[FIREBASE] applicationDefault credentials failed. Using dummy fallback cert to ensure container liveness.");
+          logger.warn("[FIREBASE] applicationDefault credentials failed. Using dummy fallback cert to ensure container liveness.");
           credential = admin.credential.cert({
             projectId: firebaseConfig.projectId || "svet-gradjevine-mock",
             privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADA\n-----END PRIVATE KEY-----",
@@ -308,6 +309,15 @@ export function triggerQuotaProtection(error: FirestoreQuotaError | unknown): bo
 }
 
 export function getMockDocSnapshot(docId: string, docPath?: string): admin.firestore.DocumentSnapshot {
+  if (env.NODE_ENV === "production") {
+    return {
+      id: docId,
+      exists: false,
+      data: () => undefined,
+      ref: { id: docId, path: docPath || `mock_col/${docId}` } as admin.firestore.DocumentReference
+    } as unknown as admin.firestore.DocumentSnapshot;
+  }
+
   let mockData: Record<string, unknown> | undefined = undefined;
   // ... (unutrašnja logika ostaje ista)
 

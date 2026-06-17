@@ -41,7 +41,7 @@ export class AdminStatsService {
                
                 let doc;
                 if (checkQuotaStatus()) {
-                   console.warn(`[AdminStatsService] Quota exhausted, using local mock for ${fastPathDoc}`);
+                   AdminStatsService.logger.warn(`[AdminStatsService] Quota exhausted, using local mock for ${fastPathDoc}`);
                    doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
                 } else {
                    // Increased timeout for Fast-Path FirestoreDoc to prevent expensive recalculations. 
@@ -56,18 +56,18 @@ export class AdminStatsService {
                  const d = doc.data();
                  const actualData = d?.stats || d;
                  if (actualData) {
-                   console.log(`[AdminStatsService] L0 Fast-Path hit for ${cacheKey}`);
+                   console.info(`[AdminStatsService] L0 Fast-Path hit for ${cacheKey}`);
                    return actualData;
                  }
                }
              } catch (e: any) {
-               console.warn(`[AdminStatsService] L0 Fast-Path failed for ${cacheKey}:`, e instanceof Error ? e.message : String(e));
+                AdminStatsService.logger.warn(`[AdminStatsService] L0 Fast-Path failed for ${cacheKey}:`, e instanceof Error ? e.message : String(e));
              }
 
              // Stop execution and return fallback immediately if circuit breaker tripped
              const { checkQuotaStatus } = await import("../config/firebase.ts");
              if (checkQuotaStatus()) {
-               console.warn(`[AdminStatsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
+                AdminStatsService.logger.warn(`[AdminStatsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
                return fallbackValue as T;
              }
 
@@ -79,7 +79,7 @@ export class AdminStatsService {
              db.doc(fastPathDoc).set({
                stats: res,
                updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-              }, { merge: true }).catch((e: any) => console.warn("[AdminStatsService] Firestore save stats:", e));
+               }, { merge: true }).catch((e: any) => AdminStatsService.logger.warn("[AdminStatsService] Firestore save stats:", e));
              
              return res;
           },
@@ -263,11 +263,11 @@ export class AdminStatsService {
         const cached = await redis.get("admin_global_metrics:cache");
         if (cached) {
           const parsed = JSON.parse(cached);
-          console.log("[AdminStatsService] Hit precompiled admin_global_metrics:cache in Redis.");
+          console.info("[AdminStatsService] Hit precompiled admin_global_metrics:cache in Redis.");
           return parsed;
         }
       } catch (err) {
-        console.warn("[AdminStatsService] Failed to read admin_global_metrics:cache from Redis:", err);
+        AdminStatsService.logger.warn("[AdminStatsService] Failed to read admin_global_metrics:cache from Redis:", err);
       }
     }
 
@@ -279,12 +279,12 @@ export class AdminStatsService {
           if (redis) {
             await redis.set("admin_global_metrics:cache", JSON.stringify(d), "EX", 3600);
           }
-          console.log("[AdminStatsService] Served global stats from admin_stats document shield.");
+          console.info("[AdminStatsService] Served global stats from admin_stats document shield.");
           return d;
         }
       }
     } catch (err) {
-      console.warn("[AdminStatsService] Failed to read admin_stats document shield:", err);
+      AdminStatsService.logger.warn("[AdminStatsService] Failed to read admin_stats document shield:", err);
     }
 
     const fallbackStats: any = {
@@ -313,7 +313,7 @@ export class AdminStatsService {
       const liveStats = await this.reconcileGlobalStats();
       return { ...fallbackStats, ...liveStats };
     } catch (err) {
-      console.warn("[AdminStatsService] Reconcile failed, returning zeroes.", err);
+      AdminStatsService.logger.warn("[AdminStatsService] Reconcile failed, returning zeroes.", err);
       return fallbackStats;
     }
   }

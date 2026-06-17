@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { z } from "zod";
@@ -32,7 +33,7 @@ const configSchema = z.object({
 // Admin endpoint za postavljanje konfiguracije
 systemRouter.post("/config", requireAuth, async (req, res) => {
   try {
-    const user = (req as any)?.user;
+    const user = getReqUser(req);
     if (!user.isAdmin) {
       return res.status(403).json({ error: "Nedozvoljen pristup" });
     }

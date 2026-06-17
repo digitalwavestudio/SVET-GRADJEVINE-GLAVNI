@@ -1,5 +1,6 @@
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
 import { db, admin } from "../config/firebase.ts";
+import { logger } from "../utils/logger.ts";
 
 export function setupMediaSubscriber() {
   eventBus.on(DomainEvents.AD_DELETED, async (eventPayload) => {
@@ -9,7 +10,7 @@ export function setupMediaSubscriber() {
     if (!id) return;
 
     try {
-      console.log(`[MediaSubscriber] AD_DELETED caught for ${id}. Checking for orphan media...`);
+      console.info(`[MediaSubscriber] AD_DELETED caught for ${id}. Checking for orphan media...`);
       // 1. Fetch soft-deleted document
       const adSnap = await db.collection("listings").doc(id).get();
       if (!adSnap.exists) return;
@@ -29,13 +30,13 @@ export function setupMediaSubscriber() {
             if (match?.[1]) {
               const filePath = decodeURIComponent(match[1]);
               await bucket.file(filePath).delete();
-              console.log(`[MediaSubscriber] Deleted orphan media: ${filePath}`);
+              console.info(`[MediaSubscriber] Deleted orphan media: ${filePath}`);
             }
           }
         } catch(err) {
           const error = err as { code?: number; message?: string };
           if(error.code !== 404) {
-             console.warn(`[MediaSubscriber] Failed to delete image ${url}:`, error.message);
+             logger.warn(`[MediaSubscriber] Failed to delete image ${url}:`, error.message);
           }
         }
       });

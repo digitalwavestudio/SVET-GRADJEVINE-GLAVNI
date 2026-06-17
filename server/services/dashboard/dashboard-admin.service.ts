@@ -1,5 +1,6 @@
 import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
+import { logger } from "../../utils/logger.ts";
 
 export class DashboardAdminService {
   static async getAdminStats() {
@@ -59,7 +60,7 @@ export class DashboardAdminService {
               precalculatedSectors = docData?.sectors || docData?.sectorData || [];
             }
           } catch (err: unknown) {
-            console.warn("[DashboardService] Failed to load pre-aggregated metadata document:", err instanceof Error ? err.message : String(err));
+            logger.warn("[DashboardService] Failed to load pre-aggregated metadata document:", err instanceof Error ? err.message : String(err));
             isFirestoreHealthy = false;
           }
 

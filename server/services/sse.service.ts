@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getRedis, getSubRedis } from "../utils/redis.ts";
 import { EventEmitter } from "events";
+import { logger } from "../utils/logger.ts";
 
 export interface SSEEvent {
   uid: string;
@@ -36,9 +37,9 @@ export class SSEService {
         .catch((err: Error) => {
           const errMsg = err?.message || "";
           if (errMsg.toLowerCase().includes("offlinequeue") || errMsg.toLowerCase().includes("writeable")) {
-            console.warn("[SSE] Redis pretplata nije dostupna (koristi se lokalni in-memory fallback).");
+            logger.warn("[SSE] Redis pretplata nije dostupna (koristi se lokalni in-memory fallback).");
           } else {
-            console.warn("[SSE] Redis sub failed asynchronously, using local memory fallback", err);
+            logger.warn("[SSE] Redis sub failed asynchronously, using local memory fallback", err);
           }
         });
     }
@@ -55,7 +56,7 @@ export class SSEService {
       try {
         await redis.sadd("active_notification_users", uid);
       } catch (e) {
-        console.warn("[SSE] Failed to add user to active_notification_users set:", e);
+        logger.warn("[SSE] Failed to add user to active_notification_users set:", e);
       }
     }
 

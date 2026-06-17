@@ -1,16 +1,18 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { notificationActionSchema } from "@svet-gradjevine/shared";
 import { CacheService } from "../services/cache.service.ts";
+import { logger } from "../utils/logger.ts";
 
 export const notificationsRouter = Router();
 
 // Polling endpoint for aggregated inbox
 notificationsRouter.get("/poll", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const clientTimestamp = parseInt(req.query.since as string) || 0;
 
     const cacheKey = `notifications_payload_${uid}`;
@@ -22,7 +24,7 @@ notificationsRouter.get("/poll", requireAuth, async (req, res, next) => {
       try {
         await redis.sadd("active_notification_users", uid);
       } catch (e) {
-        console.warn("[Notifications] Failed to add active user to redis tracking:", e);
+        logger.warn("[Notifications] Failed to add active user to redis tracking:", e);
       }
     }
 
@@ -80,7 +82,7 @@ notificationsRouter.get("/poll", requireAuth, async (req, res, next) => {
           (err.message && err.message.includes("RESOURCE_EXHAUSTED")) ||
           (err.message && err.message.includes("Quota"))
         ) {
-          console.warn(`[QUOTA ALERT] Firestore Quota Exceeded. Returning empty default notifications for user ${uid}.`);
+          logger.warn(`[QUOTA ALERT] Firestore Quota Exceeded. Returning empty default notifications for user ${uid}.`);
           payloadState = { activities: [], unreadCount: 0, lastUpdated: Date.now() };
           await CacheService.set(cacheKey, payloadState, 300000); // Cache empty for 5 mins to avoid retries
         } else {
@@ -107,7 +109,7 @@ notificationsRouter.get("/poll", requireAuth, async (req, res, next) => {
 // Mark single as read
 notificationsRouter.get("/history", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const limitNum = Math.min(parseInt(req.query.limit as string) || 5, 20);
     const { lastVisibleId } = req.query;
 
@@ -141,7 +143,7 @@ notificationsRouter.get("/history", requireAuth, async (req, res, next) => {
       });
     } catch (err: any) {
       if (err.message && err.message.includes("RESOURCE_EXHAUSTED")) {
-        console.warn(`[QUOTA ALERT] Firestore Quota Exceeded. Returning empty history for user ${uid}.`);
+        logger.warn(`[QUOTA ALERT] Firestore Quota Exceeded. Returning empty history for user ${uid}.`);
         res.json({
           activities: [],
           nextLastVisibleId: null,
@@ -159,7 +161,7 @@ notificationsRouter.get("/history", requireAuth, async (req, res, next) => {
 // Mark single as read
 notificationsRouter.post("/:id/read", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { id } = req.params;
 
     const activityRef = db.collection("activities").doc(id);
@@ -186,7 +188,7 @@ notificationsRouter.post("/:id/read", requireAuth, async (req, res, next) => {
 // Mark all as read
 notificationsRouter.post("/read-all", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
 
     const snap = await db
       .collection("activities")
@@ -218,7 +220,7 @@ notificationsRouter.post(
   validateRequest(notificationActionSchema),
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const { activity } = req.body;
 
       // Checked via schema

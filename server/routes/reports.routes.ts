@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { validateRequest } from "../middleware/validate.ts";
@@ -13,7 +14,7 @@ reportsRouter.post(
   validateRequest(reportSchema),
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const {
         targetId,
         targetType,

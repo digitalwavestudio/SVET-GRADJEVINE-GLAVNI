@@ -25,7 +25,7 @@ import { db } from '../server/config/firebase.ts';
     
     console.log('3. Klikćem na dugme za registraciju...');
     await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle', timeout: 15000 }).catch(() => {}),
+      page.waitForNavigation({ waitUntil: 'networkidle', timeout: 15000 }).catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message)),
       page.click('button[type="submit"]')
     ]);
 
@@ -39,7 +39,7 @@ import { db } from '../server/config/firebase.ts';
     
     console.log('6. Klikćem na dugme za prijavu...');
     await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle', timeout: 15000 }).catch(() => {}),
+      page.waitForNavigation({ waitUntil: 'networkidle', timeout: 15000 }).catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message)),
       page.click('button[type="submit"]')
     ]);
 
@@ -63,8 +63,8 @@ import { db } from '../server/config/firebase.ts';
 
     // Popunjavamo formu Korak 1
     console.log('10. Popunjavam Korak 1 (Sektor, Pozicija, Lokacija)...');
-    await page.selectOption('select[name="sector"]', { index: 1 }).catch(() => {});
-    await page.selectOption('select[name="profession"]', { index: 1 }).catch(() => {});
+    await page.selectOption('select[name="sector"]', { index: 1 }).catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
+    await page.selectOption('select[name="profession"]', { index: 1 }).catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
     await page.fill('input[name="location"]', 'Beograd');
     
     console.log('Klikćem na DALJE (Korak 1)...');
@@ -73,9 +73,9 @@ import { db } from '../server/config/firebase.ts';
 
     // Popunjavamo Korak 2 (Plata, Iskustvo, Tip)
     console.log('11. Popunjavam Korak 2 (Plata, Iskustvo)...');
-    await page.fill('input[name="plataMin"]', '800').catch(() => {});
-    await page.fill('input[name="plataMax"]', '1200').catch(() => {});
-    await page.selectOption('select[name="iskustvo"]', { index: 1 }).catch(() => {});
+    await page.fill('input[name="plataMin"]', '800').catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
+    await page.fill('input[name="plataMax"]', '1200').catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
+    await page.selectOption('select[name="iskustvo"]', { index: 1 }).catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
     
     console.log('Klikćem na DALJE (Korak 2)...');
     await page.click('button:has-text("DALJE")');
@@ -93,10 +93,10 @@ import { db } from '../server/config/firebase.ts';
 
     // Odabir paketa (Korak 4) i slanje
     console.log('13. Biram paket i objavljujem oglas...');
-    await page.click('button:has-text("BESPLATNO")').catch(() => {});
+    await page.click('button:has-text("BESPLATNO")').catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
     
     console.log('Klikćem na dugme za slanje/objavu...');
-    await page.click('button:has-text("OBJAVI OGLAS")').catch(() => {});
+    await page.click('button:has-text("OBJAVI OGLAS")').catch((e: any) => console.warn("[TestFlow] Interaction failed:", e?.message));
     await page.waitForTimeout(5000);
 
     console.log('Krajnji URL nakon slanja oglasa:', page.url());

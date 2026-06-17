@@ -6,6 +6,7 @@ import { checkQuotaStatus } from "../config/firebase.ts";
 import { AdaptiveQosService } from "./adaptive-qos.service.ts";
 import { CACHE_PREFIXES, CacheKeys } from "../constants/cache-keys.ts";
 import zlib from "zlib";
+import { logger } from "../utils/logger.ts";
 
 /**
  * Centralizovani servis za keširanje.
@@ -82,7 +83,7 @@ export class CacheService {
 
       // ADR 003: Pre-emptive Quota Guard (Ako nema ni bajatog keša, ne pokušavamo upit na bazu)
       if (checkQuotaStatus()) {
-         console.warn(`[CacheService] 🛡️ Pre-emptive Quota Guard: Baza zaštićena. Nema stale keša za ${key}, obustavljam block-fetch.`);
+         logger.warn(`[CacheService] 🛡️ Pre-emptive Quota Guard: Baza zaštićena. Nema stale keša za ${key}, obustavljam block-fetch.`);
          throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
       }
 
@@ -98,7 +99,7 @@ export class CacheService {
               break;
             }
           } catch (lockErr: unknown) {
-            console.warn(`[CacheService] RedisLockManager.acquire failed for key ${key}:`, lockErr instanceof Error ? lockErr.message : String(lockErr));
+            logger.warn(`[CacheService] RedisLockManager.acquire failed for key ${key}:`, lockErr instanceof Error ? lockErr.message : String(lockErr));
             break;
           }
 
@@ -117,7 +118,7 @@ export class CacheService {
       // ADR 003: Provera Throughput-a pre samog izrsavanja
       const isThroughputSafe = await AdaptiveQosService.recordReadIntent();
       if (!isThroughputSafe) {
-         console.warn(`[CacheService] 🛡️ Adaptive QoS: Throughput spike detektovan za ${key}. Baza se stiti (Block-fetch denied).`);
+         logger.warn(`[CacheService] 🛡️ Adaptive QoS: Throughput spike detektovan za ${key}. Baza se stiti (Block-fetch denied).`);
          throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
       }
 
@@ -127,7 +128,7 @@ export class CacheService {
         return val;
       } finally {
         if (acquired && lockId) {
-          await RedisLockManager.release(key, lockId).catch((e: any) => console.warn("[CacheService] Redis lock release:", e));
+          await RedisLockManager.release(key, lockId).catch((e: any) => logger.warn("[CacheService] Redis lock release:", e));
         }
       }
     };
@@ -189,7 +190,7 @@ export class CacheService {
               return envelope.data;
             }
           } catch (err) {
-            console.warn(`[CacheService SWR] Failed to check SWR backoff for ${key}:`, err);
+            logger.warn(`[CacheService SWR] Failed to check SWR backoff for ${key}:`, err);
           }
 
           // Pokušaj preuzimanja distributed lock-a (jedan pobednik) za asinhronu pozadinsku revalidaciju
@@ -202,7 +203,7 @@ export class CacheService {
             // ADR 003: Provera Throughput-a
             AdaptiveQosService.recordReadIntent().then((isThroughputSafe) => {
                if (!isThroughputSafe) {
-                 console.warn(`[CacheService SWR] 🛡️ Adaptive QoS: Background revalidation obustavljena zbog spike-a.`);
+                 logger.warn(`[CacheService SWR] 🛡️ Adaptive QoS: Background revalidation obustavljena zbog spike-a.`);
                  throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
                }
                return this.executeWithTimeout(fetchFn, timeoutMs);
@@ -216,7 +217,7 @@ export class CacheService {
                 };
                 await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
                 // Clear current backoff upon successful revalidation
-                await this.delete(backoffKey).catch((e: any) => console.warn("[CacheService] SWR delete backoff key:", e));
+                await this.delete(backoffKey).catch((e: any) => logger.warn("[CacheService] SWR delete backoff key:", e));
                 console.log(`[CacheService SWR] Successfully refreshed SWR cache for key: ${key}`);
               })
               .catch(async (err) => {
@@ -234,7 +235,7 @@ export class CacheService {
                 }
               })
               .finally(async () => {
-                await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[CacheService] SWR lock release after revalidation:", e));
+                await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[CacheService] SWR lock release after revalidation:", e));
               });
 
             // Pobednik takođe odmah dobija stale podatak da ne bi čekao na spori DB odziv (UX <5ms)
@@ -254,10 +255,10 @@ export class CacheService {
       // PRE-EMPTIVE QUOTA CHECK: If we know quota is exhausted, don't even try the fetch
       if (checkQuotaStatus()) {
          if (fallbackValue !== undefined) {
-           console.warn(`[CacheService SWR] 🛡️ Pre-emptive Quota Fallback activated for ${key}`);
+           logger.warn(`[CacheService SWR] 🛡️ Pre-emptive Quota Fallback activated for ${key}`);
            return fallbackValue;
          } else {
-           console.warn(`[CacheService SWR] 🛡️ Pre-emptive Quota Guard: Baza zaštićena. Obustavljam cold-start fetch za ${key}`);
+           logger.warn(`[CacheService SWR] 🛡️ Pre-emptive Quota Guard: Baza zaštićena. Obustavljam cold-start fetch za ${key}`);
            throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
          }
       }
@@ -281,7 +282,7 @@ export class CacheService {
         // ADR 003: Provera Throughput-a
         const isThroughputSafe = await AdaptiveQosService.recordReadIntent();
         if (!isThroughputSafe) {
-           console.warn(`[CacheService SWR] 🛡️ Adaptive QoS: Cold-start block-fetch obustavljen zbog spike-a.`);
+           logger.warn(`[CacheService SWR] 🛡️ Adaptive QoS: Cold-start block-fetch obustavljen zbog spike-a.`);
            throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
         }
 
@@ -294,18 +295,18 @@ export class CacheService {
         };
         await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
         // Cold-start success should also clear any existing backoff
-                await this.delete(backoffKey).catch((e: any) => console.warn("[CacheService] Cold-start delete backoff key:", e));
+                await this.delete(backoffKey).catch((e: any) => logger.warn("[CacheService] Cold-start delete backoff key:", e));
                 return freshData;
       } catch (err: unknown) {
         // CRITICAL FALLBACK: If cold start fails, check if we have ANY stale data to return
         const backup = await this.get<SWREnvelope<T>>(swrKey).catch(() => null);
         if (backup && backup.data) {
-           console.warn(`[CacheService SWR] Recovered cold-start failure using stale backup for ${key}`);
+           logger.warn(`[CacheService SWR] Recovered cold-start failure using stale backup for ${key}`);
            return backup.data;
         }
         
         if (fallbackValue !== undefined) {
-           console.warn(`[CacheService SWR] Recovered cold-start failure using provided fallbackValue for ${key}`);
+           logger.warn(`[CacheService SWR] Recovered cold-start failure using provided fallbackValue for ${key}`);
            return fallbackValue;
         }
 
@@ -314,7 +315,7 @@ export class CacheService {
         throw err;
       } finally {
         if (lockId) {
-          await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[CacheService] Cold-start lock release:", e));
+          await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[CacheService] Cold-start lock release:", e));
         }
       }
     };
@@ -454,7 +455,7 @@ export class CacheService {
                   tracker.end({ hit: false, reason: "logical_expiry" });
                   return null;
                 } else {
-                  console.warn(`[CacheService] 🛡️ QoS Quota Guard: Serviram STALE-CACHE (istekle podatke) za ključ ${routedKey}`);
+                  logger.warn(`[CacheService] 🛡️ QoS Quota Guard: Serviram STALE-CACHE (istekle podatke) za ključ ${routedKey}`);
                 }
               }
               // Raspakuj u originalni oblik ukoliko je prošao evaluaciju ili je još svež
@@ -483,7 +484,7 @@ export class CacheService {
           console.error("[CacheService] Redis get error, attempting local stale recovery:", errorMsg);
           // Rescue using Stale Local L1: If we have the expired item in local memory, return it gracefully rather than crashing or hitting DB
           if (item) {
-            console.warn(`[CacheService] 🛡️ Failover Recovery: Serviram istekli lokalni L1 za ključ ${routedKey} usled mrežnih/Redis problema.`);
+            logger.warn(`[CacheService] 🛡️ Failover Recovery: Serviram istekli lokalni L1 za ključ ${routedKey} usled mrežnih/Redis problema.`);
             // Privremeno ga re-setujemo na par sekundi u L1 da sledeći burstovi ne zaguše sistem
             const recoveryTtl = this.isHotKey(routedKey) ? 5000 : 2000;
             this.localCache.set(routedKey, {
@@ -564,7 +565,7 @@ export class CacheService {
                     results.set(originalKey, null);
                     continue;
                   } else {
-                    console.warn(`[CacheService] 🛡️ QoS Quota Guard MGET: Serviram STALE-CACHE za ${routedKey}`);
+                    logger.warn(`[CacheService] 🛡️ QoS Quota Guard MGET: Serviram STALE-CACHE za ${routedKey}`);
                   }
                 }
                 parsed = parsed.data;
@@ -635,7 +636,7 @@ export class CacheService {
         const { getStreamRedis } = await import("../utils/redis.ts");
         const sub = getStreamRedis();
         if (!sub) {
-          console.warn("[CacheService] Redis stream klijent nije konfigurisan. Invalidation Stream je isključen (graceful fallback).");
+          logger.warn("[CacheService] Redis stream klijent nije konfigurisan. Invalidation Stream je isključen (graceful fallback).");
           return;
         }
 
@@ -676,9 +677,9 @@ export class CacheService {
             if (errMsg.includes("ERR") || errMsg.includes("no such key")) {
               lastId = "$";
             } else if (errMsg.toLowerCase().includes("offlinequeue") || errMsg.toLowerCase().includes("writeable")) {
-              console.warn("[CacheService Invalidation Stream] Aktiviran lokalni in-memory fallback.");
+              logger.warn("[CacheService Invalidation Stream] Aktiviran lokalni in-memory fallback.");
             } else {
-              console.warn("[CacheService Stream Reader Exception]:", errMsg);
+              logger.warn("[CacheService Stream Reader Exception]:", errMsg);
             }
             await new Promise((resolve) => setTimeout(resolve, 5000));
           }

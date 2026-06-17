@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db, admin } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 
@@ -52,9 +53,9 @@ export class ChatArchiverService {
   }
 
   static startInterval() {
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       setTimeout(() => {
-        this.archiveOldChats().catch((e: any) => console.warn("[ChatArchiverService] Archive old chats:", e));
+        this.archiveOldChats().catch((e: any) => ChatArchiverService.logger.warn("[ChatArchiverService] Archive old chats:", e));
       }, 10000);
     }
 

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { logger } from "../utils/logger.ts";
 
 export type ServerServiceGroup = "ads" | "companies" | "masters" | "tools" | "general";
 
@@ -104,7 +105,7 @@ class ServerCircuitBreakerManager {
 
     if (errorRate > this.errorThreshold) {
       if (this.states.get(group) !== "OPEN") {
-        console.warn(
+        logger.warn(
           `🚨 [Server CircuitBreaker] "${group}" circuit TRIPPED! Error rate: ${(
             errorRate * 100
           ).toFixed(1)}% (Threshold: ${this.errorThreshold * 100}%)`
@@ -114,7 +115,7 @@ class ServerCircuitBreakerManager {
       }
     } else {
       if (this.states.get(group) === "OPEN") {
-        console.log(`🛡️ [Server CircuitBreaker] "${group}" circuit recovered and CLOSED.`);
+        console.info(`🛡️ [Server CircuitBreaker] "${group}" circuit recovered and CLOSED.`);
         this.states.set(group, "CLOSED");
       }
     }

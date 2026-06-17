@@ -1,5 +1,6 @@
 import { env } from "../config/env.ts";
 import { getErrorMessage } from "../utils/error-handler.ts";
+import { logger } from "../utils/logger.ts";
 
 export interface AdAlgoliaRecord {
   objectID: string;
@@ -474,7 +475,7 @@ export const deleteAdFromIndex = async (
       objectID: adId,
     });
   } catch (err: unknown) {
-    console.warn(
+    logger.warn(
       `Failed to delete object ${adId} from ${targetIndex}. Error: ${getErrorMessage(err)}`,
     );
   }
@@ -603,7 +604,7 @@ export const setupAlgoliaIndexSettings = async (): Promise<boolean> => {
   try {
     for (const indexName of indices) {
       const targetIndex = getValidIndexName(indexName);
-      console.log(`Configuring Algolia index settings: ${indexName} -> ${targetIndex}`);
+      console.info(`Configuring Algolia index settings: ${indexName} -> ${targetIndex}`);
       if (client.setSettings) {
         const isMagazine = targetIndex === "magazine_index";
         await client.setSettings({

@@ -1,8 +1,15 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { z } from "zod";
+import {
+  constructionWorkerSchema,
+  constructionResourceSchema,
+  constructionMetricSchema,
+} from "@svet-gradjevine/shared";
+import { constructionSiteUpdateSchema } from "../config/validation/construction.validation.ts";
 
 export const constructionRouter = Router();
 
@@ -19,7 +26,7 @@ const constructionSiteSchema = z.object({
 // Create/Update Site
 constructionRouter.post("/sites", requireAuth, validateRequest(constructionSiteSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { site } = req.body;
 
     if (!site.id) {
@@ -47,9 +54,9 @@ constructionRouter.post("/sites", requireAuth, validateRequest(constructionSiteS
 });
 
 // Update site (name etc.)
-constructionRouter.patch("/:siteId", requireAuth, async (req, res, next) => {
+constructionRouter.patch("/:siteId", requireAuth, validateRequest(constructionSiteUpdateSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId } = req.params;
     const updateData = req.body;
 
@@ -75,7 +82,7 @@ constructionRouter.patch("/:siteId", requireAuth, async (req, res, next) => {
 // Soft-delete site
 constructionRouter.delete("/:siteId", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId } = req.params;
 
     const docRef = db.collection("construction_sites").doc(siteId);
@@ -100,7 +107,7 @@ constructionRouter.delete("/:siteId", requireAuth, async (req, res, next) => {
 // Get all construction data (Sites, Events, Diaries)
 constructionRouter.get("/all-data", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { activeSiteId, eventsCursor, diariesCursor } = req.query;
 
     let eventsQ = db.collection("events").where("authorId", "==", uid).limit(30);
@@ -203,9 +210,9 @@ constructionRouter.get("/all-data", requireAuth, async (req, res, next) => {
 // --- Workers CRUD ---
 
 // Add worker
-constructionRouter.post("/:siteId/workers", requireAuth, async (req, res, next) => {
+constructionRouter.post("/:siteId/workers", requireAuth, validateRequest(constructionWorkerSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId } = req.params;
     const data = req.body;
 
@@ -226,9 +233,9 @@ constructionRouter.post("/:siteId/workers", requireAuth, async (req, res, next) 
 });
 
 // Update worker
-constructionRouter.put("/:siteId/workers/:workerId", requireAuth, async (req, res, next) => {
+constructionRouter.put("/:siteId/workers/:workerId", requireAuth, validateRequest(constructionWorkerSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId, workerId } = req.params;
     const data = req.body;
 
@@ -253,7 +260,7 @@ constructionRouter.put("/:siteId/workers/:workerId", requireAuth, async (req, re
 // Delete worker
 constructionRouter.delete("/:siteId/workers/:workerId", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId, workerId } = req.params;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
@@ -274,9 +281,9 @@ constructionRouter.delete("/:siteId/workers/:workerId", requireAuth, async (req,
 // --- Resources CRUD ---
 
 // Add resource
-constructionRouter.post("/:siteId/resources", requireAuth, async (req, res, next) => {
+constructionRouter.post("/:siteId/resources", requireAuth, validateRequest(constructionResourceSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId } = req.params;
     const data = req.body;
 
@@ -297,9 +304,9 @@ constructionRouter.post("/:siteId/resources", requireAuth, async (req, res, next
 });
 
 // Update resource
-constructionRouter.put("/:siteId/resources/:resourceId", requireAuth, async (req, res, next) => {
+constructionRouter.put("/:siteId/resources/:resourceId", requireAuth, validateRequest(constructionResourceSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId, resourceId } = req.params;
     const data = req.body;
 
@@ -324,7 +331,7 @@ constructionRouter.put("/:siteId/resources/:resourceId", requireAuth, async (req
 // Delete resource
 constructionRouter.delete("/:siteId/resources/:resourceId", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { siteId, resourceId } = req.params;
 
     const siteDoc = await db.collection("construction_sites").doc(siteId).get();
@@ -345,9 +352,9 @@ constructionRouter.delete("/:siteId/resources/:resourceId", requireAuth, async (
 // --- Metrics ---
 
 // Save daily metrics
-constructionRouter.post("/metrics", requireAuth, async (req, res, next) => {
+constructionRouter.post("/metrics", requireAuth, validateRequest(constructionMetricSchema), async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const data = req.body;
 
     const today = new Date();
@@ -386,7 +393,7 @@ constructionRouter.post("/metrics", requireAuth, async (req, res, next) => {
 // Get metrics for a specific year/month
 constructionRouter.get("/metrics/:year/:month", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const { year, month } = req.params;
     const yearNum = parseInt(year, 10);
     const monthNum = parseInt(month, 10);

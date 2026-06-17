@@ -1,6 +1,7 @@
 ﻿import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { SEOSchemaService, SEOEntityData } from "./seo-schema.service.ts";
+import { logger } from "../../utils/logger.ts";
 
 export class SEOMetaService {
   static async getAdMetaData(
@@ -160,7 +161,7 @@ export class SEOMetaService {
     } catch (err) {
       console.error("[SEO-Background] Failed background compilation:", err);
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[SEOMeta] lock release error:", e?.message));
+      await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[SEOMeta] lock release error:", e?.message));
     }
   }
 

@@ -1,4 +1,5 @@
-﻿import fs from "fs/promises";
+﻿import { env } from "../../config/env.ts";
+import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { Request, Response } from "express";
@@ -29,7 +30,7 @@ export class SEORenderEngine {
       return this.cachedIndexHtml;
     }
 
-    const possiblePaths = process.env.NODE_ENV === "development"
+    const possiblePaths = env.NODE_ENV === "development"
       ? [
           path.join(process.cwd(), "index.html"),
           path.join(process.cwd(), "dist", "index.html"),

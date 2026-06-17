@@ -1,12 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { env } from "../config/env.ts";
+import { logger } from "../utils/logger.ts";
 
 let aiInstance: GoogleGenAI | null = null;
 
 export const getGenAI = () => {
   if (!aiInstance) {
     if (!env.GEMINI_API_KEY) {
-      console.warn("[AI] GEMINI_API_KEY missing, AI services disabled.");
+      logger.warn("[AI] GEMINI_API_KEY missing, AI services disabled.");
       return null;
     }
     aiInstance = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
@@ -17,7 +18,7 @@ export const getGenAI = () => {
 export const callGeminiAPI = async (prompt: string) => {
   const ai = getGenAI();
   if (!ai) {
-    console.warn("[AI] Gemini API unavailable, returning empty response.");
+    logger.warn("[AI] Gemini API unavailable, returning empty response.");
     return "";
   }
   try {
@@ -35,7 +36,7 @@ export const callGeminiAPI = async (prompt: string) => {
 export const parseSearchIntent = async (query: string) => {
   const ai = getGenAI();
   if (!ai) {
-    console.warn("[AI] Gemini unavailable, returning fallback intent.");
+    logger.warn("[AI] Gemini unavailable, returning fallback intent.");
     return { keywords: [query], intentType: "SEARCH" };
   }
   try {
@@ -98,12 +99,12 @@ export const moderateImage = async (imageUrl: string) => {
       arrayBuffer.then((buffer) => {
         const base64 = Buffer.from(buffer).toString("base64");
         resolve(base64);
-      }).catch(err => console.warn('[AI] ArrayBuffer extraction error:', err));
+      }).catch(err => logger.warn('[AI] ArrayBuffer extraction error:', err));
     });
 
     const ai = getGenAI();
     if (!ai) {
-      console.warn("[AI] Gemini unavailable, skipping image moderation.");
+      logger.warn("[AI] Gemini unavailable, skipping image moderation.");
       return { isSafe: true, confidence: 1 };
     }
     const result = await ai.models.generateContent({
@@ -161,7 +162,7 @@ export const moderateImage = async (imageUrl: string) => {
 export const processDashboardCommand = async (input: string, context?: any) => {
   const ai = getGenAI();
   if (!ai) {
-    console.warn("[AI] Gemini unavailable, returning default command response.");
+    logger.warn("[AI] Gemini unavailable, returning default command response.");
     return "Komanda je obrađena.";
   }
   try {

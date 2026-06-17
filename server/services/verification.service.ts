@@ -201,7 +201,7 @@ export class VerificationService {
       if (result && result.outboxDocId && result.outboxPayload) {
         import("./cache.service.ts").then(({ CacheService }) => {
           CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000).catch(console.error);
-        }).catch(err => console.warn('[Verification] Cache import error:', err));
+        }).catch(err => VerificationService.logger.warn('[Verification] Cache import error:', err));
         import("./queue.service.ts").then(
           ({ QueueService, JobType, JobPriority }) => {
             QueueService.addJob(
@@ -218,7 +218,7 @@ export class VerificationService {
               ),
             );
           },
-        ).catch(err => console.warn('[Verification] Queue import error:', err));
+        ).catch(err => VerificationService.logger.warn('[Verification] Queue import error:', err));
       }
 
       return result;

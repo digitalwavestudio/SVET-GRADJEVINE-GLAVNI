@@ -6,6 +6,7 @@ import { LockManager } from "./lock.service.ts";
 import { CacheService } from "./cache.service.ts";
 import { ViewStatsService } from "./viewStatsService.ts";
 import { CACHE_PREFIXES, CacheKeys } from "../constants/cache-keys.ts";
+import { logger } from "../utils/logger.ts";
 
 const REDIS_KEY_PENDING = CACHE_PREFIXES.METRICS_VIEW_BUFFER;
 const REDIS_KEY_USER_STATS = CACHE_PREFIXES.METRICS_USER_STATS;
@@ -50,7 +51,7 @@ export class MetricsService {
 
           // We will let the pipeline do the throttling checks, but to be 100% accurate we would need a multi or separate get.
           // PROMPT 7: In-memory baferisanje umesto Redis I/O
-          ViewStatsService.incrementView(collectionName, targetId).catch((e: any) => console.warn("[MetricsService] Increment view stats:", e));
+          ViewStatsService.incrementView(collectionName, targetId).catch((e: any) => logger.warn("[MetricsService] Increment view stats:", e));
           
           if (authorId) pipeline.hincrby(REDIS_KEY_USER_STATS, authorId, 1);
 
@@ -106,7 +107,7 @@ export class MetricsService {
         // Wait, ViewStatsService.incrementView does a separate REDIS call (hincrby). To truly pipeline, we can just do it here:
         if (type === "view") {
           // PROMPT 7: Koristimo in-memory baferisanje iz ViewStatsService umesto Redis-a da bi smanjili I/O
-          ViewStatsService.incrementView(collectionName, targetId).catch((e: any) => console.warn("[MetricsService] Increment view stats in pipeline:", e));
+          ViewStatsService.incrementView(collectionName, targetId).catch((e: any) => logger.warn("[MetricsService] Increment view stats in pipeline:", e));
           
           if (authorId) {
             pipeline.hincrby(REDIS_KEY_USER_STATS, authorId, 1);
@@ -483,7 +484,7 @@ export class MetricsService {
           }
           return result;
         } catch (error) {
-          console.warn("[METRICS] Failed to fetch analytics (quota?):", error);
+          logger.warn("[METRICS] Failed to fetch analytics (quota?):", error);
           return []; // Return empty array as fallback
         }
       },

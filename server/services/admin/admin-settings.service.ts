@@ -4,6 +4,7 @@ import { DynamicConfigService } from "../dynamic-config.service.ts";
 import { QueueService, JobType, JobPriority } from "../queue.service.ts";
 import { CacheService } from "../cache.service.ts";
 import { runPendingMigrations } from "../migration.service.ts";
+import { logger } from "../../utils/logger.ts";
 
 export class AdminSettingsService {
   static async runMigrations() {
@@ -83,14 +84,14 @@ export class AdminSettingsService {
   }
 
   static async prewarm() {
-    console.log("🔥 [AdminSettingsService] Pre-warming branding and global settings...");
+    console.info("🔥 [AdminSettingsService] Pre-warming branding and global settings...");
     try {
       await Promise.allSettled([
         this.getSettings("branding"),
         this.getSettings("global"),
         this.getSettings("platform")
       ]);
-      console.log("✅ [AdminSettingsService] Pre-warm complete.");
+      console.info("✅ [AdminSettingsService] Pre-warm complete.");
     } catch (err) {
       console.error("❌ [AdminSettingsService] Pre-warm failed (non-blocking):", err);
     }
@@ -116,7 +117,7 @@ export class AdminSettingsService {
           }
 
           const doc = await db.collection("settings").doc(type).get();
-          console.log("AdminSettings doc:", type, "exists:", doc.exists, "data:", doc.data?.());
+          console.info("AdminSettings doc:", type, "exists:", doc.exists, "data:", doc.data?.());
           if (doc.exists && doc.data && doc.data()) {
              const data = doc.data();
                if (type === "global") {
@@ -170,7 +171,7 @@ export class AdminSettingsService {
              err?.code === 4 || // DEADLINE_EXCEEDED
              err?.code === 8    // RESOURCE_EXHAUSTED
            ) {
-             console.warn(`[AdminSettingsService] Quota/Timeout fetching settings ${type}. Returning fallback.`);
+             logger.warn(`[AdminSettingsService] Quota/Timeout fetching settings ${type}. Returning fallback.`);
              throw new Error("QUOTA_EXHAUSTED");
            }
            throw error;

@@ -159,7 +159,7 @@ export class MonitoringService {
     }
 
     // Proaktivno nadgledanje zdravlja sistema svakih 5 minuta (NOC Alerts)
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       this.monitoringInterval = setInterval(
         async () => {
         const lockKey = "lock:monitoring_check";

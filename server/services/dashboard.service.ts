@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db } from "../config/firebase.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { CacheService } from "./cache.service.ts";
@@ -5,6 +6,7 @@ import { getRedis, getSubRedis, isClusterOffline } from "../utils/redis.ts";
 import { MetricsService } from "./metrics.service.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 import * as admin from "firebase-admin";
+import { logger } from "../utils/logger.ts";
 
 // Extracted modules
 import { 
@@ -39,11 +41,11 @@ export class DashboardService {
       const cached = (await CacheService.get(`bff_cache_tiered:${userId}`)) || 
                      (await CacheService.get(`swr:bff_cache_tiered:${userId}`));
       if (cached) {
-        console.log(`⚡ [DashboardService] Instant prewarm fast-path hit! Read consolidated Redis bff_cache_tiered:${userId}.`);
+        console.info(`⚡ [DashboardService] Instant prewarm fast-path hit! Read consolidated Redis bff_cache_tiered:${userId}.`);
         return cached;
       }
     } catch (cacheErr: unknown) {
-      console.warn(`[DashboardService] Failed to read prewarmed Redis cache for ${userId}:`, getErrorMessage(cacheErr));
+      logger.warn(`[DashboardService] Failed to read prewarmed Redis cache for ${userId}:`, getErrorMessage(cacheErr));
     }
 
     const [statsResult, analyticsResult] = await Promise.allSettled([
@@ -71,7 +73,7 @@ export class DashboardService {
               ...d.data(),
             }));
           } catch (err) {
-            console.warn("[DashboardService] Failed to fetch candidate applications:", err);
+            logger.warn("[DashboardService] Failed to fetch candidate applications:", err);
           }
           return { smartMatches, recentApplications };
         }
@@ -88,7 +90,7 @@ export class DashboardService {
             recentViews: userData.viewsCount || 0,
           };
         } catch (err) {
-          console.warn("[DashboardService] Failed to fetch standard user data:", err);
+          logger.warn("[DashboardService] Failed to fetch standard user data:", err);
           return { role };
         }
       })(),
@@ -136,18 +138,18 @@ export class DashboardService {
 
   static registerPubSubEviction() {
     if (isClusterOffline()) {
-      console.warn("⚠️ [DashboardService] Skipping pub/sub eviction registration because Redis is offline.");
+      logger.warn("⚠️ [DashboardService] Skipping pub/sub eviction registration because Redis is offline.");
       return;
     }
     if (this.subRegistered) {
-      console.log("[DashboardService] Redis eviction pub/sub already registered.");
+      console.info("[DashboardService] Redis eviction pub/sub already registered.");
       return;
     }
     const subRedis = getSubRedis();
     if (subRedis) {
       const isUsable = subRedis.status !== "end" && subRedis.status !== "close";
       if (!isUsable) {
-        console.warn("[DashboardService] Failed to register pub/sub: Redis sub client is in status:", subRedis.status);
+        logger.warn("[DashboardService] Failed to register pub/sub: Redis sub client is in status:", subRedis.status);
         return;
       }
 
@@ -160,7 +162,7 @@ export class DashboardService {
       this.msgHandler = (channel: string, message: string) => {
         if (channel === REDIS_EVICTION_CHANNEL) {
           try {
-            if (process.env.NODE_ENV !== "production") console.log(`[DashboardService Pub/Sub] Cache eviction signal for user: ${message}`);
+            if (env.NODE_ENV !== "production") console.info(`[DashboardService Pub/Sub] Cache eviction signal for user: ${message}`);
             this.evictLocalMemoryCache(message);
           } catch (err: unknown) {
             console.error("[DashboardService Pub/Sub] Error handling message:", getErrorMessage(err));
@@ -170,12 +172,12 @@ export class DashboardService {
 
       subRedis.subscribe(REDIS_EVICTION_CHANNEL)
         .then(() => {
-          if (process.env.NODE_ENV !== "production") console.log(`[DashboardService] Subscribed to Redis channel: ${REDIS_EVICTION_CHANNEL}`);
+          if (env.NODE_ENV !== "production") console.info(`[DashboardService] Subscribed to Redis channel: ${REDIS_EVICTION_CHANNEL}`);
         })
         .catch((err: unknown) => {
           const errMsg = getErrorMessage(err);
           if (errMsg.toLowerCase().includes("offlinequeue") || errMsg.toLowerCase().includes("writeable")) {
-            console.warn("[DashboardService] Pub/sub registracija nije dostupna (Redis je u in-memory modu).");
+            logger.warn("[DashboardService] Pub/sub registracija nije dostupna (Redis je u in-memory modu).");
           } else {
             console.error("[DashboardService] Failed to subscribe to channel:", errMsg);
           }
@@ -187,7 +189,7 @@ export class DashboardService {
   }
 
   static async gracefulShutdown() {
-    console.log("[DashboardService] Shutting down Redis eviction pub/sub gracefully...");
+    console.info("[DashboardService] Shutting down Redis eviction pub/sub gracefully...");
     const subRedis = getSubRedis();
     const isConnected = subRedis && (subRedis.status === "ready" || subRedis.status === "connect");
 
@@ -203,8 +205,8 @@ export class DashboardService {
 
       try {
         if (isConnected) {
-          await subRedis.unsubscribe(REDIS_EVICTION_CHANNEL).catch((e: any) => console.warn("[DashboardService] Unsubscribe from Redis channel:", e));
-          console.log(`[DashboardService] Unsubscribed from channel.`);
+          await subRedis.unsubscribe(REDIS_EVICTION_CHANNEL).catch((e: any) => logger.warn("[DashboardService] Unsubscribe from Redis channel:", e));
+          console.info(`[DashboardService] Unsubscribed from channel.`);
         }
       } catch (err: unknown) { /* intentionally empty */ }
     }
@@ -229,7 +231,7 @@ export class DashboardService {
     }
 
     if (cachedStats) {
-      console.log(`[DashboardService] Performing surgical granular cache update for employer: ${uid}`);
+      console.info(`[DashboardService] Performing surgical granular cache update for employer: ${uid}`);
       try {
         const activeListingsSnap = await db.collection("listings")
           .where("authorId", "==", uid)
@@ -269,7 +271,7 @@ export class DashboardService {
         }
         return;
       } catch (err: unknown) {
-        console.warn(`[DashboardService] Surgical update failed for user ${uid}. Falling back to clean reset: ${getErrorMessage(err)}`);
+        logger.warn(`[DashboardService] Surgical update failed for user ${uid}. Falling back to clean reset: ${getErrorMessage(err)}`);
       }
     }
 
@@ -299,7 +301,7 @@ export class DashboardService {
       await CacheService.delete(CacheKeys.employerTrends(uid)).catch(err => console.error("[Cache] invalidation error:", err));
     }
 
-    this.getEmployerStats(uid).catch((e: any) => console.warn("[DashboardService] Refresh employer stats:", e));
+    this.getEmployerStats(uid).catch((e: any) => logger.warn("[DashboardService] Refresh employer stats:", e));
   }
 
   // --- Proxied Methods ---

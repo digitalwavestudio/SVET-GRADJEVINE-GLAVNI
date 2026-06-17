@@ -31,7 +31,7 @@ export class DLQMonitoringService {
       }
     } catch (error: any) {
       if (error?.code === 8 || error?.message?.includes("Quota")) {
-        console.warn("[DLQMonitor] Skiped DLQ check (Firestore quota exceeded).");
+        DLQMonitoringService.logger.warn("[DLQMonitor] Skiped DLQ check (Firestore quota exceeded).");
       } else {
         console.error("[DLQMonitor] Failed to check DLQ:", error);
       }

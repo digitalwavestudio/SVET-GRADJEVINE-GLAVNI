@@ -8,6 +8,7 @@ import { userProfileSchema } from "@svet-gradjevine/shared";
 import { User, UserRole } from "@svet-gradjevine/shared";
 import { AdminService } from "./admin.service.ts";
 import type { DecodedIdToken } from "firebase-admin/auth";
+import { logger } from "../utils/logger.ts";
 
 const l1UserCache = new Map<string, { data: User; expiry: number }>();
 const L1_USER_TTL = 30 * 1000; // 30s RAM cache for current user data
@@ -94,7 +95,7 @@ export class UsersService {
           if (privData) {
             await userRef.set(privData, { merge: true });
             await privRef.delete();
-            console.log(`[UsersService] Migrated private data for user ${uid}`);
+            console.info(`[UsersService] Migrated private data for user ${uid}`);
           }
         }
       } else {
@@ -126,7 +127,7 @@ export class UsersService {
           // Auto-init in Firestore on first Google login/signup
           try {
             await UsersService.initUser(uid, fallbackObj, fallbackUser);
-            console.log(`[UsersService] Auto-initialized Google user ${uid} in Firestore`);
+            console.info(`[UsersService] Auto-initialized Google user ${uid} in Firestore`);
           } catch (initErr) {
             console.error(`[UsersService] Failed to auto-initialize Google user ${uid}:`, initErr);
           }
@@ -153,7 +154,7 @@ export class UsersService {
     } catch (error: unknown) {
       const err = error as Error & { message?: string };
       if (err?.message === "QuickTimeout" || err?.message?.includes("timeout") || err?.message?.includes("Quota")) {
-        console.warn(`[USERS] User fetch timeout/quota for ${uid}, fast fallback activated.`);
+        logger.warn(`[USERS] User fetch timeout/quota for ${uid}, fast fallback activated.`);
       } else {
         console.error("[USERS] User fetch error:", err);
       }
@@ -375,7 +376,7 @@ export class UsersService {
     }
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[Users] Invalidate auth_session:", e?.message));
+    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session:", e?.message));
     await CacheService.delete(`public_profile_${uid}`);
     await CacheService.delete(`user_events_${uid}`);
 
@@ -416,7 +417,7 @@ export class UsersService {
       await CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000);
       await CacheService.delete(`user_me_${uid}:pub`);
       await CacheService.delete(`user_me_${uid}:priv`);
-      await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[Users] Invalidate auth_session on update:", e?.message));
+      await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on update:", e?.message));
       await CacheService.delete(`public_profile_${uid}`);
     }
 
@@ -485,7 +486,7 @@ export class UsersService {
     await AdminService.syncClaims(uid);
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[Users] Invalidate auth_session on role change:", e?.message));
+    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on role change:", e?.message));
     await CacheService.delete(`public_profile_${uid}`);
     return { success: true };
   }

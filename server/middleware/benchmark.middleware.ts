@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as Sentry from "@sentry/node";
+import { logger } from "../utils/logger.ts";
 
 /**
  * Performance benchmarking middleware to track slow requests (>100ms)
@@ -38,7 +39,7 @@ export const performanceBenchmark = (req: Request, res: Response, next: NextFunc
 
       // 1. Local Logging
       if (durationMs > 1000) {
-        console.warn(`[SlowQuery Warning] ${req.method} ${path} took ${logPayload.durationMs}ms`, logPayload);
+        logger.warn(`[SlowQuery Warning] ${req.method} ${path} took ${logPayload.durationMs}ms`, logPayload);
         
         // 2. Sentry Profiling (Only on extremely slow requests >1000ms)
         try {

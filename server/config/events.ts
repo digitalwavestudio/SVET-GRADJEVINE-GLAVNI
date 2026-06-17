@@ -35,5 +35,5 @@ export function initializeEventSubscribers() {
   // Start background cache pre-warming for premium users
   DashboardPrewarmService.startScheduler();
   
-  console.log("[Events] All systemic subscribers initialized.");
+  console.info("[Events] All systemic subscribers initialized.");
 }

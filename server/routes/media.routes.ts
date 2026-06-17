@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import multer from "multer";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
@@ -25,7 +26,7 @@ mediaRouter.post(
   validateRequest(presignedRequestSchema),
   async (req, res, next) => {
     try {
-      const user = (req as any)?.user;
+      const user = getReqUser(req);
       const { contentType = "image/webp", folder: folderParam = "media", customFileName } = req.body;
       let folder = folderParam;
 
@@ -152,7 +153,7 @@ mediaRouter.post(
   async (req, res, next) => {
     try {
       const file = req.file;
-      const user = (req as any)?.user;
+      const user = getReqUser(req);
       const requestedFolder = req.body.folder || req.query.folder || "media";
 
       if (!file) {
@@ -240,7 +241,7 @@ mediaRouter.post(
 
         publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
-        console.log(`[MEDIA STORAGE INFO] Direct local media stream active.`);
+        console.info(`[MEDIA STORAGE INFO] Direct local media stream active.`);
         
         // Dynamic file-system fallback (for local development or sandboxed dynamic workspaces)
         const uploadsDir = path.join(process.cwd(), "uploads", cleanFolder, user.uid);

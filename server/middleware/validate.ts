@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ZodSchema, ZodError, z } from "zod";
 import { db, admin } from "../config/firebase.ts";
 import { zodSerbianErrorMap } from "@svet-gradjevine/shared";
+import { logger } from "../utils/logger.ts";
 import {
   createAdSchema,
   updateAdSchema,
@@ -443,11 +444,11 @@ export const validateBody = (schema: ZodSchema) => {
         if (!isAdminUser) {
           for (const field of sensitiveFields) {
             if (req.body[field] !== undefined) {
-              console.warn(`[Privilege Escalation Warning] Non-admin user attempted to send '${field}' field in request.`);
+              logger.warn(`[Privilege Escalation Warning] Non-admin user attempted to send '${field}' field in request.`);
               delete req.body[field];
             }
             if (req.body.data && req.body.data[field] !== undefined) {
-              console.warn(`[Privilege Escalation Warning] Non-admin user attempted to send '${field}' in nested data.`);
+              logger.warn(`[Privilege Escalation Warning] Non-admin user attempted to send '${field}' in nested data.`);
               delete req.body.data[field];
             }
           }

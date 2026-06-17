@@ -24,7 +24,7 @@ export const requestCoalescingMiddleware = () => {
     const key = `${req.method}:${req.originalUrl}`;
 
     if (inFlightRequests.has(key)) {
-      console.log(`⚡ [Coalescing] Query deduplicated! Joining in-flight execution for: ${key}`);
+      console.info(`⚡ [Coalescing] Query deduplicated! Joining in-flight execution for: ${key}`);
       try {
         const result = await inFlightRequests.get(key)!;
         

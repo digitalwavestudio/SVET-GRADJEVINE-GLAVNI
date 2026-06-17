@@ -6,6 +6,7 @@ import { AppScope, AuthorizationService } from "../services/authorization.servic
 import { JwksService } from "../services/jwks.service.ts";
 import type { AuthUser } from "../types/auth.ts";
 import type { Request, Response, NextFunction } from "express";
+import { logger } from "../utils/logger.ts";
 
 // Extend Express Request
 declare module "express-serve-static-core" {
@@ -33,7 +34,7 @@ export const authMiddleware = async (
       return res.status(403).json({ error: "IP address temporarily blocked due to repeated login/init failures. Please try again in 15 minutes." });
     }
   } catch (err) {
-    console.warn("[AUTH] Error checking IP blacklist:", err);
+    logger.warn("[AUTH] Error checking IP blacklist:", err);
   }
 
   let idToken = "";
@@ -60,7 +61,7 @@ export const authMiddleware = async (
         } as DecodedIdToken;
       } catch (localVerifyErr: unknown) {
         const error = localVerifyErr instanceof Error ? localVerifyErr : new Error(String(localVerifyErr));
-        console.warn(`[AUTH] Local JWKS verification failed, trying fallback to Admin SDK: ${error.message}`);
+        logger.warn(`[AUTH] Local JWKS verification failed, trying fallback to Admin SDK: ${error.message}`);
         // Fallback to official admin SDK verifyIdToken if local check fails for unexpected reasons (e.g. key refreshing latency)
         let timeoutId: NodeJS.Timeout | null = null;
         const timeoutPromise = new Promise<never>((_, reject) => {
@@ -79,7 +80,7 @@ export const authMiddleware = async (
 
       // Clear login attempts on successful token verification
       const attemptsKey = `login_attempts:${ip}`;
-      await CacheService.delete(attemptsKey).catch((e: any) => console.warn("[AuthMiddleware] Cache delete login attempts:", e));
+      await CacheService.delete(attemptsKey).catch((e: any) => logger.warn("[AuthMiddleware] Cache delete login attempts:", e));
 
       // ADR 003: Always use Custom JWT Claims. No local caching or Redis for security logic!
       let resolvedRole = decodedToken.role as string;
@@ -102,7 +103,7 @@ export const authMiddleware = async (
               const userDoc = await db.collection("users").doc(decodedToken.uid).get();
               userData = userDoc.exists ? userDoc.data() : null;
               if (userData) {
-                await CacheService.set(authSessionKey, userData, 5 * 60 * 1000).catch((e: any) => console.warn("[AuthMiddleware] Cache set auth session:", e)); // 5 minute profile cache shield
+                await CacheService.set(authSessionKey, userData, 5 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set auth session:", e)); // 5 minute profile cache shield
               }
             }
             
@@ -115,7 +116,7 @@ export const authMiddleware = async (
             }
             
             // Keširamo u Redisu na 24 sata (24 * 60 * 60 * 1000 milisekundi)
-            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 24 * 60 * 60 * 1000).catch((e: any) => console.warn("[AuthMiddleware] Cache set user profile:", e));
+            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 24 * 60 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set user profile:", e));
           }
           
           // Upisujemo Custom Claims, tako da svaki SLEDEĆI token koji klijent pošalje već nosi role & permissions
@@ -146,7 +147,7 @@ export const authMiddleware = async (
     if (err instanceof Error && err.message === "QUOTA_EXHAUSTED") {
       return res.status(403).json({ error: "Service temporarily unavailable due to quota limits" });
     }
-    console.warn("Auth middleware token verification failed:", err);
+    logger.warn("Auth middleware token verification failed:", err);
 
     // Register login failure and conditionally blacklist IP
     const attemptsKey = `login_attempts:${ip}`;
@@ -160,7 +161,7 @@ export const authMiddleware = async (
         await CacheService.set(attemptsKey, count.toString(), 15 * 60);
       }
     } catch (e) {
-      console.warn("[AUTH] Error tracking login failure attempts:", e);
+      logger.warn("[AUTH] Error tracking login failure attempts:", e);
     }
 
     next();
@@ -236,7 +237,7 @@ export const requireScope = (scope: AppScope | string) => {
     }
 
     if (!req.user.permissions || !req.user.permissions.includes(scope)) {
-      console.warn(`[AUTH] Access denied. User ${req.user.uid} missing scope: ${scope}`);
+      logger.warn(`[AUTH] Access denied. User ${req.user.uid} missing scope: ${scope}`);
       return res.status(403).json({ 
         error: `Forbidden: Missing required scope: ${scope}`,
         requiredScope: scope 

@@ -12,6 +12,7 @@ import { dashboardAuthMiddleware } from "../middleware/dashboard-auth.middleware
 import { dashboardLimiter } from "../middleware/rate-limit.middleware.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { getErrorMessage } from "../utils/error-handler.ts";
+import { logger } from "../utils/logger.ts";
 
 export const bffRouter = Router();
 
@@ -103,7 +104,7 @@ class BffDashboardCircuitBreaker {
       if (failures) this.localFailures = failures;
       if (lastChange) this.localLastStateChange = lastChange;
     } catch (err) {
-      console.warn("[CircuitBreaker] Failed to sync circuit breaker state from Redis. Using local memory fallback.", err);
+      logger.warn("[CircuitBreaker] Failed to sync circuit breaker state from Redis. Using local memory fallback.", err);
     }
   }
 
@@ -115,7 +116,7 @@ class BffDashboardCircuitBreaker {
       await CacheService.set(this.FAILURE_KEY, this.localFailures, ttl);
       await CacheService.set(this.LAST_CHANGE_KEY, this.localLastStateChange, ttl);
     } catch (err) {
-      console.warn("[CircuitBreaker] Failed to write circuit breaker state to Redis.", err);
+      logger.warn("[CircuitBreaker] Failed to write circuit breaker state to Redis.", err);
     }
   }
 
@@ -151,7 +152,7 @@ class BffDashboardCircuitBreaker {
       if (this.localFailures.length >= this.FAILURE_THRESHOLD) {
         this.localState = "OPEN";
         this.localLastStateChange = now;
-        console.warn(`[CircuitBreaker] TRIPPED to OPEN (distributed) due to ${this.localFailures.length} failures in 10s. Cooling down for 60s.`);
+        logger.warn(`[CircuitBreaker] TRIPPED to OPEN (distributed) due to ${this.localFailures.length} failures in 10s. Cooling down for 60s.`);
       }
     }
     await this.writeToRedis();
@@ -175,7 +176,7 @@ bffRouter.get(
 
     // 1. If Circuit Breaker is OPEN, serve fallback sandbox dataset immediately without hitting database
     if (state === "OPEN") {
-      console.warn(`[CircuitBreaker] Circuit is OPEN. Serving STALE cache fallback for user: ${req.user?.uid || "unknown"}`);
+      logger.warn(`[CircuitBreaker] Circuit is OPEN. Serving STALE cache fallback for user: ${req.user?.uid || "unknown"}`);
       const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
       return res.json({
          ...(typeof staleData === "object" ? staleData : {}),
@@ -213,7 +214,7 @@ bffRouter.get(
           const currentState = await breaker.getState();
           const { checkQuotaStatus } = await import("../config/firebase.ts");
           if (currentState === "OPEN" || checkQuotaStatus()) {
-            console.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active. Rendering cache fallback.");
+            logger.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active. Rendering cache fallback.");
             const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
             if (!res.headersSent) {
               return res.json({
@@ -230,7 +231,7 @@ bffRouter.get(
       // Bezbednosni Caching Breaker
       const breakerTimeout = setTimeout(async () => {
         if (!res.headersSent) {
-          console.warn(`[LatencyBreaker] Request exceeded 5000ms for user: ${req.user?.uid}. Serving L1 memory cache fallback.`);
+          logger.warn(`[LatencyBreaker] Request exceeded 5000ms for user: ${req.user?.uid}. Serving L1 memory cache fallback.`);
           const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
           // Temporarily disable the breaker success/failure recording for timeout response
           res.json({
@@ -253,7 +254,7 @@ bffRouter.get(
       const currentState = await breaker.getState();
       const { checkQuotaStatus } = await import("../config/firebase.ts");
       if (currentState === "OPEN" || checkQuotaStatus()) {
-        console.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active on catch. Rendering cache fallback.");
+        logger.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active on catch. Rendering cache fallback.");
         const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
         return res.json({
            ...(typeof staleData === "object" ? staleData : {}),
@@ -297,7 +298,7 @@ bffRouter.get(
 
       const breakerTimeout = setTimeout(async () => {
         if (!res.headersSent) {
-          console.warn(`[LatencyBreaker] Request exceeded 5000ms for metrics user: ${req.user?.uid}.`);
+          logger.warn(`[LatencyBreaker] Request exceeded 5000ms for metrics user: ${req.user?.uid}.`);
           const staleData = (await CacheService.get(`dashboard_metrics_${req.user?.uid || req.user?.id}`, true)) || {};
           res.json({
             success: true,
@@ -329,7 +330,7 @@ bffRouter.get(
 
     // Serve sandbox if circuit is open or quota protection is manually triggered
     if (state === "OPEN" || checkQuotaStatus()) {
-        console.warn(`[CircuitBreaker] Serving homepage STALE cache for ${req.ip}`);
+        logger.warn(`[CircuitBreaker] Serving homepage STALE cache for ${req.ip}`);
         const staleData = (await CacheService.get(cacheKey, true)) || {};
         return res.json({
            ...(typeof staleData === "object" ? staleData : {}),

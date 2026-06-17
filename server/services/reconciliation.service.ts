@@ -61,7 +61,7 @@ export class ReconciliationService {
    * Runs daily in production at 3:00 AM.
    */
   static startInterval() {
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       Logger.withContext().info("[Reconciliation] Sandbox/Development nalog detektovan. Automatska sinhronizacija i rekoncilijacija su deaktivirane radi sprečavanja trošenja Firestore kvota.");
       return;
     }

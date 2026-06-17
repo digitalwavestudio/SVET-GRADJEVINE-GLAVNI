@@ -1,12 +1,14 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { admin, db } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { AdminStatsService } from "../services/admin-stats.service.ts";
+import { logger } from "../utils/logger.ts";
 
 export const statsRouter = Router();
 
 statsRouter.get("/finance", requireAuth, async (req, res, next) => {
-  if (!(req as any)?.user?.isAdmin)
+  if (!getReqUser(req).isAdmin)
     return res.status(403).json({ error: "Forbidden" });
   try {
     const stats = await AdminStatsService.getGlobalStats();
@@ -195,7 +197,7 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
           return res.json(JSON.parse(cachedStr));
         }
       } catch (err) {
-        console.warn("[author-counts] Redis read failed:", err);
+        logger.warn("[author-counts] Redis read failed:", err);
       }
     }
 
@@ -249,7 +251,7 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
       try {
         await redis.set(redisKey, JSON.stringify(result), "EX", 3600); // 1 hour TTL Shield
       } catch (err) {
-        console.warn("[author-counts] Redis write failed:", err);
+        logger.warn("[author-counts] Redis write failed:", err);
       }
     }
 
@@ -330,7 +332,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
               .get();
             today = snap.data().count;
           } catch (err) {
-            console.warn(`[stats] Failed to count today's ${collectionName}:`, err);
+            logger.warn(`[stats] Failed to count today's ${collectionName}:`, err);
           }
         } else if (collectionName === "companies") {
           try {
@@ -345,7 +347,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
               .get();
             today = snap.data().count;
           } catch (err) {
-            console.warn(`[stats] Failed to count today's companies:`, err);
+            logger.warn(`[stats] Failed to count today's companies:`, err);
           }
         }
 

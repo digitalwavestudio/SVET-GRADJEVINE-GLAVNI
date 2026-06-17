@@ -2,6 +2,7 @@
 import { env } from "../config/env.ts";
 import { logger } from "../utils/logger.ts";
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { adminRouter } from "./admin.routes.ts";
 import { z } from "zod";
 import { authRouter } from "./auth.routes.ts";
@@ -76,7 +77,7 @@ const firestoreLimiter = rateLimit({
             const [command, ...rest] = args;
             return await redisInstance.call(command, ...rest);
         } catch (e) {
-            console.warn("[RateLimit] Redis command failed, falling back to local memory logic (simulated)", e);
+            logger.warn("[RateLimit] Redis command failed, falling back to local memory logic (simulated)", e);
             return null; 
         }
     },
@@ -117,7 +118,7 @@ apiRouter.post(
   validateRequest(z.object({ body: applyJobContractSchema })),
   async (req, res, next) => {
     try {
-      const userObj = (req as any)?.user;
+      const userObj = getReqUser(req);
       const uid = userObj?.uid;
       const email = userObj?.email || "";
       const name = userObj?.name || "Korisnik";
@@ -140,7 +141,7 @@ apiRouter.post(
 );
 
 apiRouter.get("/stream", requireAuth, (req, res) => {
-  const uid = (req as any)?.user.uid;
+  const uid = getReqUser(req).uid;
   SSEService.subscribe(req, res, uid);
 });
 
@@ -160,7 +161,7 @@ apiRouter.use(async (req, res, next) => {
     try {
       const secretKey = env.TURNSTILE_SECRET_KEY;
       if (!secretKey) {
-        console.warn(
+        logger.warn(
           "[Turnstile] TURNSTILE_SECRET_KEY is not configured on server.",
         );
         return next();
@@ -186,7 +187,7 @@ apiRouter.use(async (req, res, next) => {
         "error-codes"?: string[];
       };
       if (!body.success) {
-        console.warn(
+        logger.warn(
           `[Turnstile] Verification failed from ${ipStr}:`,
           body["error-codes"],
         );
@@ -241,7 +242,7 @@ apiRouter.use((req, res, next) => {
 
     // Slow Query Tracking (iznad 2000ms)
     if (duration > 2000) {
-      console.warn(
+      logger.warn(
         `[SLOW QUERY WARNING] Request to ${req.originalUrl} took ${duration}ms`,
         {
           method: req.method,
@@ -269,7 +270,7 @@ apiRouter.use((req, res, next) => {
           console.error("Failed to log slow query to DLQ:", err);
         }
       } else {
-        console.warn(
+        logger.warn(
           `[SLOW QUERY DEBOUNCED] Firestore DLQ write skipped to prevent infinite query write loop. Last logged to DB at ${new Date(lastSlowQueryLogTime).toISOString()}`,
         );
       }
@@ -435,7 +436,7 @@ apiRouter.post("/logs", async (req, res) => {
       console.error("Failed to write frontend log to DLQ", err);
     }
   } else {
-    console.log(`${logPrefix} ${message}`, { context, uid, url });
+    console.info(`${logPrefix} ${message}`, { context, uid, url });
   }
   res.json({ success: true });
 });

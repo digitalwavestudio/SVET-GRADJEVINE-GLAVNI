@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
+import { logger } from "../utils/logger.ts";
 
 export const AD_OWNERSHIP_CACHE_PREFIX = "ad_ownership:";
 
 export function invalidateAdOwnershipCache(adId: string) {
-  CacheService.delete(`${AD_OWNERSHIP_CACHE_PREFIX}${adId}`).catch((e: any) => console.warn("[Ownership] cache invalidation error:", e?.message));
+  CacheService.delete(`${AD_OWNERSHIP_CACHE_PREFIX}${adId}`).catch((e: any) => logger.warn("[Ownership] cache invalidation error:", e?.message));
 }
 
 export const validateAdOwnership = async (

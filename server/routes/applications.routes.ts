@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { ApplicationsService } from "../services/applications.service.ts";
@@ -23,7 +24,7 @@ const submitSchema = z.object({
 // Get my applications (as candidate)
 applicationsRouter.get("/my", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const snap = await db
       .collection("applications")
       .where("candidateId", "==", uid)
@@ -41,8 +42,8 @@ applicationsRouter.get("/my", requireAuth, async (req, res, next) => {
 applicationsRouter.get("/job/:adId", requireAuth, async (req, res, next) => {
   try {
     const { adId } = req.params;
-    const uid = (req as any)?.user.uid;
-    const isAdmin = (req as any)?.user?.isAdmin || false;
+    const uid = getReqUser(req).uid;
+    const isAdmin = getReqUser(req).isAdmin || false;
 
     // Load ad from database and authorize
     const adDoc = await db.collection("listings").doc(adId).get();
@@ -76,7 +77,7 @@ applicationsRouter.post(
   validateRequest(submitSchema),
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const parsedBody = submitSchema.parse(req.body);
       const result = await ApplicationsService.submitApplication({
         ...parsedBody,
@@ -100,8 +101,8 @@ applicationsRouter.patch(
   try {
     const { id } = req.params;
     const { status } = applicationActionSchema.parse(req.body);
-    const uid = (req as any)?.user.uid;
-    const isAdmin = (req as any)?.user?.isAdmin || false;
+    const uid = getReqUser(req).uid;
+    const isAdmin = getReqUser(req).isAdmin || false;
 
     const result = await ApplicationsService.updateApplicationStatus(
       id,

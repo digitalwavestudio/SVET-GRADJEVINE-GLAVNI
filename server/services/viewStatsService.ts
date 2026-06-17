@@ -1,4 +1,5 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
+import { env } from "../config/env.ts";
 import { db, admin as firebaseAdmin } from "../config/firebase.ts";
 import { getRedis } from "../utils/redis.ts";
 import { LockManager } from "./lock.service.ts";
@@ -132,7 +133,7 @@ export class ViewStatsService {
             }
           }
 
-          console.log(`[ViewStatsService] Uspešno upisano ${countInBatch} agregiranih pregleda u Firestore.`);
+          console.info(`[ViewStatsService] Uspešno upisano ${countInBatch} agregiranih pregleda u Firestore.`);
         }
       }
     } catch (err) {
@@ -144,10 +145,10 @@ export class ViewStatsService {
 
   static init() {
     // PROMPT 7: Backend lokalni timer za batch na svaki 5 minuta
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       if (!this.flushInterval) {
         this.flushInterval = setInterval(() => this.flush(), FLUSH_DELAY_MS);
-        console.log(`[ViewStatsService] Pokrenut periodični flush planer (${FLUSH_DELAY_MS} ms) za in-memory batched page views.`);
+        console.info(`[ViewStatsService] Pokrenut periodični flush planer (${FLUSH_DELAY_MS} ms) za in-memory batched page views.`);
       }
     }
   }

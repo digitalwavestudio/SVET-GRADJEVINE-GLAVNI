@@ -28,7 +28,7 @@ export function setupRfqSubscriber() {
     DomainEvents.RFQ_CREATED,
     async (payload) => {
       try {
-        console.log(`[RfqSubscriber] RFQ_CREATED caught for ${payload.rfqId}`);
+        console.info(`[RfqSubscriber] RFQ_CREATED caught for ${payload.rfqId}`);
 
         const regionName = formatRegionId(payload.regionId);
 
@@ -42,7 +42,7 @@ export function setupRfqSubscriber() {
           .get();
 
         if (listingsSnap.empty) {
-          console.log(`[RfqSubscriber] No active marketplace sellers found for region ${payload.regionId}`);
+          console.info(`[RfqSubscriber] No active marketplace sellers found for region ${payload.regionId}`);
           return;
         }
 
@@ -55,7 +55,7 @@ export function setupRfqSubscriber() {
           )
         );
 
-        console.log(`[RfqSubscriber] Found ${authorIds.length} unique suppliers for RFQ ${payload.rfqId} in region ${payload.regionId}`);
+        console.info(`[RfqSubscriber] Found ${authorIds.length} unique suppliers for RFQ ${payload.rfqId} in region ${payload.regionId}`);
 
         // 3. Slanje email notifikacija dobavljačima (N+1 DataLoader optimizacija)
         const CHUNK_SIZE = 100;
@@ -80,7 +80,7 @@ export function setupRfqSubscriber() {
         for (const userData of suppliersData) {
           try {
             if (userData && userData.email) {
-              console.log(`[RfqSubscriber] Sending RFQ email to ${userData.email} (supplier)`);
+              console.info(`[RfqSubscriber] Sending RFQ email to ${userData.email} (supplier)`);
               await emailService.sendRfqNotification({
                 to: userData.email,
                 category: payload.category,
@@ -101,5 +101,5 @@ export function setupRfqSubscriber() {
     }
   );
 
-  console.log("[Events] RFQ Subscriber registered.");
+  console.info("[Events] RFQ Subscriber registered.");
 }

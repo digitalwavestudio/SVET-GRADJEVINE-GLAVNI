@@ -1,5 +1,6 @@
 import Redis from "ioredis";
 import { env } from "../config/env.ts";
+import { logger } from "../utils/logger.ts";
 
 // Lokalni in-memory fallback kada Redis padne
 class MockPipeline {
@@ -338,7 +339,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
         keepAlive: 5000, // TCP Keep-alive to prevent EPIPE/idle drops
         retryStrategy: (times) => {
           setDownState(true);
-          if (process.env.NODE_ENV !== "production") {
+          if (env.NODE_ENV !== "production") {
             return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
           }
           const base = 200;
@@ -359,7 +360,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
         if (hasConfigMethod(client)) {
           await client.config("SET", "maxmemory-policy", "allkeys-lru");
         }
-        if (process.env.NODE_ENV !== "production") console.log(`[Redis] Konektovan (${isMain ? 'Main' : 'Regional'}).`);
+        if (env.NODE_ENV !== "production") console.info(`[Redis] Konektovan (${isMain ? 'Main' : 'Regional'}).`);
       } catch (err: unknown) { /* intentionally empty */ }
     });
 
@@ -393,7 +394,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
       if (isNetworkError) {
         if (!getDownState()) {
           setDownState(true);
-          console.warn(`🛡️ [Redis Failover] Konekcija odbijena/pukla (${err.message}). Aktiviran lokalni fallback.`);
+          logger.warn(`🛡️ [Redis Failover] Konekcija odbijena/pukla (${err.message}). Aktiviran lokalni fallback.`);
         }
       } else {
         console.error("Redis Error:", err.message);
@@ -407,7 +408,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
           if (getDownState()) {
             if ((client.status as string) === "end") {
               if (typeof client.connect === "function") {
-                client.connect().catch((e: any) => console.warn("[Redis] Reconnect attempt failed:", e?.message));
+                client.connect().catch((e: any) => logger.warn("[Redis] Reconnect attempt failed:", e?.message));
               }
             } else if (client.status === "ready") {
               if (typeof client.ping === "function") {
@@ -544,7 +545,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
                 // Only log once and make it less scary
                 const silentErrors = ["stream isn't writeable", "offlinequeue", "epipe", "econnreset", "connection is closed"];
                 if (!silentErrors.some(e => errMsg.includes(e))) {
-                  console.warn("🛡️ [Redis] Lokalni in-memory mod aktiviran.", error.message);
+                  logger.warn("🛡️ [Redis] Lokalni in-memory mod aktiviran.", error.message);
                 }
               }
               const fallbackObj = fallbackMap as any;
@@ -590,7 +591,7 @@ export function getRawRedis(): Redis | null {
       keepAlive: 5000,
       retryStrategy: (times) => {
         isRedisDown = true;
-        if (process.env.NODE_ENV !== "production") {
+        if (env.NODE_ENV !== "production") {
           return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
         }
         const base = 200;
@@ -654,11 +655,11 @@ export function getRedis(): ResilientRedis {
     if (url) {
       try {
         const redisUrl = new URL(url);
-        if (process.env.NODE_ENV !== "production") console.log(
+        if (env.NODE_ENV !== "production") console.info(
           `[Redis] Connecting to ${redisUrl.hostname}:${redisUrl.port || 6379}...`,
         );
       } catch (e) {
-        console.warn(`[Redis] Connecting using raw path: ${url}`);
+        logger.warn(`[Redis] Connecting using raw path: ${url}`);
       }
       const raw = getRawRedis();
       if (raw) {
@@ -667,7 +668,7 @@ export function getRedis(): ResilientRedis {
     }
     
     if (!redis) {
-      console.warn("⚠️ [Redis] No host/URL configured. Initializing absolute InMemoryFallback client for process liveness.");
+      logger.warn("⚠️ [Redis] No host/URL configured. Initializing absolute InMemoryFallback client for process liveness.");
       const rawDummy = new Redis({ lazyConnect: true });
       redis = createResilientClient(rawDummy, { isMain: true });
       isRedisDown = true;
@@ -712,7 +713,7 @@ function throttleWarn(key: string, msg: string, intervalMs: number = 60000) {
   const lastTime = lastWarned.get(key) || 0;
   if (now - lastTime > intervalMs) {
     lastWarned.set(key, now);
-    console.warn(msg);
+    logger.warn(msg);
   }
 }
 
@@ -726,7 +727,7 @@ export function getSubRedis(): ResilientRedis {
         connectTimeout: 5000,
         enableOfflineQueue: true,
         retryStrategy: (times) => {
-          if (process.env.NODE_ENV !== "production") {
+          if (env.NODE_ENV !== "production") {
             return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
           }
           const base = 200;
@@ -742,7 +743,7 @@ export function getSubRedis(): ResilientRedis {
     }
     
     if (!subRedis) {
-      console.warn("⚠️ [Redis] No host/URL configured for subscriber. Initializing absolute InMemoryFallback client for process liveness.");
+      logger.warn("⚠️ [Redis] No host/URL configured for subscriber. Initializing absolute InMemoryFallback client for process liveness.");
       const rawDummy = new Redis({ lazyConnect: true });
       subRedis = createResilientClient(rawDummy, { isMain: false });
     }
@@ -761,7 +762,7 @@ export function getStreamRedis(): ResilientRedis {
         connectTimeout: 5000,
         enableOfflineQueue: true,
         retryStrategy: (times) => {
-          if (process.env.NODE_ENV !== "production") {
+          if (env.NODE_ENV !== "production") {
             return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
           }
           const base = 200;
@@ -777,7 +778,7 @@ export function getStreamRedis(): ResilientRedis {
     }
     
     if (!streamRedis) {
-      console.warn("⚠️ [Redis] No host/URL configured for stream. Initializing absolute InMemoryFallback client for process liveness.");
+      logger.warn("⚠️ [Redis] No host/URL configured for stream. Initializing absolute InMemoryFallback client for process liveness.");
       const rawDummy = new Redis({ lazyConnect: true });
       streamRedis = createResilientClient(rawDummy, { isMain: false });
     }
@@ -786,7 +787,7 @@ export function getStreamRedis(): ResilientRedis {
 }
 
 export async function shutdownRedis() {
-  if (process.env.NODE_ENV !== "production") console.log("[Redis] Graceful shutdown initiated...");
+  if (env.NODE_ENV !== "production") console.info("[Redis] Graceful shutdown initiated...");
   const cleanupClient = async (c: ResilientRedis | null | Redis) => {
     if (!c) return;
     try {

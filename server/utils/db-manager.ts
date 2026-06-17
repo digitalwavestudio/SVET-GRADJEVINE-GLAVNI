@@ -4,6 +4,7 @@ import { env } from "../config/env.ts";
 import { RegionService } from "../services/region.service.ts";
 import { TraceContext } from "./trace.ts";
 import { getRedis, getRegionalRedis } from "./redis.ts";
+import { logger } from "../utils/logger.ts";
 
 /**
  * DatabaseManager implementira Read/Write Split pattern i Regionalno Rutiranje.
@@ -43,11 +44,11 @@ export class DatabaseManager {
 
     const total = this.replicas.length + this.regionalReplicas.size;
     if (total > 0) {
-      console.log(
+      console.info(
         `✅ DBManager: Multi-Region Read-Replicas initialized (${total})`,
       );
     } else {
-      console.log("ℹ️ DBManager: Running in single-instance mode");
+      console.info("ℹ️ DBManager: Running in single-instance mode");
     }
   }
 
@@ -104,16 +105,16 @@ export class DatabaseManager {
     // Pokrećemo asinhroni thread / micro-task za kreiranje konekcije
     Promise.resolve().then(() => {
       try {
-        console.log(`📡 [DBManager] Asinhrono aktiviranje i pre-warm baze za region: ${region}`);
+        console.info(`📡 [DBManager] Asinhrono aktiviranje i pre-warm baze za region: ${region}`);
         const replicaDb = firebaseAdmin.firestore(firebaseAdmin.app());
         this.regionalReplicas.set(region, replicaDb);
-        console.log(`✅ [DBManager] Uspešno inicijalizovana regionalna replika: ${region}`);
+        console.info(`✅ [DBManager] Uspešno inicijalizovana regionalna replika: ${region}`);
       } catch (err) {
-        console.warn(`⚠️ [DBManager] Neuspešan pre-warm za region ${region}, vraćam na podrazumevani pul.`, (err as Error).message);
+        logger.warn(`⚠️ [DBManager] Neuspešan pre-warm za region ${region}, vraćam na podrazumevani pul.`, (err as Error).message);
       } finally {
         this.warmInProgress.delete(region);
       }
-    }).catch((e: any) => console.warn("[DBManager] Region pre-warm fire-and-forget:", e?.message));
+    }).catch((e: any) => logger.warn("[DBManager] Region pre-warm fire-and-forget:", e?.message));
   }
 
   /**
@@ -173,7 +174,7 @@ export class DatabaseManager {
       }
     } catch (err: unknown) {
       const error = err as Error;
-      console.warn(`🛡️ [DBManager] Redis Set Failed ("${routedKey}"), falling back to L1 RAM:`, error.message);
+      logger.warn(`🛡️ [DBManager] Redis Set Failed ("${routedKey}"), falling back to L1 RAM:`, error.message);
       this.l1Cache.set(routedKey, {
         value,
         expiresAt: Date.now() + ttlMs
@@ -200,7 +201,7 @@ export class DatabaseManager {
         if (raw) return JSON.parse(raw) as T;
       }
     } catch (err: unknown) {
-      console.warn(`🛡️ [DBManager] Redis Get Failed ("${routedKey}"), cache miss (degraded mode)`);
+      logger.warn(`🛡️ [DBManager] Redis Get Failed ("${routedKey}"), cache miss (degraded mode)`);
     }
     
     return null;
@@ -221,7 +222,7 @@ export class DatabaseManager {
         if (result === "OK") return lockId;
       }
     } catch (err: unknown) {
-      console.warn(`🛡️ [DBManager] Regional Lock Failover for ${resourceId} triggered L1 mode.`);
+      logger.warn(`🛡️ [DBManager] Regional Lock Failover for ${resourceId} triggered L1 mode.`);
     }
 
     // L1 RAM Fallback Lock

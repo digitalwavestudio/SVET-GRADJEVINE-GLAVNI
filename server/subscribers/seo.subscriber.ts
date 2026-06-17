@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { getRedis } from "../utils/redis.ts";
@@ -12,7 +13,7 @@ const getCachedIndexHtml = async () => {
     const indexPath = path.join(process.cwd(), "dist", "index.html");
     cachedIndexHtml = await readFile(indexPath, "utf-8");
   } catch (err) {
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       const devIndexPath = path.join(process.cwd(), "index.html");
       cachedIndexHtml = await readFile(devIndexPath, "utf-8");
     } else {
@@ -69,7 +70,7 @@ const prerenderAndCache = async (category: string, id: string) => {
       const urlObj = new URL(String(meta.url));
       const canonicalPath = urlObj.pathname.replace(/\/$/, "") || "/";
       const cacheKey = `seo:prerender:${canonicalPath}`;
-      console.log(
+      console.info(
         `[SEOSubscriber] Cached pre-rendered payload for ${canonicalPath}`,
       );
       await redis.set(cacheKey, html, "EX", 86400 * 7); // Cache for 7 days

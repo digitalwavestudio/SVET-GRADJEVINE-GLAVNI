@@ -1,5 +1,7 @@
+import { env } from "../config/env.ts";
 import { DatabaseManager } from "./db-manager.ts";
 import { randomUUID } from "crypto";
+import { logger } from "../utils/logger.ts";
 
 export class RedisLockManager {
   /**
@@ -41,11 +43,11 @@ export class RedisLockManager {
       if (!success) {
         const currentOwner = await redis.get(`lock:${key}`);
         if (currentOwner) {
-          console.warn(
+          logger.warn(
             `⚠️ [RedisLockManager] Lock Release Denied for key: "${key}". Current owner is "${currentOwner}", but process requested release with ID "${lockId}". This indicates a potential lock lease timeout/race condition!`
           );
         } else {
-          if (process.env.NODE_ENV !== "production") console.log(`ℹ️ [RedisLockManager] Lock for key: "${key}" was already expired or released before.`);
+          if (env.NODE_ENV !== "production") console.info(`ℹ️ [RedisLockManager] Lock for key: "${key}" was already expired or released before.`);
         }
       }
       return success;

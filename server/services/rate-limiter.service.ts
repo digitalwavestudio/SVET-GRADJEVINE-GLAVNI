@@ -1,4 +1,5 @@
 import { getRedis } from "../utils/redis.ts";
+import { logger } from "../utils/logger.ts";
 
 export class RateLimiterService {
   private static redis = getRedis();
@@ -82,7 +83,7 @@ export class RateLimiterService {
 
         // Strict Penalty: if they hit limit * 10, autoblock for 30 days
         if (count > limit * 10 && ipToBlock) {
-          console.warn(
+          logger.warn(
             `[RateLimiter] AUTOBLOCKING IP ${ipToBlock} due to excessive spam (${count}/${limit})`,
           );
           await this.blockIp(ipToBlock);

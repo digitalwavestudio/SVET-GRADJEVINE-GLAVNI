@@ -16,7 +16,7 @@ export const getPublicJobs = async (
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;
 
-    console.log("[JOBS_CTRL] getPublicJobs called, calling JobsService.getPublicJobs...");
+    console.info("[JOBS_CTRL] getPublicJobs called, calling JobsService.getPublicJobs...");
     const result = await JobsService.getPublicJobs(limit, cursor);
 
     let finalResult: {

@@ -1,5 +1,6 @@
 import { logger } from "../utils/logger.ts";
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import fs from "fs";
 import path from "path";
 import { db, admin } from "../config/firebase.ts";
@@ -88,7 +89,7 @@ messagesRouter.post(
   validateRequest(sendMessageSchema),
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const { chatId, content, recipientId, type } = req.body;
 
       const result = await ChatService.sendMessage(
@@ -114,7 +115,7 @@ messagesRouter.post(
   async (req, res, next) => {
     try {
       const file = req.file;
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const { chatId } = req.body;
 
       if (!file || !chatId)
@@ -202,7 +203,7 @@ messagesRouter.post(
 
         url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
-        console.log(`[CHAT STORAGE INFO] Direct local media stream active.`);
+        console.info(`[CHAT STORAGE INFO] Direct local media stream active.`);
         
         const uploadsDir = path.join(process.cwd(), "uploads", "chats", chatId);
         if (!fs.existsSync(uploadsDir)) {
@@ -230,7 +231,7 @@ messagesRouter.post(
   validateRequest(createConversationSchema),
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const { partnerId, initialMessage, adData } = req.body;
 
       const participants = [uid, partnerId].sort();
@@ -276,7 +277,7 @@ messagesRouter.post("/report/:id", requireAuth, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
 
     const result = await ChatService.reportConversation(id, uid, reason);
     res.json(result);
@@ -288,7 +289,7 @@ messagesRouter.post("/report/:id", requireAuth, async (req, res, next) => {
 // Get all user conversations (aggregated inbox with presence)
 messagesRouter.get("/inbox", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const limitNum = Number(req.query.limit) || 20;
     const cursor = req.query.cursor as string;
 
@@ -375,7 +376,7 @@ messagesRouter.get("/inbox", requireAuth, async (req, res, next) => {
           };
         } catch (err: any) {
           if (err.message && err.message.includes("quota")) {
-             console.warn("[Quota Protect] Returning empty inbox for user:", uid);
+             logger.warn("[Quota Protect] Returning empty inbox for user:", uid);
              return { items: [], lastVisibleId: null, hasMore: false };
           }
           throw err;
@@ -393,7 +394,7 @@ messagesRouter.get("/inbox", requireAuth, async (req, res, next) => {
 // Original legacy conversations endpoint (for backwards compatibility if needed, though we should migrate front-end to use /inbox)
 messagesRouter.get("/conversations", requireAuth, async (req, res, next) => {
   try {
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const cacheKey = `conversations_swr:${uid}`;
 
     const result = await CacheService.getOrSetSWR(
@@ -424,7 +425,7 @@ messagesRouter.get(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const user = (req as any)?.user;
+      const user = getReqUser(req);
       const uid = user.uid;
 
       // Ownership check (IDOR Protection)
@@ -502,7 +503,7 @@ messagesRouter.post(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       await ChatService.markAsRead(id, uid);
       res.json({ success: true });
     } catch (error) {
@@ -519,7 +520,7 @@ messagesRouter.get(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const user = (req as any)?.user;
+      const user = getReqUser(req);
       const uid = user.uid;
 
       // Ownership check (IDOR Protection)

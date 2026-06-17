@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db, admin } from "../config/firebase.ts";
 import { getRedis } from "../utils/redis.ts";
 import { LockManager } from "../services/lock.service.ts";
@@ -16,7 +17,7 @@ export class PageViewsAggregatorWorker {
 
     import("../utils/system-cron.ts")
       .then(({ SystemCron }) => {
-        const cronPattern = process.env.NODE_ENV === "production" ? "*/30 * * * *" : "0 */12 * * *";
+        const cronPattern = env.NODE_ENV === "production" ? "*/30 * * * *" : "0 */12 * * *";
         SystemCron.register("page_views_aggregator_cron", { pattern: cronPattern }, async () => {
           await this.flushBufferedViews();
         }).catch(err => this.logger.error("Failed to register Page Views Aggregator cron", err));
@@ -28,7 +29,7 @@ export class PageViewsAggregatorWorker {
   }
 
   static async flushBufferedViews(): Promise<void> {
-    if (process.env.NODE_ENV !== "production") return;
+    if (env.NODE_ENV !== "production") return;
     const redis = getRedis();
     if (!redis) {
       this.logger.info("Redis client not available, skipping buffered views flush.");

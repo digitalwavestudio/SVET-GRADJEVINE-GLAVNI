@@ -1,6 +1,7 @@
 import { createQueue } from "../utils/queue.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { getRedis } from "../utils/redis.ts";
+import { logger } from "../utils/logger.ts";
 
 /**
  * Tipi zadataka podržani u sistemu.
@@ -74,7 +75,7 @@ export class QueueService {
         console.log(`[QueueService] Queue ${name} created successfully.`);
         this.queues.set(name, queue);
       } else {
-        console.warn(`[QueueService] Queue ${name} could not be created.`);
+        logger.warn(`[QueueService] Queue ${name} could not be created.`);
         return null;
       }
     }
@@ -112,7 +113,7 @@ export class QueueService {
     const queue = this.getQueue(queueName);
 
     if (!queue) {
-      console.warn(
+      logger.warn(
         `[QueueService] Skipping addJob(${type}) because Redis is not configured.`,
       );
       return null;

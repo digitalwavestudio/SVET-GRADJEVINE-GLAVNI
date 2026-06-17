@@ -46,7 +46,7 @@ export class UnifiedAdsService {
                
                 let doc;
                 if (checkQuotaStatus()) {
-                   console.warn(`[UnifiedAdsService] Quota exhausted, using local mock for ${fastPathDoc}`);
+                   UnifiedAdsService.logger.warn(`[UnifiedAdsService] Quota exhausted, using local mock for ${fastPathDoc}`);
                    doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
                 } else {
                    // EXTREME TIMEOUT: 100ms for Fast-Path FirestoreDoc. 
@@ -62,19 +62,19 @@ export class UnifiedAdsService {
                  const d = doc.data();
                  const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
                  if (actualData) {
-                   console.log(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
+                   console.info(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
                    return actualData;
                  }
                }
              } catch (e: unknown) {
                const err = e instanceof Error ? e : new Error(String(e));
-               console.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
+                UnifiedAdsService.logger.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
              }
 
              // Stop execution and return fallback immediately if circuit breaker tripped
              const { checkQuotaStatus } = await import("../config/firebase.ts");
              if (checkQuotaStatus()) {
-               console.warn(`[UnifiedAdsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
+                UnifiedAdsService.logger.warn(`[UnifiedAdsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
                return fallbackValue as T;
              }
 
@@ -282,7 +282,7 @@ export class UnifiedAdsService {
       }, fallbackPartners);
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      console.warn("[PARTNERS] using disaster fallback:", error.message);
+      UnifiedAdsService.logger.warn("[PARTNERS] using disaster fallback:", error.message);
       return fallbackPartners;
     }
   }
@@ -335,7 +335,7 @@ export class UnifiedAdsService {
       }, finalFallback);
     } catch (e: unknown) {
       const err = e instanceof Error ? e : new Error(String(e));
-      console.warn(`[PROMOTED] degraded: ${err.message}`);
+      UnifiedAdsService.logger.warn(`[PROMOTED] degraded: ${err.message}`);
       return finalFallback;
     }
   }

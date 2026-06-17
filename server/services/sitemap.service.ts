@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
@@ -471,7 +472,7 @@ export class SitemapService {
   private static cronIntervalId: NodeJS.Timeout | null = null;
 
   static async preWarmCachedSitemaps(): Promise<void> {
-    console.log("[SitemapService] Starting sitemap pre-warming background task using Sequential Batching (startAfter)...");
+    console.info("[SitemapService] Starting sitemap pre-warming background task using Sequential Batching (startAfter)...");
     try {
       // 1. Core index
       const indexXml = await this.generateIndex();
@@ -529,14 +530,14 @@ export class SitemapService {
         }
       }
 
-      console.log("[SitemapService] Pre-warming sitemaps completed successfully.");
+      console.info("[SitemapService] Pre-warming sitemaps completed successfully.");
     } catch (err) {
       console.error("[SitemapService] Pre-warming sitemaps failed:", err);
     }
   }
 
   static init() {
-    if (process.env.NODE_ENV === "test") return;
+    if (env.NODE_ENV === "test") return;
 
     // Izračunaj vreme do sledećih 03:00h ujutru
     const now = new Date();
@@ -548,7 +549,7 @@ export class SitemapService {
     }
 
     const delay = target.getTime() - now.getTime();
-    console.log(`[SitemapService] Registrovan noćni cron posao u 03:00h ujutru. Prvo pokretanje za ${(delay / (60 * 60 * 1000)).toFixed(2)} sati.`);
+    console.info(`[SitemapService] Registrovan noćni cron posao u 03:00h ujutru. Prvo pokretanje za ${(delay / (60 * 60 * 1000)).toFixed(2)} sati.`);
 
     this.cronTimeoutId = setTimeout(async () => {
       await this.preWarmCachedSitemaps().catch((err) => {

@@ -1,6 +1,7 @@
 import { Queue, Worker, QueueEvents, Job } from "bullmq";
 import { env } from "../config/env.ts";
 import { getRawRedis } from "./redis.ts";
+import { logger } from "../utils/logger.ts";
 
 const getQueueConnectionOptions = () => {
   if (env.REDIS_URL) {
@@ -37,12 +38,12 @@ export const defaultConnection = connectionOptions;
  */
 export function createQueue(name: string) {
   if (!connectionOptions) {
-    console.warn(
+    logger.warn(
       `[Queue] Skipping queue ${name} initialization because Redis is missing.`,
     );
     return null;
   }
-  if (process.env.NODE_ENV !== "production") console.log(`[Queue] Initializing queue: ${name}`);
+  if (env.NODE_ENV !== "production") console.info(`[Queue] Initializing queue: ${name}`);
   return new Queue(name, {
     connection: connectionOptions,
     defaultJobOptions: {
@@ -62,7 +63,7 @@ export function createQueue(name: string) {
  */
 export function createWorker(name: string, processor: import("bullmq").Processor, options: Omit<import("bullmq").WorkerOptions, "connection"> = {}) {
   if (!connectionOptions) {
-    console.warn(`[Queue] Skipping worker ${name} initialization because Redis is missing.`);
+    logger.warn(`[Queue] Skipping worker ${name} initialization because Redis is missing.`);
     return null;
   }
   

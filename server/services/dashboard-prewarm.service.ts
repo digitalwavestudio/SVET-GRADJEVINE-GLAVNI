@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db, admin } from "../config/firebase.ts";
 import { DashboardService } from "./dashboard.service.ts";
 import { MetricsService } from "./metrics.service.ts";
@@ -22,7 +23,7 @@ export class DashboardPrewarmService {
     }
     const timeout = setTimeout(() => {
       this.prewarmDebounceMap.delete(uid);
-      this.prewarmUser(uid, role).catch((e: any) => console.warn("[DashboardPrewarmService] Prewarm user dashboard:", e));
+      this.prewarmUser(uid, role).catch((e: any) => logger.warn("[DashboardPrewarmService] Prewarm user dashboard:", e));
     }, 3000);
     this.prewarmDebounceMap.set(uid, timeout);
   }
@@ -34,7 +35,7 @@ export class DashboardPrewarmService {
   static async prewarmUser(uid: string, role?: string) {
     const { getRedis } = await import("../utils/redis.ts");
     const redis = getRedis();
-    if (redis && process.env.NODE_ENV !== "test") {
+    if (redis && env.NODE_ENV !== "test") {
       const isActive = await redis.sismember("active_users:48h", uid);
       if (!isActive) {
         logger.info(`[Prewarm] User ${uid} is not active in the last 48 hours (active_users:48h check failed). Skipping prewarm.`);
@@ -128,7 +129,7 @@ export class DashboardPrewarmService {
    * Scheduled task to ensure fast dashboard load times with Active-Only & Live-Session prioritisation.
    */
   static async prewarmPremiumUsers() {
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       logger.info("[Prewarm] Batch prewarm for premium users is safely deactivated in Sandbox/Dev environment to conserve Firebase quota.");
       return;
     }
@@ -237,7 +238,7 @@ export class DashboardPrewarmService {
    * which are critical for Homepage performance and Global visibility.
    */
   static async prewarmGlobalFastPaths() {
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       logger.info("[Prewarm Global] High-level platform fast-path prewarming is safely deactivated in Sandbox/Dev environment to conserve Firebase quota.");
       return;
     }
@@ -280,7 +281,7 @@ export class DashboardPrewarmService {
    * Starts the automatic scheduler/listener system for prewarming in event-driven reactive hybrid mode.
    */
   static startScheduler() {
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       logger.info("[Prewarm] Automated dashboard prewarm scheduler is safely deactivated in Sandbox/Dev environment to conserve Firebase quota.");
       return;
     }
@@ -303,7 +304,7 @@ export class DashboardPrewarmService {
             await DashboardPrewarmService.prewarmGlobalFastPaths();
             await DashboardPrewarmService.prewarmPremiumUsers();
           } finally {
-            await RedisLockManager.release("dashboard_prewarm_lock", lockId).catch((e: any) => console.warn("[DashboardPrewarmService] Release prewarm lock:", e));
+            await RedisLockManager.release("dashboard_prewarm_lock", lockId).catch((e: any) => logger.warn("[DashboardPrewarmService] Release prewarm lock:", e));
           }
         }).catch(err => logger.error("[Prewarm Cron] Failed to register repeatable job", err));
       })
@@ -316,7 +317,7 @@ export class DashboardPrewarmService {
         if (uid) {
           logger.info(`[Prewarm] Event PAYMENT_COMPLETED caught for user: ${uid}. Prewarming dashboard...`);
           const role = payload?.role;
-          DashboardPrewarmService.prewarmUser(uid, role).catch((e: any) => console.warn("[DashboardPrewarmService] Prewarm user on payment event:", e));
+          DashboardPrewarmService.prewarmUser(uid, role).catch((e: any) => logger.warn("[DashboardPrewarmService] Prewarm user on payment event:", e));
         }
       } catch (e: any) {
         logger.error(`[Prewarm] Reaction to PAYMENT_COMPLETED failed`, { error: e.message });

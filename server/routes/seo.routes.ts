@@ -1,16 +1,18 @@
-﻿import { Router } from "express";
+﻿import { env } from "../config/env.ts";
+import { Router } from "express";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { SEODbService } from "../services/seo/seo-db.service.ts";
 import { SEOSchemaService } from "../services/seo/seo-schema.service.ts";
 import { SEORenderEngine } from "../services/seo/seo-render-engine.ts";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
 import { LockManager } from "../services/lock.service.ts";
+import { logger } from "../utils/logger.ts";
 
 export const seoRouter = Router();
 
 // Middleware to inject meta tags
 const injectMetaTags = async (req: import("express").Request & { CacheService?: typeof import("../services/cache.service.ts").CacheService }, res: import("express").Response, next: import("express").NextFunction) => {
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     const userAgent = (req.headers["user-agent"] || "").toLowerCase();
     const isBot = /googlebot|bingbot|yandex|baidu|slurp|duckduckbot|sogou|spider|crawl|bot|gptbot|claudebot/i.test(userAgent);
     if (!isBot) return next();
@@ -236,7 +238,7 @@ async function withDistributedLock<T>(
       if (cached) return cached as T;
       retries--;
     }
-    console.warn(`[SEO] Lock timeout waiting for generation of ${resourceId}`);
+    logger.warn(`[SEO] Lock timeout waiting for generation of ${resourceId}`);
     return null; // or fallback
   }
 }
@@ -336,7 +338,7 @@ seoRouter.get("/sitemap-:type.xml", async (req, res) => {
         const result = await SitemapService.generateCollectionSitemap(coll, page);
         return result?.xml || null;
       } else {
-        console.warn(`[SEO] Blocked dynamic generation of unrecognized segment: ${type}.`);
+        logger.warn(`[SEO] Blocked dynamic generation of unrecognized segment: ${type}.`);
         return null; 
       }
     })) as string | null | undefined;
@@ -360,7 +362,7 @@ seoRouter.get("/sitemap-:type.xml", async (req, res) => {
 
 // DinamiÄki robots.txt
 seoRouter.get("/robots.txt", (req, res) => {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = env.NODE_ENV === "production";
 
   const rules = isProd
     ? `

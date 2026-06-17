@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { MonitoringService } from "../services/monitoring.service.ts";
+import { logger } from "../utils/logger.ts";
 
 let totalReads = 0;
 let totalWrites = 0;
@@ -26,7 +27,7 @@ export function telemetryMiddleware(req: Request, res: Response, next: NextFunct
 
     // Log slow requests internally
     if (duration > 3000) {
-      console.warn(`[Telemetry] Slow request: ${req.method} ${req.originalUrl} (${duration}ms)`);
+      logger.warn(`[Telemetry] Slow request: ${req.method} ${req.originalUrl} (${duration}ms)`);
     }
   });
 

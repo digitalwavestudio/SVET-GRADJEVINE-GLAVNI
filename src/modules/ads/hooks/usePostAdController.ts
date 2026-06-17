@@ -296,7 +296,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
   });
 
   // Stable fallback reference number for the session
-  const [sessionRefId] = useState(() => Math.floor(Math.random() * 900000 + 100000).toString());
+  const [sessionRefId] = useState(() => crypto.randomUUID().substring(0, 6));
 
   const editItemFetchedRef = useRef(false);
   const hasPopulatedEditRef = useRef(false);

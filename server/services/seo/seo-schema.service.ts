@@ -1,5 +1,6 @@
 import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
+import { logger } from "../../utils/logger.ts";
 
 export interface SEOEntityData {
   [key: string]: unknown;
@@ -132,7 +133,7 @@ export class SEOSchemaService {
         return cachedSchema;
       }
     } catch (err) {
-      console.warn("[SEOSchemaService] Cache read error:", err);
+      logger.warn("[SEOSchemaService] Cache read error:", err);
     }
 
     const id = data?.id;
@@ -547,7 +548,7 @@ export class SEOSchemaService {
       try {
         await CacheService.set(schemaCacheKey, resultSchemas, 24 * 60 * 60 * 1000); // 24 hours
       } catch (err) {
-        console.warn("[SEOSchemaService] Cache write error:", err);
+        logger.warn("[SEOSchemaService] Cache write error:", err);
       }
     }
 

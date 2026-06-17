@@ -1,6 +1,8 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { AnalyticsService } from "../services/analytics.service.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
+import { logger } from "../utils/logger.ts";
 
 const analyticsRouter = Router();
 
@@ -10,13 +12,13 @@ analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
     if (res.headersSent) return this as unknown as import("express").Response;
     return _origJson.call(this, body);
   };
-  const userId = (req as any)?.user?.uid;
+  const userId = getReqUser(req).uid;
   if (!userId) return res.status(401).json({ error: "Niste autentifikovani" });
   const { days } = req.query;
 
   const breakerTimeout = setTimeout(async () => {
     if (!res.headersSent) {
-      console.warn(`[LatencyBreaker] Analytics my-trends exceeded 500ms for user: ${userId}.`);
+      logger.warn(`[LatencyBreaker] Analytics my-trends exceeded 500ms for user: ${userId}.`);
       res.status(503).json({ error: "Request timeout", _degraded: true });
     }
   }, 500);
@@ -49,7 +51,7 @@ analyticsRouter.get("/ad/:adId", requireAuth, async (req, res) => {
 
   const breakerTimeout = setTimeout(async () => {
     if (!res.headersSent) {
-      console.warn(`[LatencyBreaker] Analytics ad exceeded 500ms for ad: ${adId}.`);
+      logger.warn(`[LatencyBreaker] Analytics ad exceeded 500ms for ad: ${adId}.`);
       res.status(503).json({ error: "Request timeout", _degraded: true });
     }
   }, 500);

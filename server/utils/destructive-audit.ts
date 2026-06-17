@@ -27,7 +27,7 @@ export async function logDestructiveAction(
     };
 
     // Asynchronously log to console for Google Cloud Logging, avoiding unnecessary Firestore writes
-    console.log("[AUDIT]", JSON.stringify(logPayload));
+    console.info("[AUDIT]", JSON.stringify(logPayload));
   } catch (err) {
     console.error("[AUDIT] Error during logDestructiveAction execution:", err);
   }

@@ -21,6 +21,17 @@ import { favoritesKeys } from '@/src/modules/dashboard/hooks/useFavorites';
 
 const CACHE_KEY = 'svet_gradjevine_user_cache';
 
+const SENSITIVE_FIELDS = ['email', 'phone', 'cvData', 'fcmTokens'];
+
+const stripSensitiveFields = (user: unknown): unknown => {
+  if (!user || typeof user !== 'object') return user;
+  const clone = { ...(user as Record<string, unknown>) };
+  for (const field of SENSITIVE_FIELDS) {
+    delete clone[field];
+  }
+  return clone;
+};
+
 const safeStorage = {
   getItem: (key: string): string | null => {
     try {
@@ -179,8 +190,8 @@ export function useAuthNode() {
                    // Essential: deep check to prevent re-render loop if data hasn't changed
                    return newStr === prevStr ? prev : combinedData;
                  });
-                 safeStorage.setItem(CACHE_KEY, JSON.stringify(combinedData));
-                 safeStorage.setItem('svet_gradjevine_last_sync', now.toString());
+                safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(combinedData)));
+                  safeStorage.setItem('svet_gradjevine_last_sync', now.toString());
                  setLoading(false); setIsInitializing(false);
                }
             } else {
@@ -398,7 +409,7 @@ useEffect(() => {
         }
         const updatedUser = { ...(userSnapshot as User), role: data.newRole };
         setUser(updatedUser);
-        safeStorage.setItem(CACHE_KEY, JSON.stringify(updatedUser));
+        safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(updatedUser)));
         safeStorage.removeItem('admin_preview_role');
         queryClient.clear();
         
@@ -445,7 +456,7 @@ useEffect(() => {
     // Optimizovano: odma apdejtuj UI optimistički i keširaj lokalno
     const updatedUser = { ...currentUser, ...finalData };
     setUser(updatedUser);
-    safeStorage.setItem(CACHE_KEY, JSON.stringify(updatedUser));
+    safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(updatedUser)));
 
     try {
       if (currentFbUser.current) {
@@ -479,7 +490,7 @@ useEffect(() => {
       console.error("Error updating user:", error);
       // Revert if DB failed
       setUser(currentUser); 
-      safeStorage.setItem(CACHE_KEY, JSON.stringify(currentUser));
+      safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(currentUser)));
       throw error; 
     }
   }, []); // Stabilizovan dependency

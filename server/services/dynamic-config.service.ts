@@ -1,4 +1,6 @@
+import { env } from "../config/env.ts";
 import { getRedis, getSubRedis, isClusterOffline } from "../utils/redis.ts";
+import { logger } from "../utils/logger.ts";
 
 const REDIS_CONFIG_KEY = "app:config:dynamic";
 const REDIS_CONFIG_CHANNEL = "app:config:updates";
@@ -13,7 +15,7 @@ export class DynamicConfigService {
    */
   static async init() {
     if (isClusterOffline() || !this.redis) {
-      console.warn(
+      logger.warn(
         "⚠️ DynamicConfig: Redis cluster is offline. Using local defaults only.",
       );
       return;
@@ -27,7 +29,7 @@ export class DynamicConfigService {
       if (stored) {
         this.config = JSON.parse(stored);
       } else {
-        console.warn("[DynamicConfig] Initial config load skipped or timed out. Operating with defaults.");
+        logger.warn("[DynamicConfig] Initial config load skipped or timed out. Operating with defaults.");
       }
     } catch (err) {
       console.error("[DynamicConfig] Initial load failed:", err);
@@ -42,7 +44,7 @@ export class DynamicConfigService {
             if (channel === REDIS_CONFIG_CHANNEL) {
               try {
                 this.config = JSON.parse(message);
-                if (process.env.NODE_ENV !== "production") console.log(
+                if (env.NODE_ENV !== "production") console.info(
                   "🔄 DynamicConfig: Updated across all instances in runtime",
                 );
               } catch (err) {

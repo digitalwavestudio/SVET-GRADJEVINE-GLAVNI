@@ -47,7 +47,7 @@ export const Logger = winston.createLogger({
 
 // If we're not in production then log to the `console` with a simpler format,
 // but in Cloud Run (production), JSON logs to standard output are preferred for Cloud Logging / Google Cloud
-if (process.env.NODE_ENV !== "production") {
+if (env.NODE_ENV !== "production") {
   Logger.add(
     new winston.transports.Console({
       format: combine(winston.format.colorize(), consoleFormat),

@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 import { getRedis } from "../utils/redis.ts";
@@ -99,7 +100,7 @@ export class PresenceService {
   }
 
   static init() {
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       if (!this.intervalId) {
         // Svaka 5 minuta (5 * 60 * 1000 = 300000 ms)
         this.intervalId = setInterval(() => this.flushPendingPresence(), 300000);

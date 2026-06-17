@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { CacheService } from "../services/cache.service.ts";
@@ -50,7 +51,7 @@ const promoteSchema = z.object({
 walletRouter.post("/promote", requireAuth, async (req, res, next) => {
   try {
     const parsed = promoteSchema.parse(req.body);
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
 
     const { entityId, collection, durationDays, promoteType } = parsed;
 
@@ -169,7 +170,7 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
 
     res.json({ success: true, message: "Oglas je uspešno promovisan" });
   } catch (err: any) {
-    const userId = (req as any)?.user?.uid || "unknown";
+    const userId = getReqUser(req).uid || "unknown";
     const payload = {
       userId,
       entityId: req.body?.entityId,
@@ -209,7 +210,7 @@ const adminFundSchema = z.object({
 
 walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
   try {
-    const user = (req as any)?.user;
+    const user = getReqUser(req);
     if (user?.isAdmin !== true) {
       await logToDLQ("Access Denied for Non-Admin on Add Funds", "add_funds_unauthorized", { userId: user?.uid, body: req.body });
       return res.status(403).json({ error: "Nedozvoljen pristup" });
@@ -256,7 +257,7 @@ walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
       message: `Uspešno dodato ${amount} RSD korisniku.`,
     });
   } catch (err: any) {
-    const user = (req as any)?.user;
+    const user = getReqUser(req);
     const payload = {
       adminId: user?.uid,
       targetUserId: req.body?.targetUserId,
@@ -283,7 +284,7 @@ const manualDepositSchema = z.object({
 walletRouter.post("/deposit/manual", requireAuth, async (req, res, next) => {
   try {
     const parsed = manualDepositSchema.parse(req.body);
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
     const { amount } = parsed;
 
     // Kreiramo pending transakciju
@@ -309,7 +310,7 @@ walletRouter.post("/deposit/manual", requireAuth, async (req, res, next) => {
       amount,
     });
   } catch (err: any) {
-    const userId = (req as any)?.user?.uid || "unknown";
+    const userId = getReqUser(req).uid || "unknown";
     const payload = {
       userId,
       amount: req.body?.amount,
@@ -327,7 +328,7 @@ walletRouter.post("/deposit/manual", requireAuth, async (req, res, next) => {
 
 walletRouter.get("/admin/pending-deposits", requireAuth, async (req, res, next) => {
   try {
-    const user = (req as any)?.user;
+    const user = getReqUser(req);
     if (!user.isAdmin) {
       return res.status(403).json({ error: "Nedozvoljen pristup" });
     }
@@ -386,7 +387,7 @@ const approveDepositSchema = z.object({
 walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, next) => {
   let txDataForDLQ: { userId?: string; amount?: number; referenceNumber?: string; description?: string } | null = null;
   try {
-    const user = (req as any)?.user;
+    const user = getReqUser(req);
     if (!user.isAdmin) {
       await logToDLQ("Access Denied for Non-Admin on Approve Deposit", "approve_deposit_unauthorized", { userId: user?.uid, transactionId: req.params.id });
       return res.status(403).json({ error: "Nedozvoljen pristup" });
@@ -458,7 +459,7 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
 
     res.json({ success: true, message: action === "approve" ? "Uplata je uspešno odobrena" : "Uplata je odbijena" });
   } catch (err: any) {
-    const user = (req as any)?.user;
+    const user = getReqUser(req);
     const transactionId = req.params.id;
     const payload = {
       adminId: user?.uid,
@@ -479,7 +480,7 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
 
 walletRouter.get("/transactions", requireAuth, async (req, res, next) => {
   try {
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
     const limit = parseInt(req.query.limit as string) || 50;
 
     const cacheKey = "wallet_tx_" + userId;
@@ -516,7 +517,7 @@ walletRouter.get("/transactions", requireAuth, async (req, res, next) => {
 
 walletRouter.get("/balance", requireAuth, async (req, res, next) => {
   try {
-    const userId = (req as any)?.user.uid;
+    const userId = getReqUser(req).uid;
     const { FinancialLedgerService } = await import("../services/ledger.service.ts");
     const balance = await FinancialLedgerService.getBalance(userId);
     res.json({ balance });

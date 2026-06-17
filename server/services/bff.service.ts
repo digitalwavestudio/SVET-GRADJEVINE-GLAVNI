@@ -21,6 +21,7 @@ import { UnifiedAdsService } from "./unified-ads.service.ts";
 import { UnifiedSearchService } from "./unified-search.service.ts";
 import { DashboardService } from "./dashboard.service.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
+import { logger } from "../utils/logger.ts";
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
 const L1_HOMEPAGE_TTL = 15 * 1000; // 15s in-memory Shield cache
@@ -41,7 +42,7 @@ const withHomepageQueryTimeout = async <T>(
   });
   return Promise.race([Promise.resolve(promise), timeoutPromise])
     .catch((err) => {
-      console.warn(`[BFF] Query failed or timeout: ${err.message}`);
+      logger.warn(`[BFF] Query failed or timeout: ${err.message}`);
       return fallback;
     })
     .finally(() => {
@@ -479,7 +480,7 @@ export const bffService = {
                 });
               }
             } catch (err) {
-              console.warn("[BFF Prewarm] Failed to read prewarm stats from Redis:", err);
+              logger.warn("[BFF Prewarm] Failed to read prewarm stats from Redis:", err);
             }
           }
 
@@ -495,7 +496,7 @@ export const bffService = {
               try {
                 await redis.set(prewarmKey, JSON.stringify(baseData), "EX", 10 * 60); // 10 minutes TTL
               } catch (err) {
-                console.warn("[BFF Prewarm] Failed to write prewarm stats to Redis:", err);
+                logger.warn("[BFF Prewarm] Failed to write prewarm stats to Redis:", err);
               }
             }
 

@@ -1,3 +1,4 @@
+import { env } from "../../config/env.ts";
 import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { 
@@ -11,6 +12,7 @@ import {
   EMPLOYER_STATS_TTL 
 } from "./dashboard-lru.ts";
 import { CacheKeys } from "../../constants/cache-keys.ts";
+import { logger } from "../../utils/logger.ts";
 
 export class DashboardEmployerService {
   static async getEmployerStats(uid: string) {
@@ -77,7 +79,7 @@ export class DashboardEmployerService {
               lastPaymentAmount = statsData?.lastPaymentAmount || 0;
               lastPaymentAt = statsData?.lastPaymentAt || null;
             } else if (statsDoc.status === "rejected") {
-              console.warn("[DashboardService] user_stats read failed:", (statsDoc as PromiseRejectedResult).reason?.message);
+              logger.warn("[DashboardService] user_stats read failed:", (statsDoc as PromiseRejectedResult).reason?.message);
               isFirestoreHealthy = false;
             }
 
@@ -104,23 +106,23 @@ export class DashboardEmployerService {
                 } as ApplicationItemDTO;
               }).filter((a) => a.status === "pending").slice(0, 5);
             } else if (appsResult.status === "rejected") {
-              console.warn("[DashboardService] applications query failed:", appsResult.reason?.message);
+              logger.warn("[DashboardService] applications query failed:", appsResult.reason?.message);
             }
 
             // Handle trends
             if (trendsResult.status === "fulfilled") {
               trends = trendsResult.value as DashboardTrendDTO[];
             } else if (trendsResult.status === "rejected") {
-              console.warn("[DashboardService] trends load failed:", trendsResult.reason?.message);
+              logger.warn("[DashboardService] trends load failed:", trendsResult.reason?.message);
             }
             
           } catch (err: unknown) {
-            console.warn("[DashboardService] Aggregate fetch failed critically:", err instanceof Error ? err.message : String(err));
+            logger.warn("[DashboardService] Aggregate fetch failed critically:", err instanceof Error ? err.message : String(err));
             isFirestoreHealthy = false;
           }
 
           if (!isFirestoreHealthy) {
-            console.warn("[DashboardService] Firestore unhealthy, returning empty state.");
+            logger.warn("[DashboardService] Firestore unhealthy, returning empty state.");
           }
 
           const res = {
@@ -164,7 +166,7 @@ export class DashboardEmployerService {
 
   static async getEmployerTrends(uid: string) {
     const cacheKey = CacheKeys.employerTrends(uid);
-    const devTtl = process.env.NODE_ENV === "production" ? 15 * 60 * 1000 : 30 * 60 * 1000;
+    const devTtl = env.NODE_ENV === "production" ? 15 * 60 * 1000 : 30 * 60 * 1000;
 
     try {
       const result = await CacheService.getOrSetSWR(
@@ -196,7 +198,7 @@ export class DashboardEmployerService {
               history = historyDoc.data()?.trend || {};
             }
           } catch (err: unknown) {
-            console.warn("[DashboardService] trends doc failed:", err instanceof Error ? err.message : String(err));
+            logger.warn("[DashboardService] trends doc failed:", err instanceof Error ? err.message : String(err));
             isFirestoreHealthy = false;
           }
 

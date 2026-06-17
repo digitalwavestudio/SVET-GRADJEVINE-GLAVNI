@@ -1,4 +1,5 @@
 ﻿import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { validateRequest } from "../middleware/validate.ts";
@@ -12,13 +13,13 @@ export const checkoutRouter = Router();
 checkoutRouter.get("/:id", requireAuth, async (req, res, next) => {
   try {
     const { id } = req.params;
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
     const cacheKey = `checkout_status:${id}`;
 
     // 1. Try Cache
     const cached = await CacheService.get<any>(cacheKey);
     if (cached) {
-      if (cached.userId !== uid && !(req as any)?.user.isAdmin) {
+      if (cached.userId !== uid && !getReqUser(req).isAdmin) {
         return res.status(403).json({ error: "Forbidden" });
       }
       return res.json(cached);
@@ -34,7 +35,7 @@ checkoutRouter.get("/:id", requireAuth, async (req, res, next) => {
     const checkout = { id: snap.id, ...checkoutData } as any;
 
     // Security check
-    if (checkout.userId !== uid && !(req as any)?.user.isAdmin) {
+    if (checkout.userId !== uid && !getReqUser(req).isAdmin) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -54,7 +55,7 @@ checkoutRouter.post(
   validateRequest(checkoutSchema),
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const { packageId, amount, paymentMethod } = req.body;
 
       // Amount is now strictly positive due to validation
@@ -82,7 +83,7 @@ checkoutRouter.post(
   requireAuth,
   async (req, res, next) => {
     try {
-      const uid = (req as any)?.user.uid;
+      const uid = getReqUser(req).uid;
       const { packageId, packageName, amount, customerInfo } = req.body;
 
       const invoiceNumber = `PR-${Date.now().toString().slice(-6)}`;
@@ -139,7 +140,7 @@ checkoutRouter.post(
       attachments: [{ filename: `Predracun-${invoiceNumber}.pdf`, content: pdfBuffer }]
     });
     */
-      console.log(
+      console.info(
         `[INVOICE] Generated pro-forma ${invoiceNumber} for user ${uid}`,
       );
 
@@ -161,13 +162,13 @@ checkoutRouter.patch("/:id", requireAuth, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const uid = (req as any)?.user.uid;
+    const uid = getReqUser(req).uid;
 
     const snap = await db.collection("checkouts").doc(id).get();
     if (!snap.exists) return res.status(404).json({ error: "Not found" });
 
     const checkout = snap.data()!;
-    if (checkout.userId !== uid && !(req as any)?.user.isAdmin) {
+    if (checkout.userId !== uid && !getReqUser(req).isAdmin) {
       return res.status(403).json({ error: "Forbidden" });
     }
 

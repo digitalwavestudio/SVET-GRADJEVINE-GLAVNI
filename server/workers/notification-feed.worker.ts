@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { Logger } from "../utils/logger.ts";
@@ -11,7 +12,7 @@ export class NotificationFeedWorker {
 
     import("../utils/system-cron.ts")
       .then(({ SystemCron }) => {
-        const cronPattern = process.env.NODE_ENV === "production" ? "*/15 * * * *" : "0 */12 * * *";
+        const cronPattern = env.NODE_ENV === "production" ? "*/15 * * * *" : "0 */12 * * *";
         SystemCron.register("notification_feed_coalesce_cron", { pattern: cronPattern }, async () => {
           await this.processNotificationFeeds();
         }).catch(err => this.logger.error("Failed to register Notification Feed cron", err));
@@ -19,7 +20,7 @@ export class NotificationFeedWorker {
   }
 
   static async processNotificationFeeds() {
-    if (process.env.NODE_ENV !== "production") return;
+    if (env.NODE_ENV !== "production") return;
     const redis = getRedis();
     if (!redis) {
       this.logger.info("Redis not configured. Skipping background notification feed updates.");
@@ -72,7 +73,7 @@ export class NotificationFeedWorker {
 
               // Sync unread count flag in Redis
               const statusVal = unreadCount === 0 ? "0" : "1";
-              await CacheService.set(`notifications_pending_count:${uid}`, statusVal, 30 * 24 * 60 * 60 * 1000).catch((e: any) => console.warn("[NotificationFeed] Set pending count flag:", e?.message));
+              await CacheService.set(`notifications_pending_count:${uid}`, statusVal, 30 * 24 * 60 * 60 * 1000).catch((e: any) => NotificationFeedWorker.logger.warn("[NotificationFeed] Set pending count flag:", e?.message));
             } catch (err: any) {
               this.logger.warn(`Failed to execute notification refresh for ${uid}: ${err.message || err}`);
             }

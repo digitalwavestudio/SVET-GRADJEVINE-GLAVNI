@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { Request, Response, NextFunction } from "express";
 import { db, admin } from "../config/firebase.ts";
 import { FieldValue } from "firebase-admin/firestore";
@@ -99,7 +100,7 @@ export const sendMessage = async (
                   ? `${uData.firstName} ${uData.lastName}`
                   : "Korisnik";
 
-              if (process.env.NODE_ENV !== "production") console.log(`[EMAIL DISPATCH] Sending email to ${pData.email} from ${senderName}`);
+              if (env.NODE_ENV !== "production") console.info(`[EMAIL DISPATCH] Sending email to ${pData.email} from ${senderName}`);
             }
           }
         }).catch(err => console.error("Non-blocking email retrieval error", err));
@@ -267,7 +268,7 @@ export const createChat = async (
         const isOnline = presence?.state === "online";
 
         if (!isOnline && pData.emailNotifications !== false && pData.email) {
-          console.log(
+          console.info(
             `[EMAIL DISPATCH] Sending email to ${pData.email} from ${userName} about new message.`,
           );
           // if sendChatMessageEmail exists: await sendChatMessageEmail(pData.email, userName);

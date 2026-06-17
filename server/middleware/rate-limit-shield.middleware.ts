@@ -6,6 +6,7 @@ import { CacheService } from "../services/cache.service.ts";
 import { AuditService, AuditAction } from "../services/audit.service.ts";
 import { env } from "../config/env.ts";
 import crypto from "crypto";
+import { logger } from "../utils/logger.ts";
 
 const BAD_BOTS = [
   "ahrefsbot",
@@ -152,7 +153,7 @@ export const rateLimitShield = async (
       // Invisible field expected to be empty. If filled, it's a spam bot.
       const honeypot = req.body?._honeypot || req.body?.website_url_trap;
       if (honeypot) {
-        console.warn(`[BotTrap] Spam bot caught in honeypot from IP ${ipStr}`);
+        logger.warn(`[BotTrap] Spam bot caught in honeypot from IP ${ipStr}`);
         await AuditService.log({
           action: AuditAction.SECURITY_THREAT,
           severity: 'high',

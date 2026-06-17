@@ -9,7 +9,7 @@ export function setupNotificationSubscriber() {
     DomainEvents.JOB_APPLICATION_RECEIVED,
     async (payload) => {
       try {
-        console.log(`[NotificationSubscriber] JOB_APPLICATION_RECEIVED caught via Outbox:`, payload.applicationId);
+        console.info(`[NotificationSubscriber] JOB_APPLICATION_RECEIVED caught via Outbox:`, payload.applicationId);
         
         // 1. We could use QueueService to enqueue an email task or just call NotificationService
         await NotificationService.send({
@@ -36,7 +36,7 @@ export function setupNotificationSubscriber() {
     async (payload) => {
       try {
         const { userId } = payload;
-        console.log(
+        console.info(
           `[NotificationSubscriber] USER_VERIFIED caught for ${userId}`,
         );
         await NotificationService.send({

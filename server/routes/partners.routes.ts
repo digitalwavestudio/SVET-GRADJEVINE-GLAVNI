@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getReqUser } from "../utils/request.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { db, admin } from "../config/firebase.ts";
 import { DatabaseManager } from "../utils/db-manager.ts";
@@ -85,7 +86,7 @@ partnersRouter.post("/init/:id", requireAuth, validateRequest(partnerInitSchema)
     const { code, slug } = req.body;
 
     // Optional: check if current user is admin, or if user is authorizing themselves.
-    if ((req as any)?.user.uid !== id && !(req as any)?.user.isAdmin) {
+    if (getReqUser(req).uid !== id && !getReqUser(req).isAdmin) {
       return res.status(403).json({ error: "Forbidden" });
     }
 

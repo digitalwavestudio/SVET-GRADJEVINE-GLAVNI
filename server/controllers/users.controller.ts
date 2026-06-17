@@ -5,6 +5,7 @@ import { UserTransformer } from "../bff/user.transformer.ts";
 import { db, admin } from "../config/firebase.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
 import { CacheService } from "../services/cache.service.ts";
+import { logger } from "../utils/logger.ts";
 
 export const forceSync = async (
   req: Request,
@@ -99,7 +100,7 @@ export const switchRole = async (
     await CacheService.delete(`auth:claims:${uid}`);
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
-    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => console.warn("[UsersController] Cache delete auth session:", e));
+    await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[UsersController] Cache delete auth session:", e));
     await CacheService.delete(`public_profile_${uid}`);
 
     // We should sync stats as role changed

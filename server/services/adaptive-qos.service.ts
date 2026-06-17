@@ -1,5 +1,6 @@
 import { getRedis } from "../utils/redis.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
+import { logger } from "../utils/logger.ts";
 
 /**
  * AdaptiveQosService - Pametna zastita Firestore kvota kroz asinhroni throughput monitoring.
@@ -41,14 +42,14 @@ export class AdaptiveQosService {
         }
         
         if (count > this.MAX_READ_THROUGHPUT) {
-           console.warn(`[AdaptiveQosService] ⚠️ Throughput spajk detektovan (${count} req/s). Aktiviranje Stale-Cache moda!`);
+           logger.warn(`[AdaptiveQosService] ⚠️ Throughput spajk detektovan (${count} req/s). Aktiviranje Stale-Cache moda!`);
            return false;
         }
         return true;
       } catch (err: any) {
         this.lastRedisErrorTime = Date.now();
         if (err.message === "Redis Timeout") {
-          console.warn("[AdaptiveQosService] 🛡️ Redis Latency Warning (Timeout), prelazak na lokalni Qos limit na 5s...");
+          logger.warn("[AdaptiveQosService] 🛡️ Redis Latency Warning (Timeout), prelazak na lokalni Qos limit na 5s...");
         } else {
           console.error("[AdaptiveQosService] Redis error, prelazak na lokalni limit", err);
         }
@@ -71,7 +72,7 @@ export class AdaptiveQosService {
     this.localBuckets.set(currentSecond, currentCount);
 
     if (currentCount > this.MAX_READ_THROUGHPUT) {
-       console.warn(`[AdaptiveQosService] (Local) ⚠️ Throughput spajk detektovan (${currentCount} req/s). Aktiviranje Stale-Cache moda!`);
+       logger.warn(`[AdaptiveQosService] (Local) ⚠️ Throughput spajk detektovan (${currentCount} req/s). Aktiviranje Stale-Cache moda!`);
        return false;
     }
     return true;

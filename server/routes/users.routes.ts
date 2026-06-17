@@ -11,6 +11,7 @@ import {
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
 import { AdminSettingsService } from "../services/admin/admin-settings.service.ts";
 import { validateRequest, validateBody } from "../middleware/validate.ts";
+import { logger } from "../utils/logger.ts";
 import {
   userProfileSchema,
   presenceSchema,
@@ -64,12 +65,12 @@ usersRouter.post(
           }
         } catch (err) {
           console.error("[AUTH] reCAPTCHA verify request failed:", err);
-          if (process.env.NODE_ENV === "production") {
+          if (env.NODE_ENV === "production") {
             return res.status(500).json({ error: "Internal reCAPTCHA verification service error." });
           }
         }
       } else {
-        console.warn("[AUTH] RECAPTCHA_SECRET_KEY not set. Local development bypass enabled.");
+        logger.warn("[AUTH] RECAPTCHA_SECRET_KEY not set. Local development bypass enabled.");
       }
 
       const uid = req.user?.uid;

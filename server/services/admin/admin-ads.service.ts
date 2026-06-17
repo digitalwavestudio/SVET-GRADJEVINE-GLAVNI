@@ -3,8 +3,7 @@ import { AuditService, AuditAction } from "../audit.service.ts";
 import { SyncManager } from "../sync.service.ts";
 import { CacheService } from "../cache.service.ts";
 import { AdminUsersService } from "./admin-users.service.ts";
-
-
+import { logger } from "../../utils/logger.ts";
 
 export class AdminAdsService {
   static async editListing(
@@ -54,7 +53,7 @@ export class AdminAdsService {
       console.error("[Cache Invalidation Error]:", cacheErr);
     }
     // Ensure moderation queue cache is refreshed
-    await CacheService.invalidateByPrefix("admin_moderation_queue_").catch((e: any) => console.warn("[AdminAds] cache invalidation error:", e?.message));
+    await CacheService.invalidateByPrefix("admin_moderation_queue_").catch((e: any) => logger.warn("[AdminAds] cache invalidation error:", e?.message));
 
     await AuditService.logAction(
       adminId,

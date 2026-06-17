@@ -45,7 +45,7 @@ export const uploadVerificationDocuments = async (
         return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: unknown) {
         const error = storageError as Error;
-        console.log(`[VERIFICATION STORAGE INFO] Direct local media stream active: ${error.message}`);
+        console.info(`[VERIFICATION STORAGE INFO] Direct local media stream active: ${error.message}`);
         
         const uploadsDir = path.join(process.cwd(), "uploads", "verifications", uid);
         if (!fs.existsSync(uploadsDir)) {

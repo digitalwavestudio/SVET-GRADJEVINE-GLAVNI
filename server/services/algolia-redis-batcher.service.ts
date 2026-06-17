@@ -36,7 +36,7 @@ export class AlgoliaRedisBatcher {
   public static async init() {
     // We allow initialization in dev to ensure functional integrity, 
     // but we can still use fallback sync in bufferSync if preferred.
-    const isSandbox = process.env.NODE_ENV !== "production";
+    const isSandbox = env.NODE_ENV !== "production";
     
     const redis = getRedis();
     if (!redis) {
@@ -85,7 +85,7 @@ export class AlgoliaRedisBatcher {
    * Pushes a document change to the Redis stream for bulk processing.
    */
   public static async bufferSync(category: string, id: string, data: Record<string, unknown>) {
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       await syncAdsToIndex(category, [{ id, data }]);
       return;
     }

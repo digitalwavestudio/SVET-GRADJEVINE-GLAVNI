@@ -3,6 +3,7 @@ import { db } from "../config/firebase.ts";
 import { FieldPath } from "firebase-admin/firestore";
 import { CacheService } from "../services/cache.service.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
+import { logger } from "../utils/logger.ts";
 
 export interface UserDTO {
   id?: string;
@@ -68,7 +69,7 @@ export function createFirestoreLoader(collectionPath: string) {
       // 0. Safe-Pass through Redis: Check if Firestore quota is exhausted
       const isExhausted = await CacheService.get<boolean>("circuit_breaker:firestore_quota:exhausted");
       if (isExhausted) {
-        console.warn(`[Dataloader] [Generic] Quota exhausted for ${collectionPath}, returning nulls`);
+        logger.warn(`[Dataloader] [Generic] Quota exhausted for ${collectionPath}, returning nulls`);
         return keys.map(() => null);
       }
 
@@ -111,7 +112,7 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
     // 0. Safe-Pass through Redis: Check if Firestore quota is exhausted
     const isExhausted = await CacheService.get<boolean>("circuit_breaker:firestore_quota:exhausted");
     if (isExhausted) {
-      console.warn(`[Dataloader] [Safe-Pass] [Profile] Quota exhausted, returning empty profiles for ${keys.length} keys`);
+      logger.warn(`[Dataloader] [Safe-Pass] [Profile] Quota exhausted, returning empty profiles for ${keys.length} keys`);
       return keys.map(() => null);
     }
 
@@ -187,7 +188,7 @@ export const internalUserLoader = new DataLoader<string, UserDTO | null>(
     // 0. Safe-Pass through Redis: Check if Firestore quota is exhausted
     const isExhausted = await CacheService.get<boolean>("circuit_breaker:firestore_quota:exhausted");
     if (isExhausted) {
-      console.warn(`[Dataloader] [Safe-Pass] [Internal] Quota exhausted, returning empty users for ${keys.length} keys`);
+      logger.warn(`[Dataloader] [Safe-Pass] [Internal] Quota exhausted, returning empty users for ${keys.length} keys`);
       return keys.map(() => null);
     }
 
@@ -261,7 +262,7 @@ export const listingsLoader = new DataLoader<string, ListingDTO | null>(
     // 0. Safe-Pass through Redis: Check if Firestore quota is exhausted
     const isExhausted = await CacheService.get<boolean>("circuit_breaker:firestore_quota:exhausted");
     if (isExhausted) {
-      console.warn(`[Dataloader] [Safe-Pass] Quota exhausted, returning empty listings for ${keys.length} keys`);
+      logger.warn(`[Dataloader] [Safe-Pass] Quota exhausted, returning empty listings for ${keys.length} keys`);
       return keys.map(() => null);
     }
 
@@ -315,7 +316,7 @@ export const userStatsLoader = new DataLoader<string, UserStatsDTO | null>(
     // 0. Safe-Pass through Redis: Check if Firestore quota is exhausted
     const isExhausted = await CacheService.get<boolean>("circuit_breaker:firestore_quota:exhausted");
     if (isExhausted) {
-      console.warn(`[Dataloader] [Safe-Pass] Quota exhausted, returning empty stats for ${keys.length} keys`);
+      logger.warn(`[Dataloader] [Safe-Pass] Quota exhausted, returning empty stats for ${keys.length} keys`);
       return keys.map(() => null);
     }
 

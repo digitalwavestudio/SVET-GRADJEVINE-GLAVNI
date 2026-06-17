@@ -5,6 +5,7 @@ import { admin } from "../config/firebase.ts";
 import { SitemapService } from "./sitemap.service.ts";
 import { env } from "../config/env.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
+import { logger } from "../utils/logger.ts";
 
 export const SITEMAP_QUEUE_NAME = "sitemap-queue";
 
@@ -19,8 +20,8 @@ export class SitemapWorkerService {
   private isProcessing = false;
 
   constructor() {
-    if (process.env.NODE_ENV !== "production") {
-      console.log(
+    if (env.NODE_ENV !== "production") {
+      console.info(
         "[SitemapWorker] Sandboxed Dev Mode: Skipping worker initialization to shield connections and Firestore Quotas.",
       );
       return;
@@ -28,7 +29,7 @@ export class SitemapWorkerService {
 
     const sharedClient = getRawRedis();
     if (!sharedClient) {
-      console.warn(
+      logger.warn(
         "[SitemapWorker] Skipping worker initialization, redis connection missing.",
       );
       return;
@@ -47,7 +48,7 @@ export class SitemapWorkerService {
     );
 
     this.worker.on("completed", (job) => {
-      console.log(
+      console.info(
         `[SitemapWorker] Job ${job.id} completed successfully (Trigger: ${job.data.trigger})`,
       );
     });
@@ -58,7 +59,7 @@ export class SitemapWorkerService {
   }
 
   private async processSitemapJob(job: Job<SitemapJobPayload>) {
-    console.log(
+    console.info(
       `[SitemapWorker] Starting sitemap regeneration triggered by ${job.data.trigger} - Category: ${job.data.category || "ALL"}`,
     );
 
@@ -72,7 +73,7 @@ export class SitemapWorkerService {
       const manifest = await SitemapService.getSitemapManifest();
 
       if (category && manifest[category] !== undefined) {
-        console.log(`[SitemapWorker] Regenerating all pages for segment: ${category}`);
+        console.info(`[SitemapWorker] Regenerating all pages for segment: ${category}`);
         const count = Number(manifest[category]) || 0;
         const pages = Math.ceil(count / (SitemapService as any).CHUNK_SIZE) || 1;
         let lastDoc = null;
@@ -182,7 +183,7 @@ export class SitemapWorkerService {
         removeOnComplete: true,
         attempts: 2,
       });
-      console.log(
+      console.info(
         `[SitemapWorker] Queued sitemap regeneration for ${payload.category || "all"}`,
       );
     }
@@ -195,7 +196,7 @@ export function setupSitemapQueueListeners() {
   // ENTERPRISE BLUEPRINT WAVE 2:
   // Reactive rebuild model killed to prevent Amplified Read Storms.
   // Sitemap regeneration is now handled via controlled scheduled Cron/Batch jobs.
-  console.log(
+  console.info(
     "[SitemapWorker] Reactive listeners disabled for SEO/Sitemap. Using scheduled generation instead.",
   );
 }

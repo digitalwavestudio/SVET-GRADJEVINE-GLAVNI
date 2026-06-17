@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { admin } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { LockManager } from "./lock.service.ts";
@@ -22,7 +23,7 @@ export class HousekeepingService {
   static async run() {
     this.logger.info("Housekeeping Service initialized");
 
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       this.runFullCycle().catch((err) =>
         this.logger.error("Initial full cycle check failed", err),
       );
@@ -30,7 +31,7 @@ export class HousekeepingService {
 
     import("../utils/system-cron.ts")
       .then(({ SystemCron }) => {
-        if (process.env.NODE_ENV === "production") {
+        if (env.NODE_ENV === "production") {
           SystemCron.register("housekeeping_full_cycle", { pattern: "0 * * * *" }, async () => {
             await this.runFullCycle();
           }).catch(err => this.logger.error("Failed to register full cycle cron", err));

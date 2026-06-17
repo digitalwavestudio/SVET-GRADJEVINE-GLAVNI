@@ -2,6 +2,7 @@ import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { UnifiedSearchService } from "../unified-search.service.ts";
 import { SEOSchemaService } from "./seo-schema.service.ts";
+import { logger } from "../../utils/logger.ts";
 
 export class SEODbService {
   static async getHubMetaData(hubType: string, params: Record<string, unknown>) {
@@ -163,7 +164,7 @@ export class SEODbService {
         );
         initialState = { searchResult };
       } catch (err) {
-        console.warn("[SEO-Background] Failed to fetch static initial state for hub:", err);
+        logger.warn("[SEO-Background] Failed to fetch static initial state for hub:", err);
       }
 
       const meta = {
@@ -187,7 +188,7 @@ export class SEODbService {
     } catch (err) {
       console.error("[SEO-Background] Failed compiler compiling for hub:", err);
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch((e: any) => console.warn("[SEODb] lock release error:", e?.message));
+      await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[SEODb] lock release error:", e?.message));
     }
   }
 

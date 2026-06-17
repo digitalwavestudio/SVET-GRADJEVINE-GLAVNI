@@ -23,7 +23,7 @@ export class CircuitBreaker {
   async execute<T>(action: () => Promise<T>): Promise<T> {
     if (this.state === CircuitState.OPEN) {
       if (Date.now() - this.lastErrorTime > this.timeout) {
-        console.log(`[CircuitBreaker] ${this.name} half-opening...`);
+        console.info(`[CircuitBreaker] ${this.name} half-opening...`);
         this.state = CircuitState.HALF_OPEN;
       } else {
         throw new Error(`Circuit Breaker ${this.name} is OPEN`);

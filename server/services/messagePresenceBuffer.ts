@@ -1,3 +1,4 @@
+import { env } from "../config/env.ts";
 import { db, admin } from "../config/firebase.ts";
 import { getRedis } from "../utils/redis.ts";
 import { LockManager } from "./lock.service.ts";
@@ -138,7 +139,7 @@ export class MessagePresenceBuffer {
   }
 
   static init() {
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       if (!this.intervalId) {
         // Scheduled flushing of conversation updates every 1 minute (60 * 1000 = 60000 ms)
         this.intervalId = setInterval(() => this.flushPendingConversationUpdates(), 60000);

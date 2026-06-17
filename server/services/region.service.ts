@@ -16,7 +16,7 @@ export class RegionService {
    */
   static isLeaderRegion(): boolean {
     // In dev/sandbox environments, defer to SANDBOX_WORKERS_ENABLED outside this check, do not force leader
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
       return false;
     }
     // Obično Frankfurt smatramo primarnim za write-heavy taskove koji se ne kloniraju
