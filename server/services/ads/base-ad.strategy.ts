@@ -54,7 +54,7 @@ export abstract class BaseAdStrategy {
         }
       }
 
-      const currentWalletBalance = userData.walletBalance || userData.partnerBalance || 0;
+      const currentWalletBalance = userData.walletBalance ?? userData.partnerBalance ?? 0;
       
       if (isPaidPackage && packagePrice <= 0 && rawData.paket !== "free") {
         throw new BadRequestError(`Nepoznat paket: "${rawData.paket}". Dozvoljeni paketi su: standard, premium, urgent, premium_partner.`);
@@ -164,9 +164,10 @@ export abstract class BaseAdStrategy {
           totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
           ...(rawData.paket === "premium_partner" ? { isPremiumPartner: true, "businessProfile.premiumPartner": true } : {})
         });
-        transaction.update(walletRef, {
+        transaction.set(walletRef, {
           balance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
-        });
+          lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
       } else {
         transaction.update(userRef, {
           totalAds: firebaseAdmin.firestore.FieldValue.increment(1),

@@ -210,25 +210,29 @@ export function useAuthNode() {
             if (!claims?.role && firebaseUser && !autoInitAttempted.current) {
                autoInitAttempted.current = true;
                try {
-                  const token = await firebaseUser.getIdToken();
-                  await fetch('/api/users/init', {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                     body: JSON.stringify({
-                        email: firebaseUser.email,
-                        uid: firebaseUser.uid,
-                        name: firebaseUser.displayName || '',
-                        role: 'standard',
-                        status: 'active',
-                        isPremiumProfile: false,
-                        photoURL: firebaseUser.photoURL || '',
-                        viewsCount: 0,
-                        freeAdsCount: 3
-                     })
-                  });
-                  // Ponovo fetch-ujemo profil
-                  fetchUserData();
-                  return;
+                   const token = await firebaseUser.getIdToken();
+                   const initRes = await fetch('/api/users/init', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                      body: JSON.stringify({
+                         email: firebaseUser.email,
+                         uid: firebaseUser.uid,
+                         name: firebaseUser.displayName || '',
+                         role: 'standard',
+                         status: 'active',
+                         isPremiumProfile: false,
+                         photoURL: firebaseUser.photoURL || '',
+                         viewsCount: 0,
+                         freeAdsCount: 3
+                      })
+                   });
+                   if (!initRes.ok) {
+                      console.warn("[AUTH] Auto-init failed:", initRes.status, await initRes.text().catch(() => ''));
+                   } else {
+                      // Ponovo fetch-ujemo profil
+                      fetchUserData();
+                      return;
+                   }
                } catch (initErr) {
                   console.warn("[AUTH] Auto-init after redirect failed:", initErr);
                }
