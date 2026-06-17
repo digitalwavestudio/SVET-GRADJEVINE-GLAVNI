@@ -45,15 +45,10 @@ export class ImageWorker {
         }
       },
       {
-        connection: {
-          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
-          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
-          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
-          maxRetriesPerRequest: null
-        },
-        concurrency: 2, // Max 2 concurrent Sharp operations per container to avoid OOM/CPU saturation
-        lockDuration: 300000, // 5 minutes default
-        lockRenewTime: 30000,  // Proactive auto-renew every 30s
+        connection: defaultConnection!,
+        concurrency: 1,
+        lockDuration: 300000,
+        lockRenewTime: 30000
       },
     );
 

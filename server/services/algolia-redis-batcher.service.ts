@@ -5,8 +5,8 @@ import { syncAdsToIndex } from "./algolia.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { LockManager } from "./lock.service.ts";
 import { Worker, Job } from "bullmq";
-import { QueueService, JobType } from "./queue.service.ts";
 import { defaultConnection } from "../utils/queue.ts";
+import { QueueService, JobType } from "./queue.service.ts";
 import { RegionService } from "./region.service.ts";
 
 const logger = new Logger({ module: "AlgoliaRedisBatcher" });
@@ -61,16 +61,10 @@ export class AlgoliaRedisBatcher {
             await this.processBatch();
           }
         },
-        {
-          connection: {
-          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
-          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
-          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
-          maxRetriesPerRequest: null
-        },
+        { connection: defaultConnection!,
           concurrency: 1,
-          lockDuration: 300000, // 5 minutes default
-          lockRenewTime: 30000,  // Proactive auto-renew every 30s
+          lockDuration: 300000,
+          lockRenewTime: 30000,
         }
       );
 

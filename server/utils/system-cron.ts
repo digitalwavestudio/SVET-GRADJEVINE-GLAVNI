@@ -23,12 +23,7 @@ export const SystemCron = {
       return;
     }
 
-    cronQueue = new Queue("system-cron", { connection: {
-          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
-          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
-          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
-          maxRetriesPerRequest: null
-        } });
+    cronQueue = new Queue("system-cron", { connection: defaultConnection! });
 
     // Worker koji ce pokretati zadatke
     cronWorker = new Worker(
@@ -42,17 +37,11 @@ export const SystemCron = {
           LoggerService.warn(`[SystemCron] Unknown job executed: ${job.name}`);
         }
       },
-      { 
-        connection: {
-          host: env.REDIS_HOST || (env.REDIS_URL ? new URL(env.REDIS_URL).hostname : 'localhost'),
-          port: env.REDIS_PORT ? parseInt(env.REDIS_PORT) : (env.REDIS_URL ? parseInt(new URL(env.REDIS_URL).port || '6379') : 6379),
-          password: env.REDIS_PASSWORD || (env.REDIS_URL ? new URL(env.REDIS_URL).password : undefined) || undefined,
-          maxRetriesPerRequest: null
-        }, 
+      { connection: defaultConnection!, 
         concurrency: 10,
-        lockDuration: 300000, // 5 minutes default
-        lockRenewTime: 30000,  // Proactive auto-renew every 30s
-      } // Allow concurrent executions of different tasks
+        lockDuration: 300000,
+        lockRenewTime: 30000,
+      }
     );
 
     cronWorker.on("failed", (job, err) => {
