@@ -30,7 +30,7 @@ export function useAdminUsers(searchQ: string = "") {
       getNextPageParam: (lastPage) => lastPage?.nextPageParam,
       initialPageParam: null as string | null,
       staleTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
     });
 
   const allUsers = data ? data.pages.flatMap((page) => page.users) : [];

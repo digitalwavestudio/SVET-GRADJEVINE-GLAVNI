@@ -85,7 +85,7 @@ export function useMessagesNode(
     initialPageParam: null,
     enabled: isEnabled,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     initialData: () => {
       if (!user) return undefined;
       if (typeof window === "undefined") return undefined; // guard for SSR if any
@@ -170,7 +170,7 @@ export function useMessagesNode(
     initialPageParam: null as string | null,
     enabled: !!user && !!activeConversationId && isEnabled,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     initialData: () => {
       if (!user || !activeConversationId) return undefined;
       if (typeof window === "undefined") return undefined;

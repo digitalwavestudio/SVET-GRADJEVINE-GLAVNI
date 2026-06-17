@@ -49,7 +49,7 @@ export function useAdminModeration(searchQuery?: string) {
     getNextPageParam: (lastPage) =>
       lastPage?.hasMore ? lastPage.nextCursor : undefined,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   const moderationActionMutation = useMutation({

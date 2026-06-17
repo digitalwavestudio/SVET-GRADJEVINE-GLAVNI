@@ -35,7 +35,7 @@ export function useUserProfile(userId: string | undefined) {
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minuta keširanja da se spreči dupli load na navigaciji
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 }
 

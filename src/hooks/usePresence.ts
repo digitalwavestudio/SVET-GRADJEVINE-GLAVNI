@@ -41,7 +41,7 @@ export function useUserStatus(userId?: string | null) {
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, 
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   return status || { isOnline: false };

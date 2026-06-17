@@ -15,7 +15,7 @@ export function useAdminSupport(searchQuery?: string) {
       }
     },
     staleTime: 5 * 60 * 1000, // 3 minutes
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   return { supportTickets, isLoading };

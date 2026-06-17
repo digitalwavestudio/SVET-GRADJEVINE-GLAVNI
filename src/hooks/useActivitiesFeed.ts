@@ -96,7 +96,7 @@ export function useActivitiesFeed(userId: string | undefined) {
     // Intelligent refetch on window focus to enforce server-side cost safety
     refetchInterval: false,
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   const loadMoreActivities = useCallback(() => {

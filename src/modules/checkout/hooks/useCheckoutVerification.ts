@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { db } from "@/src/firebase-db";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 
 interface VerificationResult {
   isProvisioned: boolean;
@@ -110,71 +110,59 @@ export const useCheckoutVerification = (
       }
     };
 
-    let isPolling = true;
-
-    const pollFirestore = async () => {
-      try {
-        const snapshot = await getDoc(docRef);
-        if (!isPolling) return;
-        
-        if (!snapshot.exists()) {
-          runThrottledUpdate(() => {
-            setState({
-              isProvisioned: false,
-              isLoading: false,
-              error: "session_not_found",
-              status: null,
-            });
-          });
-          return;
-        }
-
-        const data = snapshot.data();
-        const status = data?.status || "PENDING";
-
-        if (status === "PROVISIONED") {
-          clearTimeout(timeoutMsg);
-          runThrottledUpdate(() => {
-            setState({
-              isProvisioned: true,
-              isLoading: false,
-              error: null,
-              status: "PROVISIONED",
-            });
-          });
-        } else {
-          runThrottledUpdate(() => {
-            setState(prev => {
-              if (prev.status === status && !prev.isLoading) return prev;
-              return {
-                ...prev,
-                status,
-                isLoading: false
-              };
-            });
-          });
-        }
-      } catch (error) {
-        if (!isPolling) return;
-        console.error("[useCheckoutVerification] polling error:", error);
-        clearTimeout(timeoutMsg);
+    const unsubscribe = onSnapshot(docRef, (snapshot) => {
+      if (!snapshot.exists()) {
         runThrottledUpdate(() => {
           setState({
             isProvisioned: false,
             isLoading: false,
-            error: "network_error",
+            error: "session_not_found",
             status: null,
           });
         });
+        return;
       }
-    };
 
-    pollFirestore();
-    const interval = setInterval(pollFirestore, 4000);
+      const data = snapshot.data();
+      const status = data?.status || "PENDING";
+
+      if (status === "PROVISIONED") {
+        clearTimeout(timeoutMsg);
+        runThrottledUpdate(() => {
+          setState({
+            isProvisioned: true,
+            isLoading: false,
+            error: null,
+            status: "PROVISIONED",
+          });
+        });
+      } else {
+        runThrottledUpdate(() => {
+          setState(prev => {
+            if (prev.status === status && !prev.isLoading) return prev;
+            return {
+              ...prev,
+              status,
+              isLoading: false
+            };
+          });
+        });
+      }
+    }, (error) => {
+      console.error("[useCheckoutVerification] snapshot error:", error);
+      clearTimeout(timeoutMsg);
+      runThrottledUpdate(() => {
+        setState({
+          isProvisioned: false,
+          isLoading: false,
+          error: "network_error",
+          status: null,
+        });
+      });
+    });
 
     return () => {
-      isPolling = false;
-      clearInterval(interval);
+      unsubscribe();
       clearTimeout(timeoutMsg);
       if (throttleTimer) clearTimeout(throttleTimer);
     };

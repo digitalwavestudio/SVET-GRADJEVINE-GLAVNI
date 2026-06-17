@@ -65,6 +65,6 @@ export function useFilteredCount(
   return useQuery({
     queryKey: ["count", collectionName, filters],
     queryFn: () => statsService.getCachedFilteredCount(collectionName, filters),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 60 * 1000,
   });
 }

@@ -39,7 +39,7 @@ export function useAdminFinances(searchQuery?: string) {
     getNextPageParam: (lastPage) => lastPage?.nextPageParam,
     initialPageParam: null as string | null,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   const confirmPayment = useMutation({

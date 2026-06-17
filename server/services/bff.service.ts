@@ -24,10 +24,10 @@ import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 import { logger, Logger } from "../utils/logger.ts";
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
-const L1_HOMEPAGE_TTL = 15 * 1000; // 15s in-memory Shield cache
+const L1_HOMEPAGE_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
 
 const l1DashboardPrewarmCache = new Map<string, { data: any; expiry: number }>();
-const L1_DASHBOARD_PREWARM_TTL = 15 * 1000; // 15s in-memory Shield cache
+const L1_DASHBOARD_PREWARM_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
 
 const withHomepageQueryTimeout = async <T>(
   promise: Promise<T> | T,
