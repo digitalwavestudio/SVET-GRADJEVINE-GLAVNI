@@ -8,15 +8,45 @@ import { logger } from "../utils/logger.ts";
 export const statsRouter = Router();
 
 statsRouter.get("/finance", requireAuth, async (req, res, next) => {
-  if (!getReqUser(req).isAdmin)
-    return res.status(403).json({ error: "Forbidden" });
   try {
-    const stats = await AdminStatsService.getGlobalStats();
+    const user = getReqUser(req);
+    const uid = user.uid;
+
+    // Admin: return global platform stats
+    if (user.isAdmin) {
+      const stats = await AdminStatsService.getGlobalStats();
+      return res.json({
+        totalRevenue: stats.estimatedRevenue || 0,
+        confirmedCount: stats.activeAds || 0,
+        failedCount: 0,
+        initiatedCount: stats.pendingAds || 0,
+        lastUpdated: new Date().toISOString(),
+      });
+    }
+
+    // Regular user: return their own stats
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data() || {};
+    const transactionsSnap = await db
+      .collection("transactions")
+      .where("userId", "==", uid)
+      .get();
+    
+    let totalSpent = 0;
+    let totalDeposits = 0;
+    transactionsSnap.forEach((doc) => {
+      const tx = doc.data();
+      if (tx.amount > 0) totalDeposits += tx.amount;
+      else totalSpent += Math.abs(tx.amount);
+    });
+
     res.json({
-      totalRevenue: stats.estimatedRevenue || 0,
-      confirmedCount: stats.activeAds || 0,
+      totalRevenue: totalSpent,
+      confirmedCount: userData.totalAds || 0,
       failedCount: 0,
-      initiatedCount: stats.pendingAds || 0,
+      initiatedCount: userData.totalAds || 0,
+      walletBalance: userData.walletBalance || 0,
+      totalDeposits,
       lastUpdated: new Date().toISOString(),
     });
   } catch (err) {
