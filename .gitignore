@@ -14,24 +14,29 @@ firebase-service-account.json
 dist/
 dist-*
 
+# E2E test screenshots
+e2e-E2E_*/
+
 # Agent temporary scripts
 /*.js
 !eslint.config.js
 !vite.config.js
 !tailwind.config.js
 !postcss.config.js
-fix*
-patch*
-refactor*
-revert*
-rewrite*
-run_debug*
-test_flow*
-ts_nocheck*
-fund_wallet*
-remove_wildcards*
-copy_sections*
-script*
+/script*
+script_*
+temp_*
+fix_*
+patch_*
+refactor_*
+revert_*
+rewrite_*
+run_debug_*
+test_flow_*
+ts_nocheck_*
+fund_wallet_*
+remove_wildcards_*
+copy_sections_*
 b.*
 p.*
 r.*

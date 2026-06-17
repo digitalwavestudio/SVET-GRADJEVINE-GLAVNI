@@ -623,6 +623,9 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     },
     onSettled: () => {
       setIsSubmitting(false);
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: dashboardKeys.myAds.user(user.id) });
+      }
     }
   });
 
