@@ -200,7 +200,7 @@ export class VerificationService {
 
       if (result && result.outboxDocId && result.outboxPayload) {
         import("./cache.service.ts").then(({ CacheService }) => {
-          CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000).catch(console.error);
+          CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000).catch((err) => VerificationService.logger.warn("[Verification] Failed to set outbox cache flag:", err));
         }).catch(err => VerificationService.logger.warn('[Verification] Cache import error:', err));
         import("./queue.service.ts").then(
           ({ QueueService, JobType, JobPriority }) => {

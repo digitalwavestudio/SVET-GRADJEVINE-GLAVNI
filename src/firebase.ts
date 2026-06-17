@@ -29,6 +29,6 @@ if (typeof window !== 'undefined') {
   (window as any).__firebase_auth = auth;
   import('firebase/auth').then(({ signInWithCustomToken }) => {
     (window as any).__signInWithCustomToken = signInWithCustomToken;
-  }).catch(console.error);
+  }).catch((err) => console.warn("[Firebase] Failed to load signInWithCustomToken", err));
 }
 

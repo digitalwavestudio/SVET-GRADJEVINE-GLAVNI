@@ -43,7 +43,7 @@ export const globalErrorHandler = (
           code: String(errCode || ""),
           url: req.originalUrl,
           method: req.method,
-        }).catch(console.error);
+        }).catch(e => LoggerService.warn("[CriticalAlert] Failed to notify quota exceeded:", e));
       }).catch(e => console.error("[CRITICAL-ALERT] Failed to load service during error", e));
     }
   } else if (err instanceof AppError && err.statusCode !== 429 && !isValidation) {

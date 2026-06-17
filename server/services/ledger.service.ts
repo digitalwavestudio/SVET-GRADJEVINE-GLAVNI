@@ -226,7 +226,7 @@ export class FinancialLedgerService {
     }
 
     const transactionsSnap = await db.collection("transactions")
-      .where("uid", "==", uid)
+      .where("userId", "==", uid)
       .orderBy("createdAt", "asc")
       .get();
 

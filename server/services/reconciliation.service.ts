@@ -259,8 +259,8 @@ export class ReconciliationService {
     const modifiedWalletIds = new Set<string>();
     recentTransactionsSnap.docs.forEach((doc) => {
       const txData = doc.data();
-      if (txData && txData.uid) {
-        modifiedWalletIds.add(txData.uid);
+      if (txData && txData.userId) {
+        modifiedWalletIds.add(txData.userId);
       }
     });
 
