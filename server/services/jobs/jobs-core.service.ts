@@ -274,8 +274,6 @@ export class JobsCoreService {
     // Invalidate job caches to show the new job immediately on listings view
     CacheService.invalidateByPrefix("public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("swr:public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("jobs_public").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("swr:jobs_public").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
@@ -422,8 +420,6 @@ export class JobsCoreService {
     // Invalidate job caches to show the updated job immediately on listings view
     CacheService.invalidateByPrefix("public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("swr:public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("jobs_public").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("swr:jobs_public").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
@@ -495,8 +491,6 @@ export class JobsCoreService {
     // Invalidate job caches to show the deleted job immediately on listings view
     CacheService.invalidateByPrefix("public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("swr:public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("jobs_public").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("swr:jobs_public").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
     CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));

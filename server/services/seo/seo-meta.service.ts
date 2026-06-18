@@ -113,9 +113,9 @@ export class SEOMetaService {
         const { getRedis } = await import("../../utils/redis.ts");
         const redis = getRedis();
         if (redis) {
-          await redis.set(deadPathKey, "1", "EX", 172800); // 48h in seconds
+          await redis.set(deadPathKey, "1", "EX", 3600); // 1h in seconds
         }
-        await CacheService.set(cacheKey, deadMeta, 172800000); // 48h negative cache shield
+        await CacheService.set(cacheKey, deadMeta, 3600000); // 1h negative cache shield
         return;
       }
 

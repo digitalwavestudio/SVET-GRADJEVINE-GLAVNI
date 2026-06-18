@@ -115,8 +115,8 @@ export const authMiddleware = async (
               resolvedPermissions = (userData?.permissions as string[]) || AuthorizationService.getDefaultPermissions(resolvedRole);
             }
             
-            // Keširamo u Redisu na 24 sata (24 * 60 * 60 * 1000 milisekundi)
-            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 24 * 60 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set user profile:", e));
+            // Keširamo u Redisu na 1 sat (60 * 60 * 1000 milisekundi)
+            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 60 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set user profile:", e));
           }
           
           // Upisujemo Custom Claims, tako da svaki SLEDEĆI token koji klijent pošalje već nosi role & permissions

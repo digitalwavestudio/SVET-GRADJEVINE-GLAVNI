@@ -83,7 +83,7 @@ export const botPrerenderMiddleware = async (
       if (cachedHtml) {
         if (DEV) console.info(`[SEO Bot L1 Cache] Serving cached HTML for bot on path ${req.path}`);
         res.setHeader("Content-Type", "text/html");
-        res.setHeader("Cache-Control", "public, max-age=172800"); // 48h
+        res.setHeader("Cache-Control", "public, max-age=3600"); // 48h
         res.setHeader("X-Prerender-Cache-Hit", "L1-Redis");
         return res.send(cachedHtml);
       }
@@ -210,7 +210,7 @@ export const botPrerenderMiddleware = async (
         `[SEO] Serving Edge Pre-rendered HTML for BOT on ${req.path}`,
       );
       res.setHeader("Content-Type", "text/html");
-      res.setHeader("Cache-Control", "public, max-age=172800"); // 48h Cache Edge
+      res.setHeader("Cache-Control", "public, max-age=3600"); // 48h Cache Edge
       res.setHeader("X-Prerender-Hit", "true");
       res.setHeader("X-Edge-Cache", "Redis (48h)");
       return res.send(cachedHtml);
@@ -317,11 +317,11 @@ export const botPrerenderMiddleware = async (
       });
 
       // Cache it for the future
-      await redis.set(cacheKey, htmlContext, "EX", 172800); // Cache for 48 hours (SEO Stampede Protection)
-      await redis.set(`seo_render_cache:${req.path}`, htmlContext, "EX", 172800); // L1 Cache for Bot requests
+      await redis.set(cacheKey, htmlContext, "EX", 3600); // Cache for 48 hours (SEO Stampede Protection)
+      await redis.set(`seo_render_cache:${req.path}`, htmlContext, "EX", 3600); // L1 Cache for Bot requests
 
       res.setHeader("Content-Type", "text/html");
-      res.setHeader("Cache-Control", "public, max-age=172800");
+      res.setHeader("Cache-Control", "public, max-age=3600");
       res.setHeader("X-Prerender-Dynamic", "true");
       return res.send(htmlContext);
     }
@@ -340,10 +340,10 @@ export const botPrerenderMiddleware = async (
       isBotPayload: true,
     });
 
-    await redis.set(cacheKey, fallbackHtml, "EX", 172800); // Cache for 48 hours
-    await redis.set(`seo_render_cache:${req.path}`, fallbackHtml, "EX", 172800); // L1 Cache for Bot requests
+    await redis.set(cacheKey, fallbackHtml, "EX", 3600); // Cache for 48 hours
+    await redis.set(`seo_render_cache:${req.path}`, fallbackHtml, "EX", 3600); // L1 Cache for Bot requests
     res.setHeader("Content-Type", "text/html");
-    res.setHeader("Cache-Control", "public, max-age=172800");
+    res.setHeader("Cache-Control", "public, max-age=3600");
     return res.send(fallbackHtml);
   } catch (error) {
     console.error(
