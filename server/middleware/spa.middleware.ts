@@ -13,27 +13,86 @@ interface MatchedRoute {
   alwaysListing?: boolean;
 }
 
+const CITIES = [
+  "beograd", "novi-sad", "nis", "kragujevac", "subotica", "zrenjanin",
+  "pancevo", "smederevo", "cacak", "novi-pazar", "kraljevo", "sabac",
+  "uzice", "vranje", "valjevo", "leskovac", "krusevac", "zajecar",
+  "sombor", "pozarevac", "pirot", "bor", "srem", "backa", "banat",
+];
+
+// Map SEO route collection names to Firestore "listings" type discriminator
+const COLLECTION_TO_TYPE: Record<string, string> = {
+  jobs: "job",
+  machines: "machine",
+  companies: "company",
+  caterings: "catering",
+  accommodations: "accommodation",
+  plots: "plot",
+  marketplace: "marketplace",
+};
+
+function resolveFirestoreQuery(collectionName: string) {
+  const typeVal = COLLECTION_TO_TYPE[collectionName];
+  if (typeVal) {
+    return db.collection("listings").where("type", "==", typeVal);
+  }
+  return db.collection(collectionName);
+}
+
+// Each entity type uses a different field name for category/profession
+const COLLECTION_CATEGORY_FIELD: Record<string, string> = {
+  jobs: "professionSlug",
+  machines: "categorySlug",
+  marketplace: "categoryId",
+  accommodations: "typeSlug",
+  caterings: "categorySlug",
+  plots: "typeSlug",
+  companies: "mainCategories",
+  users: "professionSlug",
+};
+
+function resolveFirestoreDoc(collectionName: string, docId: string) {
+  if (collectionName === "users") {
+    return db.collection("users").doc(docId).get();
+  }
+  return db.collection("listings").doc(docId).get();
+}
+
 async function backgroundPreRenderListingHub(
   cacheKey: string,
   cachedIndexHtml: string,
   collectionName: string,
   matchedRoute: MatchedRoute,
   reqPath: string,
-  cacheTtl: number
-) {
+  cacheTtl: number,
+  categorySlug?: string,
+  citySlug?: string,
+  page: number = 1,
+): Promise<string | null> {
   const redis = getRedis();
-  if (!redis) return;
 
   try {
-    const latestDocs = await db
-      .collection(collectionName)
-      .orderBy("createdAt", "desc")
-      .limit(20)
-      .get();
+    let query: FirebaseFirestore.Query = resolveFirestoreQuery(collectionName).orderBy("createdAt", "desc");
+
+    const categoryField = COLLECTION_CATEGORY_FIELD[collectionName];
+    if (categorySlug && categoryField) {
+      if (categoryField === "mainCategories") {
+        query = query.where("mainCategories", "array-contains", categorySlug);
+      } else {
+        query = query.where(categoryField, "==", categorySlug);
+      }
+    }
+    if (citySlug) {
+      query = query.where("locationSlug", "==", citySlug);
+    }
+
+    const pageSize = 20;
+    const latestDocs = await query.limit(pageSize).offset((page - 1) * pageSize).get();
 
     let itemsHtml = "";
     const itemListElements: Record<string, unknown>[] = [];
     let idx = 1;
+    let latestCreatedAt: Date | null = null;
 
     latestDocs.forEach((doc) => {
       const data = doc.data();
@@ -52,6 +111,13 @@ async function backgroundPreRenderListingHub(
         position: idx++,
         url: canonicalUrl,
       });
+
+      if (!latestCreatedAt) {
+        const rawCreated = data.createdAt;
+        const rawUpdated = data.updatedAt;
+        const ts = rawCreated?.toDate ? rawCreated.toDate() : rawUpdated?.toDate ? rawUpdated.toDate() : null;
+        if (ts instanceof Date) latestCreatedAt = ts;
+      }
     });
 
     const itemListSchema = {
@@ -80,39 +146,83 @@ async function backgroundPreRenderListingHub(
              </aside>`;
     }
 
+    let label = matchedRoute.label;
+    if (categorySlug) label += ` - ${categorySlug.replace(/-/g, " ")}`;
+    if (citySlug) label += ` u ${citySlug.replace(/-/g, " ")}`;
+
+    const currentPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page}` : `${APP_CONFIG.BASE_URL}${reqPath}`;
+    const prevPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page - 1}` : null;
+    const nextPageUrl = latestDocs.size === pageSize ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page + 1}` : null;
+
+    let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
+    if (prevPageUrl) paginationLinks += `\n<link rel="prev" href="${prevPageUrl}" />`;
+    if (nextPageUrl) paginationLinks += `\n<link rel="next" href="${nextPageUrl}" />`;
+
     const botListHtml = `
           <main>
-             <h1>${matchedRoute.label}</h1>
-             <p>${matchedRoute.label} na portalu Svet GraÄ‘evine.</p>
+             <h1>${label}</h1>
+             <p>${label} na portalu Svet GraÄ‘evine. PronaÄ‘eno ${latestDocs.size} oglasa na strani ${page}.</p>
              <nav>
                <ul>
-                 ${itemsHtml}
+                 ${itemsHtml || "<li>Trenutno nema oglasa za ovu kategoriju.</li>"}
                </ul>
              </nav>
              ${hubLinks}
           </main>`;
 
-    const title = `${matchedRoute.label} | Svet GraÄ‘evine`;
-    const desc = `PretraÅ¾ite najveÄ‡u bazu za ${matchedRoute.label.toLowerCase()} na Balkanu. PronaÄ‘ite najbolje ponude i partnere.`;
+    const title = `${label} | Svet GraÄ‘evine`;
+    const desc = `${label} na portalu Svet GraÄ‘evine.`;
+
+    const baseUrl = APP_CONFIG.BASE_URL;
+    const bcPathParts = reqPath.split("/").filter(Boolean);
+    const hasCity = citySlug !== undefined;
+    const hasCategory = categorySlug !== undefined;
+
+    const bcItems = [
+      { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+    ];
+
+    if (hasCity || hasCategory) {
+      const listingSlug = bcPathParts[0] || "";
+      bcItems.push({
+        "@type": "ListItem", position: 2,
+        name: matchedRoute.label,
+        item: `${baseUrl}/${listingSlug}`,
+      });
+      if (hasCategory && hasCity) {
+        bcItems.push({
+          "@type": "ListItem", position: 3,
+          name: `${categorySlug!.replace(/-/g, " ")} u ${citySlug!.replace(/-/g, " ")}`,
+          item: `${baseUrl}${reqPath}`,
+        });
+      } else if (hasCity) {
+        bcItems.push({
+          "@type": "ListItem", position: 3,
+          name: citySlug!.replace(/-/g, " "),
+          item: `${baseUrl}${reqPath}`,
+        });
+      } else {
+        bcItems.push({
+          "@type": "ListItem", position: 3,
+          name: categorySlug!.replace(/-/g, " "),
+          item: `${baseUrl}${reqPath}`,
+        });
+      }
+    } else {
+      bcItems.push({
+        "@type": "ListItem", position: 2,
+        name: label,
+        item: `${baseUrl}${reqPath}`,
+      });
+    }
 
     const bc = {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "PoÄetna",
-          item: APP_CONFIG.BASE_URL,
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: matchedRoute.label,
-          item: `${APP_CONFIG.BASE_URL}${reqPath}`,
-        },
-      ],
+      itemListElement: bcItems,
     };
+
+    const lastmod = (latestCreatedAt || new Date()).toISOString().split("T")[0];
 
     let html = cachedIndexHtml;
     html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
@@ -120,7 +230,8 @@ async function backgroundPreRenderListingHub(
       "</head>",
       `
 <meta name="description" content="${desc}" />
-<link rel="canonical" href="${APP_CONFIG.BASE_URL}${reqPath}" />
+<meta name="lastmod" content="${lastmod}" />
+${paginationLinks}
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${desc}" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${reqPath}" />
@@ -134,9 +245,13 @@ ${jsonLdScript}
       `<div id="root">${botListHtml}</div>`,
     );
 
-    await redis.set(cacheKey, html, "EX", cacheTtl);
+    if (redis) {
+      await redis.set(cacheKey, html, "EX", cacheTtl);
+    }
+    return html;
   } catch (error) {
     console.error("[SPA-Background] Error caching listing hub:", error);
+    return null;
   }
 }
 
@@ -148,26 +263,29 @@ async function backgroundPreRenderDetailPage(
   reqPath: string,
   matchedRoute: MatchedRoute,
   cacheTtl: number
-) {
+): Promise<string | null> {
   const redis = getRedis();
-  if (!redis) return;
 
   try {
-    const adDoc = await db.collection(collectionName).doc(adId).get();
+    const adDoc = await resolveFirestoreDoc(collectionName, adId);
     if (!adDoc.exists) {
-      await redis.set(`blacklist_404:${adId}`, "1", "EX", 86400); // 24h blacklist
-      await redis.set(cacheKey, "404", "EX", 4 * 3600);
-      return;
+      if (redis) {
+        await redis.set(`blacklist_404:${adId}`, "1", "EX", 86400);
+        await redis.set(cacheKey, "404", "EX", 4 * 3600);
+      }
+      return null;
     }
 
     const adData = adDoc.data();
-    if (!adData) return;
+    if (!adData) return null;
     adData.id = adDoc.id;
 
     if (adData.status === "deleted" || adData.status === "inactive") {
-      await redis.set(`blacklist_404:${adId}`, "1", "EX", 86400); // 24h blacklist
-      await redis.set(cacheKey, "404", "EX", 4 * 3600);
-      return;
+      if (redis) {
+        await redis.set(`blacklist_404:${adId}`, "1", "EX", 86400);
+        await redis.set(cacheKey, "404", "EX", 4 * 3600);
+      }
+      return null;
     }
 
     const baseTitle = adData.title || adData.name || "Oglas";
@@ -301,6 +419,9 @@ async function backgroundPreRenderDetailPage(
       });
     }
 
+    const detailTs = adData.updatedAt?.toDate?.() || adData.createdAt?.toDate?.();
+    const lastmodDate = (detailTs instanceof Date ? detailTs : new Date()).toISOString().split("T")[0];
+
     let html = cachedIndexHtml;
     html = html.replace(
       /<title>.*?<\/title>/,
@@ -318,6 +439,7 @@ async function backgroundPreRenderDetailPage(
       "</head>",
       `
 <meta name="description" content="${desc}" />
+<meta name="lastmod" content="${lastmodDate}" />
 <link rel="canonical" href="${canonicalUrl}" />
 <link rel="preload" as="image" href="${image}" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -344,9 +466,13 @@ ${structuredDataHtml}
       );
     }
 
-    await redis.set(cacheKey, html, "EX", cacheTtl);
+    if (redis) {
+      await redis.set(cacheKey, html, "EX", cacheTtl);
+    }
+    return html;
   } catch (error) {
     console.error("[SPA-Background] Error caching detail page:", error);
+    return null;
   }
 }
 
@@ -380,7 +506,7 @@ export const createSpaMiddleware = () => {
       if (req.path.startsWith("/api")) {
         return res.status(404).json({ error: "Not Found" });
       }
-      const cacheKey = `seo:page:${req.path}`;
+      const cacheKey = `seo:page:${req.path}${req.query.page ? `?page=${req.query.page}` : ""}`;
       const now = Date.now();
 
       // Soft-404 Negative Cache Shield
@@ -533,12 +659,24 @@ export const createSpaMiddleware = () => {
         const collectionName = matchedRoute.coll;
         const fullId = req.path.split("/").pop() || "";
 
+        const pathSegments = req.path.split("/").filter(Boolean);
+        const lastSegment = pathSegments[pathSegments.length - 1] || "";
+
+        // Crawl explosion protection: paths with >3 segments get noindex
+        const isDeepPath = pathSegments.length > 3;
+        if (isDeepPath) {
+          res.setHeader("X-Robots-Tag", "noindex, nofollow");
+        }
+
         const isPseoRoute = !req.path.includes("~");
+
+        const isGeoPage = isPseoRoute && CITIES.includes(lastSegment);
 
         const isListingPage =
           matchedRoute.alwaysListing === true ||
           req.path === matchedRoute.path.slice(0, -1) ||
-          req.path === matchedRoute.path;
+          req.path === matchedRoute.path ||
+          isGeoPage;
 
         const userAgent = req.headers["user-agent"]?.toLowerCase() || "";
         const isBot =
@@ -546,52 +684,94 @@ export const createSpaMiddleware = () => {
             userAgent,
           );
 
+        let categorySlug: string | undefined;
+        let citySlug: string | undefined;
+
         if (isListingPage) {
-          const title = `${matchedRoute.label} | Svet GraÄ‘evine`;
-          const desc = `PretraÅ¾ite najveÄ‡u bazu za ${matchedRoute.label.toLowerCase()} na Balkanu. PronaÄ‘ite najbolje ponude i partnere.`;
-
-          // Breadcrumb for listing
-          const bc = {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "PoÄetna",
-                item: APP_CONFIG.BASE_URL,
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: matchedRoute.label,
-                item: `${APP_CONFIG.BASE_URL}${req.path}`,
-              },
-            ],
-          };
-
-          // Optimize out blocking Firestore query by running it asynchronously in background
           if (isBot && collectionName) {
             const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
-            backgroundPreRenderListingHub(cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL).catch(err => {
-              console.error("[SPA-Background] Error caching listing hub:", err);
-            });
+
+            // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
+            if (isGeoPage && pathSegments.length >= 2) {
+              citySlug = lastSegment;
+              if (pathSegments.length >= 3) {
+                categorySlug = pathSegments[pathSegments.length - 2];
+              }
+            } else if (pathSegments.length === 2 && isPseoRoute) {
+              categorySlug = pathSegments[1];
+            }
+
+            const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
+            const rendered = await backgroundPreRenderListingHub(
+              cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL,
+              categorySlug, citySlug, pageNum,
+            );
+            if (rendered) return res.send(rendered);
           }
 
+          // Build breadcrumb for geo pages with 3 levels
+          let label = matchedRoute.label;
+          let breadcrumbHtml = "";
+          const baseUrl = APP_CONFIG.BASE_URL;
+          if (isGeoPage) {
+            const readableCity = citySlug ? citySlug.replace(/-/g, " ") : lastSegment.replace(/-/g, " ");
+            const listingUrl = `${baseUrl}/${pathSegments[0]}`;
+            const currentUrl = `${baseUrl}${req.path}`;
+            if (categorySlug) {
+              const readableCategory = categorySlug.replace(/-/g, " ");
+              label = `${matchedRoute.label} - ${readableCategory} u ${readableCity}`;
+              breadcrumbHtml = `<script type="application/ld+json">${JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+                  { "@type": "ListItem", position: 2, name: matchedRoute.label, item: listingUrl },
+                  { "@type": "ListItem", position: 3, name: `${readableCategory} u ${readableCity}`, item: currentUrl },
+                ],
+              })}</script>`;
+            } else {
+              label = `${matchedRoute.label} u ${readableCity}`;
+              breadcrumbHtml = `<script type="application/ld+json">${JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+                  { "@type": "ListItem", position: 2, name: matchedRoute.label, item: listingUrl },
+                  { "@type": "ListItem", position: 3, name: readableCity, item: currentUrl },
+                ],
+              })}</script>`;
+            }
+          } else {
+            breadcrumbHtml = `<script type="application/ld+json">${JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+                { "@type": "ListItem", position: 2, name: matchedRoute.label, item: `${baseUrl}${req.path}` },
+              ],
+            })}</script>`;
+          }
+
+          const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
+          const currentPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${req.path}?page=${pageNum}` : `${APP_CONFIG.BASE_URL}${req.path}`;
+          const prevPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${req.path}?page=${pageNum - 1}` : null;
+          let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
+          if (prevPageUrl) paginationLinks += `\n<link rel="prev" href="${prevPageUrl}" />`;
+
+          const lastmod = new Date().toISOString().split("T")[0];
+
+          // Fallback skeleton for non-bot or if pre-render fails
           let skeletonHtml = html;
-          skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
+          skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${label} | Svet GraÄ‘evine</title>`);
           skeletonHtml = skeletonHtml.replace(
             "</head>",
             `
-<meta name="description" content="${desc}" />
-<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />
-<meta property="og:title" content="${title}" />
-<meta property="og:description" content="${desc}" />
-<meta property="og:url" content="${APP_CONFIG.BASE_URL}${req.path}" />
-<script type="application/ld+json">${JSON.stringify(bc)}</script>
+<meta name="description" content="${label} na portalu Svet GraÄ‘evine." />
+<meta name="lastmod" content="${lastmod}" />
+${paginationLinks}
+${breadcrumbHtml}
 </head>`,
           );
-
           return res.send(skeletonHtml);
         }
 
@@ -619,6 +799,8 @@ export const createSpaMiddleware = () => {
           const canonicalUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
           const defaultImage = "https://svetgradjevine.com/og-default.jpg";
 
+          const detailLastmod = new Date().toISOString().split("T")[0];
+
           let skeletonHtml = html;
           skeletonHtml = skeletonHtml.replace(
             /<title>.*?<\/title>/,
@@ -629,6 +811,7 @@ export const createSpaMiddleware = () => {
             "</head>",
             `
 <meta name="description" content="${desc}" />
+<meta name="lastmod" content="${detailLastmod}" />
 <link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${desc}" />
@@ -638,11 +821,10 @@ export const createSpaMiddleware = () => {
 </head>`,
           );
 
-          // Trigger asynchronous background cache refresh for this dynamic page
+          // Pre-render detail page synchronously for bots so first request gets real data
           const indexHtmlForDetailBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
-          backgroundPreRenderDetailPage(cacheKey, indexHtmlForDetailBg, collectionName, adId, req.path, matchedRoute, CACHE_TTL).catch((err) => {
-            console.error("[SPA] Error pre-rendering detail page in background:", err);
-          });
+          const rendered = await backgroundPreRenderDetailPage(cacheKey, indexHtmlForDetailBg, collectionName, adId, req.path, matchedRoute, CACHE_TTL);
+          if (rendered) return res.send(rendered);
 
           return res.send(skeletonHtml);
         }

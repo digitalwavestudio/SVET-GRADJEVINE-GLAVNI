@@ -83,11 +83,16 @@ export class SEOMetaService {
       };
 
       const collectionName = typeToCollection[baseEntity] || baseEntity;
+
+      // All listing data is in "listings" collection; "users" is a separate real collection
+      const firestoreRef = collectionName === "users"
+        ? db.collection("users").doc(rawId)
+        : db.collection("listings").doc(rawId);
       
       const cachedDoc = await CacheService.getOrSet<{ exists: boolean; data: SEOEntityData | null }>(
         `seo_meta:${collectionName}:${rawId}`,
         async () => {
-          const doc = await db.collection(collectionName).doc(rawId).get();
+          const doc = await firestoreRef.get();
           return {
             exists: doc.exists,
             data: doc.exists ? doc.data() as SEOEntityData : null

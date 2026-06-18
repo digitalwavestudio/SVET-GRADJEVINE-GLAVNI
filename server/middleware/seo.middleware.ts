@@ -3,7 +3,7 @@ import { APP_CONFIG } from "../../src/constants/config.ts";
 import { env } from "../config/env.ts";
 import { getRedis } from "../utils/redis.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
-import { MatrixRouter } from "../services/matrix-router.service.ts";
+
 import { eventBus } from "../events/event-bus.ts";
 import { SEORenderEngine, SEOMetaData } from "../services/seo/seo-render-engine.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
@@ -316,50 +316,9 @@ export const botPrerenderMiddleware = async (
       }
     }
 
-    // 2. Fallback: Dynamically generate the payload on the fly without React
-    if (meta && !meta.isDead) {
-      if (DEV) console.info(
-        `[SEO] Dynamically generating SEO payload for BOT on ${req.path}`,
-      );
-
-      const htmlContext = await SEORenderEngine.assembleHtml({
-        reqPath: req.path,
-        host: req.get("host") || "svetgradjevine.com",
-        meta: meta as unknown as SEOMetaData,
-        pageNum,
-        paginationTags,
-        isBotPayload: true,
-      });
-
-      // Cache it for the future
-      await redis.set(cacheKey, htmlContext, "EX", 3600); // Cache for 48 hours (SEO Stampede Protection)
-      await redis.set(`seo_render_cache:${req.path}`, htmlContext, "EX", 3600); // L1 Cache for Bot requests
-
-      res.setHeader("Content-Type", "text/html");
-      res.setHeader("Cache-Control", "public, max-age=3600");
-      res.setHeader("X-Prerender-Dynamic", "true");
-      return res.send(htmlContext);
-    }
-
-    // Fallback: If no dynamic entity meta is found, STILL inject Canonical & Pagination for Hub Pages
-    // 7.1 Entity Knowledge Graph & Skalabilni P-SEO Hub Routing
-    const isIndexable = await MatrixRouter.evaluateHubIndexability(req.path);
-
-    const fallbackHtml = await SEORenderEngine.assembleHtml({
-      reqPath: req.path,
-      host: req.get("host") || "svetgradjevine.com",
-      meta: null,
-      pageNum,
-      paginationTags,
-      indexable: isIndexable,
-      isBotPayload: true,
-    });
-
-    await redis.set(cacheKey, fallbackHtml, "EX", 3600); // Cache for 48 hours
-    await redis.set(`seo_render_cache:${req.path}`, fallbackHtml, "EX", 3600); // L1 Cache for Bot requests
-    res.setHeader("Content-Type", "text/html");
-    res.setHeader("Cache-Control", "public, max-age=3600");
-    return res.send(fallbackHtml);
+    // Pass through to createSpaMiddleware which handles ALL pre-rendering
+    // (listings, geo hubs, detail pages) with richer HTML output.
+    return next();
   } catch (error) {
     console.error(
       `[SEO] Error fetching prerender from Redis for ${req.path}`,
