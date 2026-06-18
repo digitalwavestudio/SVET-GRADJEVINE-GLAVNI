@@ -1,25 +1,25 @@
 import { parseGlobalSearch, GlobalSearchIntent } from '@/src/services/aiService';
 import { withRetry } from '@/src/lib/retry';
-import { 
-  Job, 
-  CateringOffer, 
-  RealEstatePlot, 
-  Machine, 
-  Accommodation, 
-  Company, 
-  Master, 
-  MarketplaceItem 
+import {
+  Job,
+  CateringOffer,
+  RealEstatePlot,
+  Machine,
+  Accommodation,
+  Company,
+  Master,
+  MarketplaceItem
 } from '@svet-gradjevine/shared';
 import { algoliaSearch, AlgoliaFilters } from '../../../services/algoliaFrontendService';
 
-export type UnifiedSearchEntity = 
-  | Job 
-  | CateringOffer 
-  | RealEstatePlot 
-  | Machine 
-  | Accommodation 
-  | Company 
-  | Master 
+export type UnifiedSearchEntity =
+  | Job
+  | CateringOffer
+  | RealEstatePlot
+  | Machine
+  | Accommodation
+  | Company
+  | Master
   | MarketplaceItem;
 
 export interface SearchResult {
@@ -33,6 +33,8 @@ export interface SearchResult {
   data: UnifiedSearchEntity;
 }
 
+const CATEGORIES = ["jobs", "accommodations", "catering", "companies", "machines", "marketplace", "plots", "masters"] as const;
+
 export const unifiedSearchService = {
   /**
    * Performs an intelligent global search across all active categories.
@@ -40,17 +42,33 @@ export const unifiedSearchService = {
   async search(queryString: string, forcedCategory?: string): Promise<{ results: SearchResult[], aiIntent: GlobalSearchIntent | null }> {
     try {
       const aiIntent = await parseGlobalSearch(queryString);
-      
+
       if (!aiIntent) {
         return { results: [], aiIntent: null };
       }
 
-      // If category is recognized, search specifically in that collection
-      // Otherwise, we could search across all, but let's prioritize the recognized one or marketplace
-      const categoryToSearch = forcedCategory || aiIntent.category || 'marketplace';
-      const results = await unifiedSearchService.executeStructuredSearch(categoryToSearch, aiIntent);
+      // If AI recognized a category, search only that one. Otherwise search all categories.
+      const categoryToSearch = forcedCategory || aiIntent.category;
 
-      return { results, aiIntent };
+      if (categoryToSearch) {
+        const results = await unifiedSearchService.executeStructuredSearch(categoryToSearch, aiIntent);
+        return { results, aiIntent };
+      }
+
+      // AI failed to recognize category - search all categories, merge by type priority
+      const allResults: SearchResult[] = [];
+      const seenIds = new Set<string>();
+      for (const cat of CATEGORIES) {
+        const results = await unifiedSearchService.executeStructuredSearch(cat, aiIntent);
+        for (const r of results) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id);
+            allResults.push(r);
+          }
+        }
+        if (allResults.length >= 50) break;
+      }
+      return { results: allResults, aiIntent };
     } catch (error) {
        console.error("Unified Search Error:", error);
        return { results: [], aiIntent: null };

@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { DashboardLayout } from '@/src/modules/core';
 import LoadingState from '@/src/components/LoadingState';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSearch } from '@/src/modules/search/hooks/useSearch';
 import NoResults from '@/src/components/ui/NoResults';
-import { VirtuosoGrid } from 'react-virtuoso';
 import { useFavoriteIds } from '@/src/modules/dashboard/hooks/useFavorites';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 
@@ -108,58 +106,63 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col h-[calc(100vh-100px)]">
-        <div className="mb-12 shrink-0">
-          <h1 className="text-4xl font-black text-white mb-4">Rezultati pretrage</h1>
-          <p className="text-white/60">
-            Prikazujemo rezultate za: <span className="text-[#ffad3a] font-bold">"{query}"</span>
-          </p>
-          
-          {aiIntent && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-4 bg-white/5 rounded-[10px] border border-white/10 flex items-center gap-4"
-            >
-              <div className="w-10 h-10 bg-[#ffad3a]/20 rounded-full flex items-center justify-center text-[#ffad3a]">
-                <span className="material-symbols-outlined">psychology</span>
-              </div>
-              <div>
-                <p className="text-sm text-white/80">
-                  AI je prepoznao: 
-                  <span className="ml-2 px-2 py-1 bg-white/10 rounded-[10px] text-xs uppercase font-bold text-[#ffad3a]">
-                    {aiIntent.category || 'Globalna pretraga'}
-                  </span>
-                  {aiIntent.locationSlug && (
-                    <span className="ml-2 px-2 py-1 bg-white/10 rounded-[10px] text-xs uppercase font-bold text-emerald-400">
-                      Lokacija: {aiIntent.locationSlug}
-                    </span>
-                  )}
-                </p>
-              </div>
-            </motion.div>
-          )}
+    <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col min-h-screen">
+      <div className="mb-12 shrink-0">
+        <div className="flex items-center gap-3 mb-4">
+          <Link to="/" className="text-white/40 hover:text-white transition-colors">
+            <span className="material-symbols-outlined">home</span>
+          </Link>
+          <span className="text-white/20">/</span>
+          <span className="text-white/60">Pretraga</span>
         </div>
-
-        {loading ? (
-          <div className="flex-1 overflow-hidden">
-             <LoadingState count={6} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" />
-          </div>
-        ) : (
-          <div className="flex-1 min-h-0">
-             {results.length > 0 ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 overflow-auto h-full">
-                 {results.map((res: SearchResult, index: number) => (
-                   <Item key={res.id || index} res={res} />
-                 ))}
-               </div>
-            ) : (
-              <NoResults />
-            )}
-          </div>
+        <h1 className="text-4xl font-black text-white mb-4">Rezultati pretrage</h1>
+        <p className="text-white/60">
+          Prikazujemo rezultate za: <span className="text-[#ffad3a] font-bold">"{query}"</span>
+        </p>
+        
+        {aiIntent && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 p-4 bg-white/5 rounded-[10px] border border-white/10 flex items-center gap-4"
+          >
+            <div className="w-10 h-10 bg-[#ffad3a]/20 rounded-full flex items-center justify-center text-[#ffad3a]">
+              <span className="material-symbols-outlined">psychology</span>
+            </div>
+            <div>
+              <p className="text-sm text-white/80">
+                AI je prepoznao: 
+                <span className="ml-2 px-2 py-1 bg-white/10 rounded-[10px] text-xs uppercase font-bold text-[#ffad3a]">
+                  {aiIntent.category || 'Globalna pretraga'}
+                </span>
+                {aiIntent.locationSlug && (
+                  <span className="ml-2 px-2 py-1 bg-white/10 rounded-[10px] text-xs uppercase font-bold text-emerald-400">
+                    Lokacija: {aiIntent.locationSlug}
+                  </span>
+                )}
+              </p>
+            </div>
+          </motion.div>
         )}
       </div>
-    </DashboardLayout>
+
+      {loading ? (
+        <div className="flex-1 overflow-hidden">
+           <LoadingState count={6} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" />
+        </div>
+      ) : (
+        <div className="flex-1 min-h-0">
+           {results.length > 0 ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 overflow-auto h-full">
+               {results.map((res: SearchResult, index: number) => (
+                 <Item key={res.id || index} res={res} />
+               ))}
+             </div>
+          ) : (
+            <NoResults />
+          )}
+        </div>
+      )}
+    </div>
   );
 }
