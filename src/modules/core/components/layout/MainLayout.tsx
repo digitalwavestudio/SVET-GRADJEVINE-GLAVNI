@@ -12,7 +12,7 @@ export function MainLayout() {
       <SignupBanner />
       <Navbar />
         <StickySearchHeader />
-      <main className="flex-1 flex flex-col relative pb-16 md:pb-0">
+      <main className="flex-1 flex flex-col relative pb-24 md:pb-0">
         <Outlet />
       </main>
       <Footer />
