@@ -60,7 +60,7 @@ export default function JobDetailsPage() {
   const actualId = id ? extractJobId(id) : '';
   const { data: jobDataResult, isLoading: loading, isError } = useJobDetails(actualId);
   const jobData = jobDataResult as any;
-  const { updateJob, applyToJob } = useJobMutations();
+  const { updateJob, deleteJob, applyToJob } = useJobMutations();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -232,7 +232,7 @@ export default function JobDetailsPage() {
       />
 
       {user?.isAdmin && (
-        <AdminCommandCenter jobData={jobData} updateJob={updateJob} />
+        <AdminCommandCenter jobData={jobData} deleteJob={deleteJob} />
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">

@@ -1,14 +1,13 @@
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, CheckCircle2 } from 'lucide-react';
-import { JobResponse } from '@/src/modules/jobs/types/models';
+import { XCircle, Trash2 } from 'lucide-react';
 
 interface AdminCommandCenterProps {
   jobData: any;
-  updateJob: (params: { id: string; updates: any }) => Promise<any>;
+  deleteJob: (id: string) => Promise<any>;
 }
 
-export default function AdminCommandCenter({ jobData, updateJob }: AdminCommandCenterProps) {
+export default function AdminCommandCenter({ jobData, deleteJob }: AdminCommandCenterProps) {
   const navigate = useNavigate();
 
   return (
@@ -19,8 +18,8 @@ export default function AdminCommandCenter({ jobData, updateJob }: AdminCommandC
       <div className="max-w-7xl mx-auto px-8 relative z-10">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 bg-white/5 p-10 rounded-[10px] border border-white/10 backdrop-blur-3xl shadow-2xl">
           <div className="flex items-center gap-8">
-            <div className="w-20 h-20 rounded-[10px] bg-red-500/20 flex items-center justify-center text-red-500 border border-red-500/20 animate-pulse">
-              <Zap size={32} />
+            <div className="w-20 h-20 rounded-[10px] bg-red-500/20 flex items-center justify-center text-red-500 border border-red-500/20">
+              <Trash2 size={32} />
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
@@ -40,51 +39,28 @@ export default function AdminCommandCenter({ jobData, updateJob }: AdminCommandC
           </div>
 
           <div className="flex items-center gap-4">
-            {jobData.status === 'pending' && (
-              <>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={async () => {
-                    if (confirm('Odobriti oglas?')) {
-                      await updateJob({ id: jobData.id, updates: { status: 'active' } });
-                      alert('Oglas je sada aktivan.');
-                    }
-                  }}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 h-16 px-10 rounded-[10px] text-sm font-black uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/20 flex items-center gap-3"
-                >
-                  <CheckCircle2 size={18} />
-                  ODOBRI OGLAS
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={async () => {
-                    const reason = prompt('Razlog odbijanja oglas:');
-                    if (reason !== null) {
-                      await updateJob({ id: jobData.id, updates: { status: 'rejected', rejectionReason: reason } as Partial<JobResponse> & { rejectionReason: string } });
-                      alert('Oglas je odbijen.');
-                      navigate('/admin');
-                    }
-                  }}
-                  className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 h-16 px-10 rounded-[10px] text-sm font-black uppercase tracking-widest transition-all flex items-center gap-3"
-                >
-                  ODBIJ OGLAS
-                </motion.button>
-              </>
-            )}
-            {jobData.status === 'active' && (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => updateJob({ id: jobData.id, updates: { status: 'pending' } })}
-                className="bg-white/5 hover:bg-white/10 text-white border border-white/10 h-16 px-10 rounded-[10px] text-sm font-black uppercase tracking-widest transition-all"
-              >
-                VRATI NA ČEKANJE
-              </motion.button>
-            )}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={async () => {
+                if (confirm('Da li ste sigurni da želite da uklonite ovaj oglas? Ova radnja je nepovratna.')) {
+                  try {
+                    await deleteJob(jobData.id);
+                    alert('Oglas je uklonjen.');
+                    navigate('/poslovi');
+                  } catch {
+                    alert('Greška pri uklanjanju oglasa.');
+                  }
+                }
+              }}
+              className="bg-red-500 hover:bg-red-400 text-white h-16 px-10 rounded-[10px] text-sm font-black uppercase tracking-widest transition-all shadow-xl shadow-red-500/20 flex items-center gap-3"
+            >
+              <XCircle size={18} />
+              UKLONI OGLAS
+            </motion.button>
             <div className="w-px h-12 bg-white/10 mx-2" />
-            <button onClick={() => navigate('/admin')} className="text-xs font-black text-white/50 hover:text-white uppercase tracking-[0.2em] transition-colors">
-              Zatvori
+            <button onClick={() => navigate(-1)} className="text-xs font-black text-white/50 hover:text-white uppercase tracking-[0.2em] transition-colors">
+              Nazad
             </button>
           </div>
         </div>

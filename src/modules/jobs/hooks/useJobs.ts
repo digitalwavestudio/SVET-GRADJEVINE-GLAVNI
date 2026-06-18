@@ -310,6 +310,14 @@ export function useJobMutations() {
     },
   });
 
+  const deleteJob = useMutation<void, Error, string>({
+    mutationFn: (id: string) => jobsService.deleteJob(id),
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: queryKeys.jobs.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
+    },
+  });
+
   const incrementViews = useMutation<void, Error, string>({
     mutationFn: (id: string) => jobsService.incrementViews(id),
   });
@@ -436,6 +444,7 @@ export function useJobMutations() {
 
   return {
     updateJob: updateJob.mutateAsync,
+    deleteJob: deleteJob.mutateAsync,
     incrementViews: incrementViews.mutateAsync,
     applyToJob: applyToJob.mutateAsync,
     updateApplicationStatus: updateApplicationStatus.mutateAsync,
