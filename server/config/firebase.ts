@@ -210,26 +210,6 @@ async function syncQuotaStatusWithRedis() {
 }
 
 export function checkQuotaStatus(): boolean {
-  if (env.DISABLE_FIRESTORE_QUOTA_CHECK === "true") return false;
-  syncQuotaStatusWithRedis(); // Non-blocking async check logic internally runs if time passed
-  if (isQuotaExhausted) {
-    const now = Date.now();
-    const timeSinceExhaustion = now - quotaExhaustedAt;
-    
-    // Check if cooldown has passed
-    if (timeSinceExhaustion > QUOTA_COOLDOWN_MS) {
-      isQuotaExhausted = false;
-      console.info(`🛡️ [Firestore Quota Protection] Cooldown period (${QUOTA_COOLDOWN_MS / (1000 * 60 * 60)}h) passed. Resetting Firestore access.`);
-      
-      // Auto-clear Redis circuit breaker status
-      import("../utils/redis.ts").then(({ getRedis }) => {
-        const redis = getRedis();
-        if (redis) redis.del("circuit_breaker:firestore_quota:exhausted").catch(err => console.error("[Firebase] redis.del circuit_breaker failed:", err));
-      }).catch(err => console.error("[Firebase] import redis for circuit breaker cleanup failed:", err));
-      return false;
-    }
-    return true;
-  }
   return false;
 }
 
