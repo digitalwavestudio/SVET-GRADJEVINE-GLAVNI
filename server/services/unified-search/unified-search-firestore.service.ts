@@ -432,6 +432,7 @@ export class UnifiedSearchFirestore {
       "comp",
       "salary",
       "logo",
+      "description",
     );
 
     try {

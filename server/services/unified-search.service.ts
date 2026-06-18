@@ -176,7 +176,7 @@ export class UnifiedSearchService {
           lastVisibleId
         );
 
-        if (algoliaResult) {
+        if (algoliaResult && algoliaResult.docs && algoliaResult.docs.length > 0) {
           return algoliaResult;
         }
 
