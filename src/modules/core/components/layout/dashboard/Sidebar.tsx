@@ -118,6 +118,7 @@ export const Sidebar = memo(({
               key={item.path}
               to={item.path}
               onMouseEnter={() => handlePrefetch(item.path)}
+              onClick={() => setIsMobileMenuOpen(false)}
               className={linkClassName}
             >
               <span className={`material-symbols-outlined text-xl ${isNadzorniCentar ? 'text-white' : isActive ? 'text-slate-950' : 'opacity-60 group-hover:opacity-100'}`}>
@@ -138,13 +139,14 @@ export const Sidebar = memo(({
       <div className="p-6 border-t border-white/5 space-y-2">
         <Link
           to="/podesavanja"
+          onClick={() => setIsMobileMenuOpen(false)}
           className="flex items-center gap-3 px-4 py-3 rounded-[10px] text-white/50 hover:text-white hover:bg-white/5 transition-all group"
         >
           <span className="material-symbols-outlined text-xl opacity-60 group-hover:opacity-100">settings</span>
           <span className="text-[11px] font-black tracking-[0.1em] uppercase">PODEŠAVANJA</span>
         </Link>
         <button
-          onClick={logoutAndRedirect}
+          onClick={() => { setIsMobileMenuOpen(false); logoutAndRedirect(); }}
           className="flex items-center gap-3 px-4 py-3 rounded-[10px] text-white/50 hover:text-error hover:bg-error/5 transition-all group w-full text-left"
         >
           <span className="material-symbols-outlined text-xl opacity-60 group-hover:opacity-100">logout</span>
