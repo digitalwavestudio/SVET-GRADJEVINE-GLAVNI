@@ -77,15 +77,3 @@ export const getAutoTitle = (formData: Record<string, any>, selectedCategory: st
   return "Novi Oglas";
 };
 
-export const ROLE_PERMISSIONS: Record<string, string[]> = {
-  standard: ["accommodation", "marketplace", "plot"],
-  majstor: ["accommodation", "marketplace"],
-  poslodavac: ["job", "company", "accommodation", "catering", "machines", "plot", "marketplace"],
-  smestaj: ["accommodation"],
-  ketering: ["catering"],
-  placevi: ["plot"],
-  masine: ["machines"],
-  marketplace: ["marketplace"],
-  partner: [],
-  admin: ["job", "company", "accommodation", "catering", "machines", "plot", "marketplace"],
-};

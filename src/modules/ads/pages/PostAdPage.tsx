@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Step1 } from "@/src/modules/ads/components/post-ad/Step1";
 import { Step2 } from "@/src/modules/ads/components/post-ad/Step2";
 import { Step3 } from "@/src/modules/ads/components/post-ad/Step3";
@@ -14,7 +14,6 @@ import { usePlatformSettings } from "@/src/modules/dashboard/hooks/useMyAds";
 import { SuccessState } from "@/src/modules/ads/components/post-ad/SuccessState";
 import { CategorySelector } from "@/src/modules/ads/components/post-ad/CategorySelector";
 import { AdOverlays } from "@/src/modules/ads/components/post-ad/AdOverlays";
-import { AccessRestricted } from "@/src/modules/ads/components/post-ad/AccessRestricted";
 import {
   jobSchema as jobSchema,
   machineSchema as machineSchema,
@@ -24,7 +23,7 @@ import {
   marketplaceSchema as marketplaceSchema,
   businessProfileSchema as companySchema,
 } from "@svet-gradjevine/shared";
-import { getAutoTitle, ROLE_PERMISSIONS } from "@/src/modules/ads/utils/adUtils";
+import { getAutoTitle } from "@/src/modules/ads/utils/adUtils";
 
 const getValidationSchema = (category: string | null) => {
   switch (category) {
@@ -47,23 +46,8 @@ const getValidationSchema = (category: string | null) => {
   }
 };
 
-import { RoleGuard } from "@/src/components/auth/RoleGuard";
-
-// ... previous helper code ...
-
 export default function PostAdPage() {
-  const allowedRoles = Object.keys(ROLE_PERMISSIONS).filter(role => ROLE_PERMISSIONS[role].length > 0);
-  
-  return (
-    <RoleGuard allowedRoles={allowedRoles}>
-      <PostAdContent />
-    </RoleGuard>
-  );
-}
-
-function PostAdContent() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { logoUrl } = useBrandLogo();
   const { user } = useAuth();
   const { data: settings } = usePlatformSettings();
@@ -100,7 +84,6 @@ function PostAdContent() {
 
   if (!user) return null;
 
-  const allowedCategories = ROLE_PERMISSIONS[user.role] || [];
   const autoTitle = getAutoTitle(formData, selectedCategory, user);
 
   if (isSubmitted) {
@@ -132,17 +115,9 @@ function PostAdContent() {
       { id: "marketplace", title: "Alat i oprema (Polovno)", subtitle: "POLOVAN ALAT I OPREMA", icon: "build" },
     ];
 
-    const options = allOptions.filter((opt) =>
-      allowedCategories.includes(opt.id)
-    );
-
-    if (options.length === 0) {
-      return <AccessRestricted userRole={user.role} />;
-    }
-
     return (
       <CategorySelector
-        options={options}
+        options={allOptions}
         selectedCategory={selectedCategory}
         onSelect={setSelectedCategory}
         logoUrl={logoUrl || undefined}
