@@ -20,39 +20,18 @@ let _googleProvider: GoogleAuthProvider | null = null;
 
 try {
   const cfg = readConfig();
-  if (cfg.apiKey && cfg.projectId) {
-    _app = getApps().length === 0 ? initializeApp(cfg) : getApp();
-    _auth = getAuth(_app);
-    _db = getFirestore(_app);
-    _googleProvider = new GoogleAuthProvider();
-  }
+  _app = getApps().length === 0 ? initializeApp(cfg) : getApp();
+  _auth = getAuth(_app);
+  _db = getFirestore(_app);
+  _googleProvider = new GoogleAuthProvider();
 } catch (err) {
   console.warn('[FIREBASE] init failed:', err);
 }
 
-export const app = _app!;
 export const auth = _auth!;
 export const db = _db!;
 export const googleProvider = _googleProvider!;
 
 export function getAuthSafe(): Auth | null { return _auth; }
 export function getFirestoreSafe(): Firestore | null { return _db; }
-export function getGoogleProviderSafe(): GoogleAuthProvider | null { return _googleProvider; }
-export function isFirebaseAvailable(): boolean { return !!_app; }
-export function getAppSafe(): FirebaseApp | null { return _app; }
-export function ensureFirebase() {
-  return { app: _app, auth: _auth, db: _db, googleProvider: _googleProvider };
-}
-
-export default {
-  getAuthSafe,
-  getFirestoreSafe,
-  getGoogleProviderSafe,
-  isFirebaseAvailable,
-  getAppSafe,
-  ensureFirebase,
-  auth,
-  db,
-  googleProvider,
-  app,
-};
+export { getAuth, onAuthStateChanged, onIdTokenChanged, signOut } from 'firebase/auth';
