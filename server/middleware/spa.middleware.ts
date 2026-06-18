@@ -433,6 +433,13 @@ export const createSpaMiddleware = () => {
           path.join(distPath, "index.html"),
           "utf-8",
         );
+        // Apply runtime env replacements for %VITE_*% placeholders
+        cachedIndexHtml = cachedIndexHtml
+          .replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+          .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+          .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+          .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+          .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
       }
       let html = cachedIndexHtml;
 

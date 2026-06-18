@@ -275,31 +275,8 @@ async function startServer() {
         } catch (e) { next(e); }
       });
     } else {
-      const distPath = path.join(process.cwd(), "dist");
-      app.use(express.static(distPath));
-      
-      let cachedHtml: string | null = null;
-      app.use((req, res) => {
-        if (req.url.startsWith("/api")) return res.status(404).json({ error: "Not Found" });
-        
-        try {
-          if (!cachedHtml) {
-            cachedHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
-          }
-          
-          let html = cachedHtml;
-          html = html.replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "");
-          html = html.replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "");
-          html = html.replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings");
-          html = html.replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "");
-          html = html.replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
-          
-          res.status(200).set({ "Content-Type": "text/html" }).end(html);
-        } catch (err) {
-          console.error("Failed to serve index.html with replacement:", err);
-          res.sendFile(path.join(distPath, "index.html"));
-        }
-      });
+      const { createSpaMiddleware } = await import("./server/middleware/spa.middleware.ts");
+      app.use(createSpaMiddleware());
     }
 
     Sentry.setupExpressErrorHandler(app);
