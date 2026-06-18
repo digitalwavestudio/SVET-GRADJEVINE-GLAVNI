@@ -40,6 +40,7 @@ export class JobsCoreService {
           "title",
           "price",
           "location",
+          "loc",
           "type",
           "status",
           "createdAt",
@@ -48,7 +49,9 @@ export class JobsCoreService {
           "isUrgent",
           "comp",
           "salary",
+          "sal",
           "logo",
+          "benefits",
         )
         .get();
 

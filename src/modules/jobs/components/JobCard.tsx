@@ -75,18 +75,18 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           </div>
 
           {/* Small Corner Logo */}
-          <div className="w-12 h-12 shrink-0 bg-white rounded-lg p-1 flex items-center justify-center border border-white/5 relative z-10 overflow-hidden shadow-sm">
+          <div className="w-9 h-9 shrink-0 bg-white rounded-lg p-1 flex items-center justify-center border border-white/5 relative z-10 overflow-hidden shadow-sm">
             {job.logo ? (
               <OptimizedImage
                 src={job.logo}
                 placeholder={job.logoPlaceholder}
                 alt="Logo"
                 className="w-full h-full object-contain aspect-square"
-                width={48}
-                height={48}
+                width={36}
+                height={36}
               />
             ) : (
-              <div className="w-full h-full bg-slate-950/5 rounded-md flex items-center justify-center text-slate-950 font-black text-sm">
+              <div className="w-full h-full bg-slate-950/5 rounded-md flex items-center justify-center text-slate-950 font-black text-xs">
                 {getInitials(job.comp)}
               </div>
             )}
@@ -100,7 +100,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">Mesto rada</span>
             <span itemProp="jobLocation" itemScope itemType="https://schema.org/Place" className="flex items-center gap-1 text-white/80 text-[10px] font-bold">
               <span className="material-symbols-outlined text-[12px] text-secondary" aria-hidden="true">location_on</span>
-              <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="addressLocality">{job.loc}</span></span>
+              <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="addressLocality">{job.loc || job.location}</span></span>
             </span>
           </div>
 
@@ -108,7 +108,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           <div className="text-right flex flex-col">
             <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">Plata / Satnica</span>
             <span className="text-secondary font-black text-sm font-mono leading-none">
-              {job.sal || 'Dogovor'}
+              {job.sal || job.salary || 'Dogovor'}
             </span>
           </div>
         </div>

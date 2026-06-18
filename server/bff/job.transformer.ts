@@ -6,9 +6,11 @@ export interface MobileJobResponse {
   title: string;
   comp: string;
   loc: string;
+  sal?: string;
   salary?: string;
   logo?: string;
   isUrgent?: boolean;
+  benefits?: string[];
 }
 
 export interface RawJobInput {
@@ -16,12 +18,15 @@ export interface RawJobInput {
   title?: string;
   comp?: string;
   loc?: string;
+  location?: string;
+  sal?: string | number | null;
   salary?: string | number | null;
   logo?: string;
   isUrgent?: boolean;
   photoURL?: string;
   coverImage?: string;
   images?: string[];
+  benefits?: string[];
   [key: string]: unknown;
 }
 
@@ -31,10 +36,12 @@ export class JobTransformer {
       id: job.id || "",
       title: job.title || "",
       comp: job.comp || "",
-      loc: job.loc || "",
-      salary: job.salary?.toString(),
+      loc: job.loc || job.location || "",
+      sal: job.sal?.toString() || job.salary?.toString() || "",
+      salary: job.salary?.toString() || job.sal?.toString() || "",
       logo: ImageTransformer.getOptimizedUrl(job.logo, "200x200"),
       isUrgent: job.isUrgent,
+      benefits: Array.isArray(job.benefits) ? job.benefits : [],
     };
   }
 

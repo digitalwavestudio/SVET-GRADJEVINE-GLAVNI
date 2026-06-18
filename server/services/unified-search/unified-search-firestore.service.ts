@@ -154,6 +154,7 @@ export class UnifiedSearchFirestore {
       "title",
       "price",
       "location",
+      "loc",
       "type",
       "status",
       "createdAt",
@@ -162,7 +163,9 @@ export class UnifiedSearchFirestore {
       "isUrgent",
       "comp",
       "salary",
+      "sal",
       "logo",
+      "benefits",
     );
 
     if (firestoreCursorId) {
@@ -423,6 +426,7 @@ export class UnifiedSearchFirestore {
       "title",
       "price",
       "location",
+      "loc",
       "type",
       "status",
       "createdAt",
@@ -431,9 +435,11 @@ export class UnifiedSearchFirestore {
       "isUrgent",
       "comp",
       "salary",
+      "sal",
       "logo",
       "description",
       "name",
+      "benefits",
     );
 
     try {
