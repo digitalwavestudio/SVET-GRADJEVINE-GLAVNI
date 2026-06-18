@@ -335,11 +335,6 @@ useEffect(() => {
 }, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
-      const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-      if (isMobile) {
-        signInWithRedirect(auth, googleProvider).catch(console.error);
-        return;
-      }
       try {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
