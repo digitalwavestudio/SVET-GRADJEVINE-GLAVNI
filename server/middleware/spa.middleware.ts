@@ -20,6 +20,21 @@ const CITIES = [
   "sombor", "pozarevac", "pirot", "bor", "srem", "backa", "banat",
 ];
 
+const CITY_DISPLAY: Record<string, string> = {
+  beograd: "Beograd", "novi-sad": "Novi Sad", nis: "Niš",
+  kragujevac: "Kragujevac", subotica: "Subotica", zrenjanin: "Zrenjanin",
+  pancevo: "Pančevo", smederevo: "Smederevo", cacak: "Čačak",
+  "novi-pazar": "Novi Pazar", kraljevo: "Kraljevo", sabac: "Šabac",
+  uzice: "Užice", vranje: "Vranje", valjevo: "Valjevo",
+  leskovac: "Leskovac", krusevac: "Kruševac", zajecar: "Zaječar",
+  sombor: "Sombor", pozarevac: "Požarevac", pirot: "Pirot",
+  bor: "Bor",
+};
+
+function formatCity(slug: string): string {
+  return CITY_DISPLAY[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
+}
+
 // Map SEO route collection names to Firestore "listings" type discriminator
 const COLLECTION_TO_TYPE: Record<string, string> = {
   jobs: "job",
@@ -505,7 +520,7 @@ async function backgroundPreRenderHomepage(
       const location = data.city || data.location || "";
       const price = data.price ? `${data.price} ${data.currency || "EUR"}` : "";
 
-      itemsHtml += `<li><a href="${url}">${title}</a>${location ? ` - ${location}` : ""}${price ? ` (${price})` : ""}</li>`;
+      itemsHtml += `<li><a href="${url}">${title}</a>${location ? ` - ${formatCity(location)}` : ""}${price ? ` (${price})` : ""}</li>`;
     });
 
     const botHtml = `
@@ -519,6 +534,7 @@ async function backgroundPreRenderHomepage(
       </main>`;
 
     let html = cachedIndexHtml;
+    html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
     html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
     html = html.replace("</head>", `
 <meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
@@ -727,6 +743,7 @@ export const createSpaMiddleware = () => {
         }
 
         // Set proper homepage meta for all visitors
+        html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
         html = html.replace(/<title>.*?<\/title>/, `<title>Svet GraÄ‘evine - Portal za graÄ‘evinske oglase</title>`);
         html = html.replace("</head>", `<meta name="description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /></head>`);
         return res.send(html);
