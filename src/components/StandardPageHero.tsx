@@ -34,7 +34,7 @@ export function StandardPageHero({
   overlayGradient = 'linear-gradient(to right, rgba(5, 15, 25, 0.98) 0%, rgba(5, 15, 25, 0.8) 35%, rgba(5, 15, 25, 0.2) 100%)',
 }: StandardPageHeroProps) {
   return (
-    <section className="relative min-h-[auto] md:min-h-screen md:h-screen flex flex-col items-start overflow-hidden bg-surface-container-lowest border-b border-white/5 glass-panel gold-glow">
+    <section className="relative min-h-[auto] md:min-h-screen md:h-screen flex flex-col items-start bg-surface-container-lowest border-b border-white/5 glass-panel gold-glow">
       {/* Background Layer */}
       {/* Background Layer */}
       <div className="absolute inset-0 z-0 text-white">
@@ -57,8 +57,8 @@ export function StandardPageHero({
         <div className="absolute top-1/4 -right-24 w-[600px] h-[600px] bg-secondary/5 blur-[140px] rounded-full pointer-events-none"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 w-full relative z-20 h-full">
-        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-0 pt-12 md:pt-[240px]">
+      <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">
+        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-0 pt-6 md:pt-[240px]">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
@@ -67,7 +67,7 @@ export function StandardPageHero({
             className="flex-2 max-w-4xl col-start-1 animate-fade-in-up"
           >
             {/* Badge Zone - Row 1 (40px) */}
-            <div className="h-full flex items-center">
+            <div className="md:h-full flex items-center">
               {badge && (
                 <div className="flex items-center gap-4">
                   <div className="h-px w-10 bg-secondary/30"></div>
@@ -79,7 +79,7 @@ export function StandardPageHero({
             </div>
             
             {/* Title Zone - Row 2 (240px) - Locked height for H1 */}
-            <div className="h-[240px] flex flex-col justify-center">
+            <div className="md:h-[240px] flex flex-col justify-center">
               <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-[-0.05em] uppercase">
                 {title}
                 {titleAccent && (
@@ -92,7 +92,7 @@ export function StandardPageHero({
             </div>
             
             {/* Subtitle Zone - Row 3 (120px) */}
-            <div className="h-full">
+            <div className="md:h-full">
               {subtitle && (
                 <div className="relative pl-8 h-full border-l border-secondary/30 flex items-center">
                   <p className="text-[10px] md:text-xs font-bold text-white/40 max-w-xl leading-relaxed uppercase tracking-[0.3em]">
