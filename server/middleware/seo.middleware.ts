@@ -223,17 +223,32 @@ export const botPrerenderMiddleware = async (
     let meta: SEOMeta | null = null;
 
     if (pathParts[0] === "statistika") {
-      // KORAK 10.2: Entity Aggregation Hubs
       if (DEV) console.info(`[SEO] Generating AI/Bot Statistical Hub for ${req.path}`);
       const statData = SEOMetaService.generateStatisticalHub(req.path);
       res.setHeader("Content-Type", "text/html");
-      res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day cache
+      res.setHeader("Cache-Control", "public, max-age=86400");
       return res.send(statData);
+    }
+
+    // For single-segment listing pages (e.g. /poslovi, /firme, /masine) or
+    // multi-segment hub pages (e.g. /poslovi/zidar), pass through to
+    // seoRouter / createSpaMiddleware which render actual ad listings.
+    if (pathParts.length < 2) {
+      return next();
     }
 
     if (pathParts.length >= 2) {
       const idSegment = pathParts.pop() || "";
       const baseEntity = pathParts[0];
+
+      // LISTING/HUB PAGE DETECTION:
+      // If the last segment doesn't contain "~" and baseEntity isn't a known detail type,
+      // this is a P-SEO hub page (e.g. /poslovi/zidar/beograd), NOT a detail page.
+      // Pass through to seoRouter/createSpaMiddleware which handle these properly.
+      const detailEntityTypes = ["posao", "firma", "gradjevinske-masine", "masina", "nekretnine", "ketering", "smestaj", "majstor", "profil", "oglas"];
+      if (!idSegment.includes("~") && !detailEntityTypes.includes(baseEntity)) {
+        return next();
+      }
 
       // Aggressive Bot Rate Limiter for Firestore-backed Meta Fetch
       const botMetaRateKey = `bot_meta_limit:${ip}`;
