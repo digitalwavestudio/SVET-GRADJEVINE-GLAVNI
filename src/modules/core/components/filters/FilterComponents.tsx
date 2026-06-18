@@ -6,17 +6,6 @@ export const FilterSidebar = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      {/* Mobile Floating Trigger Button */}
-      <div className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="w-full py-4 bg-secondary text-slate-950 font-black rounded-full shadow-[0_4px_20px_rgba(254,191,13,0.4)] flex items-center justify-center gap-2 uppercase tracking-widest text-xs active:scale-95 transition-transform"
-        >
-          <span className="material-symbols-outlined text-lg">filter_list</span>
-          Filteri i pretraga
-        </button>
-      </div>
-
       {/* Mobile Drawer Overlay */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex flex-col p-6 animate-in fade-in duration-200">
