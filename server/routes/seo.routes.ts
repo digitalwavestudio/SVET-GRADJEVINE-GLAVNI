@@ -1,5 +1,6 @@
 ﻿import { env } from "../config/env.ts";
 import { Router } from "express";
+import { APP_CONFIG } from "../../src/constants/config.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { SEODbService } from "../services/seo/seo-db.service.ts";
 import { SEOSchemaService } from "../services/seo/seo-schema.service.ts";
@@ -274,12 +275,17 @@ seoRouter.get("/sitemap.xml", async (_req, res) => {
       await CacheService.set(cacheKey, sitemap, 6 * 60 * 60 * 1000); // 6 hours as per PROMPT 6
     }
 
+    if (!sitemap) {
+      sitemap = generateFallbackSitemap();
+    }
+
     res.header("Content-Type", "application/xml");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    res.send(sitemap || "");
+    res.send(sitemap);
   } catch (error) {
     console.error("Sitemap error:", error);
-    res.status(500).send("Error generating sitemap index");
+    res.header("Content-Type", "application/xml");
+    res.send(generateFallbackSitemap());
   }
 });
 
@@ -412,7 +418,7 @@ Allow: /
 Disallow: /api/
 Disallow: /dashboard/
 
-Sitemap: ${req.protocol}://${req.get("host")}/api/seo/sitemap.xml
+Sitemap: ${req.protocol}://${req.get("host")}/sitemap.xml
 `
     : `
 User-agent: *
@@ -452,4 +458,31 @@ seoRouter.get(
     }
   },
 );
+
+const STATIC_SITEMAP_URLS = [
+  "",
+  "/poslovi",
+  "/kompanije",
+  "/radnici",
+  "/za-poslodavce",
+  "/onama",
+  "/kontakt",
+  "/magazin",
+];
+
+function generateFallbackSitemap(): string {
+  const domain = APP_CONFIG?.BASE_URL || "https://svetgradjevine.com";
+  const now = new Date().toISOString();
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  STATIC_SITEMAP_URLS.forEach((path) => {
+    xml += "  <url>\n";
+    xml += `    <loc>${domain}${path}</loc>\n`;
+    xml += `    <lastmod>${now}</lastmod>\n`;
+    xml += "    <changefreq>daily</changefreq>\n";
+    xml += "    <priority>0.8</priority>\n";
+    xml += "  </url>\n";
+  });
+  xml += "</urlset>";
+  return xml;
+}
 

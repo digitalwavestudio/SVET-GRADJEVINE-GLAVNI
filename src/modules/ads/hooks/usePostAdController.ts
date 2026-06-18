@@ -255,7 +255,7 @@ export interface AdFormData {
   profession: string;
   companyMainCats: string[];
   companySubCats: string[];
-  benefiti: string[];
+  benefits: string[];
   amenities: string[];
   plotDocs: { label: string; url: string }[];
   companyPortfolioImages?: (string | File)[];
@@ -317,7 +317,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
       profession: '',
       companyMainCats: [],
       companySubCats: [],
-      benefiti: [],
+      benefits: [],
       amenities: [],
       plotDocs: [{ label: '', url: '' }],
       plotInfrastructure: {

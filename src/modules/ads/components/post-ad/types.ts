@@ -67,7 +67,7 @@ export interface FormDataState {
   iskustvo: string;
   tipAngazmana: string;
   customEngagement: string;
-  benefiti: string[];
+  benefits: string[];
 
   // Accommodation
   accType: string;

@@ -196,7 +196,7 @@ export function mapEditItemToFormData(
       dinamikaIsplate: 'mesecna', 
       iskustvo: item.experienceSlug || '',
       tipAngazmana: item.engagementSlug || 'puno-radno-vreme',
-      benefiti: item.benefits || [],
+      benefits: item.benefits || [],
       opis: item.description || '', 
       phone: item.telefon || item.phone || '',
       email: '',

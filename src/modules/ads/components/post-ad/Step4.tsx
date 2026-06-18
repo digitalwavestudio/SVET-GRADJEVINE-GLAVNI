@@ -453,7 +453,7 @@ export function Step4({
                         <div className="flex flex-wrap gap-2">
                           {(selectedCategory === "accommodation"
                             ? formData.amenities
-                            : formData.benefiti
+                            : formData.benefits
                           )?.map((slug: string) => {
                             const list =
                               selectedCategory === "accommodation"
@@ -473,7 +473,7 @@ export function Step4({
                           })}
                           {(selectedCategory === "accommodation"
                             ? formData.amenities
-                            : formData.benefiti
+                            : formData.benefits
                           )?.length === 0 && (
                             <span className="text-on-surface-variant italic text-xs">
                               Nisu navedeni

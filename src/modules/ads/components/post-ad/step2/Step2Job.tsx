@@ -107,21 +107,21 @@ export function Step2Job({ nextStep, prevStep }: { nextStep?: () => void; prevSt
             {BENEFITS.map(benefit => (
               <label 
                 key={benefit.slug} 
-                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-300 ${((watch('benefiti') as string[]) || []).includes(benefit.slug) ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/5 scale-[1.02]' : benefit.slug === 'pomoc-pri-vizi' ? 'border-white/5 bg-secondary/[0.04] hover:border-white/20' : 'border-white/5 bg-white/[0.02] hover:border-white/20'}`}
+                className={`flex flex-col items-center justify-center gap-3 p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-300 ${((watch('benefits') as string[]) || []).includes(benefit.slug) ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/5 scale-[1.02]' : benefit.slug === 'pomoc-pri-vizi' ? 'border-white/5 bg-secondary/[0.04] hover:border-white/20' : 'border-white/5 bg-white/[0.02] hover:border-white/20'}`}
               >
                 <input 
                   type="checkbox" 
-                  checked={((watch('benefiti') as string[]) || []).includes(benefit.slug)}
+                  checked={((watch('benefits') as string[]) || []).includes(benefit.slug)}
                   onChange={() => {
-                    const current = (watch('benefiti') as string[]) || [];
+                    const current = (watch('benefits') as string[]) || [];
                     const next = current.includes(benefit.slug) 
                       ? current.filter(b => b !== benefit.slug)
                       : [...current, benefit.slug];
-                    setValue('benefiti', next);
+                    setValue('benefits', next);
                   }}
                   className="hidden" 
                 />
-                <span className={`material-symbols-outlined text-3xl transition-colors ${((watch('benefiti') as string[]) || []).includes(benefit.slug) ? 'text-secondary' : 'text-on-surface-variant'}`}>
+                <span className={`material-symbols-outlined text-3xl transition-colors ${((watch('benefits') as string[]) || []).includes(benefit.slug) ? 'text-secondary' : 'text-on-surface-variant'}`}>
                   {benefit.slug === 'smestaj' ? 'home' : 
                    benefit.slug === 'topli-obrok' ? 'restaurant' : 
                    benefit.slug === 'pauza-za-kafu' ? 'coffee' :
@@ -132,7 +132,7 @@ export function Step2Job({ nextStep, prevStep }: { nextStep?: () => void; prevSt
                    benefit.slug === 'placen-prekovremeni' ? 'more_time' :
                    benefit.slug === 'pomoc-pri-vizi' ? 'public' : 'check_circle'}
                 </span>
-                <span className={`text-[10px] font-black uppercase tracking-widest text-center transition-colors ${((watch('benefiti') as string[]) || []).includes(benefit.slug) ? 'text-white' : 'text-on-surface-variant'}`}>
+                <span className={`text-[10px] font-black uppercase tracking-widest text-center transition-colors ${((watch('benefits') as string[]) || []).includes(benefit.slug) ? 'text-white' : 'text-on-surface-variant'}`}>
                   {benefit.name}
                 </span>
               </label>

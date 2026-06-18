@@ -37,7 +37,7 @@ export const applyPayloadTransform = (selectedCategory: string | null, sData: Re
       plataMax: Number(sData.plataMax) || 0,
       
       salaryType: sData.salaryType,
-      benefits: sData.benefiti,
+      benefits: sData.benefits,
       phone: sData.kontaktTelefon || commonMeta.phone
     };
   } 
