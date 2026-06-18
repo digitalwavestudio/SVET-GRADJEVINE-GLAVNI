@@ -112,7 +112,19 @@ export class UnifiedSearchUtils {
       distance: typeof data._distance === "number" ? Math.round(data._distance / 1000) : null, // convert meters to km
       loc: (data.loc as string) || (data.location as string) || (data.locationSlug as string) || "",
       sal: (data.sal as string) || (data.salary as string) || "",
-      benefits: Array.isArray(data.benefits) ? (data.benefits as string[]) : []
+      benefits: Array.isArray(data.benefits) ? (data.benefits as string[]) : [],
+      benefiti: Array.isArray(data.benefiti) ? (data.benefiti as string[]) : [],
+      rawBenefits: Array.isArray(data.rawBenefits) ? (data.rawBenefits as string[]) : [],
+      plataMin: data.plataMin,
+      plataMax: data.plataMax,
+      salaryType: data.salaryType,
+      smestaj: data.smestaj,
+      prevoz: data.prevoz,
+      hrana: data.hrana,
+      housing: data.housing,
+      transport: data.transport,
+      food: data.food,
+      topliObrok: data.topliObrok
     };
   }
 }
