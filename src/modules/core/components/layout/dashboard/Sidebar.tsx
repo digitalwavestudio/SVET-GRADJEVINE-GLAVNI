@@ -59,7 +59,7 @@ export const Sidebar = memo(({
   };
 
   return (
-    <aside className={`w-64 bg-[#0A0F14] border-r border-white/5 flex flex-col fixed inset-y-0 left-0 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:sticky md:top-0 h-[100dvh] z-[100] transition-transform duration-300 ease-in-out`}>
+    <aside className={`w-64 bg-[#0A0F14] border-r border-white/5 flex flex-col fixed inset-y-0 left-0 transform overflow-hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:sticky md:top-0 h-[100dvh] z-[100] transition-transform duration-300 ease-in-out`}>
       {/* Platform Logo Section */}
       <div className="h-[64px] px-0 py-[40px] mb-[20px] hidden md:flex items-center justify-center border-b border-white/5">
         <Link to="/" className="inline-block group">
