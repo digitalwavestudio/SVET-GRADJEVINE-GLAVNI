@@ -53,12 +53,12 @@ export default function MyInquiriesPage() {
         </div>
 
         {/* Navigation Bar / Tabs */}
-        <div className="flex flex-wrap gap-2 p-1.5 bg-white/5 border border-white/10 rounded-[10px] w-fit">
+        <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 p-1.5 bg-white/5 border border-white/10 rounded-[10px] w-full md:w-fit">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+              className={`px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
                 activeTab === tab.id
                   ? 'bg-secondary text-slate-950 shadow-lg'
                   : 'text-white/40 hover:text-white hover:bg-white/5'
