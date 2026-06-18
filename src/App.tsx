@@ -29,9 +29,7 @@ import { getMastersRouter } from '@/src/modules/masters/routes';
 import { getSearchRouter } from '@/src/modules/search/routes';
 
 const PageLoader = () => (
-  <div className="bg-surface min-h-screen flex items-center justify-center">
-    <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
-  </div>
+  <div className="bg-surface min-h-screen"></div>
 );
 
 import { useRealtimeSync } from '@/src/hooks/useRealtimeSync';
