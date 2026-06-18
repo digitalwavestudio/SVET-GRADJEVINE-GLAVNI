@@ -1,37 +1,17 @@
-import { FirebaseApp, getApps, getApp, initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getApps, getApp, initializeApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { initializeFirestore } from 'firebase/firestore';
+import firebaseConfig from '../../firebase-applet-config.json';
 
-function readConfig() {
-  return {
-    apiKey: (import.meta.env.VITE_FIREBASE_API_KEY as string) ?? '',
-    authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) ?? '',
-    projectId: (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) ?? '',
-    storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) ?? undefined,
-    messagingSenderId: (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) ?? undefined,
-    appId: (import.meta.env.VITE_FIREBASE_APP_ID as string) ?? undefined,
-  };
-}
+// Match old src/firebase.ts behavior exactly
+const app = getApps().length === 0 ? initializeApp({ ...firebaseConfig }) : getApp();
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 
-let _app: FirebaseApp | null = null;
-let _auth: Auth | null = null;
-let _db: Firestore | null = null;
-let _googleProvider: GoogleAuthProvider | null = null;
-
+let dbInstance: any = null;
 try {
-  const cfg = readConfig();
-  _app = getApps().length === 0 ? initializeApp(cfg) : getApp();
-  _auth = getAuth(_app);
-  _db = getFirestore(_app);
-  _googleProvider = new GoogleAuthProvider();
-} catch (err) {
-  console.warn('[FIREBASE] init failed:', err);
+  dbInstance = initializeFirestore(app, {}, firebaseConfig.firestoreDatabaseId);
+} catch (err: any) {
+  console.warn('[FIREBASE] Firestore init failed:', err?.message || err);
 }
-
-export const auth = _auth!;
-export const db = _db!;
-export const googleProvider = _googleProvider!;
-
-export function getAuthSafe(): Auth | null { return _auth; }
-export function getFirestoreSafe(): Firestore | null { return _db; }
-export { getAuth, onAuthStateChanged, onIdTokenChanged, signOut } from 'firebase/auth';
+export const db = dbInstance;
