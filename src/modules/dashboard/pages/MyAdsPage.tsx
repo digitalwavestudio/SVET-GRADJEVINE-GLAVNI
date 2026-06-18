@@ -56,7 +56,7 @@ export default function MyAdsPage() {
     setPromoteModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, type?: string) => {
     setConfirmDialog({
       isOpen: true,
       title: 'BRISANJE OGLASA',
@@ -65,7 +65,7 @@ export default function MyAdsPage() {
       isDanger: true,
       onConfirm: async () => {
         try {
-          await deleteAd({ id });
+          await deleteAd({ id, type });
           setConfirmDialog(null);
           setAlertDialog({
             isOpen: true,

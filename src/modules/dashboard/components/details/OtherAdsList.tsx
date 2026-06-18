@@ -10,7 +10,7 @@ interface OtherAdsListProps {
   showTitle?: boolean;
   onPromote: (id: string, collection: string, isUrgentCheck: boolean) => void;
   onApprove: (id: string) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, type?: string) => void;
 }
 
 export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDelete }: OtherAdsListProps) {

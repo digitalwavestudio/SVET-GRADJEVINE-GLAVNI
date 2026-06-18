@@ -7,7 +7,7 @@ interface DashboardAdActionsProps {
   collection: string;
   onPromote: (id: string, collection: string, isUrgentCheck: boolean) => void;
   onApprove: (id: string) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, type?: string) => void;
 }
 
 export function DashboardAdActions({ ad, size = 'md', collection, onPromote, onApprove, onDelete }: DashboardAdActionsProps) {
@@ -51,7 +51,7 @@ export function DashboardAdActions({ ad, size = 'md', collection, onPromote, onA
       )}
 
       <button 
-        onClick={() => onDelete(ad.id)}
+        onClick={() => onDelete(ad.id, ad.postType)}
         className={`${btnSize} bg-red-500/10 border border-red-500/20 rounded-[10px] flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10`}
         title="Obriši"
       >

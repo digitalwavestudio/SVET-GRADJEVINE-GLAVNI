@@ -9,7 +9,7 @@ interface PlotAdsListProps {
   ads: MachineAdData[];
   onPromote: (id: string, collection: string, isUrgentCheck: boolean) => void;
   onApprove: (id: string) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, type?: string) => void;
 }
 
 export function PlotAdsList({ ads, onPromote, onApprove, onDelete }: PlotAdsListProps) {

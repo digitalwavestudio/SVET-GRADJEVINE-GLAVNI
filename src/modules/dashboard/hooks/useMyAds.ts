@@ -184,6 +184,16 @@ export function useMyAdsMutations(userId: string | undefined) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  const typeToCategory: Record<string, string> = {
+    job: 'jobs',
+    accommodation: 'accommodations',
+    machine: 'machines',
+    catering: 'caterings',
+    plot: 'plots',
+    real_estate: 'real_estate',
+    company: 'companies',
+  };
+
   const updateAdStatus = async (id: string, status: string) => {
     return mutationGuard(() => apiClient.patch(`/ads/${id}`, { status }), {
       actionName: `updateAdStatus_${status}`,
@@ -192,12 +202,16 @@ export function useMyAdsMutations(userId: string | undefined) {
   };
 
   const deleteMutation = useMutation({
-    mutationFn: async ({ id }: { id: string }) => {
+    mutationFn: async ({ id, type }: { id: string; type?: string }) => {
       if (!navigator.onLine) {
         offlineSyncManager.addToOutbox("deleteAd", { id });
         return { offline: true };
       }
-      return await updateAdStatus(id, "deleted");
+      const category = typeToCategory[type || ''] || 'marketplace';
+      return mutationGuard(() => apiClient.delete(`/ads/${category}/${id}`), {
+        actionName: 'deleteAd',
+        context: { id, userId },
+      });
     },
     onMutate: async ({ id }) => {
       if (!userId) return;
