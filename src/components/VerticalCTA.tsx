@@ -27,40 +27,16 @@ export const VerticalCTA: React.FC<VerticalCTAProps> = ({
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="mt-4 relative overflow-hidden rounded-[20px] border border-white/5 bg-surface-container-low p-6 md:p-8 text-center group"
     >
-      {/* Tech Container for Icon (Matches Homepage Hero style) */}
+      {/* Tech Container for Icon (Cleaned up, static background) */}
       <div className="flex justify-center mb-10">
         <div className="relative w-20 h-20 flex items-center justify-center flex-shrink-0">
-          {/* Inner Glow/Circle */}
-          <div className="absolute inset-3 rounded-full border border-secondary/40 bg-secondary/10 scale-110 group-hover:scale-125 transition-transform duration-700"></div>
-          
-          {/* Main Rotating Outer Ring (Secondary Color) */}
-          <motion.div 
-            animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-1 rounded-full border-t-2 border-r border-transparent border-secondary opacity-80"
-          />
-          
-          {/* Secondary Fast Rotating Ring */}
-          <motion.div 
-            animate={{ rotate: -360 }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-1 rounded-full border-b-2 border-l border-transparent border-secondary/40"
-          />
-          
-          {/* Dash Ring (Suprotan smer) */}
-          <motion.div 
-            animate={{ rotate: -360 }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-3 rounded-full border border-dashed border-white/20 opacity-40"
-          />
-          
-          {/* Static Tech Frame */}
-          <div className="absolute -inset-6 rounded-full border border-white/5 opacity-30"></div>
+          {/* Clean background circle */}
+          <div className="absolute inset-0 rounded-full border border-secondary/20 bg-secondary/5 group-hover:scale-105 transition-transform duration-500"></div>
           
           <Icon 
             size={32} 
             strokeWidth={1.5}
-            className="relative z-10 text-secondary transition-all duration-700 group-hover:scale-110 group-hover:rotate-6" 
+            className="relative z-10 text-secondary transition-all duration-700 group-hover:scale-110" 
           />
         </div>
       </div>
