@@ -87,28 +87,30 @@ export class SEODbService {
       const cached = await CacheService.get<Record<string, unknown>>(cacheKey);
       if (cached) return cached;
 
-      // START OF PSEO SKELETON AUTOMATION
-      // Fire-and-forget background resolution to avoid blocking the main thread / hydration with synchronous Firestore calls
-      this.backgroundFetchAndCacheHubMetaData(
-        hubType,
-        params,
-        stateCategory,
-        stateFilters,
-        title,
-        description,
-        url,
-        cacheKey,
-      ).catch(err => {
-        console.error(`[SEO-Background] Error compiling hub metadata for ${url}:`, err);
-      });
+      // Fetch hub metadata synchronously so the FIRST request gets real data.
+      try {
+        const hubMeta = await this.backgroundFetchAndCacheHubMetaData(
+          hubType,
+          params,
+          stateCategory,
+          stateFilters,
+          title,
+          description,
+          url,
+          cacheKey,
+        );
+        if (hubMeta) return hubMeta;
+      } catch (err) {
+        console.error(`[SEO] Error fetching hub metadata for ${url}:`, err);
+      }
 
-      // Instantly return static fallback meta to trigger fast-serving of SEO friendly skeletons on the server
+      // Fallback if fetch fails
       return {
         title,
         description,
         image: "https://svetgradjevine.com/og-default.jpg",
         url,
-        initialState: null, // Strict cache strategy: skeleton only, no synchronous db bypass
+        initialState: null,
         structuredData: {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
@@ -145,13 +147,18 @@ export class SEODbService {
     description: string,
     url: string,
     cacheKey: string,
-  ): Promise<void> {
+  ): Promise<Record<string, unknown> | null> {
     const { RedisLockManager } = await import("../../utils/redis-lock.ts");
     const lockKey = `lock:seo_hub:${cacheKey}`;
     const lockId = await RedisLockManager.acquire(lockKey, 30000);
     if (!lockId) {
-      logger.debug(`[SEO-Background] Background compilation already in progress for hub ${url}. Skipping concurrent Firestore read.`);
-      return;
+      const waitStart = Date.now();
+      while (Date.now() - waitStart < 5000) {
+        await new Promise(r => setTimeout(r, 500));
+        const cached = await CacheService.get<Record<string, unknown>>(cacheKey);
+        if (cached) return cached;
+      }
+      return null;
     }
 
     try {
@@ -184,9 +191,11 @@ export class SEODbService {
         viewsCount: 1,
       };
 
-      await CacheService.set(cacheKey, meta, 3600000); // 1h cache
+      await CacheService.set(cacheKey, meta, 3600000);
+      return meta;
     } catch (err) {
-      console.error("[SEO-Background] Failed compiler compiling for hub:", err);
+      console.error("[SEO] Failed hub metadata fetch:", err);
+      return null;
     } finally {
       await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[SEODb] lock release error:", e?.message));
     }

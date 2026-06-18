@@ -30,32 +30,34 @@ export class SEOMetaService {
       const cached = await CacheService.get<Record<string, unknown>>(cacheKey);
       if (cached) return cached;
 
-      // START OF SEO SKELETON AUTOMATION
-      // Fire-and-forget background resolution to avoid blocking the main thread / hydration with synchronous Firestore calls
-      this.backgroundFetchAndCacheAdMetaData(baseEntity, idSegment, resolvedPath, cacheKey).catch(err => {
-        console.error(`[SEO-Background] Error caching ad metadata for ${resolvedPath}:`, err);
-      });
-
-      // Instantly return null to trigger fast-serving of SEO friendly skeletons on the server
-      return null;
+      // Fetch metadata synchronously instead of fire-and-forget.
+      // This ensures the FIRST bot/human request gets real data, not an empty shell.
+      const meta = await this.fetchAdMetaData(baseEntity, idSegment, resolvedPath, cacheKey);
+      return meta || null;
     } catch (e) {
       console.error("SEO Data Error:", e);
       return null;
     }
   }
 
-  static async backgroundFetchAndCacheAdMetaData(
+  static async fetchAdMetaData(
     baseEntity: string,
     idSegment: string,
     resolvedPath: string,
     cacheKey: string
-  ): Promise<void> {
+  ): Promise<Record<string, unknown> | null> {
     const { RedisLockManager } = await import("../../utils/redis-lock.ts");
     const lockKey = `lock:seo_meta:${cacheKey}`;
     const lockId = await RedisLockManager.acquire(lockKey, 30000);
     if (!lockId) {
-       logger.debug(`[SEO-Background] Background compilation already in progress for ${resolvedPath}. Skipping concurrent Firestore read.`);
-       return;
+       // Another request is already fetching; poll for cache
+       const waitStart = Date.now();
+       while (Date.now() - waitStart < 5000) {
+         await new Promise(r => setTimeout(r, 500));
+         const cached = await CacheService.get<Record<string, unknown>>(cacheKey);
+         if (cached) return cached;
+       }
+       return null;
     }
     
     try {
@@ -115,8 +117,8 @@ export class SEOMetaService {
         if (redis) {
           await redis.set(deadPathKey, "1", "EX", 3600); // 1h in seconds
         }
-        await CacheService.set(cacheKey, deadMeta, 3600000); // 1h negative cache shield
-        return;
+        await CacheService.set(cacheKey, deadMeta, 3600000);
+        return deadMeta;
       }
 
       const title = data?.title || data?.name || data?.adTitle || "Oglas";
@@ -157,11 +159,13 @@ export class SEOMetaService {
         ),
       };
 
-      await CacheService.set(cacheKey, meta, 3600000); // 1h cache
+      await CacheService.set(cacheKey, meta, 3600000);
+      return meta;
     } catch (err) {
-      console.error("[SEO-Background] Failed background compilation:", err);
+      console.error("[SEO] Failed metadata fetch:", err);
+      return null;
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[SEOMeta] lock release error:", e?.message));
+      await RedisLockManager.release(lockKey, lockId).catch(() => {});
     }
   }
 

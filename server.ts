@@ -29,7 +29,14 @@ async function startServer() {
       return res.status(503).json({ error: "Service Unavailable", message: "Sistem se pokreće, pokušajte ponovo za par sekundi." });
     }
     
-    // Stateless Loading Screen for web requests (Auto-Refresh)
+    // Bots get 503 with Retry-After so they retry later instead of indexing the loading page
+    const ua = (req.headers["user-agent"] || "").toLowerCase();
+    if (/bot|crawler|spider|gptbot|claudebot|perplexity|chatgpt|qwen/i.test(ua)) {
+      res.setHeader("Retry-After", "10");
+      return res.status(503).send("Service Unavailable - Server is starting up. Retry later.");
+    }
+
+    // Stateless Loading Screen for human web requests (Auto-Refresh)
     res.setHeader("Retry-After", "3");
     res.status(200).send(`
       <!DOCTYPE html>

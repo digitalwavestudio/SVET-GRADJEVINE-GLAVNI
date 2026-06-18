@@ -88,7 +88,7 @@ export const rateLimitShield = async (
       // AI Bots are allowed but we apply a stricter rate limit for expensive paths to prevent "scraping bursts"
       if (isWhitelistedAiBot) {
         const aiBotLimitKey = `shield:ai_bot:${hashedIp}`;
-        const isAllowed = await RateLimiterService.isAllowed(aiBotLimitKey, 10, 60); // Max 10 expensive hits per minute for AI bots
+        const isAllowed = await RateLimiterService.isAllowed(aiBotLimitKey, 100, 60); // Max 100 expensive hits per minute for AI bots (was 10 - too restrictive for crawlers)
         if (!isAllowed) {
            return res.status(429).json({ error: "AI Bot rate limit reached for expensive resources." });
         }
