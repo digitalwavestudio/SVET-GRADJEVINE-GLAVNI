@@ -34,7 +34,7 @@ export function StandardPageHero({
   overlayGradient = 'linear-gradient(to right, rgba(5, 15, 25, 0.98) 0%, rgba(5, 15, 25, 0.8) 35%, rgba(5, 15, 25, 0.2) 100%)',
 }: StandardPageHeroProps) {
   return (
-    <section className="relative min-h-[auto] md:min-h-screen md:h-screen flex flex-col items-start bg-surface-container-lowest border-b border-white/5 glass-panel gold-glow">
+    <section className="relative min-h-[480px] sm:min-h-[520px] md:min-h-screen md:h-screen flex flex-col items-start bg-surface-container-lowest border-b border-white/5 glass-panel gold-glow">
       {/* Background Layer */}
       {/* Background Layer */}
       <div className="absolute inset-0 z-0 text-white">
@@ -58,7 +58,7 @@ export function StandardPageHero({
       </div>
 
       <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">
-        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-28 md:pt-[240px] pb-12 md:pb-0">
+        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-36 md:pt-[240px] pb-20 md:pb-0">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
