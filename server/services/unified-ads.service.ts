@@ -1,6 +1,7 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { admin as firebaseAdmin, db, getDb } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
+import { CacheInvalidationService } from "./cache-invalidation.service.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { AuditService, AuditAction } from "./audit.service.ts";
 import { Logger } from "../utils/logger.ts";
@@ -196,17 +197,12 @@ export class UnifiedAdsService {
       updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
     });
 
-    const { CacheService } = await import("./cache.service.ts");
     const { CacheKeys } = await import("../constants/cache-keys.ts");
     await CacheService.delete(CacheKeys.adDetail(id));
     const { invalidateAdOwnershipCache } = await import("../middleware/ownership.middleware.ts");
     invalidateAdOwnershipCache(id);
-    await CacheService.invalidateByPrefix(`myAds_${adData.authorId}`);
-    await CacheService.invalidateByPrefix(`publicProfileAds_${adData.authorId}`);
-    await CacheService.invalidateByPrefix("public_ads_");
-    await CacheService.invalidateByPrefix("swr:public_ads_");
-    await CacheService.invalidateByPrefix("search_ads_");
-    await CacheService.invalidateByPrefix("swr:search_ads_"); 
+    const category = (adData.type as string) || "jobs";
+    CacheInvalidationService.onAdChange(category, adData.authorId);
     const { PredictiveAnalyticsService } = await import("./predictive.service.ts");
     await PredictiveAnalyticsService.forceRefresh(id).catch((e: unknown) => console.error("[Ads] operation error:", e));
 

@@ -2,6 +2,7 @@ import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
 import { AuditService, AuditAction } from "../audit.service.ts";
 import { SyncManager } from "../sync.service.ts";
 import { CacheService } from "../cache.service.ts";
+import { CacheInvalidationService } from "../cache-invalidation.service.ts";
 import { AdminUsersService } from "./admin-users.service.ts";
 import { logger } from "../../utils/logger.ts";
 
@@ -27,8 +28,8 @@ export class AdminAdsService {
     await SyncManager.syncAd(collection, id, updates, oldData);
 
     // Invalidate cache for ad detail and related listings
+    const category = (oldData.type as string) || (collection === "listings" ? "jobs" : collection);
     try {
-      const category = (oldData.type as string) || (collection === "listings" ? "jobs" : collection);
       await Promise.all([
         CacheService.delete(`ads:detail:${id}`),
         CacheService.delete(`swr:ads:detail:${id}`),
@@ -36,22 +37,11 @@ export class AdminAdsService {
         CacheService.delete(`job_${id}_mobile`),
         CacheService.delete(`swr:job_${id}_web`),
         CacheService.delete(`swr:job_${id}_mobile`),
-        CacheService.invalidateByPrefix("public_jobs_"),
-        CacheService.invalidateByPrefix("swr:public_jobs_"),
-        CacheService.invalidateByPrefix("homepage_premium_jobs_"),
-        CacheService.invalidateByPrefix("swr:homepage_premium_jobs_"),
-        CacheService.invalidateByPrefix("homepage_urgent_jobs_"),
-        CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_"),
-        CacheService.invalidateByPrefix(`public_ads_${category}_`),
-        CacheService.invalidateByPrefix(`swr:public_ads_${category}_`),
-        CacheService.invalidateByPrefix("unified_search_"),
-        CacheService.invalidateByPrefix("fallback_search_"),
       ]);
     } catch (cacheErr) {
       console.error("[Cache Invalidation Error]:", cacheErr);
     }
-    // Ensure moderation queue cache is refreshed
-    await CacheService.invalidateByPrefix("admin_moderation_queue_").catch((e: any) => logger.warn("[AdminAds] cache invalidation error:", e?.message));
+    await CacheInvalidationService.onAdminAdModeration(category);
 
     await AuditService.logAction(
       adminId,
@@ -112,20 +102,11 @@ export class AdminAdsService {
         CacheService.delete(`job_${id}_mobile`),
         CacheService.delete(`swr:job_${id}_web`),
         CacheService.delete(`swr:job_${id}_mobile`),
-        CacheService.invalidateByPrefix("public_jobs_"),
-        CacheService.invalidateByPrefix("swr:public_jobs_"),
-        CacheService.invalidateByPrefix("homepage_premium_jobs_"),
-        CacheService.invalidateByPrefix("swr:homepage_premium_jobs_"),
-        CacheService.invalidateByPrefix("homepage_urgent_jobs_"),
-        CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_"),
-        CacheService.invalidateByPrefix(`public_ads_${category}_`),
-        CacheService.invalidateByPrefix(`swr:public_ads_${category}_`),
-        CacheService.invalidateByPrefix("unified_search_"),
-        CacheService.invalidateByPrefix("fallback_search_"),
       ]);
     } catch (cacheErr) {
       console.error("[Cache Invalidation Error]:", cacheErr);
     }
+    await CacheInvalidationService.onAdminAdModeration(category);
 
     await AuditService.logAction(
       adminId,

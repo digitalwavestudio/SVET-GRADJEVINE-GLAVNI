@@ -1,6 +1,7 @@
 import { db, getDb, admin as firebaseAdmin } from "../../config/firebase.ts";
 import DOMPurify from "isomorphic-dompurify";
 import { CacheService } from "../cache.service.ts";
+import { CacheInvalidationService } from "../cache-invalidation.service.ts";
 import { Job, jobSchema, User } from "@svet-gradjevine/shared";
 import { AppError, BadRequestError, NotFoundError } from "../../utils/appError.ts";
 import { sanitizeInput } from "../../../src/lib/sanitize.ts";
@@ -272,12 +273,7 @@ export class JobsCoreService {
     });
 
     // Invalidate job caches to show the new job immediately on listings view
-    CacheService.invalidateByPrefixes([
-      "public_jobs_", "swr:public_jobs_",
-      "homepage_premium_jobs_", "swr:homepage_premium_jobs_",
-      "homepage_urgent_jobs_", "swr:homepage_urgent_jobs_",
-      `myAds_${uid}`,
-    ]).catch((e: unknown) => console.error("[Cache] invalidation error:", e));
+    CacheInvalidationService.onJobChange(uid);
 
     return { success: true, jobId: resultData.id };
   }
@@ -417,12 +413,7 @@ export class JobsCoreService {
     });
 
     // Invalidate job caches to show the updated job immediately on listings view
-    CacheService.invalidateByPrefixes([
-      "public_jobs_", "swr:public_jobs_",
-      "homepage_premium_jobs_", "swr:homepage_premium_jobs_",
-      "homepage_urgent_jobs_", "swr:homepage_urgent_jobs_",
-      `myAds_${uid}`,
-    ]).catch((e: unknown) => console.error("[Cache] invalidation error:", e));
+    CacheInvalidationService.onJobChange(uid);
 
     return { success: true };
   }
@@ -487,13 +478,7 @@ export class JobsCoreService {
     });
 
     // Invalidate job caches to show the deleted job immediately on listings view
-    CacheService.invalidateByPrefix("public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("swr:public_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch((e: unknown) => console.error("[Cache] invalidation error:", e));
-    CacheService.invalidateByPrefix(`myAds_${uid}`).catch((e: unknown) => console.error("[Cache] invalidation error:", e));
+    CacheInvalidationService.onJobChange(uid);
 
     return { success: true };
   }
