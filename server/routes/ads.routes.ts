@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { UnifiedAdsService } from "../services/unified-ads.service.ts";
-import { authMiddleware, requireAuth, requirePermission, requireVerifiedEmail } from "../middleware/auth.middleware.ts";
+import { authMiddleware, requireAuth, requireVerifiedEmail } from "../middleware/auth.middleware.ts";
 import { validateAdOwnership } from "../middleware/ownership.middleware.ts";
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
 import { adCreationLimiter } from "../middleware/rate-limit.middleware.ts";
@@ -356,7 +356,6 @@ adsRouter.post(
   "/create",
   authMiddleware,
   idempotency({ ttl: 10 }),
-  requirePermission("ads:create"),
   requireVerifiedEmail,
   adCreationLimiter,
   validateBody(createAdSchema),
