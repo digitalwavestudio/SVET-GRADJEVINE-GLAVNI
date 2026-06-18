@@ -629,6 +629,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
       if (user?.id) {
         queryClient.invalidateQueries({ queryKey: dashboardKeys.myAds.user(user.id) });
       }
+      queryClient.invalidateQueries({ queryKey: ['jobs', 'list'] });
     }
   });
 
