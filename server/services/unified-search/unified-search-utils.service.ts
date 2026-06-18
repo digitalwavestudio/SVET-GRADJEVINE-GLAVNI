@@ -101,6 +101,7 @@ export class UnifiedSearchUtils {
       images: Array.isArray(data.images) ? (data.images.slice(0, 3) as string[]) : [],
       authorId: (data.authorId as string) || "",
       companyId: (data.companyId as string) || "",
+      description: (data.description as string) || (data.opis as string) || "",
       role: (data.role as string) || "",
       profession: (data.profession as string) || "",
       professionSlug: (data.professionSlug as string) || "",
