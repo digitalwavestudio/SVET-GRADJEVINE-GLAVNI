@@ -7,16 +7,16 @@ export function WeatherConditionsWidget() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 blur-3xl rounded-full pointer-events-none"></div>
         
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 w-full md:w-auto">
             <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-3xl text-secondary">cloud</span>
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 mb-1">
                 Vremenski Uslovi
                 <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse hidden md:block"></span>
               </h3>
-              <p className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase">Beograd, idealno za spoljne radove</p>
+              <p className="text-[10px] font-bold text-white/40 tracking-[0.2em] uppercase leading-relaxed">Beograd, idealno za spoljne radove</p>
             </div>
           </div>
 
