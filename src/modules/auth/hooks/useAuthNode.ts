@@ -500,7 +500,7 @@ useEffect(() => {
          
          // Adminima dozvoljavamo promenu uloge (za preview), ali je ne šaljemo u /profile update 
          // jer se uloga čuva kao Claim u Firebase-u ili u posebnom polju koje /profile ne menja
-          const protectedFields = ['admin', 'credits', 'balance', 'walletBalance', 'package', 'packageExpiresAt', 'stats', 'createdAt', 'id', 'uid', 'email'];
+          const protectedFields = ['admin', 'credits', 'balance', 'walletBalance', 'package', 'packageExpiresAt', 'stats', 'createdAt', 'id', 'uid', 'email', 'wallet', 'cryptoWallet', 'fiatBalance', 'isVerified', 'planExpiration', 'status'];
          
          // Ako NIJE admin, štitimo i 'role'
          if (!isAdmin) {
