@@ -63,3 +63,5 @@ firestore_indexes.md
 *.exe
 *.timestamp-*.mjs
 vite.config.ts.timestamp-*
+
+disk_usage*
