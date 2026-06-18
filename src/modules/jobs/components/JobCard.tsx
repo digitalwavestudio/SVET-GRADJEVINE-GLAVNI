@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BENEFITS } from '@/src/constants/taxonomy';
+import { BENEFITS, LOCATIONS } from '@/src/constants/taxonomy';
 import { buildJobUrl } from '@/src/lib/seo';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { PremiumBadge } from '@/src/components/ui/PremiumBadge';
@@ -18,6 +18,8 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
     return isNaN(d.getTime()) ? null : d;
   };
   const createdDate = parseDate(job.createdAt);
+
+  const friendlyLoc = LOCATIONS.find(l => l.slug === job.loc || l.slug === job.location)?.name || job.loc || job.location || 'Srbija';
 
   return (
     <>
@@ -41,7 +43,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         )}
 
         {/* Top Header Row: Title/Company on Left, Logo on Right */}
-        <div className="flex items-start justify-between gap-3 relative z-10">
+        <div className="flex items-start justify-between gap-3 relative z-10 min-h-[56px]">
           <div className="flex-grow min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               {job.isUrgent && (
@@ -52,7 +54,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               {job.isPremium && <PremiumBadge />}
             </div>
             
-            <h3 itemProp="title" className="text-base font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug">
+            <h3 itemProp="title" className="text-base font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug line-clamp-2 min-h-[36px]">
               <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)}>
                 {job.title}
               </Link>
@@ -100,7 +102,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">Mesto rada</span>
             <span itemProp="jobLocation" itemScope itemType="https://schema.org/Place" className="flex items-center gap-1 text-white/80 text-[10px] font-bold">
               <span className="material-symbols-outlined text-[12px] text-secondary" aria-hidden="true">location_on</span>
-              <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="addressLocality">{job.loc || job.location}</span></span>
+              <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="addressLocality">{friendlyLoc}</span></span>
             </span>
           </div>
 
@@ -114,14 +116,16 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         </div>
 
         {/* Benefits Section: smestaj, prevoz, hrana */}
-        <div className="flex flex-wrap gap-1.5 relative z-10">
+        <div className="flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
           {(() => {
             const benefitsSlugs = job.benefits || [];
             const hasSmestaj = benefitsSlugs.includes('smestaj');
             const hasPrevoz = benefitsSlugs.includes('prevoz');
             const hasHrana = benefitsSlugs.includes('topli-obrok');
 
-            if (!hasSmestaj && !hasPrevoz && !hasHrana) return null;
+            if (!hasSmestaj && !hasPrevoz && !hasHrana) {
+              return <div className="h-[22px] w-full"></div>;
+            }
 
             return (
               <>
