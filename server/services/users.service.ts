@@ -327,7 +327,6 @@ export class UsersService {
         privateUpdates,
         { merge: true },
       );
-      batch.delete(db.collection("users").doc(uid).collection("private").doc("data"));
     }
 
     const relevantFields = [

@@ -15,7 +15,10 @@ async function startServer() {
   // Phase 0: Absolute Liveness Priority
   app.get("/api/health", (_req, res) => res.json({ status: "ok", mode }));
   app.get("/api/system/liveness", (_req, res) => res.status(200).send("OK"));
-  app.get("/api/system/readiness", (_req, res) => res.json({ database: true, redis: true, resources: true }));
+  app.get("/api/system/readiness", (_req, res) => {
+    if (!isReady) return res.status(503).json({ error: "Service Unavailable", message: "Sistem se pokreće, pokušajte ponovo za par sekundi." });
+    res.json({ database: true, redis: true, resources: true });
+  });
 
   // Stateless Guard middleware to prevent 404s and connection starvation
   app.use((req, res, next) => {

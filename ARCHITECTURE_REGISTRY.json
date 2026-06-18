@@ -2,7 +2,7 @@
   "project_name": "Svet Građevine",
   "version": "1.0.0",
   "last_audit": "2026-05-28",
-  "meta_comment": "Ovaj fajl definise tehnoloski plafon i zatvoreni arhitektonski katalog. Svaka regresija na nize nivoe tehnologije bice automatski detektovana od strane INTEGRITY_SHIELD skripte.",
+  "meta_comment": "Arhitektonski katalog — definise dozvoljene/zabranjene tehnologije i guardrail pattern-e. Pasivna dokumentacija, nema automatske enforcement skripte.",
   "technological_ceiling": {
     "background_jobs": {
       "approved": [
