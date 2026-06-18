@@ -73,7 +73,7 @@ export class NotificationFeedWorker {
 
               // Sync unread count flag in Redis
               const statusVal = unreadCount === 0 ? "0" : "1";
-              await CacheService.set(`notifications_pending_count:${uid}`, statusVal, 30 * 24 * 60 * 60 * 1000).catch((e: any) => NotificationFeedWorker.logger.warn("[NotificationFeed] Set pending count flag:", e?.message));
+              await CacheService.set(`notifications_pending_count:${uid}`, statusVal, 30 * 60 * 1000).catch((e: any) => NotificationFeedWorker.logger.warn("[NotificationFeed] Set pending count flag:", e?.message));
             } catch (err: any) {
               this.logger.warn(`Failed to execute notification refresh for ${uid}: ${err.message || err}`);
             }

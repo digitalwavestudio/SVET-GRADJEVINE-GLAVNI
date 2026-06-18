@@ -55,7 +55,7 @@ export const validateAdOwnership = async (
     if (adDoc.exists) {
       adDocAuthorId = adDoc.data()?.authorId as string;
       if (adDocAuthorId) {
-        await CacheService.set(ownershipCacheKey, adDocAuthorId, 300); // 5 min TTL
+        await CacheService.set(ownershipCacheKey, adDocAuthorId, 300 * 1000); // 5 min TTL
       }
     }
 

@@ -155,10 +155,10 @@ export const authMiddleware = async (
       const currentAttempts = await CacheService.get<string>(attemptsKey);
       const count = currentAttempts ? parseInt(currentAttempts, 10) + 1 : 1;
       if (count > 5) {
-        await CacheService.set(`blacklist:ip:${ip}`, "1", 15 * 60); // Block for 15 minutes
+        await CacheService.set(`blacklist:ip:${ip}`, "1", 15 * 60 * 1000); // Block for 15 minutes
         await CacheService.delete(attemptsKey);
       } else {
-        await CacheService.set(attemptsKey, count.toString(), 15 * 60);
+        await CacheService.set(attemptsKey, count.toString(), 15 * 60 * 1000);
       }
     } catch (e) {
       logger.warn("[AUTH] Error tracking login failure attempts:", e);

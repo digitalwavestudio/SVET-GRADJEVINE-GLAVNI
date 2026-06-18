@@ -104,7 +104,7 @@ authRouter.post('/devices/track', requireAuth, async (req, res, next) => {
     }
     
     // Store back in Redis, expire in 7 days
-    await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60);
+    await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60 * 1000);
     res.json({ success: true, sessions });
   } catch (err) {
     next(err);
@@ -138,7 +138,7 @@ authRouter.post('/devices/revoke-others', requireAuth, async (req, res, next) =>
     if (currentDeviceId) {
        const deviceIdStr = Array.isArray(currentDeviceId) ? currentDeviceId[0] : currentDeviceId;
        sessions = sessions.filter((s: ActiveSession) => s.deviceId === deviceIdStr);
-       await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60);
+       await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60 * 1000);
     }
     
     // Put other device IDs into a deny-list!

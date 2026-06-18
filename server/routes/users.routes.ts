@@ -131,7 +131,7 @@ usersRouter.post(
         await admin.auth().revokeRefreshTokens(uid).catch(err => console.error("[Users] revokeRefreshTokens failed:", err));
       }
 
-      await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60);
+      await CacheService.set(`active_sessions:${uid}`, JSON.stringify(sessions), 7 * 24 * 60 * 60 * 1000);
 
       // Log authentication audit trial
       await AuditService.log({
