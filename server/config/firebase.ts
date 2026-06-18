@@ -263,48 +263,7 @@ async function tryResolveFromRedis(docPath: string): Promise<admin.firestore.Doc
   return null;
 }
 
-export function triggerQuotaProtection(error: FirestoreQuotaError | unknown): boolean {
-  if (env.DISABLE_FIRESTORE_QUOTA_CHECK === "true") return false;
-  const err = error as FirestoreQuotaError;
-  const errMsg = err?.message || String(err);
-  const errDetails = err?.details || "";
-  if (
-    errMsg.includes("RESOURCE_EXHAUSTED") ||
-    errMsg.includes("Quota limit exceeded") ||
-    errMsg.includes("quota exceeded") ||
-    errDetails.includes("Quota limit exceeded") ||
-    errMsg.includes("request timeout") ||
-    err?.code === 8 ||
-    errMsg.includes("Could not load the default credentials") ||
-    errMsg.includes("Failed to get Firestore instance") ||
-    errMsg.includes("Unauthorized") ||
-    errMsg.includes("credential") ||
-    errMsg.includes("permission_denied") ||
-    errMsg.includes("Permission denied") ||
-    err?.code === 7
-  ) {
-    if (!isQuotaExhausted) {
-      isQuotaExhausted = true;
-      quotaExhaustedAt = Date.now();
-      console.error(
-        "🚨 [Firestore Quota Protection ACTIVATED] Firestore Free Quota reached. Centralized Sandbox Fallbacks activated to protect server integrity!"
-      );
-
-      // Save globally to Redis asynchronous so it informs other nodes/workers
-      import("../utils/redis.ts").then(({ getRedis }) => {
-        const redis = getRedis();
-        if (redis) {
-          redis.set(
-            "circuit_breaker:firestore_quota:exhausted",
-            JSON.stringify({ isExhausted: true, exhaustedAt: quotaExhaustedAt }),
-            "PX",
-            QUOTA_COOLDOWN_MS
-          ).catch(err => console.error("[Firebase] redis.set circuit_breaker failed:", err));
-        }
-      }).catch(err => console.error("[Firebase] import redis for circuit breaker set failed:", err));
-    }
-    return true;
-  }
+export function triggerQuotaProtection(_error: FirestoreQuotaError | unknown): boolean {
   return false;
 }
 
@@ -563,7 +522,7 @@ export const db = new Proxy(
             return result.catch((err: Error) => {
               if (triggerQuotaProtection(err)) {
                 if (prop === 'runTransaction') {
-                  return true;
+                  throw err;
                 }
                 return null;
               }
