@@ -562,7 +562,10 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         return { isEdit: true, id: editId, sData };
       } else {
         const result = await apiClient.post<AdItemData>('/ads/create', { category: categoryToApi, data: { ...payload, id: adId } });
-        return { isEdit: false, id: result?.id as string, sData };
+        if (!result?.id) {
+          throw new Error("Sistem nije vratio ID oglasa. Oglas možda nije sačuvan. Pokušajte ponovo.");
+        }
+        return { isEdit: false, id: result.id as string, sData };
       }
     },
     onMutate: async () => {

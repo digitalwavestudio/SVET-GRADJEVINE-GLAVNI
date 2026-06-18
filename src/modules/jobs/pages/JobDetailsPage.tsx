@@ -21,6 +21,7 @@ import { useFavoriteIds } from '@/src/modules/dashboard/hooks/useFavorites';
 import MediaGallery from '@/src/modules/core/components/details/MediaGallery';
 import { StickyDetailCTABar } from '@/src/components/layout/StickyDetailCTABar';
 import AdminCommandCenter from '@/src/modules/jobs/components/jobs/AdminCommandCenter';
+import { BENEFITS } from '@/src/constants/taxonomy';
 import {
   Briefcase,
   MapPin,
@@ -429,20 +430,20 @@ export default function JobDetailsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { key: 'smestaj', name: 'Smeštaj za radnike', icon: 'home_work' },
-                { key: 'topli-obrok', name: 'Topli obrok / Ishrana', icon: 'restaurant' },
-                { key: 'pauza-za-kafu', name: 'Pauza za kafu', icon: 'coffee' },
-                { key: 'prevoz', name: 'Prevoz do posla i nazad', icon: 'directions_bus' },
-                { key: 'htz-oprema', name: 'Radno odelo i HTZ oprema', icon: 'engineering' },
-                { key: 'prijava-ugovor', name: 'Prijava / Ugovor obavezna', icon: 'shield_person' },
-                { key: 'placen-prekovremeni', name: 'Plaćen prekovremeni rad', icon: 'more_time' },
-                { key: 'pomoc-pri-vizi', name: 'Pomoć pri vizi / radnoj dozvoli', icon: 'public' }
-              ].map(benefit => {
-                const isProvided = jobData.benefits?.includes(benefit.key) || jobData.benefiti?.includes(benefit.key) || jobData.rawBenefits?.includes(benefit.key);
+              {BENEFITS.map(benefit => {
+                const isProvided = jobData.benefits?.includes(benefit.slug) || jobData.benefiti?.includes(benefit.slug) || jobData.rawBenefits?.includes(benefit.slug);
+                const icon = benefit.slug === 'smestaj' ? 'home_work' : 
+                  benefit.slug === 'topli-obrok' ? 'restaurant' : 
+                  benefit.slug === 'pauza-za-kafu' ? 'coffee' :
+                  benefit.slug === 'prevoz' ? 'directions_bus' : 
+                  benefit.slug === 'htz-oprema' ? 'engineering' :
+                  benefit.slug === 'alat-za-rad' ? 'handyman' :
+                  benefit.slug === 'prijava-ugovor' ? 'shield_person' :
+                  benefit.slug === 'placen-prekovremeni' ? 'more_time' :
+                  benefit.slug === 'pomoc-pri-vizi' ? 'public' : 'check_circle';
                 return (
                   <div
-                    key={benefit.key}
+                    key={benefit.slug}
                     className={`p-5 rounded-[10px] border flex items-center justify-between transition-all duration-300 ${
                       isProvided
                         ? 'bg-emerald-500/[0.03] border-emerald-500/15 text-white'
@@ -451,7 +452,7 @@ export default function JobDetailsPage() {
                   >
                     <div className="flex items-center gap-3.5 flex-1">
                       <span className={`material-symbols-outlined text-2xl ${isProvided ? 'text-emerald-400' : 'text-white/20'}`}>
-                        {benefit.icon}
+                        {icon}
                       </span>
                       <span className="font-bold text-xs uppercase tracking-widest">{benefit.name}</span>
                     </div>

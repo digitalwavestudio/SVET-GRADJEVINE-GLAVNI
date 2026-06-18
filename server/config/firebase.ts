@@ -532,7 +532,7 @@ export const db = new Proxy(
                   return await originalUpdate(wrapTransaction(transaction));
                 } catch (txErr: unknown) {
                   if (triggerQuotaProtection(txErr)) {
-                    return true;
+                    throw new Error('QUOTA_EXHAUSTED: Firestore quota exceeded, transaction not committed');
                   }
                   throw txErr;
                 }
