@@ -58,7 +58,7 @@ export function StandardPageHero({
       </div>
 
       <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">
-        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-0 pt-6 md:pt-[240px]">
+        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-28 md:pt-[240px] pb-12 md:pb-0">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
