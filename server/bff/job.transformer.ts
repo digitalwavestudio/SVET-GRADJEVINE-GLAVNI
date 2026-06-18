@@ -11,6 +11,18 @@ export interface MobileJobResponse {
   logo?: string;
   isUrgent?: boolean;
   benefits?: string[];
+  benefiti?: string[];
+  rawBenefits?: string[];
+  plataMin?: number;
+  plataMax?: number;
+  salaryType?: string;
+  smestaj?: boolean;
+  prevoz?: boolean;
+  hrana?: boolean;
+  housing?: boolean;
+  transport?: boolean;
+  food?: boolean;
+  topliObrok?: boolean;
 }
 
 export interface RawJobInput {
@@ -42,6 +54,18 @@ export class JobTransformer {
       logo: ImageTransformer.getOptimizedUrl(job.logo, "200x200"),
       isUrgent: job.isUrgent,
       benefits: Array.isArray(job.benefits) ? job.benefits : [],
+      benefiti: Array.isArray(job.benefiti) ? (job.benefiti as string[]) : undefined,
+      rawBenefits: Array.isArray(job.rawBenefits) ? (job.rawBenefits as string[]) : undefined,
+      plataMin: typeof job.plataMin === 'number' ? job.plataMin : (typeof job.plataMin === 'string' && !isNaN(Number(job.plataMin)) ? Number(job.plataMin) : undefined),
+      plataMax: typeof job.plataMax === 'number' ? job.plataMax : (typeof job.plataMax === 'string' && !isNaN(Number(job.plataMax)) ? Number(job.plataMax) : undefined),
+      salaryType: typeof job.salaryType === 'string' ? job.salaryType : undefined,
+      smestaj: typeof job.smestaj === 'boolean' ? job.smestaj : undefined,
+      prevoz: typeof job.prevoz === 'boolean' ? job.prevoz : undefined,
+      hrana: typeof job.hrana === 'boolean' ? job.hrana : undefined,
+      housing: typeof job.housing === 'boolean' ? job.housing : undefined,
+      transport: typeof job.transport === 'boolean' ? job.transport : undefined,
+      food: typeof job.food === 'boolean' ? job.food : undefined,
+      topliObrok: typeof job.topliObrok === 'boolean' ? job.topliObrok : undefined,
     };
   }
 
