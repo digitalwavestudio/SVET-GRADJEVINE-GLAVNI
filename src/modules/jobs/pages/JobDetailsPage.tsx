@@ -220,7 +220,7 @@ export default function JobDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B0F] font-sans text-white selection:bg-secondary selection:text-slate-950">
+    <div className="min-h-screen bg-[#070B0F] font-sans text-white selection:bg-secondary selection:text-slate-950 pb-20 md:pb-0">
       <SeoHead
         title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : `${displayTitle} ${jobData.location ? `- ${jobData.location}` : ''} - Svet Građevine`}
         description={cleanDescription.substring(0, 160)}
@@ -350,8 +350,8 @@ export default function JobDetailsPage() {
         <article className="lg:col-span-8 space-y-12">
           <MediaGallery images={jobData.images || []} title={displayTitle} imageStatus={jobData.imageStatus} />
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-[#0D141C] border border-white/5 p-6 rounded-[12px] flex flex-col justify-between h-36 hover:border-secondary/20 transition-all group">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-secondary/20 transition-all group">
               <div className="w-10 h-10 rounded-[8px] bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
                 <Wallet size={20} className="stroke-[2.5]" />
               </div>
@@ -359,7 +359,7 @@ export default function JobDetailsPage() {
                 <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">
                   {jobData.salaryType === 'hourly' ? 'Satnica' : 'Mesečna plata'}
                 </span>
-                <span className="text-xl font-black text-secondary tracking-tight">
+                <span className="text-base sm:text-xl font-black text-secondary tracking-tight break-words">
                   {jobData.plataMin != null
                     ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} EUR`
                     : 'Po dogovoru'}
@@ -368,37 +368,37 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
-            <div className="bg-[#0D141C] border border-white/5 p-6 rounded-[12px] flex flex-col justify-between h-36 hover:border-white/15 transition-all">
+            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
               <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
                 <Clock size={20} className="stroke-[2.5]" />
               </div>
               <div>
                 <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Tip angažmana / Radno vreme</span>
-                <span className="text-lg font-black text-white tracking-tight uppercase">
+                <span className="text-base sm:text-lg font-black text-white tracking-tight uppercase">
                   {getEngagementLabel(jobData.tipAngazmana, jobData.customEngagement)}
                 </span>
               </div>
             </div>
 
-            <div className="bg-[#0D141C] border border-white/5 p-6 rounded-[12px] flex flex-col justify-between h-36 hover:border-white/15 transition-all">
+            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
               <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
                 <Briefcase size={20} className="stroke-[2.5]" />
               </div>
               <div>
                 <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Potrebno Iskustvo</span>
-                <span className="text-lg font-black text-white tracking-tight uppercase">
+                <span className="text-base sm:text-lg font-black text-white tracking-tight uppercase">
                   {getExperienceLabel(jobData.iskustvo)}
                 </span>
               </div>
             </div>
 
-            <div className="bg-[#0D141C] border border-white/5 p-6 rounded-[12px] flex flex-col justify-between h-36 hover:border-white/15 transition-all">
+            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
               <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
                 <Calendar size={20} className="stroke-[2.5]" />
               </div>
               <div>
                 <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Dinamika Isplate</span>
-                <span className="text-lg font-black text-white tracking-tight uppercase">
+                <span className="text-base sm:text-lg font-black text-white tracking-tight uppercase">
                   {getPaymentDynamicsLabel(jobData.dinamikaIsplate)}
                 </span>
               </div>
@@ -556,7 +556,7 @@ export default function JobDetailsPage() {
 
                 {isLoggedIn ? (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-3">
                       <a
                         href={showPhone ? `tel:${phoneNumber}` : '#'}
                         onClick={(e) => {
@@ -571,26 +571,28 @@ export default function JobDetailsPage() {
                         className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-950 py-5 rounded-[10px] font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-yellow-500/10"
                       >
                         <Phone size={18} fill="currentColor" />
-                        {showPhone ? `Tel: ${phoneNumber}` : 'Pozovi Poslodavca'}
+                        {showPhone ? `Tel: ${phoneNumber}` : 'POZOVI POSLODAVCA'}
                       </a>
-                      <a
-                        href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/20 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">chat</span>
-                        WhatsApp
-                      </a>
-                      <a
-                        href={`https://viber.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-purple-600/10 hover:bg-purple-600/20 text-purple-400 border border-purple-600/20 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">call</span>
-                        Viber
-                      </a>
+                      <div className="grid grid-cols-2 gap-3">
+                        <a
+                          href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/20 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">chat</span>
+                          WhatsApp
+                        </a>
+                        <a
+                          href={`https://viber.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-purple-600/10 hover:bg-purple-600/20 text-purple-400 border border-purple-600/20 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">call</span>
+                          Viber
+                        </a>
+                      </div>
                     </div>
                     <button
                       onClick={handleStartChat}
