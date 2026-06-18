@@ -41,7 +41,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
   const machines = machinesData?.pages?.[0]?.items || [];
 
   return (
-    <nav ref={containerRef} aria-labelledby="hub-navigation" className="max-w-7xl mx-auto px-4 sm:px-8 w-full py-4 relative z-10">
+    <nav ref={containerRef} aria-labelledby="hub-navigation" className="max-w-7xl mx-auto px-4 sm:px-8 w-full pt-4 md:pt-8 pb-6 md:pb-8 relative z-10">
       <div className="bg-[#050A0F]/80 border border-white/10 rounded-2xl px-6 py-10 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
         <header className="mb-10 text-center">
           <h2 id="hub-navigation" className="text-2xl font-black uppercase tracking-tight text-white mb-2">

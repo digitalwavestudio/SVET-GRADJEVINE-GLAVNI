@@ -11,7 +11,7 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer role="contentinfo" className="bg-[#0a1016] w-full pt-16 md:pt-24 pb-8 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
+    <footer role="contentinfo" className="bg-[#0a1016] w-full pt-16 md:pt-24 pb-24 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       {/* Background glow for luxury feel */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>

@@ -164,7 +164,7 @@ export default function SeoContentBlock({ type, locationSlug, grad, zanimanje, i
   const locForTitle = gradName ? `u mestu ${gradName}` : 'u Srbiji';
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-8 w-full py-12 lg:py-20 relative z-10">
+    <section className="max-w-7xl mx-auto px-4 sm:px-8 w-full pt-16 lg:pt-20 pb-12 lg:pb-20 relative z-10">
       {/* FAQ Schema Markup */}
       <script type="application/ld+json">
         {JSON.stringify([
