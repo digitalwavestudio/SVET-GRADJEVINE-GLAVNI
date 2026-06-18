@@ -7,7 +7,7 @@ export class DashboardAdminService {
     const cacheKey = "admin_global_stats:v2";
     
     try {
-      const stats = await CacheService.getOrSetSWR(
+      const stats = await CacheService.getOrSet(
         cacheKey,
         async () => {
           const { AdminStatsService } = await import("../admin-stats.service.ts");
@@ -45,7 +45,7 @@ export class DashboardAdminService {
     const cacheKey = "admin_chart_data:v2";
     
     try {
-      const result = await CacheService.getOrSetSWR(
+      const result = await CacheService.getOrSet(
         cacheKey,
         async () => {
           let history: Record<string, { korisnici: number; oglasi: number; prihodi: number; transakcije: number }> = {};

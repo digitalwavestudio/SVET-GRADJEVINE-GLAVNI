@@ -229,24 +229,19 @@ export abstract class BaseAdStrategy {
       });
     }
 
-    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("promoted_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("public_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("search_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_global_stats").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_chart_data").catch(err => console.error("[Cache] invalidation error:", err));
-
+    const prefixes = [
+      `myAds_${uid}`, `publicProfileAds_${uid}`, "promoted_", "public_ads_",
+      "search_ads_", "admin_moderation_queue_", "admin_global_stats", "admin_chart_data",
+    ];
     if (this.category === "jobs") {
-      CacheService.invalidateByPrefix("public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("unified_search_job_").catch(err => console.error("[Cache] invalidation error:", err));
+      prefixes.push(
+        "public_jobs_", "swr:public_jobs_",
+        "homepage_premium_jobs_", "swr:homepage_premium_jobs_",
+        "homepage_urgent_jobs_", "swr:homepage_urgent_jobs_",
+        "unified_search_job_",
+      );
     }
+    CacheService.invalidateByPrefixes(prefixes).catch(err => console.error("[Cache] invalidation error:", err));
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(err => console.error("[Cache] invalidation error:", err));
@@ -386,24 +381,19 @@ export abstract class BaseAdStrategy {
       ).catch((err) => console.error("Queue immediate push failed for updateAd", err.message));
     }
 
-    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("promoted_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("public_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("search_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_global_stats").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_chart_data").catch(err => console.error("[Cache] invalidation error:", err));
-
+    const prefixes = [
+      `myAds_${uid}`, `publicProfileAds_${uid}`, "promoted_", "public_ads_",
+      "search_ads_", "admin_moderation_queue_", "admin_global_stats", "admin_chart_data",
+    ];
     if (this.category === "jobs") {
-      CacheService.invalidateByPrefix("public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("unified_search_job_").catch(err => console.error("[Cache] invalidation error:", err));
+      prefixes.push(
+        "public_jobs_", "swr:public_jobs_",
+        "homepage_premium_jobs_", "swr:homepage_premium_jobs_",
+        "homepage_urgent_jobs_", "swr:homepage_urgent_jobs_",
+        "unified_search_job_",
+      );
     }
+    CacheService.invalidateByPrefixes(prefixes).catch(err => console.error("[Cache] invalidation error:", err));
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(err => console.error("[Cache] invalidation error:", err));
@@ -472,24 +462,19 @@ export abstract class BaseAdStrategy {
       ).catch((err) => console.error("Queue immediate push failed for deleteAd", err.message));
     }
 
-    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("promoted_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("public_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("search_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_global_stats").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_chart_data").catch(err => console.error("[Cache] invalidation error:", err));
-
+    const prefixes = [
+      `myAds_${uid}`, `publicProfileAds_${uid}`, "promoted_", "public_ads_",
+      "search_ads_", "admin_moderation_queue_", "admin_global_stats", "admin_chart_data",
+    ];
     if (this.category === "jobs") {
-      CacheService.invalidateByPrefix("public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("unified_search_job_").catch(err => console.error("[Cache] invalidation error:", err));
+      prefixes.push(
+        "public_jobs_", "swr:public_jobs_",
+        "homepage_premium_jobs_", "swr:homepage_premium_jobs_",
+        "homepage_urgent_jobs_", "swr:homepage_urgent_jobs_",
+        "unified_search_job_",
+      );
     }
+    CacheService.invalidateByPrefixes(prefixes).catch(err => console.error("[Cache] invalidation error:", err));
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(err => console.error("[Cache] invalidation error:", err));
@@ -614,24 +599,19 @@ export abstract class BaseAdStrategy {
     
     if (result.outboxPayload?.payload?.uid) {
        const uid = result.outboxPayload.payload.uid;
-    CacheService.invalidateByPrefix(`myAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix(`publicProfileAds_${uid}`).catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("promoted_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("public_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("search_ads_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_moderation_queue_").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_global_stats").catch(err => console.error("[Cache] invalidation error:", err));
-    CacheService.invalidateByPrefix("admin_chart_data").catch(err => console.error("[Cache] invalidation error:", err));
-
+    const prefixes = [
+      `myAds_${uid}`, `publicProfileAds_${uid}`, "promoted_", "public_ads_",
+      "search_ads_", "admin_moderation_queue_", "admin_global_stats", "admin_chart_data",
+    ];
     if (this.category === "jobs") {
-      CacheService.invalidateByPrefix("public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:public_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_premium_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("swr:homepage_urgent_jobs_").catch(err => console.error("[Cache] invalidation error:", err));
-      CacheService.invalidateByPrefix("unified_search_job_").catch(err => console.error("[Cache] invalidation error:", err));
+      prefixes.push(
+        "public_jobs_", "swr:public_jobs_",
+        "homepage_premium_jobs_", "swr:homepage_premium_jobs_",
+        "homepage_urgent_jobs_", "swr:homepage_urgent_jobs_",
+        "unified_search_job_",
+      );
     }
+    CacheService.invalidateByPrefixes(prefixes).catch(err => console.error("[Cache] invalidation error:", err));
 
     import("../dashboard.service.ts").then(({ DashboardService }) => {
       DashboardService.clearEmployerStatsCache(uid).catch(err => console.error("[Cache] invalidation error:", err));

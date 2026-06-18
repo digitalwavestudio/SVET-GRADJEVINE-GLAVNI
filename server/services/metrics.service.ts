@@ -408,7 +408,7 @@ export class MetricsService {
   static async getUserAnalytics(userId: string, days: number = 30) {
     const cacheKey = CacheKeys.userAnalytics(userId, days);
 
-    const baseStats = await CacheService.getOrSetSWR(
+    const baseStats = await CacheService.getOrSet(
       cacheKey,
       async () => {
         const startDate = new Date();
@@ -488,8 +488,7 @@ export class MetricsService {
           return []; // Return empty array as fallback
         }
       },
-      300000,
-      []
+      300000
     ); // 5 min TTL
 
     const pendingStats = await this.getPendingDailyStats(userId, undefined);

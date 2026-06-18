@@ -101,7 +101,7 @@ export class AdminSettingsService {
     const cacheKey = `settings_swr_${type}`;
     const timeoutMs = type === "branding" ? 2000 : 10000;
 
-    return await CacheService.getOrSetSWR(
+    return await CacheService.getOrSet(
       cacheKey,
       async () => {
         try {
@@ -177,28 +177,7 @@ export class AdminSettingsService {
            throw error;
          }
        },
-       15 * 60 * 1000,
-       type === "branding" ? { 
-         heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-         heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
-         primaryColor: "#0f172a",
-         secondaryColor: "#3b82f6" 
-        } : (type === "global" ? {
-          pricing: {
-             jobs: { standard: 500, premium: 1000, urgent: 1500 },
-             accommodations: { standard: 500, premium: 1000, urgent: 1500 },
-             caterings: { standard: 500, premium: 1000, urgent: 1500 },
-             marketplace: { standard: 500, premium: 1000, urgent: 1500 },
-             machines: { standard: 500, premium: 1000, urgent: 1500 },
-             plots: { standard: 500, premium: 1000, urgent: 1500 },
-             professional_monthly: 6000
-          },
-         limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
-         messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
-         globalRateLimit: 100,
-         initialCredits: 1500
-       } : null), // Fallback
-       timeoutMs
-    ); // 15 minutes cache with SWR
+        15 * 60 * 1000
+      ); // 15 minuta cache
   }
 }

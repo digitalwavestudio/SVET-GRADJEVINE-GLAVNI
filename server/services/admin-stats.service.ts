@@ -32,7 +32,7 @@ export class AdminStatsService {
 
     const fetchTask = (async () => {
       try {
-        const data = await CacheService.getOrSetSWR(
+        const data = await CacheService.getOrSet(
           cacheKey,
           async () => {
              // 1. Try Firestore Fast-Path (L0) as a cheaper fallback than query
@@ -84,7 +84,6 @@ export class AdminStatsService {
              return res;
           },
           3600 * 1000, // 1 hour TTL
-          fallbackValue
         );
         this.l1ShieldCache.set(cacheKey, { data, expiry: now + this.L1_SHIELD_TTL });
         return data;

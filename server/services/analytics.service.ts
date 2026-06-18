@@ -9,7 +9,7 @@ export class AnalyticsService {
   static async getAdViewTrend(adId: string, days: number = 7) {
     const cacheKey = `analytics_trend:${adId}:${days}`;
 
-    const snapData = await CacheService.getOrSetSWR(
+    const snapData = await CacheService.getOrSet(
       cacheKey,
       async () => {
         const startDate = new Date();
@@ -32,8 +32,7 @@ export class AnalyticsService {
         });
         return fetchedStats;
       },
-      300000,
-      {}
+      300000
     );
 
     const stats: Record<string, number> = {};

@@ -754,6 +754,64 @@ export class CacheService {
   }
 
   /**
+   * Briše sve ključeve za više prefiksa u jednom batch pozivu.
+   * Svi DEL-ovi se grupišu u Redis pipeline za manje round-trip-ova.
+   */
+  static async invalidateByPrefixes(prefixes: string[]): Promise<void> {
+    if (prefixes.length === 0) return;
+
+    const geoRegion = DatabaseManager.getRequestRegion();
+
+    // Očisti lokalni L1 za sve prefikse
+    for (const prefix of prefixes) {
+      this.deleteLocalByPrefixOnly(prefix);
+    }
+
+    // Očisti L2
+    const client = this.redisClient;
+    if (client) {
+      try {
+        const pipeline = client.pipeline();
+        const seen = new Set<string>();
+
+        for (const prefix of prefixes) {
+          const regionalPrefix = geoRegion && geoRegion !== "beograd" ? `${geoRegion}:${prefix}` : prefix;
+          const prefList = [prefix];
+          if (regionalPrefix !== prefix) {
+            prefList.push(regionalPrefix);
+          }
+
+          for (const pref of prefList) {
+            let cursor = "0";
+            do {
+              const [newCursor, keys] = await client.scan(
+                cursor,
+                "MATCH",
+                `${pref}*`,
+                "COUNT",
+                200,
+              );
+              cursor = newCursor;
+              for (const key of keys) {
+                if (!seen.has(key)) {
+                  seen.add(key);
+                  pipeline.del(key);
+                }
+              }
+            } while (cursor !== "0");
+          }
+        }
+
+        if (seen.size > 0) {
+          await pipeline.exec();
+        }
+      } catch (err) {
+        console.error("[CacheService] Redis invalidateByPrefixes error:", err);
+      }
+    }
+  }
+
+  /**
    * Briše sve ključeve koji počinju sa prefiksom iz oba keša.
    */
   static async invalidateByPrefix(prefix: string): Promise<void> {
