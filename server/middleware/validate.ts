@@ -619,7 +619,8 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
         "/api/analytics/", "/analytics/",
         "/api/favorites/", "/favorites/",
         "/api/logs", "/logs",
-        "/api/admin/", "/admin/"
+        "/api/admin/", "/admin/",
+        "/api/ai/", "/ai/"
       ];
 
       const isExempt = exemptPrefixes.some(prefix => path.includes(prefix));
