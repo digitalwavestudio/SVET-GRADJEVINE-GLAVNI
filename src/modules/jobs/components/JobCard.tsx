@@ -21,6 +21,16 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
   const friendlyLoc = LOCATIONS.find(l => l.slug === job.loc || l.slug === job.location)?.name || job.loc || job.location || 'Srbija';
 
+  const getSalaryDisplay = () => {
+    if (job.plataMin != null) {
+      const min = Number(job.plataMin).toLocaleString();
+      const max = job.plataMax != null ? ` - ${Number(job.plataMax).toLocaleString()}` : '';
+      const type = job.salaryType === 'hourly' ? ' / sat' : ' / mesec';
+      return `${min}${max} EUR${type}`;
+    }
+    return job.sal || job.salary || 'Dogovor';
+  };
+
   return (
     <>
       {/* Mobile Card Layout */}
@@ -110,7 +120,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           <div className="text-right flex flex-col">
             <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">Plata / Satnica</span>
             <span className="text-secondary font-black text-sm font-mono leading-none">
-              {job.sal || job.salary || 'Dogovor'}
+              {getSalaryDisplay()}
             </span>
           </div>
         </div>
@@ -118,10 +128,10 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         {/* Benefits Section: smestaj, prevoz, hrana */}
         <div className="flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
           {(() => {
-            const benefitsSlugs = job.benefits || [];
-            const hasSmestaj = benefitsSlugs.includes('smestaj');
-            const hasPrevoz = benefitsSlugs.includes('prevoz');
-            const hasHrana = benefitsSlugs.includes('topli-obrok');
+            const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
+            const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
+            const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
+            const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
 
             if (!hasSmestaj && !hasPrevoz && !hasHrana) {
               return <div className="h-[22px] w-full"></div>;
@@ -268,16 +278,38 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               </span>
             </div>
 
-            <div className="hidden md:flex flex-wrap gap-2">
-              {(job.benefits || []).slice(0, viewMode === 'list' ? 3 : 2).map((benefitSlug: string) => {
-                const benefit = BENEFITS.find(b => b.slug === benefitSlug);
-                if (!benefit) return null;
+            {/* Benefits Section for Desktop */}
+            <div className="hidden md:flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
+              {(() => {
+                const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
+                const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
+                const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
+                const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
+
+                if (!hasSmestaj && !hasPrevoz && !hasHrana) {
+                  return <div className="h-[22px] w-full"></div>;
+                }
+
                 return (
-                  <span key={benefitSlug} className="flex items-center gap-1 px-2 py-0.5 bg-white/5 text-white/50 text-[9px] rounded-sm font-bold border border-white/5 uppercase tracking-wider">
-                     {benefit.name}
-                  </span>
+                  <>
+                    {hasSmestaj && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 text-green-400 text-[9px] rounded-full font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[10px]">home</span> Smeštaj
+                      </span>
+                    )}
+                    {hasPrevoz && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] rounded-full font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[10px]">commute</span> Prevoz
+                      </span>
+                    )}
+                    {hasHrana && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[9px] rounded-full font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[10px]">restaurant</span> Hrana
+                      </span>
+                    )}
+                  </>
                 );
-              })}
+              })()}
             </div>
           </div>
         </div>
@@ -286,7 +318,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         <div className={`${viewMode === 'list' ? 'md:min-w-[150px] md:text-right flex md:flex-col items-center md:items-end justify-between w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-white/5' : 'mt-auto pt-4 border-t border-white/5 flex items-center justify-between'} relative z-10`}>
           <div className="flex flex-col items-start md:items-end">
             <div className="text-secondary font-black text-lg mb-1 font-mono">
-              {job.sal}
+              {getSalaryDisplay()}
             </div>
             {viewMode === 'list' && (
               <div className="text-white/30 text-[9px] font-bold uppercase tracking-widest mb-3 font-mono">
