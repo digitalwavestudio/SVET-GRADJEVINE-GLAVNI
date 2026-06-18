@@ -166,6 +166,18 @@ export class UnifiedSearchFirestore {
       "sal",
       "logo",
       "benefits",
+      "plataMin",
+      "plataMax",
+      "salaryType",
+      "smestaj",
+      "prevoz",
+      "hrana",
+      "housing",
+      "transport",
+      "food",
+      "topliObrok",
+      "benefiti",
+      "rawBenefits",
     );
 
     if (firestoreCursorId) {
@@ -440,6 +452,18 @@ export class UnifiedSearchFirestore {
       "description",
       "name",
       "benefits",
+      "plataMin",
+      "plataMax",
+      "salaryType",
+      "smestaj",
+      "prevoz",
+      "hrana",
+      "housing",
+      "transport",
+      "food",
+      "topliObrok",
+      "benefiti",
+      "rawBenefits",
     );
 
     try {

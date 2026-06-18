@@ -56,18 +56,17 @@ export function JobListings({
             viewMode={viewMode}
           />
         ) : filteredJobs.length === 0 ? (
-          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'grid grid-cols-1 gap-4'}>
-            {jobs.map((job, index) => (
-              <div key={job.id || index}>
-                <JobCard job={job} viewMode={viewMode} prefetch={prefetch} />
-              </div>
-            ))}
+          <div className="w-full bg-[#13212e]/20 p-12 rounded-[10px] border border-white/5 text-center flex flex-col items-center justify-center min-h-[350px]">
+            <span className="material-symbols-outlined text-white/10 text-6xl mb-4" style={{ fontVariationSettings: '"FILL" 1' }}>search_off</span>
+            <h3 className="font-black text-2xl text-white/50 mb-2 uppercase tracking-tighter">Nema pronađenih oglasa</h3>
+            <p className="text-on-surface-variant text-base">Pokušajte da izmenite filtere ili pretragu.</p>
+            <button onClick={handleResetFilters} className="mt-6 px-6 py-2.5 bg-secondary text-black font-black rounded uppercase text-xs tracking-widest hover:bg-yellow-500 transition-colors">Resetuj filtere</button>
           </div>
         ) : (
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'grid grid-cols-1 gap-4'}>
             {filteredJobs.map((job, index) => (
                <div key={job.id || index}>
-                 <JobCard job={job} viewMode={viewMode} prefetch={prefetch} />
+                  <JobCard job={job} viewMode={viewMode} prefetch={prefetch} />
                </div>
             ))}
           </div>

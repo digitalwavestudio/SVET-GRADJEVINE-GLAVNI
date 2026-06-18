@@ -445,6 +445,19 @@ export class UnifiedAdsService {
         "comp",
         "salary",
         "logo",
+        "plataMin",
+        "plataMax",
+        "salaryType",
+        "smestaj",
+        "prevoz",
+        "hrana",
+        "housing",
+        "transport",
+        "food",
+        "topliObrok",
+        "benefits",
+        "benefiti",
+        "rawBenefits",
       )
       .get();
 

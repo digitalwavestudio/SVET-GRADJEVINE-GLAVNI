@@ -337,8 +337,8 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
     }
     return result;
   }, [jobs, debouncedSearchQuery, salaryRange, selectedBenefits, sortBy]);
-  const filteredPremiumJobs = useMemo(() => applyLocalFilters(premiumJobs), [premiumJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
-  const filteredUrgentJobs = useMemo(() => applyLocalFilters(urgentJobs), [urgentJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
+  const filteredPremiumJobs = useMemo(() => applyLocalFilters(premiumJobs).filter((j: any) => j.isPremium === true), [premiumJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
+  const filteredUrgentJobs = useMemo(() => applyLocalFilters(urgentJobs).filter((j: any) => j.isUrgent === true), [urgentJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
 
   // Reset page when filters change (Not needed anymore with server-side pagination)
   

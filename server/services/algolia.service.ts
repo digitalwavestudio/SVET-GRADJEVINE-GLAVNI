@@ -37,6 +37,20 @@ export interface AdAlgoliaRecord {
   _geoloc?: { lat: number; lng: number };
   images?: string[];
   logo?: string;
+  sal?: string | number;
+  plataMin?: number;
+  plataMax?: number;
+  salaryType?: string;
+  benefits?: string[];
+  benefiti?: string[];
+  rawBenefits?: string[];
+  smestaj?: boolean;
+  prevoz?: boolean;
+  hrana?: boolean;
+  housing?: boolean;
+  transport?: boolean;
+  food?: boolean;
+  topliObrok?: boolean;
   _isPartialUpdate?: boolean;
 }
 
@@ -318,6 +332,10 @@ export const projectForAlgolia = (doc: Record<string, unknown>): Partial<AdAlgol
     isPremiumPartner: doc.isPremiumPartner as boolean | undefined,
     isVerified: doc.isVerified as boolean | undefined,
     salary: doc.salary as string | number | undefined,
+    sal: doc.sal as string | number | undefined,
+    plataMin: doc.plataMin as number | undefined,
+    plataMax: doc.plataMax as number | undefined,
+    salaryType: doc.salaryType as string | undefined,
     salaryRate: doc.salaryRate as string | undefined,
     comp: doc.comp as string | undefined,
     authorId: doc.authorId as string | undefined,
@@ -333,6 +351,16 @@ export const projectForAlgolia = (doc: Record<string, unknown>): Partial<AdAlgol
     sectorSlug: doc.sectorSlug as string | undefined,
     areaM2: doc.areaM2 as number | undefined,
     tacnaLokacija: doc.tacnaLokacija as string | undefined,
+    benefits: Array.isArray(doc.benefits) ? doc.benefits : undefined,
+    benefiti: Array.isArray(doc.benefiti) ? doc.benefiti : undefined,
+    rawBenefits: Array.isArray(doc.rawBenefits) ? doc.rawBenefits : undefined,
+    smestaj: typeof doc.smestaj === 'boolean' ? doc.smestaj : undefined,
+    prevoz: typeof doc.prevoz === 'boolean' ? doc.prevoz : undefined,
+    hrana: typeof doc.hrana === 'boolean' ? doc.hrana : undefined,
+    housing: typeof doc.housing === 'boolean' ? doc.housing : undefined,
+    transport: typeof doc.transport === 'boolean' ? doc.transport : undefined,
+    food: typeof doc.food === 'boolean' ? doc.food : undefined,
+    topliObrok: typeof doc.topliObrok === 'boolean' ? doc.topliObrok : undefined,
     _geoloc: geopoint ? { lat: geopoint.latitude, lng: geopoint.longitude } : _geoloc,
   };
 

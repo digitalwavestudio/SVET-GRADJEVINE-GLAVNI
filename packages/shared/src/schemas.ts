@@ -37,13 +37,22 @@ export const jobSchema = z.object({
 
 export const jobSearchSchema = z.object({
   searchQuery: z.string().optional(),
-  locationSlug: z.string().optional(),
-  professionSlug: z.string().optional(),
-  sector: z.string().optional(),
-  engagement: z.string().optional(),
-  experience: z.string().optional(),
-  minSalary: z.number().optional(),
-  maxSalary: z.number().optional(),
+  filters: z.object({
+    locationSlug: z.string().optional(),
+    professionSlug: z.string().optional(),
+    sector: z.string().optional(),
+    engagement: z.string().optional(),
+    experience: z.string().optional(),
+    minSalary: z.number().optional(),
+    maxSalary: z.number().optional(),
+    isPremium: z.boolean().optional(),
+    isUrgent: z.boolean().optional(),
+    isPremiumPartner: z.boolean().optional(),
+    isVerified: z.boolean().optional(),
+    showAllStatuses: z.boolean().optional(),
+    status: z.string().optional(),
+    companyId: z.string().optional()
+  }).optional(),
   lastVisibleId: z.string().nullable().optional(),
   pageSize: z.number().min(1).max(100).optional()
 });
