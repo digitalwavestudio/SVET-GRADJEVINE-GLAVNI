@@ -20,17 +20,7 @@ window.onerror = function(message, source, lineno, colno, error) {
     }).catch(() => console.warn('[Main] window.onerror log fetch failed'));
   } catch (e) { console.error("[Main] window.onerror handler error:", e); }
 
-  import('./lib/sanitize.ts').then(({ sanitizeInput }) => {
-    const root = document.getElementById('root');
-    if (root) {
-      root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
-        `<h2>Global Error Caught!</h2>` +
-        `<p><strong>Message:</strong> ${sanitizeInput(message)}</p>` +
-        `<p><strong>Source:</strong> ${sanitizeInput(String(source))}:${sanitizeInput(String(lineno))}:${sanitizeInput(String(colno))}</p>` +
-        `<pre>${sanitizeInput(error?.stack || '')}</pre>` +
-        `</div>`;
-    }
-  });
+  console.error('[Main] Global Error:', { message, source, lineno, colno, stack: error?.stack });
 };
 window.addEventListener('unhandledrejection', function(event) {
   const reasonStr = String(event.reason?.message || event.reason || '').toLowerCase();
@@ -55,15 +45,7 @@ window.addEventListener('unhandledrejection', function(event) {
     }).catch(() => console.warn('[Main] unhandledrejection log fetch failed'));
   } catch (e) { console.error("[Main] unhandledrejection handler error:", e); }
 
-  import('./lib/sanitize.ts').then(({ sanitizeInput }) => {
-    const root = document.getElementById('root');
-    if (root) {
-      root.innerHTML = `<div style="padding: 20px; color: red; background: #222; font-family: monospace;">` +
-        `<h2>Unhandled Promise Rejection!</h2>` +
-        `<pre>${sanitizeInput(event.reason?.stack || String(event.reason))}</pre>` +
-        `</div>`;
-    }
-  });
+  console.error('[Main] Unhandled Promise Rejection:', event.reason);
 });
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
