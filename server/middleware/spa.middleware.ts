@@ -476,6 +476,66 @@ ${structuredDataHtml}
   }
 }
 
+async function backgroundPreRenderHomepage(
+  cacheKey: string,
+  cachedIndexHtml: string,
+  cacheTtl: number,
+): Promise<string | null> {
+  const redis = getRedis();
+
+  try {
+    const snapshot = await db.collection("listings")
+      .orderBy("createdAt", "desc")
+      .limit(6)
+      .get();
+
+    let itemsHtml = "";
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const id = doc.id;
+      const title = data.title || data.name || "Oglas";
+      const slug = title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+      const typeMap: Record<string, string> = {
+        job: "posao", machine: "masina", company: "firma",
+        catering: "ketering", accommodation: "smestaj",
+        plot: "placevi", marketplace: "alat-i-oprema",
+      };
+      const path = typeMap[data.type] || "oglas";
+      const url = `${APP_CONFIG.BASE_URL}/${path}/${slug}~${id}`;
+      const location = data.city || data.location || "";
+      const price = data.price ? `${data.price} ${data.currency || "EUR"}` : "";
+
+      itemsHtml += `<li><a href="${url}">${title}</a>${location ? ` - ${location}` : ""}${price ? ` (${price})` : ""}</li>`;
+    });
+
+    const botHtml = `
+      <main>
+        <h1>Svet Građevine - Portal za građevinske oglase</h1>
+        <p>Najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više.</p>
+        <section>
+          <h2>Najnoviji oglasi</h2>
+          <ul>${itemsHtml || "<li>Trenutno nema aktivnih oglasa.</li>"}</ul>
+        </section>
+      </main>`;
+
+    let html = cachedIndexHtml;
+    html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
+    html = html.replace("</head>", `
+<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
+</head>`);
+    html = html.replace('<div id="root"></div>', `<div id="root">${botHtml}</div>`);
+
+    if (redis) {
+      await redis.set(cacheKey, html, "EX", cacheTtl);
+    }
+    return html;
+  } catch (error) {
+    console.error("[SPA-Homepage] Error caching homepage:", error);
+    return null;
+  }
+}
+
 export const createSpaMiddleware = () => {
   const router = express.Router();
   const distPath = path.join(process.cwd(), "dist");
@@ -652,6 +712,23 @@ export const createSpaMiddleware = () => {
           "</head>",
           `<meta name="description" content="${meta.desc}" /><link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" /></head>`,
         );
+        return res.send(html);
+      }
+
+      // Homepage: pre-render latest listings for bots
+      if (req.path === "/") {
+        const userAgent = req.headers["user-agent"]?.toLowerCase() || "";
+        const isBot = /bot|googlebot|crawler|spider|robot|crawling|whatsapp|telegram|facebookexternalhit|twitterbot|linkedinbot|viber/i.test(userAgent);
+
+        if (isBot) {
+          const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
+          const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
+          if (rendered) return res.send(rendered);
+        }
+
+        // Set proper homepage meta for all visitors
+        html = html.replace(/<title>.*?<\/title>/, `<title>Svet GraÄ‘evine - Portal za graÄ‘evinske oglase</title>`);
+        html = html.replace("</head>", `<meta name="description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /></head>`);
         return res.send(html);
       }
 
