@@ -421,7 +421,7 @@ input, textarea {
   section.relative.z-50.min-h-screen {
     padding-top: 5.5rem !important;
     padding-bottom: 1.5rem !important;
-    min-h-screen: auto !important;
+    min-height: auto !important;
     height: auto !important;
   }
   h1.font-headline {

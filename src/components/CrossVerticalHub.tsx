@@ -52,7 +52,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {currentVertical !== 'poslovi' && (
-            <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-secondary/30 transition-colors flex flex-col justify-between h-[340px]">
+            <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-secondary/30 transition-colors flex flex-col justify-between md:h-[340px]">
               <div>
                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                   <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
@@ -89,7 +89,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'firme' && (
-             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-indigo-500/30 transition-colors flex flex-col justify-between h-[340px]">
+             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-indigo-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
                <div>
                   <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                      <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500">
@@ -116,7 +116,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'majstori' && (
-            <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-colors flex flex-col justify-between h-[340px]">
+            <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-blue-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
               <div>
                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                   <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
@@ -151,7 +151,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'smestaj' && (
-             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-teal-500/30 transition-colors flex flex-col justify-between h-[340px]">
+             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-teal-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
                <div>
                   <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                      <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-500">
@@ -178,7 +178,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'masine' && (
-            <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-green-500/30 transition-colors flex flex-col justify-between h-[340px]">
+            <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-green-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
               <div>
                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                   <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500">
@@ -213,7 +213,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'ketering' && (
-             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/30 transition-colors flex flex-col justify-between h-[340px]">
+             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-amber-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
                <div>
                   <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                      <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
@@ -240,7 +240,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'alat-i-oprema' && (
-             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-pink-500/30 transition-colors flex flex-col justify-between h-[340px]">
+             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-pink-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
                <div>
                   <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                      <div className="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-500">
@@ -262,7 +262,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           )}
 
           {currentVertical !== 'placevi' && (
-             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-lime-500/30 transition-colors flex flex-col justify-between h-[340px]">
+             <div className="bg-[#0A1118]/50 border border-white/5 rounded-2xl p-6 hover:border-lime-500/30 transition-colors flex flex-col justify-between md:h-[340px]">
                <div>
                   <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/5">
                      <div className="w-10 h-10 rounded-lg bg-lime-500/10 flex items-center justify-center text-lime-500">
