@@ -144,8 +144,8 @@ function Root() {
           maxAge: 1000 * 60 * 60 * 24,
           dehydrateOptions: {
             shouldDehydrateQuery: (query) => {
-              if (!query?.queryKey) return false;
-                  const keysToPersist = ['premium-partners', 'categories', 'static-config', 'configs'];
+              if (!query?.queryKey || !Array.isArray(query.queryKey)) return false;
+              const keysToPersist = ['premium-partners', 'categories', 'static-config', 'configs'];
               return keysToPersist.some((key) => {
                 const stringKey = typeof key === 'string' ? key : JSON.stringify(key);
                 return query.queryKey.some((qk) => {
