@@ -25,7 +25,7 @@ export async function parseGlobalSearch(query: string): Promise<GlobalSearchInte
     return data;
   } catch (error) {
     logger.error("Error parsing global search with API:", error);
-    return { keywords: [query], intentType: 'SEARCH' };
+    return { keywords: [query], intentType: 'SEARCH', category: undefined, subCategory: undefined, locationSlug: undefined, minPrice: undefined, maxPrice: undefined, isUrgent: false } as GlobalSearchIntent;
   }
 }
 

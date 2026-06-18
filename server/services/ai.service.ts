@@ -51,43 +51,14 @@ export const parseSearchIntent = async (query: string) => {
       3. Cena: "do 5000" -> maxPrice: 5000.
       4. Izdvoj ključne reči koje nisu lokacija ili kategorija.
       `,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            category: {
-              type: Type.STRING,
-              enum: [
-                "jobs",
-                "accommodations",
-                "catering",
-                "companies",
-                "machines",
-                "real-estate",
-                "marketplace",
-                "masters",
-              ],
-              nullable: true,
-            },
-            subCategory: { type: Type.STRING, nullable: true },
-            locationSlug: { type: Type.STRING, nullable: true },
-            minPrice: { type: Type.NUMBER, nullable: true },
-            maxPrice: { type: Type.NUMBER, nullable: true },
-            keywords: { type: Type.ARRAY, items: { type: Type.STRING } },
-            isUrgent: { type: Type.BOOLEAN },
-            intentType: { type: Type.STRING, enum: ["SEARCH", "QUESTION"] },
-          },
-          required: ["keywords", "intentType"],
-        },
-      },
     });
     const jsonStr = response.text?.trim() || "{}";
-    return JSON.parse(jsonStr);
-  } catch (error) {
-    console.error("Gemini API error:", error);
-    return { keywords: [query], intentType: "SEARCH" };
-  }
+    try {
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      // Fallback if Gemini returns non‑JSON
+      return { keywords: [query], intentType: "SEARCH" };
+    }
 };
 
 export const moderateImage = async (imageUrl: string) => {
