@@ -68,31 +68,14 @@ export function MapRadarWidget({
         </div>
 
         {/* Blueprint Building Shapes - DYNAMIC */}
-        <div className="absolute top-[15%] left-[25%] w-56 h-36 border-2 border-dashed border-secondary/20 bg-secondary/5 rounded-[10px] flex flex-col items-center justify-center group/obj transition-all hover:bg-secondary/10 hover:border-secondary/40">
-           <span className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.3em] rotate-[-5deg] group-hover/obj:text-secondary group-hover/obj:rotate-0 transition-all">OBJEKAT A</span>
-           <span className="text-[8px] font-bold text-secondary/20 uppercase tracking-widest mt-1">GLAVNA STRUKTURA</span>
+        <div className="absolute top-[10%] sm:top-[15%] left-[5%] sm:left-[25%] w-36 h-24 sm:w-56 sm:h-36 border-2 border-dashed border-secondary/20 bg-secondary/5 rounded-[10px] flex flex-col items-center justify-center group/obj transition-all hover:bg-secondary/10 hover:border-secondary/40">
+           <span className="text-[8px] sm:text-[10px] font-black text-secondary/40 uppercase tracking-[0.3em] rotate-[-5deg] group-hover/obj:text-secondary group-hover/obj:rotate-0 transition-all">OBJEKAT A</span>
+           <span className="text-[7px] sm:text-[8px] font-bold text-secondary/20 uppercase tracking-widest mt-1">GLAVNA STRUKTURA</span>
         </div>
         
-        <div className="absolute bottom-[20%] right-[20%] w-40 h-56 border-2 border-dashed border-white/10 bg-white/[0.02] rounded-[10px] flex flex-col items-center justify-center group/obj transition-all hover:bg-white/[0.05] hover:border-white/20">
-           <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] rotate-[10deg] group-hover/obj:text-white/40 group-hover/obj:rotate-0 transition-all">OBJEKAT B</span>
-           <span className="text-[8px] font-bold text-white/10 uppercase tracking-widest mt-1">POMOĆNI ANEKS</span>
-        </div>
-
-        <div className="absolute top-[40%] right-[10%] w-32 h-32 border-2 border-dashed border-blue-500/20 bg-blue-500/5 rounded-full flex flex-col items-center justify-center group/obj transition-all hover:bg-blue-500/10 hover:border-blue-500/40">
-           <span className="text-[9px] font-black text-blue-500/30 uppercase tracking-[0.2em] group-hover/obj:text-blue-500 transition-all">BAZEN / SPA</span>
-        </div>
-
-        {/* UPLOADER NA MAPI - PRAVA OPCIJA */}
-        <div className="absolute bottom-6 left-6 z-20">
-          <button className="bg-[#131920]/80 backdrop-blur-md border border-white/10 p-4 rounded-[10px] flex items-center gap-4 hover:bg-white/5 transition-all group/upload shadow-2xl">
-            <div className="w-12 h-12 rounded-[10px] bg-white/5 flex items-center justify-center group-hover/upload:bg-green-500 transition-all">
-              <span className="material-symbols-outlined text-white group-hover/upload:text-black">3d_rotation</span>
-            </div>
-            <div className="text-left">
-              <span className="text-[10px] font-black text-white uppercase tracking-widest block">Učitaj 3D Model Terena</span>
-              <span className="text-[8px] text-white/30 font-bold uppercase tracking-widest">DRONE SCAN / LiDAR (.obj, .fbx)</span>
-            </div>
-          </button>
+        <div className="absolute bottom-[10%] sm:bottom-[20%] right-[5%] sm:right-[20%] w-28 h-36 sm:w-40 sm:h-56 border-2 border-dashed border-white/10 bg-white/[0.02] rounded-[10px] flex flex-col items-center justify-center group/obj transition-all hover:bg-white/[0.05] hover:border-white/20">
+           <span className="text-[8px] sm:text-[10px] font-black text-white/20 uppercase tracking-[0.3em] rotate-[10deg] group-hover/obj:text-white/40 group-hover/obj:rotate-0 transition-all">OBJEKAT B</span>
+           <span className="text-[7px] sm:text-[8px] font-bold text-white/10 uppercase tracking-widest mt-1">POMOĆNI ANEKS</span>
         </div>
 
         {/* Workers Pins */}
