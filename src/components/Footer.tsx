@@ -120,9 +120,6 @@ export default function Footer() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">
             <ThemeToggle className="mt-0" />
-            <Link to="/" className="px-5 py-3 rounded-full bg-[#0061a5] text-white font-black uppercase tracking-widest text-xs hover:bg-[#2481ff] transition-all shadow-[0_8px_30px_rgba(0,97,165,0.25)]">
-              Magazin
-            </Link>
           </div>
           
           <div className="text-on-surface-variant text-xs font-medium uppercase tracking-widest text-center">
