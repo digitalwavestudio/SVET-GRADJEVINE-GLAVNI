@@ -113,6 +113,48 @@ export const emailService = {
   },
 
   /**
+   * Šablon: Predračun (proforma invoice)
+   */
+  async sendProformaInvoiceNotification({ to, invoiceNumber, customerName, total, pdfBuffer }: { to: string; invoiceNumber: string; customerName: string; total: number; pdfBuffer: Buffer }) {
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <div style="background-color: #0f172a; padding: 20px; border-radius: 6px 6px 0 0; text-align: center;">
+          <h2 style="color: #FEBF0D; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Svet Građevine</h2>
+        </div>
+        <div style="padding: 30px 20px;">
+          <p>Poštovani <strong>${customerName}</strong>,</p>
+          <p>U prilogu Vam dostavljamo predračun broj <strong>${invoiceNumber}</strong> na iznos od <strong>${total.toLocaleString('sr-RS')} RSD</strong>.</p>
+          <p>Predračun možete preuzeti i sa Vašeg profila na portalu.</p>
+          <div style="margin-top: 25px; text-align: center;">
+            <a href="${env.APP_URL}/dashboard" style="background-color: #FEBF0D; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;">Moj Profil</a>
+          </div>
+        </div>
+        <p style="font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 30px; text-align: center;">Ovo je automatska poruka sa portala Svet Građevine.</p>
+      </div>
+    `;
+
+    try {
+      if (!env.SMTP_USER || !env.SMTP_PASS) {
+        if (env.NODE_ENV !== "production") console.log(`[EMAIL SIMULACIJA] To: ${to} | Subject: Predračun ${invoiceNumber} | PDF attachment included`);
+        return { success: true, simulated: true };
+      }
+
+      await transporter.sendMail({
+        from: '"Svet Građevine" <noreply@svetgradjevine.com>',
+        to,
+        subject: `Predračun ${invoiceNumber} - Svet Građevine`,
+        html,
+        attachments: [{ filename: `Predracun-${invoiceNumber}.pdf`, content: pdfBuffer }],
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Email Error:", error);
+      throw error;
+    }
+  },
+
+  /**
    * Šablon: Novi RFQ (Tender za nabavku)
    */
   async sendRfqNotification({ to, category, region, phone, specification }: { to: string; category: string; region: string; phone: string; specification: Array<{ name: string; amount: number | string; unit: string; desc?: string }> }) {

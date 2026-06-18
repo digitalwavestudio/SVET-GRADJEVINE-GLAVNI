@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getAuth } from 'firebase/auth';
 import { collection, doc } from 'firebase/firestore';
-import { db } from '@/src/firebase-db';
+import { db } from '@/src/lib/firebase';
 import { useToast } from '@/src/context/ToastContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/src/context/AuthContext';

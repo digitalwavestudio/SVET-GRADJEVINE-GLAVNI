@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { UserProfile } from '@/src/types/user';
+import type { UserProfile } from '@svet-gradjevine/shared';
 
 export type FormErrors = Record<string, string | string[]>;
 

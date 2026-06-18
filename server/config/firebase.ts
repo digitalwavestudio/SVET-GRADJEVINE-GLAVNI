@@ -454,7 +454,6 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
     };
   } else if (docId === "config" || docPath?.includes("system/config")) {
     mockData = {
-      stripeEnabled: true,
       allowFreePostings: true,
     };
   } else if (docPath?.includes("user_stats/")) {

@@ -6,7 +6,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.png';
 import { useToast } from '@/src/context/ToastContext';
-import { auth, googleProvider } from '@/src/firebase';
+import { auth, googleProvider } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { getErrorMessage } from '@/src/lib/utils';
 
@@ -37,26 +37,6 @@ export default function LoginPage() {
       setError(redirectError);
     }
   }, [redirectError]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('bypassToken');
-    if (token) {
-      setLoading(true);
-      setError('');
-      import('firebase/auth').then(async ({ signInWithCustomToken }) => {
-        try {
-          await signInWithCustomToken(auth, token);
-        } catch (e: any) {
-          setError('Auto-prijava nije uspela: ' + e.message);
-          setLoading(false);
-        }
-      }).catch((err) => {
-        setError('Greška kod učitavanja modula za prijavu');
-        setLoading(false);
-      });
-    }
-  }, []);
 
   useEffect(() => {
     if (user && !authLoading) {

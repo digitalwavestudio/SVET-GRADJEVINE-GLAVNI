@@ -16,7 +16,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useMessages } from '@/src/context/MessagesContext';
 import { useTrackView } from '@/src/hooks/useTrackView';
 import { useMachineDetails, useMachineMutations } from '@/src/modules/machines/hooks/useMachines';
-import { db } from '@/src/firebase-db';
+import { db } from '@/src/lib/firebase';
 
 import { 
   Calendar, 

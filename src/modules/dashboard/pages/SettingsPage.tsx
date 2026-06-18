@@ -6,7 +6,7 @@ import { DashboardLayout } from '@/src/modules/core';
 import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 import Spinner from '@/src/components/ui/Spinner';
 import { useAuth } from '@/src/context/AuthContext';
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 import { uploadImage } from '@/src/lib/imageUtils';
 import { userProfileSchema } from '@/src/modules/auth';
 import { z } from 'zod';

@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { realEstateService, RealEstatePlot, RealEstateFilters } from "@/src/modules/real_estate/services/realEstateService";
-import { db } from "@/src/firebase-db";
+import { db } from "@/src/lib/firebase";
 import { queryKeys } from "@/src/lib/queryKeysFactory";
 
 interface InitialState {

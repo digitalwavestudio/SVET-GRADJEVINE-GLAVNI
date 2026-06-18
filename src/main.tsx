@@ -84,11 +84,7 @@ initZodLocalization();
 // initErrorMonitor();
 import './index.css';
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
+
 
 /*
 function reportWebVitals(metric: any) {

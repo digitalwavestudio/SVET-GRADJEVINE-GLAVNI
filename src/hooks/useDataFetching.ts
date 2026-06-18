@@ -36,7 +36,7 @@ export function useDataFetching<T, F = any>(
   const [hasMore, setHasMore] = useState(true);
   const [quotaExceeded, setQuotaExceededHook] = useState(false);
   const [lastVisible, setLastVisible] = useState<any>(null);
-  const [currentFilters, setCurrentFilters] = useState<F>(() => ({} as any as F));
+  const [currentFilters, setCurrentFilters] = useState<F>(() => ({} as F));
   
   const lastDocRef = useRef<any>(null);
 

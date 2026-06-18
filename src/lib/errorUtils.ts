@@ -1,4 +1,4 @@
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 import { logger } from '@/src/lib/logger';
 
 export enum OperationType {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { db } from "@/src/firebase-db";
+import { db } from "@/src/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 
 interface VerificationResult {

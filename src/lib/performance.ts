@@ -11,8 +11,8 @@ import { getTracer } from './tracing';
 // import { SpanStatusCode, type Span } from '@opentelemetry/api';
 
 const perf = null;
-const SpanStatusCode = { OK: 0, ERROR: 1 } as any;
-const trace = (...args: any[]) => ({ start: () => {}, stop: () => {}, putAttribute: () => {} }) as any;
+const SpanStatusCode: Record<string, number> = { OK: 0, ERROR: 1 };
+const trace = (..._args: unknown[]) => ({ start: () => {}, stop: () => {}, putAttribute: (..._a: unknown[]) => {}, setStatus: (..._a: unknown[]) => {}, end: () => {}, setAttributes: (..._a: unknown[]) => {} });
 type Span = any;
 type Trace = any;
 

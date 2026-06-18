@@ -12,7 +12,7 @@ import emailjs from '@emailjs/browser';
  * - {{reply_to}} - Email adresa kandidata (opciono, za direktan odgovor)
  */
 const getEnvVar = (viteKey: string | undefined, keyName: string): string => {
-  const runtimeVal = (window as any).__APP_ENV__?.[keyName];
+  const runtimeVal = window.__APP_ENV__?.[keyName];
   if (runtimeVal && !runtimeVal.startsWith('%')) {
     return runtimeVal;
   }

@@ -12,7 +12,7 @@ export function useBotDetector(): boolean {
     if (typeof window === 'undefined') return;
     
     // Proveravamo globalni flag od strane servera ili interpretiramo User-Agent na klijentu
-    if ((window as any).__IS_BOT__) {
+    if (window.__IS_BOT__) {
       setIsBot(true);
       return;
     }

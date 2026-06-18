@@ -6,7 +6,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.png';
 import { useToast } from '@/src/context/ToastContext';
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { passwordRegex } from '@svet-gradjevine/shared';
 

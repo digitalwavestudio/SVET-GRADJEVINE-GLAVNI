@@ -10,7 +10,7 @@ import {
   getRedirectResult,
   User as FirebaseUser
 } from 'firebase/auth';
-import { auth, googleProvider } from '@/src/firebase-auth';
+import { auth, googleProvider } from '@/src/lib/firebase';
 import { subscribeToOfflineStatus, subscribeToQuotaStatus } from '@/src/lib/errorUtils';
 import { partnerService } from '@/src/services/partnerService';
 import { User, UserRole } from '@/src/modules/core/types/user';
@@ -95,18 +95,7 @@ export function useAuthNode() {
   const autoInitAttempted = useRef(false);
   const redirectProcessed = useRef(false);
 
-  // O-O (Oauth-Obfuscation) Check
-  const isBotRef = useRef<boolean>(false);
-
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-       if ((window as any).__IS_BOT__ || /bot|googlebot|crawler|spider|robot|crawling|chatgpt|claude|perplexity/i.test(navigator.userAgent)) {
-          isBotRef.current = true;
-          setLoading(false); setIsInitializing(false);
-          return;
-       }
-    }
-
     isMountedFn.current = true;
     
     // Subscribe to quota and offline status changes
@@ -126,7 +115,7 @@ export function useAuthNode() {
   }, []);
 
   const subscribeToUser = useCallback((firebaseUser: FirebaseUser) => {
-    if (!isMountedFn.current || !firebaseUser || isBotRef.current) return;
+    if (!isMountedFn.current || !firebaseUser) return;
     
     if (unsubUserRef.current) {
       unsubUserRef.current();
@@ -254,8 +243,6 @@ export function useAuthNode() {
   }, []); // State setters are stable; refs prevent stale closures
 
   useEffect(() => {
-    if (isBotRef.current) return;
-
     let initTimeout: NodeJS.Timeout | null = null;
 
     // Guard: Pokrećemo bezbednosni timeout od 2000ms da bismo otkočili UI ukoliko Firebase Auth mrežni handshake visi (česta pojava u sandboxed iframe-ovima).
@@ -297,7 +284,7 @@ export function useAuthNode() {
 
       return () => {
         if (initTimeout) clearTimeout(initTimeout);
-        if (!isBotRef.current) unsubscribeAuth();
+        unsubscribeAuth();
       };
   }, [subscribeToUser]);
 

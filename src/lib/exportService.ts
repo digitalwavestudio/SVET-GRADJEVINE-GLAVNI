@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { auth } from '../firebase';
+import { auth } from './firebase';
 
 export interface TelemetryItem {
   type: 'firestore' | 'performance' | 'error' | 'event' | 'auth';

@@ -1,5 +1,5 @@
 import { ApiClient } from '@svet-gradjevine/api';
-import { auth } from '../firebase';
+import { auth } from './firebase';
 import { circuitBreaker } from './circuitBreaker';
 import { trackApiCall } from './performance';
 import { safeLocalStorage } from './safeStorage';

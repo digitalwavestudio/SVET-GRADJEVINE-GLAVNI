@@ -586,7 +586,7 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
   // Za sve rute koje NISU registrovane iznad, zabranjujemo payload u potpunosti umesto da se oslanjamo na propusni fallback.
   // Ukoliko programer zaboravi da registruje novu rutu, sistem će automatski odbaciti nepoznati payload.
   if (!schema) {
-    if (!path.includes("stripe/webhook") && Object.keys(req.body || {}).length > 0) {
+    if (Object.keys(req.body || {}).length > 0) {
       const errorMsg = `[Enterprise Guard] ZERO_TRUST_VIOLATION: Odbijeno slanje payload-a. API ruta (${method} ${path}) NEMA eksplicitno registrovanu Zod šemu u autoValidateMiddleware.`;
       console.error(errorMsg);
       

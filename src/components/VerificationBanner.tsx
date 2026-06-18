@@ -4,7 +4,7 @@ import { AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import React from 'react';
 import { useAuth } from '@/src/context/AuthContext';
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 
 export const VerificationBanner: React.FC = () => {
   const { user, loading, isInitializing } = useAuth();

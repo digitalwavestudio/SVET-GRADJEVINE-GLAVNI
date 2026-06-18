@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/src/context/AuthContext';
 
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 import { walletService } from '@/src/modules/checkout/services/walletService';
 
 interface AdminAddFundsModalProps {

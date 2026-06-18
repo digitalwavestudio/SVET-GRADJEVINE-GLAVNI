@@ -15,7 +15,7 @@ dist/
 dist-*
 
 # E2E test screenshots
-e2e-E2E_*/
+e2e-*/
 
 # Agent temporary scripts
 /*.js

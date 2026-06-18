@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys, dashboardKeys } from '../lib/queryKeysFactory';
-import { auth } from '../firebase-auth';
+import { auth } from '../lib/firebase';
 
 export function useRealtimeSync() {
   const { user } = useAuth();

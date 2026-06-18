@@ -2,9 +2,8 @@
 import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
-import { validateRequest } from "../middleware/validate.ts";
-import { checkoutSchema } from "@svet-gradjevine/shared";
 import { generateProformaInvoice } from "../utils/invoiceGenerator.ts";
+import { emailService } from "../services/emailService.ts";
 import { CacheService } from "../services/cache.service.ts";
 
 export const checkoutRouter = Router();
@@ -47,35 +46,6 @@ checkoutRouter.get("/:id", requireAuth, async (req, res, next) => {
     next(error);
   }
 });
-
-// Create checkout session
-checkoutRouter.post(
-  "/",
-  requireAuth,
-  validateRequest(checkoutSchema),
-  async (req, res, next) => {
-    try {
-      const uid = getReqUser(req).uid;
-      const { packageId, amount, paymentMethod } = req.body;
-
-      // Amount is now strictly positive due to validation
-
-      const checkout = {
-        userId: uid,
-        packageId,
-        amount,
-        paymentMethod,
-        status: "pending",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
-
-      const docRef = await db.collection("checkouts").add(checkout);
-      res.status(201).json({ id: docRef.id, success: true });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
 
 // Generate Pro-forma Invoice
 checkoutRouter.post(
@@ -129,17 +99,17 @@ checkoutRouter.post(
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // In a real app we would use nodemailer here:
-      /*
-    const transporter = nodemailer.createTransport({...});
-    await transporter.sendMail({
-      from: '"Svet GraÄ‘evine" <noreply@svetgradjevine.com>',
-      to: customerInfo?.email,
-      subject: `PredraÄun ${invoiceNumber} - Svet GraÄ‘evine`,
-      text: 'PoÅ¡tovani, u prilogu se nalazi VaÅ¡ predraÄun.',
-      attachments: [{ filename: `Predracun-${invoiceNumber}.pdf`, content: pdfBuffer }]
-    });
-    */
+      // Send email with PDF attachment
+      if (customerInfo?.email) {
+        emailService.sendProformaInvoiceNotification({
+          to: customerInfo.email,
+          invoiceNumber,
+          customerName: customerInfo.name || "Korisnik",
+          total: amount,
+          pdfBuffer,
+        }).catch(err => console.error(`[INVOICE] Failed to send email for ${invoiceNumber}:`, err));
+      }
+
       console.info(
         `[INVOICE] Generated pro-forma ${invoiceNumber} for user ${uid}`,
       );

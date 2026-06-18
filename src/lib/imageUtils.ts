@@ -1,6 +1,6 @@
 import imageCompression from "browser-image-compression";
 import { apiClient } from "@/src/lib/apiClient";
-import { auth } from "@/src/firebase";
+import { auth } from "@/src/lib/firebase";
 
 export type CompressionMode =
   | "avatar"

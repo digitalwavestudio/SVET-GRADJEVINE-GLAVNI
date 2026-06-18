@@ -13,7 +13,7 @@ import { useTrackView } from '@/src/hooks/useTrackView';
 import { useRealEstateDetails, useRealEstateMutations } from '@/src/modules/real_estate/hooks/useRealEstate';
 import { RealEstatePlot } from '@/src/modules/real_estate/services/realEstateService';
 import { useFavoriteIds } from '@/src/modules/dashboard/hooks/useFavorites';
-import { db } from '@/src/firebase-db';
+import { db } from '@/src/lib/firebase';
 
 import { 
   Maximize, 

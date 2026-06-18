@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAuth } from "firebase/auth";
 import { apiClient } from "@/src/lib/apiClient";
-import type { UserProfile, FavoriteAd } from "@/src/types/user.ts";
+import type { UserProfile, FavoriteAd } from "@svet-gradjevine/shared";
 
 export const userKeys = {
   all: ["users"] as const,

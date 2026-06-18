@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { toast } from 'react-hot-toast';
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 
 interface PricingTier {
   standard: number;

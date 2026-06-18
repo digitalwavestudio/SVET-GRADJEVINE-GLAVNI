@@ -12,7 +12,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useMessages } from '@/src/context/MessagesContext';
 import { useTrackView } from '@/src/hooks/useTrackView';
 import { useAccommodationDetails, useAccommodationMutations } from '@/src/modules/accommodations/hooks/useAccommodations';
-import { db } from '@/src/firebase-db';
+import { db } from '@/src/lib/firebase';
 
 import { 
   Maximize, 

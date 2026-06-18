@@ -2,7 +2,7 @@ import { algoliasearch } from 'algoliasearch';
 import { apiClient } from '@/src/lib/apiClient';
 
 const getEnvVar = (viteKey: string | undefined, keyName: string): string => {
-  const runtimeVal = (window as any).__APP_ENV__?.[keyName];
+  const runtimeVal = window.__APP_ENV__?.[keyName];
   if (runtimeVal && !runtimeVal.startsWith('%')) {
     return runtimeVal;
   }

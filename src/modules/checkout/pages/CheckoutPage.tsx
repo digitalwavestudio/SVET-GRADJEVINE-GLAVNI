@@ -4,7 +4,7 @@ import Footer from '@/src/components/Footer';
 import Navbar from '@/src/components/Navbar';
 import { APP_CONFIG } from '@/src/constants/config';
 import { useAuth } from '@/src/context/AuthContext';
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 import { partnerService } from '@/src/services/partnerService';
 
 type CheckoutStatus = 'initiated' | 'pending' | 'confirmed' | 'failed';
@@ -28,7 +28,7 @@ export default function CheckoutPage() {
 
   const selectedPackage = packages[packageId] || packages.pro;
 
-  const [paymentMethod, setPaymentMethod] = useState<'qr' | 'invoice'>('qr');
+  const paymentMethod = 'invoice';
   const [promoCode, setPromoCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState(0);
   const [promoStatus, setPromoStatus] = useState<null | 'success' | 'error'>(null);
@@ -127,7 +127,6 @@ export default function CheckoutPage() {
 
         const pdfBlob = await response.blob();
 
-        // Trigger download
         const url = window.URL.createObjectURL(new Blob([pdfBlob]));
         const link = document.createElement('a');
         link.href = url;
@@ -145,20 +144,6 @@ export default function CheckoutPage() {
         }, 2000);
         return;
       }
-
-      // Execute consolidated checkout flow for other methods
-
-      // Update state to pending while waiting for simulated confirmation
-      setCheckoutStatus('pending');
-
-      // Note: Success redirection happens after simulated confirmation in service
-      // For UX, we show success after a short wait if status confirms
-      setTimeout(() => {
-        setCheckoutStatus('confirmed');
-        alert(`ZAHTEV ZA PLAĆANJE POSLAT (${method}). Hvala na poverenju!`);
-        navigate('/poslovi');
-        setIsProcessing(false);
-      }, 2500);
 
     } catch (err) {
       console.error("Checkout process failed:", err);
@@ -194,78 +179,6 @@ export default function CheckoutPage() {
           </div>
 
           <div className="relative z-10">
-            {/* Payment Method Selector */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-              <button onClick={() => setPaymentMethod('qr')} className={`py-4 px-2 rounded-[10px] border-2 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === 'qr' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-white/5 bg-white/5 text-on-surface-variant hover:bg-white/10'}`}>
-                <span className="material-symbols-outlined text-2xl">qr_code_scanner</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-center">mBanking / QR</span>
-              </button>
-              <button onClick={() => setPaymentMethod('invoice')} className={`py-4 px-2 rounded-[10px] border-2 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === 'invoice' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-white/5 bg-white/5 text-on-surface-variant hover:bg-white/10'}`}>
-                <span className="material-symbols-outlined text-2xl">request_quote</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-center">Faktura (Virmanski)</span>
-              </button>
-            </div>
-
-            {/* Dynamic Content */}
-            {paymentMethod === 'invoice' && (
-              <div className="space-y-8 py-4">
-                <div className="bg-white/10 border border-white/10 rounded-[10px] p-8 flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center text-secondary mb-4">
-                    <span className="material-symbols-outlined text-3xl">request_quote</span>
-                  </div>
-                  <h3 className="text-lg font-black uppercase tracking-tight mb-2">Faktura / Uplatnica</h3>
-                  <p className="text-[10px] text-white/50 leading-relaxed font-bold max-w-sm uppercase tracking-widest">
-                    Generišite predfakturu i uplatnicu. Plaćanje će se evidentirati nakon prijema uplate.
-                  </p>
-                </div>
-
-                <div className="pt-4">
-                  <button 
-                    disabled={isProcessing}
-                    onClick={() => handleSuccessfulPayment('INVOICE/FAKTURA')} 
-                    className="w-full bg-white hover:bg-slate-200 text-slate-950 font-black py-6 rounded-[10px] transition-all flex items-center justify-center gap-3 relative overflow-hidden group disabled:opacity-50"
-                  >
-                    <span className="material-symbols-outlined relative z-10">{isProcessing ? 'sync' : 'receipt_long'}</span>
-                    <span className="tracking-[0.2em] uppercase text-sm relative z-10">
-                      {isProcessing ? 'GENERISANJE...' : `GENERIŠI PREDRAČUN ZA ${currentTotal.toFixed(2)} EUR`}
-                    </span>
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            {paymentMethod === 'qr' && (
-              <div className="space-y-6">
-                <div className="bg-white/5 border border-white/10 rounded-[10px] p-8 flex flex-col items-center text-center">
-                  <div className="w-48 h-48 bg-white p-2 rounded-[10px] mb-6 shadow-[0_0_40px_rgba(255,255,255,0.1)] relative">
-                    <div className="w-full h-full flex items-center justify-center opacity-30">
-                      <span className="material-symbols-outlined text-[120px] text-white">qr_code_scanner</span>
-                    </div>
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg border border-slate-200">
-                      <span className="text-slate-900 font-black text-[10px]">IPS</span>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-black uppercase tracking-tight mb-2">IPS Skeniraj (mBanking)</h3>
-                  <p className="text-xs text-white/60 leading-relaxed font-medium max-w-sm">
-                    Otvorite mBanking aplikaciju na Vašem telefonu i izaberite opciju <strong>"IPS Skeniraj"</strong>. Skenirajte QR kod za instant plaćanje.
-                  </p>
-                </div>
-                
-                <div className="pt-4">
-                  <button 
-                    disabled={isProcessing}
-                    onClick={() => handleSuccessfulPayment('QR/MBANKING')} 
-                    className="w-full bg-[#0A0F14] border-2 border-secondary text-secondary hover:bg-secondary hover:text-slate-950 font-black py-5 rounded-[10px] transition-all flex items-center justify-center gap-3 group disabled:opacity-50"
-                  >
-                    <span className="material-symbols-outlined animate-spin-slow">refresh</span>
-                    <span className="tracking-[0.2em] uppercase text-sm">
-                      {isProcessing ? 'PROVERA UPLATE...' : 'POTVRDI SKENIRANJE'}
-                    </span>
-                  </button>
-                </div>
-              </div>
-            )}
-
             {paymentMethod === 'invoice' && (
               <div className="space-y-6">
                 <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 p-6 rounded-[10px] flex items-start gap-4 mb-6">

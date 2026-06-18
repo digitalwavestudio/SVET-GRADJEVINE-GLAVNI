@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { auth } from '@/src/firebase';
+import { auth } from '@/src/lib/firebase';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, 
   LineChart, Line, Legend, AreaChart, Area 

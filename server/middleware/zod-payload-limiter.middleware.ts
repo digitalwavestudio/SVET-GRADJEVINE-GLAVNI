@@ -39,11 +39,6 @@ export const zodPayloadLimiterMiddleware = async (
   next: NextFunction
 ) => {
   if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body && typeof req.body === 'object') {
-    // 3. Ignorisati stripe webhook-e koji koriste sirovi buffer
-    if (req.originalUrl.includes('stripe')) {
-      return next();
-    }
-
     try {
       // Skeniranje za Firebase API Key Abuse/Spam (štiti Firebase resurs)
       const stringifiedPayload = JSON.stringify(req.body);
