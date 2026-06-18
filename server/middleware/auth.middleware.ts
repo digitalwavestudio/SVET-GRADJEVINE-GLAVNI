@@ -85,7 +85,7 @@ export const authMiddleware = async (
       // ADR 003: Always use Custom JWT Claims. No local caching or Redis for security logic!
       let resolvedRole = decodedToken.role as string;
       let resolvedPermissions = decodedToken.permissions as string[];
-      
+
       if (!resolvedRole) {
         try {
           const cacheKey = `user:profile:cache:${decodedToken.uid}`;
@@ -129,6 +129,16 @@ export const authMiddleware = async (
           resolvedRole = "standard";
           resolvedPermissions = AuthorizationService.getDefaultPermissions("standard");
         }
+      }
+
+      // Ako JWT ima role ali nema permissions (stari token pre dodavanja permissions claim-a),
+      // popunjavamo iz default-a i upisujemo u custom claims za sledeći put
+      if (resolvedRole && !resolvedPermissions) {
+        resolvedPermissions = AuthorizationService.getDefaultPermissions(resolvedRole);
+        admin.auth().setCustomUserClaims(decodedToken.uid, {
+          role: resolvedRole,
+          permissions: resolvedPermissions,
+        }).catch((e) => console.error("[AUTH] setCustomUserClaims fallback failed:", e));
       }
 
       const authUser = {
