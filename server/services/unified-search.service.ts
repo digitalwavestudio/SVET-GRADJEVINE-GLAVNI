@@ -180,7 +180,8 @@ export class UnifiedSearchService {
           return algoliaResult;
         }
 
-        if (queryComplexity === "COMPLEX") {
+        // COMPLEX non-search queries (geo, radius) → fallback cache ili prazno
+        if (queryComplexity === "COMPLEX" && !filtersAny.search) {
           try {
             const fallbackKey = `fallback_search_${category}`;
             const fallbackData = await CacheService.get<UnifiedSearchResult>(fallbackKey);
