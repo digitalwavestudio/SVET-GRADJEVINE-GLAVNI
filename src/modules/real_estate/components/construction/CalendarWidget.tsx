@@ -51,13 +51,13 @@ export const CalendarWidget = React.memo(function CalendarWidget({
   return (
     <div className="flex-1 lg:w-[70%] flex flex-col gap-6">
       <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 lg:p-8">
-        <div className="grid grid-cols-7 gap-3 mb-6">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-3 mb-6">
           {['PON', 'UTO', 'SRE', 'ČET', 'PET', 'SUB', 'NED'].map(d => (
             <div key={d} className="text-center text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">{d}</div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-3">
           {emptyStartDays.map((_, i) => (
             <div key={`empty-${i}`} className="aspect-square rounded-[10px] p-2"></div>
           ))}
@@ -96,20 +96,21 @@ export const CalendarWidget = React.memo(function CalendarWidget({
               <div 
                 key={day} 
                 onClick={() => handleDayClick(day, dayData, dayEvents)}
-                className={`aspect-square rounded-[10px] p-2 sm:p-3 flex flex-col justify-between transition-all duration-300 ${dayData?.cost || isToday ? 'cursor-pointer' : ''} ${bgClass} ${transformClass}`}
+                className={`aspect-square rounded-[10px] p-1.5 sm:p-3 flex flex-col justify-between transition-all duration-300 ${dayData?.cost || isToday ? 'cursor-pointer' : ''} ${bgClass} ${transformClass}`}
               >
                 <div className="flex justify-between items-start w-full">
                     <span className={`text-xs md:text-sm font-black ${isToday ? 'text-white drop-shadow-md' : isSelected ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]' : dayData?.cost || dayEvents.length > 0 ? 'text-white/80' : isWeekend ? 'text-white/20' : 'text-white/40'}`}>
                         {day}
                     </span>
                     <div className="flex gap-1">
-                        {dayData?.isAnomaly && <span title="Upozorenje" className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>}
-                        {dayData?.isMilestone && <span title="Milestone" className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>}
-                        {dayEvents.some(e => e.type === 'phase') && <span title="Aktivna Faza" className="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(247,150,26,0.5)]"></span>}
+                        {dayData?.isAnomaly && <span title="Upozorenje" className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>}
+                        {dayData?.isMilestone && <span title="Milestone" className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>}
+                        {dayEvents.some(e => e.type === 'phase') && <span title="Aktivna Faza" className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(247,150,26,0.5)]"></span>}
                     </div>
                 </div>
                 
-                <div className="flex flex-col gap-0.5 items-end mt-auto w-full">
+                {/* Desktop detailed stats */}
+                <div className="hidden md:flex flex-col gap-0.5 items-end mt-auto w-full">
                   {dayData && dayData.cost > 0 ? (
                     <>
                       <div className="flex w-full justify-between items-end mb-0.5">
@@ -132,6 +133,13 @@ export const CalendarWidget = React.memo(function CalendarWidget({
                     </>
                   ) : null}
                 </div>
+
+                {/* Mobile activity dot indicator */}
+                {dayData && dayData.cost > 0 && (
+                  <div className="flex md:hidden justify-center items-center mt-auto w-full pb-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]"></span>
+                  </div>
+                )}
               </div>
             );
           })}
