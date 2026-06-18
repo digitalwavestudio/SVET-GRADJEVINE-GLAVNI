@@ -7,7 +7,6 @@ import DepositModal from '../components/DepositModal';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { queryKeys } from '@/src/lib/queryKeysFactory';
-import { useFinanceSummary } from '../hooks/useFinanceStats';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiClient } from '@/src/lib/apiClient';
 
@@ -246,8 +245,6 @@ export default function WalletPage() {
   const [visibleCount, setVisibleCount] = useState(25);
   const PAGE_STEP = 25;
 
-  const { data: financeStats, isLoading: statsLoading } = useFinanceSummary();
-
   const queryKey = useMemo(
     () => [...queryKeys.wallet.transactions(user?.id || 'guest'), statusFilter, typeFilter],
     [user?.id, statusFilter, typeFilter],
@@ -415,9 +412,9 @@ export default function WalletPage() {
 
                     <div className="space-y-1 mb-10">
                       <div className="text-xs font-bold text-white/40 uppercase tracking-widest">TRENUTNI SALDO</div>
-                      <div className="text-6xl font-black text-white tracking-tight tabular-nums flex items-baseline gap-2">
+                      <div className="text-4xl sm:text-6xl font-black text-white tracking-tight tabular-nums flex flex-wrap items-baseline gap-2">
                         {walletBalance.toLocaleString()}
-                        <span className="text-xl text-emerald-500 font-bold uppercase tracking-widest">Kredita</span>
+                        <span className="text-lg sm:text-xl text-emerald-500 font-bold uppercase tracking-widest">Kredita</span>
                       </div>
                     </div>
 
