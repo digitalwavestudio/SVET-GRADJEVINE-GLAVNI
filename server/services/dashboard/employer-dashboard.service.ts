@@ -45,26 +45,31 @@ export class DashboardEmployerService {
 
           try {
             const { userStatsLoader } = await import("../../utils/dataloader.ts");
-            const [statsDoc, adsResult, appsResult, trendsResult] = await Promise.allSettled([
+            const [statsDoc, adsResult, appsResult, trendsResult, adsCountResult] = await Promise.allSettled([
               // 1. User Stats (Optimized via DataLoader)
               userStatsLoader.load(uid),
               // 2. Latest Listings
-              db.collection("listings")
+              db.collectionGroup("listings")
                 .where("authorId", "==", uid)
-                .where("status", "!=", "deleted")
-                .orderBy("status", "asc")
+                .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
                 .orderBy("createdAt", "desc")
                 .limit(10)
                 .get(),
               // 3. Pending Applications
-              db.collection("applications")
+              db.collectionGroup("applications")
                 .where("employerId", "==", uid)
                 .where("status", "==", "pending")
                 .orderBy("createdAt", "desc")
                 .limit(5)
                 .get(),
               // 4. Employer Trends
-              this.getEmployerTrends(uid)
+              this.getEmployerTrends(uid),
+              // 5. Dynamic count fallback
+              db.collectionGroup("listings")
+                .where("authorId", "==", uid)
+                .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
+                .count()
+                .get()
             ]);
 
             // Handle user_stats (Surgical Loader Pattern)
@@ -81,6 +86,11 @@ export class DashboardEmployerService {
             } else if (statsDoc.status === "rejected") {
               logger.warn("[DashboardService] user_stats read failed:", (statsDoc as PromiseRejectedResult).reason?.message);
               isFirestoreHealthy = false;
+            }
+
+            // Fallback for totalAds if user_stats doesn't have it or is out of sync
+            if (adsCountResult.status === "fulfilled") {
+              totalAds = Math.max(totalAds, adsCountResult.value.data().count);
             }
 
             if (adsResult.status === "fulfilled") {

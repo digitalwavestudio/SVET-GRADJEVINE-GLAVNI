@@ -115,9 +115,9 @@ export class UnifiedAdsService {
 
   static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
     const rawDb = getDb();
-    let q = rawDb.collection("listings")
+    let q = rawDb.collectionGroup("listings")
       .where("authorId", "==", uid)
-      .where("status", "!=", "deleted")
+      .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
       .orderBy("createdAt", "desc")
       .limit(limitNum + 1);
 

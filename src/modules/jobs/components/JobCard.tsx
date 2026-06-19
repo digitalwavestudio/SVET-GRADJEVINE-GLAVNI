@@ -35,7 +35,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
       {/* Mobile Card Layout */}
       <article 
         itemScope itemType="https://schema.org/JobPosting"
-        className={`md:hidden group relative glass-card border border-white/5 rounded-[10px] p-4 flex flex-col gap-3 transition-all duration-500 overflow-hidden ${job.isPremium ? 'border-secondary/30 bg-secondary/[0.03] shadow-[0_0_40px_rgba(254,191,13,0.08)]' : ''}`}
+        className={`md:hidden group relative glass-card rounded-[10px] p-4 flex flex-col gap-3 transition-all duration-500 overflow-hidden ${job.isPremium ? 'border-2 border-yellow-500/80 bg-secondary/[0.03] shadow-[0_0_20px_rgba(234,179,8,0.2)]' : 'border border-white/5'}`}
       >
         {createdDate && (
           <>
@@ -170,7 +170,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
       {/* Desktop Card Layout */}
       <article 
         itemScope itemType="https://schema.org/JobPosting"
-        className={`hidden md:flex group relative h-full glass-card border border-white/5 rounded-[10px] transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_0_30px_rgba(254,191,13,0.05)] hover:-translate-y-1 overflow-hidden ${viewMode === 'list' ? 'p-5 flex-row items-center gap-5' : 'p-5 flex-col'} ${job.isPremium ? 'border-secondary/30 bg-secondary/[0.03] shadow-[0_0_40px_rgba(254,191,13,0.08)]' : ''}`}
+        className={`hidden md:flex group relative h-full glass-card rounded-[10px] transition-all duration-500 overflow-hidden ${viewMode === 'list' ? 'p-5 flex-row items-center gap-5' : 'p-5 flex-col'} ${job.isPremium ? 'border-2 border-yellow-500/80 bg-secondary/[0.03] shadow-[0_0_20px_rgba(234,179,8,0.2)] hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:-translate-y-1' : 'border border-white/5 hover:border-secondary/30 hover:shadow-[0_0_30px_rgba(254,191,13,0.05)] hover:-translate-y-1'}`}
       >
         {createdDate && (
           <>
