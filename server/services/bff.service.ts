@@ -186,14 +186,49 @@ export const bffService = {
             dynamicViewsCount: 0,
           };
 
-          const premiumJobsRaw =
+          let premiumJobsRaw: RawAdData[] =
             premiumAdsData.status === "fulfilled" && premiumAdsData.value
               ? (premiumAdsData.value as RawAdData[])
               : [];
-          const urgentJobsRaw =
+
+          if (!premiumJobsRaw.length) {
+            try {
+              const snap = await db.collection("listings")
+                .where("status", "==", "active")
+                .where("isPremium", "==", true)
+                .orderBy("createdAt", "desc")
+                .limit(12)
+                .get();
+              if (!snap.empty) {
+                premiumJobsRaw = snap.docs.map((doc) => {
+                  const d = doc.data();
+                  return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
+                }) as RawAdData[];
+              }
+            } catch {}
+          }
+
+          let urgentJobsRaw: RawAdData[] =
             urgentAdsData.status === "fulfilled" && urgentAdsData.value
               ? (urgentAdsData.value as RawAdData[])
               : [];
+
+          if (!urgentJobsRaw.length) {
+            try {
+              const snap = await db.collection("listings")
+                .where("status", "==", "active")
+                .where("isUrgent", "==", true)
+                .orderBy("createdAt", "desc")
+                .limit(12)
+                .get();
+              if (!snap.empty) {
+                urgentJobsRaw = snap.docs.map((doc) => {
+                  const d = doc.data();
+                  return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
+                }) as RawAdData[];
+              }
+            } catch {}
+          }
 
           const urgentJobsMap = (ad: RawAdData): MappedAdData => ({
             ...ad,
