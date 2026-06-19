@@ -1,4 +1,4 @@
-﻿// ≡ƒ¢í∩╕Å [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
+// ≡ƒ¢í∩╕Å [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
@@ -325,14 +325,14 @@ export class UnifiedAdsService {
     isUrgent?: boolean;
     isPremium?: boolean;
   }) {
-    const cacheKey = `promoted_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
+    const cacheKey = `promoted_v2_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
     const fastPathDoc = "metadata/promoted_ads_fastpath";
     const fastPathField = options.isUrgent ? "urgent" : "premium";
 
     const fallbackPremiumAds = [
       {
         id: "fp1",
-        title: "Gra─æevinski In┼╛enjer - ┼áef Gradili┼íta",
+        title: "Građevinski Inženjer - Šef Gradilišta",
         category: "jobs",
         grad: "Beograd",
         location: "Novi Beograd",
@@ -346,7 +346,7 @@ export class UnifiedAdsService {
       },
       {
         id: "fp2",
-        title: "Rukovalac Bagerom i Utovariva─ìem",
+        title: "Rukovalac Bagerom i Utovarivačem",
         category: "jobs",
         grad: "Novi Sad",
         location: "Novi Sad",
@@ -363,7 +363,7 @@ export class UnifiedAdsService {
     const fallbackUrgentAds = [
       {
         id: "fu1",
-        title: "HITNO: Kerami─ìar / Gipsar za unutra┼ínje radove",
+        title: "HITNO: Keramičar / Gipsar za unutrašnje radove",
         category: "jobs",
         grad: "Beograd",
         location: "Beograd",

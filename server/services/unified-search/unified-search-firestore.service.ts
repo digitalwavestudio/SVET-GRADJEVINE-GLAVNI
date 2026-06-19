@@ -5,6 +5,7 @@ import { UnifiedSearchUtils } from "./unified-search-utils.service.ts";
 import { CacheService } from "../cache.service.ts";
 import { Logger } from "../../utils/logger.ts";
 import * as admin from "firebase-admin";
+import { FieldPath, Timestamp, QueryDocumentSnapshot } from "firebase-admin/firestore";
 import crypto from "crypto";
 import { 
   UnifiedSearchResult, 
@@ -148,7 +149,10 @@ export class UnifiedSearchFirestore {
     // COUNT aggregation uklonjen pošto generiše nepredvidiv broj "Read" operacija za kompleksne/nestandardne upite.
     // Prelazimo na "N + 1" limit paginaciju da detektujemo sledeću stranu bez dodatih čitanja.
     
-    q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(admin.firestore.FieldPath.documentId(), "desc");
+    if (!filtersAny.isPremium && !filtersAny.isUrgent) {
+      q = q.orderBy("isPremium", "desc");
+    }
+    q = q.orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
     q = q.limit(pageSize + 1); // 🚀 N + 1 Optimizacija
     q = q.select(
       // Core
@@ -194,7 +198,7 @@ export class UnifiedSearchFirestore {
         // to bypass the extra .get() call, saving 1 Read per page.
         if (parsedToken.isPremium !== undefined && parsedToken.createdAt !== undefined) {
           const createdAtVal = typeof parsedToken.createdAt === 'number' 
-            ? admin.firestore.Timestamp.fromMillis(parsedToken.createdAt)
+            ? Timestamp.fromMillis(parsedToken.createdAt)
             : parsedToken.createdAt;
           
           q = q.startAfter(parsedToken.isPremium, createdAtVal, parsedToken.id);
@@ -240,7 +244,7 @@ export class UnifiedSearchFirestore {
       const hasMore = snap.docs.length > pageSize;
       const actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
 
-      const docs: UnifiedSearchDoc[] = actualDocs.map((doc: admin.firestore.QueryDocumentSnapshot) =>
+      const docs: UnifiedSearchDoc[] = actualDocs.map((doc: QueryDocumentSnapshot) =>
           isMagazineSearch
             ? UnifiedSearchUtils.mapToArticle({ id: doc.id, ...doc.data() })
             : UnifiedSearchUtils.mapToListing(
@@ -434,7 +438,10 @@ export class UnifiedSearchFirestore {
       );
 
     // Limit to 150 latest documents for in-memory keyword filtering (quota safe)
-    q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(admin.firestore.FieldPath.documentId(), "desc");
+    if (!filtersAny.isPremium && !filtersAny.isUrgent) {
+      q = q.orderBy("isPremium", "desc");
+    }
+    q = q.orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
     q = q.limit(150);
     q = q.select(
       "title", "name", "description", "price", "location", "loc",
@@ -473,7 +480,7 @@ export class UnifiedSearchFirestore {
 
       const snap = await q.get();
 
-      const allDocs: UnifiedSearchDoc[] = snap.docs.map((doc: admin.firestore.QueryDocumentSnapshot) =>
+      const allDocs: UnifiedSearchDoc[] = snap.docs.map((doc: QueryDocumentSnapshot) =>
         isMagazineSearch
           ? UnifiedSearchUtils.mapToArticle({ id: doc.id, ...doc.data() })
           : UnifiedSearchUtils.mapToListing(

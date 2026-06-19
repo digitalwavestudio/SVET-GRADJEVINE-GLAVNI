@@ -63,7 +63,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               {job.isPremium && <PremiumBadge />}
             </div>
             
-            <h3 itemProp="title" className="text-base font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug line-clamp-2 min-h-[36px]">
+            <h3 itemProp="title" className="text-base font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug line-clamp-2 min-h-[36px]">
               <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)}>
                 {job.title}
               </Link>
@@ -213,7 +213,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         <div className="flex-grow w-full relative z-10">
           <div className="flex flex-col mb-3">
             <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <h3 itemProp="title" className={`${viewMode === 'list' ? 'text-xl' : 'text-lg'} font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight`}>
+              <h3 itemProp="title" className={`${viewMode === 'list' ? 'text-xl' : 'text-lg'} font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug`}>
                 <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
                   {job.title}
                 </Link>

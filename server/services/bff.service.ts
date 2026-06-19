@@ -1,4 +1,4 @@
-﻿import { 
+import { 
   Job, 
   Machine, 
   RealEstatePlot, 
@@ -59,7 +59,7 @@ const homepageSingleFlightMap = new Map<string, Promise<HomepageDataResult>>();
 
 export const bffService = {
   async getHomepageData(platform: string): Promise<HomepageDataResult> {
-    const cacheKey = `homepage_bff_${platform}_v4`;
+    const cacheKey = `homepage_bff_${platform}_v5`;
 
     // 1. L1 Process Shield (Hard RAM Cache)
     const now = Date.now();

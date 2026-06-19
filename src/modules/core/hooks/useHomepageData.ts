@@ -3,7 +3,7 @@ import { apiClient } from "@/src/lib/apiClient";
 
 export function useHomepageData() {
   return useQuery({
-    queryKey: ["global", "homepage_data"],
+    queryKey: ["global", "homepage_data_v2"],
     queryFn: async () => {
       const data = await apiClient.get<any>("/bff/homepage");
       return data || {};

@@ -1,4 +1,4 @@
-﻿import { env } from "./env.ts";
+import { env } from "./env.ts";
 import admin from "firebase-admin";
 import { getFirestore, QuerySnapshot, DocumentSnapshot } from "firebase-admin/firestore";
 import fs from "fs";
@@ -299,8 +299,8 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
     }
   } else if (docId === "branding" || docPath?.includes("settings/branding")) {
     mockData = {
-      heroTitle: "OSNA┼╜UJEMO GRA─ÉEVINSKU INDUSTRIJU",
-      heroSubtitle: "Povezujemo profesionalce i klijente ┼íirom regiona.",
+      heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
+      heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
       primaryColor: "#0f172a",
       secondaryColor: "#3b82f6"
     };
@@ -321,7 +321,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
       urgent: [
         {
           id: "fu1",
-          title: "HITNO: Kerami─ìar / Gipsar za unutra┼ínje radove",
+          title: "HITNO: Keramičar / Gipsar za unutrašnje radove",
           category: "jobs",
           grad: "Beograd",
           location: "Beograd",
@@ -337,7 +337,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
       premium: [
         {
           id: "fp1",
-          title: "Gra─æevinski In┼╛enjer - ┼áef Gradili┼íta",
+          title: "Građevinski Inženjer - Šef Gradilišta",
           category: "jobs",
           grad: "Beograd",
           location: "Novi Beograd",
@@ -351,7 +351,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
         },
         {
           id: "fp2",
-          title: "Rukovalac Bagerom i Utovariva─ìem",
+          title: "Rukovalac Bagerom i Utovarivačem",
           category: "jobs",
           grad: "Novi Sad",
           location: "Novi Sad",

@@ -35,7 +35,7 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
   return (
     <>
       {/* Mobile Instagram-Style Circular Strip */}
-      <div className="flex md:hidden overflow-x-auto no-scrollbar gap-6 py-4 px-2 w-full mb-6 scroll-smooth">
+      <div className="flex md:hidden overflow-x-auto no-scrollbar gap-4 py-4 px-4 w-full mb-6 mt-10 scroll-smooth snap-x snap-mandatory touch-pan-x">
         {HERO_TABS.map((tab, idx) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -46,20 +46,20 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.04 }}
-              className="flex flex-col items-center text-center shrink-0 w-20 cursor-pointer active:scale-90 transition-transform duration-150"
+              className="flex flex-col items-center text-center shrink-0 w-[6.5rem] cursor-pointer snap-start"
               onClick={() => onTabChange(tab.id as HeroTabType)}
             >
               {/* Outer Golden/Glowing Orb Wrapper */}
-              <div className="relative">
+              <div className="relative active:scale-95 transition-transform duration-150">
                 <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                  className={`w-[5.5rem] h-[5.5rem] rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isActive
                       ? "border-secondary bg-secondary/15 shadow-[0_0_15px_rgba(254,191,13,0.4)] scale-105"
                       : "border-white/10 bg-white/5 hover:border-secondary/40"
                   }`}
                 >
                   <Icon
-                    size={22}
+                    size={32}
                     className={`transition-colors duration-300 ${
                       isActive ? "text-secondary" : "text-white/70"
                     }`}
@@ -67,12 +67,12 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
                 </div>
                 {/* Active Dot Indicator */}
                 {isActive && (
-                  <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-secondary border-2 border-slate-950 rounded-full animate-pulse"></span>
+                  <span className="absolute bottom-1 right-1 w-4 h-4 bg-secondary border-2 border-slate-950 rounded-full animate-pulse"></span>
                 )}
               </div>
               
               <span
-                className={`text-[9px] font-black uppercase tracking-widest mt-2.5 truncate w-full transition-colors ${
+                className={`text-[11px] font-black uppercase tracking-widest mt-3 truncate w-full px-1 transition-colors ${
                   isActive ? "text-secondary" : "text-white/60"
                 }`}
               >
