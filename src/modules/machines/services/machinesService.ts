@@ -79,8 +79,9 @@ export const machinesService = {
       
       if (errorData?.redirect && safeRedirect(errorData.redirect)) {
           window.location.href = errorData.redirect;
+          return null;
       }
-      return null;
+      throw e;
     }
   },
 
