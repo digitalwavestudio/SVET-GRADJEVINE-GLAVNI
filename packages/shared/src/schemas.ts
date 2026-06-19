@@ -32,7 +32,10 @@ export const jobSchema = z.object({
   email: z.string().email().or(z.literal('')).optional().or(z.null()),
   status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
   companyId: z.string().nullable().optional(),
-  paket: z.string().optional()
+  paket: z.string().optional(),
+  isPremium: z.boolean().optional(),
+  isUrgent: z.boolean().optional(),
+  isPremiumPartner: z.boolean().optional()
 });
 
 export const jobSearchSchema = z.object({
