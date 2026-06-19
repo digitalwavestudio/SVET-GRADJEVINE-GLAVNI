@@ -151,35 +151,35 @@ export class UnifiedSearchFirestore {
     q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(admin.firestore.FieldPath.documentId(), "desc");
     q = q.limit(pageSize + 1); // 🚀 N + 1 Optimizacija
     q = q.select(
-      "title",
-      "name",
-      "description",
-      "price",
-      "location",
-      "loc",
-      "type",
-      "status",
-      "createdAt",
-      "images",
-      "isPremium",
-      "isUrgent",
-      "comp",
-      "salary",
-      "sal",
-      "logo",
-      "benefits",
-      "plataMin",
-      "plataMax",
-      "salaryType",
-      "smestaj",
-      "prevoz",
-      "hrana",
-      "housing",
-      "transport",
-      "food",
-      "topliObrok",
-      "benefiti",
-      "rawBenefits",
+      // Core
+      "title", "name", "description", "price", "location", "loc",
+      "type", "status", "createdAt", "images", "imageStatus",
+      "isPremium", "isUrgent", "isPremiumPartner", "isVerified",
+      "comp", "salary", "sal", "logo",
+      "benefits", "plataMin", "plataMax", "salaryType",
+      "smestaj", "prevoz", "hrana",
+      "housing", "transport", "food", "topliObrok", "benefiti", "rawBenefits",
+      // Listing common
+      "adTitle", "adType", "categoryId", "categorySlug",
+      "companyName", "companyLogo", "isCompanyVerified",
+      "locationSlug", "authorId", "authorSnapshot",
+      // Machines
+      "machineType", "condition", "fuelType",
+      "weightKg", "weightLb", "year", "workingHours", "make", "model",
+      "isNegotiable", "pricePerDay", "pricePerHour",
+      "pricePerWeek", "pricePerMonth", "isServiced",
+      // Accommodations
+      "accommodationType", "beds", "roomType", "parkingAvailable", "typeSlug",
+      // Real estate / plots
+      "area", "purpose", "accessRoad", "highwayAccess", "railAccess",
+      // Catering
+      "cateringType", "kitchenType", "invoiceAvailable",
+      "minOrder", "dailyCapacityMeals",
+      // Jobs
+      "jobType", "profession", "professionSlug",
+      "currency", "city",
+      // Misc
+      "mainCategories",
     );
 
     if (firestoreCursorId) {
@@ -272,7 +272,7 @@ export class UnifiedSearchFirestore {
         docs,
         lastVisibleId: secureNextCursor,
         hasMore,
-        totalHits: undefined, // Total hits is now ignored
+        totalHits: docs.length,
       };
 
       if (!lastVisibleId && !filtersAny.search) {
@@ -437,35 +437,27 @@ export class UnifiedSearchFirestore {
     q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(admin.firestore.FieldPath.documentId(), "desc");
     q = q.limit(150);
     q = q.select(
-      "title",
-      "price",
-      "location",
-      "loc",
-      "type",
-      "status",
-      "createdAt",
-      "images",
-      "isPremium",
-      "isUrgent",
-      "comp",
-      "salary",
-      "sal",
-      "logo",
-      "description",
-      "name",
-      "benefits",
-      "plataMin",
-      "plataMax",
-      "salaryType",
-      "smestaj",
-      "prevoz",
-      "hrana",
-      "housing",
-      "transport",
-      "food",
-      "topliObrok",
-      "benefiti",
-      "rawBenefits",
+      "title", "name", "description", "price", "location", "loc",
+      "type", "status", "createdAt", "images", "imageStatus",
+      "isPremium", "isUrgent", "isPremiumPartner", "isVerified",
+      "comp", "salary", "sal", "logo",
+      "benefits", "plataMin", "plataMax", "salaryType",
+      "smestaj", "prevoz", "hrana",
+      "housing", "transport", "food", "topliObrok", "benefiti", "rawBenefits",
+      "adTitle", "adType", "categoryId", "categorySlug",
+      "companyName", "companyLogo", "isCompanyVerified",
+      "locationSlug", "authorId", "authorSnapshot",
+      "machineType", "condition", "fuelType",
+      "weightKg", "weightLb", "year", "workingHours", "make", "model",
+      "isNegotiable", "pricePerDay", "pricePerHour",
+      "pricePerWeek", "pricePerMonth", "isServiced",
+      "accommodationType", "beds", "roomType", "parkingAvailable", "typeSlug",
+      "area", "purpose", "accessRoad", "highwayAccess", "railAccess",
+      "cateringType", "kitchenType", "invoiceAvailable",
+      "minOrder", "dailyCapacityMeals",
+      "jobType", "profession", "professionSlug",
+      "currency", "city",
+      "mainCategories",
     );
 
     try {
@@ -523,6 +515,7 @@ export class UnifiedSearchFirestore {
         docs: paginatedDocs,
         lastVisibleId: secureNextCursor,
         hasMore,
+        totalHits: filteredDocs.length,
         warning: "Prikazujemo rezultate u rezervnom (resilient) režimu rada jer je glavni pretraživač trenutno nedostupan."
       };
     } catch (error: unknown) {
