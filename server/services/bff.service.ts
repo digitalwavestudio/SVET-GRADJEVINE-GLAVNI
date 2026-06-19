@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   Job, 
   Machine, 
   RealEstatePlot, 
@@ -19,19 +19,15 @@ import { db, checkQuotaStatus } from "../config/firebase.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { UnifiedAdsService } from "./unified-ads.service.ts";
 import { UnifiedSearchService } from "./unified-search.service.ts";
+import { MagazineCrudService } from "./magazine/magazine-crud.service.ts";
 import { DashboardService } from "./dashboard.service.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
-import { logger, Logger } from "../utils/logger.ts";
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
-const L1_HOMEPAGE_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
-
-export function clearL1HomepageCache() {
-  l1HomepageCache.clear();
-}
+const L1_HOMEPAGE_TTL = 15 * 1000; // 15s in-memory Shield cache
 
 const l1DashboardPrewarmCache = new Map<string, { data: any; expiry: number }>();
-const L1_DASHBOARD_PREWARM_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
+const L1_DASHBOARD_PREWARM_TTL = 15 * 1000; // 15s in-memory Shield cache
 
 const withHomepageQueryTimeout = async <T>(
   promise: Promise<T> | T,
@@ -46,7 +42,7 @@ const withHomepageQueryTimeout = async <T>(
   });
   return Promise.race([Promise.resolve(promise), timeoutPromise])
     .catch((err) => {
-      logger.warn(`[BFF] Query failed or timeout: ${err.message}`);
+      console.warn(`[BFF] Query failed or timeout: ${err.message}`);
       return fallback;
     })
     .finally(() => {
@@ -70,7 +66,7 @@ export const bffService = {
 
     // 2. SingleFlight Implementation for Homepage
     if (homepageSingleFlightMap.has(cacheKey)) {
-      logger.debug(`✈️ [SingleFlight] Coalescing concurrent homepage request: ${cacheKey}`);
+      console.log(`Γ£ê∩╕Å [SingleFlight] Coalescing concurrent homepage request: ${cacheKey}`);
       return homepageSingleFlightMap.get(cacheKey) as Promise<HomepageDataResult>;
     }
 
@@ -79,7 +75,7 @@ export const bffService = {
       return await CacheService.getOrSetSWR<HomepageDataResult>(
         cacheKey,
         async (): Promise<HomepageDataResult> => {
-          const bffSubTimeoutMs = 10000;
+          const bffSubTimeoutMs = 3000;
 
           const [
             globalStats,
@@ -89,6 +85,7 @@ export const bffService = {
             realEstateData,
             accommodationsData,
             cateringsData,
+            magazineData,
           ] = await Promise.allSettled([
             withHomepageQueryTimeout(
               AdminStatsService.getGlobalStats(),
@@ -141,6 +138,11 @@ export const bffService = {
               bffSubTimeoutMs,
               { docs: [], lastVisibleId: null, hasMore: false },
             ),
+            withHomepageQueryTimeout(
+              MagazineCrudService.getArticles({ limit: 4 }),
+              bffSubTimeoutMs,
+              [],
+            ),
           ]);
 
           const gStats = (
@@ -152,7 +154,6 @@ export const bffService = {
             cateringCount?: number,
             realEstateCount?: number,
             companiesCount?: number,
-            totalUsers?: number,
             premiumPartners?: number,
             urgentAds?: number
           };
@@ -166,7 +167,8 @@ export const bffService = {
             totalJobs +
             totalMachines +
             totalAccommodations +
-            totalCaterings;
+            totalCaterings +
+            120;
 
           const stats: HomepageStats = {
             totalJobs,
@@ -175,60 +177,24 @@ export const bffService = {
             totalCaterings,
             totalRealEstate: gStats.realEstateCount || 0,
             totalCompanies: gStats.companiesCount || 0,
-            totalUsers: gStats.totalUsers || 0,
-            premiumJobs: gStats.premiumPartners || 0,
-            urgentJobs: gStats.urgentAds || 0,
+            premiumJobs: gStats.premiumPartners || 150,
+            urgentJobs: gStats.urgentAds || 45,
             totalAdsCount: calculatedAdsCount,
-            dynamicFirmsCount: gStats.companiesCount || 0,
-            dynamicWorkersCount: gStats.totalUsers || 0,
-            dynamicMachineryCount: gStats.machinesCount || 0,
-            dynamicRealEstateCount: gStats.realEstateCount || 0,
-            dynamicViewsCount: 0,
+            dynamicFirmsCount: 450 + Math.floor(totalJobs / 2),
+            dynamicWorkersCount: 12500 + totalJobs * 10,
+            dynamicMachineryCount: 800 + totalMachines,
+            dynamicRealEstateCount: 300 + totalAccommodations,
+            dynamicViewsCount: 850000 + calculatedAdsCount * 12,
           };
 
-          let premiumJobsRaw: RawAdData[] =
+          const premiumJobsRaw =
             premiumAdsData.status === "fulfilled" && premiumAdsData.value
               ? (premiumAdsData.value as RawAdData[])
               : [];
-
-          if (!premiumJobsRaw.length) {
-            try {
-              const snap = await db.collection("listings")
-                .where("status", "==", "active")
-                .where("isPremium", "==", true)
-                .orderBy("createdAt", "desc")
-                .limit(12)
-                .get();
-              if (!snap.empty) {
-                premiumJobsRaw = snap.docs.map((doc) => {
-                  const d = doc.data();
-                  return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
-                }) as RawAdData[];
-              }
-            } catch {}
-          }
-
-          let urgentJobsRaw: RawAdData[] =
+          const urgentJobsRaw =
             urgentAdsData.status === "fulfilled" && urgentAdsData.value
               ? (urgentAdsData.value as RawAdData[])
               : [];
-
-          if (!urgentJobsRaw.length) {
-            try {
-              const snap = await db.collection("listings")
-                .where("status", "==", "active")
-                .where("isUrgent", "==", true)
-                .orderBy("createdAt", "desc")
-                .limit(12)
-                .get();
-              if (!snap.empty) {
-                urgentJobsRaw = snap.docs.map((doc) => {
-                  const d = doc.data();
-                  return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
-                }) as RawAdData[];
-              }
-            } catch {}
-          }
 
           const urgentJobsMap = (ad: RawAdData): MappedAdData => ({
             ...ad,
@@ -276,7 +242,8 @@ export const bffService = {
           const latestRealEstate = buildMappedDocs<RealEstatePlot>(realEstateData);
           const latestAccommodations = buildMappedDocs<Accommodation>(accommodationsData);
           const latestCaterings = buildMappedDocs<CateringOffer>(cateringsData);
-          const latestArticles: any[] = [];
+          const latestArticles =
+            magazineData.status === "fulfilled" ? (magazineData.value as any[]) : [];
 
           return {
             success: true,
@@ -300,7 +267,6 @@ export const bffService = {
             totalCaterings: 0,
             totalRealEstate: 0,
             totalCompanies: 0,
-            totalUsers: 0,
             premiumJobs: 0,
             urgentJobs: 0,
             totalAdsCount: 0,
@@ -310,16 +276,16 @@ export const bffService = {
             dynamicRealEstateCount: 0,
             dynamicViewsCount: 0,
           },
-        premiumJobs: [],
-        urgentJobs: [],
-        latestMachines: [],
-        latestRealEstate: [],
-        latestAccommodations: [],
-        latestCaterings: [],
-        latestArticles: [],
-      },
-    );
-  })();
+          premiumJobs: [],
+          urgentJobs: [],
+          latestMachines: [],
+          latestRealEstate: [],
+          latestAccommodations: [],
+          latestCaterings: [],
+          latestArticles: [],
+        },
+      );
+    })();
 
     homepageSingleFlightMap.set(cacheKey, fetchTask);
     try {
@@ -382,11 +348,11 @@ export const bffService = {
           }
           
           walletData = {
-            balance: wallet ? (wallet.balance || 0) : (uData.walletBalance || 0),
+            balance: wallet ? (wallet.balance || 0) : 0,
             lastAuditPassed: wallet ? (wallet.lastAuditPassed === true) : false,
             activeRoles: fetchedRoles
           };
-          await CacheService.set(walletCacheKey, walletData, 300000); // 5min fallback cache
+          await CacheService.set(walletCacheKey, walletData, 86400000); // 24h fallback cache
         }
         
         let userData: { totalUnreadMessages?: number; stats?: { totalMyAds?: number; unreadMessages?: number; unreadActivities?: number } } | null = null;
@@ -397,9 +363,9 @@ export const bffService = {
         let myAdsCount = 0;
         let unreadMessagesCount = 0;
         let unreadActivitiesCount = 0;
-        const walletBalance = walletData.balance;
-        const walletVerified = walletData.lastAuditPassed;
-        const activeRoles: string[] = walletData.activeRoles || [];
+        let walletBalance = walletData.balance;
+        let walletVerified = walletData.lastAuditPassed;
+        let activeRoles: string[] = walletData.activeRoles || [];
 
         if (userData) {
           const stats = userData.stats || {};
@@ -440,7 +406,7 @@ export const bffService = {
     reqUser: AuthUser,
     cacheControlHeader?: string
   ): Promise<DashboardDataResult> {
-    const cacheKey = `bff_cache_tiered:${userId}:${role}`;
+    const cacheKey = `bff_cache_tiered:${userId}`;
     const flightKey = `${userId}:${role}`;
 
     const { checkQuotaStatus } = await import("../config/firebase.ts");
@@ -497,7 +463,7 @@ export const bffService = {
 
           const { getRedis } = await import("../utils/redis.ts");
           const redis = getRedis();
-          const prewarmKey = `dashboard_stats_prewarm:${userId}:${role}`;
+          const prewarmKey = `dashboard_stats_prewarm:${userId}`;
           let baseData: any = null;
 
           // 1. Check L1 Memory Cache first
@@ -505,7 +471,7 @@ export const bffService = {
           const l1PrewarmCached = l1DashboardPrewarmCache.get(prewarmKey);
           if (l1PrewarmCached && now < l1PrewarmCached.expiry) {
             baseData = l1PrewarmCached.data;
-            logger.debug(`[BFF L1 Prewarm] Served pre-calculated stats from L1 RAM cache: ${prewarmKey}`);
+            console.log(`[BFF L1 Prewarm] Served pre-calculated stats from L1 RAM cache: ${prewarmKey}`);
           }
 
           if (!baseData && redis) {
@@ -513,7 +479,7 @@ export const bffService = {
               const cachedStr = await redis.get(prewarmKey);
               if (cachedStr) {
                 baseData = JSON.parse(cachedStr);
-                logger.debug(`[BFF Prewarm] Served pre-calculated dashboard stats from ${prewarmKey}`);
+                console.log(`[BFF Prewarm] Served pre-calculated dashboard stats from ${prewarmKey}`);
                 
                 // Write into L1 cache for extremely fast subsequent reads
                 l1DashboardPrewarmCache.set(prewarmKey, {
@@ -522,7 +488,7 @@ export const bffService = {
                 });
               }
             } catch (err) {
-              logger.warn("[BFF Prewarm] Failed to read prewarm stats from Redis:", err);
+              console.warn("[BFF Prewarm] Failed to read prewarm stats from Redis:", err);
             }
           }
 
@@ -538,7 +504,7 @@ export const bffService = {
               try {
                 await redis.set(prewarmKey, JSON.stringify(baseData), "EX", 10 * 60); // 10 minutes TTL
               } catch (err) {
-                logger.warn("[BFF Prewarm] Failed to write prewarm stats to Redis:", err);
+                console.warn("[BFF Prewarm] Failed to write prewarm stats to Redis:", err);
               }
             }
 

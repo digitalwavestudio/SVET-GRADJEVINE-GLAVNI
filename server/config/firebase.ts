@@ -1,4 +1,4 @@
-import { env } from "./env.ts";
+﻿import { env } from "./env.ts";
 import admin from "firebase-admin";
 import { getFirestore, QuerySnapshot, DocumentSnapshot } from "firebase-admin/firestore";
 import fs from "fs";
@@ -155,7 +155,7 @@ import { MonitoringService } from "../services/monitoring.service.ts";
 let isQuotaExhausted = false;
 let quotaExhaustedAt = 0;
 // PROMPT 10: 24h Firebase (Daily Quota) cooldown instead of 5-min circuit breaker
-const QUOTA_COOLDOWN_MS = 5 * 60 * 1000; // Smanjeno sa 24h na 5 minuta za plaćeni (Blaze) plan
+const QUOTA_COOLDOWN_MS = 5 * 60 * 1000; // Smanjeno sa 24h na 5 minuta za pla─çeni (Blaze) plan
 let lastRedisSync = 0;
 
 export function withTimeout<T>(promise: Promise<T>, ms: number, errMessage: string): Promise<T> {
@@ -200,7 +200,7 @@ async function syncQuotaStatusWithRedis() {
       } else {
         if (isQuotaExhausted) {
           isQuotaExhausted = false;
-          console.info("🛡️ [Firestore Quota Protection] Circuit breaker reset by Redis.");
+          console.info("≡ƒ¢í∩╕Å [Firestore Quota Protection] Circuit breaker reset by Redis.");
         }
       }
     }
@@ -227,7 +227,7 @@ async function tryResolveFromRedis(docPath: string): Promise<admin.firestore.Doc
       if (cached) {
         const data = JSON.parse(cached);
         const docId = docPath.split("/").pop() || "unknown";
-        console.info(`🛡️ [Firestore Quota] Served ${docPath} from Redis L2 Shield Cache.`);
+        console.info(`≡ƒ¢í∩╕Å [Firestore Quota] Served ${docPath} from Redis L2 Shield Cache.`);
         return {
           id: docId,
           exists: true,
@@ -258,7 +258,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
   }
 
   let mockData: Record<string, unknown> | undefined = undefined;
-  // ... (unutrašnja logika ostaje ista)
+  // ... (unutra┼ínja logika ostaje ista)
 
   if (docId === "admin_stats" || docPath?.includes("metadata/admin_stats")) {
     mockData = {
@@ -280,7 +280,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
       id: docId,
       name: "Standardni Korisnik",
       firstName: "Korisnik",
-      lastName: "Svet Građevine",
+      lastName: "Svet Gra─æevine",
       email: "sandbox-user@svetgradjevine.com",
       role: "standard",
       isAdmin: false,
@@ -299,8 +299,8 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
     }
   } else if (docId === "branding" || docPath?.includes("settings/branding")) {
     mockData = {
-      heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-      heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
+      heroTitle: "OSNA┼╜UJEMO GRA─ÉEVINSKU INDUSTRIJU",
+      heroSubtitle: "Povezujemo profesionalce i klijente ┼íirom regiona.",
       primaryColor: "#0f172a",
       secondaryColor: "#3b82f6"
     };
@@ -321,7 +321,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
       urgent: [
         {
           id: "fu1",
-          title: "HITNO: Keramičar / Gipsar za unutrašnje radove",
+          title: "HITNO: Kerami─ìar / Gipsar za unutra┼ínje radove",
           category: "jobs",
           grad: "Beograd",
           location: "Beograd",
@@ -337,7 +337,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
       premium: [
         {
           id: "fp1",
-          title: "Građevinski Inženjer - Šef Gradilišta",
+          title: "Gra─æevinski In┼╛enjer - ┼áef Gradili┼íta",
           category: "jobs",
           grad: "Beograd",
           location: "Novi Beograd",
@@ -351,7 +351,7 @@ export function getMockDocSnapshot(docId: string, docPath?: string): admin.fires
         },
         {
           id: "fp2",
-          title: "Rukovalac Bagerom i Utovarivačem",
+          title: "Rukovalac Bagerom i Utovariva─ìem",
           category: "jobs",
           grad: "Novi Sad",
           location: "Novi Sad",

@@ -1,7 +1,6 @@
-// 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
-import { admin as firebaseAdmin, db, getDb } from "../config/firebase.ts";
+﻿// ≡ƒ¢í∩╕Å [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
+import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
-import { CacheInvalidationService } from "./cache-invalidation.service.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { AuditService, AuditAction } from "./audit.service.ts";
 import { Logger } from "../utils/logger.ts";
@@ -20,7 +19,7 @@ export class UnifiedAdsService {
   // L1 Hard Cache (Shield) specifically for homepage performance
   private static l1ShieldCache = new Map<string, { data: any; expiry: number }>();
   private static inflightPromises = new Map<string, Promise<any>>();
-  private static readonly L1_SHIELD_TTL = 5 * 60 * 1000; // 5 min protection (smanjuje Firestore read-ove 5x)
+  private static readonly L1_SHIELD_TTL = 60 * 1000; // 1 minute protection
 
   /**
    * Internal helper to handle request collapsing and L1/L2 caching logic for metadata
@@ -40,71 +39,51 @@ export class UnifiedAdsService {
       try {
         const data = await CacheService.getOrSetSWR(
           cacheKey,
-           async () => {
-              // Prvo probaj realan Firestore upit (da dobijemo sveže podatke)
-              try {
-                const { checkQuotaStatus } = await import("../config/firebase.ts");
-                if (!checkQuotaStatus()) {
-                  const res = await fetchFn();
-                  if (res && Array.isArray(res)) {
-                    return res; // Sveže je, koristi ga
-                  }
+          async () => {
+             // 1. Try Firestore Fast-Path (L0) as a cheaper fallback than query
+             try {
+               const { checkQuotaStatus, getMockDocSnapshot } = await import("../config/firebase.ts");
+               
+                let doc;
+                if (checkQuotaStatus()) {
+                   console.warn(`[UnifiedAdsService] Quota exhausted, using local mock for ${fastPathDoc}`);
+                   doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
+                } else {
+                   // EXTREME TIMEOUT: 100ms for Fast-Path FirestoreDoc. 
+                   // If Firestore is slow, we'd rather fail the Fast-Path and fallback than block the BFF.
+                   const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 100));
+                   doc = await Promise.race([
+                     db.doc(fastPathDoc).get(),
+                     timeoutPromise
+                   ]).catch(() => null);
                 }
-              } catch (e: unknown) {
-                const err = e instanceof Error ? e : new Error(String(e));
-                 UnifiedAdsService.logger.warn(`[UnifiedAdsService] Cold query failed for ${cacheKey}:`, err.message);
-              }
 
-              // Ako realan upit nije uspeo, probaj Fast-Path (L0) kao fallback
-              try {
-                const { checkQuotaStatus, getMockDocSnapshot } = await import("../config/firebase.ts");
-                
-                 let doc;
-                 if (checkQuotaStatus()) {
-                    doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
-                 } else {
-                    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 100));
-                    doc = await Promise.race([
-                      db.doc(fastPathDoc).get(),
-                      timeoutPromise
-                    ]).catch(() => null);
+               if (doc && doc.exists) {
+                 const d = doc.data();
+                 const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
+                 if (actualData) {
+                   console.log(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
+                   return actualData;
                  }
+               }
+             } catch (e: unknown) {
+               const err = e instanceof Error ? e : new Error(String(e));
+               console.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
+             }
 
-                if (doc && doc.exists) {
-                  const d = doc.data();
-                  const isUrgentReq = cacheKey.includes("urgent");
-                  const isPremiumReq = cacheKey.includes("premium");
-                  const actualData = isUrgentReq ? (d?.urgent || d?.premium || d)
-                    : isPremiumReq ? (d?.premium || d?.urgent || d)
-                    : d?.stats || d?.partners || d;
-                  if (actualData) {
-                    console.info(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
-                    return actualData;
-                  }
-                }
-              } catch (e: unknown) {
-                const err = e instanceof Error ? e : new Error(String(e));
-                 UnifiedAdsService.logger.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
-                try {
-                  const { getMockDocSnapshot } = await import("../config/firebase.ts");
-                  const mockDoc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
-                  if (mockDoc && mockDoc.exists) {
-                    const md = mockDoc.data();
-                    const isUrgentReq = cacheKey.includes("urgent");
-                    const isPremiumReq = cacheKey.includes("premium");
-                    const actualData = isUrgentReq ? (md?.urgent || md?.premium || md)
-                      : isPremiumReq ? (md?.premium || md?.urgent || md)
-                      : md?.stats || md?.partners || md;
-                    if (actualData) {
-                      return actualData;
-                    }
-                  }
-                } catch {}
-              }
+             // Stop execution and return fallback immediately if circuit breaker tripped
+             const { checkQuotaStatus } = await import("../config/firebase.ts");
+             if (checkQuotaStatus()) {
+               console.warn(`[UnifiedAdsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
+               return fallbackValue as T;
+             }
 
-              return fallbackValue as T;
-           },
-           5 * 60 * 1000, // 5 min TTL (SWR se ne brise na onAdChange, pa se osvezava kroz stale-window)
+             // 2. Fallback to real query (Cold Path)
+             const res = await fetchFn();
+             
+             return res;
+          },
+          30 * 24 * 3600 * 1000, // Near-Infinite 30 Days TTL (Protected with Event-Driven Cache Invalidation)
           fallbackValue
         );
         this.l1ShieldCache.set(cacheKey, { data, expiry: now + this.L1_SHIELD_TTL });
@@ -120,9 +99,9 @@ export class UnifiedAdsService {
 
     this.inflightPromises.set(cacheKey, fetchTask);
     
-    // 3. Global Tier-2 Safety Timeout: 10s max wait for the whole tiered lookup
+    // 3. Global Tier-2 Safety Timeout: 150ms max wait for the whole tiered lookup
     const globalTimeout = new Promise<T>((resolve) => {
-      setTimeout(() => resolve(fallbackValue as T), 10000);
+      setTimeout(() => resolve(fallbackValue as T), 150);
     });
 
     return Promise.race([fetchTask, globalTimeout]);
@@ -134,42 +113,65 @@ export class UnifiedAdsService {
   }
 
   static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
-    const rawDb = getDb();
-    let q = rawDb.collectionGroup("listings")
+    let q = db.collection("listings")
       .where("authorId", "==", uid)
-      .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
-      .orderBy("createdAt", "desc")
-      .limit(limitNum + 1)
-      .select(
-        "title", "name", "description", "price", "location", "loc", "type", "status",
-        "createdAt", "images", "isPremium", "isUrgent", "comp", "salary", "sal",
-        "logo", "plataMin", "plataMax", "salaryType", "smestaj", "prevoz", "hrana",
-        "housing", "transport", "food", "topliObrok", "benefits", "benefiti", "rawBenefits",
-        "authorId", "companyName",
-      );
-
+      .where("status", "in", ["active", "pending", "pending_payment", "inactive", "draft", "rejected"])
+      .orderBy("createdAt", "desc");
+      
     if (cursor) {
-      const cursorDoc = await rawDb.collection("listings").doc(cursor).get();
-      if (cursorDoc.exists) q = q.startAfter(cursorDoc);
+      if (cursor.includes("|")) {
+        const [timeStr, id] = cursor.split("|");
+        const ts = firebaseAdmin.firestore.Timestamp.fromMillis(parseInt(timeStr, 10));
+        q = q.startAfter(ts, id);
+      } else if (cursor.match(/^\d+$/)) {
+         q = q.startAfter(firebaseAdmin.firestore.Timestamp.fromMillis(parseInt(cursor, 10)));
+      } else {
+         const cursorDoc = await db.collection("listings").doc(cursor).get();
+         if (cursorDoc.exists) {
+            q = q.startAfter(cursorDoc);
+         }
+      }
     }
+    
+    const snap = await q
+      .orderBy(firebaseAdmin.firestore.FieldPath.documentId(), "desc")
+      .limit(searchQ ? 150 : limitNum) // Fetch more if searching
+      .select(
+        "title",
+        "price",
+        "location",
+        "type",
+        "status",
+        "createdAt",
+        "images",
+        "isPremium",
+        "isUrgent",
+        "comp",
+        "salary",
+        "logo",
+        "thumbnail",
+        "authorId",
+        "viewsCount",
+        "applicantsCount",
+        "category",
+        "grad",
+        "company"
+      )
+      .get();
 
-    const snap = await q.get();
     const { ImageTransformer } = await import("../utils/image.transformer.ts");
 
-    const hasMore = snap.docs.length > limitNum;
-    const pageDocs = hasMore ? snap.docs.slice(0, limitNum) : snap.docs;
-
-    let docs = pageDocs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
+    let docs: (Listing & { typeLabel: string; postType: string })[] = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
       const data = doc.data() as Listing;
       let typeLabel = '';
       let postType = data.type || '';
 
       switch(data.type) {
         case 'job': typeLabel = 'Posao'; break;
-        case 'accommodation': typeLabel = 'Smeštaj'; break;
-        case 'machine': typeLabel = 'Mašina'; break;
+        case 'accommodation': typeLabel = 'Sme┼ítaj'; break;
+        case 'machine': typeLabel = 'Ma┼íina'; break;
         case 'catering': typeLabel = 'Ketering'; break;
-        case 'plot':
+        case 'plot': 
         case 'real_estate':
           typeLabel = 'Plac'; break;
         case 'company': typeLabel = 'Firma'; break;
@@ -186,16 +188,16 @@ export class UnifiedAdsService {
 
     if (searchQ) {
       const lowQ = searchQ.toLowerCase();
-      docs = docs.filter(d =>
-        (d.title && d.title.toLowerCase().includes(lowQ)) ||
+      docs = docs.filter(d => 
+        (d.title && d.title.toLowerCase().includes(lowQ)) || 
         (d.comp && d.comp.toLowerCase().includes(lowQ))
-      );
+      ).slice(0, limitNum);
     }
 
     return {
       docs,
-      lastVisibleId: pageDocs.length > 0 ? pageDocs[pageDocs.length - 1].id : null,
-      hasMore,
+      lastVisibleId: docs.length === limitNum ? `${(docs[docs.length - 1] as any).createdAt?.toDate ? (docs[docs.length - 1] as any).createdAt.toDate().getTime() : ((docs[docs.length - 1] as any).createdAt || Date.now())}|${(docs[docs.length - 1] as any).id}` : null,
+      hasMore: docs.length === limitNum
     };
   }
 
@@ -204,7 +206,7 @@ export class UnifiedAdsService {
     const snap = await adRef.get();
 
     if (!snap.exists) {
-      throw new BadRequestError("Oglas nije pronađen");
+      throw new BadRequestError("Oglas nije prona─æen");
     }
 
     const adData = snap.data()!;
@@ -224,18 +226,19 @@ export class UnifiedAdsService {
       updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
     });
 
+    const { CacheService } = await import("./cache.service.ts");
     const { CacheKeys } = await import("../constants/cache-keys.ts");
     await CacheService.delete(CacheKeys.adDetail(id));
-    const { invalidateAdOwnershipCache } = await import("../middleware/ownership.middleware.ts");
-    invalidateAdOwnershipCache(id);
-    const category = (adData.type as string) || "jobs";
-    CacheInvalidationService.onAdChange(category, adData.authorId);
+    await CacheService.invalidateByPrefix(`myAds_${adData.authorId}`);
+    await CacheService.invalidateByPrefix(`publicProfileAds_${adData.authorId}`);
+    await CacheService.invalidateByPrefix("public_ads_");
+    await CacheService.invalidateByPrefix("search_ads_"); 
     const { PredictiveAnalyticsService } = await import("./predictive.service.ts");
-    await PredictiveAnalyticsService.forceRefresh(id).catch((e: unknown) => console.error("[Ads] operation error:", e));
+    await PredictiveAnalyticsService.forceRefresh(id).catch(() => {});
 
     // Invalidate employer dashboard stats cache to resolve "Ghost" ads immediately
     const { DashboardService } = await import("./dashboard.service.ts");
-    await DashboardService.clearEmployerStatsCache(adData.authorId).catch((e: unknown) => console.error("[Ads] operation error:", e));
+    await DashboardService.clearEmployerStatsCache(adData.authorId).catch(() => {});
 
     return { success: true };
   }
@@ -266,7 +269,14 @@ export class UnifiedAdsService {
     const cacheKey = "premium_partners_v2";
     const fastPathDoc = "metadata/premium_partners_fastpath";
 
-    const fallbackPartners: { id: string; name: string; logo: string }[] = [];
+    const fallbackPartners = [
+      { id: "f1", name: "ENERGOPROJEKT", logo: "" },
+      { id: "f2", name: "STRABAG", logo: "" },
+      { id: "f3", name: "NAPRED", logo: "" },
+      { id: "f4", name: "KARIN KOMERC", logo: "" },
+      { id: "f5", name: "MILLENNIUM TEAM", logo: "" },
+      { id: "f6", name: "PUTEVI SRBIJE", logo: "" }
+    ];
 
     try {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
@@ -292,11 +302,20 @@ export class UnifiedAdsService {
 
         const finalData = partners.length > 0 ? partners : fallbackPartners;
         
+        // Strip undefined values which Firebase rejects
+        const sanitizedFinalData = JSON.parse(JSON.stringify(finalData));
+        
+        // Sync back to Fast-Path
+        db.doc(fastPathDoc).set({
+          partners: sanitizedFinalData,
+          updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(() => {});
+
         return finalData;
       }, fallbackPartners);
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      UnifiedAdsService.logger.warn("[PARTNERS] using disaster fallback:", error.message);
+      console.warn("[PARTNERS] using disaster fallback:", error.message);
       return fallbackPartners;
     }
   }
@@ -308,8 +327,57 @@ export class UnifiedAdsService {
   }) {
     const cacheKey = `promoted_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
     const fastPathDoc = "metadata/promoted_ads_fastpath";
+    const fastPathField = options.isUrgent ? "urgent" : "premium";
 
-    const finalFallback: any[] = [];
+    const fallbackPremiumAds = [
+      {
+        id: "fp1",
+        title: "Gra─æevinski In┼╛enjer - ┼áef Gradili┼íta",
+        category: "jobs",
+        grad: "Beograd",
+        location: "Novi Beograd",
+        salary: "1500 - 2000 EUR",
+        comp: "Energoprojekt Visokogradnja",
+        logo: "",
+        images: [],
+        isPremium: true,
+        isUrgent: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: "fp2",
+        title: "Rukovalac Bagerom i Utovariva─ìem",
+        category: "jobs",
+        grad: "Novi Sad",
+        location: "Novi Sad",
+        salary: "1200 - 1400 EUR",
+        comp: "Karin Komerc",
+        logo: "",
+        images: [],
+        isPremium: true,
+        isUrgent: false,
+        createdAt: new Date().toISOString()
+      }
+    ];
+
+    const fallbackUrgentAds = [
+      {
+        id: "fu1",
+        title: "HITNO: Kerami─ìar / Gipsar za unutra┼ínje radove",
+        category: "jobs",
+        grad: "Beograd",
+        location: "Beograd",
+        salary: "2000+ EUR",
+        comp: "Lux Adaptacije d.o.o.",
+        logo: "",
+        images: [],
+        isPremium: false,
+        isUrgent: true,
+        createdAt: new Date().toISOString()
+      }
+    ];
+
+    const finalFallback = options.isUrgent ? fallbackUrgentAds : fallbackPremiumAds;
 
     try {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
@@ -335,11 +403,20 @@ export class UnifiedAdsService {
             };
           });
 
+          // Strip undefined values which Firebase rejects
+          const sanitizedResults = JSON.parse(JSON.stringify(results));
+
+          // Self-heal Fast-Path
+          db.doc(fastPathDoc).set({
+            [fastPathField]: sanitizedResults,
+            updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
+          }, { merge: true }).catch(() => {});
+
           return results;
       }, finalFallback);
     } catch (e: unknown) {
       const err = e instanceof Error ? e : new Error(String(e));
-      UnifiedAdsService.logger.warn(`[PROMOTED] degraded: ${err.message}`);
+      console.warn(`[PROMOTED] degraded: ${err.message}`);
       return finalFallback;
     }
   }
@@ -399,7 +476,7 @@ export class UnifiedAdsService {
         return cached;
       }
     } catch (e) {
-      // Ignorišemo Redis greške pri čitanju
+      // Ignori┼íemo Redis gre┼íke pri ─ìitanju
     }
 
     const collName = category === "companies" ? "users" : "listings";
@@ -442,8 +519,6 @@ export class UnifiedAdsService {
       .limit(limitCount)
       .select(
         "title",
-        "name",
-        "description",
         "price",
         "location",
         "type",
@@ -455,19 +530,6 @@ export class UnifiedAdsService {
         "comp",
         "salary",
         "logo",
-        "plataMin",
-        "plataMax",
-        "salaryType",
-        "smestaj",
-        "prevoz",
-        "hrana",
-        "housing",
-        "transport",
-        "food",
-        "topliObrok",
-        "benefits",
-        "benefiti",
-        "rawBenefits",
       )
       .get();
 
@@ -485,11 +547,11 @@ export class UnifiedAdsService {
       hasMore: docs.length === limitCount,
     };
 
-    // PROMPT 5: Čuvanje aktivnih oglasa u Redisu 15 minuta (900000 ms) čime neutrališemo Google Crawler upite
+    // PROMPT 5: ─îuvanje aktivnih oglasa u Redisu 15 minuta (900000 ms) ─ìime neutrali┼íemo Google Crawler upite
     try {
       await CacheService.set(cacheKey, result, 900000);
     } catch (e) {
-      // Ignorišemo greške
+      // Ignori┼íemo gre┼íke
     }
 
     return result;
