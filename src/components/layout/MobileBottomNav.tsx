@@ -93,66 +93,79 @@ export const MobileBottomNav: React.FC = () => {
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="md:hidden fixed inset-0 z-[60] bg-[#070B0F]/95 backdrop-blur-xl"
+          className="md:hidden fixed inset-0 z-[60] bg-[#050F19] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] overflow-y-auto"
           onClick={() => setIsSearchOpen(false)}
         >
-          <div
-            className="flex items-center gap-3 p-4 border-b border-white/5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex-1 flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-              <span className="material-symbols-outlined text-white/40">search</span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Pretraži Svet Građevine..."
-                className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/20 font-medium"
-              />
-            </div>
+          {/* Top Gradient Overlay */}
+          <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-secondary/10 to-transparent pointer-events-none"></div>
+
+          {/* Header */}
+          <div className="relative flex justify-end p-4 z-10">
             <button
               onClick={() => setIsSearchOpen(false)}
-              className="w-10 h-10 flex items-center justify-center text-white/40 hover:text-white/70"
+              className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-white bg-white/5 rounded-full backdrop-blur-md border border-white/10 shadow-lg"
             >
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
 
-          <div className="p-4" onClick={(e) => e.stopPropagation()}>
-            {searchQuery.trim() ? (
+          <div className="relative z-10 px-6 pt-10 pb-20 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            {/* AI Icon */}
+            <div className="w-20 h-20 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] rounded-[20px] flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(254,191,13,0.3)] animate-pulse-gold border border-white/20 relative">
+               <div className="absolute inset-0 rounded-[20px] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
+               <span className="material-symbols-outlined text-slate-950 text-4xl" style={{ fontVariationSettings: '"FILL" 1' }}>auto_awesome</span>
+            </div>
+            
+            {/* Title & Description */}
+            <h2 className="font-headline text-4xl font-black text-white text-center mb-3 uppercase tracking-tighter drop-shadow-md">PAMETNA PRETRAGA</h2>
+            <p className="text-white/50 text-center text-sm md:text-base mb-10 max-w-sm">Opišite šta vam treba. Naš AI će pronaći najbolje rezultate u celom sistemu.</p>
+            
+            {/* Search Form */}
+            <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(); }} className="w-full max-w-md relative flex flex-col items-center">
+              <div className="w-full relative bg-[#0A1624] rounded-[16px] border-2 border-secondary/40 focus-within:border-secondary shadow-[0_0_20px_rgba(254,191,13,0.1)] focus-within:shadow-[0_0_40px_rgba(254,191,13,0.3)] transition-all duration-300 p-2 flex items-center group overflow-hidden">
+                <div className="absolute inset-0 bg-secondary/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                
+                <span className="material-symbols-outlined text-secondary ml-4 text-2xl animate-pulse">search_spark</span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Traži posao, mašine, firme..."
+                  className="flex-1 bg-transparent text-lg text-white outline-none placeholder:text-white/30 font-medium px-4 py-4 relative z-10"
+                />
+              </div>
+              
               <button
-                onClick={handleSearchSubmit}
-                className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-yellow-500/10 flex items-center justify-center gap-2"
+                type="submit"
+                disabled={!searchQuery.trim()}
+                className="w-full mt-6 py-4 bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] text-[#0d151c] rounded-[14px] font-headline font-black text-lg uppercase tracking-widest shadow-[0_10px_20px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:from-[#ffad3a] hover:to-[#ffa424] transition-all active:scale-[0.98] border border-white/20"
               >
-                <span className="material-symbols-outlined text-sm">search</span>
-                PRETRAŽI "{searchQuery.trim()}"
+                PRETRAŽI
+                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>arrow_forward</span>
               </button>
-            ) : (
-              <div className="space-y-1">
-                <div className="text-[9px] font-black text-white/20 tracking-[0.2em] uppercase mb-4">BRZA NAVIGACIJA</div>
-                {[
-                  { label: 'Poslovi', icon: 'work', path: '/poslovi' },
-                  { label: 'Majstori', icon: 'construction', path: '/majstori' },
-                  { label: 'Firme', icon: 'business', path: '/firme' },
-                  { label: 'Smeštaj', icon: 'hotel', path: '/smestaj' },
-                  { label: 'Ketering', icon: 'restaurant', path: '/ketering' },
-                  { label: 'Alat i oprema', icon: 'storefront', path: '/alat-i-oprema' },
-                  { label: 'Građ. mašine', icon: 'precision_manufacturing', path: '/gradjevinske-masine' },
-                  { label: 'Placevi', icon: 'terrain', path: '/placevi' },
-                ].map((link) => (
-                  <NavLink
-                    key={link.path}
-                    to={link.path}
-                    onClick={() => setIsSearchOpen(false)}
-                    className="flex items-center gap-3 w-full px-4 py-3.5 rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-all"
+            </form>
+            
+            {/* AI Search Suggestions */}
+            <div className="mt-12 w-full max-w-md">
+              <div className="text-[10px] font-black text-white/30 tracking-[0.2em] uppercase mb-4 text-center">POPULARNE PRETRAGE</div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {['Moler u Beogradu', 'Polovan bager', 'Ketering za 50 radnika', 'Iznajmljivanje skele'].map((suggestion, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setSearchQuery(suggestion);
+                      setTimeout(() => {
+                        inputRef.current?.focus();
+                      }, 50);
+                    }}
+                    className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-medium hover:bg-white/10 hover:text-white hover:border-secondary/30 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-lg text-white/30">{link.icon}</span>
-                    <span className="text-[11px] font-black uppercase tracking-wider">{link.label}</span>
-                  </NavLink>
+                    {suggestion}
+                  </button>
                 ))}
               </div>
-            )}
+            </div>
           </div>
         </motion.div>
       )}
