@@ -83,17 +83,22 @@ export function createFirestoreLoader(collectionPath: string) {
         chunks.push(keys.slice(i, i + 30));
       }
 
-      const allDocs = await Promise.all(
+      const results = await Promise.all(
         chunks.map(async (chunk) => {
-          const snap = await db
-            .collection(collectionPath)
-            .where(FieldPath.documentId(), "in", chunk)
-            .get();
-          return snap.docs;
+          try {
+            const snap = await db
+              .collection(collectionPath)
+              .where(FieldPath.documentId(), "in", chunk)
+              .get();
+            return snap.docs;
+          } catch (err) {
+            logger.error(`[Dataloader] Generic Firestore query failed for ${collectionPath} chunk:`, err);
+            return [];
+          }
         }),
       );
 
-      const mergedDocs = allDocs.flat();
+      const mergedDocs = results.flat();
       const dic = new Map(
         mergedDocs.map((doc) => [doc.id, { id: doc.id, ...doc.data() }]),
       );
@@ -140,37 +145,41 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
 
       await Promise.all(
         chunks.map(async (chunk) => {
-          const snap = await db
-            .collection("users")
-            .where(FieldPath.documentId(), "in", chunk)
-            .get();
-          snap.docs.forEach((doc) => {
-            const rawUser = { id: doc.id, ...doc.data() } as Record<string, unknown>;
-            const {
-              email: _e,
-              phoneNumber: _p,
-              pib: _pib,
-              maticniBroj: _mb,
-              address: _a,
-              savedJobs: _sj,
-              savedAds: _sa,
-              savedSearches: _ss,
-              ...publicUser
-            } = rawUser;
+          try {
+            const snap = await db
+              .collection("users")
+              .where(FieldPath.documentId(), "in", chunk)
+              .get();
+            snap.docs.forEach((doc) => {
+              const rawUser = { id: doc.id, ...doc.data() } as Record<string, unknown>;
+              const {
+                email: _e,
+                phoneNumber: _p,
+                pib: _pib,
+                maticniBroj: _mb,
+                address: _a,
+                savedJobs: _sj,
+                savedAds: _sa,
+                savedSearches: _ss,
+                ...publicUser
+              } = rawUser;
 
-            const profile = {
-              ...publicUser,
-              uid: rawUser.uid || doc.id,
-              id: doc.id,
-              displayName:
-                rawUser.displayName ||
-                `${rawUser.firstName || ""} ${rawUser.lastName || ""}`.trim(),
-            };
+              const profile = {
+                ...publicUser,
+                uid: rawUser.uid || doc.id,
+                id: doc.id,
+                displayName:
+                  rawUser.displayName ||
+                  `${rawUser.firstName || ""} ${rawUser.lastName || ""}`.trim(),
+              };
 
-            fetchedUsers.set(doc.id, profile as UserDTO);
-            // REDUCED TTL: 60 SECONDS (Short-lived aggregation to protect quotas without stale state)
-            CacheService.set(`public_profile_${doc.id}`, profile, 60000).catch(err => console.error("[Cache] invalidation error:", err));
-          });
+              fetchedUsers.set(doc.id, profile as UserDTO);
+              // REDUCED TTL: 60 SECONDS (Short-lived aggregation to protect quotas without stale state)
+              CacheService.set(`public_profile_${doc.id}`, profile, 60000).catch(err => console.error("[Cache] invalidation error:", err));
+            });
+          } catch (err) {
+            logger.error(`[Dataloader] User profile Firestore query failed for chunk ${chunk.join(",")}:`, err);
+          }
         }),
       );
     }
@@ -215,16 +224,20 @@ export const internalUserLoader = new DataLoader<string, UserDTO | null>(
 
       await Promise.all(
         chunks.map(async (chunk) => {
-          const snap = await db
-            .collection("users")
-            .where(FieldPath.documentId(), "in", chunk)
-            .get();
-          snap.docs.forEach((doc) => {
-            const data = { id: doc.id, uid: doc.id, ...doc.data() } as UserDTO;
-            fetchedUsers.set(doc.id, data);
-            // REDUCED TTL: 60 SECONDS
-            CacheService.set(`user_full_${doc.id}`, data, 60000).catch(err => console.error("[Cache] invalidation error:", err));
-          });
+          try {
+            const snap = await db
+              .collection("users")
+              .where(FieldPath.documentId(), "in", chunk)
+              .get();
+            snap.docs.forEach((doc) => {
+              const data = { id: doc.id, uid: doc.id, ...doc.data() } as UserDTO;
+              fetchedUsers.set(doc.id, data);
+              // REDUCED TTL: 60 SECONDS
+              CacheService.set(`user_full_${doc.id}`, data, 60000).catch(err => console.error("[Cache] invalidation error:", err));
+            });
+          } catch (err) {
+            logger.error(`[Dataloader] Internal user Firestore query failed for chunk ${chunk.join(",")}:`, err);
+          }
         }),
       );
     }
@@ -289,16 +302,20 @@ export const listingsLoader = new DataLoader<string, ListingDTO | null>(
 
       await Promise.all(
         chunks.map(async (chunk) => {
-          const snap = await db
-            .collection("listings")
-            .where(FieldPath.documentId(), "in", chunk)
-            .get();
-          snap.docs.forEach((doc) => {
-            const data = { id: doc.id, ...doc.data() } as ListingDTO;
-            fetchedListings.set(doc.id, data);
-            // REDUCED TTL: 120 SECONDS -> INCREASED TO 30 MINUTES (1,800,000 ms) for SEO crawlers and performance
-            CacheService.set(CacheKeys.adDetail(doc.id), data, 1800000).catch(err => console.error("[Cache] invalidation error:", err));
-          });
+          try {
+            const snap = await db
+              .collection("listings")
+              .where(FieldPath.documentId(), "in", chunk)
+              .get();
+            snap.docs.forEach((doc) => {
+              const data = { id: doc.id, ...doc.data() } as ListingDTO;
+              fetchedListings.set(doc.id, data);
+              // REDUCED TTL: 120 SECONDS -> INCREASED TO 30 MINUTES (1,800,000 ms) for SEO crawlers and performance
+              CacheService.set(CacheKeys.adDetail(doc.id), data, 1800000).catch(err => console.error("[Cache] invalidation error:", err));
+            });
+          } catch (err) {
+            logger.error(`[Dataloader] Firestore query failed for chunk ${chunk.join(",")}:`, err);
+          }
         }),
       );
     }
@@ -343,16 +360,20 @@ export const userStatsLoader = new DataLoader<string, UserStatsDTO | null>(
 
       await Promise.all(
         chunks.map(async (chunk) => {
-          const snap = await db
-            .collection("user_stats")
-            .where(FieldPath.documentId(), "in", chunk)
-            .get();
-          snap.docs.forEach((doc) => {
-            const data = { id: doc.id, ...doc.data() } as UserStatsDTO;
-            fetchedStats.set(doc.id, data);
-            // REDUCED TTL: 120 SECONDS
-            CacheService.set(`user_stats_${doc.id}`, data, 120000).catch(err => console.error("[Cache] invalidation error:", err));
-          });
+          try {
+            const snap = await db
+              .collection("user_stats")
+              .where(FieldPath.documentId(), "in", chunk)
+              .get();
+            snap.docs.forEach((doc) => {
+              const data = { id: doc.id, ...doc.data() } as UserStatsDTO;
+              fetchedStats.set(doc.id, data);
+              // REDUCED TTL: 120 SECONDS
+              CacheService.set(`user_stats_${doc.id}`, data, 120000).catch(err => console.error("[Cache] invalidation error:", err));
+            });
+          } catch (err) {
+            logger.error(`[Dataloader] User stats Firestore query failed for chunk ${chunk.join(",")}:`, err);
+          }
         }),
       );
     }

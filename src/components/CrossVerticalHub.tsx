@@ -193,7 +193,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
                   <ul className="space-y-4 mb-6">
                     {machines.slice(0,3).map((machine: any) => (
                       <li key={machine.id}>
-                        <Link to={`/gradjevinske-masine/srbija/ostalo/${machine.id}`} className="block group">
+                        <Link to={`/gradjevinske-masine/${machine.id}`} className="block group">
                           <h4 className="text-xs font-bold text-white group-hover:text-green-500 transition-colors line-clamp-1">{machine.title || machine.adTitle}</h4>
                           <p className="text-xs text-white/70 mt-1 bg-white/5 px-1.5 py-0.5 rounded inline-block">{machine.price ? `${machine.price}€` : 'Po dogovoru'}</p>
                         </Link>

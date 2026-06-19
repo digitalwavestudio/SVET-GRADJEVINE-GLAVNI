@@ -245,6 +245,10 @@ export const getAdById = async (
       return res.status(data.status as number).json(data);
     }
 
+    if (data === null || data === undefined) {
+      return res.status(503).json({ error: "Servis trenutno nedostupan" });
+    }
+
     res.json(data);
   } catch (err) {
     console.error("[ADS] getAdById Error:", err);
