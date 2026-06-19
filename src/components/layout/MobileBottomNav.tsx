@@ -32,6 +32,38 @@ export const MobileBottomNav: React.FC = () => {
     }
   }, [isSearchOpen]);
 
+  useEffect(() => {
+    if (isSearchOpen) {
+      // Dodaj dummy history state da bi Back dugme moglo da ga "potrosi"
+      window.history.pushState({ searchOpen: true }, '');
+      
+      const handlePopState = () => {
+        setIsSearchOpen(false);
+      };
+      
+      const handleGlobalClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        const link = target.closest('a');
+        // Ako korisnik klikne na logo (link ka /) ili bilo koji link, zatvori modal
+        if (link) {
+          setIsSearchOpen(false);
+        }
+      };
+
+      window.addEventListener('popstate', handlePopState);
+      document.addEventListener('click', handleGlobalClick);
+      
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+        document.removeEventListener('click', handleGlobalClick);
+      };
+    }
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    setIsSearchOpen(false);
+  }, [location.pathname, location.search]);
+
   return (
     <>
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-t border-white/5 pb-safe-bottom">
@@ -111,13 +143,13 @@ export const MobileBottomNav: React.FC = () => {
 
           <div className="relative z-10 px-6 pt-10 pb-20 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
             {/* AI Icon */}
-            <div className="w-20 h-20 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] rounded-[20px] flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(254,191,13,0.3)] animate-pulse-gold border border-white/20 relative">
+            <div className="w-20 h-20 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] rounded-[20px] flex items-center justify-center mb-12 shadow-[0_0_40px_rgba(254,191,13,0.3)] animate-pulse-gold border border-white/20 relative">
                <div className="absolute inset-0 rounded-[20px] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
                <span className="material-symbols-outlined text-slate-950 text-4xl" style={{ fontVariationSettings: '"FILL" 1' }}>auto_awesome</span>
             </div>
             
             {/* Title & Description */}
-            <h2 className="font-headline text-4xl font-black text-white text-center mb-3 uppercase tracking-tighter drop-shadow-md">PAMETNA PRETRAGA</h2>
+            <h2 className="font-headline text-4xl font-black text-white text-center mb-3 mt-6 uppercase tracking-tighter drop-shadow-md">PAMETNA PRETRAGA</h2>
             <p className="text-white/50 text-center text-sm md:text-base mb-10 max-w-sm">Opišite šta vam treba. Naš AI će pronaći najbolje rezultate u celom sistemu.</p>
             
             {/* Search Form */}
@@ -125,7 +157,7 @@ export const MobileBottomNav: React.FC = () => {
               <div className="w-full relative bg-[#0A1624] rounded-[16px] border-2 border-secondary/40 focus-within:border-secondary shadow-[0_0_20px_rgba(254,191,13,0.1)] focus-within:shadow-[0_0_40px_rgba(254,191,13,0.3)] transition-all duration-300 p-2 flex items-center group overflow-hidden">
                 <div className="absolute inset-0 bg-secondary/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                 
-                <span className="material-symbols-outlined text-secondary ml-4 text-2xl animate-pulse">search_spark</span>
+                <span className="material-symbols-outlined text-secondary ml-4 text-2xl animate-pulse">search</span>
                 <input
                   ref={inputRef}
                   type="text"

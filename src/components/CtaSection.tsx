@@ -121,14 +121,14 @@ export default function CtaSection() {
   return (
     <>
       {/* Hero Section with Architectural CTA */}
-      <section className="relative min-h-[921px] bg-[#0F1923] overflow-hidden flex items-center py-20 px-6 lg:px-20">
+      <section className="relative min-h-[921px] bg-[#0F1923] overflow-hidden flex items-center py-20 px-4 md:px-8">
         {/* Background Elements */}
         <div className="absolute inset-0 blueprint-bg opacity-30"></div>
         <div className="absolute -right-20 top-1/4 opacity-10 pointer-events-none transform rotate-12 scale-150">
           <span className="material-symbols-outlined text-[400px] text-white select-none">architecture</span>
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
-        <div className="relative z-10 w-full max-w-[1920px] mx-auto">
+        <div className="relative z-10 w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-8">
               <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">

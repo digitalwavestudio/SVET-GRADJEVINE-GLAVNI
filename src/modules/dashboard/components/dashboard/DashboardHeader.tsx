@@ -172,8 +172,9 @@ export default React.memo(function DashboardHeader({
         </div>
         <div>
           <div className="flex flex-wrap items-center gap-4 mb-2">
-            <h1 className="text-4xl font-black tracking-tighter uppercase text-white">
-              {greeting}, <span className="text-secondary">{userName || user.email}</span>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter uppercase text-white w-full leading-tight">
+              {greeting}, <br className="sm:hidden" />
+              <span className="text-secondary block sm:inline mt-1 sm:mt-0">{userName || user.email}</span>
             </h1>
             {isOffline && (
               <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-[10px]">

@@ -330,7 +330,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                </DashboardGuard>
             </div>
           </motion.div>
-        </div>\n</motion.div>
+        </div>
+      </motion.div>
   );
 });
 

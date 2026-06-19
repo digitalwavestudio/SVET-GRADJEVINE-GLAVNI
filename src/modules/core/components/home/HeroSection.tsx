@@ -86,9 +86,7 @@ export default function HeroSection() {
             <div className="relative z-20 w-full mt-10 md:mt-40">
               {/* Main HUD Search Module - Now Above Categories */}
               <div className="relative mb-8 md:mb-36 group/searchwrapper">
-                {/* Corner Accents */}
-                <div className="absolute -top-3 -left-3 md:-top-6 md:-left-6 w-6 h-6 md:w-12 md:h-12 border-t-2 border-l-2 border-secondary/20 rounded-tl-[10px] pointer-events-none group-hover/searchwrapper:border-secondary/40 transition-colors duration-500"></div>
-                <div className="absolute -bottom-3 -right-3 md:-bottom-6 md:-right-6 w-6 h-6 md:w-12 md:h-12 border-b-2 border-r-2 border-secondary/20 rounded-br-[10px] pointer-events-none group-hover/searchwrapper:border-secondary/40 transition-colors duration-500"></div>
+
 
                 <form
                   onSubmit={handleSearch}
@@ -107,7 +105,7 @@ export default function HeroSection() {
                         placeholder={placeholderMap[activeTab]}
                         autoComplete="off"
                         spellCheck="false"
-                        className="w-full bg-transparent border-none focus:ring-0 focus:shadow-none text-white placeholder-white/70 focus:placeholder-white text-sm sm:text-lg md:text-xl font-headline font-black italic tracking-tight py-2 md:py-6 px-0 outline-none uppercase transition-all"
+                        className="w-full bg-transparent border-none focus:ring-0 focus:shadow-none text-white placeholder-white/70 focus:placeholder-white text-[11px] sm:text-base md:text-xl font-headline font-black italic tracking-tight py-2 md:py-6 px-0 outline-none uppercase transition-all text-ellipsis"
                       />
                     </div>
 
