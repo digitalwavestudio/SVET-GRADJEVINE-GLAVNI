@@ -78,11 +78,16 @@ class ClientCircuitBreaker {
    * If usage exceeds 80% (approx 4,000,000 characters/bytes of the 5MB browser limit),
    * it purges older and less critical cached responses.
    */
+  private lastMemoryGuardRun = 0;
+
   private runMemoryGuard() {
     if (typeof window === 'undefined') return;
+    const now = Date.now();
+    if (now - this.lastMemoryGuardRun < 30000) return; // throttle to every 30s
+    this.lastMemoryGuardRun = now;
     try {
       let totalChars = 0;
-      const cbKeys: { key: string; timestamp: number; size: number }[] = [];
+      const evictable: { key: string; timestamp: number; size: number }[] = [];
 
       for (let i = 0; i < safeLocalStorage.length; i++) {
         const key = safeLocalStorage.key(i);
@@ -94,40 +99,33 @@ class ClientCircuitBreaker {
           if (key.startsWith('sg_cb_cache:')) {
             try {
               const parsed = JSON.parse(val);
-              cbKeys.push({
+              evictable.push({
                 key,
                 timestamp: parsed.timestamp || 0,
                 size
               });
             } catch (e) {
-              cbKeys.push({ key, timestamp: 0, size });
+              evictable.push({ key, timestamp: 0, size });
             }
           }
         }
       }
 
-      const limit = 4 * 1024 * 1024; // 4MB (80% of 5MB limit)
-      if (totalChars > limit) {
-        console.warn(`⚠️ [MemoryGuard] LocalStorage usage at ${(totalChars / (5 * 1024 * 1024) * 100).toFixed(1)}% (${(totalChars / 1024).toFixed(1)}KB), initiating garbage collection...`);
-        
+      const MAX_BYTES = 4.5 * 1024 * 1024; // 4.5MB (90% of 5MB limit)
+      if (totalChars > MAX_BYTES) {
         // Sort by timestamp asc (oldest first)
-        cbKeys.sort((a, b) => a.timestamp - b.timestamp);
+        evictable.sort((a, b) => a.timestamp - b.timestamp);
 
         let freedBytes = 0;
-        for (const item of cbKeys) {
+        for (const item of evictable) {
           safeLocalStorage.removeItem(item.key);
           freedBytes += item.size;
           totalChars -= item.size;
-
-          // Stop when we are safely below 60% of the limit (approx 3MB)
-          if (totalChars < 3 * 1024 * 1024) {
-            break;
-          }
+          if (totalChars < 2.5 * 1024 * 1024) break; // target 2.5MB
         }
-        console.info(`🛡️ [MemoryGuard] LocalStorage garbage collection complete. Freed ${(freedBytes / 1024).toFixed(1)}KB.`);
       }
     } catch (err) {
-      console.warn('[MemoryGuard] Optimization failed:', err);
+      // silent
     }
   }
 
@@ -143,11 +141,17 @@ class ClientCircuitBreaker {
     const slimItem = (item: unknown): unknown => {
       if (typeof item !== 'object' || item === null) return item;
 
-      // Retain only crucial parameters: id, title (naslov), price (cena) and basic identity tags
       const essentials = [
-        'id', 'uid', 'title', 'price', 'name', 'comp', 'logo', 'logoUrl', 
+        'id', 'uid', 'title', 'price', 'name', 'comp', 'logo', 'logoUrl',
         'location', 'type', 'status', 'createdAt', 'isPremium', 'isUrgent',
-        'pricePerDay', 'pricePerHour', 'category', 'role', 'grad'
+        'pricePerDay', 'pricePerHour', 'category', 'role', 'grad',
+        'adTitle', 'adType', 'machPrice', 'machPricePerDay', 'machYear', 'machHours',
+        'machBrand', 'machModel', 'machAdType', 'machCategory', 'machSubCategory', 'machFuel',
+        'year', 'workingHours', 'machineType', 'condition', 'fuelType', 'weightKg',
+        'companyName', 'companyLogo', 'isCompanyVerified', 'categoryId', 'categorySlug',
+        'isServiced', 'isNegotiable', 'imageStatus', 'imagePlaceholders',
+        'currency', 'city', 'description', 'authorId', 'authorSnapshot',
+        'locationSlug', 'professionSlug', 'mainCategories',
       ];
       
       const typedItem = item as Record<string, unknown>;

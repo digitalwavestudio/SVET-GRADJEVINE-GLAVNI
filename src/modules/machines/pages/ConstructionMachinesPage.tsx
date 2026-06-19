@@ -76,7 +76,19 @@ export default function ConstructionMachinesPage() {
   const totalMachinesCount = (data?.pages[0] as any)?.totalHits ?? (isEmptyFilter ? machineStats?.total : machines.length) ?? machines.length;
 
   const machinesToDisplay = useMemo(() => {
-    let result = [...machines];
+    let result = [...machines].map(m => ({
+      ...m,
+      adTitle: m.adTitle || m.title,
+      year: m.year || m.machYear,
+      workingHours: m.workingHours || m.machHours,
+      price: m.price || m.machPrice,
+      pricePerDay: m.pricePerDay || m.machPricePerDay,
+      pricePerHour: m.pricePerHour || m.machPricePerHour,
+      adType: m.adType || m.machAdType,
+      fuelType: m.fuelType || m.machFuel,
+      categoryId: m.categoryId || m.machCategory || m.machSubCategory,
+      condition: m.condition || 'polovno',
+    }));
     
     if (sortBy === 'price-asc') {
       result = [...result].sort((a, b) => {

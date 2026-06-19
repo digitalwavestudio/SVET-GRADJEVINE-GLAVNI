@@ -141,7 +141,20 @@ export abstract class BaseAdStrategy {
             }
           : (rawData as { _geoloc?: unknown })?._geoloc || null,
         imageStatus: hasRawImages ? "processing" : "ready",
+        // Normalize field names for machine category
+        adTitle: rawData.adTitle || rawData.title,
       };
+
+      if (this.entityType === "machine") {
+        adData.categoryId = rawData.categoryId || rawData.machCategory || rawData.machSubCategory;
+        adData.adType = rawData.adType || rawData.machAdType;
+        adData.year = rawData.year || rawData.machYear;
+        adData.workingHours = rawData.workingHours || rawData.machHours;
+        adData.price = adData.price || rawData.machPrice;
+        adData.pricePerDay = adData.pricePerDay || rawData.machPricePerDay;
+        adData.fuelType = adData.fuelType || rawData.machFuel;
+        adData.condition = adData.condition || "polovno";
+      }
 
       transaction.set(adRef, adData, { merge: true });
 
