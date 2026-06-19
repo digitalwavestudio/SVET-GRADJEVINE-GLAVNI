@@ -54,6 +54,11 @@ export class DashboardEmployerService {
                 .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
                 .orderBy("createdAt", "desc")
                 .limit(10)
+                .select(
+                  "title", "price", "location", "type", "status",
+                  "createdAt", "images", "isPremium", "comp", "salary",
+                  "logo", "plataMin", "plataMax",
+                )
                 .get(),
               // 3. Pending Applications
               db.collectionGroup("applications")
@@ -61,6 +66,7 @@ export class DashboardEmployerService {
                 .where("status", "==", "pending")
                 .orderBy("createdAt", "desc")
                 .limit(5)
+                .select("applicantId", "jobId", "status", "createdAt", "applicantName", "jobTitle")
                 .get(),
               // 4. Employer Trends
               this.getEmployerTrends(uid),

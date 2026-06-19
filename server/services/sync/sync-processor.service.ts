@@ -279,6 +279,8 @@ export class SyncProcessor {
           .where("updatedAt", ">=", fifteenMinsAgo);
       }
 
+      const reindexLimit = 500;
+      collRef = collRef.limit(reindexLimit).select("id", "type", "title", "status", "updatedAt", "authorId", "location", "price", "comp", "category", "description");
       const stream = collRef.stream();
       await new Promise<void>((resolve, reject) => {
         let algoliaBatch: { id: string; data: Record<string, unknown> }[] = [];

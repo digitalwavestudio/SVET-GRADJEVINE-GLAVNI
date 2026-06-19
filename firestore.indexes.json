@@ -109,7 +109,7 @@
     },
     {
       "collectionGroup": "applications",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
           "fieldPath": "employerId",
@@ -123,7 +123,7 @@
     },
     {
       "collectionGroup": "applications",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
           "fieldPath": "applicantId",
@@ -137,7 +137,7 @@
     },
     {
       "collectionGroup": "applications",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
         {
           "fieldPath": "jobId",

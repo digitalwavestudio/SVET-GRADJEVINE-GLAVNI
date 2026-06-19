@@ -120,7 +120,14 @@ export class UnifiedAdsService {
       .where("authorId", "==", uid)
       .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
       .orderBy("createdAt", "desc")
-      .limit(limitNum + 1);
+      .limit(limitNum + 1)
+      .select(
+        "title", "name", "description", "price", "location", "loc", "type", "status",
+        "createdAt", "images", "isPremium", "isUrgent", "comp", "salary", "sal",
+        "logo", "plataMin", "plataMax", "salaryType", "smestaj", "prevoz", "hrana",
+        "housing", "transport", "food", "topliObrok", "benefits", "benefiti", "rawBenefits",
+        "authorId", "companyName",
+      );
 
     if (cursor) {
       const cursorDoc = await rawDb.collection("listings").doc(cursor).get();

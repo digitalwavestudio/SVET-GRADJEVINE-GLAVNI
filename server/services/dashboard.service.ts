@@ -245,6 +245,11 @@ export class DashboardService {
           .where("status", "in", ["active", "paused", "rejected"])
           .orderBy("createdAt", "desc")
           .limit(10)
+          .select(
+            "title", "price", "location", "type", "status",
+            "createdAt", "images", "isPremium", "comp", "salary",
+            "logo", "plataMin", "plataMax",
+          )
           .get();
 
         const recentAds = latestSnap.docs.map((doc: admin.firestore.QueryDocumentSnapshot) => {
