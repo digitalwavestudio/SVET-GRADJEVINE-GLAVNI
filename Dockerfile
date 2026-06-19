@@ -1,18 +1,18 @@
 # Build stage
 FROM node:20 AS build
 WORKDIR /app
-COPY package*.json ./
+COPY package*.json .npmrc ./
 COPY packages/ ./packages/
-RUN npm config set fetch-retries 5 && npm config set fetch-retry-mintimeout 30000 && npm install
+RUN npm ci
 COPY . .
 RUN npm run build
 
 # Run stage
 FROM node:20
 WORKDIR /app
-COPY package*.json ./
+COPY package*.json .npmrc ./
 COPY packages/ ./packages/
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/firebase-applet-config.json ./firebase-applet-config.json
 
