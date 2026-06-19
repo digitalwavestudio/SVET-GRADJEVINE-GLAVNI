@@ -266,15 +266,6 @@ export class UnifiedAdsService {
 
         const finalData = partners.length > 0 ? partners : fallbackPartners;
         
-        // Strip undefined values which Firebase rejects
-        const sanitizedFinalData = JSON.parse(JSON.stringify(finalData));
-        
-        // Sync back to Fast-Path
-        await db.doc(fastPathDoc).set({
-          partners: sanitizedFinalData,
-          updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).catch((e: unknown) => console.error("[Ads] operation error:", e));
-
         return finalData;
       }, fallbackPartners);
     } catch (err: unknown) {
@@ -291,7 +282,6 @@ export class UnifiedAdsService {
   }) {
     const cacheKey = `promoted_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
     const fastPathDoc = "metadata/promoted_ads_fastpath";
-    const fastPathField = options.isUrgent ? "urgent" : "premium";
 
     const finalFallback: any[] = [];
 
@@ -318,15 +308,6 @@ export class UnifiedAdsService {
               createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt,
             };
           });
-
-          // Strip undefined values which Firebase rejects
-          const sanitizedResults = JSON.parse(JSON.stringify(results));
-
-          // Self-heal Fast-Path
-          await db.doc(fastPathDoc).set({
-            [fastPathField]: sanitizedResults,
-            updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-          }, { merge: true }).catch((e: unknown) => console.error("[Ads] operation error:", e));
 
           return results;
       }, finalFallback);
