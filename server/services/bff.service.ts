@@ -79,7 +79,7 @@ export const bffService = {
       return await CacheService.getOrSetSWR<HomepageDataResult>(
         cacheKey,
         async (): Promise<HomepageDataResult> => {
-          const bffSubTimeoutMs = 3000;
+          const bffSubTimeoutMs = 10000;
 
           const [
             globalStats,
@@ -275,16 +275,16 @@ export const bffService = {
             dynamicRealEstateCount: 0,
             dynamicViewsCount: 0,
           },
-          premiumJobs: [],
-          urgentJobs: [],
-          latestMachines: [],
-          latestRealEstate: [],
-          latestAccommodations: [],
-          latestCaterings: [],
-          latestArticles: [],
-        },
-      );
-    })();
+        premiumJobs: [],
+        urgentJobs: [],
+        latestMachines: [],
+        latestRealEstate: [],
+        latestAccommodations: [],
+        latestCaterings: [],
+        latestArticles: [],
+      },
+    );
+  })();
 
     homepageSingleFlightMap.set(cacheKey, fetchTask);
     try {
