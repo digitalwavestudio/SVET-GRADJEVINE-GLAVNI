@@ -101,9 +101,9 @@ export class UnifiedAdsService {
 
     this.inflightPromises.set(cacheKey, fetchTask);
     
-    // 3. Global Tier-2 Safety Timeout: 500ms max wait for the whole tiered lookup
+    // 3. Global Tier-2 Safety Timeout: 10s max wait for the whole tiered lookup
     const globalTimeout = new Promise<T>((resolve) => {
-      setTimeout(() => resolve(fallbackValue as T), 500);
+      setTimeout(() => resolve(fallbackValue as T), 10000);
     });
 
     return Promise.race([fetchTask, globalTimeout]);
