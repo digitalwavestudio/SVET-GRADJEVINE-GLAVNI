@@ -172,20 +172,20 @@ constructionRouter.get("/all-data", requireAuth, async (req, res, next) => {
           .collection("construction_sites")
           .doc(activeSiteId as string)
           .collection("workers")
-          .limit(1000)
+          .limit(100)
           .get(),
         db
           .collection("construction_sites")
           .doc(activeSiteId as string)
           .collection("resources")
-          .limit(1000)
+          .limit(100)
           .get(),
         db
           .collection("construction_sites")
           .doc(activeSiteId as string)
           .collection("metrics")
           .orderBy("day", "asc")
-          .limit(365)
+          .limit(31)
           .get(),
       ]);
       siteWorkers = {

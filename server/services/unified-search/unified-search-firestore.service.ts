@@ -14,17 +14,11 @@ import {
 } from "../unified-search.service.ts";
 
 export class UnifiedSearchFirestore {
-  static async executeFirestoreSearch(
+  private static buildBaseQuery(
     category: string,
     entityType: string,
-    filters: UnifiedSearchFilters,
-    pageSize: number,
-    currentPage: number,
-    firestoreCursorId: string | undefined,
-    lastVisibleId: string | undefined,
-    logger: Logger
-  ): Promise<UnifiedSearchResult> {
-    const filtersAny: UnifiedSearchFilters = filters;
+    filtersAny: UnifiedSearchFilters
+  ): FirebaseFirestore.Query {
     let q: FirebaseFirestore.Query;
     const isMagazineSearch = category === "magazine" || category === "articles" || entityType === "article";
     const isProfileSearch =
@@ -122,7 +116,6 @@ export class UnifiedSearchFirestore {
     if (filtersAny.highwayAccess) q = q.where("highwayAccess", "==", true);
     if (filtersAny.railAccess) q = q.where("railAccess", "==", true);
 
-
     if (filtersAny.profession)
       q = q.where("professionSlug", "==", filtersAny.profession);
 
@@ -145,6 +138,22 @@ export class UnifiedSearchFirestore {
         ">=",
         Number(filtersAny.dailyCapacity),
       );
+      
+    return q;
+  }
+
+  static async executeFirestoreSearch(
+    category: string,
+    entityType: string,
+    filters: UnifiedSearchFilters,
+    pageSize: number,
+    currentPage: number,
+    firestoreCursorId: string | undefined,
+    lastVisibleId: string | undefined,
+    logger: Logger
+  ): Promise<UnifiedSearchResult> {
+    const filtersAny: UnifiedSearchFilters = filters;
+    let q = this.buildBaseQuery(category, entityType, filtersAny);
 
     // COUNT aggregation uklonjen pošto generiše nepredvidiv broj "Read" operacija za kompleksne/nestandardne upite.
     // Prelazimo na "N + 1" limit paginaciju da detektujemo sledeću stranu bez dodatih čitanja.
@@ -314,125 +323,7 @@ export class UnifiedSearchFirestore {
     logger: Logger
   ): Promise<UnifiedSearchResult> {
     const filtersAny: UnifiedSearchFilters = filters;
-    let q: FirebaseFirestore.Query;
-    const isMagazineSearch = category === "magazine" || category === "articles" || entityType === "article";
-    const isProfileSearch =
-      category === "masters" ||
-      category === "companies" ||
-      entityType === "master" ||
-      entityType === "company";
-
-    if (isProfileSearch) {
-      q = db.collection("users");
-      const targetRole =
-        category === "masters" || entityType === "master"
-          ? "majstor"
-          : "company";
-      q = q.where("role", "==", targetRole);
-    } else if (isMagazineSearch) {
-      q = db.collection("articles");
-      if (!filtersAny.showAllStatuses) q = q.where("status", "==", "published");
-    } else if (
-      [
-        "listings",
-        "jobs",
-        "job",
-        "machines",
-        "accommodations",
-        "caterings",
-        "plots",
-        "marketplace",
-        "realEstate",
-      ].includes(category) ||
-      entityType !== category
-    ) {
-      q = db.collection("listings");
-      if (entityType && entityType !== "all")
-        q = q.where("type", "==", entityType);
-    } else {
-      q = db.collection(category);
-    }
-
-    if (!filtersAny.showAllStatuses) q = q.where("status", "==", "active");
-
-    const targetedLoc = filtersAny.locationSlug || filtersAny.location;
-    if (targetedLoc && targetedLoc !== "SVE") {
-      const resGeo = resolveGeoFallback(targetedLoc as string);
-      if (resGeo && resGeo.district && resGeo.district !== "srbija" && resGeo.district !== targetedLoc) {
-        const locOptions = Array.from(new Set([targetedLoc, resGeo.district]));
-        q = q.where("locationSlug", "in", locOptions);
-      } else {
-        q = q.where("locationSlug", "==", targetedLoc);
-      }
-    }
-    if (filtersAny.authorId) q = q.where("authorId", "==", filtersAny.authorId);
-    if (filtersAny.userId) q = q.where("authorId", "==", filtersAny.userId);
-    if (filtersAny.companyId)
-      q = q.where("companyId", "==", filtersAny.companyId);
-
-    if (filtersAny.isPremiumPartner)
-      q = q.where("isPremiumPartner", "==", true);
-    if (filtersAny.isVerified) q = q.where("isVerified", "==", true);
-    if (filtersAny.isUrgent) q = q.where("isUrgent", "==", true);
-    if (filtersAny.isPremium) q = q.where("isPremium", "==", true);
-
-    if (filtersAny.mainCategory)
-      q = q.where("mainCategories", "array-contains", filtersAny.mainCategory);
-    if (filtersAny.employeeCount)
-      q = q.where("employeeCount", "==", filtersAny.employeeCount);
-
-    if (filtersAny.type && entityType === "accommodation")
-      q = q.where("typeSlug", "==", filtersAny.type);
-    if (filtersAny.accommodationType)
-      q = q.where("accommodationType", "==", filtersAny.accommodationType);
-    if (filtersAny.beds || filtersAny.minBeds)
-      q = q.where("beds", ">=", Number(filtersAny.beds || filtersAny.minBeds));
-    if (filtersAny.roomType) q = q.where("roomType", "==", filtersAny.roomType);
-    if (filtersAny.parkingAvailable)
-      q = q.where("parkingAvailable", "==", true);
-
-    if (filtersAny.machineType)
-      q = q.where("machineType", "==", filtersAny.machineType);
-    if (filtersAny.condition)
-      q = q.where("condition", "==", filtersAny.condition);
-    if (filtersAny.adType) q = q.where("adType", "==", filtersAny.adType);
-    if (filtersAny.categoryId)
-      q = q.where("categoryId", "==", filtersAny.categoryId);
-    if (filtersAny.fuelType) q = q.where("fuelType", "==", filtersAny.fuelType);
-    if (filtersAny.minWeightKg)
-      q = q.where("weightKg", ">=", Number(filtersAny.minWeightKg));
-    if (filtersAny.maxWeightKg)
-      q = q.where("weightKg", "<=", Number(filtersAny.maxWeightKg));
-
-    if (filtersAny.minArea) q = q.where("area", ">=", Number(filtersAny.minArea));
-    if (filtersAny.maxArea) q = q.where("area", "<=", Number(filtersAny.maxArea));
-    if (filtersAny.purpose) q = q.where("purpose", "==", filtersAny.purpose);
-    if (filtersAny.accessRoad) q = q.where("accessRoad", "==", true);
-    if (filtersAny.highwayAccess) q = q.where("highwayAccess", "==", true);
-    if (filtersAny.railAccess) q = q.where("railAccess", "==", true);
-
-    if (filtersAny.profession)
-      q = q.where("professionSlug", "==", filtersAny.profession);
-
-    if (filtersAny.minPrice != null)
-      q = q.where("price", ">=", Number(filtersAny.minPrice));
-    if (filtersAny.maxPrice != null)
-      q = q.where("price", "<=", Number(filtersAny.maxPrice));
-
-    if (filtersAny.cateringType)
-      q = q.where("cateringType", "==", filtersAny.cateringType);
-    if (filtersAny.kitchenType)
-      q = q.where("kitchenType", "==", filtersAny.kitchenType);
-    if (filtersAny.invoiceAvailable)
-      q = q.where("invoiceAvailable", "==", true);
-    if (filtersAny.minOrder)
-      q = q.where("minOrder", "<=", Number(filtersAny.minOrder));
-    if (filtersAny.dailyCapacity)
-      q = q.where(
-        "dailyCapacityMeals",
-        ">=",
-        Number(filtersAny.dailyCapacity),
-      );
+    let q = this.buildBaseQuery(category, entityType, filtersAny);
 
     // Limit to 150 latest documents for in-memory keyword filtering (quota safe)
     q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");

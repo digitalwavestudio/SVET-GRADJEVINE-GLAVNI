@@ -147,7 +147,7 @@ export class DashboardPrewarmService {
       const premiumUsersSnap = await db.collection("users")
         .where("isVerified", "==", true)
         .where("role", "in", ["poslodavac", "COMPANY", "partner", "PARTNER"])
-        .limit(50) // Candidate pool limit smanjen sa 150 na 50 radi optimizacije resursa
+        .limit(25) // Candidate pool limit prepolovljen sa 50 na 25 radi dodatne optimizacije resursa
         .get();
 
       const candidates = premiumUsersSnap.docs.map(doc => {
@@ -162,37 +162,20 @@ export class DashboardPrewarmService {
 
       logger.info(`[Prewarm] Evaluating ${candidates.length} candidate premium users for activity...`);
 
-      // Bulk pre-fetch active ad presence for candidates that are not active by session (Resolves N+1 query pattern)
       const candidateIdsPendingCheck = candidates
         .filter(c => !this.isWithin48Hours(c.lastLogin) && !this.isWithin48Hours(c.lastActive))
         .map(c => c.id);
 
       const uidsWithActiveListings = new Set<string>();
 
+      // Concurrent bulk check with limit(1) per user to strictly bound Firestore reads to N
       if (candidateIdsPendingCheck.length > 0) {
-        const chunkSize = 30; // Firestore "in" filter limit
-        for (let i = 0; i < candidateIdsPendingCheck.length; i += chunkSize) {
-          const chunk = candidateIdsPendingCheck.slice(i, i + chunkSize);
-          try {
-            const listingsSnap = await db.collection("listings")
-              .where("authorId", "in", chunk)
-              .where("status", "==", "active")
-              .select("authorId")
-              .get();
-            
-            listingsSnap.docs.forEach(doc => {
-              const authorId = doc.data().authorId;
-              if (authorId) uidsWithActiveListings.add(authorId);
-            });
-          } catch (err: any) {
-            logger.warn(`[Prewarm] Failed bulk active listings check for chunk sizing ${chunk.length}: ${err.message}`);
-            // Fallback to sequential checks for this chunk if the bulk query fails
-            for (const uid of chunk) {
-              const singleHas = await this.hasActiveListings(uid);
-              if (singleHas) uidsWithActiveListings.add(uid);
-            }
-          }
-        }
+        await Promise.all(
+          candidateIdsPendingCheck.map(async (uid) => {
+            const hasAds = await this.hasActiveListings(uid);
+            if (hasAds) uidsWithActiveListings.add(uid);
+          })
+        );
       }
 
       const activeUsers: Array<{ id: string; role: string }> = [];

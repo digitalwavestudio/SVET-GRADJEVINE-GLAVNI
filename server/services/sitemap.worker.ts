@@ -90,7 +90,7 @@ export class SitemapWorkerService {
              await bucket.file(filename).save(res.xml, { contentType: "application/xml" });
              lastDoc = res.lastDoc;
           } else {
-             await SitemapService.streamCollectionSitemapToStream(category, page, writeStream);
+             lastDoc = await SitemapService.streamCollectionSitemapToStream(category, writeStream, lastDoc);
           }
         }
       } else if (category === "magazine") {
@@ -133,7 +133,7 @@ export class SitemapWorkerService {
                lastDoc = res.lastDoc;
             } else {
               const writeStream = bucket.file(filename).createWriteStream({ contentType: "application/xml" });
-              await SitemapService.streamCollectionSitemapToStream(coll, page, writeStream);
+              lastDoc = await SitemapService.streamCollectionSitemapToStream(coll, writeStream, lastDoc);
             }
           }
         }

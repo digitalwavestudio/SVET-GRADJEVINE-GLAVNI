@@ -191,10 +191,11 @@ export class ReconciliationService {
     Logger.withContext().info(`[Reconciliation] Starting Algolia Index Size Audit for: ${indexName}`);
 
     // Replacing iteration with count aggregations
-    const activeAdsCountSnap = await db.collection("listings").where("status", "==", "active").count().get();
-    const firestoreActiveCount = activeAdsCountSnap.data().count;
+    // Privremeni fix: Koristi .get() umesto .count() dok Firebase ne obriše mrtve indekse
+    const activeAdsCountSnap = await db.collection("listings").where("status", "==", "active").get();
+    let currentTotalAdsCount = activeAdsCountSnap.size;
 
-    Logger.withContext().info(`[Reconciliation] Step 1 (Index Audit) Done. Active Items in Firestore: ${firestoreActiveCount}. Cross-reference with Algolia dashboard.`);
+    Logger.withContext().info(`[Reconciliation] Step 1 (Index Audit) Done. Active Items in Firestore: ${currentTotalAdsCount}. Cross-reference with Algolia dashboard.`);
     
     // Step 2: Skip iteration and use count logic
     await this.reconcileFirestoreToAlgolia();
@@ -240,13 +241,12 @@ export class ReconciliationService {
   private static async performFinancialAudit() {
     Logger.withContext().info("[Reconciliation] Starting Financial Integrity Audit...");
     
-    // Convert .get() to .count().get()
+    // Zamenjeno count() sa get()
     const walletSnap = await db.collection("wallets")
       .where("balance", ">", 0)
-      .count()
       .get();
       
-    Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance: ${walletSnap.data().count}`);
+    Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance: ${walletSnap.size}`);
 
     // Optimizacija (PROMPT 10): Čitanje isključivo transakcija izmenjenih u poslednjih 1h koristeći indeks na 'createdAt'
     const oneHourAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 1 * 60 * 60 * 1000));

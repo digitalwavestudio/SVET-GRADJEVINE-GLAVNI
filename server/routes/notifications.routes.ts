@@ -194,7 +194,7 @@ notificationsRouter.post("/read-all", requireAuth, async (req, res, next) => {
       .collection("activities")
       .where("userId", "==", uid)
       .where("read", "==", false)
-      .limit(500)
+      .limit(50)
       .get();
 
     if (!snap.empty) {

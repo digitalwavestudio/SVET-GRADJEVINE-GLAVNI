@@ -110,7 +110,9 @@ export const useCheckoutVerification = (
       }
     };
 
-    const unsubscribe = onSnapshot(docRef, (snapshot) => {
+    let unsubscribe: (() => void) | null = null;
+    
+    unsubscribe = onSnapshot(docRef, (snapshot) => {
       if (!snapshot.exists()) {
         runThrottledUpdate(() => {
           setState({
@@ -120,6 +122,7 @@ export const useCheckoutVerification = (
             status: null,
           });
         });
+        if (unsubscribe) unsubscribe();
         return;
       }
 
@@ -136,6 +139,7 @@ export const useCheckoutVerification = (
             status: "PROVISIONED",
           });
         });
+        if (unsubscribe) unsubscribe();
       } else {
         runThrottledUpdate(() => {
           setState(prev => {
@@ -162,7 +166,7 @@ export const useCheckoutVerification = (
     });
 
     return () => {
-      unsubscribe();
+      if (unsubscribe) unsubscribe();
       clearTimeout(timeoutMsg);
       if (throttleTimer) clearTimeout(throttleTimer);
     };

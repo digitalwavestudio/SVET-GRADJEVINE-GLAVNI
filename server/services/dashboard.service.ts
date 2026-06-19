@@ -233,14 +233,14 @@ export class DashboardService {
     if (cachedStats) {
       console.info(`[DashboardService] Performing surgical granular cache update for employer: ${uid}`);
       try {
-        const activeListingsSnap = await db.collectionGroup("listings")
+        const activeListingsSnap = await db.collection("listings")
           .where("authorId", "==", uid)
           .where("status", "==", "active")
           .count()
           .get();
         const activeCount = activeListingsSnap.data().count;
 
-        const latestSnap = await db.collectionGroup("listings")
+        const latestSnap = await db.collection("listings")
           .where("authorId", "==", uid)
           .where("status", "in", ["active", "paused", "rejected"])
           .orderBy("createdAt", "desc")

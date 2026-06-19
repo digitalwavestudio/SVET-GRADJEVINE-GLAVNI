@@ -241,40 +241,35 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
           "==",
           companyId || authorId,
         )
-        .count()
         .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
+        .catch(() => ({ size: 0 })),
       queryListings("machine")
         .where("authorId", "==", authorId)
-        .count()
         .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
+        .catch(() => ({ size: 0 })),
       queryListings("accommodation")
         .where("authorId", "==", authorId)
-        .count()
         .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
+        .catch(() => ({ size: 0 })),
       queryListings("catering")
         .where("authorId", "==", authorId)
-        .count()
         .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
+        .catch(() => ({ size: 0 })),
       queryListings("real_estate")
         .where("authorId", "==", authorId)
-        .count()
         .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
+        .catch(() => ({ size: 0 })),
     ];
 
     const [jobsSnap, machinesSnap, accsSnap, catsSnap, plotsSnap] =
       await Promise.all(promises);
 
     const result = {
-      jobs: (jobsSnap as { data: () => { count: number } }).data().count,
-      machines: (machinesSnap as { data: () => { count: number } }).data().count,
-      accommodations: (accsSnap as { data: () => { count: number } }).data().count,
-      catering: (catsSnap as { data: () => { count: number } }).data().count,
-      realestate: (plotsSnap as { data: () => { count: number } }).data().count,
+      jobs: (jobsSnap as { size: number }).size || 0,
+      machines: (machinesSnap as { size: number }).size || 0,
+      accommodations: (accsSnap as { size: number }).size || 0,
+      catering: (catsSnap as { size: number }).size || 0,
+      realestate: (plotsSnap as { size: number }).size || 0,
     };
 
     if (redis) {
@@ -318,8 +313,8 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
       async () => {
         const { getRedis } = await import("../utils/redis.ts");
         const redis = getRedis();
-        if (redis) redis.del("admin_global_metrics:cache").catch(err => console.error("[Stats] Redis del failed:", err));
-        const reconciled = await AdminStatsService.reconcileGlobalStats();
+        // Citanje prethodno izracunatih statistika, BEZ brisanja kesa i pokretanja O(N) skeniranja
+        const globalStats = await AdminStatsService.getGlobalStats();
 
         const fieldMap: Record<string, string> = {
           jobs: "totalJobs",
@@ -344,41 +339,18 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
         };
 
         const countKey = fieldMap[collectionName];
-        const total = countKey ? reconciled[countKey] || 0 : 0;
-        const premium = reconciled.premiumPartners || 0;
+        const total = countKey ? globalStats[countKey] || 0 : 0;
+        const premium = globalStats.premiumPartners || globalStats.premiumAds || 0;
 
         let today = 0;
         const targetType = typeMap[collectionName];
         if (targetType) {
-          try {
-            const todayStart = admin.firestore.Timestamp.fromDate(
-              (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
-            );
-            const snap = await db
-              .collection("listings")
-              .where("type", "==", targetType)
-              .where("createdAt", ">=", todayStart)
-              .count()
-              .get();
-            today = snap.data().count;
-          } catch (err) {
-            logger.warn(`[stats] Failed to count today's ${collectionName}:`, err);
-          }
+          // TODO: Implementirati efikasnije brojanje za "danas" bez count() skeniranja cele baze.
+          // Zbog Firebase baga sa čitanjem "duhova", count() trenutno troši hiljade readova.
+          today = 0; 
         } else if (collectionName === "companies") {
-          try {
-            const todayStart = admin.firestore.Timestamp.fromDate(
-              (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
-            );
-            const snap = await db
-              .collection("users")
-              .where("role", "==", "poslodavac")
-              .where("createdAt", ">=", todayStart)
-              .count()
-              .get();
-            today = snap.data().count;
-          } catch (err) {
-            logger.warn(`[stats] Failed to count today's companies:`, err);
-          }
+          // TODO: Obezbediti efikasno brojanje kompanija za danas
+          today = 0;
         }
 
         return { total, today, premium };

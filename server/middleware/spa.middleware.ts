@@ -1,4 +1,4 @@
-﻿import { env } from "../config/env.ts";
+import { env } from "../config/env.ts";
 import express from "express";
 import path from "path";
 import fs from "fs";
@@ -83,6 +83,7 @@ async function backgroundPreRenderListingHub(
   categorySlug?: string,
   citySlug?: string,
   page: number = 1,
+  cursor?: string
 ): Promise<string | null> {
   const redis = getRedis();
 
@@ -115,7 +116,23 @@ async function backgroundPreRenderListingHub(
     const pageSize = 20;
     const maxPage = 50;
     const safeOffset = Math.min((page - 1) * pageSize, (maxPage - 1) * pageSize);
-    const latestDocs = await query.limit(pageSize).offset(safeOffset).get();
+
+    if (cursor) {
+      try {
+        const lastDoc = await db.collection("listings").doc(cursor).get();
+        if (lastDoc.exists) {
+          query = query.startAfter(lastDoc);
+        } else if (safeOffset > 0) {
+          query = query.offset(safeOffset);
+        }
+      } catch (e) {
+        if (safeOffset > 0) query = query.offset(safeOffset);
+      }
+    } else if (safeOffset > 0) {
+      query = query.offset(safeOffset);
+    }
+
+    const latestDocs = await query.limit(pageSize).get();
 
     let itemsHtml = "";
     const itemListElements: Record<string, unknown>[] = [];
@@ -180,7 +197,11 @@ async function backgroundPreRenderListingHub(
 
     const currentPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page}` : `${APP_CONFIG.BASE_URL}${reqPath}`;
     const prevPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page - 1}` : null;
-    const nextPageUrl = latestDocs.size === pageSize ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page + 1}` : null;
+    let nextPageUrl = null;
+    if (latestDocs.size === pageSize) {
+      const lastDocId = latestDocs.docs[latestDocs.docs.length - 1].id;
+      nextPageUrl = `${APP_CONFIG.BASE_URL}${reqPath}?page=${page + 1}&cursor=${lastDocId}`;
+    }
 
     let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
     if (prevPageUrl) paginationLinks += `\n<link rel="prev" href="${prevPageUrl}" />`;
@@ -809,9 +830,10 @@ export const createSpaMiddleware = () => {
             }
 
             const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
+            const cursor = req.query.cursor as string | undefined;
             const rendered = await backgroundPreRenderListingHub(
               cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL,
-              categorySlug, citySlug, pageNum,
+              categorySlug, citySlug, pageNum, cursor
             );
             if (rendered) return res.send(rendered);
           }

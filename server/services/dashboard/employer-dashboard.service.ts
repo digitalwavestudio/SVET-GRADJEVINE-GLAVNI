@@ -49,7 +49,7 @@ export class DashboardEmployerService {
               // 1. User Stats (Optimized via DataLoader)
               userStatsLoader.load(uid),
               // 2. Latest Listings
-              db.collectionGroup("listings")
+              db.collection("listings")
                 .where("authorId", "==", uid)
                 .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
                 .orderBy("createdAt", "desc")
@@ -61,7 +61,7 @@ export class DashboardEmployerService {
                 )
                 .get(),
               // 3. Pending Applications
-              db.collectionGroup("applications")
+              db.collection("applications")
                 .where("employerId", "==", uid)
                 .where("status", "==", "pending")
                 .orderBy("createdAt", "desc")
@@ -71,7 +71,7 @@ export class DashboardEmployerService {
               // 4. Employer Trends
               this.getEmployerTrends(uid),
               // 5. Dynamic count fallback
-              db.collectionGroup("listings")
+              db.collection("listings")
                 .where("authorId", "==", uid)
                 .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
                 .count()

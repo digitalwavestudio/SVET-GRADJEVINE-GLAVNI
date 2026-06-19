@@ -1,4 +1,4 @@
-﻿import { env } from "../config/env.ts";
+import { env } from "../config/env.ts";
 import { Router } from "express";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
@@ -272,7 +272,7 @@ seoRouter.get("/sitemap.xml", async (_req, res) => {
     }
 
     if (sitemap) {
-      await CacheService.set(cacheKey, sitemap, 6 * 60 * 60 * 1000); // 6 hours as per PROMPT 6
+      await CacheService.set(cacheKey, sitemap, 24 * 60 * 60 * 1000); // 24 hours
     }
 
     if (!sitemap) {

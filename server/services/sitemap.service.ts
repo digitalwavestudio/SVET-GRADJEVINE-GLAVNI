@@ -6,7 +6,7 @@ import { CacheService } from "./cache.service.ts";
 
 export class SitemapService {
   private static domain = APP_CONFIG.BASE_URL;
-  private static CHUNK_SIZE = 25000; // Sigurna margina za memoriju (standardni limit je 50k)
+  private static CHUNK_SIZE = 500; // Sigurna margina za bazu i memoriju (štiti Firebase reads)
 
   /**
    * Sitemap Manifest Engine
@@ -199,10 +199,9 @@ export class SitemapService {
 
   static streamCollectionSitemapToStream(
     coll: string,
-    page: number,
     writeStream: NodeJS.WritableStream,
-  ): Promise<void> {
-    const skip = (page - 1) * this.CHUNK_SIZE;
+    startAfterDoc: any = null
+  ): Promise<any> {
     const domain = this.domain;
     const now = new Date().toISOString();
 
@@ -220,17 +219,24 @@ export class SitemapService {
       '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n',
     );
 
-    const queryStream = db
+    let q = db
       .collection(coll)
       .where("status", "==", "active")
       .orderBy("createdAt", "desc")
       .select("category", "updatedAt")
-      .offset(skip)
-      .limit(this.CHUNK_SIZE)
-      .stream();
+      .limit(this.CHUNK_SIZE);
+
+    if (startAfterDoc) {
+      q = q.startAfter(startAfterDoc);
+    }
+
+    const queryStream = q.stream();
 
     return new Promise((resolve, reject) => {
+      let lastSnapshot: any = null;
+
       queryStream.on("data", (docSnapshot: any) => {
+        lastSnapshot = docSnapshot;
         const data = docSnapshot.data();
         const rawTitle =
           data.title || data.name || (coll === "jobs" ? "Posao" : "Oglas");
@@ -260,7 +266,9 @@ export class SitemapService {
         writeStream.end("</urlset>");
       });
 
-      writeStream.on("finish", resolve);
+      writeStream.on("finish", () => {
+        resolve(lastSnapshot);
+      });
       writeStream.on("error", reject);
       queryStream.on("error", reject);
     });
@@ -608,5 +616,6 @@ export class SitemapService {
   }
 }
 
-// Inicijalizujemo cron posao
-SitemapService.init();
+// Ugašeno: Inicijalizacija cron posla više nije potrebna jer SitemapWorker (BullMQ) 
+// već preuzima ovu ulogu i izvršava je jednom za sve instance, sprečavajući Read Storm.
+// SitemapService.init();
