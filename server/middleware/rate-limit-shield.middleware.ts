@@ -54,13 +54,12 @@ export const rateLimitShield = async (
 
     const ua = (req.headers["user-agent"] || "").toLowerCase();
 
-    const isWhitelistedSearchBot = ["googlebot", "bingbot"].some((bot) => ua.includes(bot));
+    const isWhitelistedSearchBot = ["googlebot", "bingbot", "algolia"].some((bot) => ua.includes(bot));
     const isWhitelistedAiBot = ["gptbot", "claudebot", "perplexitybot", "applebot-ai", "oai-searchbot"].some((bot) => ua.includes(bot));
     const isWhitelistedBot = isWhitelistedSearchBot || isWhitelistedAiBot;
 
     // expensivePaths: Sitemaps, Search endpoints, P-SEO insights, and Feeds
     const isExpensivePath = 
-      req.path.includes("/sitemap") || 
       req.path.includes("/search") || 
       req.path.includes("/pseo") ||
       req.path.includes("/feed") ||
