@@ -12,7 +12,7 @@ import { moderationService } from '@/src/services/moderationService';
 import { apiClient } from '@/src/lib/apiClient';
 import { traceAsync } from '@/src/lib/performance';
 import { MAX_AD_IMAGES } from '@/src/constants/limits';
-import { dashboardKeys } from '@/src/lib/queryKeysFactory';
+import { dashboardKeys, queryKeys } from '@/src/lib/queryKeysFactory';
 
 import { getValidationSchema, getAutoTitle } from '@/src/modules/ads/utils/adUtils';
 import { applyPayloadTransform } from '@/src/modules/ads/hooks/usePostAdControllerPayload';
@@ -629,7 +629,15 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
       if (user?.id) {
         queryClient.invalidateQueries({ queryKey: dashboardKeys.myAds.user(user.id) });
       }
-      queryClient.invalidateQueries({ queryKey: ['jobs', 'list'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.ads.all });
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.machines.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accommodations.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.catering.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.masters.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.marketplace.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.realEstate.all });
     }
   });
 
