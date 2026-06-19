@@ -72,7 +72,7 @@ export class UnifiedAdsService {
 
                 if (doc && doc.exists) {
                   const d = doc.data();
-                  const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
+                  const actualData = d?.stats || d?.partners || d?.premium || d?.urgent || d;
                   if (actualData) {
                     console.info(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
                     return actualData;
@@ -81,6 +81,17 @@ export class UnifiedAdsService {
               } catch (e: unknown) {
                 const err = e instanceof Error ? e : new Error(String(e));
                  UnifiedAdsService.logger.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
+                try {
+                  const { getMockDocSnapshot } = await import("../config/firebase.ts");
+                  const mockDoc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
+                  if (mockDoc && mockDoc.exists) {
+                    const md = mockDoc.data();
+                    const actualData = md?.stats || md?.partners || md?.premium || md?.urgent || md;
+                    if (actualData) {
+                      return actualData;
+                    }
+                  }
+                } catch {}
               }
 
               return fallbackValue as T;
