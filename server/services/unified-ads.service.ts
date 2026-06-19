@@ -20,7 +20,7 @@ export class UnifiedAdsService {
   // L1 Hard Cache (Shield) specifically for homepage performance
   private static l1ShieldCache = new Map<string, { data: any; expiry: number }>();
   private static inflightPromises = new Map<string, Promise<any>>();
-  private static readonly L1_SHIELD_TTL = 60 * 1000; // 1 minute protection
+  private static readonly L1_SHIELD_TTL = 5 * 60 * 1000; // 5 min protection (smanjuje Firestore read-ove 5x)
 
   /**
    * Internal helper to handle request collapsing and L1/L2 caching logic for metadata
@@ -85,7 +85,7 @@ export class UnifiedAdsService {
 
               return fallbackValue as T;
            },
-          30 * 24 * 3600 * 1000, // Near-Infinite 30 Days TTL (Protected with Event-Driven Cache Invalidation)
+           5 * 60 * 1000, // 5 min TTL (SWR se ne brise na onAdChange, pa se osvezava kroz stale-window)
           fallbackValue
         );
         this.l1ShieldCache.set(cacheKey, { data, expiry: now + this.L1_SHIELD_TTL });
