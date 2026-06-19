@@ -40,50 +40,51 @@ export class UnifiedAdsService {
       try {
         const data = await CacheService.getOrSetSWR(
           cacheKey,
-          async () => {
-             // 1. Try Firestore Fast-Path (L0) as a cheaper fallback than query
-             try {
-               const { checkQuotaStatus, getMockDocSnapshot } = await import("../config/firebase.ts");
-               
-                let doc;
-                if (checkQuotaStatus()) {
-                   UnifiedAdsService.logger.warn(`[UnifiedAdsService] Quota exhausted, using local mock for ${fastPathDoc}`);
-                   doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
-                } else {
-                   // EXTREME TIMEOUT: 100ms for Fast-Path FirestoreDoc. 
-                   // If Firestore is slow, we'd rather fail the Fast-Path and fallback than block the BFF.
-                   const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 100));
-                   doc = await Promise.race([
-                     db.doc(fastPathDoc).get(),
-                     timeoutPromise
-                   ]).catch(() => null);
+           async () => {
+              // Prvo probaj realan Firestore upit (da dobijemo sveže podatke)
+              try {
+                const { checkQuotaStatus } = await import("../config/firebase.ts");
+                if (!checkQuotaStatus()) {
+                  const res = await fetchFn();
+                  if (res && Array.isArray(res)) {
+                    return res; // Sveže je, koristi ga
+                  }
                 }
+              } catch (e: unknown) {
+                const err = e instanceof Error ? e : new Error(String(e));
+                 UnifiedAdsService.logger.warn(`[UnifiedAdsService] Cold query failed for ${cacheKey}:`, err.message);
+              }
 
-               if (doc && doc.exists) {
-                 const d = doc.data();
-                 const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
-                 if (actualData) {
-                   console.info(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
-                   return actualData;
+              // Ako realan upit nije uspeo, probaj Fast-Path (L0) kao fallback
+              try {
+                const { checkQuotaStatus, getMockDocSnapshot } = await import("../config/firebase.ts");
+                
+                 let doc;
+                 if (checkQuotaStatus()) {
+                    doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
+                 } else {
+                    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 100));
+                    doc = await Promise.race([
+                      db.doc(fastPathDoc).get(),
+                      timeoutPromise
+                    ]).catch(() => null);
                  }
-               }
-             } catch (e: unknown) {
-               const err = e instanceof Error ? e : new Error(String(e));
-                UnifiedAdsService.logger.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
-             }
 
-             // Stop execution and return fallback immediately if circuit breaker tripped
-             const { checkQuotaStatus } = await import("../config/firebase.ts");
-             if (checkQuotaStatus()) {
-                UnifiedAdsService.logger.warn(`[UnifiedAdsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
-               return fallbackValue as T;
-             }
+                if (doc && doc.exists) {
+                  const d = doc.data();
+                  const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
+                  if (actualData) {
+                    console.info(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
+                    return actualData;
+                  }
+                }
+              } catch (e: unknown) {
+                const err = e instanceof Error ? e : new Error(String(e));
+                 UnifiedAdsService.logger.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
+              }
 
-             // 2. Fallback to real query (Cold Path)
-             const res = await fetchFn();
-             
-             return res;
-          },
+              return fallbackValue as T;
+           },
           30 * 24 * 3600 * 1000, // Near-Infinite 30 Days TTL (Protected with Event-Driven Cache Invalidation)
           fallbackValue
         );
