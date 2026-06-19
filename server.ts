@@ -13,7 +13,7 @@ async function startServer() {
   let isReady = false;
 
   // Phase 0: Absolute Liveness Priority
-  app.get("/api/health", (_req, res) => res.json({ status: "ok", mode }));
+  app.get("/api/health", (_req, res) => res.json({ status: "ok", mode, commit: "00527a4", premiumFix: true }));
   app.get("/api/system/liveness", (_req, res) => res.status(200).send("OK"));
   app.get("/api/system/readiness", (_req, res) => {
     if (!isReady) return res.status(503).json({ error: "Service Unavailable", message: "Sistem se pokreće, pokušajte ponovo za par sekundi." });
