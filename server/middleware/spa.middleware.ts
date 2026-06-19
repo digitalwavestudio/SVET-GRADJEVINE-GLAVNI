@@ -87,7 +87,9 @@ async function backgroundPreRenderListingHub(
   const redis = getRedis();
 
   try {
-    let query: FirebaseFirestore.Query = resolveFirestoreQuery(collectionName).orderBy("createdAt", "desc");
+    let query: FirebaseFirestore.Query = resolveFirestoreQuery(collectionName)
+      .where("status", "==", "active")
+      .orderBy("createdAt", "desc");
 
     const categoryField = COLLECTION_CATEGORY_FIELD[collectionName];
     if (categorySlug && categoryField) {
@@ -101,8 +103,19 @@ async function backgroundPreRenderListingHub(
       query = query.where("locationSlug", "==", citySlug);
     }
 
+    query = query.select(
+      "title", "name", "city", "createdAt", "updatedAt", "status",
+      "price", "location", "loc", "type", "images",
+      "isPremium", "isUrgent", "comp", "salary", "sal", "logo",
+      "description", "adTitle", "adType", "categoryId", "categorySlug",
+      "companyName", "companyLogo", "locationSlug", "authorId",
+      "professionSlug", "machineType", "condition", "fuelType", "area",
+    );
+
     const pageSize = 20;
-    const latestDocs = await query.limit(pageSize).offset((page - 1) * pageSize).get();
+    const maxPage = 50;
+    const safeOffset = Math.min((page - 1) * pageSize, (maxPage - 1) * pageSize);
+    const latestDocs = await query.limit(pageSize).offset(safeOffset).get();
 
     let itemsHtml = "";
     const itemListElements: Record<string, unknown>[] = [];
