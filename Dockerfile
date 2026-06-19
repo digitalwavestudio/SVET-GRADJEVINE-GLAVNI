@@ -3,7 +3,7 @@ FROM node:20 AS build
 WORKDIR /app
 COPY package*.json ./
 COPY packages/ ./packages/
-RUN npm install
+RUN npm config set fetch-retries 5 && npm config set fetch-retry-mintimeout 30000 && npm install
 COPY . .
 RUN npm run build
 

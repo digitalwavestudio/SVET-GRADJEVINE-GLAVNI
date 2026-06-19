@@ -38,6 +38,8 @@ export class JobsCoreService {
         .limit(limit)
         .select(
           "title",
+          "name",
+          "description",
           "price",
           "location",
           "loc",

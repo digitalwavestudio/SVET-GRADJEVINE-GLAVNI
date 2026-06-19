@@ -435,6 +435,8 @@ export class UnifiedAdsService {
       .limit(limitCount)
       .select(
         "title",
+        "name",
+        "description",
         "price",
         "location",
         "type",

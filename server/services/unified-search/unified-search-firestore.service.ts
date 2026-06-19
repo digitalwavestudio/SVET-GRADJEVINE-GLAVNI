@@ -152,6 +152,8 @@ export class UnifiedSearchFirestore {
     q = q.limit(pageSize + 1); // 🚀 N + 1 Optimizacija
     q = q.select(
       "title",
+      "name",
+      "description",
       "price",
       "location",
       "loc",
