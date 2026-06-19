@@ -1,4 +1,5 @@
 import { VerticalCTA } from '@/src/components/VerticalCTA';
+import { Button } from '@/src/components/ui/Button';
 import { Map } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -13,7 +14,6 @@ import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterInput, FilterSelect, FilterToggle, FilterCTA, MarketStatsWidget, SortingBar } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
-import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
 import { ACCESS_ROAD_TYPES, LOCATIONS, REAL_ESTATE_PURPOSES } from '@/src/constants/taxonomy';
 import { useRealEstateList } from '@/src/modules/real_estate/hooks/useRealEstate';
@@ -245,8 +245,8 @@ export default function RealEstatePage() {
       
       <StandardPageHero
         badge="Premijum Investicione Lokacije"
-        title="pametna odluka"
-        titleAccent="za pametne investitore"
+        title="ZA PAMETNE"
+        titleAccent="INVESTITORE"
         subtitle="Industrijska, građevinska i komercijalna zemljišta proverenog potencijala. Direktan kontakt, bez skrivenih troškova."
         stats={[
           { label: "Aktivne Lokacije", value: realEstateStats?.total?.toLocaleString() || "420", icon: "map" },
@@ -254,17 +254,16 @@ export default function RealEstatePage() {
           { label: "Premium Ponuda", value: realEstateStats?.premium?.toLocaleString() || "40", icon: "verified" }
         ]}
       >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-3xl w-full">
+        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
           <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
-            <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:scale-110 transition-transform">location_searching</span>
-            <input 
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
-              placeholder="Pretraži lokacije (npr. Inđija, Subotica)..." 
+            <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
+            <input
               type="text"
-              aria-label="Pretraga placeva"
+              placeholder="PRETRAŽI LOKACIJE (NPR. INĐIJA, SUBOTICA)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
           <Button 

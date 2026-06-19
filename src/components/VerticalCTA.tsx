@@ -63,11 +63,6 @@ export const VerticalCTA: React.FC<VerticalCTAProps> = ({
         </Link>
       </div>
 
-      {/* Decorative HUD corners */}
-      <div className="absolute top-6 left-6 w-8 h-8 border-t border-l border-white/10 rounded-tl-lg pointer-events-none group-hover:border-secondary/30 transition-colors duration-500"></div>
-      <div className="absolute top-6 right-6 w-8 h-8 border-t border-r border-white/10 rounded-tr-lg pointer-events-none group-hover:border-secondary/30 transition-colors duration-500"></div>
-      <div className="absolute bottom-6 left-6 w-8 h-8 border-b border-l border-white/10 rounded-bl-lg pointer-events-none group-hover:border-secondary/30 transition-colors duration-500"></div>
-      <div className="absolute bottom-6 right-6 w-8 h-8 border-b border-r border-white/10 rounded-br-lg pointer-events-none group-hover:border-secondary/30 transition-colors duration-500"></div>
     </motion.div>
   );
 };

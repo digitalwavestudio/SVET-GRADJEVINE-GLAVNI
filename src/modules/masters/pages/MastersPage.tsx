@@ -232,7 +232,7 @@ export default function MastersPage() {
             onClick={handleApplyFilters}
             variant="primary"
             className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
-            icon="person_search"
+            icon="search"
           >
             PRETRAŽI
           </Button>

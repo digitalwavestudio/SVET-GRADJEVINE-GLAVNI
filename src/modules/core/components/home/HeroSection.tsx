@@ -58,7 +58,6 @@ export default function HeroSection() {
               }}
             ></div>
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-            <div className="absolute top-1/4 -right-24 w-[600px] h-[600px] bg-secondary/5 blur-[140px] rounded-full pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-surface-container-lowest to-transparent z-20"></div>
           </motion.div>
         </div>
@@ -70,7 +69,6 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-[1300px] w-full relative mt-16 md:mt-32"
           >
-            <div className="absolute -inset-20 radial-glow pointer-events-none opacity-50"></div>
 
             <h1 className="font-headline text-3xl sm:text-5xl md:text-8xl font-black text-white leading-[1.1] mb-8 tracking-tighter uppercase relative">
               SVE ZA GRAĐEVINU

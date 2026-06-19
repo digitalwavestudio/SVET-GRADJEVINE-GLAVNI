@@ -23,64 +23,68 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 relative w-full">
-              <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-8 scroll-smooth w-full">
-                {latestMachines.length > 0 ? latestMachines.map((machine: any, idx: number) => (
-                <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-[85vw] md:w-auto">
-                  <div className="h-48 overflow-hidden relative">
-                    <OptimizedImage src={machine.images?.[0] || ""} fallbackType="machine" alt={machine.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      
-                    <div className="absolute top-4 right-4 bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-[10px] text-secondary font-bold uppercase">
-                      {machine.listingType === 'sale' ? 'Prodaja' : 'Iznajmljivanje'}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            <div className="lg:col-span-2 relative w-full h-full flex flex-col">
+              {latestMachines.length > 0 ? (
+                <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-8 scroll-smooth w-full h-full">
+                  {latestMachines.map((machine: any, idx: number) => (
+                  <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-[85vw] md:w-auto h-full flex flex-col">
+                    <div className="h-48 overflow-hidden relative shrink-0">
+                      <OptimizedImage src={machine.images?.[0] || ""} fallbackType="machine" alt={machine.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        
+                      <div className="absolute top-4 right-4 bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-[10px] text-secondary font-bold uppercase">
+                        {machine.listingType === 'sale' ? 'Prodaja' : 'Iznajmljivanje'}
+                      </div>
+                    </div>
+                    <div className="p-6 flex flex-col flex-1 justify-between">
+                      <div>
+                        <h3 className="font-bold text-lg mb-2 uppercase line-clamp-1">{machine.title}</h3>
+                        <div className="flex items-center gap-4 text-on-surface-variant text-sm mb-4">
+                          {machine.yearOfManufacture && (
+                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">schedule</span> {machine.yearOfManufacture}. god</span>
+                          )}
+                          {machine.workingHours !== undefined && (
+                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">history</span> {machine.workingHours}h</span>
+                          )}
+                          {machine.location && !machine.workingHours && (
+                             <span className="flex items-center gap-1 line-clamp-1"><span className="material-symbols-outlined text-[16px]">location_on</span> {typeof machine.location === 'object' ? machine.location.address : machine.location}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center mt-4">
+                        <span className="text-2xl font-black text-secondary">
+                          {machine.price ? `€${machine.price.toLocaleString()}` : 'Po upitu'}
+                        </span>
+                        <button 
+                          onClick={() => navigate(`/gradjevinske-masine/${machine.id}`)}
+                          aria-label={`Pogledaj detalje ${machine.title}`}
+                          className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20"
+                        >
+                          <span className="material-symbols-outlined group-hover/btn:text-on-secondary transition-colors text-white">chevron_right</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg mb-2 uppercase line-clamp-1">{machine.title}</h3>
-                    <div className="flex items-center gap-4 text-on-surface-variant text-sm mb-4">
-                      {machine.yearOfManufacture && (
-                        <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">schedule</span> {machine.yearOfManufacture}. god</span>
-                      )}
-                      {machine.workingHours !== undefined && (
-                        <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">history</span> {machine.workingHours}h</span>
-                      )}
-                      {machine.location && !machine.workingHours && (
-                         <span className="flex items-center gap-1 line-clamp-1"><span className="material-symbols-outlined text-[16px]">location_on</span> {typeof machine.location === 'object' ? machine.location.address : machine.location}</span>
-                      )}
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-black text-secondary">
-                        {machine.price ? `€${machine.price.toLocaleString()}` : 'Po upitu'}
-                      </span>
-                      <button 
-                        onClick={() => navigate(`/gradjevinske-masine/${machine.id}`)}
-                        aria-label={`Pogledaj detalje ${machine.title}`}
-                        className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20"
-                      >
-                        <span className="material-symbols-outlined group-hover/btn:text-on-secondary transition-colors text-white">chevron_right</span>
-                      </button>
-                    </div>
-                  </div>
+                ))}
                 </div>
-              )) : (
-                <div className="md:col-span-2 bg-surface-container-lowest p-12 rounded-[10px] border border-white/5 text-center w-full flex flex-col items-center justify-center min-h-[350px]">
+              ) : (
+                <div className="bg-surface-container-lowest p-12 rounded-[10px] border border-white/5 text-center w-full flex flex-col items-center justify-center min-h-[350px] h-full flex-1">
                   <span className="material-symbols-outlined text-white/10 text-6xl mb-4" style={{ fontVariationSettings: '"FILL" 1' }}>precision_manufacturing</span>
                   <h3 className="font-black text-2xl text-white/50 mb-2 uppercase tracking-tighter">Trenutno nema objavljenih mašina</h3>
                   <p className="text-on-surface-variant text-base">Oglasa za građevinske mašine trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
                 </div>
               )}
-              </div>
               <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#0A0F14] to-transparent pointer-events-none z-10 md:hidden"></div>
             </div>
             {/* Category Sidebar */}
-            <div className="bg-[#0A0F14] p-6 sm:p-10 rounded-[10px] border border-white/5 flex flex-col relative shadow-2xl overflow-hidden group/sidebar">
-               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[60px] pointer-events-none group-hover/sidebar:bg-secondary/10 transition-colors duration-500"></div>
+            <div className="bg-surface-container-low p-6 sm:p-10 rounded-[10px] border border-white/10 flex flex-col relative shadow-xl overflow-hidden group/sidebar h-full">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 blur-[60px] pointer-events-none group-hover/sidebar:bg-secondary/20 transition-colors duration-500"></div>
                <div className="absolute top-0 left-0 w-[2px] bg-secondary h-0 group-hover/sidebar:h-full transition-all duration-700"></div>
 
               <h3 className="text-sm font-black text-white uppercase tracking-[0.3em] mb-10 border-b border-white/10 pb-5">
                 Istaknute Kategorije
               </h3>
-              <ul className="space-y-3 flex-1">
+              <ul className="space-y-3 flex-1 flex flex-col justify-center">
                 {[
                   { name: 'Bageri i utovarivači', cat: 'excavators' },
                   { name: 'Dizalice i kranovi', cat: 'cranes' },
@@ -88,13 +92,13 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                 ].map((cat, i) => (
                   <li 
                     key={i}
-                    className="flex justify-between items-center p-5 rounded-[12px] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-white/10 hover:translate-x-1 transition-all duration-300 cursor-pointer group/item" 
+                    className="flex justify-between items-center p-5 rounded-[12px] bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/20 hover:translate-x-1 transition-all duration-300 cursor-pointer group/item" 
                     onClick={() => navigate(`/gradjevinske-masine?category=${cat.cat}`)}
                   >
-                    <span className="group-hover/item:text-secondary transition-colors uppercase font-black text-sm tracking-widest text-[#B4B9BE]">
+                    <span className="group-hover/item:text-white transition-colors uppercase font-black text-sm tracking-widest text-[#B4B9BE]">
                       {cat.name}
                     </span>
-                    <span className="material-symbols-outlined text-lg text-white/10 group-hover/item:text-secondary group-hover/item:translate-x-1 transition-all duration-300">
+                    <span className="material-symbols-outlined text-lg text-white/20 group-hover/item:text-secondary group-hover/item:translate-x-1 transition-all duration-300">
                       arrow_forward
                     </span>
                   </li>
@@ -103,9 +107,10 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               
               <Link 
                 to="/gradjevinske-masine"
-                className="w-full mt-10 py-4 md:py-5 flex items-center justify-center uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-white/5 hover:bg-secondary hover:text-slate-950 transition-all duration-500 rounded-[12px] border border-white/10 hover:border-secondary shadow-lg hover:shadow-secondary/20"
+                className="w-full mt-10 py-4 md:py-5 flex items-center justify-center gap-2 uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-secondary text-slate-950 hover:bg-yellow-400 transition-all duration-500 rounded-[12px] shadow-lg hover:scale-[1.02]"
               >
-                Sve građevinske mašine
+                Sve mašine
+                <span className="material-symbols-outlined text-sm">arrow_right_alt</span>
               </Link>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { VerticalCTA } from '@/src/components/VerticalCTA';
+import { Button } from '@/src/components/ui/Button';
 import { Tractor } from 'lucide-react';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { AnimatePresence, motion } from 'motion/react';
@@ -76,7 +77,7 @@ export default function ConstructionMachinesPage() {
   const totalMachinesCount = (data?.pages[0] as any)?.totalHits ?? (isEmptyFilter ? machineStats?.total : machines.length) ?? machines.length;
 
   const machinesToDisplay = useMemo(() => {
-    let result = [...machines].map(m => ({
+    let result = [...machines].map((m: any) => ({
       ...m,
       adTitle: m.adTitle || m.title,
       year: m.year || m.machYear,
@@ -323,21 +324,24 @@ export default function ConstructionMachinesPage() {
       >
         <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
           <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
-            <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:scale-110 transition-transform">manage_search</span>
-            <input 
-              aria-label="Pretraga mašina po modelu ili proizvođaču" 
-              type="text" 
-              value={searchQuery} 
-              onChange={(e) => setSearchQuery(e.target.value)} 
-              placeholder="Model mašine, proizvođač..." 
-              className="w-full bg-transparent outline-none border-none text-white px-3 md:px-6 py-4 md:py-5 font-black uppercase tracking-[0.2em] placeholder:text-white/20 text-[10px]" 
+            <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
+            <input
+              type="text"
+              placeholder="MODEL MAŠINE, PROIZVOĐAČ..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
-          <Link to="/postavi-oglas" className="w-full md:w-auto bg-secondary text-slate-950 font-black uppercase tracking-[0.2em] px-12 h-16 rounded-[10px] hover:bg-white transition-all shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 text-[10px]">
-            <span className="material-symbols-outlined text-xl">add_circle</span>
-            <span>OGLASI MAŠINU</span>
-          </Link>
+          <Button 
+            onClick={handleApplyFilters}
+            variant="primary"
+            className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
+            icon="search"
+          >
+            PRETRAŽI
+          </Button>
         </div>
       </StandardPageHero>
 

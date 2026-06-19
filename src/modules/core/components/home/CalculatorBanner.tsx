@@ -27,10 +27,10 @@ export default function CalculatorBanner() {
             </div>
             
             {/* Action */}
-            <div className="w-full max-w-[200px] md:w-auto mx-auto lg:mx-0 shrink-0 flex items-center justify-center gap-4 bg-white/5 hover:bg-secondary px-6 md:px-8 py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-sm transition-all duration-500 group-hover:scale-105">
+            <div className="w-max mx-auto lg:mx-0 shrink-0 flex items-center justify-center gap-3 bg-white/5 hover:bg-secondary px-4 md:px-8 py-3 md:py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-xs md:text-sm transition-all duration-500 group-hover:scale-105">
               Isprobaj odmah 
-              <div className="bg-white/10 p-2 rounded-[10px] group-hover:bg-slate-950 group-hover:text-white transition-colors">
-                <ArrowRight className="w-5 h-5" />
+              <div className="bg-white/10 p-1.5 md:p-2 rounded-[10px] group-hover:bg-slate-950 group-hover:text-white transition-colors">
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
               </div>
             </div>
           </Link>

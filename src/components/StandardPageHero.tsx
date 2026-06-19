@@ -54,7 +54,6 @@ export function StandardPageHero({
         ></div>
         {/* Noise Texture for that visual signature */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-        <div className="absolute top-1/4 -right-24 w-[600px] h-[600px] bg-secondary/5 blur-[140px] rounded-full pointer-events-none"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">

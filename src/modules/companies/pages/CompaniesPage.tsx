@@ -1,4 +1,5 @@
 import { VerticalCTA } from '@/src/components/VerticalCTA';
+import { Button } from '@/src/components/ui/Button';
 import { Building2 } from 'lucide-react';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { AnimatePresence, motion } from 'motion/react';
@@ -215,20 +216,21 @@ function CompaniesPage() {
             <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
             <input
               type="text"
+              placeholder="PRETRAŽI FIRME..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="PRETRAŽI FIRME..."
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-4 md:px-6" 
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
-          <button 
+          <Button 
             onClick={handleApplyFilters}
-            className="w-full md:w-auto bg-secondary text-slate-950 px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0"
+            variant="primary"
+            className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
+            icon="search"
           >
-            <span className="material-symbols-outlined text-xl">search</span>
-            <span>PRETRAŽI</span>
-          </button>
+            PRETRAŽI
+          </Button>
         </div>
       </StandardPageHero>
  
@@ -532,19 +534,7 @@ function CompaniesPage() {
               />
             </div>
 
-            {/* AI Assistant Banner */}
-            <div className="mt-20 bg-gradient-to-br from-secondary/10 to-transparent p-10 rounded-[10px] border border-secondary/20 flex flex-col md:flex-row items-center gap-10">
-              <div className="w-20 h-20 bg-secondary/20 rounded-[10px] flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-secondary text-4xl animate-pulse">psychology</span>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-black text-white uppercase tracking-tight mb-2">Tražite specifičnu ekipu za vaš projekat?</h4>
-                <p className="text-xs text-white/40 font-bold uppercase tracking-[0.1em] leading-relaxed">
-                  Pustite naš SmartMatch AI da analizira vaše zahteve i preporuči vam najbolje partnere na osnovu vaših referenci, budžeta i rokova.
-                </p>
-              </div>
-              <button className="px-8 py-4 bg-secondary text-slate-950 font-black rounded-[10px] text-[10px] uppercase tracking-widest">POKRENI SMARTMATCH</button>
-            </div>
+
           </div>
         </div>
       </section>
