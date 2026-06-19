@@ -149,10 +149,7 @@ export class UnifiedSearchFirestore {
     // COUNT aggregation uklonjen pošto generiše nepredvidiv broj "Read" operacija za kompleksne/nestandardne upite.
     // Prelazimo na "N + 1" limit paginaciju da detektujemo sledeću stranu bez dodatih čitanja.
     
-    if (!filtersAny.isPremium && !filtersAny.isUrgent) {
-      q = q.orderBy("isPremium", "desc");
-    }
-    q = q.orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
+    q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
     q = q.limit(pageSize + 1); // 🚀 N + 1 Optimizacija
     q = q.select(
       // Core
@@ -438,10 +435,7 @@ export class UnifiedSearchFirestore {
       );
 
     // Limit to 150 latest documents for in-memory keyword filtering (quota safe)
-    if (!filtersAny.isPremium && !filtersAny.isUrgent) {
-      q = q.orderBy("isPremium", "desc");
-    }
-    q = q.orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
+    q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
     q = q.limit(150);
     q = q.select(
       "title", "name", "description", "price", "location", "loc",
