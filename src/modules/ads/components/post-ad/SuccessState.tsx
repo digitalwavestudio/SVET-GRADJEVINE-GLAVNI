@@ -38,7 +38,7 @@ export const SuccessState: React.FC<SuccessStateProps> = ({ type, packageName, o
           {type === 'free' ? (
             "Vaš oglas je uspešno sačuvan i trenutno se nalazi besplatno na pregledu kod administratora. Nakon odobrenja, biće vidljiv svim korisnicima na platformi."
           ) : (
-            <>Uspešno ste platili paket <strong>{packageName}</strong> iz Vašeg Walleta. Sredstva su skinuta, a oglas je odmah aktiviran i biće veoma brzo vidljiv svim korisnicima.</>
+            <>Uspešno ste platili paket <strong>{packageName}</strong> iz Vašeg Walleta. Sredstva su skinuta, a oglas je odmah aktiviran. Vaš oglas će se pojaviti za 5 minuta na sajtu.</>
           )}
         </p>
 

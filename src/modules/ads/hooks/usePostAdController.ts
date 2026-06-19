@@ -602,7 +602,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
 
       setSubmittedPackage(result.sData?.paket || null);
       setIsSubmitted(true);
-      showSuccess(editId ? 'Oglas uspešno izmenjen!' : 'Oglas uspešno postavljen!');
+      showSuccess(editId ? 'Oglas uspešno izmenjen!' : 'Oglas uspešno postavljen! Pojaviće se za 5 minuta na sajtu.');
       reset();
       resetFormStore();
 
