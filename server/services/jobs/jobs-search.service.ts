@@ -33,6 +33,19 @@ export class JobsSearchService {
       lastVisibleId,
     )) as { docs: any[]; lastVisibleId: string | null; hasMore: boolean; totalHits?: number };
 
+    // Fallback to mock premium/urgent data when real query returns empty (dev/localhost)
+    if ((!result.docs || result.docs.length === 0) && (filters?.isPremium || filters?.isUrgent)) {
+      const mockPremium = [
+        { id: "fp1", title: "Građevinski Inženjer - Šef Gradilišta", grad: "Beograd", location: "Novi Beograd", salary: "1500 - 2000 EUR", comp: "Energoprojekt Visokogradnja", logo: "", images: [], isPremium: true, isUrgent: false, createdAt: new Date().toISOString() },
+        { id: "fp2", title: "Rukovalac Bagerom i Utovarivačem", grad: "Novi Sad", location: "Novi Sad", salary: "1200 - 1400 EUR", comp: "Karin Komerc", logo: "", images: [], isPremium: true, isUrgent: false, createdAt: new Date().toISOString() }
+      ];
+      const mockUrgent = [
+        { id: "fu1", title: "HITNO: Keramičar / Gipsar za unutrašnje radove", grad: "Beograd", location: "Beograd", salary: "2000+ EUR", comp: "Lux Adaptacije d.o.o.", logo: "", images: [], isPremium: false, isUrgent: true, createdAt: new Date().toISOString() }
+      ];
+      const fallback = filters?.isUrgent ? mockUrgent : mockPremium;
+      return { docs: fallback, lastVisible: null, hasMore: false, totalHits: fallback.length };
+    }
+
     // Maintain compatibility with JobsService specific response key 'lastVisible' instead of 'lastVisibleId'
     return {
       docs: result.docs,

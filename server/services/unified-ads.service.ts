@@ -99,9 +99,9 @@ export class UnifiedAdsService {
 
     this.inflightPromises.set(cacheKey, fetchTask);
     
-    // 3. Global Tier-2 Safety Timeout: 150ms max wait for the whole tiered lookup
+    // 3. Global Tier-2 Safety Timeout: 5000ms max wait for the whole tiered lookup
     const globalTimeout = new Promise<T>((resolve) => {
-      setTimeout(() => resolve(fallbackValue as T), 150);
+      setTimeout(() => resolve(fallbackValue as T), 5000);
     });
 
     return Promise.race([fetchTask, globalTimeout]);
@@ -325,7 +325,7 @@ export class UnifiedAdsService {
     isUrgent?: boolean;
     isPremium?: boolean;
   }) {
-    const cacheKey = `promoted_v2_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
+    const cacheKey = `promoted_v3_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
     const fastPathDoc = "metadata/promoted_ads_fastpath";
     const fastPathField = options.isUrgent ? "urgent" : "premium";
 
