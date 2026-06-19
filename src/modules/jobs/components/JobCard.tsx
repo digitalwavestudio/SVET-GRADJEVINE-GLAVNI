@@ -25,8 +25,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
     if (job.plataMin != null) {
       const min = Number(job.plataMin).toLocaleString();
       const max = job.plataMax != null ? ` - ${Number(job.plataMax).toLocaleString()}` : '';
-      const type = job.salaryType === 'hourly' ? ' / sat' : ' / mesec';
-      return `${min}${max} EUR${type}`;
+      return `${min}${max} EUR`;
     }
     return job.sal || job.salary || 'Dogovor';
   };
@@ -81,7 +80,6 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               {job.isCompanyVerified && (
                 <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
               )}
-              <span className="w-1 h-1 rounded-full bg-white/20"></span>
               <span className="text-white/40 text-[9px] font-bold uppercase tracking-wider">{job.cat}</span>
             </div>
           </div>
@@ -118,8 +116,10 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
           {/* Salary / Payment */}
           <div className="text-right flex flex-col">
-            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">Plata / Satnica</span>
-            <span className="text-secondary font-black text-sm font-mono leading-none">
+            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">
+              {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
+            </span>
+            <span className="text-secondary font-black text-base font-mono leading-none">
               {getSalaryDisplay()}
             </span>
           </div>
@@ -249,7 +249,6 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                   )}
                 </div>
               )}
-              <span className="w-1 h-1 rounded-full bg-white/20"></span>
               <span className="text-white/40 text-[9px] font-bold uppercase tracking-widest">{job.cat}</span>
             </div>
           </div>
@@ -317,7 +316,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         {/* Action Section */}
         <div className={`${viewMode === 'list' ? 'md:min-w-[150px] md:text-right flex md:flex-col items-center md:items-end justify-between w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-white/5' : 'mt-auto pt-4 border-t border-white/5 flex items-center justify-between'} relative z-10`}>
           <div className="flex flex-col items-start md:items-end">
-            <div className="text-secondary font-black text-lg mb-1 font-mono">
+            <div className="text-secondary font-black text-xl mb-1 font-mono">
               {getSalaryDisplay()}
             </div>
             {viewMode === 'list' && (

@@ -221,7 +221,7 @@ export default function JobDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B0F] font-sans text-white selection:bg-secondary selection:text-slate-950 pb-20 md:pb-0">
+    <div className="min-h-screen bg-slate-950 font-sans text-white selection:bg-secondary selection:text-slate-950 pb-20 md:pb-0">
       <SeoHead
         title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : `${displayTitle} ${jobData.location ? `- ${jobData.location}` : ''} - Svet Građevine`}
         description={cleanDescription.substring(0, 160)}
@@ -245,7 +245,7 @@ export default function JobDetailsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-12">
-        <div className="bg-gradient-to-br from-[#0D141C] to-[#080D12] border border-white/5 rounded-[20px] p-6 sm:p-10 lg:p-12 shadow-2xl relative overflow-hidden">
+        <div className="bg-slate-900/50 border border-white/5 rounded-[20px] p-6 sm:p-10 lg:p-12 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-secondary via-amber-500 to-transparent"></div>
           <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -352,7 +352,7 @@ export default function JobDetailsPage() {
           <MediaGallery images={jobData.images || []} title={displayTitle} imageStatus={jobData.imageStatus} />
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-secondary/20 transition-all group">
+            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-secondary/20 transition-all group">
               <div className="w-10 h-10 rounded-[8px] bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
                 <Wallet size={20} className="stroke-[2.5]" />
               </div>
@@ -369,7 +369,7 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
-            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
+            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
               <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
                 <Clock size={20} className="stroke-[2.5]" />
               </div>
@@ -381,7 +381,7 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
-            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
+            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
               <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
                 <Briefcase size={20} className="stroke-[2.5]" />
               </div>
@@ -393,7 +393,7 @@ export default function JobDetailsPage() {
               </div>
             </div>
 
-            <div className="bg-[#0D141C] border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
+            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
               <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
                 <Calendar size={20} className="stroke-[2.5]" />
               </div>
@@ -406,7 +406,7 @@ export default function JobDetailsPage() {
             </div>
           </div>
 
-          <section className="bg-[#0D141C] border border-white/5 rounded-[16px] p-6 sm:p-10 space-y-6">
+          <section className="bg-slate-900/50 border border-white/5 rounded-[16px] p-6 sm:p-10 space-y-6">
             <div className="flex items-center gap-4 border-b border-white/5 pb-6">
               <div className="w-12 h-12 rounded-[10px] bg-secondary/10 flex items-center justify-center text-secondary">
                 <Briefcase size={22} />
@@ -418,7 +418,7 @@ export default function JobDetailsPage() {
             </div>
           </section>
 
-          <section className="bg-[#0D141C] border border-white/5 rounded-[16px] p-6 sm:p-10 space-y-8">
+          <section className="bg-slate-900/50 border border-white/5 rounded-[16px] p-6 sm:p-10 space-y-8">
             <div className="flex items-center gap-4 border-b border-white/5 pb-6">
               <div className="w-12 h-12 rounded-[10px] bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                 <span className="material-symbols-outlined text-[24px]">fact_check</span>
@@ -473,7 +473,7 @@ export default function JobDetailsPage() {
             </div>
           </section>
 
-          <section className="bg-[#0D141C] border border-white/5 rounded-[16px] overflow-hidden">
+          <section className="bg-slate-900/50 border border-white/5 rounded-[16px] overflow-hidden">
             <div className="relative p-6 sm:p-10 border-b border-white/5">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-[10px] bg-blue-500/10 flex items-center justify-center text-blue-400">
@@ -502,7 +502,7 @@ export default function JobDetailsPage() {
               <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_80px_rgba(0,0,0,0.7)]"></div>
             </div>
 
-            <div className="p-6 bg-[#0B1017] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="p-6 bg-slate-900/80 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="text-center sm:text-left">
                 <h4 className="text-white font-black text-sm uppercase tracking-wider mb-1">Mesto i okolina gradilišta</h4>
                 <p className="text-white/40 text-xs font-bold uppercase">{jobData.tacnaLokacija || jobData.location}</p>
@@ -531,7 +531,7 @@ export default function JobDetailsPage() {
 
         <aside className="lg:col-span-4 space-y-6" aria-label="Kontakt i prijava">
           <div className="sticky top-24 space-y-6">
-            <div className="bg-[#0D141C] border border-white/5 rounded-[16px] p-6 sm:p-8 relative overflow-hidden">
+            <div className="bg-slate-900/50 border border-white/5 rounded-[16px] p-6 sm:p-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[80px] rounded-full -mr-16 -mt-16 pointer-events-none"></div>
 
               <div className="relative z-10 space-y-6">
@@ -637,7 +637,7 @@ export default function JobDetailsPage() {
               </div>
             )}
 
-            <div className="bg-[#0D141C] border border-white/5 rounded-[12px] p-6">
+            <div className="bg-slate-900/50 border border-white/5 rounded-[12px] p-6">
               <div className="flex gap-4 items-start">
                 <div className="p-3 rounded-[10px] bg-white/5 text-secondary">
                   <ShieldCheck size={20} />

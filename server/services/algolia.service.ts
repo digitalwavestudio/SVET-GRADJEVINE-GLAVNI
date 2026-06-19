@@ -661,6 +661,8 @@ export const setupAlgoliaIndexSettings = async (): Promise<boolean> => {
               "filterOnly(professionSlug)",
               "filterOnly(typeSlug)",
               "filterOnly(role)",
+              "filterOnly(isPremium)",
+              "filterOnly(isUrgent)",
               "areaM2", 
               "price",
             ],
