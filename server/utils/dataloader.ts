@@ -324,6 +324,7 @@ export const listingsLoader = new DataLoader<string, ListingDTO | null>(
   },
   {
     batchScheduleFn: (callback) => setTimeout(callback, 50),
+    cache: false,
   },
 );
 

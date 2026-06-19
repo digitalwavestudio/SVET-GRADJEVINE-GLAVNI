@@ -248,7 +248,12 @@ export const getAdById = async (
           }
         }
 
-        return publicAdSchema.parse(docData);
+        try {
+          return publicAdSchema.parse(docData);
+        } catch (parseErr) {
+          console.warn("[ADS] Schema validation failed, returning raw data:", parseErr);
+          return docData;
+        }
       },
       1800000,
       null
