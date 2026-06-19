@@ -57,32 +57,52 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       handleCardClick(url, { job });
                     }
                   }}
-                  className={`${UI_TOKENS.PREMIUM_CARD} block w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer`}
+                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer"
                 >
-                  <div className={`${UI_TOKENS.PREMIUM_CARD_INNER} px-4 py-6 md:px-7 md:py-9 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8`}>
-                    <div className="w-20 h-20 md:w-28 md:h-28 bg-white rounded-[10px] p-2 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.1)] flex items-center justify-center text-slate-950 font-bold overflow-hidden relative z-10">
+                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 h-full">
+                    <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10 flex items-center justify-center overflow-hidden">
                       {job.logo ? (
-                        <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain aspect-square rounded-[8px]" loading="lazy" />
+                        <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full p-1" loading="lazy" />
                       ) : (
-                        <span className="text-2xl md:text-3xl font-black text-slate-950">{job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}</span>
+                        <div className="w-full h-full bg-slate-950/5 rounded-full flex items-center justify-center text-slate-950 font-black text-2xl">
+                          {job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}
+                        </div>
                       )}
                     </div>
-                    <div className="flex-1 text-center md:text-left min-w-0 w-full">
-                      <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                        <span className="material-symbols-outlined text-yellow-500 text-sm drop-shadow-[0_0_8px_rgba(254,191,13,0.6)] animate-pulse" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
-                        <span className="text-yellow-500 text-[13px] font-black uppercase tracking-widest text-center md:text-left drop-shadow-[0_0_10px_rgba(254,191,13,0.5)]">PREMIUM</span>
+                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-center min-w-0 w-full">
+                      <div className="flex items-center justify-center md:justify-start gap-2 mb-2 relative z-10 animate-blink">
+                        <span className="material-symbols-outlined text-yellow-500 text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                        <span className="text-yellow-500 text-xs font-bold uppercase tracking-widest hover:text-yellow-400 transition-colors">Premium Partner</span>
                       </div>
-                      <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white group-hover/card:text-secondary transition-colors line-clamp-1 uppercase tracking-tighter mb-4 text-center md:text-left">{displayTitle}</h3>
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase line-clamp-2">
+                        {displayTitle}
+                      </h3>
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                        {(job.description || job.body || job.content || job.opis || '')?.replace(/<[^>]*>?/gm, '') || 'Istražite najbolju priliku iz naše premium ponude proverenih kompanija.'}
+                      </p>
                       
-                      <div className="flex flex-col gap-4 items-center md:items-start">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center md:justify-start">
-                          {job.salary && <span className={UI_TOKENS.BADGE_PREMIUM}>{formatPrice(job.salary)}</span>}
-                          {job.type && <span className={UI_TOKENS.BADGE_DEFAULT}>
-                            {job.type === 'job' ? 'POSAO' : job.type === 'machine' ? 'MAŠINA' : job.type === 'real_estate' ? 'NEKRETNINA' : job.type === 'company' ? 'KOMPANIJA' : job.type === 'accommodation' ? 'SMEŠTAJ' : job.type === 'catering' ? 'KETERING' : 'OGLAS'}
-                          </span>}
-                          {job.loc && <span className={UI_TOKENS.BADGE_DEFAULT}>{job.loc}</span>}
+                      <div className="flex flex-col gap-4 items-center md:items-start relative z-10 mt-auto">
+                        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                          {(job.salary || job.sal || job.price) && (
+                            <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">payments</span>
+                              {formatPrice(job.salary || job.sal || job.price)}
+                            </span>
+                          )}
+                          {job.type && (
+                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">category</span>
+                              {job.type === 'job' ? 'POSAO' : job.type === 'machine' ? 'MAŠINA' : job.type === 'real_estate' ? 'NEKRETNINA' : job.type === 'company' ? 'KOMPANIJA' : job.type === 'accommodation' ? 'SMEŠTAJ' : job.type === 'catering' ? 'KETERING' : 'OGLAS'}
+                            </span>
+                          )}
+                          {(job.loc || job.lokacijaStr || job.location) && (
+                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">location_on</span>
+                              {job.loc || job.lokacijaStr || job.location}
+                            </span>
+                          )}
                         </div>
-                        <button className={UI_TOKENS.BTN_PREMIUM}>POGLEDAJ OGLAS</button>
+                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20">POGLEDAJ OGLAS</button>
                       </div>
                     </div>
                   </div>

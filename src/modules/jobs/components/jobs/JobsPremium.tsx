@@ -61,12 +61,27 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                           {job.title}
                         </Link>
                       </h3>
-                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">{job.opis || 'Pridružite se modernom timu na velikim projektima i osigurajte najbolje uslove rada u industriji.'}</p>
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                        {(job.description || job.body || job.content || job.opis || '')?.replace(/<[^>]*>?/gm, '') || 'Pridružite se modernom timu na velikim projektima i osigurajte najbolje uslove rada u industriji.'}
+                      </p>
                       <div className="flex flex-col gap-4 items-center md:items-start relative z-10 mt-auto">
                         <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                          <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[11px] font-bold uppercase">{job.sal}</span>
-                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase">{job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug || 'FULL TIME'}</span>
-                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase">{job.loc || job.lokacijaStr}</span>
+                          {(job.sal || job.salary) && (
+                            <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">payments</span>
+                              {job.sal || job.salary}
+                            </span>
+                          )}
+                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">schedule</span>
+                            {job.time || job.radnoVreme || (job.engagementSlug === 'puno-radno-vreme' ? 'Puno radno vreme' : job.engagementSlug?.replace(/-/g, ' ')) || 'Puno radno vreme'}
+                          </span>
+                          {(job.loc || job.lokacijaStr || job.location) && (
+                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">location_on</span>
+                              {job.loc || job.lokacijaStr || job.location}
+                            </span>
+                          )}
                         </div>
                         <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20">APLICIRAJ</button>
                       </div>
