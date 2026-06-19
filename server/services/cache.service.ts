@@ -2,10 +2,11 @@ import { MonitoringService } from "./monitoring.service.ts";
 import { getRedis } from "../utils/redis.ts";
 import { RedisLockManager } from "../utils/redis-lock.ts";
 import { DatabaseManager } from "../utils/db-manager.ts";
-import { checkQuotaStatus } from "../config/firebase.ts";
+import { db, checkQuotaStatus } from "../config/firebase.ts";
 import { AdaptiveQosService } from "./adaptive-qos.service.ts";
 import { CACHE_PREFIXES, CacheKeys } from "../constants/cache-keys.ts";
 import zlib from "zlib";
+import crypto from "crypto";
 import { Logger, logger } from "../utils/logger.ts";
 
 /**
@@ -15,6 +16,32 @@ import { Logger, logger } from "../utils/logger.ts";
 export class CacheService {
   private static localCache = new Map<string, { value: unknown; expiry: number; hits: number }>();
   private static inFlight = new Map<string, Promise<unknown>>();
+
+  /* =====================================================
+   * Firestore L3 Cache (shared across Cloud Run instances)
+   * Used when Redis is unavailable.
+   * ===================================================== */
+  private static readonly FS_CACHE_COLLECTION = "cache_store_v2";
+
+  private static fsCacheDocId(key: string): string {
+    return crypto.createHash("md5").update(key).digest("hex");
+  }
+
+  private static shouldUseFsCache(key: string, ttlMs?: number): boolean {
+    if (this.redisClient) return false;
+    if (ttlMs !== undefined && ttlMs < 60000) return false;
+    return key.startsWith("swr:") ||
+      key.startsWith("homepage_bff_") ||
+      key.startsWith("promoted_") ||
+      key.startsWith("unified_search_") ||
+      key.startsWith("fallback_search_") ||
+      key.startsWith("public_ads_") ||
+      key.startsWith("public_jobs_") ||
+      key.startsWith("admin_global_stats") ||
+      key.startsWith("admin_chart_data") ||
+      key.startsWith("homepage_premium_jobs_") ||
+      key.startsWith("homepage_urgent_jobs_");
+  }
 
   private static async executeWithTimeout<R>(fn: () => Promise<R>, timeoutMs: number = 25000): Promise<R> {
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -408,6 +435,19 @@ export class CacheService {
         console.error("[CacheService] Redis set error:", err);
       }
     }
+
+    // L3 Firestore shared cache (fallback kada nema Redis-a)
+    if (!client && this.shouldUseFsCache(routedKey, ttlMs)) {
+      const fsDocId = this.fsCacheDocId(routedKey);
+      db.collection(this.FS_CACHE_COLLECTION).doc(fsDocId).set({
+        key: routedKey,
+        value,
+        expiresAt: Date.now() + ttlMs + 24 * 60 * 60 * 1000, // 24h stale retention
+        createdAt: Date.now(),
+      }).catch((err: unknown) => {
+        console.error("[CacheService] Firestore set error:", err);
+      });
+    }
   }
 
   /**
@@ -495,6 +535,31 @@ export class CacheService {
             tracker.end({ hit: true, cache_layer: "L1_failover_stale" });
             return item.value as T;
           }
+        }
+      }
+
+      // 3. Provera L3 (Firestore) - shared cache across Cloud Run instances
+      if (!client && this.shouldUseFsCache(routedKey)) {
+        try {
+          const fsDocId = this.fsCacheDocId(routedKey);
+          const fsSnap = await db.collection(this.FS_CACHE_COLLECTION).doc(fsDocId).get().catch(() => null);
+          if (fsSnap && fsSnap.exists) {
+            const fsData = fsSnap.data()!;
+            if (Date.now() <= fsData.expiresAt) {
+              // Hydrate L1 from Firestore (kraći TTL jer Firestore nije brz)
+              this.localCache.set(routedKey, {
+                value: fsData.value,
+                expiry: Date.now() + 30000, // 30s L1 hydration
+                hits: 1,
+              });
+              tracker.end({ hit: true, cache_layer: "L3_Firestore" });
+              return fsData.value as T;
+            }
+            // Istekao - obriši iz Firestore-a (fire-and-forget)
+            fsSnap.ref.delete().catch(() => {});
+          }
+        } catch {
+          // Firestore read error - ignore
         }
       }
 
@@ -750,6 +815,12 @@ export class CacheService {
       } catch (err) {
         console.error("[CacheService] Redis delete error:", err);
       }
+    }
+
+    // L3 Firestore shared cache cleanup
+    if (!client && this.shouldUseFsCache(routedKey)) {
+      const fsDocId = this.fsCacheDocId(routedKey);
+      db.collection(this.FS_CACHE_COLLECTION).doc(fsDocId).delete().catch(() => {});
     }
   }
 

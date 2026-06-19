@@ -26,6 +26,10 @@ import { logger, Logger } from "../utils/logger.ts";
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
 const L1_HOMEPAGE_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
 
+export function clearL1HomepageCache() {
+  l1HomepageCache.clear();
+}
+
 const l1DashboardPrewarmCache = new Map<string, { data: any; expiry: number }>();
 const L1_DASHBOARD_PREWARM_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
 

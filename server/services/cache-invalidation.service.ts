@@ -18,6 +18,8 @@ export class CacheInvalidationService {
       CACHE_PREFIXES.ADMIN_MODERATION_QUEUE,
       CACHE_PREFIXES.ADMIN_GLOBAL_STATS,
       CACHE_PREFIXES.ADMIN_CHART_DATA,
+      "homepage_bff_",
+      "swr:homepage_bff_",
     ];
 
     if (category === "jobs") {
@@ -35,6 +37,14 @@ export class CacheInvalidationService {
     await CacheService.invalidateByPrefixes(prefixes).catch((err) =>
       console.error("[CacheInvalidation] onAdChange error:", err)
     );
+
+    // Clear L1 homepage cache in bff.service.ts
+    try {
+      const { clearL1HomepageCache } = await import("./bff.service.ts");
+      clearL1HomepageCache();
+    } catch {
+      // ignore import error
+    }
 
     // Also clear employer stats for this user in background
     try {
@@ -57,11 +67,20 @@ export class CacheInvalidationService {
       CACHE_PREFIXES.PUBLIC_PROFILE_ADS + uid,
       CACHE_PREFIXES.ADMIN_GLOBAL_STATS,
       CACHE_PREFIXES.ADMIN_CHART_DATA,
+      "homepage_bff_",
+      "swr:homepage_bff_",
     ];
 
     await CacheService.invalidateByPrefixes(prefixes).catch((err) =>
       console.error("[CacheInvalidation] onJobChange error:", err)
     );
+
+    try {
+      const { clearL1HomepageCache } = await import("./bff.service.ts");
+      clearL1HomepageCache();
+    } catch {
+      // ignore import error
+    }
   }
 
   static async onAdminAdModeration(category: string): Promise<void> {
@@ -71,6 +90,8 @@ export class CacheInvalidationService {
       CACHE_PREFIXES.SWR_ENVELOPE + CACHE_PREFIXES.PUBLIC_ADS,
       CACHE_PREFIXES.ADMIN_GLOBAL_STATS,
       CACHE_PREFIXES.ADMIN_CHART_DATA,
+      "homepage_bff_",
+      "swr:homepage_bff_",
     ];
 
     if (category === "jobs") {
@@ -89,6 +110,13 @@ export class CacheInvalidationService {
     await CacheService.invalidateByPrefixes(prefixes).catch((err) =>
       console.error("[CacheInvalidation] onAdminAdModeration error:", err)
     );
+
+    try {
+      const { clearL1HomepageCache } = await import("./bff.service.ts");
+      clearL1HomepageCache();
+    } catch {
+      // ignore import error
+    }
   }
 
   static async onUserProfileChange(uid: string): Promise<void> {
