@@ -72,7 +72,11 @@ export class UnifiedAdsService {
 
                 if (doc && doc.exists) {
                   const d = doc.data();
-                  const actualData = d?.stats || d?.partners || d?.premium || d?.urgent || d;
+                  const isUrgentReq = cacheKey.includes("urgent");
+                  const isPremiumReq = cacheKey.includes("premium");
+                  const actualData = isUrgentReq ? (d?.urgent || d?.premium || d)
+                    : isPremiumReq ? (d?.premium || d?.urgent || d)
+                    : d?.stats || d?.partners || d;
                   if (actualData) {
                     console.info(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
                     return actualData;
@@ -86,7 +90,11 @@ export class UnifiedAdsService {
                   const mockDoc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
                   if (mockDoc && mockDoc.exists) {
                     const md = mockDoc.data();
-                    const actualData = md?.stats || md?.partners || md?.premium || md?.urgent || md;
+                    const isUrgentReq = cacheKey.includes("urgent");
+                    const isPremiumReq = cacheKey.includes("premium");
+                    const actualData = isUrgentReq ? (md?.urgent || md?.premium || md)
+                      : isPremiumReq ? (md?.premium || md?.urgent || md)
+                      : md?.stats || md?.partners || md;
                     if (actualData) {
                       return actualData;
                     }
