@@ -173,25 +173,39 @@ export const getAdById = async (
   res: Response,
   next: NextFunction,
 ) => {
-  // Edge/BFF caching headers for public ad fetching
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=300, stale-while-revalidate=86400, stale-if-error=86400",
-  );
-
   try {
     const { id } = req.params;
 
+    const { db } = await import("../config/firebase.ts");
     const { CacheService } = await import("../services/cache.service.ts");
     const { CacheKeys } = await import("../constants/cache-keys.ts");
+    const { publicAdSchema } = await import("../dto/ads.dto.ts");
     const cacheKey = CacheKeys.adDetail(id);
 
     const data = await CacheService.getOrSetSWR(
       cacheKey,
       async () => {
-        const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
-        const { publicAdSchema } = await import("../dto/ads.dto.ts");
-        const docData = await UnifiedAdsService.getAdById("", id);
+        let docData: Record<string, unknown> | null = null;
+
+        // 1. Try DataLoader first
+        try {
+          const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
+          docData = await UnifiedAdsService.getAdById("", id) as unknown as Record<string, unknown> | null;
+        } catch (e) {
+          console.warn("[ADS] DataLoader failed, falling back to direct Firestore query:", e);
+        }
+
+        // 2. Fallback: direct Firestore query (bypasses DataLoader)
+        if (!docData) {
+          try {
+            const snap = await db.collection("listings").doc(id).get();
+            if (snap.exists) {
+              docData = { id: snap.id, ...snap.data() } as Record<string, unknown>;
+            }
+          } catch (e) {
+            console.warn("[ADS] Direct Firestore fallback also failed:", e);
+          }
+        }
 
         if (!docData) {
           return { error: "Oglas nije pronađen ili je obrisan", status: 410 };
@@ -220,10 +234,9 @@ export const getAdById = async (
           }
         }
 
-        // Povezujemo userProfileLoader kako bismo spakovali pojedinačna čitanja autora u jedan upit
         if (docData.authorId && typeof docData.authorId === "string") {
           const { userProfileLoader } = await import("../utils/dataloader.ts");
-          const author = await userProfileLoader.load(docData.authorId).catch(() => null);
+          const author = await userProfileLoader.load(docData.authorId as string).catch(() => null);
           if (author) {
             docData.authorSnapshot = {
               uid: author.uid || author.id,
@@ -238,20 +251,27 @@ export const getAdById = async (
         return publicAdSchema.parse(docData);
       },
       1800000,
-      null // Fallback
-    ); // 30 min cache
+      null
+    );
 
     if (data && data.error && data.status) {
+      res.setHeader("Cache-Control", "no-cache");
       return res.status(data.status as number).json(data);
     }
 
     if (data === null || data === undefined) {
+      res.setHeader("Cache-Control", "no-cache");
       return res.status(503).json({ error: "Servis trenutno nedostupan" });
     }
 
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=300, stale-while-revalidate=86400, stale-if-error=86400",
+    );
     res.json(data);
   } catch (err) {
     console.error("[ADS] getAdById Error:", err);
+    res.setHeader("Cache-Control", "no-cache");
     res.status(503).json({ error: "Servis trenutno nedostupan" });
   }
 };
