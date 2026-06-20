@@ -115,24 +115,47 @@ async function backgroundPreRenderListingHub(
 
     const pageSize = 20;
     const maxPage = 50;
-    const safeOffset = Math.min((page - 1) * pageSize, (maxPage - 1) * pageSize);
 
     if (cursor) {
       try {
-        const lastDoc = await db.collection("listings").doc(cursor).get();
+        const lastDoc = await resolveFirestoreDoc(collectionName, cursor);
         if (lastDoc.exists) {
           query = query.startAfter(lastDoc);
-        } else if (safeOffset > 0) {
-          query = query.offset(safeOffset);
         }
-      } catch (e) {
-        if (safeOffset > 0) query = query.offset(safeOffset);
+      } catch {
+        // Cursor fetch failed — just return null so caller serves SPA fallback
+        return null;
       }
-    } else if (safeOffset > 0) {
-      query = query.offset(safeOffset);
+    } else if (page > 1) {
+      // No cursor + page > 1: use cached boundary from previous page render
+      // instead of .offset() which reads all skipped docs (Firestore bills them)
+      const boundaryKey = `hub:boundary:${cacheKey}:p${page - 1}`;
+      try {
+        const boundaryDocId = redis ? await redis.get(boundaryKey) : null;
+        if (boundaryDocId) {
+          const boundaryDoc = await resolveFirestoreDoc(collectionName, boundaryDocId);
+          if (boundaryDoc.exists) {
+            query = query.startAfter(boundaryDoc);
+          } else {
+            return null;
+          }
+        } else {
+          // No cached boundary — can't paginate without offset
+          return null;
+        }
+      } catch {
+        return null;
+      }
     }
 
     const latestDocs = await query.limit(pageSize).get();
+
+    // Store page boundary in Redis so next page can use startAfter instead of .offset()
+    if (redis && latestDocs.size === pageSize) {
+      const lastDocId = latestDocs.docs[latestDocs.docs.length - 1].id;
+      const boundaryKey = `hub:boundary:${cacheKey}:p${page}`;
+      redis.set(boundaryKey, lastDocId, "EX", 86400).catch(() => {});
+    }
 
     let itemsHtml = "";
     const itemListElements: Record<string, unknown>[] = [];
