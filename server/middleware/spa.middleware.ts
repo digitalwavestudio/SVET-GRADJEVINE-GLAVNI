@@ -716,6 +716,12 @@ export const createSpaMiddleware = () => {
           label: "GraÄ‘evinske maÅ¡ine",
         },
         {
+          path: "/gradjevinske-masine",
+          coll: "machines",
+          label: "GraÄ‘evinske maÅ¡ine",
+          alwaysListing: true,
+        },
+        {
           path: "/masine",
           coll: "machines",
           label: "GraÄ‘evinske maÅ¡ine",
@@ -802,7 +808,7 @@ export const createSpaMiddleware = () => {
         // Set proper homepage meta for all visitors
         html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
         html = html.replace(/<title>.*?<\/title>/, `<title>Svet GraÄ‘evine - Portal za graÄ‘evinske oglase</title>`);
-        html = html.replace("</head>", `<meta name="description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /></head>`);
+        html = html.replace("</head>", `<meta name="description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet GraÄ‘evine - Portal za graÄ‘evinske oglase" /><meta property="og:description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
         return res.send(html);
       }
 
@@ -866,7 +872,7 @@ export const createSpaMiddleware = () => {
           let breadcrumbHtml = "";
           const baseUrl = APP_CONFIG.BASE_URL;
           if (isGeoPage) {
-            const readableCity = citySlug ? citySlug.replace(/-/g, " ") : lastSegment.replace(/-/g, " ");
+            const readableCity = citySlug ? formatCity(citySlug) : formatCity(lastSegment);
             const listingUrl = `${baseUrl}/${pathSegments[0]}`;
             const currentUrl = `${baseUrl}${req.path}`;
             if (categorySlug) {
@@ -915,6 +921,7 @@ export const createSpaMiddleware = () => {
           // Fallback skeleton for non-bot or if pre-render fails
           let skeletonHtml = html;
           skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${label} | Svet GraÄ‘evine</title>`);
+          const defaultImage = "https://svetgradjevine.com/og-default.jpg";
           skeletonHtml = skeletonHtml.replace(
             "</head>",
             `
@@ -922,6 +929,11 @@ export const createSpaMiddleware = () => {
 <meta name="lastmod" content="${lastmod}" />
 ${paginationLinks}
 ${breadcrumbHtml}
+<meta property="og:title" content="${label} | Svet GraÄ‘evine" />
+<meta property="og:description" content="${label} na portalu Svet GraÄ‘evine." />
+<meta property="og:image" content="${defaultImage}" />
+<meta property="og:url" content="${currentPageUrl}" />
+<meta property="og:type" content="website" />
 </head>`,
           );
           return res.send(skeletonHtml);
