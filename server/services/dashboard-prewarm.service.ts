@@ -110,20 +110,6 @@ export class DashboardPrewarmService {
     return ms >= fortyEightHoursAgo;
   }
 
-  private static async hasActiveListings(uid: string): Promise<boolean> {
-    try {
-      const listingsSnap = await db.collection("listings")
-        .where("authorId", "==", uid)
-        .where("status", "==", "active")
-        .limit(1)
-        .get();
-      return !listingsSnap.empty;
-    } catch (err: any) {
-      logger.warn(`[Prewarm] Failed to query listings for user ${uid}: ${err.message}`);
-      return false;
-    }
-  }
-
   /**
    * Prewarms all premium users (verified employers and partners).
    * Scheduled task to ensure fast dashboard load times with Active-Only & Live-Session prioritisation.
@@ -168,14 +154,24 @@ export class DashboardPrewarmService {
 
       const uidsWithActiveListings = new Set<string>();
 
-      // Concurrent bulk check with limit(1) per user to strictly bound Firestore reads to N
+      // Batch check active listings — single Firestore query instead of N individual queries
       if (candidateIdsPendingCheck.length > 0) {
-        await Promise.all(
-          candidateIdsPendingCheck.map(async (uid) => {
-            const hasAds = await this.hasActiveListings(uid);
-            if (hasAds) uidsWithActiveListings.add(uid);
-          })
-        );
+        const chunkSize = 30;
+        for (let i = 0; i < candidateIdsPendingCheck.length; i += chunkSize) {
+          const chunk = candidateIdsPendingCheck.slice(i, i + chunkSize);
+          try {
+            const snap = await db.collection("listings")
+              .where("authorId", "in", chunk)
+              .where("status", "==", "active")
+              .get();
+            snap.docs.forEach(doc => {
+              const data = doc.data();
+              if (data.authorId) uidsWithActiveListings.add(data.authorId);
+            });
+          } catch (err: any) {
+            logger.warn(`[Prewarm] Failed to batch-check listings for chunk: ${err.message}`);
+          }
+        }
       }
 
       const activeUsers: Array<{ id: string; role: string }> = [];
