@@ -135,6 +135,12 @@ export default defineConfig(({mode}) => {
               if (id.includes('lucide-react') || id.includes('motion') || id.includes('recharts') || id.includes('framer-motion')) {
                 return 'vendor-ui';
               }
+              if (id.includes('@tanstack/react-query')) return 'vendor-query';
+              if (id.includes('react-hook-form') || id.includes('zod')) return 'vendor-form';
+              if (id.includes('algoliasearch')) return 'vendor-algolia';
+              if (id.includes('date-fns')) return 'vendor-date';
+              if (id.includes('zustand')) return 'vendor-state';
+              if (id.includes('react-virtuoso')) return 'vendor-virtuoso';
               return 'vendor';
             }
           },
