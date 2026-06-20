@@ -6,7 +6,7 @@ import { safeSessionStorage } from '@/src/lib/safeStorage';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.png';
 
-export function SignupBanner() {
+export default function SignupBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
