@@ -329,55 +329,7 @@ export class UnifiedAdsService {
     const fastPathDoc = "metadata/promoted_ads_fastpath";
     const fastPathField = options.isUrgent ? "urgent" : "premium";
 
-    const fallbackPremiumAds = [
-      {
-        id: "fp1",
-        title: "Građevinski Inženjer - Šef Gradilišta",
-        category: "jobs",
-        grad: "Beograd",
-        location: "Novi Beograd",
-        salary: "1500 - 2000 EUR",
-        comp: "Energoprojekt Visokogradnja",
-        logo: "",
-        images: [],
-        isPremium: true,
-        isUrgent: false,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "fp2",
-        title: "Rukovalac Bagerom i Utovarivačem",
-        category: "jobs",
-        grad: "Novi Sad",
-        location: "Novi Sad",
-        salary: "1200 - 1400 EUR",
-        comp: "Karin Komerc",
-        logo: "",
-        images: [],
-        isPremium: true,
-        isUrgent: false,
-        createdAt: new Date().toISOString()
-      }
-    ];
-
-    const fallbackUrgentAds = [
-      {
-        id: "fu1",
-        title: "HITNO: Keramičar / Gipsar za unutrašnje radove",
-        category: "jobs",
-        grad: "Beograd",
-        location: "Beograd",
-        salary: "2000+ EUR",
-        comp: "Lux Adaptacije d.o.o.",
-        logo: "",
-        images: [],
-        isPremium: false,
-        isUrgent: true,
-        createdAt: new Date().toISOString()
-      }
-    ];
-
-    const finalFallback = options.isUrgent ? fallbackUrgentAds : fallbackPremiumAds;
+    const finalFallback: RawAdData[] = [];
 
     try {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
