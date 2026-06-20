@@ -79,7 +79,7 @@ export class UnifiedSearchService {
     const cacheString = JSON.stringify({ filters: canonicalFilters, pageSize, lastVisibleId: lastVisibleId || null });
     // Use sha256 to keep key short and avoid Redis max key size issues
     const hash = crypto.createHash("sha256").update(cacheString).digest("hex");
-    const cacheKey = `unified_search_${category}_${hash}`;
+    const cacheKey = `unified_search_v2_${category}_${hash}`;
 
     // 0. L1 Process Shield (Hard RAM Cache) for homepage queries
     const now = Date.now();
