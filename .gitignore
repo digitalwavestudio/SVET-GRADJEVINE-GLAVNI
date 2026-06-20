@@ -19,6 +19,7 @@ e2e-*/
 
 # Agent temporary scripts
 /*.js
+/*.mjs
 !eslint.config.js
 !vite.config.js
 !tailwind.config.js

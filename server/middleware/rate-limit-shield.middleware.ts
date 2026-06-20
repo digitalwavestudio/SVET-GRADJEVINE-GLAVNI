@@ -94,6 +94,19 @@ export const rateLimitShield = async (
            return res.status(429).json({ error: "AI Bot rate limit reached for expensive resources." });
         }
       }
+
+      // IP-based throttling for expensive paths regardless of UA
+      // Catches crawlers with clean "Mozilla/5.0..." UAs (no bot/crawler/spider keywords)
+      if (!isWhitelistedSearchBot) {
+        const expensiveIpLimitKey = `shield:expensive_ip:${hashedIp}`;
+        const isAllowed = await RateLimiterService.isAllowed(expensiveIpLimitKey, 120, 60);
+        if (!isAllowed) {
+          return res.status(429).json({
+            error: "Too Many Requests",
+            message: "Previse zahteva. Pokusajte kasnije."
+          });
+        }
+      }
     }
 
     // 0.2 Bot-Trap: Block useless SEO/scraping bots early
