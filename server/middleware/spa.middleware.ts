@@ -5,7 +5,6 @@ import fs from "fs";
 import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { getRedis } from "../utils/redis.ts";
-import { bffService } from "../services/bff.service.ts";
 
 interface MatchedRoute {
   path: string;
@@ -602,23 +601,9 @@ async function backgroundPreRenderHomepage(
     let html = cachedIndexHtml;
     html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
     html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
-
-    // Inject BFF data so React renders immediately without fetching
-    let initialDataScript = "";
-    try {
-      const bffData = await bffService.getHomepageData("web");
-      if (bffData) {
-        const safeJson = JSON.stringify(bffData).replace(/</g, '\\u003c');
-        initialDataScript = `<script>window.__INITIAL_HOMEPAGE_DATA__=${safeJson}</script>`;
-      }
-    } catch (e) {
-      console.warn("[SPA-Homepage] BFF preload failed, continuing without:", e);
-    }
-
     html = html.replace("</head>", `
 <meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
-${initialDataScript}
 </head>`);
     html = html.replace('<div id="root"></div>', `<div id="root">${botHtml}</div>`);
 
