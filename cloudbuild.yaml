@@ -23,7 +23,7 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '8080'
-      - '--set-env-vars'
+      - '--update-env-vars'
       - 'APP_REGION=us-west1'
       - '--min-instances'
       - '1'
