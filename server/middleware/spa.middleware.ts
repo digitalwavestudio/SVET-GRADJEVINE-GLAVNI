@@ -307,6 +307,8 @@ ${paginationLinks}
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${desc}" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${reqPath}" />
+<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:type" content="website" />
 <script type="application/ld+json">${JSON.stringify(bc)}</script>
 ${jsonLdScript}
 </head>`,
