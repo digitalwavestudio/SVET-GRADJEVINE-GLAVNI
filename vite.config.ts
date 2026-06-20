@@ -136,7 +136,9 @@ export default defineConfig(({mode}) => {
                 return 'vendor-motion';
               }
               if (id.includes('lucide-react')) return 'vendor-icons';
-              if (id.includes('recharts')) return 'vendor-charts';
+              // Don't split recharts into its own chunk — it's only used by lazy-loaded pages,
+              // so it'll be bundled with those page chunks and won't get modulepreloaded on the homepage.
+              // if (id.includes('recharts')) return 'vendor-charts';
               if (id.includes('@tanstack/react-query')) return 'vendor-query';
               if (id.includes('react-hook-form') || id.includes('zod')) return 'vendor-form';
               if (id.includes('algoliasearch')) return 'vendor-algolia';
