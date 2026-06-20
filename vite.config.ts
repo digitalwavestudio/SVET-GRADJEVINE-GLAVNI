@@ -132,9 +132,11 @@ export default defineConfig(({mode}) => {
               if (id.includes('firebase') || id.includes('firebase-admin')) {
                 return 'vendor-firebase';
               }
-              if (id.includes('lucide-react') || id.includes('motion') || id.includes('recharts') || id.includes('framer-motion')) {
-                return 'vendor-ui';
+              if (id.includes('motion') || id.includes('framer-motion')) {
+                return 'vendor-motion';
               }
+              if (id.includes('lucide-react')) return 'vendor-icons';
+              if (id.includes('recharts')) return 'vendor-charts';
               if (id.includes('@tanstack/react-query')) return 'vendor-query';
               if (id.includes('react-hook-form') || id.includes('zod')) return 'vendor-form';
               if (id.includes('algoliasearch')) return 'vendor-algolia';
