@@ -1,15 +1,8 @@
 import { queryClient } from './queryClient';
 import { queryKeys } from '@/src/lib/queryKeysFactory';
-import { jobsService } from '@/src/modules/jobs/services/jobsService';
-import { mastersService } from '@/src/modules/masters/services/mastersService';
-import { companiesService } from '@/src/modules/companies/services/companiesService';
-import { machinesService } from '@/src/modules/machines/services/machinesService';
-import { accommodationsService } from '@/src/modules/accommodations/services/accommodationsService';
-import { cateringService } from '@/src/modules/catering/services/cateringService';
-import { realEstateService } from '@/src/modules/real_estate/services/realEstateService';
-import { marketplaceService } from '@/src/modules/marketplace/services/marketplaceService';
 
 export const jobLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { jobsService } = await import('@/src/modules/jobs/services/jobsService');
   const url = new URL(request.url);
   const searchParams = Object.fromEntries(url.searchParams.entries());
   
@@ -28,6 +21,7 @@ export const jobLoader = async ({ params, request }: import('react-router-dom').
 };
 
 export const masterLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { mastersService } = await import('@/src/modules/masters/services/mastersService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   
@@ -44,6 +38,7 @@ export const masterLoader = async ({ params, request }: import('react-router-dom
 };
 
 export const companiesLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { companiesService } = await import('@/src/modules/companies/services/companiesService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   if (params.grad && params.grad !== 'all') filters.location = params.grad;
@@ -58,6 +53,7 @@ export const companiesLoader = async ({ params, request }: import('react-router-
 };
 
 export const machinesLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { machinesService } = await import('@/src/modules/machines/services/machinesService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   
@@ -74,6 +70,7 @@ export const machinesLoader = async ({ params, request }: import('react-router-d
 };
 
 export const accommodationsLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { accommodationsService } = await import('@/src/modules/accommodations/services/accommodationsService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   if (params.tip && params.tip !== 'all') filters.type = params.tip;
@@ -89,6 +86,7 @@ export const accommodationsLoader = async ({ params, request }: import('react-ro
 };
 
 export const cateringLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { cateringService } = await import('@/src/modules/catering/services/cateringService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   if (params.grad && params.grad !== 'all') filters.location = params.grad;
@@ -103,6 +101,7 @@ export const cateringLoader = async ({ params, request }: import('react-router-d
 };
 
 export const realEstateLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { realEstateService } = await import('@/src/modules/real_estate/services/realEstateService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   if (params.namena && params.namena !== 'all') filters.purpose = params.namena;
@@ -118,6 +117,7 @@ export const realEstateLoader = async ({ params, request }: import('react-router
 };
 
 export const marketplaceLoader = async ({ params, request }: import('react-router-dom').LoaderFunctionArgs) => {
+  const { marketplaceService } = await import('@/src/modules/marketplace/services/marketplaceService');
   const url = new URL(request.url);
   const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
   
