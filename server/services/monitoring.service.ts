@@ -665,7 +665,7 @@ export class MonitoringService {
 
     if (this.redis) {
       try {
-        await this.redis.setex(cacheKey, 120, JSON.stringify(result));
+        await this.redis.setex(cacheKey, 600, JSON.stringify(result));
       } catch (err) {
         // fallback
       }
