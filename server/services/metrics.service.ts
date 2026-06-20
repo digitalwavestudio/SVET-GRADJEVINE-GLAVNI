@@ -16,7 +16,7 @@ const REDIS_KEY_PENDING_FAVS_USER = CACHE_PREFIXES.METRICS_FAVS_USER;
 const REDIS_KEY_BOT_HITS = CACHE_PREFIXES.METRICS_BOT_HITS;
 const REDIS_KEY_BOT_PATHS = CACHE_PREFIXES.METRICS_BOT_PATHS;
 const REDIS_PREFIX_CACHE = CACHE_PREFIXES.METRICS_VIEW_CACHE;
-const FLUSH_DELAY_MS = env.NODE_ENV === "production" ? 30 * 60 * 1000 : 2 * 60 * 60 * 1000; // 30 minutes in production, 2 hours in sandbox/dev
+const FLUSH_DELAY_MS = env.NODE_ENV === "production" ? 2 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000; // 2h in production, 4h in sandbox/dev
 
 export type MetricType = "view" | "click" | "inquiry";
 export type MetricSource = "internal" | "external" | "direct";

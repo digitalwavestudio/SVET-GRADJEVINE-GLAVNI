@@ -6,7 +6,7 @@ import { LockManager } from "./lock.service.ts";
 import { CACHE_PREFIXES } from "../constants/cache-keys.ts";
 
 const REDIS_KEY_PENDING_VIEWS = CACHE_PREFIXES.METRICS_VIEW_BUFFER;
-const FLUSH_DELAY_MS = 60 * 60 * 1000; // 1 sat između upisa u bazu
+const FLUSH_DELAY_MS = 2 * 60 * 60 * 1000; // 2 sata između upisa u bazu
 
 export class ViewStatsService {
   private static redis = getRedis();
