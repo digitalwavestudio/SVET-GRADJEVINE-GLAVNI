@@ -120,12 +120,21 @@ export default defineConfig(({mode}) => {
       emptyOutDir: true,
       minify: true,
       // Raise warning limit to avoid false alarms for large chunks after minification
-      chunkSizeWarningLimit: 1000, // KB
+      chunkSizeWarningLimit: 500, // KB
       // Split vendor code into a separate chunk for better caching and size management
       rollupOptions: {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
+                return 'vendor-react';
+              }
+              if (id.includes('firebase') || id.includes('firebase-admin')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('lucide-react') || id.includes('motion') || id.includes('recharts') || id.includes('framer-motion')) {
+                return 'vendor-ui';
+              }
               return 'vendor';
             }
           },
