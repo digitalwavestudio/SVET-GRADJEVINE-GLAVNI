@@ -71,6 +71,12 @@ export class DLQRecoveryWorker {
 
     try {
       const { CacheService } = await import("./cache.service.ts");
+      // Minimum interval check: ne dozvoli scavenge češće od 5 minuta
+      const lastRun = await CacheService.get<number>("dlq_last_scavenge_run");
+      if (lastRun && Date.now() - lastRun < 5 * 60 * 1000) {
+        this.logger.info("[DLQ Worker] Skipping scavenge: last run was less than 5 min ago.");
+        return;
+      }
       const isEmpty = await CacheService.get<boolean>("dlq_is_empty");
       if (isEmpty === true) {
         this.logger.info("[DLQ Worker] Skipping scavenge: Redis Shield indicates no DLQ items (5m TTL).");
@@ -101,7 +107,11 @@ export class DLQRecoveryWorker {
         this.logger.error("[DLQRecovery] Error during DLQ scavenge:", err);
       }
     } finally {
-      if (lockId) await LockManager.release(lockKey, lockId);
+      if (lockId) {
+        const { CacheService } = await import("./cache.service.ts");
+        await CacheService.set("dlq_last_scavenge_run", Date.now(), 10 * 60 * 1000);
+        await LockManager.release(lockKey, lockId);
+      }
     }
   }
 
@@ -110,7 +120,7 @@ export class DLQRecoveryWorker {
     const outboxSnap = await db
       .collection("outbox")
       .where("status", "in", ["dlq", "processing", "failed_permanently"])
-      .limit(50)
+      .limit(20)
       .get();
 
     if (outboxSnap.empty) return 0;
@@ -190,7 +200,7 @@ export class DLQRecoveryWorker {
     const taskSnap = await db
       .collection("outbox_tasks")
       .where("status", "in", ["failed", "processing", "failed_permanently"])
-      .limit(50)
+      .limit(20)
       .get();
 
     if (taskSnap.empty) return 0;
@@ -247,7 +257,7 @@ export class DLQRecoveryWorker {
     const pureDlqSnap = await db
       .collection("dlq")
       .where("status", "in", ["pending_review", "failed_permanently"])
-      .limit(50)
+      .limit(20)
       .get();
 
     if (pureDlqSnap.empty) return 0;

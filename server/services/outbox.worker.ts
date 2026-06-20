@@ -205,11 +205,11 @@ export class OutboxWorker {
       }
 
       if (!this.isRedisFallbackActive) {
-        const shardPromises = Array.from({ length: 3 }).map((_, shardId) =>
+        const shardPromises = Array.from({ length: 2 }).map((_, shardId) =>
           db.collection("outbox")
             .where("status", "==", "pending")
             .where("shardNum", "==", shardId)
-            .limit(10)
+            .limit(5)
             .get()
         );
         const snaps = await Promise.all(shardPromises);
@@ -304,11 +304,11 @@ export class OutboxWorker {
       }
 
       if (!this.isRedisFallbackActive) {
-        const shardPromises = Array.from({ length: 3 }).map((_, shardId) =>
+        const shardPromises = Array.from({ length: 2 }).map((_, shardId) =>
           db.collection("outbox")
             .where("status", "==", "pending")
             .where("shardNum", "==", shardId)
-            .limit(10)
+            .limit(5)
             .get()
         );
         const snaps = await Promise.all(shardPromises);
