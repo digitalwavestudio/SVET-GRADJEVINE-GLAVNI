@@ -23,16 +23,10 @@ export class HousekeepingService {
   static async run() {
     this.logger.info("Housekeeping Service initialized");
 
-    if (env.NODE_ENV === "production") {
-      this.runFullCycle().catch((err) =>
-        this.logger.error("Initial full cycle check failed", err),
-      );
-    }
-
     import("../utils/system-cron.ts")
       .then(({ SystemCron }) => {
         if (env.NODE_ENV === "production") {
-          SystemCron.register("housekeeping_full_cycle", { pattern: "0 * * * *" }, async () => {
+          SystemCron.register("housekeeping_full_cycle", { pattern: "0 3 * * *" }, async () => {
             await this.runFullCycle();
           }).catch(err => this.logger.error("Failed to register full cycle cron", err));
         }

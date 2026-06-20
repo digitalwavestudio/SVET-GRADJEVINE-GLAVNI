@@ -25,6 +25,11 @@ export const runPendingMigrations = async (): Promise<{
   const executed: string[] = [];
   const errors: string[] = [];
 
+  if (availableMigrations.length === 0) {
+    logger.debug("[Migrations] No pending migrations registered. Skipping Firestore check.");
+    return { executed, errors };
+  }
+
   try {
     const executedDoc = await db
       .collection(MIGRATIONS_COLLECTION)
