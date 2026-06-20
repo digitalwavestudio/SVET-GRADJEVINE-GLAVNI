@@ -325,7 +325,7 @@ export class UnifiedAdsService {
     isUrgent?: boolean;
     isPremium?: boolean;
   }) {
-    const cacheKey = `promoted_v3_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
+    const cacheKey = `promoted_v4_${options.isUrgent ? "urgent" : ""}_${options.isPremium ? "premium" : ""}_${options.limit || 12}`;
     const fastPathDoc = "metadata/promoted_ads_fastpath";
     const fastPathField = options.isUrgent ? "urgent" : "premium";
 
@@ -382,8 +382,8 @@ export class UnifiedAdsService {
     try {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
           let query = db
-            .collection("listings")
-            .where("status", "==", "active");
+            .collectionGroup("listings")
+            .where("status", "in", ["active", "approved"]);
 
           if (options.isUrgent) query = query.where("isUrgent", "==", true);
           if (options.isPremium) query = query.where("isPremium", "==", true);
