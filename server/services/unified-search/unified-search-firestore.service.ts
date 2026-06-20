@@ -14,6 +14,38 @@ import {
 } from "../unified-search.service.ts";
 
 export class UnifiedSearchFirestore {
+  private static readonly SEARCH_FIELDS = [
+    "title", "name", "description", "price", "location", "loc",
+    "type", "status", "createdAt", "images", "imageStatus",
+    "isPremium", "isUrgent", "isPremiumPartner", "isVerified",
+    "comp", "salary", "sal", "logo",
+    "benefits", "plataMin", "plataMax", "salaryType",
+    "smestaj", "prevoz", "hrana",
+    "housing", "transport", "food", "topliObrok", "benefiti", "rawBenefits",
+    "adTitle", "adType", "categoryId", "categorySlug",
+    "companyName", "companyLogo", "isCompanyVerified",
+    "locationSlug", "authorId", "authorSnapshot",
+    "machineType", "condition", "fuelType",
+    "weightKg", "weightLb", "year", "workingHours", "make", "model",
+    "isNegotiable", "pricePerDay", "pricePerHour",
+    "pricePerWeek", "pricePerMonth", "isServiced",
+    "accommodationType", "beds", "roomType", "parkingAvailable", "typeSlug",
+    "area", "purpose", "accessRoad", "highwayAccess", "railAccess",
+    "cateringType", "kitchenType", "invoiceAvailable",
+    "minOrder", "dailyCapacityMeals",
+    "jobType", "profession", "professionSlug",
+    "currency", "city",
+    "mainCategories",
+  ];
+
+  private static applyCommonSortAndSelect(q: FirebaseFirestore.Query): FirebaseFirestore.Query {
+    return q
+      .orderBy("isPremium", "desc")
+      .orderBy("createdAt", "desc")
+      .orderBy(FieldPath.documentId(), "desc")
+      .select(...this.SEARCH_FIELDS);
+  }
+
   private static buildBaseQuery(
     category: string,
     entityType: string,
@@ -154,39 +186,8 @@ export class UnifiedSearchFirestore {
     // COUNT aggregation uklonjen pošto generiše nepredvidiv broj "Read" operacija za kompleksne/nestandardne upite.
     // Prelazimo na "N + 1" limit paginaciju da detektujemo sledeću stranu bez dodatih čitanja.
     
-    q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
+    q = this.applyCommonSortAndSelect(q);
     q = q.limit(pageSize + 1); // 🚀 N + 1 Optimizacija
-    q = q.select(
-      // Core
-      "title", "name", "description", "price", "location", "loc",
-      "type", "status", "createdAt", "images", "imageStatus",
-      "isPremium", "isUrgent", "isPremiumPartner", "isVerified",
-      "comp", "salary", "sal", "logo",
-      "benefits", "plataMin", "plataMax", "salaryType",
-      "smestaj", "prevoz", "hrana",
-      "housing", "transport", "food", "topliObrok", "benefiti", "rawBenefits",
-      // Listing common
-      "adTitle", "adType", "categoryId", "categorySlug",
-      "companyName", "companyLogo", "isCompanyVerified",
-      "locationSlug", "authorId", "authorSnapshot",
-      // Machines
-      "machineType", "condition", "fuelType",
-      "weightKg", "weightLb", "year", "workingHours", "make", "model",
-      "isNegotiable", "pricePerDay", "pricePerHour",
-      "pricePerWeek", "pricePerMonth", "isServiced",
-      // Accommodations
-      "accommodationType", "beds", "roomType", "parkingAvailable", "typeSlug",
-      // Real estate / plots
-      "area", "purpose", "accessRoad", "highwayAccess", "railAccess",
-      // Catering
-      "cateringType", "kitchenType", "invoiceAvailable",
-      "minOrder", "dailyCapacityMeals",
-      // Jobs
-      "jobType", "profession", "professionSlug",
-      "currency", "city",
-      // Misc
-      "mainCategories",
-    );
 
     if (firestoreCursorId) {
       if (!checkQuotaStatus()) {
@@ -320,31 +321,8 @@ export class UnifiedSearchFirestore {
     let q = this.buildBaseQuery(category, entityType, filtersAny);
 
     // Limit to 150 latest documents for in-memory keyword filtering (quota safe)
-    q = q.orderBy("isPremium", "desc").orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
+    q = this.applyCommonSortAndSelect(q);
     q = q.limit(150);
-    q = q.select(
-      "title", "name", "description", "price", "location", "loc",
-      "type", "status", "createdAt", "images", "imageStatus",
-      "isPremium", "isUrgent", "isPremiumPartner", "isVerified",
-      "comp", "salary", "sal", "logo",
-      "benefits", "plataMin", "plataMax", "salaryType",
-      "smestaj", "prevoz", "hrana",
-      "housing", "transport", "food", "topliObrok", "benefiti", "rawBenefits",
-      "adTitle", "adType", "categoryId", "categorySlug",
-      "companyName", "companyLogo", "isCompanyVerified",
-      "locationSlug", "authorId", "authorSnapshot",
-      "machineType", "condition", "fuelType",
-      "weightKg", "weightLb", "year", "workingHours", "make", "model",
-      "isNegotiable", "pricePerDay", "pricePerHour",
-      "pricePerWeek", "pricePerMonth", "isServiced",
-      "accommodationType", "beds", "roomType", "parkingAvailable", "typeSlug",
-      "area", "purpose", "accessRoad", "highwayAccess", "railAccess",
-      "cateringType", "kitchenType", "invoiceAvailable",
-      "minOrder", "dailyCapacityMeals",
-      "jobType", "profession", "professionSlug",
-      "currency", "city",
-      "mainCategories",
-    );
 
     try {
       if (checkQuotaStatus()) {
