@@ -51,7 +51,7 @@ export class UnifiedSearchFirestore {
       ].includes(category) ||
       entityType !== category
     ) {
-      q = db.collection("listings");
+      q = db.collectionGroup("listings");
       if (entityType && entityType !== "all")
         q = q.where("type", "==", entityType);
     } else {
