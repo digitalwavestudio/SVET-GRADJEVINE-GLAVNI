@@ -680,8 +680,11 @@ export const createSpaMiddleware = () => {
       if (path.includes("/assets/")) {
         // Hashed assets are fully immutable
         res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      } else if (/\.(png|jpg|jpeg|webp|svg|ico|woff2?)$/i.test(path)) {
+        // Images and fonts: 7 days + stale-while-revalidate
+        res.setHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
       } else {
-        // General static/public assets (service worker, manifest, fonts)
+        // General static assets (service worker, manifest, etc.)
         res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=3600, stale-while-revalidate=600");
       }
     }

@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import {defineConfig, loadEnv} from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import Sitemap from 'vite-plugin-sitemap';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { LOCATIONS } from './src/constants/taxonomy';
@@ -100,9 +101,11 @@ export default defineConfig(({mode}) => {
         'react/jsx-runtime',
         '@tanstack/react-query',
         '@tanstack/react-query-persist-client',
+        '@tanstack/query-sync-storage-persister',
         'firebase/app',
         'firebase/auth',
         'firebase/firestore',
+        'firebase/performance',
         'lucide-react',
         'motion',
         'recharts',
@@ -120,32 +123,37 @@ export default defineConfig(({mode}) => {
       emptyOutDir: true,
       minify: true,
       // Raise warning limit to avoid false alarms for large chunks after minification
-      chunkSizeWarningLimit: 500, // KB
+      chunkSizeWarningLimit: 1000, // KB
       // Split vendor code into a separate chunk for better caching and size management
       rollupOptions: {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler')) {
-                return 'vendor-react';
+              if (id.includes('react-dom') || id.includes('react/') || id.includes('react-router') || id.includes('scheduler')) {
+                return 'vendor-core';
               }
-              if (id.includes('firebase') || id.includes('firebase-admin')) {
+              if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) {
+                return 'vendor-data';
+              }
+              if (id.includes('zustand') || id.includes('zod')) {
+                return 'vendor-data';
+              }
+              if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) {
+                return 'vendor-charts';
+              }
+              if (id.includes('stripe')) {
+                return 'vendor-payment';
+              }
+              if (id.includes('motion')) {
+                return 'vendor-animation';
+              }
+              if (id.includes('lucide-react') || id.includes('react-hot-toast') || id.includes('react-helmet-async') || id.includes('tailwind-merge') || id.includes('clsx')) {
+                return 'vendor-ui';
+              }
+              if (id.includes('firebase')) {
                 return 'vendor-firebase';
               }
-              if (id.includes('motion') || id.includes('framer-motion')) {
-                return 'vendor-motion';
-              }
-              if (id.includes('lucide-react')) return 'vendor-icons';
-              // Don't split recharts into its own chunk — it's only used by lazy-loaded pages,
-              // so it'll be bundled with those page chunks and won't get modulepreloaded on the homepage.
-              // if (id.includes('recharts')) return 'vendor-charts';
-              if (id.includes('@tanstack/react-query')) return 'vendor-query';
-              if (id.includes('react-hook-form') || id.includes('zod')) return 'vendor-form';
-              if (id.includes('algoliasearch')) return 'vendor-algolia';
-              if (id.includes('date-fns')) return 'vendor-date';
-              if (id.includes('zustand')) return 'vendor-state';
-              if (id.includes('react-virtuoso')) return 'vendor-virtuoso';
-              return 'vendor';
+              return 'vendor-other';
             }
           },
         },
