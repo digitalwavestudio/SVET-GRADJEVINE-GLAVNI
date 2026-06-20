@@ -58,13 +58,15 @@ export const rateLimitShield = async (
     const isWhitelistedAiBot = ["gptbot", "claudebot", "perplexitybot", "applebot-ai", "oai-searchbot"].some((bot) => ua.includes(bot));
     const isWhitelistedBot = isWhitelistedSearchBot || isWhitelistedAiBot;
 
-    // expensivePaths: Sitemaps, Search endpoints, P-SEO insights, and Feeds
+    // expensivePaths: Sitemaps, Search, P-SEO listing combos, and Feeds
+    const isPseoPath = ["/poslovi/", "/masine/", "/gradjevinske-masine/", "/smestaj/", "/ketering/", "/placevi/", "/alat-i-oprema/", "/firme/"].some(p => req.path.startsWith(p));
     const isExpensivePath = 
       req.path.includes("/search") || 
       req.path.includes("/pseo") ||
       req.path.includes("/feed") ||
       req.path.includes("/ads/") ||
-      req.path.includes("/masters/");
+      req.path.includes("/masters/") ||
+      isPseoPath;
 
     // 0.1 Bot Shield Enhancement (PROMPT 8)
     if (isExpensivePath) {

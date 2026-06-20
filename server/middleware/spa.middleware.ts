@@ -318,7 +318,8 @@ ${jsonLdScript}
     );
 
     if (redis) {
-      await redis.set(cacheKey, html, "EX", cacheTtl);
+      const effectiveTtl = latestDocs.size === 0 ? cacheTtl * 2 : cacheTtl;
+      await redis.set(cacheKey, html, "EX", effectiveTtl);
     }
     return html;
   } catch (error) {
@@ -614,7 +615,8 @@ export const createSpaMiddleware = () => {
   const distPath = path.join(process.cwd(), "dist");
 
   let cachedIndexHtml: string | null = null;
-  const CACHE_TTL = 30 * 60; // 30 minutes in seconds for Redis
+  const CACHE_TTL = 2 * 3600; // 2 hours for listing page SSR (was 30min — too many Firestore reads when cold)
+  const CACHE_TTL_EMPTY = 4 * 3600; // 4 hours for empty geo/profession listings (no results = no need to re-check often)
   const redis = getRedis();
 
   // Local fallback cache for SEO (protects Firestore if Redis is down)
@@ -638,6 +640,12 @@ export const createSpaMiddleware = () => {
     try {
       if (req.path.startsWith("/api")) {
         return res.status(404).json({ error: "Not Found" });
+      }
+      // ads.txt — served from dist/static or as fallback
+      if (req.path === "/ads.txt") {
+        res.header("Content-Type", "text/plain; charset=utf-8");
+        res.header("Cache-Control", "public, max-age=86400");
+        return res.send("# Svet Građevine - Ads.txt\n");
       }
       const cacheKey = `seo:page:${req.path}${req.query.page ? `?page=${req.query.page}` : ""}`;
       const now = Date.now();
@@ -846,6 +854,8 @@ export const createSpaMiddleware = () => {
 
         if (isListingPage) {
           if (isBot && collectionName) {
+            const uaShort = userAgent.substring(0, 120);
+            console.log(`[SPA] Bot SSR: ${req.path} | UA: ${uaShort} | IP: ${req.ip || req.socket.remoteAddress}`);
             const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
 
             // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
@@ -993,9 +1003,23 @@ ${breadcrumbHtml}
           return res.send(skeletonHtml);
         }
       }
-      res.send(html);
+      // Custom 404 for unmatched routes
+      const notFoundHtml = html
+        .replace(/<title>.*?<\/title>/, "<title>Stranica nije pronađena | Svet Građevine</title>")
+        .replace(
+          "</head>",
+          `<meta name="description" content="Tražena stranica nije pronađena (404)." />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />
+</head>`,
+        )
+        .replace(
+          '<div id="root"></div>',
+          `<div id="root"><main style="text-align:center;padding:4rem 1rem"><h1>404</h1><p>Stranica nije pronađena.</p><a href="/">Početna stranica</a></main></div>`,
+        );
+      res.status(404).send(notFoundHtml);
     } catch (err) {
-      res.sendFile(path.join(distPath, "index.html"));
+      res.status(500).send("Internal Server Error");
     }
   });
 
