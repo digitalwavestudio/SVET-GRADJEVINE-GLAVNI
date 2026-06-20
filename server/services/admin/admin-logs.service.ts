@@ -52,22 +52,18 @@ export class AdminLogsService {
     return CacheService.getOrSet<Record<string, number>>(
       "admin:ticket_stats",
       async () => {
-        const snap = await db.collection("supportTickets").select("status").get();
-        let total = 0;
-        let open = 0;
-        let closed = 0;
-        snap.forEach((doc) => {
-          total++;
-          const status = doc.data().status;
-          if (status === "closed") {
-            closed++;
-          } else {
-            open++;
-          }
-        });
-        return { total, open, closed };
+        const totalSnap = await db.collection("supportTickets").count().get();
+        const closedSnap = await db.collection("supportTickets")
+          .where("status", "==", "closed")
+          .count()
+          .get();
+        return {
+          total: totalSnap.data().count,
+          open: totalSnap.data().count - closedSnap.data().count,
+          closed: closedSnap.data().count
+        };
       },
-      5 * 60 * 1000 // 5 minuta TTL
+      5 * 60 * 1000
     );
   }
 

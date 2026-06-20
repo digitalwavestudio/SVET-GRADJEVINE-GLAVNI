@@ -190,10 +190,8 @@ export class ReconciliationService {
     const indexName = env.ALGOLIA_INDEX_NAME || "listings";
     Logger.withContext().info(`[Reconciliation] Starting Algolia Index Size Audit for: ${indexName}`);
 
-    // Replacing iteration with count aggregations
-    // Privremeni fix: Koristi .get() umesto .count() dok Firebase ne obriše mrtve indekse
-    const activeAdsCountSnap = await db.collection("listings").where("status", "==", "active").get();
-    let currentTotalAdsCount = activeAdsCountSnap.size;
+    const activeAdsCountSnap = await db.collection("listings").where("status", "==", "active").count().get();
+    let currentTotalAdsCount = activeAdsCountSnap.data().count;
 
     Logger.withContext().info(`[Reconciliation] Step 1 (Index Audit) Done. Active Items in Firestore: ${currentTotalAdsCount}. Cross-reference with Algolia dashboard.`);
     
@@ -241,23 +239,29 @@ export class ReconciliationService {
   private static async performFinancialAudit() {
     Logger.withContext().info("[Reconciliation] Starting Financial Integrity Audit...");
     
-    // Zamenjeno count() sa get()
     const walletSnap = await db.collection("wallets")
       .where("balance", ">", 0)
+      .count()
       .get();
-      
-    Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance: ${walletSnap.size}`);
+       
+    Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance: ${walletSnap.data().count}`);
 
-    // Optimizacija (PROMPT 10): Čitanje isključivo transakcija izmenjenih u poslednjih 1h koristeći indeks na 'createdAt'
     const oneHourAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 1 * 60 * 60 * 1000));
     const recentTransactionsSnap = await db.collection("transactions")
       .where("createdAt", ">=", oneHourAgo)
+      .count()
       .get();
 
-    Logger.withContext().info(`[Reconciliation] Audited ${recentTransactionsSnap.size} transactions created/modified in the last 1h using index-based query.`);
+    Logger.withContext().info(`[Reconciliation] Audited ${recentTransactionsSnap.data().count} transactions created/modified in the last 1h using index-based query. Count-only; no doc reads.`);
+
+    // Fetch only userIds with changes — minimal read via .select()
+    const txSnap = await db.collection("transactions")
+      .where("createdAt", ">=", oneHourAgo)
+      .select("userId")
+      .get();
 
     const modifiedWalletIds = new Set<string>();
-    recentTransactionsSnap.docs.forEach((doc) => {
+    txSnap.docs.forEach((doc) => {
       const txData = doc.data();
       if (txData && txData.userId) {
         modifiedWalletIds.add(txData.userId);

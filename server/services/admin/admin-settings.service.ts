@@ -7,6 +7,31 @@ import { runPendingMigrations } from "../migration.service.ts";
 import { logger } from "../../utils/logger.ts";
 
 export class AdminSettingsService {
+  private static readonly DEFAULTS: Record<string, any> = {
+    branding: {
+      heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
+      heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
+      primaryColor: "#0f172a",
+      secondaryColor: "#3b82f6"
+    },
+    global: {
+      pricing: {
+        jobs: { standard: 500, premium: 1000, urgent: 1500 },
+        accommodations: { standard: 500, premium: 1000, urgent: 1500 },
+        caterings: { standard: 500, premium: 1000, urgent: 1500 },
+        marketplace: { standard: 500, premium: 1000, urgent: 1500 },
+        machines: { standard: 500, premium: 1000, urgent: 1500 },
+        plots: { standard: 500, premium: 1000, urgent: 1500 },
+        professional_monthly: 6000
+      },
+      limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
+      messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
+      globalRateLimit: 100,
+      initialCredits: 1500
+    },
+    platform: {}
+  };
+
   static async runMigrations() {
     return runPendingMigrations();
   }
@@ -85,99 +110,62 @@ export class AdminSettingsService {
 
   static async prewarm() {
     console.info("🔥 [AdminSettingsService] Pre-warming branding and global settings...");
-    try {
-      await Promise.allSettled([
-        this.getSettings("branding"),
-        this.getSettings("global"),
-        this.getSettings("platform")
-      ]);
-      console.info("✅ [AdminSettingsService] Pre-warm complete.");
-    } catch (err) {
-      console.error("❌ [AdminSettingsService] Pre-warm failed (non-blocking):", err);
+    const types = ["branding", "global", "platform"];
+    for (const type of types) {
+      const cacheKey = `settings_swr_${type}`;
+      const cached = await CacheService.get(cacheKey).catch(() => null);
+      if (!cached) {
+        await CacheService.set(cacheKey, this.DEFAULTS[type] || {}, 15 * 60 * 1000).catch(() => {});
+      }
     }
+    // Background refresh — ne blokira startup
+    Promise.allSettled(
+      types.map(type => this.getSettings(type).catch(() => {}))
+    ).then(() => console.info("✅ [AdminSettingsService] Pre-warm complete."));
   }
 
   static async getSettings(type: string) {
     const cacheKey = `settings_swr_${type}`;
-    const timeoutMs = type === "branding" ? 2000 : 10000;
 
     return await CacheService.getOrSet(
       cacheKey,
       async () => {
         try {
-          if (type === "branding") {
-            const doc = await db.collection("settings").doc("branding").get();
-            if (doc.exists) return doc.data();
-            return {
-              heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-              heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
-              primaryColor: "#0f172a",
-              secondaryColor: "#3b82f6"
-            };
-          }
-
           const doc = await db.collection("settings").doc(type).get();
-          console.info("AdminSettings doc:", type, "exists:", doc.exists, "data:", doc.data?.());
           if (doc.exists && doc.data && doc.data()) {
-             const data = doc.data();
-               if (type === "global") {
-                  return {
-                     pricing: {
-                        jobs: { standard: 500, premium: 1000, urgent: 1500 },
-                        accommodations: { standard: 500, premium: 1000, urgent: 1500 },
-                        caterings: { standard: 500, premium: 1000, urgent: 1500 },
-                        marketplace: { standard: 500, premium: 1000, urgent: 1500 },
-                        machines: { standard: 500, premium: 1000, urgent: 1500 },
-                        plots: { standard: 500, premium: 1000, urgent: 1500 },
-                        professional_monthly: 6000,
-                        ...data?.pricing
-                     },
-                    limits: { free_listings_per_month: 3, max_images_per_ad: 10, ...data?.limits },
-                    messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false, ...data?.messages },
-                    globalRateLimit: data?.globalRateLimit || 100,
-                    initialCredits: data?.initialCredits !== undefined ? data.initialCredits : 1500
-                 };
-              }
-              return data;
-           }
-           if (type === "branding") return { 
-             heroTitle: "OSNAŽUJEMO GRAĐEVINSKU INDUSTRIJU",
-             heroSubtitle: "Povezujemo profesionalce i klijente širom regiona.",
-             primaryColor: "#0f172a",
-             secondaryColor: "#3b82f6" 
-           };
-            if (type === "global") return {
-              pricing: {
-                 jobs: { standard: 500, premium: 1000, urgent: 1500 },
-                 accommodations: { standard: 500, premium: 1000, urgent: 1500 },
-                 caterings: { standard: 500, premium: 1000, urgent: 1500 },
-                 marketplace: { standard: 500, premium: 1000, urgent: 1500 },
-                 machines: { standard: 500, premium: 1000, urgent: 1500 },
-                 plots: { standard: 500, premium: 1000, urgent: 1500 },
-                 professional_monthly: 6000
-              },
-             limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
-             messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
-             globalRateLimit: 100,
-             initialCredits: 1500
-           };
-           return null;
-         } catch (error: any) {
-           const err = error as Error & { details?: string; code?: number };
-           if (
-             err?.message?.includes("Quota limit exceeded") ||
-             err?.details?.includes("Quota limit exceeded") ||
-             err?.message?.includes("Trip Circuit Breaker") ||
-             err?.code === 4 || // DEADLINE_EXCEEDED
-             err?.code === 8    // RESOURCE_EXHAUSTED
-           ) {
-             logger.warn(`[AdminSettingsService] Quota/Timeout fetching settings ${type}. Returning fallback.`);
-             throw new Error("QUOTA_EXHAUSTED");
-           }
-           throw error;
-         }
-       },
-        15 * 60 * 1000
-      ); // 15 minuta cache
+            const data = doc.data();
+            if (type === "global") {
+              return {
+                ...this.DEFAULTS.global,
+                pricing: { ...this.DEFAULTS.global.pricing, ...data?.pricing },
+                limits: { ...this.DEFAULTS.global.limits, ...data?.limits },
+                messages: { ...this.DEFAULTS.global.messages, ...data?.messages },
+                globalRateLimit: data?.globalRateLimit ?? this.DEFAULTS.global.globalRateLimit,
+                initialCredits: data?.initialCredits ?? this.DEFAULTS.global.initialCredits
+              };
+            }
+            if (type === "branding") {
+              return { ...this.DEFAULTS.branding, ...data };
+            }
+            return data;
+          }
+          return this.DEFAULTS[type] || {};
+        } catch (error: any) {
+          const err = error as Error & { details?: string; code?: number };
+          if (
+            err?.message?.includes("Quota limit exceeded") ||
+            err?.details?.includes("Quota limit exceeded") ||
+            err?.message?.includes("Trip Circuit Breaker") ||
+            err?.code === 4 ||
+            err?.code === 8
+          ) {
+            logger.warn(`[AdminSettingsService] Quota/Timeout fetching settings ${type}. Returning fallback.`);
+            throw new Error("QUOTA_EXHAUSTED");
+          }
+          throw error;
+        }
+      },
+      15 * 60 * 1000
+    );
   }
 }

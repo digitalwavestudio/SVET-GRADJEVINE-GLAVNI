@@ -546,6 +546,7 @@ messagesRouter.get(
         .collection("messages")
         .where("type", "==", "image")
         .orderBy("createdAt", "desc")
+        .limit(50)
         .get();
       res.json(
         snap.docs.map((doc) => ({

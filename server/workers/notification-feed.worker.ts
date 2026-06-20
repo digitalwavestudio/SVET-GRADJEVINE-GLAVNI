@@ -12,7 +12,7 @@ export class NotificationFeedWorker {
 
     import("../utils/system-cron.ts")
       .then(({ SystemCron }) => {
-        const cronPattern = env.NODE_ENV === "production" ? "*/15 * * * *" : "0 */12 * * *";
+        const cronPattern = env.NODE_ENV === "production" ? "0 */2 * * *" : "0 */12 * * *";
         SystemCron.register("notification_feed_coalesce_cron", { pattern: cronPattern }, async () => {
           await this.processNotificationFeeds();
         }).catch(err => this.logger.error("Failed to register Notification Feed cron", err));

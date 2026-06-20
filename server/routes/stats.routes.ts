@@ -30,6 +30,8 @@ statsRouter.get("/finance", requireAuth, async (req, res, next) => {
     const transactionsSnap = await db
       .collection("transactions")
       .where("userId", "==", uid)
+      .select("amount")
+      .limit(100)
       .get();
     
     let totalSpent = 0;
@@ -241,35 +243,40 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
           "==",
           companyId || authorId,
         )
+        .count()
         .get()
-        .catch(() => ({ size: 0 })),
+        .catch(() => ({ data: () => ({ count: 0 }) })),
       queryListings("machine")
         .where("authorId", "==", authorId)
+        .count()
         .get()
-        .catch(() => ({ size: 0 })),
+        .catch(() => ({ data: () => ({ count: 0 }) })),
       queryListings("accommodation")
         .where("authorId", "==", authorId)
+        .count()
         .get()
-        .catch(() => ({ size: 0 })),
+        .catch(() => ({ data: () => ({ count: 0 }) })),
       queryListings("catering")
         .where("authorId", "==", authorId)
+        .count()
         .get()
-        .catch(() => ({ size: 0 })),
+        .catch(() => ({ data: () => ({ count: 0 }) })),
       queryListings("real_estate")
         .where("authorId", "==", authorId)
+        .count()
         .get()
-        .catch(() => ({ size: 0 })),
+        .catch(() => ({ data: () => ({ count: 0 }) })),
     ];
 
     const [jobsSnap, machinesSnap, accsSnap, catsSnap, plotsSnap] =
       await Promise.all(promises);
 
     const result = {
-      jobs: (jobsSnap as { size: number }).size || 0,
-      machines: (machinesSnap as { size: number }).size || 0,
-      accommodations: (accsSnap as { size: number }).size || 0,
-      catering: (catsSnap as { size: number }).size || 0,
-      realestate: (plotsSnap as { size: number }).size || 0,
+      jobs: (jobsSnap as { data: () => { count: number } }).data().count || 0,
+      machines: (machinesSnap as { data: () => { count: number } }).data().count || 0,
+      accommodations: (accsSnap as { data: () => { count: number } }).data().count || 0,
+      catering: (catsSnap as { data: () => { count: number } }).data().count || 0,
+      realestate: (plotsSnap as { data: () => { count: number } }).data().count || 0,
     };
 
     if (redis) {
