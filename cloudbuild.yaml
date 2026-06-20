@@ -25,6 +25,8 @@ steps:
       - '8080'
       - '--set-env-vars'
       - 'APP_REGION=us-west1'
+      - '--min-instances'
+      - '1'
 
 images:
   - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
