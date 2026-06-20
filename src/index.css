@@ -290,6 +290,11 @@ input, textarea {
   }
 }
 
+  @keyframes slide-up {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
   @keyframes fade-in-up {
     0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -316,6 +321,7 @@ input, textarea {
 }
 
 @layer utilities {
+  .animate-slide-up { animation: slide-up 0.4s ease-out forwards; }
   .animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
   .animate-chevron-bounce { animation: chevron-bounce 1s ease-in-out infinite; }
   .shadow-gold-glow-subtle { box-shadow: 0 0 10px rgba(254,191,13,0.15); }
