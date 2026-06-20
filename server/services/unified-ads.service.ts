@@ -300,18 +300,7 @@ export class UnifiedAdsService {
           };
         });
 
-        const finalData = partners.length > 0 ? partners : fallbackPartners;
-        
-        // Strip undefined values which Firebase rejects
-        const sanitizedFinalData = JSON.parse(JSON.stringify(finalData));
-        
-        // Sync back to Fast-Path
-        db.doc(fastPathDoc).set({
-          partners: sanitizedFinalData,
-          updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).catch(() => {});
-
-        return finalData;
+        return partners.length > 0 ? partners : fallbackPartners;
       }, fallbackPartners);
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
@@ -354,15 +343,6 @@ export class UnifiedAdsService {
               createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt,
             };
           });
-
-          // Strip undefined values which Firebase rejects
-          const sanitizedResults = JSON.parse(JSON.stringify(results));
-
-          // Self-heal Fast-Path
-          db.doc(fastPathDoc).set({
-            [fastPathField]: sanitizedResults,
-            updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-          }, { merge: true }).catch(() => {});
 
           return results;
       }, finalFallback);
