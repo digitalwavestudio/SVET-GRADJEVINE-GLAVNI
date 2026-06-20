@@ -137,7 +137,9 @@ async function startServer() {
         SSEService.init().catch(e => console.error("SSE Init failed", e));
         
         const { AdminSettingsService } = await import("./server/services/admin/admin-settings.service.ts");
-        await AdminSettingsService.prewarm().catch(e => console.error("AdminSettings Pre-warm failed", e));
+        if (RegionService.isLeaderRegion() || process.env.NODE_ENV !== "production") {
+          await AdminSettingsService.prewarm().catch(e => console.error("AdminSettings Pre-warm failed", e));
+        }
 
         // 1. Worker Initialization (for WORKER or FULL mode)
         if (mode === "worker" || mode === "full") {
