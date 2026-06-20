@@ -14,6 +14,7 @@ COPY package*.json .npmrc ./
 COPY packages/ ./packages/
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist-ssr ./dist-ssr
 COPY --from=build /app/firebase-applet-config.json ./firebase-applet-config.json
 
 ENV PORT=8080

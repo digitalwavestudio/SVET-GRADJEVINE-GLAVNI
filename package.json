@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "start": "node dist/server.cjs",
-    "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "build": "vite build && vite build --config vite.ssr.config.ts && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
     "preview": "vite preview",
     "simulate:prod": "echo 'Script removed - use server.ts in production mode directly'",
     "freeze-architecture": "echo 'Script removed - use esbuild for architecture analysis'",

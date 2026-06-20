@@ -6,6 +6,50 @@ import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { getRedis } from "../utils/redis.ts";
 
+const SSR_DIST_DIR = path.resolve(process.cwd(), "dist-ssr");
+const SSR_ENTRY_PATH = path.join(SSR_DIST_DIR, "entry-server.mjs");
+
+async function reactSsrHomepage(url: string): Promise<string | null> {
+  try {
+    if (!fs.existsSync(SSR_ENTRY_PATH)) return null;
+
+    const origWindow = globalThis.window;
+    const origDocument = globalThis.document;
+
+    try {
+      const textNode = { data: '' };
+      const mockStyleEl = { appendChild: () => {}, firstChild: textNode, data: '' };
+      const mockDoc = {
+        createElement: () => mockStyleEl,
+        querySelector: () => null,
+        documentElement: { style: {} },
+        head: { appendChild: () => mockStyleEl },
+      };
+      globalThis.window = {
+        __APP_ENV__: {},
+        location: { href: url, pathname: url.split('?')[0], search: url.includes('?') ? '?' + url.split('?')[1] : '' },
+        innerWidth: 1024, innerHeight: 768,
+        matchMedia: () => ({ matches: false, addListener: () => {}, removeListener: () => {}, addEventListener: () => {}, removeEventListener: () => {}, dispatchEvent: () => false }),
+        addEventListener: () => {}, removeEventListener: () => {},
+        document: mockDoc,
+        localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {}, clear: () => {}, key: () => null, length: 0 },
+        history: { pushState: () => {}, replaceState: () => {}, scrollRestoration: '' },
+        scrollTo: () => {}, scrollY: 0, pageXOffset: 0, pageYOffset: 0,
+      } as any;
+      globalThis.document = mockDoc as any;
+
+      const ssrModule = await import(/* @vite-ignore */ `file://${SSR_ENTRY_PATH.replace(/\\/g, '/')}`);
+      return await ssrModule.render(url);
+    } finally {
+      globalThis.window = origWindow;
+      globalThis.document = origDocument;
+    }
+  } catch (error) {
+    console.error("[SSR] React SSR failed for homepage:", error);
+    return null;
+  }
+}
+
 interface MatchedRoute {
   path: string;
   coll: string;
@@ -811,13 +855,32 @@ export const createSpaMiddleware = () => {
         return res.send(html);
       }
 
-      // Homepage: pre-render latest listings for all users
+      // Homepage: React SSR (fallback to string-based pre-render)
       if (req.path === "/") {
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
+
+        // Try React SSR first
+        const reactHtml = await reactSsrHomepage(req.originalUrl || req.path);
+        if (reactHtml) {
+          const titleMatch = reactHtml.match(/<title>(.*?)<\/title>/);
+          const title = titleMatch ? titleMatch[1] : 'Svet Građevine - Portal za građevinske oglase';
+
+          let finalHtml = indexHtml
+            .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
+            .replace('<div id="root"></div>', `<div id="root">${reactHtml}</div>`);
+
+          const redisCache = getRedis();
+          if (redisCache) {
+            redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
+          }
+          return res.send(finalHtml);
+        }
+
+        // Fallback: string-based pre-render
         const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
         if (rendered) return res.send(rendered);
 
-        // Set proper homepage meta for all visitors
+        // Minimal fallback
         html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
         html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
         html = html.replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" /><meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
