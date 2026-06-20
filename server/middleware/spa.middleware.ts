@@ -811,16 +811,11 @@ export const createSpaMiddleware = () => {
         return res.send(html);
       }
 
-      // Homepage: pre-render latest listings for bots
+      // Homepage: pre-render latest listings for all users
       if (req.path === "/") {
-        const userAgent = req.headers["user-agent"]?.toLowerCase() || "";
-        const isBot = /bot|googlebot|crawler|spider|robot|crawling|whatsapp|telegram|facebookexternalhit|twitterbot|linkedinbot|viber/i.test(userAgent);
-
-        if (isBot) {
-          const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
-          const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
-          if (rendered) return res.send(rendered);
-        }
+        const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
+        const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
+        if (rendered) return res.send(rendered);
 
         // Set proper homepage meta for all visitors
         html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
@@ -862,9 +857,11 @@ export const createSpaMiddleware = () => {
         let citySlug: string | undefined;
 
         if (isListingPage) {
-          if (isBot && collectionName) {
-            const uaShort = userAgent.substring(0, 120);
-            console.log(`[SPA] Bot SSR: ${req.path} | UA: ${uaShort} | IP: ${req.ip || req.socket.remoteAddress}`);
+          if (collectionName) {
+            if (isBot) {
+              const uaShort = userAgent.substring(0, 120);
+              console.log(`[SPA] Bot SSR: ${req.path} | UA: ${uaShort} | IP: ${req.ip || req.socket.remoteAddress}`);
+            }
             const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
 
             // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
