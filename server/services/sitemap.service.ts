@@ -70,7 +70,6 @@ export class SitemapService {
   }
 
   static async generateMagazineSitemap(page: number = 1, startAfterDoc?: any): Promise<{ xml: string, lastDoc: any }> {
-    const skip = (page - 1) * this.CHUNK_SIZE;
     let q = db
       .collection("articles")
       .where("status", "==", "published")
@@ -140,7 +139,6 @@ export class SitemapService {
     page: number = 1,
     startAfterDoc?: any
   ): Promise<{ xml: string, lastDoc: any }> {
-    const skip = (page - 1) * this.CHUNK_SIZE;
     let q = db
       .collection(coll)
       .where("status", "==", "active")
@@ -316,7 +314,6 @@ export class SitemapService {
   }
 
   static async generateCompaniesSitemap(page: number = 1, startAfterDoc?: any): Promise<{ xml: string, lastDoc: any }> {
-    const skip = (page - 1) * this.CHUNK_SIZE;
     let q = db
       .collection("users")
       .where("role", "==", "poslodavac")
@@ -334,7 +331,6 @@ export class SitemapService {
   }
 
   static async generateMastersSitemap(page: number = 1, startAfterDoc?: any): Promise<{ xml: string, lastDoc: any }> {
-    const skip = (page - 1) * this.CHUNK_SIZE;
     let q = db
       .collection("users")
       .where("role", "==", "majstor")
