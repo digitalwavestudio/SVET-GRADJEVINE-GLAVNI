@@ -204,12 +204,12 @@ async function backgroundPreRenderListingHub(
                <ul>
                  <li><a href="${APP_CONFIG.BASE_URL}/poslovi/beograd">Posao Beograd</a></li>
                  <li><a href="${APP_CONFIG.BASE_URL}/poslovi/novi-sad">Posao Novi Sad</a></li>
-                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/nis">Posao NiÅ¡</a></li>
+                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/nis">Posao Niš</a></li>
                </ul>
                <h3>Popularne profesije</h3>
                <ul>
                  <li><a href="${APP_CONFIG.BASE_URL}/poslovi/zidar">Zidar posao</a></li>
-                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/elektricar">ElektriÄar posao</a></li>
+                 <li><a href="${APP_CONFIG.BASE_URL}/poslovi/elektricar">Električar posao</a></li>
                </ul>
              </aside>`;
     }
@@ -233,7 +233,7 @@ async function backgroundPreRenderListingHub(
     const botListHtml = `
           <main>
              <h1>${label}</h1>
-             <p>${label} na portalu Svet GraÄ‘evine. PronaÄ‘eno ${latestDocs.size} oglasa na strani ${page}.</p>
+             <p>${label} na portalu Svet Građevine. Pronađeno ${latestDocs.size} oglasa na strani ${page}.</p>
              <nav>
                <ul>
                  ${itemsHtml || "<li>Trenutno nema oglasa za ovu kategoriju.</li>"}
@@ -242,8 +242,8 @@ async function backgroundPreRenderListingHub(
              ${hubLinks}
           </main>`;
 
-    const title = `${label} | Svet GraÄ‘evine`;
-    const desc = `${label} na portalu Svet GraÄ‘evine.`;
+    const title = `${label} | Svet Građevine`;
+    const desc = `${label} na portalu Svet Građevine.`;
 
     const baseUrl = APP_CONFIG.BASE_URL;
     const bcPathParts = reqPath.split("/").filter(Boolean);
@@ -251,7 +251,7 @@ async function backgroundPreRenderListingHub(
     const hasCategory = categorySlug !== undefined;
 
     const bcItems = [
-      { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+      { "@type": "ListItem", position: 1, name: "Početna", item: baseUrl },
     ];
 
     if (hasCity || hasCategory) {
@@ -361,7 +361,7 @@ async function backgroundPreRenderDetailPage(
     }
 
     const baseTitle = adData.title || adData.name || "Oglas";
-    const title = `${baseTitle} | Svet GraÄ‘evine`;
+    const title = `${baseTitle} | Svet Građevine`;
     let desc =
       adData.description ||
       adData.requirements ||
@@ -373,7 +373,7 @@ async function backgroundPreRenderDetailPage(
         .replace(/<[^>]*>?/gm, "")
         .replace(/"/g, "&quot;");
     } else {
-      desc = "Detalji oglasa na portalu Svet GraÄ‘evine.";
+      desc = "Detalji oglasa na portalu Svet Građevine.";
     }
 
     const image =
@@ -400,7 +400,7 @@ async function backgroundPreRenderDetailPage(
                 ${adData.employmentType ? `<li>Tip zaposlenja: ${adData.employmentType}</li>` : ""}
               </ul>
            </section>
-           <a href="${canonicalUrl}" itemprop="url">PrikaÅ¾i originalni oglas</a>
+           <a href="${canonicalUrl}" itemprop="url">Prikaži originalni oglas</a>
          </main>
        `;
 
@@ -413,7 +413,7 @@ async function backgroundPreRenderDetailPage(
         {
           "@type": "ListItem",
           position: 1,
-          name: "PoÄetna",
+          name: "Početna",
           item: "https://svetgradjevine.com/",
         },
         {
@@ -446,7 +446,7 @@ async function backgroundPreRenderDetailPage(
         employmentType: "FULL_TIME",
         hiringOrganization: {
           "@type": "Organization",
-          name: adData.companyName || "Svet GraÄ‘evine",
+          name: adData.companyName || "Svet Građevine",
           logo: "https://svetgradjevine.com/logo192.png",
         },
         jobLocation: {
@@ -521,7 +521,7 @@ async function backgroundPreRenderDetailPage(
 <meta property="og:image" content="${image}" />
 <meta property="og:image:alt" content="${baseTitle}" />
 <meta property="og:url" content="${canonicalUrl}" />
-<meta property="og:site_name" content="Svet GraÄ‘evine" />
+<meta property="og:site_name" content="Svet Građevine" />
 <meta property="og:type" content="article" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${title}" />
@@ -703,7 +703,7 @@ export const createSpaMiddleware = () => {
       let html = cachedIndexHtml;
 
       const adRoutes = [
-        { path: "/posao/", coll: "jobs", label: "Posao u graÄ‘evini" },
+        { path: "/posao/", coll: "jobs", label: "Posao u građevini" },
         {
           path: "/poslovi",
           coll: "jobs",
@@ -713,24 +713,24 @@ export const createSpaMiddleware = () => {
         {
           path: "/gradjevinske-masine/",
           coll: "machines",
-          label: "GraÄ‘evinske maÅ¡ine",
+          label: "Građevinske mašine",
         },
         {
           path: "/gradjevinske-masine",
           coll: "machines",
-          label: "GraÄ‘evinske maÅ¡ine",
+          label: "Građevinske mašine",
           alwaysListing: true,
         },
         {
           path: "/masine",
           coll: "machines",
-          label: "GraÄ‘evinske maÅ¡ine",
+          label: "Građevinske mašine",
           alwaysListing: true,
         },
         {
           path: "/smestaj",
           coll: "accommodations",
-          label: "SmeÅ¡taj za radnike",
+          label: "Smeštaj za radnike",
         }, // Handles both /smestaj/id and /smestaj/beograd
         {
           path: "/ketering/provajder/",
@@ -743,14 +743,14 @@ export const createSpaMiddleware = () => {
           label: "Ketering",
           alwaysListing: true,
         },
-        { path: "/placevi", coll: "plots", label: "GraÄ‘evinsko zemljiÅ¡te" }, // /placevi/:grad and /placevi (Listing)
-        { path: "/nekretnine/", coll: "plots", label: "GraÄ‘evinsko zemljiÅ¡te" }, // /nekretnine/:id (Detail)
+        { path: "/placevi", coll: "plots", label: "Građevinsko zemljište" }, // /placevi/:grad and /placevi (Listing)
+        { path: "/nekretnine/", coll: "plots", label: "Građevinsko zemljište" }, // /nekretnine/:id (Detail)
         { path: "/alat-i-oprema", coll: "marketplace", label: "Alat i oprema" }, // Handles both
         { path: "/firma/", coll: "companies", label: "Profil firme" }, // Detail
         {
           path: "/firme",
           coll: "companies",
-          label: "GraÄ‘evinske kompanije",
+          label: "Građevinske kompanije",
           alwaysListing: true,
         },
         {
@@ -768,16 +768,16 @@ export const createSpaMiddleware = () => {
       // Static Pages SEO
       const staticMetas: Record<string, {title: string, desc: string}> = {
         "/o-nama": {
-          title: "O nama | Svet GraÄ‘evine",
-          desc: "Saznajte viÅ¡e o misiji i viziji najveÄ‡eg graÄ‘evinskog portala na Balkanu.",
+          title: "O nama | Svet Građevine",
+          desc: "Saznajte više o misiji i viziji najvećeg građevinskog portala na Balkanu.",
         },
         "/kontakt": {
-          title: "Kontakt | Svet GraÄ‘evine",
-          desc: "Kontaktirajte nas za saradnju, oglaÅ¡avanje ili tehniÄku podrÅ¡ku.",
+          title: "Kontakt | Svet Građevine",
+          desc: "Kontaktirajte nas za saradnju, oglašavanje ili tehničku podršku.",
         },
         "/cenovnik": {
-          title: "Cenovnik oglaÅ¡avanja | Svet GraÄ‘evine",
-          desc: "Detaljan pregled cena za isticanje oglasa i banersko oglaÅ¡avanje.",
+          title: "Cenovnik oglašavanja | Svet Građevine",
+          desc: "Detaljan pregled cena za isticanje oglasa i banersko oglašavanje.",
         },
       };
 
@@ -807,8 +807,8 @@ export const createSpaMiddleware = () => {
 
         // Set proper homepage meta for all visitors
         html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
-        html = html.replace(/<title>.*?<\/title>/, `<title>Svet GraÄ‘evine - Portal za graÄ‘evinske oglase</title>`);
-        html = html.replace("</head>", `<meta name="description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet GraÄ‘evine - Portal za graÄ‘evinske oglase" /><meta property="og:description" content="Svet GraÄ‘evine - najveÄ‡i graÄ‘evinski portal na Balkanu. PronaÄ‘ite posao, maÅ¡ine, firme, smeÅ¡taj i viÅ¡e." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
+        html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
+        html = html.replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" /><meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
         return res.send(html);
       }
 
@@ -882,7 +882,7 @@ export const createSpaMiddleware = () => {
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 itemListElement: [
-                  { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+                  { "@type": "ListItem", position: 1, name: "Početna", item: baseUrl },
                   { "@type": "ListItem", position: 2, name: matchedRoute.label, item: listingUrl },
                   { "@type": "ListItem", position: 3, name: `${readableCategory} u ${readableCity}`, item: currentUrl },
                 ],
@@ -893,7 +893,7 @@ export const createSpaMiddleware = () => {
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 itemListElement: [
-                  { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+                  { "@type": "ListItem", position: 1, name: "Početna", item: baseUrl },
                   { "@type": "ListItem", position: 2, name: matchedRoute.label, item: listingUrl },
                   { "@type": "ListItem", position: 3, name: readableCity, item: currentUrl },
                 ],
@@ -904,7 +904,7 @@ export const createSpaMiddleware = () => {
               "@context": "https://schema.org",
               "@type": "BreadcrumbList",
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: "PoÄetna", item: baseUrl },
+                { "@type": "ListItem", position: 1, name: "Početna", item: baseUrl },
                 { "@type": "ListItem", position: 2, name: matchedRoute.label, item: `${baseUrl}${req.path}` },
               ],
             })}</script>`;
@@ -920,17 +920,17 @@ export const createSpaMiddleware = () => {
 
           // Fallback skeleton for non-bot or if pre-render fails
           let skeletonHtml = html;
-          skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${label} | Svet GraÄ‘evine</title>`);
+          skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${label} | Svet Građevine</title>`);
           const defaultImage = "https://svetgradjevine.com/og-default.jpg";
           skeletonHtml = skeletonHtml.replace(
             "</head>",
             `
-<meta name="description" content="${label} na portalu Svet GraÄ‘evine." />
+<meta name="description" content="${label} na portalu Svet Građevine." />
 <meta name="lastmod" content="${lastmod}" />
 ${paginationLinks}
 ${breadcrumbHtml}
-<meta property="og:title" content="${label} | Svet GraÄ‘evine" />
-<meta property="og:description" content="${label} na portalu Svet GraÄ‘evine." />
+<meta property="og:title" content="${label} | Svet Građevine" />
+<meta property="og:description" content="${label} na portalu Svet Građevine." />
 <meta property="og:image" content="${defaultImage}" />
 <meta property="og:url" content="${currentPageUrl}" />
 <meta property="og:type" content="website" />
@@ -958,8 +958,8 @@ ${breadcrumbHtml}
             .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
             .join(" ");
 
-          const title = `${readableTitle} | Svet GraÄ‘evine`;
-          const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet GraÄ‘evine. NajveÄ‡i graÄ‘evinski portal i berza na Balkanu.`;
+          const title = `${readableTitle} | Svet Građevine`;
+          const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet Građevine. Najveći građevinski portal i berza na Balkanu.`;
           const canonicalUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
           const defaultImage = "https://svetgradjevine.com/og-default.jpg";
 
