@@ -47,7 +47,8 @@ function RootLayout() {
 
   useEffect(() => {
     measurePageLoad();
-    initGA(import.meta.env.VITE_GA_MEASUREMENT_ID);
+    const gaId = (typeof window !== 'undefined' && (window as any).__APP_ENV__?.VITE_GA_MEASUREMENT_ID) || import.meta.env.VITE_GA_MEASUREMENT_ID;
+    initGA(gaId);
   }, []);
 
   useEffect(() => {

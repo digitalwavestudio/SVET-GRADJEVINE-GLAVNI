@@ -713,7 +713,9 @@ export const createSpaMiddleware = () => {
           .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
           .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
           .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
-          .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
+           .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
+          const gaId = env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY";
+          cachedIndexHtml = cachedIndexHtml.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
       }
       let html = cachedIndexHtml;
 
