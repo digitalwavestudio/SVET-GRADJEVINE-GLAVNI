@@ -19,8 +19,9 @@ export class RegionService {
     if (env.NODE_ENV !== "production") {
       return false;
     }
-    // Obično Frankfurt smatramo primarnim za write-heavy taskove koji se ne kloniraju
-    return this.currentRegion === "europe-west3";
+    // Single-region deployment (us-west1): all instances can lead.
+    // Redis locks provide mutual exclusion for background tasks.
+    return true;
   }
 
   /**

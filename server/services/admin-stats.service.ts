@@ -1,6 +1,7 @@
 ﻿import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 import { Logger } from "../utils/logger.ts";
+import { LockManager } from "./lock.service.ts";
 
 /**
  * AdminStatsService handles proactive aggregation of platform metrics on the server side.
@@ -324,6 +325,13 @@ export class AdminStatsService {
    * PROMPT 9: Hard limits and small batches to prevent Quota Exhaustion.
    */
   static async reconcileGlobalStats(): Promise<Record<string, any>> {
+    const lockKey = "lock:admin_stats_reconcile";
+    const lockId = await LockManager.acquire(lockKey, 5 * 60 * 1000);
+    if (!lockId) {
+      this.logger.info("[AdminStatsService] Reconciliation already running on another instance, skipping.");
+      return {};
+    }
+
     this.logger.info("[AdminStatsService] Starting sharding baseline reconciliation...");
     
     // Safety boundaries to prevent massive read spikes
@@ -373,6 +381,8 @@ export class AdminStatsService {
     } catch (error) {
       this.logger.error("Failed to reconcile global stats securely", { error });
       throw error;
+    } finally {
+      await LockManager.release(lockKey, lockId).catch(() => {});
     }
   }
 }

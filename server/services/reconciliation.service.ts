@@ -91,6 +91,18 @@ export class ReconciliationService {
    * Updates metadata/admin_stats document, performing count aggregations once daily at 4:00 AM
    */
   static async updateAdminStats() {
+    if (!RegionService.isLeaderRegion()) {
+      Logger.withContext().info("[Reconciliation] Skipping admin stats — not leader region.");
+      return;
+    }
+
+    const lockKey = "lock:reconciliation_admin_stats";
+    const lockId = await LockManager.acquire(lockKey, 10 * 60 * 1000);
+    if (!lockId) {
+      Logger.withContext().info("[Reconciliation] Admin stats update already running on another instance, skipping.");
+      return;
+    }
+
     Logger.withContext().info("[Reconciliation] Running daily admin stats calculation at 04:00 AM...");
     try {
       const activeAdsSnap = await db.collection("listings").where("status", "==", "active").count().get();
@@ -141,6 +153,8 @@ export class ReconciliationService {
       }
     } catch (error) {
       Logger.withContext().error("[Reconciliation] Failed updating admin_stats document:", error);
+    } finally {
+      await LockManager.release(lockKey, lockId).catch(() => {});
     }
   }
 
