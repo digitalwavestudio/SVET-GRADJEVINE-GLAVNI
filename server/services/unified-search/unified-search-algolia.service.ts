@@ -129,11 +129,8 @@ export class UnifiedSearchAlgolia {
       if (searchResult) {
         const hits = searchResult.hits || [];
         if (hits.length > 0) {
-          const isMagazineResult = algoliaIndex === "articles" || algoliaIndex === "magazine_index";
           let docs: UnifiedSearchDoc[] = hits.map((h: AlgoliaHit) =>
-            isMagazineResult 
-              ? UnifiedSearchUtils.mapToArticle(h as unknown as Record<string, unknown>)
-              : UnifiedSearchUtils.mapToListing(
+              UnifiedSearchUtils.mapToListing(
                   ImageTransformer.transformDocumentImages({
                     id: h.objectID,
                     ...h,

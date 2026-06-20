@@ -20,7 +20,6 @@ export class UnifiedSearchFirestore {
     filtersAny: UnifiedSearchFilters
   ): FirebaseFirestore.Query {
     let q: FirebaseFirestore.Query;
-    const isMagazineSearch = category === "magazine" || category === "articles" || entityType === "article";
     const isProfileSearch =
       category === "masters" ||
       category === "companies" ||
@@ -34,9 +33,6 @@ export class UnifiedSearchFirestore {
           ? "majstor"
           : "company";
       q = q.where("role", "==", targetRole);
-    } else if (isMagazineSearch) {
-      q = db.collection("articles");
-      if (!filtersAny.showAllStatuses) q = q.where("status", "==", "published");
     } else if (
       [
         "listings",
@@ -251,14 +247,12 @@ export class UnifiedSearchFirestore {
       const actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
 
       const docs: UnifiedSearchDoc[] = actualDocs.map((doc: QueryDocumentSnapshot) =>
-          isMagazineSearch
-            ? UnifiedSearchUtils.mapToArticle({ id: doc.id, ...doc.data() })
-            : UnifiedSearchUtils.mapToListing(
-                ImageTransformer.transformDocumentImages({
-                  id: doc.id,
-                  ...doc.data(),
-                })
-              )
+          UnifiedSearchUtils.mapToListing(
+              ImageTransformer.transformDocumentImages({
+                id: doc.id,
+                ...doc.data(),
+              })
+            )
       );
 
       const rawLastVisibleDoc = actualDocs.length > 0 ? actualDocs[actualDocs.length - 1] : null;
@@ -366,9 +360,7 @@ export class UnifiedSearchFirestore {
       const snap = await q.get();
 
       const allDocs: UnifiedSearchDoc[] = snap.docs.map((doc: QueryDocumentSnapshot) =>
-        isMagazineSearch
-          ? UnifiedSearchUtils.mapToArticle({ id: doc.id, ...doc.data() })
-          : UnifiedSearchUtils.mapToListing(
+          UnifiedSearchUtils.mapToListing(
               ImageTransformer.transformDocumentImages({
                 id: doc.id,
                 ...doc.data(),

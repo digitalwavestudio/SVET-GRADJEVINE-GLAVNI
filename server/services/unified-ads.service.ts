@@ -382,7 +382,7 @@ export class UnifiedAdsService {
     try {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
           let query = db
-            .collectionGroup("listings")
+            .collection("listings")
             .where("status", "in", ["active", "approved"]);
 
           if (options.isUrgent) query = query.where("isUrgent", "==", true);
