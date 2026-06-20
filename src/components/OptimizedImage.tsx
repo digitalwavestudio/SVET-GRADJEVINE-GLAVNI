@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { Building2, User, Image as ImageIcon, HardHat, Briefcase, Sofa, Utensils, Wrench } from 'lucide-react';
+import { getResponsiveSrcSet } from '@/src/lib/imageOptimization';
 
 type FallbackType = 'default' | 'user' | 'company' | 'ad' | 'machine' | 'real_estate' | 'accommodation' | 'catering' | 'jobs';
 
@@ -121,8 +122,8 @@ export function OptimizedImage({
       <img
         src={src}
         alt={alt}
-        srcSet={src}
-        sizes="(max-width: 640px) 100vw, 50vw"
+        srcSet={getResponsiveSrcSet(src)}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         className={`${className} ${loading ? 'opacity-0 scale-105' : 'opacity-100 scale-100'} transition-all duration-700 ease-out z-[6] relative`}
         onLoad={handleLoad}
         onError={handleError}
