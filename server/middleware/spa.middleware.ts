@@ -165,14 +165,17 @@ async function backgroundPreRenderListingHub(
     latestDocs.forEach((doc) => {
       const data = doc.data();
       const id = doc.id;
-      const slug = data.title
-        ? data.title
+      const title = data.title || data.name || "";
+      // Skip placeholder/test entries from SEO output
+      if (title.toLowerCase().includes("test")) return;
+      const slug = title
+        ? title
             .toLowerCase()
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")
         : "oglas";
       const canonicalUrl = `${APP_CONFIG.BASE_URL}${matchedRoute.path.replace("poslovi", "posao").replace(/\/+$/, "")}/${slug}~${id}`;
-      itemsHtml += `<li><a href="${canonicalUrl}">${data.title || data.name || "Oglas"}</a> - ${data.city || "Srbija"}</li>`;
+      itemsHtml += `<li><a href="${canonicalUrl}">${title || "Oglas"}</a> - ${data.city || "Srbija"}</li>`;
 
       itemListElements.push({
         "@type": "ListItem",
@@ -309,6 +312,7 @@ ${paginationLinks}
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${reqPath}" />
 <meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
 <meta property="og:type" content="website" />
+<style>img{aspect-ratio:auto;max-width:100%;height:auto}</style>
 <script type="application/ld+json">${JSON.stringify(bc)}</script>
 ${jsonLdScript}
 </head>`,
@@ -519,6 +523,7 @@ async function backgroundPreRenderDetailPage(
 <link rel="preload" as="image" href="${image}" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>img{aspect-ratio:auto;max-width:100%;height:auto}</style>
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${desc}" />
 <meta property="og:image" content="${image}" />
