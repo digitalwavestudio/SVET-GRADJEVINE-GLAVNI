@@ -71,7 +71,6 @@ export class HousekeepingService {
       await this.expirePremiums();
       await this.reconcileGlobalStats();
       await this.archiveDeletedAds();
-      await this.cleanupNotifications();
       await this.cleanupActivitiesAndDLQ();
       await this.cleanupOldDrafts();
       await this.cleanupAuditLogs();
@@ -114,10 +113,6 @@ export class HousekeepingService {
 
   static async expirePremiums() {
     return HousekeepingAds.expirePremiums();
-  }
-
-  static async cleanupNotifications() {
-    return HousekeepingCleanups.cleanupNotifications();
   }
 
   static async cleanupActivitiesAndDLQ() {

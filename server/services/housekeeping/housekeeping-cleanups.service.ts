@@ -7,24 +7,6 @@ import { HousekeepingUtils } from "./housekeeping-utils.service.ts";
 export class HousekeepingCleanups {
   private static logger = new Logger({ service: "HousekeepingCleanups" });
 
-  static async cleanupNotifications() {
-    this.logger.info("Auditing expired notifications...");
-    try {
-      const now = new Date();
-      const expiredDocs = await db
-        .collectionGroup("notifications")
-        .where("expiresAt", "<", now)
-        .count()
-        .get();
-
-      this.logger.info(
-        `Audit: Found ${expiredDocs.data().count} expired notifications to be cleaned up.`,
-      );
-    } catch (error) {
-      this.logger.error("Audit notifications failed", error);
-    }
-  }
-
   static async cleanupActivitiesAndDLQ() {
     this.logger.info("Auditing old activities and DLQ tasks...");
     try {
