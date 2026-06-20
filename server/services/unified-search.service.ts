@@ -48,7 +48,7 @@ export class UnifiedSearchService {
 
   // L1 Hard Cache (Shield) for homepage snippet queries
   private static l1ShieldCache = new Map<string, { data: UnifiedSearchResult; expiry: number }>();
-  private static readonly L1_SHIELD_TTL = 60 * 1000; // 1 minute protection
+  private static readonly L1_SHIELD_TTL = 5 * 60 * 1000; // 5 min protection
 
   static analyzeQueryComplexity(filters: UnifiedSearchFilters): "SIMPLE" | "COMPLEX" {
     return UnifiedSearchUtils.analyzeQueryComplexity(filters);

@@ -16,14 +16,14 @@ import {
 export class UnifiedSearchFirestore {
   private static readonly SEARCH_FIELDS = [
     "title", "name", "description", "price", "location", "loc",
-    "type", "status", "createdAt", "images", "imageStatus",
+    "type", "status", "createdAt", "images",
     "isPremium", "isUrgent", "isPremiumPartner", "isVerified",
     "comp", "salary", "sal", "logo",
     "benefits", "plataMin", "plataMax", "salaryType",
     "smestaj", "prevoz", "hrana",
     "housing", "transport", "food", "topliObrok", "benefiti", "rawBenefits",
     "adTitle", "adType", "categoryId", "categorySlug",
-    "companyName", "companyLogo", "isCompanyVerified",
+    "companyName", "companyLogo",
     "locationSlug", "authorId", "authorSnapshot",
     "machineType", "condition", "fuelType",
     "weightKg", "weightLb", "year", "workingHours", "make", "model",
