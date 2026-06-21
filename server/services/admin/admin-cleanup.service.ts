@@ -37,6 +37,7 @@ export class AdminCleanupService {
     const listingsSnap = await db
       .collection("listings")
       .where("authorId", "==", targetUserId)
+      .limit(500)
       .get();
 
     const listingsData = listingsSnap.docs.map(doc => ({
