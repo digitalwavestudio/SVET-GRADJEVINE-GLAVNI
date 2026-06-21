@@ -110,6 +110,18 @@ const DETAIL_PATH_MAP: Record<string, string> = {
   users: "majstor",
 };
 
+// Primary canonical path for each collection's listing hub (aliases like /masine resolve here)
+const CANONICAL_PATH_MAP: Record<string, string> = {
+  jobs: "/poslovi",
+  machines: "/gradjevinske-masine",
+  marketplace: "/alat-i-oprema",
+  accommodations: "/smestaj",
+  caterings: "/ketering",
+  plots: "/placevi",
+  companies: "/firme",
+  users: "/majstori",
+};
+
 // Each entity type uses a different field name for category/profession
 const COLLECTION_CATEGORY_FIELD: Record<string, string> = {
   jobs: "professionSlug",
@@ -279,12 +291,14 @@ async function backgroundPreRenderListingHub(
     if (categorySlug) label += ` - ${categorySlug.replace(/-/g, " ")}`;
     if (citySlug) label += ` u ${citySlug.replace(/-/g, " ")}`;
 
-    const currentPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page}` : `${APP_CONFIG.BASE_URL}${reqPath}`;
-    const prevPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${reqPath}?page=${page - 1}` : null;
+    const isPseoPage = !!categorySlug || !!citySlug;
+    const canonicalReqPath = isPseoPage ? reqPath : (CANONICAL_PATH_MAP[collectionName] || reqPath);
+    const currentPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${canonicalReqPath}?page=${page}` : `${APP_CONFIG.BASE_URL}${canonicalReqPath}`;
+    const prevPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${canonicalReqPath}?page=${page - 1}` : null;
     let nextPageUrl = null;
     if (latestDocs.size === pageSize) {
       const lastDocId = latestDocs.docs[latestDocs.docs.length - 1].id;
-      nextPageUrl = `${APP_CONFIG.BASE_URL}${reqPath}?page=${page + 1}&cursor=${lastDocId}`;
+      nextPageUrl = `${APP_CONFIG.BASE_URL}${canonicalReqPath}?page=${page + 1}&cursor=${lastDocId}`;
     }
 
     let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
@@ -998,15 +1012,16 @@ export const createSpaMiddleware = () => {
               // to avoid flash of server content before React hydration
               const fullTitle = `${matchedRoute.label} | Svet Građevine`;
               const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
+              const canonicalPath = CANONICAL_PATH_MAP[collectionName] || req.path;
               html = html.replace(/<meta name="description"[^>]*\/?>/gi, "");
               const cleanHtml = html
                 .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
                 .replace("</head>", `
 <meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase. Svet Građevine je vodeći građevinski portal na Balkanu." />
-<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />
+<link rel="canonical" href="${APP_CONFIG.BASE_URL}${canonicalPath}" />
 <meta property="og:title" content="${fullTitle}" />
 <meta property="og:description" content="${baseDesc}" />
-<meta property="og:url" content="${APP_CONFIG.BASE_URL}${req.path}" />
+<meta property="og:url" content="${APP_CONFIG.BASE_URL}${canonicalPath}" />
 <meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -1062,8 +1077,9 @@ export const createSpaMiddleware = () => {
           }
 
           const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
-          const currentPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${req.path}?page=${pageNum}` : `${APP_CONFIG.BASE_URL}${req.path}`;
-          const prevPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${req.path}?page=${pageNum - 1}` : null;
+          const canonicalSkeletonPath = CANONICAL_PATH_MAP[collectionName] || req.path;
+          const currentPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${canonicalSkeletonPath}?page=${pageNum}` : `${APP_CONFIG.BASE_URL}${canonicalSkeletonPath}`;
+          const prevPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${canonicalSkeletonPath}?page=${pageNum - 1}` : null;
           let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
           if (prevPageUrl) paginationLinks += `\n<link rel="prev" href="${prevPageUrl}" />`;
 
@@ -1089,7 +1105,7 @@ ${breadcrumbHtml}
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${fullTitle}" />
-<meta name="twitter:description" content="${label} na portalu Svet Građevine." />
+<meta name="twitter:description" content="${label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />
 <meta name="twitter:image" content="${defaultImage}" />
 </head>`,
           );
