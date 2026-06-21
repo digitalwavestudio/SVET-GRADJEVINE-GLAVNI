@@ -998,6 +998,7 @@ export const createSpaMiddleware = () => {
               // to avoid flash of server content before React hydration
               const fullTitle = `${matchedRoute.label} | Svet Građevine`;
               const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
+              html = html.replace(/<meta name="description"[^>]*\/?>/gi, "");
               const cleanHtml = html
                 .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
                 .replace("</head>", `
