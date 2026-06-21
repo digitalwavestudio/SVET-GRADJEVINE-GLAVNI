@@ -16,6 +16,11 @@ export async function idempotencyMiddleware(
     return next();
   }
 
+  // Skip idempotency for read-only search endpoints (POST /api/search/*)
+  if (req.path.startsWith("/api/search/")) {
+    return next();
+  }
+
   // Tražimo klijentski definisan ključ ili pravimo dinamički debounce ključ
   let key = req.header("Idempotency-Key") || req.header("idempotency-key");
 

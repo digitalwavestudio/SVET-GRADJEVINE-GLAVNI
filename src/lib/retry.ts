@@ -30,8 +30,9 @@ export const withRetry = async <T>(
         errorCodeStr === 'deadline-exceeded' ||
         (errorStatusNum !== null && errorStatusNum >= 500 && errorStatusNum < 600);
 
-      // Do not retry 4xx errors or logical app errors unless they are mapped to 5xx
-      if (!isNetworkError && attempt > 1) {
+      // Do not retry 4xx errors, 409 (already processing), or logical app errors
+      const isNonRetriable = errorStatusNum === 409 || (!isNetworkError && attempt > 1);
+      if (isNonRetriable) {
          throw error;
       }
       

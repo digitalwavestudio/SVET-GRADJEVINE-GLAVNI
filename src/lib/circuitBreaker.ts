@@ -217,7 +217,23 @@ class ClientCircuitBreaker {
           timestamp: Date.now()
         }));
       } catch (err) {
-        console.warn('[CircuitBreaker] Failed to cache response in safeLocalStorage:', err);
+        // If quota exceeded, nuke all cache entries and retry once
+        if (err instanceof DOMException && err.name === 'QuotaExceededError') {
+          try {
+            for (let i = safeLocalStorage.length - 1; i >= 0; i--) {
+              const k = safeLocalStorage.key(i);
+              if (k?.startsWith('sg_cb_cache:')) safeLocalStorage.removeItem(k);
+            }
+            safeLocalStorage.setItem(cacheKey, JSON.stringify({
+              data: finalPayload,
+              timestamp: Date.now()
+            }));
+          } catch (e2) {
+            console.warn('[CircuitBreaker] Failed to cache even after clearing all cache:', e2);
+          }
+        } else {
+          console.warn('[CircuitBreaker] Failed to cache response in safeLocalStorage:', err);
+        }
       }
     }
 
