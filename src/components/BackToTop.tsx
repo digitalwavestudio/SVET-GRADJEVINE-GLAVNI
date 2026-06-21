@@ -6,15 +6,35 @@ export default function BackToTop() {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = totalScroll > 0 ? (window.scrollY / totalScroll) * 100 : 0;
-      setScrollProgress(progress);
-      setIsVisible(window.scrollY > 300);
+    let ticking = false;
+    let cachedScrollHeight = document.documentElement.scrollHeight;
+    let cachedInnerHeight = window.innerHeight;
+
+    const updateLayoutCache = () => {
+      cachedScrollHeight = document.documentElement.scrollHeight;
+      cachedInnerHeight = window.innerHeight;
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const totalScroll = cachedScrollHeight - cachedInnerHeight;
+          const scrollY = window.scrollY;
+          const progress = totalScroll > 0 ? (scrollY / totalScroll) * 100 : 0;
+          setScrollProgress(progress);
+          setIsVisible(scrollY > 300);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', updateLayoutCache, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', updateLayoutCache);
+    };
   }, []);
 
   const scrollToTop = () => {
