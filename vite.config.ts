@@ -50,18 +50,18 @@ export default defineConfig(({mode}) => {
     },
   });
 
-  // Load CSS asynchronously so it doesn't block render
-  const asyncCssPlugin = () => ({
-    name: 'async-css',
+  // Inline critical CSS in index.html for first paint
+  const inlineCriticalCssPlugin = () => ({
+    name: 'inline-critical-css',
     transformIndexHtml: {
       order: 'post',
       handler: (html: string) => {
-        return html
-          // Convert render-blocking <link rel="stylesheet"> to async via media="print" trick
-          .replace(
-            /<link rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>/g,
-            '<link rel="stylesheet" media="print" onload="this.media=\'all\'" href="$1">'
-          );
+        // Replace Tailwind body background and root styles inline
+        const criticalCss = '#root:empty{background-color:#0F1923;min-height:100vh}body{background-color:#0F1923;margin:0}';
+        return html.replace(
+          '<style>\n      #root:empty { background-color: #0F1923; min-height: 100vh; }\n    </style>',
+          '<style>' + criticalCss + '</style>'
+        );
       },
     },
   });
@@ -73,7 +73,7 @@ export default defineConfig(({mode}) => {
       react(),
       tailwindcss(),
       stripModulePreloadPlugin(),
-      asyncCssPlugin(),
+      inlineCriticalCssPlugin(),
       isProd && VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
