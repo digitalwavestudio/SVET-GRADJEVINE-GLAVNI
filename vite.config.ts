@@ -36,12 +36,27 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd(), '');
   const isProd = mode === 'production';
 
+  // Strip unnecessary vendor chunks from modulepreload (not needed on initial page)
+  const stripModulePreloadPlugin = () => ({
+    name: 'strip-modulepreload',
+    transformIndexHtml: {
+      order: 'post',
+      handler: (html: string) => {
+        return html.replace(
+          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|payment)[^"]*"[^>]*>\n?/g,
+          ''
+        );
+      },
+    },
+  });
+
   return {
     base: '/',
     logLevel: 'info',
     plugins: [
       react(),
       tailwindcss(),
+      stripModulePreloadPlugin(),
       isProd && VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
