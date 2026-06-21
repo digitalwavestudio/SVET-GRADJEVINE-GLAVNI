@@ -24,8 +24,8 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           <div className="overflow-hidden relative w-full">
             <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#0F1923] to-transparent pointer-events-none z-10 md:hidden"></div>
             {premiumJobs && premiumJobs.length > 0 ? (
-            <div className="flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max">
-              {Array(8).fill(premiumJobs).flat().map((job: any, idx: number) => {
+            <div className="flex gap-8 animate-[scroll_120s_linear_infinite] hover:[animation-play-state:paused] w-max">
+              {Array(4).fill(premiumJobs).flat().map((job: any, idx: number) => {
                 const url = (() => {
                   try {
                     if (job.type === 'company' || job.isPremiumPartner) return `/firma/${job.id}`;

@@ -32,10 +32,10 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
         </div>
         <div className={`relative w-full ${isExpanded ? '' : 'overflow-hidden'}`}>
           {jobs.length > 0 ? (
-            <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
-              {(isExpanded ? jobs : jobs.slice(0, 4))
-                .map(job => (
-                <div key={job.id} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
+            <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_120s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
+              {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
+                .map((job, idx) => (
+                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
                   <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 h-full">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10">
                       {job.logo ? (
