@@ -43,25 +43,44 @@ export default defineConfig(({mode}) => {
       order: 'post',
       handler: (html: string) => {
         return html.replace(
-          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|payment|firebase)[^"]*"[^>]*>\n?/g,
+          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|firebase)[^"]*"[^>]*>\n?/g,
           ''
         );
       },
     },
   });
 
-  // Inline critical CSS in index.html for first paint
+  // Inline critical CSS + defer full Tailwind stylesheet
   const inlineCriticalCssPlugin = () => ({
     name: 'inline-critical-css',
     transformIndexHtml: {
       order: 'post',
       handler: (html: string) => {
-        // Replace Tailwind body background and root styles inline
-        const criticalCss = '#root:empty{background-color:#0F1923;min-height:100vh}body{background-color:#0F1923;margin:0}';
-        return html.replace(
+        const criticalCss = [
+          '#root:empty{background-color:#0F1923;min-height:100vh}',
+          'body{background-color:#0F1923;margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif}',
+          'nav{position:fixed;top:0;left:0;right:0;z-index:999;height:4rem;background:rgba(15,25,35,0.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.05)}',
+          'nav .flex{display:flex;align-items:center;gap:0.75rem}',
+          'nav img{width:130px;height:auto;max-height:42px}',
+          '.hero-gradient{background:linear-gradient(135deg,rgba(15,25,35,0.9) 0%,rgba(15,25,35,0.4) 50%,rgba(15,25,35,0.1) 100%)}',
+          '.hero-bottom-fade{-webkit-mask-image:linear-gradient(to bottom,black 80%,transparent 100%);mask-image:linear-gradient(to bottom,black 80%,transparent 100%)}',
+          '.glass-panel{background:rgba(19,28,38,0.7);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}',
+          'h1.font-headline{font-family:Montserrat,sans-serif;font-weight:700}',
+          'input,textarea{background:rgba(255,255,255,0.03);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.05)}',
+          '::-webkit-scrollbar{width:8px;height:8px}',
+          '::-webkit-scrollbar-track{background:#0f1923}',
+          '::-webkit-scrollbar-thumb{background:#24303d;border-radius:4px}',
+        ].join('');
+        html = html.replace(
           '<style>\n      #root:empty { background-color: #0F1923; min-height: 100vh; }\n    </style>',
           '<style>' + criticalCss + '</style>'
         );
+        // Defer full CSS bundle: load async to avoid render blocking
+        html = html.replace(
+          /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/,
+          '<link rel="stylesheet" media="print" onload="this.media=\'all\'" crossorigin href="$1">'
+        );
+        return html;
       },
     },
   });
@@ -81,6 +100,7 @@ export default defineConfig(({mode}) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
           navigateFallbackDenylist: [/^\/__/],
           maximumFileSizeToCacheInBytes: 10000000,
+          navigationPreload: true,
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
@@ -89,6 +109,32 @@ export default defineConfig(({mode}) => {
                 cacheName: 'firebase-storage-cache',
                 expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
                 cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/api\.svet-gradjevine\.com\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 },
+                networkTimeoutSeconds: 4,
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'google-fonts-stylesheets',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-webfonts',
+                expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 60 }
               }
             }
           ]
@@ -155,7 +201,7 @@ export default defineConfig(({mode}) => {
       emptyOutDir: true,
       minify: true,
       // Raise warning limit to avoid false alarms for large chunks after minification
-      chunkSizeWarningLimit: 1000, // KB
+      chunkSizeWarningLimit: 500, // KB
       // Split vendor code into a separate chunk for better caching and size management
       rollupOptions: {
         output: {
@@ -173,9 +219,7 @@ export default defineConfig(({mode}) => {
               if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) {
                 return 'vendor-charts';
               }
-              if (id.includes('stripe')) {
-                return 'vendor-payment';
-              }
+              // Stripe removed — unused on frontend
               if (id.includes('motion')) {
                 return 'vendor-animation';
               }
