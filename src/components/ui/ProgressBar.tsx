@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -20,11 +19,9 @@ export default function ProgressBar() {
   }, [location.pathname]);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 h-1 bg-secondary z-[100]"
-      initial={{ width: 0 }}
-      animate={{ width: `${progress}%` }}
-      transition={{ duration: 0.3 }}
+    <div
+      className="fixed top-0 left-0 h-1 bg-secondary z-[100] transition-all duration-300"
+      style={{ width: `${progress}%` }}
     />
   );
 }

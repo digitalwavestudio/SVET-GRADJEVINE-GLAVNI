@@ -1,5 +1,4 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { motion } from 'motion/react';
 import { AlertCircle, RefreshCcw, Home } from 'lucide-react';
 import { exportService } from '../../lib/exportService';
 
@@ -67,9 +66,7 @@ class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6 text-white font-sans">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+          <div 
             className="max-w-md w-full bg-zinc-900 border border-white/5 rounded-2xl p-8 shadow-2xl text-center space-y-6"
           >
             <div className="mx-auto w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center text-rose-500">
@@ -116,7 +113,7 @@ class ErrorBoundary extends Component<Props, State> {
                 Home
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       );
     }

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { usePremiumPartners } from '@/src/modules/core/hooks/usePremiumPartners';
 
 export default function TrustSection() {
@@ -10,14 +9,9 @@ export default function TrustSection() {
   return (
     <section className="bg-transparent py-16 border-t border-white/5 overflow-hidden min-h-[300px] flex flex-col justify-center">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-8 w-full">
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-slate-500 text-center font-bold text-[10px] uppercase tracking-[0.4em] mb-12"
-        >
+        <p className="text-slate-500 text-center font-bold text-[10px] uppercase tracking-[0.4em] mb-12">
           Poverenje su nam ukazali lideri industrije
-        </motion.p>
+        </p>
         
         <div className="relative group">
           {/* Fading Edges */}
@@ -25,14 +19,8 @@ export default function TrustSection() {
           <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 bg-gradient-to-l from-[#0F1923] to-transparent z-10"></div>
 
           <div className="flex overflow-hidden">
-            <motion.div 
-              animate={displayPartners.length > 0 ? { x: ["0%", "-50%"] } : {}}
-              transition={{ 
-                duration: 40, 
-                repeat: Infinity, 
-                ease: "linear" 
-              }}
-              className="flex items-center gap-16 px-8 flex-nowrap w-fit"
+            <div 
+              className="flex items-center gap-16 px-8 flex-nowrap w-fit animate-marquee"
             >
               {/* Double mapping for infinite scroll effect */}
               {[...displayPartners, ...displayPartners].map((partner, idx) => (
@@ -44,6 +32,9 @@ export default function TrustSection() {
                     <img 
                       src={partner.logo} 
                       alt={partner.name} 
+                      width="160" height="40"
+                      loading="lazy"
+                      decoding="async"
                       className="h-8 md:h-10 w-auto object-contain filter brightness-200"
                     />
                   ) : (
@@ -61,7 +52,7 @@ export default function TrustSection() {
               {loading && [1,2,3,4,5].map(i => (
                 <div key={i} className="h-8 w-32 bg-white/5 rounded-[10px] animate-pulse"></div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

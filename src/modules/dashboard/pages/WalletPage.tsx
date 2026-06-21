@@ -7,7 +7,7 @@ import DepositModal from '../components/DepositModal';
 import { toast } from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { queryKeys } from '@/src/lib/queryKeysFactory';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { apiClient } from '@/src/lib/apiClient';
 
 // ─── Premium Config ─────────────────────────────────────────────────────────

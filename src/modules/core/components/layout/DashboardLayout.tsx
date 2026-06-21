@@ -8,7 +8,7 @@ import { DashboardTopHeader } from './dashboard/DashboardTopHeader';
 import { MobileHeader } from './dashboard/MobileHeader';
 import { useDashboardUIStore } from '@/src/modules/dashboard/store/dashboardUIStore';
 import DashboardSkeleton from '@/src/modules/dashboard/components/dashboard/DashboardSkeleton';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { MobileBottomNav } from '@/src/components/layout/MobileBottomNav';
 
 export function DashboardLayout({ 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,7 +8,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: string;
   asChild?: boolean;
   className?: string;
-  motionProps?: any;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -18,7 +16,6 @@ export const Button: React.FC<ButtonProps> = ({
   icon,
   children,
   className = '',
-  motionProps = {},
   ...props
 }) => {
   const variantClasses = {
@@ -31,7 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
     blue: "group bg-gradient-to-br from-blue-400 to-blue-700 text-white px-6 py-2 rounded-[10px] font-black transition-all duration-300 hover:from-blue-500 hover:to-blue-800 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] text-xs uppercase tracking-widest flex items-center gap-2"
   };
 
-  const finalClasses = `${variantClasses[variant as keyof typeof variantClasses] || variantClasses.primary} ${className} transition-all duration-300 flex items-center justify-center gap-2 group touch-target`;
+  const finalClasses = `${variantClasses[variant as keyof typeof variantClasses] || variantClasses.primary} ${className} transition-all duration-300 flex items-center justify-center gap-2 group touch-target hover:-translate-y-0.5 active:scale-95`;
 
   const content = (
     <>
@@ -47,29 +44,21 @@ export const Button: React.FC<ButtonProps> = ({
   if (to) {
     return (
       <Link to={to} className={finalClasses} {...(props as import('react').AnchorHTMLAttributes<HTMLAnchorElement>)}>
-        <motion.span 
-          className="flex items-center gap-2"
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          {...motionProps}
-        >
+        <span className="flex items-center gap-2">
           {content}
-        </motion.span>
+        </span>
       </Link>
     );
   }
 
   return (
-    <motion.button
+    <button
       className={finalClasses}
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.95 }}
-      {...motionProps}
       {...props}
     >
       <span className="flex items-center gap-2">
         {content}
       </span>
-    </motion.button>
+    </button>
   );
 };

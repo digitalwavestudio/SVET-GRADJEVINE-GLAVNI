@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '@/src/context/AuthContext';
 
 export const MobileBottomNav: React.FC = () => {
@@ -118,16 +117,12 @@ export const MobileBottomNav: React.FC = () => {
       </div>
     </div>
 
-    <AnimatePresence>
-      {isSearchOpen && (
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="md:hidden fixed inset-0 z-[60] bg-[#050F19] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] overflow-y-auto"
-          onClick={() => setIsSearchOpen(false)}
-        >
+    <div
+      className={`md:hidden fixed inset-0 z-[60] bg-[#050F19] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] overflow-y-auto transition-transform duration-300 ${
+        isSearchOpen ? 'translate-y-0' : 'translate-y-full'
+      }`}
+      onClick={() => setIsSearchOpen(false)}
+    >
           {/* Top Gradient Overlay */}
           <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-secondary/10 to-transparent pointer-events-none"></div>
 
@@ -199,9 +194,7 @@ export const MobileBottomNav: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </div>
     </>
   );
 };

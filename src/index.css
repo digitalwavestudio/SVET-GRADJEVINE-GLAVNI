@@ -326,6 +326,7 @@ input, textarea {
   .animate-chevron-bounce { animation: chevron-bounce 1s ease-in-out infinite; }
   .shadow-gold-glow-subtle { box-shadow: 0 0 10px rgba(254,191,13,0.15); }
   .animate-pulse-gold { animation: pulse-gold 2s infinite; }
+  .animate-marquee { animation: scroll 40s linear infinite; }
   /* Touch target utility */
   .touch-target { @apply min-h-[48px] min-w-[48px] flex items-center justify-center; }
   /* Skeleton base */
