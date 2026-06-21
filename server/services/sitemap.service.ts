@@ -121,6 +121,13 @@ export class SitemapService {
         const staticPages = [
           "",
           "/poslovi",
+          "/gradjevinske-masine",
+          "/alat-i-oprema",
+          "/smestaj",
+          "/ketering",
+          "/placevi",
+          "/firme",
+          "/majstori",
           "/kompanije",
           "/radnici",
           "/za-poslodavce",
