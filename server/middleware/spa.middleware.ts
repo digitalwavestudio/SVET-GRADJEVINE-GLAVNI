@@ -360,6 +360,7 @@ async function backgroundPreRenderListingHub(
     const lastmod = (latestCreatedAt || new Date()).toISOString().split("T")[0];
 
     let html = cachedIndexHtml;
+    html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
     html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
     html = html.replace(
       "</head>",
@@ -566,6 +567,7 @@ async function backgroundPreRenderDetailPage(
     const lastmodDate = (detailTs instanceof Date ? detailTs : new Date()).toISOString().split("T")[0];
 
     let html = cachedIndexHtml;
+    html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
     html = html.replace(
       /<title>.*?<\/title>/,
       `<title>${title}</title>`,
@@ -876,6 +878,7 @@ export const createSpaMiddleware = () => {
 
       if (staticMetas[req.path]) {
         const meta = staticMetas[req.path];
+        html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
         html = html.replace(
           /<title>.*?<\/title>/,
           `<title>${meta.title}</title>`,
@@ -1067,6 +1070,7 @@ export const createSpaMiddleware = () => {
 
           // Fallback skeleton for non-bot or if pre-render fails
           let skeletonHtml = html;
+          skeletonHtml = skeletonHtml.replace(/<meta name="description"[^>]*\/?>/i, "");
           const fullTitle = `${label} | Svet Građevine`;
           skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`);
           const defaultImage = "https://svetgradjevine.com/og-default.jpg";
@@ -1159,6 +1163,7 @@ ${breadcrumbHtml}
 
       // Custom 404 for unmatched routes
       const notFoundHtml = html
+        .replace(/<meta name="description"[^>]*\/?>/i, "")
         .replace(/<title>.*?<\/title>/, "<title>Stranica nije pronađena | Svet Građevine</title>")
         .replace(
           "</head>",
