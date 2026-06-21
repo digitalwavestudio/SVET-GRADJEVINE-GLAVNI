@@ -385,7 +385,7 @@ ${jsonLdScript}
 
     html = html.replace(
       '<div id="root"></div>',
-      `<div id="root"></div>\n<div style="display:none" aria-hidden="true">${botListHtml}</div>`,
+      `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botListHtml}</div>`,
     );
 
     if (redis) {
@@ -608,7 +608,7 @@ ${structuredDataHtml}
     if (botSemanticHtml) {
       html = html.replace(
         '<div id="root"></div>',
-        `<div id="root"></div>\n<div style="display:none" aria-hidden="true">${botSemanticHtml}</div>`,
+        `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botSemanticHtml}</div>`,
       );
     }
 
@@ -674,7 +674,7 @@ async function backgroundPreRenderHomepage(
 <meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 </head>`);
-    html = html.replace('<div id="root"></div>', `<div id="root"></div>\n<div style="display:none" aria-hidden="true">${botHtml}</div>`);
+    html = html.replace('<div id="root"></div>', `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botHtml}</div>`);
 
     if (redis) {
       await redis.set(cacheKey, html, "EX", cacheTtl);
@@ -1094,7 +1094,7 @@ ${breadcrumbHtml}
           );
           skeletonHtml = skeletonHtml.replace(
             '<div id="root"></div>',
-            `<div id="root"></div>\n<div style="display:none" aria-hidden="true"><main><h1>${label}</h1></main></div>`,
+            `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true"><main><h1>${label}</h1><a href="${APP_CONFIG.BASE_URL}/">Svet Građevine</a></main></div>`,
           );
           return res.send(skeletonHtml);
         }
