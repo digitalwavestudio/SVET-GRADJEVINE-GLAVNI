@@ -159,7 +159,7 @@ export class SitemapService {
       accommodations: "smestaj",
       caterings: "ketering",
       plots: "nekretnine",
-      marketplace: "marketplace",
+      marketplace: "alat-i-oprema",
     };
 
     const prefix = pathPrefixMap[coll] || coll;
@@ -209,7 +209,7 @@ export class SitemapService {
       accommodations: "smestaj",
       caterings: "ketering",
       plots: "nekretnine",
-      marketplace: "marketplace",
+      marketplace: "alat-i-oprema",
     };
     const prefix = pathPrefixMap[coll] || coll;
 
