@@ -291,10 +291,12 @@ async function backgroundPreRenderListingHub(
     if (prevPageUrl) paginationLinks += `\n<link rel="prev" href="${prevPageUrl}" />`;
     if (nextPageUrl) paginationLinks += `\n<link rel="next" href="${nextPageUrl}" />`;
 
+    const platformDesc = "Svet Građevine je vodeći građevinski portal na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente širom regiona.";
     const botListHtml = `
           <main>
              <h1>${label}</h1>
              <p>${label} na portalu Svet Građevine. Pronađeno ${latestDocs.size} oglasa na strani ${page}.</p>
+             <p>${platformDesc}</p>
              <nav>
                <ul>
                  ${itemsHtml || "<li>Trenutno nema oglasa za ovu kategoriju.</li>"}
@@ -646,10 +648,13 @@ async function backgroundPreRenderHomepage(
       itemsHtml += `<li><a href="${url}">${title}</a>${location ? ` - ${formatCity(location)}` : ""}${price ? ` (${price})` : ""}</li>`;
     });
 
+    const platformDesc = "Svet Građevine je vodeći građevinski portal na Balkanu koji povezuje izvođače, poslodavce, majstore i klijente širom Srbije, Hrvatske, Bosne i Hercegovine, Crne Gore i regiona.";
     const botHtml = `
       <main>
         <h1>Svet Građevine - Portal za građevinske oglase</h1>
         <p>Najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više.</p>
+        <p>${platformDesc}</p>
+        <p>Bez obzira da li tražite iskusnog zidara za renoviranje, rukovaoca bagerom za veliki projekat, ili želite da iznajmite građevinske mašine — na pravom ste mestu. Naša platforma nudi hiljade oglasa iz kategorija: posao u građevini, građevinske mašine, smeštaj za radnike, ketering, građevinsko zemljište, alat i oprema, i više.</p>
         <section>
           <h2>Najnoviji oglasi</h2>
           <ul>${itemsHtml || "<li>Trenutno nema aktivnih oglasa.</li>"}</ul>
