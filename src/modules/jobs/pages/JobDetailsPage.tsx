@@ -264,7 +264,7 @@ export default function JobDetailsPage() {
                   </span>
                 )}
                 <span className="px-4 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest border bg-white/5 text-white/60 border-white/10">
-                  {jobData.tipAngazmana?.replace(/-/g, ' ')?.toUpperCase() || 'PUNO RADNO VREME'}
+                  {getEngagementLabel(jobData.tipAngazmana, jobData.customEngagement).toUpperCase()}
                 </span>
                 <span className="px-4 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest border bg-white/5 text-white/60 border-white/10 flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[14px] text-secondary">visibility</span>

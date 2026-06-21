@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { buildJobUrl } from '@/src/lib/seo';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
-import { LOCATIONS, PROFESSIONS, CORE_SECTORS } from '@/src/constants/taxonomy';
+import { LOCATIONS, PROFESSIONS, CORE_SECTORS, ENGAGEMENT_TYPES } from '@/src/constants/taxonomy';
 
 const getFriendlyLocation = (job: any) => {
   const slug = job.locationSlug || job.location || job.loc || job.lokacijaStr;
@@ -85,6 +85,26 @@ const getFriendlySalary = (job: any) => {
   return null;
 };
 
+const getFriendlyEngagement = (job: any) => {
+  if (job.type && job.type !== 'job') {
+    return null;
+  }
+  const slug = job.tipAngazmana || job.engagementSlug || job.engagement || job.time;
+  const custom = job.customEngagement || job.radnoVreme;
+  
+  if (slug === 'upisi') return custom || 'Radno vreme';
+  if (!slug) return custom || 'Puno radno vreme';
+  
+  if (typeof slug === 'string') {
+    const cleanSlug = slug.toLowerCase().trim();
+    const found = ENGAGEMENT_TYPES.find(e => e.slug === cleanSlug || e.id === cleanSlug);
+    if (found) return found.name;
+    return slug.replace(/-/g, ' ').charAt(0).toUpperCase() + slug.slice(1).toLowerCase().replace(/-/g, ' ');
+  }
+  
+  return custom || 'Puno radno vreme';
+};
+
 export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
   return (<>
     {/* PREMIUM OGLASI SECTION */}
@@ -134,9 +154,9 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       handleCardClick(url, { job });
                     }
                   }}
-                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer h-full"
+                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer h-[400px] md:h-[230px]"
                 >
-                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 w-full h-full min-h-[350px] sm:min-h-[300px] md:min-h-[210px]">
+                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 w-full h-full">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10 flex items-center justify-center overflow-hidden">
                       {job.logo ? (
                         <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full p-1" loading="lazy" />
@@ -146,7 +166,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-between min-w-0 w-full">
+                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-between min-w-0 w-full font-sans">
                       <div>
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-2 relative z-10 animate-blink">
                           <span className="material-symbols-outlined text-yellow-500 text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
@@ -168,6 +188,12 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                               {getFriendlySalary(job)}
                             </span>
                           )}
+                          {getFriendlyEngagement(job) && (
+                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">schedule</span>
+                              {getFriendlyEngagement(job)}
+                            </span>
+                          )}
                           <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
                             <span className="material-symbols-outlined text-[14px]">category</span>
                             {getFriendlyCategory(job)}
@@ -176,6 +202,32 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                             <span className="material-symbols-outlined text-[14px]">location_on</span>
                             {getFriendlyLocation(job)}
                           </span>
+                          {(() => {
+                            const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
+                            const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
+                            const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
+                            const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
+
+                            return (
+                              <>
+                                {hasSmestaj && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">home</span> Smeštaj
+                                  </span>
+                                )}
+                                {hasPrevoz && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">commute</span> Prevoz
+                                  </span>
+                                )}
+                                {hasHrana && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">restaurant</span> Hrana
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                         <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20">POGLEDAJ OGLAS</button>
                       </div>

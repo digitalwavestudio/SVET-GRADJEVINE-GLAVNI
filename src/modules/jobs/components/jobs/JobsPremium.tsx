@@ -86,8 +86,14 @@ const getFriendlySalary = (job: any) => {
 };
 
 const getFriendlyEngagement = (job: any) => {
-  const slug = job.engagementSlug || job.engagement || job.time || job.radnoVreme;
-  if (!slug) return 'Puno radno vreme';
+  if (job.type && job.type !== 'job') {
+    return null;
+  }
+  const slug = job.tipAngazmana || job.engagementSlug || job.engagement || job.time;
+  const custom = job.customEngagement || job.radnoVreme;
+  
+  if (slug === 'upisi') return custom || 'Radno vreme';
+  if (!slug) return custom || 'Puno radno vreme';
   
   if (typeof slug === 'string') {
     const cleanSlug = slug.toLowerCase().trim();
@@ -96,7 +102,7 @@ const getFriendlyEngagement = (job: any) => {
     return slug.replace(/-/g, ' ').charAt(0).toUpperCase() + slug.slice(1).toLowerCase().replace(/-/g, ' ');
   }
   
-  return 'Puno radno vreme';
+  return custom || 'Puno radno vreme';
 };
 
 interface JobsPremiumProps {
@@ -131,8 +137,8 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
             <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
               {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
                 .map((job, idx) => (
-                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-full ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
-                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 w-full h-full min-h-[350px] sm:min-h-[300px] md:min-h-[210px]">
+                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-[400px] md:h-[230px] ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
+                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 w-full h-full">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10">
                       {job.logo ? (
                         <OptimizedImage 
@@ -147,7 +153,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                         <div className="w-full h-full bg-slate-950/5 rounded-full flex items-center justify-center text-slate-950 font-black text-2xl">{getInitials(job.comp)}</div>
                       )}
                     </div>
-                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-between w-full min-w-0">
+                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-between w-full min-w-0 font-sans">
                       <div>
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-2 relative z-10 animate-blink">
                           <span className="material-symbols-outlined text-yellow-500 text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
@@ -170,14 +176,42 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                               {getFriendlySalary(job)}
                             </span>
                           )}
-                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">schedule</span>
-                            {getFriendlyEngagement(job)}
-                          </span>
+                          {getFriendlyEngagement(job) && (
+                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">schedule</span>
+                              {getFriendlyEngagement(job)}
+                            </span>
+                          )}
                           <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
                             <span className="material-symbols-outlined text-[14px]">location_on</span>
                             {getFriendlyLocation(job)}
                           </span>
+                          {(() => {
+                            const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
+                            const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
+                            const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
+                            const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
+
+                            return (
+                              <>
+                                {hasSmestaj && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">home</span> Smeštaj
+                                  </span>
+                                )}
+                                {hasPrevoz && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">commute</span> Prevoz
+                                  </span>
+                                )}
+                                {hasHrana && (
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">restaurant</span> Hrana
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                         <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20">APLICIRAJ</button>
                       </div>
