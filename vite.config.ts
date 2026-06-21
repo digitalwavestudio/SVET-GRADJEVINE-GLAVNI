@@ -59,9 +59,9 @@ export default defineConfig(({mode}) => {
         const criticalCss = [
           '#root:empty{background-color:#0F1923;min-height:100vh}',
           'body{background-color:#0F1923;margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif}',
-          'nav{position:fixed;top:0;left:0;right:0;z-index:999;height:4rem;background:rgba(15,25,35,0.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.05)}',
-          'nav .flex{display:flex;align-items:center;gap:0.75rem}',
-          'nav img{width:130px;height:auto;max-height:42px}',
+          'nav.fixed.top-0{position:fixed;top:0;left:0;right:0;z-index:999;height:4rem;background:rgba(15,25,35,0.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.05)}',
+          'nav.fixed.top-0 .flex{display:flex;align-items:center;gap:0.75rem}',
+          'nav.fixed.top-0 img{width:130px;height:auto;max-height:42px}',
           '.hero-gradient{background:linear-gradient(135deg,rgba(15,25,35,0.9) 0%,rgba(15,25,35,0.4) 50%,rgba(15,25,35,0.1) 100%)}',
           '.hero-bottom-fade{-webkit-mask-image:linear-gradient(to bottom,black 80%,transparent 100%);mask-image:linear-gradient(to bottom,black 80%,transparent 100%)}',
           '.glass-panel{background:rgba(19,28,38,0.7);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}',
