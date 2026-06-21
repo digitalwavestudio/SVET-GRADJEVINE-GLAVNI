@@ -1,5 +1,5 @@
 /**
- * Standardized slugify logic for Svet Gradjevine platform.
+ * Standardized slugify logic for Svet Građevine platform.
  * Handles Serbian Cyrillic/Latin characters.
  */
 export function slugify(text: string): string {

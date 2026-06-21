@@ -7,7 +7,7 @@ const logger = new Logger({ service: "Tracing" });
 const isTracingEnabled = env.ENABLE_TRACING === "true" || !!env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
 /**
- * Svet Gradjevine - Distributed Tracing Initialization
+ * Svet Građevine - Distributed Tracing Initialization
  */
 let sdk: any = null;
 

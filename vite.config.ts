@@ -43,7 +43,7 @@ export default defineConfig(({mode}) => {
       order: 'post',
       handler: (html: string) => {
         return html.replace(
-          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|firebase)[^"]*"[^>]*>\n?/g,
+          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|firebase|animation|motion)[^"]*"[^>]*>\n?/g,
           ''
         );
       },
@@ -185,7 +185,6 @@ export default defineConfig(({mode}) => {
         'firebase/firestore',
         'firebase/performance',
         'lucide-react',
-        'motion',
         'recharts',
         'axios',
         'zod',
@@ -207,7 +206,7 @@ export default defineConfig(({mode}) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('react-dom') || id.includes('react/') || id.includes('react-router') || id.includes('scheduler')) {
+              if (id.includes('react-dom') || /[\/\\]react[\/\\.]/.test(id) || id.includes('react-router') || id.includes('scheduler')) {
                 return 'vendor-core';
               }
               if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) {
@@ -220,8 +219,8 @@ export default defineConfig(({mode}) => {
                 return 'vendor-charts';
               }
               // Stripe removed — unused on frontend
-              if (id.includes('motion')) {
-                return 'vendor-animation';
+              if (id.includes('framer-motion') || id.includes('motion-dom') || id.includes('motion-utils') || id.includes('motion')) {
+                return 'vendor-motion';
               }
               if (id.includes('lucide-react') || id.includes('react-hot-toast') || id.includes('react-helmet-async') || id.includes('tailwind-merge') || id.includes('clsx')) {
                 return 'vendor-ui';

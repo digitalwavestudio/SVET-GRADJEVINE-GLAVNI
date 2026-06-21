@@ -1,7 +1,7 @@
 import DOMPurify from 'isomorphic-dompurify';
 
 /**
- * Robust input sanitization for Svet Gradjevine platform.
+ * Robust input sanitization for Svet Građevine platform.
  * Prevents XSS and malicious scripts while allowing basic safe text.
  */
 export const sanitizeInput = (input: unknown): string => {
