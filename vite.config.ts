@@ -226,6 +226,9 @@ export default defineConfig(({mode}) => {
               if (id.includes('lucide-react') || id.includes('react-hot-toast') || id.includes('react-helmet-async') || id.includes('tailwind-merge') || id.includes('clsx')) {
                 return 'vendor-ui';
               }
+              if (id.includes('firebase/auth')) {
+                return 'vendor-firebase-auth';
+              }
               if (id.includes('firebase')) {
                 return 'vendor-firebase';
               }

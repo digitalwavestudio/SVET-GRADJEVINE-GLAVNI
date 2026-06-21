@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource/montserrat";
 
 html {
   scroll-behavior: smooth;
