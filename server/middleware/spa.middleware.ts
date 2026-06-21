@@ -799,17 +799,17 @@ export const createSpaMiddleware = () => {
         {
           path: "/ketering/provajder/",
           coll: "caterings",
-          label: "Ketering i hrana",
+          label: "Ketering i ugostiteljstvo",
         },
         {
           path: "/ketering",
           coll: "caterings",
-          label: "Ketering",
+          label: "Ketering i ugostiteljstvo",
           alwaysListing: true,
         },
         { path: "/placevi", coll: "plots", label: "Građevinsko zemljište" }, // /placevi/:grad and /placevi (Listing)
         { path: "/nekretnine/", coll: "plots", label: "Građevinsko zemljište" }, // /nekretnine/:id (Detail)
-        { path: "/alat-i-oprema", coll: "marketplace", label: "Alat i oprema" }, // Handles both
+        { path: "/alat-i-oprema", coll: "marketplace", label: "Alat i građevinska oprema" }, // Handles both
         { path: "/firma/", coll: "companies", label: "Profil firme" }, // Detail
         {
           path: "/firme",
@@ -820,7 +820,7 @@ export const createSpaMiddleware = () => {
         {
           path: "/majstori",
           coll: "users",
-          label: "Majstori",
+          label: "Majstori u građevini",
           alwaysListing: true,
         },
       ];
@@ -1019,7 +1019,8 @@ export const createSpaMiddleware = () => {
 
           // Fallback skeleton for non-bot or if pre-render fails
           let skeletonHtml = html;
-          skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${label} | Svet Građevine</title>`);
+          const fullTitle = `${label} | Svet Građevine`;
+          skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`);
           const defaultImage = "https://svetgradjevine.com/og-default.jpg";
           skeletonHtml = skeletonHtml.replace(
             "</head>",
@@ -1028,12 +1029,16 @@ export const createSpaMiddleware = () => {
 <meta name="lastmod" content="${lastmod}" />
 ${paginationLinks}
 ${breadcrumbHtml}
-<meta property="og:title" content="${label} | Svet Građevine" />
+<meta property="og:title" content="${fullTitle}" />
 <meta property="og:description" content="${label} na portalu Svet Građevine." />
 <meta property="og:image" content="${defaultImage}" />
 <meta property="og:url" content="${currentPageUrl}" />
 <meta property="og:type" content="website" />
 </head>`,
+          );
+          skeletonHtml = skeletonHtml.replace(
+            '<div id="root"></div>',
+            `<div id="root"></div>\n<div style="display:none" aria-hidden="true"><main><h1>${label}</h1></main></div>`,
           );
           return res.send(skeletonHtml);
         }
