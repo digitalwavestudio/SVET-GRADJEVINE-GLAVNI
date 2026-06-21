@@ -79,23 +79,23 @@ export default function HomePage() {
         <CalculatorBanner />
       </div>
 
-      <div className="scroll-fade-in scroll-fade-in">
+      <div className="scroll-fade-in">
         <UrgentJobs urgentJobs={urgentJobs} isLoading={isLoadingBff} />
       </div>
 
-      <div className="scroll-fade-in scroll-fade-in">
+      <div className="scroll-fade-in">
         <PremiumJobs premiumJobs={premiumJobs} handleCardClick={handleCardClick} />
       </div>
 
-      <div className="scroll-fade-in scroll-fade-in">
+      <div className="scroll-fade-in">
         <EquipmentSection latestMachines={latestMachines} latestRealEstate={latestRealEstate} />
       </div>
 
-      <div className="scroll-fade-in scroll-fade-in">
+      <div className="scroll-fade-in">
         <CateringSection latestAccommodations={latestAccommodations} latestCaterings={latestCaterings} />
       </div>
 
-      <div className="scroll-fade-in scroll-fade-in">
+      <div className="scroll-fade-in">
         <AboutSection 
           totalAdsCount={totalAdsCount}
           dynamicFirmsCount={dynamicFirmsCount}
@@ -111,7 +111,7 @@ export default function HomePage() {
       </div>
 
       {/* New CTA Section */}
-      <div className="scroll-fade-in scroll-fade-in">
+      <div className="scroll-fade-in">
         <CtaSection />
       </div>
     </div>

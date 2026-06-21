@@ -702,7 +702,7 @@ input, textarea {
 }
 
 .scroll-fade-in {
-  animation: scrollFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: scrollFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation-timeline: view();
   animation-range: entry 0% entry 100%;
 }
