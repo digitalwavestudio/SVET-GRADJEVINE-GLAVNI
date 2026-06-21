@@ -49,7 +49,7 @@ window.addEventListener('unhandledrejection', function(event) {
 });
 import { StrictMode, useEffect, useState } from 'react';
 import { hydrateRoot } from 'react-dom/client';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider, hydrate } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { HelmetProvider } from 'react-helmet-async';
@@ -60,6 +60,12 @@ import App from '@/src/App';
 
 initZodLocalization();
 import './index.css';
+
+const ssrData = typeof window !== 'undefined' ? (window as any).__SSR_DATA__ : null;
+const dehydratedState = ssrData?.dehydratedState;
+if (dehydratedState) {
+  hydrate(queryClient, dehydratedState);
+}
 
 function Root() {
   const [persister, setPersister] = useState<any | null>(null);

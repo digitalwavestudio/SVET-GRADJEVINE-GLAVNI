@@ -24,7 +24,7 @@ import { authLimiter } from "../middleware/rate-limit.middleware.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { idempotency } from "../middlewares/idempotency.ts";
 import { UsersService } from "../services/users.service.ts";
-import { admin } from "../config/firebase.ts";
+import { admin, getDb } from "../config/firebase.ts";
 import { AuditService, AuditAction } from "../services/audit.service.ts";
 import { UnifiedAdsService } from "../services/unified-ads.service.ts";
 import { userPresenceLoader } from "../utils/dataloader.ts";
@@ -307,7 +307,7 @@ usersRouter.post("/activate-premium", requireAuth, async (req, res, next) => {
     if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
     const premiumPrice = await getPremiumPrice();
-    const db = admin.firestore();
+    const db = getDb();
     const userRef = db.collection("users").doc(uid);
     const userSnap = await userRef.get();
 

@@ -1,0 +1,53 @@
+import { Suspense, useEffect } from 'react';
+import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
+import { initGA, trackPageView } from '@/src/lib/analytics';
+import NetworkStatus from '@/src/components/NetworkStatus';
+import CookieConsent from '@/src/components/CookieConsent';
+import BackToTop from '@/src/components/BackToTop';
+import { VerificationBanner } from '@/src/components/VerificationBanner';
+import { measurePageLoad } from '@/src/lib/performance';
+import { useAffiliateTracking } from '@/src/hooks/useAffiliateTracking';
+import { usePresence } from '@/src/hooks/usePresence';
+import { useRealtimeSync } from '@/src/hooks/useRealtimeSync';
+import QuotaBanner from '@/src/components/QuotaBanner';
+import ProgressBar from '@/src/components/ui/ProgressBar';
+import { usePerformanceNavigation } from '@/src/lib/performance';
+
+const PageLoader = () => (
+  <div className="bg-surface min-h-screen"></div>
+);
+
+export function RootLayout() {
+  const location = useLocation();
+  
+  useAffiliateTracking();
+  usePresence();
+  useRealtimeSync();
+  usePerformanceNavigation();
+
+  useEffect(() => {
+    measurePageLoad();
+    const gaId = (typeof window !== 'undefined' && (window as any).__APP_ENV__?.VITE_GA_MEASUREMENT_ID) || import.meta.env.VITE_GA_MEASUREMENT_ID;
+    initGA(gaId);
+  }, []);
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location]);
+
+  return (
+    <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary">
+      <ProgressBar />
+      <QuotaBanner />
+      {location.pathname !== '/prijava' && location.pathname !== '/registracija' && <VerificationBanner />}
+      <NetworkStatus />
+      <CookieConsent />
+      <ScrollRestoration />
+      <BackToTop />
+      
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
+    </div>
+  );
+}

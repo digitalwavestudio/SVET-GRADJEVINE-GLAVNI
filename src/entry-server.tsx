@@ -1,84 +1,63 @@
-import React, { Suspense } from 'react';
 import { renderToString } from 'react-dom/server';
-import { StaticRouter } from 'react-router-dom';
+import { createStaticHandler, createStaticRouter, StaticRouterProvider, createRoutesFromElements } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { dehydrate } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
-import { ThemeProvider } from '@/src/context/ThemeContext';
-import { ToastProvider } from '@/src/context/ToastContext';
-import { BrandProvider } from '@/src/context/BrandContext';
-import { MessagesProvider } from '@/src/context/MessagesContext';
-import { VisibilityAbortProvider } from '@/src/context/VisibilityAbortContext';
-import { AuthContext, AuthContextType } from '@/src/context/AuthContext';
-import ProgressBar from '@/src/components/ui/ProgressBar';
-import QuotaBanner from '@/src/components/QuotaBanner';
-import { VerificationBanner } from '@/src/components/VerificationBanner';
-import NetworkStatus from '@/src/components/NetworkStatus';
-import CookieConsent from '@/src/components/CookieConsent';
-import BackToTop from '@/src/components/BackToTop';
-import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
-import { MobileBottomNav } from '@/src/components/layout/MobileBottomNav';
-import { StickySearchHeader } from '@/src/components/layout/StickySearchHeader';
-import SignupBanner from '@/src/components/SignupBanner';
-import HomePage from '@/src/modules/core/pages/HomePage';
+import { getRouteElements } from './modules/routeElements';
+import { AppProviders } from './components/AppProviders';
+import { Toaster } from 'react-hot-toast';
 
-const mockAuth: AuthContextType = {
-  user: null, loading: false, isInitializing: false, isOffline: false, isQuotaExceeded: false,
-  loginWithGoogle: () => Promise.resolve(), loginWithEmail: () => Promise.resolve(),
-  registerWithEmail: () => Promise.resolve(), logout: () => Promise.resolve(),
-  switchRole: () => Promise.resolve(), updateUser: () => Promise.resolve(),
-  getIdToken: () => Promise.resolve(undefined), toggleSavedJob: () => Promise.resolve(),
-  toggleSavedAd: () => Promise.resolve(), saveSearch: () => Promise.resolve(),
-  removeSearch: () => Promise.resolve(),
-};
+export interface SsrResult {
+  html: string;
+  dehydratedState: unknown;
+  helmetHtml: string;
+  status: number;
+}
 
-export async function render(url: string): Promise<string> {
-  if (typeof globalThis.window !== 'undefined') {
-    (globalThis.window as any).location = { href: url, pathname: url.split('?')[0], search: url.includes('?') ? '?' + url.split('?')[1] : '' };
-  }
+export async function render(url: string): Promise<SsrResult> {
+  const routes = createRoutesFromElements(getRouteElements());
 
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { enabled: false, retry: false, staleTime: Infinity, gcTime: Infinity } },
+    defaultOptions: {
+      queries: {
+        enabled: false,
+        retry: false,
+        staleTime: Infinity,
+        gcTime: Infinity,
+      },
+    },
   });
 
-  return renderToString(
+  const handler = createStaticHandler(routes);
+  const request = new Request(url, { method: 'GET' });
+  const context = await handler.query(request, { requestContext: { queryClient } });
+
+  if (context instanceof Response) {
+    return { html: '', dehydratedState: null, helmetHtml: '', status: context.status };
+  }
+
+  const router = createStaticRouter(handler.dataRoutes, context);
+  const helmetContext: Record<string, unknown> = {};
+
+  const html = renderToString(
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <ToastProvider>
-          <BrandProvider>
-            <AuthContext.Provider value={mockAuth}>
-              <MessagesProvider>
-                <VisibilityAbortProvider>
-                  <HelmetProvider>
-                    <StaticRouter location={url}>
-                      <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary">
-                        <ProgressBar />
-                        <QuotaBanner />
-                        <VerificationBanner />
-                        <NetworkStatus />
-                        <CookieConsent />
-                        <BackToTop />
-                        <Suspense>
-                          <div className="flex flex-col min-h-screen">
-                            <Suspense><SignupBanner /></Suspense>
-                            <Navbar />
-                            <StickySearchHeader />
-                            <main className="flex-1 flex flex-col relative pb-24 md:pb-0">
-                              <HomePage />
-                            </main>
-                            <Footer />
-                            <MobileBottomNav />
-                          </div>
-                        </Suspense>
-                      </div>
-                    </StaticRouter>
-                  </HelmetProvider>
-                </VisibilityAbortProvider>
-              </MessagesProvider>
-            </AuthContext.Provider>
-          </BrandProvider>
-        </ToastProvider>
-      </ThemeProvider>
+      <AppProviders>
+        <HelmetProvider context={helmetContext}>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: { background: '#0A0F14', color: '#fff', border: '1px solid rgba(255,173,58,0.2)' },
+            }}
+          />
+          <StaticRouterProvider router={router} context={context} />
+        </HelmetProvider>
+      </AppProviders>
     </QueryClientProvider>
   );
+
+  const dehydratedState = dehydrate(queryClient);
+  const helmet = (helmetContext as any).helmet;
+  const helmetHtml = helmet ? helmet.title.toString() + helmet.meta.toString() + helmet.link.toString() : '';
+
+  return { html, dehydratedState, helmetHtml, status: context.statusCode || 200 };
 }

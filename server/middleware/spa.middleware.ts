@@ -9,14 +9,30 @@ import { getRedis } from "../utils/redis.ts";
 const SSR_DIST_DIR = path.resolve(process.cwd(), "dist-ssr");
 const SSR_ENTRY_PATH = path.join(SSR_DIST_DIR, "entry-server.mjs");
 
-async function reactSsrHomepage(url: string): Promise<string | null> {
+interface SsrResult {
+  html: string;
+  dehydratedState: unknown;
+  helmetHtml: string;
+  status: number;
+}
+
+async function reactSsrPage(fullUrl: string): Promise<SsrResult | null> {
   try {
     if (!fs.existsSync(SSR_ENTRY_PATH)) return null;
 
     const origWindow = globalThis.window;
     const origDocument = globalThis.document;
+    const origFetch = globalThis.fetch;
 
     try {
+      const origin = fullUrl.startsWith('http') ? new URL(fullUrl).origin : 'http://localhost:3000';
+      globalThis.fetch = function ssrFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+        if (typeof input === 'string' && input.startsWith('/')) {
+          input = `${origin}${input}`;
+        }
+        return origFetch.call(globalThis, input, init);
+      };
+
       const textNode = { data: '' };
       const mockStyleEl = { appendChild: () => {}, firstChild: textNode, data: '' };
       const mockDoc = {
@@ -27,7 +43,7 @@ async function reactSsrHomepage(url: string): Promise<string | null> {
       };
       globalThis.window = {
         __APP_ENV__: {},
-        location: { href: url, pathname: url.split('?')[0], search: url.includes('?') ? '?' + url.split('?')[1] : '' },
+        location: { href: fullUrl, pathname: fullUrl.split('?')[0].replace(/^https?:\/\/[^/]+/, ''), search: fullUrl.includes('?') ? '?' + fullUrl.split('?')[1] : '' },
         innerWidth: 1024, innerHeight: 768,
         matchMedia: () => ({ matches: false, addListener: () => {}, removeListener: () => {}, addEventListener: () => {}, removeEventListener: () => {}, dispatchEvent: () => false }),
         addEventListener: () => {}, removeEventListener: () => {},
@@ -38,14 +54,15 @@ async function reactSsrHomepage(url: string): Promise<string | null> {
       } as any;
       globalThis.document = mockDoc as any;
 
-      const ssrModule = await import(/* @vite-ignore */ `file://${SSR_ENTRY_PATH.replace(/\\/g, '/')}`);
-      return await ssrModule.render(url);
+      const ssrModule = await import(/* @vite-ignore */ `file:///${SSR_ENTRY_PATH.replace(/\\/g, '/')}`);
+      return await ssrModule.render(fullUrl);
     } finally {
+      globalThis.fetch = origFetch;
       globalThis.window = origWindow;
       globalThis.document = origDocument;
     }
   } catch (error) {
-    console.error("[SSR] React SSR failed for homepage:", error);
+    console.error("[SSR] React SSR failed:", error);
     return null;
   }
 }
@@ -928,14 +945,18 @@ export const createSpaMiddleware = () => {
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
 
         // Try React SSR first
-        const reactHtml = await reactSsrHomepage(req.originalUrl || req.path);
-        if (reactHtml) {
-          const titleMatch = reactHtml.match(/<title>(.*?)<\/title>/);
-          const title = titleMatch ? titleMatch[1] : 'Svet Građevine - Portal za građevinske oglase';
+        const scheme = req.get('x-forwarded-proto') || 'http';
+        const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+        const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+        const ssrResult = await reactSsrPage(ssrUrl);
+        if (ssrResult) {
+          const { html, dehydratedState, helmetHtml } = ssrResult;
 
           let finalHtml = indexHtml
-            .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
-            .replace('<div id="root"></div>', `<div id="root">${reactHtml}</div>`);
+            .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+            .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+
+          res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
 
           const redisCache = getRedis();
           if (redisCache) {
@@ -988,6 +1009,27 @@ export const createSpaMiddleware = () => {
             if (isBot) {
               const uaShort = userAgent.substring(0, 120);
               console.log(`[SPA] Bot SSR: ${req.path} | UA: ${uaShort} | IP: ${req.ip || req.socket.remoteAddress}`);
+
+              // Try React SSR first
+              const scheme = req.get('x-forwarded-proto') || 'http';
+              const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+              const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+              const ssrResult = await reactSsrPage(ssrUrl);
+              if (ssrResult) {
+                const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+                const { html, dehydratedState, helmetHtml } = ssrResult;
+                let finalHtml = indexHtml
+                  .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+                  .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+                res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+                const redisCache = getRedis();
+                if (redisCache) {
+                  redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
+                }
+                return res.send(finalHtml);
+              }
+
+              // Fallback: string-based pre-render
               const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
 
               // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
