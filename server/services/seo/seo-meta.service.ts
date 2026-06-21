@@ -21,7 +21,7 @@ export class SEOMetaService {
       if (redis) {
         const isDead = await redis.get(deadPathKey);
         if (isDead) {
-          logger.debug([SEO Shield] Dead path hit for . Blocking re-fetch.);
+          logger.debug(`[SEO Shield] Dead path hit for ${resolvedPath}. Blocking re-fetch.`);
           return { isDead: true };
         }
       }
