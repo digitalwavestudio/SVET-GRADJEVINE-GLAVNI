@@ -306,7 +306,7 @@ async function backgroundPreRenderListingHub(
           </main>`;
 
     const title = `${label} | Svet Građevine`;
-    const desc = `${label} na portalu Svet Građevine.`;
+    const desc = `${label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente širom regiona.`;
 
     const baseUrl = APP_CONFIG.BASE_URL;
     const bcPathParts = reqPath.split("/").filter(Boolean);
@@ -997,11 +997,11 @@ export const createSpaMiddleware = () => {
               // Non-bot: serve clean SPA shell with meta tags (no pre-rendered listing content)
               // to avoid flash of server content before React hydration
               const fullTitle = `${matchedRoute.label} | Svet Građevine`;
-              const baseDesc = `${matchedRoute.label} na Svet Građevine portalu.`;
+              const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
               const cleanHtml = html
                 .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
                 .replace("</head>", `
-<meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase na Svet Građevine portalu." />
+<meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase. Svet Građevine je vodeći građevinski portal na Balkanu." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />
 <meta property="og:title" content="${fullTitle}" />
 <meta property="og:description" content="${baseDesc}" />
@@ -1077,12 +1077,12 @@ export const createSpaMiddleware = () => {
           skeletonHtml = skeletonHtml.replace(
             "</head>",
             `
-<meta name="description" content="${label} na portalu Svet Građevine." />
+<meta name="description" content="${label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente širom regiona." />
 <meta name="lastmod" content="${lastmod}" />
 ${paginationLinks}
 ${breadcrumbHtml}
 <meta property="og:title" content="${fullTitle}" />
-<meta property="og:description" content="${label} na portalu Svet Građevine." />
+<meta property="og:description" content="${label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />
 <meta property="og:image" content="${defaultImage}" />
 <meta property="og:url" content="${currentPageUrl}" />
 <meta property="og:type" content="website" />
