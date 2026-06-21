@@ -154,7 +154,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       handleCardClick(url, { job });
                     }
                   }}
-                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer h-[400px] md:h-[230px]"
+                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer h-[440px] md:h-[280px]"
                 >
                   <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 w-full h-full">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10 flex items-center justify-center overflow-hidden">
