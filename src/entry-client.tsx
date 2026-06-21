@@ -49,7 +49,6 @@ window.addEventListener('unhandledrejection', function(event) {
 });
 import { StrictMode, useEffect, useState } from 'react';
 import { hydrateRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
@@ -98,9 +97,7 @@ function Root() {
   const content = (
     <ErrorBoundary>
       <HelmetProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <App />
       </HelmetProvider>
     </ErrorBoundary>
   );
