@@ -19,6 +19,7 @@ const BOT_AGENTS = [
   "duckduckbot",
   "slurp",
   "baiduspider",
+  "ahrefsbot",
   "gptbot",
   "claudebot",
   "perplexitybot",

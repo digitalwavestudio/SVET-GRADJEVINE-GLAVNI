@@ -194,7 +194,7 @@ export const rateLimitShield = async (
 
     // 2. Global rate limit (Configurable via Admin Dashboard) using SHA-256 hashed IP
     const limitBase = DynamicConfigService.get("globalRateLimit", 1000);
-    const botLimitBase = 3000; // Even "good" bots get limited to prevent spoofing floods
+    const botLimitBase = 20000; // Generous limit for known crawlers (AhrefsBot, GPTBot, etc.)
 
     const isStaticAsset = req.path.startsWith("/assets/") || req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|map|txt|xml)$/i);
 
