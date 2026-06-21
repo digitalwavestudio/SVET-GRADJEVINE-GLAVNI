@@ -1,5 +1,5 @@
-import { ensureInitialized, db } from "./server/config/firebase.ts";
-import { env } from "./server/config/env.ts";
+import { ensureInitialized, db } from "../server/config/firebase.ts";
+import { env } from "../server/config/env.ts";
 
 async function check() {
   ensureInitialized();

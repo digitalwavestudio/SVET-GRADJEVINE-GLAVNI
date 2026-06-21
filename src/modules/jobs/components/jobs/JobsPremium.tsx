@@ -2,6 +2,102 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { buildJobUrl } from '@/src/lib/seo';
+import { LOCATIONS, PROFESSIONS, CORE_SECTORS, ENGAGEMENT_TYPES } from '@/src/constants/taxonomy';
+
+const getFriendlyLocation = (job: any) => {
+  const slug = job.locationSlug || job.location || job.loc || job.lokacijaStr;
+  if (!slug) return 'Srbija';
+  
+  if (typeof slug === 'string') {
+    const cleanSlug = slug.toLowerCase().trim();
+    const found = LOCATIONS.find(l => l.slug === cleanSlug || l.id === cleanSlug);
+    if (found) return found.name;
+    return slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
+  }
+  
+  if (typeof slug === 'object' && slug !== null) {
+    if ('name' in slug) return (slug as any).name;
+    if ('address' in slug) return (slug as any).address;
+  }
+  
+  return 'Srbija';
+};
+
+const getFriendlyCategory = (job: any) => {
+  if (job.type === 'job') {
+    const profSlug = job.professionSlug;
+    if (profSlug) {
+      for (const sector in PROFESSIONS) {
+        const found = PROFESSIONS[sector].find(p => p.slug === profSlug || p.id === profSlug);
+        if (found) return found.name;
+      }
+    }
+    
+    const sectSlug = job.sectorSlug || job.categorySlug || job.sector;
+    if (sectSlug) {
+      const found = CORE_SECTORS.find(s => s.slug === sectSlug || s.id === sectSlug);
+      if (found) return found.name;
+    }
+    
+    return 'Građevinski posao';
+  }
+  
+  if (job.type === 'machine') return 'Građevinska mašina';
+  if (job.type === 'real_estate') return 'Plac / Zemljište';
+  if (job.type === 'company') return 'Firma';
+  if (job.type === 'accommodation') return 'Smeštaj za radnike';
+  if (job.type === 'catering') return 'Ketering';
+  
+  return 'Premium oglas';
+};
+
+const getFriendlySalary = (job: any) => {
+  const min = job.plataMin;
+  const max = job.plataMax;
+  
+  if (min !== undefined && min !== null && min !== '') {
+    const minVal = Number(min);
+    if (!isNaN(minVal)) {
+      if (max !== undefined && max !== null && max !== '') {
+        const maxVal = Number(max);
+        if (!isNaN(maxVal)) {
+          if (minVal === maxVal) return `€${minVal.toLocaleString()}`;
+          return `€${minVal.toLocaleString()} - €${maxVal.toLocaleString()}`;
+        }
+      }
+      return `Od €${minVal.toLocaleString()}`;
+    }
+  }
+  
+  if (max !== undefined && max !== null && max !== '') {
+    const maxVal = Number(max);
+    if (!isNaN(maxVal)) {
+      return `Do €${maxVal.toLocaleString()}`;
+    }
+  }
+  
+  const oldSalary = job.salary || job.sal || job.price;
+  if (oldSalary) {
+    if (typeof oldSalary === 'number') return `€${oldSalary.toLocaleString()}`;
+    return oldSalary;
+  }
+  
+  return null;
+};
+
+const getFriendlyEngagement = (job: any) => {
+  const slug = job.engagementSlug || job.engagement || job.time || job.radnoVreme;
+  if (!slug) return 'Puno radno vreme';
+  
+  if (typeof slug === 'string') {
+    const cleanSlug = slug.toLowerCase().trim();
+    const found = ENGAGEMENT_TYPES.find(e => e.slug === cleanSlug || e.id === cleanSlug);
+    if (found) return found.name;
+    return slug.replace(/-/g, ' ').charAt(0).toUpperCase() + slug.slice(1).toLowerCase().replace(/-/g, ' ');
+  }
+  
+  return 'Puno radno vreme';
+};
 
 interface JobsPremiumProps {
   jobs: any[];
@@ -32,11 +128,11 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
         </div>
         <div className={`relative w-full ${isExpanded ? '' : 'overflow-hidden'}`}>
           {jobs.length > 0 ? (
-            <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_120s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
+            <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
               {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
                 .map((job, idx) => (
-                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
-                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 h-full">
+                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-full ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
+                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center rounded-[10px] border border-white/5 w-full h-full min-h-[350px] sm:min-h-[300px] md:min-h-[210px]">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10">
                       {job.logo ? (
                         <OptimizedImage 
@@ -51,37 +147,37 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                         <div className="w-full h-full bg-slate-950/5 rounded-full flex items-center justify-center text-slate-950 font-black text-2xl">{getInitials(job.comp)}</div>
                       )}
                     </div>
-                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-center">
-                      <div className="flex items-center justify-center md:justify-start gap-2 mb-2 relative z-10 animate-blink">
-                        <span className="material-symbols-outlined text-yellow-500 text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
-                        <Link to={`/firma/${job.comp}`} className="text-yellow-500 text-xs font-bold uppercase tracking-widest hover:text-yellow-400 transition-colors">Premium Partner</Link>
+                    <div className="flex-1 text-center md:text-left flex flex-col h-full justify-between w-full min-w-0">
+                      <div>
+                        <div className="flex items-center justify-center md:justify-start gap-2 mb-2 relative z-10 animate-blink">
+                          <span className="material-symbols-outlined text-yellow-500 text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                          <Link to={`/firma/${job.comp}`} className="text-yellow-500 text-xs font-bold uppercase tracking-widest hover:text-yellow-400 transition-colors">Premium Partner</Link>
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase line-clamp-2">
+                          <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
+                            {job.title}
+                          </Link>
+                        </h3>
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                          {(job.description || job.body || job.content || job.opis || '')?.replace(/<[^>]*>?/gm, '') || 'Pridružite se modernom timu na velikim projektima i osigurajte najbolje uslove rada u industriji.'}
+                        </p>
                       </div>
-                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase line-clamp-2">
-                        <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
-                          {job.title}
-                        </Link>
-                      </h3>
-                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                        {(job.description || job.body || job.content || job.opis || '')?.replace(/<[^>]*>?/gm, '') || 'Pridružite se modernom timu na velikim projektima i osigurajte najbolje uslove rada u industriji.'}
-                      </p>
                       <div className="flex flex-col gap-4 items-center md:items-start relative z-10 mt-auto">
                         <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                          {(job.sal || job.salary) && (
+                          {getFriendlySalary(job) && (
                             <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
                               <span className="material-symbols-outlined text-[14px]">payments</span>
-                              {job.sal || job.salary}
+                              {getFriendlySalary(job)}
                             </span>
                           )}
                           <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
                             <span className="material-symbols-outlined text-[14px]">schedule</span>
-                            {job.time || job.radnoVreme || (job.engagementSlug === 'puno-radno-vreme' ? 'Puno radno vreme' : job.engagementSlug?.replace(/-/g, ' ')) || 'Puno radno vreme'}
+                            {getFriendlyEngagement(job)}
                           </span>
-                          {(job.loc || job.lokacijaStr || job.location) && (
-                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px]">location_on</span>
-                              {job.loc || job.lokacijaStr || job.location}
-                            </span>
-                          )}
+                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">location_on</span>
+                            {getFriendlyLocation(job)}
+                          </span>
                         </div>
                         <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20">APLICIRAJ</button>
                       </div>
