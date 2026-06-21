@@ -4,11 +4,9 @@ Sva prethodna pravila su uklonjena na zahtev korisnika.
 
 ## Firestore Indexes
 
-After modifying `firestore.indexes.json`, deploy with:
+Deploy to default database:
   firebase deploy --only firestore:indexes
 
-New composite indexes added for geo P-SEO queries:
-- listings CG: type + createdAt DESC, type + locationSlug + createdAt DESC, type + professionSlug + createdAt DESC, type + professionSlug + locationSlug + createdAt DESC
-- users COLLECTION: locationSlug + createdAt DESC, professionSlug + createdAt DESC, professionSlug + locationSlug + createdAt DESC
+**IMPORTANT**: App uses `ai-studio` database (not `(default)`). The `firebase deploy` only targets `(default)`. To deploy indexes to `ai-studio`, use `gcloud firestore indexes composite create` or the REST API directly.
 
-Without these indexes, geo listing queries will fail at runtime with "index required" error.
+All indexes from `firestore.indexes.json` have been deployed to the `ai-studio` database (43 indexes total, Jun 21 2026). The `(default)` database also has the same indexes deployed earlier.
