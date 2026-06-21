@@ -56,12 +56,12 @@ export const searchJobs = async (
     // CACHING LOGIC FOR HOMEPAGE PREVIEWS (Plan 2 Optimization)
     const isPremiumHomepage =
       validated?.filters?.isPremium === true &&
-      validated?.filters?.status === "approved" &&
+      validated?.filters?.status === "active" &&
       validated?.pageSize === 6 &&
       !validated?.searchQuery;
     const isUrgentHomepage =
       validated?.filters?.isUrgent === true &&
-      validated?.filters?.status === "approved" &&
+      validated?.filters?.status === "active" &&
       validated?.pageSize === 6 &&
       !validated?.searchQuery;
 

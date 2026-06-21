@@ -83,8 +83,13 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
 
-  const { data: premiumData } = usePremiumJobs(sanitizedFilters, 6);
-  const { data: urgentData } = useUrgentJobs(sanitizedFilters, 6);
+  const [showPremiumAndUrgent, setShowPremiumAndUrgent] = useState(false);
+  useEffect(() => {
+    if (jobs.length > 0) setShowPremiumAndUrgent(true);
+  }, [jobs.length]);
+
+  const { data: premiumData } = usePremiumJobs(sanitizedFilters, 6, { enabled: showPremiumAndUrgent });
+  const { data: urgentData } = useUrgentJobs(sanitizedFilters, 6, { enabled: showPremiumAndUrgent });
   const premiumJobs = useMemo(() => premiumData?.pages.flatMap(p => p.items) || [], [premiumData]);
   const urgentJobs = useMemo(() => urgentData?.pages.flatMap(p => p.items) || [], [urgentData]);
 
@@ -337,7 +342,11 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
     }
     return result;
   }, [jobs, debouncedSearchQuery, salaryRange, selectedBenefits, sortBy]);
-  const filteredPremiumJobs = useMemo(() => applyLocalFilters(premiumJobs).filter((j: any) => j.isPremium === true), [premiumJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
+  const filteredPremiumJobs = useMemo(() => {
+    const res = applyLocalFilters(premiumJobs).filter((j: any) => j.isPremium === true);
+    console.log("JobsPage filteredPremiumJobs:", res.length, "raw premiumJobs:", premiumJobs.length, "all raw jobs:", jobs.length);
+    return res;
+  }, [premiumJobs, debouncedSearchQuery, salaryRange, selectedBenefits, jobs]);
   const filteredUrgentJobs = useMemo(() => applyLocalFilters(urgentJobs).filter((j: any) => j.isUrgent === true), [urgentJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
 
   // Reset page when filters change (Not needed anymore with server-side pagination)

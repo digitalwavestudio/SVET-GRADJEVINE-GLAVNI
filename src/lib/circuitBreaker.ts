@@ -203,9 +203,8 @@ class ClientCircuitBreaker {
 
     // Save successful responses to localStorage for offline fallback
     if (success && payload !== undefined && typeof window !== 'undefined') {
+      const cacheKey = `sg_cb_cache:${url}`;
       try {
-        const cacheKey = `sg_cb_cache:${url}`;
-        
         // Memory Guard capacity verification & cleanup
         this.runMemoryGuard();
 
@@ -224,6 +223,8 @@ class ClientCircuitBreaker {
               const k = safeLocalStorage.key(i);
               if (k?.startsWith('sg_cb_cache:')) safeLocalStorage.removeItem(k);
             }
+            // Aggressive data slimming / compression
+            const finalPayload = this.slimPayload(url, payload);
             safeLocalStorage.setItem(cacheKey, JSON.stringify({
               data: finalPayload,
               timestamp: Date.now()
