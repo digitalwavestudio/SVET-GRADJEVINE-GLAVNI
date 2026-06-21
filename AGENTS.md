@@ -1,6 +1,11 @@
 # Agents Protocol
 
-Sva prethodna pravila su uklonjena na zahtev korisnika.
+## Pravila
+
+1. **Jezik** — uvek pišem na srpskom (latinica)
+2. **Objašnjenja** — normalnim jezikom, DOZVOLJEN žargon
+3. **GitHub** — kad kažeš "šalji na GitHub", odmah commit i push CEO CODE na main GRANU, bez pitanja
+4. **Ne šalji na cloud** — nikad ne guram BUILD na Cloud! NIKAD!
 
 ## Firestore Indexes
 
