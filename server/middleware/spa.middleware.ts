@@ -372,6 +372,10 @@ ${paginationLinks}
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${reqPath}" />
 <meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
 <meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${desc}" />
+<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
 <style>img{aspect-ratio:auto;max-width:100%;height:auto}</style>
 <script type="application/ld+json">${JSON.stringify(bc)}</script>
 ${jsonLdScript}
@@ -885,13 +889,24 @@ export const createSpaMiddleware = () => {
 
       // Homepage: React SSR (fallback to string-based pre-render)
       if (req.path === "/") {
-        if (!isBot) {
-          // Non-bot: serve clean SPA shell with meta tags (no pre-rendered content)
-          const cleanHtml = html
-            .replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`)
-            .replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" /><meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
-          return res.send(cleanHtml);
-        }
+          if (!isBot) {
+            // Non-bot: serve clean SPA shell with meta tags (no pre-rendered content)
+            const cleanHtml = html
+              .replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`)
+              .replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
+<meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" />
+<meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:url" content="${APP_CONFIG.BASE_URL}/" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Svet Građevine - Portal za građevinske oglase" />
+<meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+</head>`);
+            return res.send(cleanHtml);
+          }
 
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
 
@@ -978,9 +993,23 @@ export const createSpaMiddleware = () => {
             } else {
               // Non-bot: serve clean SPA shell with meta tags (no pre-rendered listing content)
               // to avoid flash of server content before React hydration
+              const fullTitle = `${matchedRoute.label} | Svet Građevine`;
+              const baseDesc = `${matchedRoute.label} na Svet Građevine portalu.`;
               const cleanHtml = html
-                .replace(/<title>.*?<\/title>/, `<title>${matchedRoute.label} | Svet Građevine</title>`)
-                .replace("</head>", `<meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase na Svet Građevine portalu." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" /></head>`);
+                .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
+                .replace("</head>", `
+<meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase na Svet Građevine portalu." />
+<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />
+<meta property="og:title" content="${fullTitle}" />
+<meta property="og:description" content="${baseDesc}" />
+<meta property="og:url" content="${APP_CONFIG.BASE_URL}${req.path}" />
+<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${fullTitle}" />
+<meta name="twitter:description" content="${baseDesc}" />
+<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+</head>`);
               return res.send(cleanHtml);
             }
           }
@@ -1053,6 +1082,10 @@ ${breadcrumbHtml}
 <meta property="og:image" content="${defaultImage}" />
 <meta property="og:url" content="${currentPageUrl}" />
 <meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${fullTitle}" />
+<meta name="twitter:description" content="${label} na portalu Svet Građevine." />
+<meta name="twitter:image" content="${defaultImage}" />
 </head>`,
           );
           skeletonHtml = skeletonHtml.replace(
