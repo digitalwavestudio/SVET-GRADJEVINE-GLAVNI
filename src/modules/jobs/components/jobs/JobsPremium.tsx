@@ -61,24 +61,31 @@ const getFriendlySalary = (job: any) => {
       if (max !== undefined && max !== null && max !== '') {
         const maxVal = Number(max);
         if (!isNaN(maxVal)) {
-          if (minVal === maxVal) return `€${minVal.toLocaleString()}`;
-          return `€${minVal.toLocaleString()} - €${maxVal.toLocaleString()}`;
+          if (minVal === maxVal) return `${minVal.toLocaleString()} €`;
+          return `${minVal.toLocaleString()} - ${maxVal.toLocaleString()} €`;
         }
       }
-      return `Od €${minVal.toLocaleString()}`;
+      return `Od ${minVal.toLocaleString()} €`;
     }
   }
   
   if (max !== undefined && max !== null && max !== '') {
     const maxVal = Number(max);
     if (!isNaN(maxVal)) {
-      return `Do €${maxVal.toLocaleString()}`;
+      return `Do ${maxVal.toLocaleString()} €`;
     }
   }
   
   const oldSalary = job.salary || job.sal || job.price;
   if (oldSalary) {
-    if (typeof oldSalary === 'number') return `€${oldSalary.toLocaleString()}`;
+    if (typeof oldSalary === 'number') return `${oldSalary.toLocaleString()} €`;
+    if (typeof oldSalary === 'string') {
+      let clean = oldSalary.replace(/€/g, '').trim();
+      if (!clean.endsWith('€') && !clean.endsWith('E') && !clean.endsWith('e')) {
+        clean = clean + ' €';
+      }
+      return clean;
+    }
     return oldSalary;
   }
   
@@ -117,6 +124,7 @@ interface JobsPremiumProps {
 }
 
 export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setIsExpanded, prefetch, getInitials, hasMore, loadMore, loadingMore }) => {
+  console.log("JobsPremium render, jobs count:", jobs?.length, "jobs:", jobs);
   return (
     <section className="py-20 bg-[#0F1923] relative">
       <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-500/20 via-transparent to-transparent"></div>
@@ -137,8 +145,8 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
             <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
               {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
                 .map((job, idx) => (
-                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-[460px] md:h-[310px] ${isExpanded ? 'w-full' : 'w-[85vw] md:w-[580px]'}`}>
-                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center md:items-start rounded-[10px] border border-white/5 w-full h-full relative">
+                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-[480px] md:h-[340px] ${isExpanded ? 'w-full' : 'w-[85vw] sm:min-w-[340px] md:min-w-[620px] md:w-[620px]'}`}>
+                  <div className="bg-[#0F1923] pt-6 px-6 pb-4 md:pt-7 md:px-7 md:pb-5 flex flex-col md:flex-row gap-6 md:gap-7 items-center md:items-start rounded-[10px] border border-white/5 w-full h-full relative">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10 flex items-center justify-center overflow-hidden">
                       {job.logo ? (
                         <OptimizedImage 
@@ -158,24 +166,20 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                           <span className="material-symbols-outlined text-yellow-500 text-base" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                           <span className="text-yellow-500 text-base font-black uppercase tracking-widest hover:text-yellow-400 transition-colors">Premium Oglas</span>
                         </div>
-                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase line-clamp-2">
+                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase line-clamp-2 pr-24 md:pr-28">
                           <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
                             {job.title?.replace(' — ', ' ') || 'Premium Posao'}
                           </Link>
                         </h3>
-                        <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-2 pr-4">
                           {(job.description || job.body || job.content || job.opis || '')?.replace(/<[^>]*>?/gm, '') || 'Pridružite se modernom timu na velikim projektima i osigurajte najbolje uslove rada u industriji.'}
                         </p>
                       </div>
                       <div className="flex flex-col gap-3 items-center md:items-start relative z-10 mt-auto w-full">
-                        {/* Red 1: Kategorija, Radno vreme */}
+                        {/* Red 1: Radno vreme */}
                         <div className="flex flex-wrap gap-2.5 justify-center md:justify-start w-full">
-                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">category</span>
-                            {getFriendlyCategory(job)}
-                          </span>
                           {getFriendlyEngagement(job) && (
-                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                            <span className="bg-white/5 text-slate-300 px-3 py-1 rounded text-[11px] font-bold uppercase flex items-center gap-1">
                               <span className="material-symbols-outlined text-[14px]">schedule</span>
                               {getFriendlyEngagement(job)}
                             </span>
@@ -193,17 +197,17 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                             return (
                               <>
                                 {hasSmestaj && (
-                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] rounded font-bold uppercase tracking-wider">
                                     <span className="material-symbols-outlined text-[14px]">home</span> Smeštaj
                                   </span>
                                 )}
                                 {hasPrevoz && (
-                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[11px] rounded font-bold uppercase tracking-wider">
                                     <span className="material-symbols-outlined text-[14px]">commute</span> Prevoz
                                   </span>
                                 )}
                                 {hasHrana && (
-                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[11px] rounded-full font-bold uppercase tracking-wider">
+                                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[11px] rounded font-bold uppercase tracking-wider">
                                     <span className="material-symbols-outlined text-[14px]">restaurant</span> Hrana
                                   </span>
                                 )}
@@ -211,11 +215,16 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                             );
                           })()}
                         </div>
-                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20 mt-1">APLICIRAJ</button>
+                        {/* Red 3: Dugme levo */}
+                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-9 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20 mt-1">APLICIRAJ</button>
                       </div>
                     </div>
+                    {/* Kategorija u gornjem desnom uglu */}
+                    <span className="absolute top-6 right-6 md:top-7 md:right-7 bg-white/5 text-slate-300 px-3 py-1 rounded text-[11px] font-bold uppercase z-20 pointer-events-none">
+                      {getFriendlyCategory(job)}
+                    </span>
                     {getFriendlySalary(job) && (
-                      <span className="absolute bottom-6 right-6 md:bottom-7 md:right-7 text-[#D4AF37] text-sm md:text-base font-black uppercase tracking-widest pointer-events-none z-20">
+                      <span className="absolute bottom-4 right-6 md:bottom-[22px] md:right-7 text-[#D4AF37] text-4xl md:text-5xl font-black uppercase pointer-events-none z-20">
                         {getFriendlySalary(job)}
                       </span>
                     )}
