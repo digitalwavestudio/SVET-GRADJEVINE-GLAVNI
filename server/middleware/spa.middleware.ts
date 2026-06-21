@@ -1075,6 +1075,14 @@ ${breadcrumbHtml}
           return res.send(skeletonHtml);
         }
       }
+
+      // Passthrough for SPA-only routes handled by React Router (no server pre-render needed)
+      const spaPassthroughPrefixes = ["/pretraga", "/profil", "/cene-i-statistika"];
+      const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
+      if (isSpaPassthrough) {
+        return res.send(html);
+      }
+
       // Custom 404 for unmatched routes
       const notFoundHtml = html
         .replace(/<title>.*?<\/title>/, "<title>Stranica nije pronađena | Svet Građevine</title>")

@@ -9,7 +9,6 @@ import crypto from "crypto";
 import { logger } from "../utils/logger.ts";
 
 const BAD_BOTS = [
-  "ahrefsbot",
   "semrushbot",
   "mj12bot",
   "dotbot",
@@ -54,7 +53,7 @@ export const rateLimitShield = async (
 
     const ua = (req.headers["user-agent"] || "").toLowerCase();
 
-    const isWhitelistedSearchBot = ["googlebot", "bingbot", "algolia"].some((bot) => ua.includes(bot));
+    const isWhitelistedSearchBot = ["googlebot", "bingbot", "algolia", "ahrefsbot"].some((bot) => ua.includes(bot));
     const isWhitelistedAiBot = ["gptbot", "claudebot", "perplexitybot", "applebot-ai", "oai-searchbot"].some((bot) => ua.includes(bot));
     const isWhitelistedBot = isWhitelistedSearchBot || isWhitelistedAiBot;
 

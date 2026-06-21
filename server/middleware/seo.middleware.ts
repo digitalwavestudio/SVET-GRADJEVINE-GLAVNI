@@ -222,7 +222,7 @@ export const botPrerenderMiddleware = async (
     const pathParts = req.path.split("/").filter(Boolean);
     let meta: SEOMeta | null = null;
 
-    if (pathParts[0] === "statistika") {
+    if (pathParts[0] === "statistika" || pathParts[0] === "cene-i-statistika") {
       if (DEV) console.info(`[SEO] Generating AI/Bot Statistical Hub for ${req.path}`);
       const statData = SEOMetaService.generateStatisticalHub(req.path);
       res.setHeader("Content-Type", "text/html");
