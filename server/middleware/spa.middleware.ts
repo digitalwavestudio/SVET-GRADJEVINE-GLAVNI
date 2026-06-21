@@ -98,6 +98,18 @@ function resolveFirestoreQuery(collectionName: string) {
   return db.collection(collectionName);
 }
 
+// Map collection name to detail URL path prefix (reverse of adRoutes detail paths)
+const DETAIL_PATH_MAP: Record<string, string> = {
+  jobs: "posao",
+  machines: "gradjevinske-masine",
+  accommodations: "smestaj",
+  caterings: "ketering",
+  plots: "nekretnine",
+  marketplace: "alat-i-oprema",
+  companies: "firma",
+  users: "majstor",
+};
+
 // Each entity type uses a different field name for category/profession
 const COLLECTION_CATEGORY_FIELD: Record<string, string> = {
   jobs: "professionSlug",
@@ -218,12 +230,14 @@ async function backgroundPreRenderListingHub(
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")
         : "oglas";
-      const canonicalUrl = `${APP_CONFIG.BASE_URL}${matchedRoute.path.replace("poslovi", "posao").replace(/\/+$/, "")}/${slug}~${id}`;
+      const detailPathPrefix = DETAIL_PATH_MAP[collectionName] || collectionName;
+      const canonicalUrl = `${APP_CONFIG.BASE_URL}/${detailPathPrefix}/${slug}~${id}`;
       itemsHtml += `<li><a href="${canonicalUrl}">${title || "Oglas"}</a> - ${data.city || "Srbija"}</li>`;
 
       itemListElements.push({
         "@type": "ListItem",
         position: idx++,
+        name: title || "Oglas",
         url: canonicalUrl,
       });
 
