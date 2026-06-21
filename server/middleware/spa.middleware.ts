@@ -829,6 +829,12 @@ export const createSpaMiddleware = () => {
       const isAdminRoute =
         req.path.startsWith("/admin") || req.path.startsWith("/dashboard");
 
+      const userAgent = req.headers["user-agent"]?.toLowerCase() || "";
+      const isBot =
+        /bot|googlebot|crawler|spider|robot|crawling|whatsapp|telegram|facebookexternalhit|twitterbot|linkedinbot|viber/i.test(
+          userAgent,
+        );
+
       // Static Pages SEO
       const staticMetas: Record<string, {title: string, desc: string}> = {
         "/o-nama": {
@@ -860,6 +866,14 @@ export const createSpaMiddleware = () => {
 
       // Homepage: React SSR (fallback to string-based pre-render)
       if (req.path === "/") {
+        if (!isBot) {
+          // Non-bot: serve clean SPA shell with meta tags (no pre-rendered content)
+          const cleanHtml = html
+            .replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`)
+            .replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" /><meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
+          return res.send(cleanHtml);
+        }
+
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
 
         // Try React SSR first
@@ -913,11 +927,7 @@ export const createSpaMiddleware = () => {
           req.path === matchedRoute.path ||
           isGeoPage;
 
-        const userAgent = req.headers["user-agent"]?.toLowerCase() || "";
-        const isBot =
-          /bot|googlebot|crawler|spider|robot|crawling|whatsapp|telegram|facebookexternalhit|twitterbot|linkedinbot|viber/i.test(
-            userAgent,
-          );
+
 
         let categorySlug: string | undefined;
         let citySlug: string | undefined;
@@ -927,26 +937,33 @@ export const createSpaMiddleware = () => {
             if (isBot) {
               const uaShort = userAgent.substring(0, 120);
               console.log(`[SPA] Bot SSR: ${req.path} | UA: ${uaShort} | IP: ${req.ip || req.socket.remoteAddress}`);
-            }
-            const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+              const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
 
-            // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
-            if (isGeoPage && pathSegments.length >= 2) {
-              citySlug = lastSegment;
-              if (pathSegments.length >= 3) {
-                categorySlug = pathSegments[pathSegments.length - 2];
+              // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
+              if (isGeoPage && pathSegments.length >= 2) {
+                citySlug = lastSegment;
+                if (pathSegments.length >= 3) {
+                  categorySlug = pathSegments[pathSegments.length - 2];
+                }
+              } else if (pathSegments.length === 2 && isPseoRoute) {
+                categorySlug = pathSegments[1];
               }
-            } else if (pathSegments.length === 2 && isPseoRoute) {
-              categorySlug = pathSegments[1];
-            }
 
-            const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
-            const cursor = req.query.cursor as string | undefined;
-            const rendered = await backgroundPreRenderListingHub(
-              cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL,
-              categorySlug, citySlug, pageNum, cursor
-            );
-            if (rendered) return res.send(rendered);
+              const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
+              const cursor = req.query.cursor as string | undefined;
+              const rendered = await backgroundPreRenderListingHub(
+                cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL,
+                categorySlug, citySlug, pageNum, cursor
+              );
+              if (rendered) return res.send(rendered);
+            } else {
+              // Non-bot: serve clean SPA shell with meta tags (no pre-rendered listing content)
+              // to avoid flash of server content before React hydration
+              const cleanHtml = html
+                .replace(/<title>.*?<\/title>/, `<title>${matchedRoute.label} | Svet Građevine</title>`)
+                .replace("</head>", `<meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase na Svet Građevine portalu." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" /></head>`);
+              return res.send(cleanHtml);
+            }
           }
 
           // Build breadcrumb for geo pages with 3 levels
