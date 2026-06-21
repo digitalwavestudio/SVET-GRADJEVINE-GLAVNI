@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -43,11 +42,9 @@ export default function HeroSection() {
     <>
       <section className="relative z-50 min-h-screen flex items-center pt-14 md:pt-24 pb-8 md:pb-16 bg-surface-container-lowest">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.5 }}
+          <div
             className="absolute inset-0 z-0 hero-bottom-fade"
+            style={{ animation: "heroBgIn 1.5s ease-out forwards" }}
           >
             <div className="w-full h-full bg-[#050F19] bg-blueprint [background-size:40px_40px]"></div>
             <div
@@ -59,15 +56,13 @@ export default function HeroSection() {
             ></div>
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
             <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-surface-container-lowest to-transparent z-20"></div>
-          </motion.div>
+          </div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full">
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+          <div
             className="max-w-[1300px] w-full relative mt-16 md:mt-32"
+            style={{ animation: "heroContentIn 0.8s ease-out 0.2s both" }}
           >
 
             <h1 className="font-headline text-3xl sm:text-5xl md:text-8xl font-black text-white leading-[1.1] mb-8 tracking-tighter uppercase relative">
@@ -215,7 +210,7 @@ export default function HeroSection() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </>

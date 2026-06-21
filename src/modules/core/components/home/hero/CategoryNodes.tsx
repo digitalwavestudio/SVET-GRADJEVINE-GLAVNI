@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "motion/react";
 import { 
   Briefcase, 
   HardHat, 
@@ -41,12 +40,10 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
           const isActive = activeTab === tab.id;
 
           return (
-            <motion.div
+            <div
               key={tab.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.04 }}
               className="flex flex-col items-center text-center shrink-0 w-[6.5rem] cursor-pointer snap-start"
+              style={{ animation: `nodeFadeIn 0.4s ease-out ${idx * 0.04}s both` }}
               onClick={() => onTabChange(tab.id as HeroTabType)}
             >
               {/* Outer Golden/Glowing Orb Wrapper */}
@@ -78,7 +75,7 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
               >
                 {tab.label}
               </span>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -90,12 +87,10 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
           const isActive = activeTab === tab.id;
 
           return (
-            <motion.div
+            <div
               key={tab.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + idx * 0.05 }}
               className="group relative cursor-pointer"
+              style={{ animation: `nodeSlideIn 0.5s ease-out ${0.3 + idx * 0.05}s both` }}
               onClick={() => onTabChange(tab.id as HeroTabType)}
             >
               {/* Background Sequence Number */}
@@ -188,7 +183,7 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
                   />
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>

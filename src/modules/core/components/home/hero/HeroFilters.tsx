@@ -1,5 +1,4 @@
 import React from "react";
-import { motion, AnimatePresence } from "motion/react";
 import {
   Briefcase,
   Building2,
@@ -92,25 +91,13 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
   } = filters;
 
   return (
-    <AnimatePresence>
-      {showFilters && (
-        <motion.div
-          key="hero-filters-panel"
-          initial={{
-            height: 0,
-            opacity: 0,
-            y: -10,
-            overflow: "hidden",
-          }}
-          animate={{
-            height: "auto",
-            opacity: 1,
-            y: 0,
-            transitionEnd: { overflow: "visible" },
-          }}
-          exit={{ height: 0, opacity: 0, y: -10, overflow: "hidden" }}
-        >
-          <div className="py-4 relative">
+    <div
+      className={`grid transition-[grid-template-rows] duration-400 ease-[0.16,1,0.3,1] ${
+        showFilters ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+      }`}
+    >
+      <div className="overflow-hidden">
+        <div className="py-4 relative">
             {/* Selected Tab Specific Filters */}
             {activeTab === "poslovi" || activeTab === "majstori" ? (
               <div className="flex flex-col gap-4">
@@ -350,10 +337,9 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
                   className="group-hover:translate-x-2 transition-transform duration-500 md:w-6 md:h-6"
                 />
               </button>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  </div>
   );
 };

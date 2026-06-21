@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
@@ -193,42 +192,33 @@ export default function CtaSection() {
                 </div>
 
                 {/* Testimonial Card Slider */}
-                <motion.div 
-                  whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(59, 130, 246, 0.25)" }}
-                  className="col-span-1 sm:col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500"
+                <div 
+                  className="col-span-1 sm:col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(59,130,246,0.25)]"
                 >
                   <div className="absolute top-0 right-0 p-6 opacity-5">
                     <span className="material-symbols-outlined text-8xl text-white">format_quote</span>
                   </div>
                   
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentIndex}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 1.05 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-14 h-14 rounded-[10px] overflow-hidden border-2 border-white/10 p-0.5">
-                          <OptimizedImage 
-                            src={testimonials[currentIndex].image} 
-                            fallbackType="user" 
-                            fallbackText={testimonials[currentIndex].name} 
-                            alt={testimonials[currentIndex].name} 
-                            className="w-full h-full object-cover rounded-[6px]" 
-                          />
-                        </div>
-                        <div>
-                          <p className="text-white font-black text-lg tracking-tight">{testimonials[currentIndex].name}</p>
-                          <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">{testimonials[currentIndex].role}</p>
-                        </div>
+                  <div key={currentIndex} className="animate-testimonial-in">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-14 h-14 rounded-[10px] overflow-hidden border-2 border-white/10 p-0.5">
+                        <OptimizedImage 
+                          src={testimonials[currentIndex].image} 
+                          fallbackType="user" 
+                          fallbackText={testimonials[currentIndex].name} 
+                          alt={testimonials[currentIndex].name} 
+                          className="w-full h-full object-cover rounded-[6px]" 
+                        />
                       </div>
-                      <p className="text-slate-300 italic text-lg leading-relaxed font-medium">
-                        {testimonials[currentIndex].text}
-                      </p>
-                    </motion.div>
-                  </AnimatePresence>
+                      <div>
+                        <p className="text-white font-black text-lg tracking-tight">{testimonials[currentIndex].name}</p>
+                        <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">{testimonials[currentIndex].role}</p>
+                      </div>
+                    </div>
+                    <p className="text-slate-300 italic text-lg leading-relaxed font-medium">
+                      {testimonials[currentIndex].text}
+                    </p>
+                  </div>
 
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-8 justify-center sm:justify-start">
                     {testimonials.map((_, idx) => (
@@ -246,7 +236,7 @@ export default function CtaSection() {
                       />
                     ))}
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Secondary Stats */}
                 <div className="glass-card p-8 rounded-[10px] border border-white/10 group hover:border-blue-500/50 transition-all duration-500 shadow-xl relative overflow-hidden">

@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CtaSection from '@/src/components/CtaSection';
@@ -76,57 +75,27 @@ export default function HomePage() {
       />
       <HeroSection />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6 }}
-      >
+      <div className="scroll-fade-in">
         <CalculatorBanner />
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
+      <div className="scroll-fade-in scroll-fade-in">
         <UrgentJobs urgentJobs={urgentJobs} isLoading={isLoadingBff} />
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
+      <div className="scroll-fade-in scroll-fade-in">
         <PremiumJobs premiumJobs={premiumJobs} handleCardClick={handleCardClick} />
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
+      <div className="scroll-fade-in scroll-fade-in">
         <EquipmentSection latestMachines={latestMachines} latestRealEstate={latestRealEstate} />
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
+      <div className="scroll-fade-in scroll-fade-in">
         <CateringSection latestAccommodations={latestAccommodations} latestCaterings={latestCaterings} />
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-      >
+      <div className="scroll-fade-in scroll-fade-in">
         <AboutSection 
           totalAdsCount={totalAdsCount}
           dynamicFirmsCount={dynamicFirmsCount}
@@ -135,21 +104,16 @@ export default function HomePage() {
           dynamicRealEstateCount={dynamicRealEstateCount}
           dynamicViewsCount={dynamicViewsCount}
         />
-      </motion.div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-px w-full bg-white/10"></div>
       </div>
 
       {/* New CTA Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-      >
+      <div className="scroll-fade-in scroll-fade-in">
         <CtaSection />
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { safeSessionStorage } from '@/src/lib/safeStorage';
@@ -32,15 +31,13 @@ export default function SignupBanner() {
   if (user) return null;
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ y: 200, opacity: 0, scale: 0.95 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 200, opacity: 0, scale: 0.95 }}
-          transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
-          className="fixed bottom-0 left-0 right-0 z-[5000] p-4 sm:p-6 sm:pb-8 pointer-events-none flex justify-center"
-        >
+    <div
+      className={`fixed bottom-0 left-0 right-0 z-[5000] p-4 sm:p-6 sm:pb-8 pointer-events-none flex justify-center transition-all duration-[0.8s] ease-[0.16,1,0.3,1] ${
+        isVisible
+          ? "translate-y-0 opacity-100 scale-100"
+          : "translate-y-[200px] opacity-0 scale-95"
+      }`}
+    >
           <div className="w-full max-w-5xl bg-slate-950/80 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5),_0_0_40px_rgba(254,191,13,0.15)] rounded-[24px] lg:rounded-full p-6 lg:p-4 lg:pr-6 flex flex-col lg:flex-row items-center justify-between gap-6 pointer-events-auto relative overflow-hidden ring-1 ring-white/5">
             
             {/* Ambient Glows */}
@@ -93,9 +90,7 @@ export default function SignupBanner() {
             </button>
 
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </div>
   );
 }
 
