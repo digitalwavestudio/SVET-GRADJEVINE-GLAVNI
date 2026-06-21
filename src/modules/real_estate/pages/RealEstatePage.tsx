@@ -22,7 +22,7 @@ import { useCollectionStats } from '@/src/hooks/useCollectionStats';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
 import { ListingSkeleton } from '@/src/components/ListingSkeleton';
-import heroPlacesImage from '@/src/assets/images/regenerated_image_1777753146328.jpg';
+import heroPlacesImage from '@/src/assets/images/regenerated_image_1777753146328.webp';
 
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 

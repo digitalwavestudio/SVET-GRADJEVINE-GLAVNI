@@ -6,7 +6,7 @@ import { useDashboardUIStore } from '@/src/modules/dashboard/store/dashboardUISt
 import { useQueryClient } from '@tanstack/react-query';
 import { dashboardKeys, queryKeys as factoryQueryKeys } from '@/src/lib/queryKeysFactory';
 import { apiClient } from '@/src/lib/apiClient';
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 
 interface SidebarProps {
   pulseRoleSelection?: boolean;

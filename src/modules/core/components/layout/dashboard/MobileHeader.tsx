@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useDashboardUIStore } from '@/src/modules/dashboard/store/dashboardUIStore';
 import { useBrandLogo } from '@/src/context/BrandContext';
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 
 export const MobileHeader: React.FC = () => {
   const { user } = useAuth();

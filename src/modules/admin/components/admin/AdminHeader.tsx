@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 
 interface AdminHeaderProps {
   activeTab: string;

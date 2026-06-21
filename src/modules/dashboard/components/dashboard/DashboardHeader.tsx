@@ -9,7 +9,7 @@ import { useDashboardUIStore } from "@/src/modules/dashboard/store/dashboardUISt
 
 import { User } from "@/src/modules/core/types/user";
 import { generateDailyBriefing, BriefingRoleData } from "@/src/lib/briefingService";
-import logoImage from "@/src/assets/images/logo.png";
+import logoImage from "@/src/assets/images/logo.webp";
 
 interface DashboardHeaderProps {
   userName: string;

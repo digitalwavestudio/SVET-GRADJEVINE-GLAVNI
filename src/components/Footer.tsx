@@ -4,7 +4,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import ThemeToggle from '@/src/components/ThemeToggle';
 
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 
 export default function Footer() {
   const { user } = useAuth();

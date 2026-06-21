@@ -83,7 +83,7 @@ const MarketplaceItemDetailsPage = () => {
       <SeoHead
         title={`${item.title} | Alat i oprema — Svet Građevine`}
         description={cleanDescription.substring(0, 160)}
-        image={item.image || "https://svetgradjevine.com/logo.png"}
+        image={item.image || "https://svetgradjevine.com/logo.webp"}
         url={`https://svetgradjevine.com/alat-i-oprema/${item.id}`}
         type="website"
         jsonLd={[seoSchema, breadcrumbSchema]}

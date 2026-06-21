@@ -4,7 +4,7 @@ import { useAuth } from "@/src/context/AuthContext";
 import { useBrandLogo } from "@/src/context/BrandContext";
 import { useBotDetector } from "@/src/hooks/useBotDetector";
 import { Button } from "@/src/components/ui/Button";
-import logoImage from "@/src/assets/images/logo.png";
+import logoImage from "@/src/assets/images/logo.webp";
 
 export default function Navbar() {
   const location = useLocation();

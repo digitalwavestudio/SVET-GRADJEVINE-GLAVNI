@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/src/context/AuthContext';
-import logoImage from "@/src/assets/images/logo.png";
+import logoImage from "@/src/assets/images/logo.webp";
 
 export function AuthLoader({ children }: { children: React.ReactNode }) {
   const { loading, user } = useAuth();

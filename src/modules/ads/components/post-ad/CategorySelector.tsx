@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 
 interface CategoryOption {
   id: string;

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 import { useToast } from '@/src/context/ToastContext';
 import { auth, googleProvider } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';

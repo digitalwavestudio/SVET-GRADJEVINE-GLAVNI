@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { safeSessionStorage } from '@/src/lib/safeStorage';
 import { useBrandLogo } from '@/src/context/BrandContext';
-import logoImage from '@/src/assets/images/logo.png';
+import logoImage from '@/src/assets/images/logo.webp';
 
 export default function SignupBanner() {
   const [isVisible, setIsVisible] = useState(false);

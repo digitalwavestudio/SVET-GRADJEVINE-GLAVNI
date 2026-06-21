@@ -43,9 +43,25 @@ export default defineConfig(({mode}) => {
       order: 'post',
       handler: (html: string) => {
         return html.replace(
-          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|payment)[^"]*"[^>]*>\n?/g,
+          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|payment|firebase)[^"]*"[^>]*>\n?/g,
           ''
         );
+      },
+    },
+  });
+
+  // Load CSS asynchronously so it doesn't block render
+  const asyncCssPlugin = () => ({
+    name: 'async-css',
+    transformIndexHtml: {
+      order: 'post',
+      handler: (html: string) => {
+        return html
+          // Convert render-blocking <link rel="stylesheet"> to async via media="print" trick
+          .replace(
+            /<link rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>/g,
+            '<link rel="stylesheet" media="print" onload="this.media=\'all\'" href="$1">'
+          );
       },
     },
   });
@@ -57,6 +73,7 @@ export default defineConfig(({mode}) => {
       react(),
       tailwindcss(),
       stripModulePreloadPlugin(),
+      asyncCssPlugin(),
       isProd && VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
