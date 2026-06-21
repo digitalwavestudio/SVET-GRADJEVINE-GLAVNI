@@ -141,7 +141,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                   }
                 })();
 
-                const displayTitle = job.title || job.name || 'Premium Oglas';
+                const displayTitle = (job.title || job.name || 'Premium Oglas').replace(' — ', ' ');
 
                 return (
                 <Link 
@@ -156,7 +156,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                   }}
                   className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[580px] md:w-[580px] cursor-pointer h-[460px] md:h-[310px]"
                 >
-                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center md:items-start rounded-[10px] border border-white/5 w-full h-full">
+                  <div className="bg-[#0F1923] p-6 md:p-7 flex flex-col md:flex-row gap-6 md:gap-7 items-center md:items-start rounded-[10px] border border-white/5 w-full h-full relative">
                     <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full p-2 shrink-0 group-hover/card:scale-110 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10 flex items-center justify-center overflow-hidden">
                       {job.logo ? (
                         <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full p-1" loading="lazy" />
@@ -169,8 +169,10 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                     <div className="flex-1 text-center md:text-left flex flex-col h-full justify-between min-w-0 w-full font-sans">
                       <div>
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-2 relative z-10 animate-blink">
-                          <span className="material-symbols-outlined text-yellow-500 text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
-                          <span className="text-yellow-500 text-xs font-bold uppercase tracking-widest hover:text-yellow-400 transition-colors">Premium Partner</span>
+                          <span className="material-symbols-outlined text-yellow-500 text-base" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                          <span className="text-yellow-500 text-base font-black uppercase tracking-widest hover:text-yellow-400 transition-colors">
+                            {job.type === 'company' || job.isPremiumPartner ? 'Premium Partner' : 'Premium Oglas'}
+                          </span>
                         </div>
                         <h3 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase line-clamp-2">
                           {displayTitle}
@@ -180,28 +182,23 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                         </p>
                       </div>
                       
-                      <div className="flex flex-col gap-4 items-center md:items-start relative z-10 mt-auto">
-                        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                          {getFriendlySalary(job) && (
-                            <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px]">payments</span>
-                              {getFriendlySalary(job)}
-                            </span>
-                          )}
+                      <div className="flex flex-col gap-3 items-center md:items-start relative z-10 mt-auto w-full">
+                        {/* Red 1: Kategorija, Radno vreme */}
+                        <div className="flex flex-wrap gap-2.5 justify-center md:justify-start w-full">
+                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">category</span>
+                            {getFriendlyCategory(job)}
+                          </span>
                           {getFriendlyEngagement(job) && (
                             <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
                               <span className="material-symbols-outlined text-[14px]">schedule</span>
                               {getFriendlyEngagement(job)}
                             </span>
                           )}
-                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">category</span>
-                            {getFriendlyCategory(job)}
-                          </span>
-                          <span className="bg-white/5 text-slate-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">location_on</span>
-                            {getFriendlyLocation(job)}
-                          </span>
+                        </div>
+
+                        {/* Red 2: Benefiti (Smeštaj, Prevoz, Hrana) */}
+                        <div className="flex flex-wrap gap-2.5 justify-center md:justify-start w-full min-h-[26px]">
                           {(() => {
                             const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
                             const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
@@ -229,9 +226,14 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                             );
                           })()}
                         </div>
-                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20">POGLEDAJ OGLAS</button>
+                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-6 py-2 h-fit rounded hover:from-yellow-500 hover:to-yellow-700 transition-all text-sm uppercase shadow-lg shadow-yellow-500/20 mt-1">POGLEDAJ OGLAS</button>
                       </div>
                     </div>
+                    {getFriendlySalary(job) && (
+                      <span className="absolute bottom-6 right-6 md:bottom-7 md:right-7 text-[#D4AF37] text-sm md:text-base font-black uppercase tracking-widest pointer-events-none z-20">
+                        {getFriendlySalary(job)}
+                      </span>
+                    )}
                   </div>
                 </Link>
               );
