@@ -47,7 +47,7 @@ export function CrossVerticalHub({ gradSlug, zanimanjeSlug, currentVertical }: C
           <h2 id="hub-navigation" className="text-2xl font-black uppercase tracking-tight text-white mb-2">
             Povezane Usluge {gradName ? `u mestu ${gradName}` : ''}
           </h2>
-          <p className="text-white/70 text-sm">Pronadjite sve što vam treba za građevinski projekat na jednom mestu.</p>
+          <p className="text-white/70 text-sm">Pronađite sve što vam treba za građevinski projekat na jednom mestu.</p>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
