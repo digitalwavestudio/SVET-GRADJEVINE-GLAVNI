@@ -1,12 +1,7 @@
-import { useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CtaSection from '@/src/components/CtaSection';
 import SeoHead from '@/src/components/SeoHead';
-import { SEO } from '@/src/components/SEO';
-import { APP_CONFIG } from '@/src/constants/config';
-import { buildJobUrl } from '@/src/lib/seo';
-import { UI_TOKENS } from '@/src/lib/uiTokens';
-import CustomSelect from '@/src/modules/core/components/home/CustomSelect';
 import HeroSection from '@/src/modules/core/components/home/HeroSection';
 import CalculatorBanner from '@/src/modules/core/components/home/CalculatorBanner';
 import UrgentJobs from '@/src/modules/core/components/home/UrgentJobs';
@@ -14,24 +9,12 @@ import PremiumJobs from '@/src/modules/core/components/home/PremiumJobs';
 import EquipmentSection from '@/src/modules/core/components/home/EquipmentSection';
 import CateringSection from '@/src/modules/core/components/home/CateringSection';
 import AboutSection from '@/src/modules/core/components/home/AboutSection';
-import AnimatedCounter from '@/src/modules/core/components/home/AnimatedCounter';
 import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  
-  // Background preloading of critical dashboard routes immediately on home page idle
-  useEffect(() => {
-    import('@/src/modules/dashboard/routes')
-      .then(({ prefetchDashboard }) => {
-        prefetchDashboard();
-      })
-      .catch((err) => {
-        console.warn('[Home] Prefetch error:', err);
-      });
-  }, []);
   
   // Ovdje umesto skidanja CELIH KOLEKCIJA samo vučemo kompresovan BFF endpoint
   const { data: bffData, isLoading: isLoadingBff } = useHomepageData();
