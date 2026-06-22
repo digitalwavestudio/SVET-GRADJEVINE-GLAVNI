@@ -628,6 +628,27 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
               onChange={(val) => setSortBy(val as any)}
             />
 
+            {/* Kontekstualni link ka Cene i statistika */}
+            {zanimanje && (
+              <Link
+                to={`/cene-i-statistika/${zanimanje}${grad ? `/${grad}` : ''}`}
+                className="block w-full bg-white/[0.02] border border-white/5 rounded-[10px] p-4 hover:bg-white/[0.04] transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-secondary text-2xl">bar_chart</span>
+                  <div>
+                    <p className="text-sm font-bold text-white group-hover:text-secondary transition-colors">
+                      Pogledaj cene i statistiku
+                    </p>
+                    <p className="text-xs text-on-surface-variant">
+                      Prosečne plate, broj oglasa i trendovi za ovu poziciju
+                    </p>
+                  </div>
+                  <span className="material-symbols-outlined text-on-surface-variant ml-auto group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+              </Link>
+            )}
+
             {/* Jobs Listing */}
             <JobListings
               viewMode={viewMode}

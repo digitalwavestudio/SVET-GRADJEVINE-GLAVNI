@@ -327,33 +327,51 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           </div>
           
           {viewMode === 'list' ? (
-            <Link 
-              to={buildJobUrl(job)}
-              state={{ job: {
-                title: job.title,
-                company: job.comp,
-                location: job.loc,
-                tacnaLokacija: job.tacnaLokacija,
-                type: job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug,
-                start: 'Odmah',
-                salary: job.sal,
-                time: job.time,
-                status: job.status,
-                isPremium: job.isPremium,
-                isUrgent: job.isUrgent
-              }}}
-              className="hidden md:inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-black px-6 py-3 rounded-[10px] border border-white/10 transition-all uppercase tracking-widest text-[10px]"
-            >
-              POGLEDAJ 
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </Link>
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                to={`/cene-i-statistika/${job.professionSlug || job.profession || ''}${(job.locationSlug || job.loc || job.location) ? `/${job.locationSlug || job.loc || job.location}` : ''}`}
+                className="text-white/30 hover:text-secondary text-[9px] font-black uppercase tracking-widest transition-colors px-2"
+                title="Pogledaj cene i statistiku"
+              >
+                CENE
+              </Link>
+              <Link 
+                to={buildJobUrl(job)}
+                state={{ job: {
+                  title: job.title,
+                  company: job.comp,
+                  location: job.loc,
+                  tacnaLokacija: job.tacnaLokacija,
+                  type: job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug,
+                  start: 'Odmah',
+                  salary: job.sal,
+                  time: job.time,
+                  status: job.status,
+                  isPremium: job.isPremium,
+                  isUrgent: job.isUrgent
+                }}}
+                className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-black px-6 py-3 rounded-[10px] border border-white/10 transition-all uppercase tracking-widest text-[10px]"
+              >
+                POGLEDAJ 
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
+            </div>
           ) : (
-            <Link 
-              to={buildJobUrl(job)}
-              className="hidden md:flex w-10 h-10 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center text-white hover:bg-white/10 hover:text-secondary transition-all"
-            >
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </Link>
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                to={`/cene-i-statistika/${job.professionSlug || job.profession || ''}${(job.locationSlug || job.loc || job.location) ? `/${job.locationSlug || job.loc || job.location}` : ''}`}
+                className="text-white/20 hover:text-secondary text-[8px] font-black uppercase tracking-widest transition-colors"
+                title="Pogledaj cene i statistiku"
+              >
+                CENE
+              </Link>
+              <Link 
+                to={buildJobUrl(job)}
+                className="w-10 h-10 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center text-white hover:bg-white/10 hover:text-secondary transition-all"
+              >
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
+            </div>
           )}
         </div>
       </article>

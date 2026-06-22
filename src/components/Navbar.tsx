@@ -127,6 +127,11 @@ export default function Navbar() {
                   Placevi
                 </span>
               </Link>
+              <Link to="/cene-i-statistika" className={navLinkClass("/cene-i-statistika")}>
+                <span className={isActive("/cene-i-statistika") ? "" : hoverGradient}>
+                  Cene
+                </span>
+              </Link>
             </div>
           )}
 
@@ -240,7 +245,8 @@ export default function Navbar() {
                     { path: "/ketering", label: "Ketering", icon: "restaurant" },
                     { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
                     { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
-                    { path: "/placevi", label: "Placevi", icon: "terrain" }
+                    { path: "/placevi", label: "Placevi", icon: "terrain" },
+                    { path: "/cene-i-statistika", label: "Cene i statistika", icon: "bar_chart" }
                   ].map((link) => (
                     <Link
                       key={link.path}
