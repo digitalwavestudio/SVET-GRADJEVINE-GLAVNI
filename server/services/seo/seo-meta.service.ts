@@ -2,6 +2,7 @@
 import { CacheService } from "../cache.service.ts";
 import { SEOSchemaService, SEOEntityData } from "./seo-schema.service.ts";
 import { logger, Logger } from "../../utils/logger.ts";
+import { APP_CONFIG } from "../../../src/constants/config.ts";
 
 export class SEOMetaService {
   static async getAdMetaData(
@@ -114,7 +115,7 @@ export class SEOMetaService {
           isDead: true,
           hasTraffic,
           collectionName,
-          url: `https://svetgradjevine.com${resolvedPath}`,
+          url: `${APP_CONFIG.BASE_URL}${resolvedPath}`,
         };
         const deadPathKey = `dead_path:${resolvedPath}`;
         const { getRedis } = await import("../../utils/redis.ts");
@@ -134,9 +135,9 @@ export class SEOMetaService {
         data?.images?.[0] ||
         data?.photoURL ||
         data?.logo ||
-        "https://svetgradjevine.com/og-default.jpg";
+        "${APP_CONFIG.BASE_URL}/og-default.jpg";
 
-      const url = `https://svetgradjevine.com${resolvedPath}`;
+      const url = `${APP_CONFIG.BASE_URL}${resolvedPath}`;
 
       const meta = {
         title: `${title} | Svet Građevine`,
@@ -242,7 +243,7 @@ export class SEOMetaService {
       creator: {
         "@type": "Organization",
         name: "Svet Građevine",
-        url: "https://svetgradjevine.com",
+        url: "${APP_CONFIG.BASE_URL}",
       },
       license: "https://creativecommons.org/licenses/by/4.0/",
       isAccessibleForFree: true,
@@ -262,7 +263,7 @@ export class SEOMetaService {
     <meta charset="UTF-8">
     <title>${title} | Svet Građevine</title>
     <meta name="description" content="${description}">
-    <link rel="canonical" href="https://svetgradjevine.com${path}" />
+     <link rel="canonical" href="${APP_CONFIG.BASE_URL}${path}" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <script type="application/ld+json">
       ${JSON.stringify(structuredData, null, 2)}
@@ -294,9 +295,9 @@ export class SEOMetaService {
       <nav aria-label="Related Statistical Categories" class="seo-internal-links">
          <h3>Povezane Statistike</h3>
          <ul>
-            <li><a href="https://svetgradjevine.com/statistika/plata/zidar">Prosečna plata Zidar Srbija</a></li>
-            <li><a href="https://svetgradjevine.com/statistika/najamnica/bager">Cene Mesečnog Najma Bagera</a></li>
-            <li><a href="https://svetgradjevine.com/poslovi">Povratak na Poslove</a></li>
+            <li><a href="${APP_CONFIG.BASE_URL}/statistika/plata/zidar">Prosečna plata Zidar Srbija</a></li>
+            <li><a href="${APP_CONFIG.BASE_URL}/statistika/najamnica/bager">Cene Mesečnog Najma Bagera</a></li>
+            <li><a href="${APP_CONFIG.BASE_URL}/poslovi">Povratak na Poslove</a></li>
          </ul>
       </nav>
     </main>
@@ -403,7 +404,7 @@ export class SEOMetaService {
     const loc = data.location || data.locationSlug || data.city || data.loc;
     // Helper function to create HTML li elements
     const makeLink = (url: string, anchor: string) =>
-      `<li><a href="https://svetgradjevine.com${url}">${anchor}</a></li>\n`;
+      `<li><a href="${APP_CONFIG.BASE_URL}${url}">${anchor}</a></li>\n`;
 
     if (type === "jobs") {
       const category = data.kategorija || data.zanimanje || data.category;
