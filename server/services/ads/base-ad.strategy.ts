@@ -190,7 +190,7 @@ export abstract class BaseAdStrategy {
       const outboxRef = db.collection("outbox").doc();
       const outboxPayloadObj = {
         type: DomainEvents.AD_CREATED,
-        payload: { category: this.category, id: adId, uid },
+        payload: { category: this.category, id: adId, uid, title: rawData.title || rawData.adTitle || rawData.name || "" },
         status: "pending",
         attempts: 0,
         createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),

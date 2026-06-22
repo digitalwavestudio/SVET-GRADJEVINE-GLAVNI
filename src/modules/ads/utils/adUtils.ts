@@ -1,4 +1,4 @@
-import { PROFESSIONS, LOCATIONS, ACCOMMODATION_TYPES, KITCHEN_TYPES, REAL_ESTATE_PURPOSES } from "@/src/constants/taxonomy";
+import { PROFESSIONS, LOCATIONS, ACCOMMODATION_TYPES, KITCHEN_TYPES, REAL_ESTATE_PURPOSES, SECTORS } from "@/src/constants/taxonomy";
 import { MACHINE_SUBCATEGORIES } from "@/src/constants/machineTaxonomy";
 import { 
   jobSchema, machineSchema, accommodationSchema, cateringSchema, 
@@ -68,7 +68,19 @@ export const getAutoTitle = (formData: Record<string, any>, selectedCategory: st
   if (selectedCategory === "company") {
     return formData.companyName || user?.company || "Nova Firma";
   }
-  
+
+  if (selectedCategory === "job") {
+    if (formData.profession && formData.location) {
+      const profName = getProfessionName(formData, selectedCategory);
+      return `${profName} — ${locationName}`;
+    }
+    if (formData.sector && formData.location) {
+      const sectorName = SECTORS.find((s) => s.slug === formData.sector)?.name || "";
+      return `${sectorName} — ${locationName}`;
+    }
+    return formData.location ? `Posao — ${locationName}` : "Posao";
+  }
+
   if (formData.profession && formData.location) {
     const profName = getProfessionName(formData, selectedCategory);
     return `${profName} — ${locationName}`;
