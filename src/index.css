@@ -3,6 +3,9 @@
 @import "@fontsource/montserrat";
 @import "@fontsource/montserrat/700.css";
 
+/* Global box-sizing and mobile reset */
+*, *::before, *::after { box-sizing: border-box; }
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
@@ -293,6 +296,7 @@ input, textarea {
   }
 }
 
+<<<<<<< Updated upstream
   @keyframes slide-up {
     0% { transform: translateY(100%); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
@@ -716,5 +720,15 @@ input, textarea {
 
 .animate-testimonial-in {
   animation: testimonialIn 0.4s ease-out;
+}
+
+/* Mobile responsive overrides from stashed changes */
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  h1, .title { font-size: 1.5rem; }
+  .btn-standard { padding: 0.5rem 1rem; }
+  .glass-panel { backdrop-filter: blur(8px); }
+  /* Global overflow fix */
+  html, body { overflow-x: hidden; }
 }
 

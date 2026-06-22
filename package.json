@@ -48,6 +48,7 @@
     "@tanstack/react-virtual": "^3.13.24",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^5.0.4",
+    
     "algoliasearch": "^5.51.0",
     "axios": "^1.16.0",
     "browser-image-compression": "^2.0.2",

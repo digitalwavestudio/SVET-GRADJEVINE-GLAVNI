@@ -415,7 +415,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 apiRouter.use(
   "/proxy/billing",
   createProxyMiddleware({
-    target: env.BILLING_SERVICE_URL || "http://localhost:4001",
+    target: process.env.BILLING_SERVICE_URL || "https://billing.svet-gradjevine.com",
     changeOrigin: true,
     pathRewrite: { "^/api/proxy/billing": "" },
   }) as unknown as import("express").RequestHandler,

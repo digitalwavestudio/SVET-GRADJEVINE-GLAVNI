@@ -203,8 +203,16 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                 )}
               </div>
 
-              {recentAds.length > 0 ? (
-                <div ref={parentRef} className="flex-1 overflow-y-auto no-scrollbar scroll-smooth pr-2">
+              {recentAds === undefined || recentAds === null ? (
+                <div className="bg-white/[0.01] border border-dashed border-white/5 rounded-[10px] p-12 text-center flex flex-col items-center gap-4">
+                  <span className="material-symbols-outlined text-white/10 text-4xl">cloud_off</span>
+                  <div className="space-y-1">
+                    <h5 className="text-white/60 text-xs font-black uppercase tracking-wider">Spisak oglasa je privremeno nedostupan</h5>
+                    <p className="text-white/20 text-[9px] uppercase tracking-widest max-w-xs mx-auto">Sistem je parcijalno uspeo da učita profil, ali ne i listu oglasa.</p>
+                  </div>
+                </div>
+              ) : recentAds.length > 0 ? (
+                <div ref={parentRef} className="max-h-[350px] overflow-y-auto no-scrollbar scroll-smooth pr-2">
                   <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
                     {virtualizer.getVirtualItems().map((virtualItem) => {
                       const ad = recentAds[virtualItem.index];
@@ -290,7 +298,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 sm:p-8 md:p-12 text-center flex flex-col items-center justify-center gap-6 relative overflow-hidden group">
+                <div className="border border-dashed border-white/10 rounded-[10px] p-12 text-center flex flex-col items-center justify-center gap-6 relative overflow-hidden group flex-1">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center relative shadow-2xl">
                     <div className="absolute inset-0 border border-secondary/20 rounded-full animate-ping opacity-20"></div>

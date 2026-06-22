@@ -30,6 +30,7 @@ interface UsePostAdControllerProps {
   launchMode?: boolean;
 }
 
+// Interfaces and data types for usePostAdController
 interface UserAttributes {
   id: string;
   uid: string;

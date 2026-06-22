@@ -10,6 +10,14 @@ async function startServer() {
   let server: Server;
   const app = express();
 
+// Enforce HTTPS redirect
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(`https://${req.headers.host}${req.originalUrl}`);
+  }
+  next();
+});
+
   let isReady = false;
 
   // Phase 0: Absolute Liveness Priority
