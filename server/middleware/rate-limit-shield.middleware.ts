@@ -53,7 +53,7 @@ export const rateLimitShield = async (
 
     const ua = (req.headers["user-agent"] || "").toLowerCase();
 
-    const isWhitelistedSearchBot = ["googlebot", "bingbot", "algolia", "ahrefsbot"].some((bot) => ua.includes(bot));
+    const isWhitelistedSearchBot = ["googlebot", "bingbot", "algolia", "ahrefs"].some((bot) => ua.includes(bot));
     const isWhitelistedAiBot = ["gptbot", "claudebot", "perplexitybot", "applebot-ai", "oai-searchbot"].some((bot) => ua.includes(bot));
     const isWhitelistedBot = isWhitelistedSearchBot || isWhitelistedAiBot;
 
