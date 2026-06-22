@@ -272,10 +272,26 @@ export const bffService = {
             return [];
           };
 
-          const latestMachines = buildMappedDocs<Machine>(machinesData);
-          const latestRealEstate = buildMappedDocs<RealEstatePlot>(realEstateData);
-          const latestAccommodations = buildMappedDocs<Accommodation>(accommodationsData);
-          const latestCaterings = buildMappedDocs<CateringOffer>(cateringsData);
+          const snippet = <T extends Record<string, unknown>>(entity: T, fields: (keyof T)[]): Record<string, unknown> => {
+            const s: Record<string, unknown> = {};
+            for (const f of fields) {
+              if (f in entity) s[f as string] = entity[f];
+            }
+            return s;
+          };
+
+          const latestMachines = buildMappedDocs<Record<string, unknown>>(machinesData).map((m) =>
+            snippet(m, ["id", "title", "images", "listingType", "yearOfManufacture", "workingHours", "location", "price"])
+          );
+          const latestRealEstate = buildMappedDocs<Record<string, unknown>>(realEstateData).map((p) =>
+            snippet(p, ["id", "title", "images", "listingType", "isPremium", "location", "area", "price"])
+          );
+          const latestAccommodations = buildMappedDocs<Record<string, unknown>>(accommodationsData).map((a) =>
+            snippet(a, ["id", "title", "images", "location", "capacity", "rooms", "bathrooms", "hasKitchen", "price"])
+          );
+          const latestCaterings = buildMappedDocs<Record<string, unknown>>(cateringsData).map((c) =>
+            snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
+          );
           const latestArticles: any[] = [];
 
           return {
