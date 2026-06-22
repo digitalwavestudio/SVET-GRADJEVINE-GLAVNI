@@ -22,7 +22,7 @@ import { ActiveFilterChips, MarketStatsWidget, SortingBar } from '@/src/modules/
 import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
 import { BENEFITS, LOCATIONS, SECTORS } from '@/src/constants/taxonomy';
-import { useJobs, usePremiumJobs, useUrgentJobs } from '@/src/modules/jobs/hooks/useJobs';
+import { useJobs } from '@/src/modules/jobs/hooks/useJobs';
 
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 import { AnalyticsDashboardUI } from '@/src/components/AnalyticsDashboardUI';
@@ -83,15 +83,8 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
 
-  const [showPremiumAndUrgent, setShowPremiumAndUrgent] = useState(false);
-  useEffect(() => {
-    if (jobs.length > 0) setShowPremiumAndUrgent(true);
-  }, [jobs.length]);
-
-  const { data: premiumData } = usePremiumJobs(sanitizedFilters, 6, { enabled: showPremiumAndUrgent });
-  const { data: urgentData } = useUrgentJobs(sanitizedFilters, 6, { enabled: showPremiumAndUrgent });
-  const premiumJobs = useMemo(() => premiumData?.pages.flatMap(p => p.items) || [], [premiumData]);
-  const urgentJobs = useMemo(() => urgentData?.pages.flatMap(p => p.items) || [], [urgentData]);
+  const premiumJobs = useMemo(() => jobs.filter(j => j.isPremium === true).slice(0, 6), [jobs]);
+  const urgentJobs = useMemo(() => jobs.filter(j => j.isUrgent === true).slice(0, 6), [jobs]);
 
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
