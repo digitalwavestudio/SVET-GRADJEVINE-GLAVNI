@@ -48,32 +48,21 @@ export class DashboardEmployerService {
             const [statsDoc, adsResult, appsResult, trendsResult, adsCountResult] = await Promise.allSettled([
               // 1. User Stats (Optimized via DataLoader)
               userStatsLoader.load(uid),
-              // 2. Latest Listings
+              // 2. Latest Listings (without composite index)
               db.collection("listings")
                 .where("authorId", "==", uid)
-                .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
-                .orderBy("createdAt", "desc")
                 .limit(10)
-                .select(
-                  "title", "price", "location", "type", "status",
-                  "createdAt", "images", "isPremium", "comp", "salary",
-                  "logo", "plataMin", "plataMax",
-                )
                 .get(),
-              // 3. Pending Applications
+              // 3. Pending Applications (without composite index)
               db.collection("applications")
                 .where("employerId", "==", uid)
-                .where("status", "==", "pending")
-                .orderBy("createdAt", "desc")
                 .limit(5)
-                .select("applicantId", "jobId", "status", "createdAt", "applicantName", "jobTitle")
                 .get(),
               // 4. Employer Trends
               this.getEmployerTrends(uid),
-              // 5. Dynamic count fallback
+              // 5. Dynamic count fallback (without composite index)
               db.collection("listings")
                 .where("authorId", "==", uid)
-                .where("status", "in", ["active", "paused", "rejected", "pending", "pending_payment", "expired", "draft", "archived"])
                 .count()
                 .get()
             ]);
@@ -102,25 +91,37 @@ export class DashboardEmployerService {
             if (adsResult.status === "fulfilled") {
               const adsDocs = adsResult.value.docs;
               
-              allAds = adsDocs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
-                const data = doc.data();
-                return {
-                  id: doc.id,
-                  collType: data.type,
-                  ...data,
-                } as DashboardAdItemDTO;
-              }).filter((ad) => ad.status !== "deleted").slice(0, 10);
+              allAds = adsDocs
+                .sort((a, b) => {
+                  const aTime = a.data()?.createdAt?.toMillis?.() || a.data()?.createdAt?._seconds * 1000 || 0;
+                  const bTime = b.data()?.createdAt?.toMillis?.() || b.data()?.createdAt?._seconds * 1000 || 0;
+                  return bTime - aTime;
+                })
+                .map((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
+                  const data = doc.data();
+                  return {
+                    id: doc.id,
+                    collType: data.type,
+                    ...data,
+                  } as DashboardAdItemDTO;
+                }).filter((ad) => ad.status !== "deleted").slice(0, 10);
             }
 
             // Handle applications
             if (appsResult.status === "fulfilled") {
-              recentApplications = appsResult.value.docs.map((d) => {
-                const data = d.data();
-                return {
-                  id: d.id,
-                  ...data,
-                } as ApplicationItemDTO;
-              }).filter((a) => a.status === "pending").slice(0, 5);
+              recentApplications = appsResult.value.docs
+                .sort((a, b) => {
+                  const aTime = a.data()?.createdAt?.toMillis?.() || a.data()?.createdAt?._seconds * 1000 || 0;
+                  const bTime = b.data()?.createdAt?.toMillis?.() || b.data()?.createdAt?._seconds * 1000 || 0;
+                  return bTime - aTime;
+                })
+                .map((d) => {
+                  const data = d.data();
+                  return {
+                    id: d.id,
+                    ...data,
+                  } as ApplicationItemDTO;
+                }).filter((a) => a.status === "pending").slice(0, 5);
             } else if (appsResult.status === "rejected") {
               logger.warn("[DashboardService] applications query failed:", appsResult.reason?.message);
             }
