@@ -141,7 +141,7 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
     <div ref={viewRef} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main Attribution Chart */}
       <div className="lg:col-span-2 bg-[#0A0F14] border border-white/5 rounded-[10px] p-8 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/2 blur-3xl -mr-32 -mt-32"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 blur-3xl -mr-32 -mt-32"></div>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 relative z-10">
           <div>
             <h3 className="text-xl font-black text-white uppercase tracking-tight">Analitika izvora saobraćaja</h3>

@@ -89,7 +89,7 @@ export default function MessagesPage() {
 
   return (
     <DashboardLayout>
-      <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-140px)] h-[calc(100dvh-100px)] flex flex-col md:flex-row bg-[#0A0F14] border border-white/5 rounded-[10px] md:rounded-[10px] overflow-hidden shadow-2xl relative">
+      <div className="md:h-[calc(100vh-140px)] h-[calc(100dvh-100px)] flex flex-col md:flex-row bg-[#0A0F14] border border-white/5 rounded-[10px] md:rounded-[10px] overflow-hidden shadow-2xl relative">
         
         <MessageSidebar 
           conversations={conversations}
