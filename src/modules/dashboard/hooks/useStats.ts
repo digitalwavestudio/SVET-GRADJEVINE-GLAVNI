@@ -50,10 +50,10 @@ export function usePseoInsights(options: {
       options.zanimanje,
     ),
     queryFn: async ({ signal }) => {
-      const params: Record<string, string | undefined> = { collection: options.collection };
-      if (options.grad) params.grad = options.grad;
-      if (options.zanimanje) params.zanimanje = options.zanimanje;
-      return apiClient.get<PseoInsight>("/stats/pseo-insights", params);
+      const qs = new URLSearchParams({ collection: options.collection });
+      if (options.grad) qs.set('grad', options.grad);
+      if (options.zanimanje) qs.set('zanimanje', options.zanimanje);
+      return apiClient.get<PseoInsight>(`/stats/pseo-insights?${qs.toString()}`);
     },
     staleTime: 10 * 60 * 1000, // 10 minutes stale time (štiti Firestore kvotu)
     gcTime: 10 * 60 * 1000,    // 10 minutes cache garbage collection time

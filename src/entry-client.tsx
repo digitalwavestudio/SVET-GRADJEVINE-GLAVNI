@@ -48,7 +48,7 @@ window.addEventListener('unhandledrejection', function(event) {
   console.error('[Entry] Unhandled Promise Rejection:', event.reason);
 });
 import { StrictMode, useEffect, useState } from 'react';
-import { hydrateRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import { QueryClientProvider, hydrate } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
@@ -135,10 +135,15 @@ const rootElement = document.getElementById('root');
 if (!rootElement) {
   console.error('[Entry] Root element not found!');
 } else {
-  hydrateRoot(
-    rootElement,
+  const hasSsr = rootElement.hasChildNodes() || !!dehydratedState;
+  const app = (
     <StrictMode>
       <Root />
     </StrictMode>
   );
+  if (hasSsr) {
+    hydrateRoot(rootElement, app);
+  } else {
+    createRoot(rootElement).render(app);
+  }
 }
