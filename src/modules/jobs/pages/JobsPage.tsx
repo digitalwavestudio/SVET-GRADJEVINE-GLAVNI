@@ -264,22 +264,22 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
     const currentQ = currentParams.get('q') || '';
     const currentLoc = grad || 'all';
     const currentProf = zanimanje || 'SVE';
-    const currentSector = currentParams.get('sector');
-    const currentEng = currentParams.get('engagement');
-    const currentExp = currentParams.get('experience');
+    const currentSector = currentParams.get('sector') || null;
+    const currentEng = currentParams.get('engagement') || null;
+    const currentExp = currentParams.get('experience') || null;
     const currentMinS = Number(currentParams.get('minSalary')) || 0;
-    const currentMaxS = Number(currentParams.get('maxSalary')) || 5000;
+    const currentMaxS = currentParams.get('maxSalary') ? Number(currentParams.get('maxSalary')) : 5000;
     const currentRadius = currentParams.get('radius') || '50';
     const currentBenefits = currentParams.getAll('benefit');
 
-    const selectedLoc = selectedLocationsStr ? selectedLocationsStr.split(',')[0] : 'all';
-    const selProf = selectedProfession || 'SVE';
+    const selectedLoc = selectedLocationsStr ? selectedLocationsStr.split(',')[0] : null;
+    const selProf = selectedProfession || null;
 
     const hasChanged = 
-      debouncedSearchQuery !== currentQ ||
-      selectedLoc !== currentLoc ||
+      debouncedSearchQuery.trim() !== currentQ.trim() ||
+      (selectedLoc !== (grad || null)) ||
       debouncedRadius !== currentRadius ||
-      selProf !== currentProf ||
+      selProf !== (zanimanje || null) ||
       selectedSector !== currentSector ||
       selectedEngagement !== currentEng ||
       selectedExperience !== currentExp ||
