@@ -757,6 +757,27 @@ export const createSpaMiddleware = () => {
         res.header("Cache-Control", "public, max-age=86400");
         return res.send("# Svet Građevine - Ads.txt\n");
       }
+
+      // 301 redirects for old/removed URLs
+      const redirects: Record<string, string> = {
+        "/onama": "/o-nama",
+        "/kompanije": "/firme",
+        "/radnici": "/poslovi",
+        "/za-poslodavce": "/postavi-oglas",
+      };
+      if (redirects[req.path]) {
+        return res.redirect(301, redirects[req.path]);
+      }
+      if (req.path.startsWith("/magazin/")) {
+        return res.redirect(301, "/");
+      }
+      if (/^\/majstor\/.+~.+/.test(req.path)) {
+        return res.redirect(301, "/majstori");
+      }
+      if (/^\/masina\/.+~.+/.test(req.path)) {
+        return res.redirect(301, "/gradjevinske-masine");
+      }
+
       const cacheKey = `seo:page:${req.path}${req.query.page ? `?page=${req.query.page}` : ""}`;
       const now = Date.now();
 
