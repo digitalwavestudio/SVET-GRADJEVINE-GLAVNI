@@ -167,6 +167,23 @@ seoRouter.get("/majstori/:categoryOrCity", (req, res, next) => {
   injectMetaTags(req, res, next);
 });
 
+// PSEO city hub pages for listing types — registered before /:type/:id to
+// avoid the catch-all treating city slugs as detail page IDs (returns 410)
+const cityHubRoutes = [
+  { path: "/gradjevinske-masine/:city", hubType: "machine_city" },
+  { path: "/masine/:city", hubType: "machine_city_alt" },
+  { path: "/smestaj/:city", hubType: "accommodation_city" },
+  { path: "/placevi/:city", hubType: "plot_city" },
+  { path: "/alat-i-oprema/:city", hubType: "marketplace_city" },
+];
+for (const { path, hubType } of cityHubRoutes) {
+  seoRouter.get(path, (req, res, next) => {
+    (req.params as Record<string, string>).type = "pseo_hub";
+    (req.params as Record<string, string>).hubType = hubType;
+    injectMetaTags(req, res, next);
+  });
+}
+
 seoRouter.get("/:type/:id", injectMetaTags);
 
 // Fallback dynamic OG image generator
