@@ -50,7 +50,7 @@ export default defineConfig(({mode}) => {
     },
   });
 
-  // Inline critical CSS + defer full Tailwind stylesheet
+  // Inline critical CSS + fix stylesheet loading for CSP
   const inlineCriticalCssPlugin = () => ({
     name: 'inline-critical-css',
     transformIndexHtml: {
@@ -75,10 +75,10 @@ export default defineConfig(({mode}) => {
           '<style>\n      #root:empty { background-color: #0F1923; min-height: 100vh; }\n    </style>',
           '<style>' + criticalCss + '</style>'
         );
-        // Defer full CSS bundle: load async to avoid render blocking
+        // Remove media="print" onload from stylesheet links (CSP blocks inline handlers)
         html = html.replace(
-          /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/,
-          '<link rel="stylesheet" media="print" onload="this.media=\'all\'" crossorigin href="$1">'
+          /<link rel="stylesheet" media="print" onload="this\.media='all'"/g,
+          '<link rel="stylesheet"'
         );
         return html;
       },
@@ -179,7 +179,6 @@ export default defineConfig(({mode}) => {
         'react/jsx-runtime',
         '@tanstack/react-query',
         '@tanstack/react-query-persist-client',
-        '@tanstack/query-sync-storage-persister',
         'firebase/app',
         'firebase/auth',
         'firebase/firestore',
