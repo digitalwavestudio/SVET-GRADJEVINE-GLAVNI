@@ -201,17 +201,23 @@ export default function Navbar() {
             {!isDesktop && (
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-[48px] h-12 flex flex-col justify-center items-center rounded-[10px] border border-white/10 bg-primary/10 text-white focus:outline-none hover:bg-primary/20 active:scale-95 transition-all duration-300 z-[200] focus-visible:ring-2 focus-visible:ring-primary/50 touch-target"
+                className={`flex flex-col justify-center items-center rounded-[10px] border transition-all duration-300 z-[200] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95 touch-target ${
+                  isOpen 
+                    ? 'bg-secondary/15 border-secondary/50 text-secondary shadow-[0_0_15px_rgba(254,191,13,0.15)]' 
+                    : 'bg-white/[0.02] backdrop-blur-md border-white/10 text-white hover:border-secondary/30 hover:bg-secondary/5'
+                }`}
                 aria-label="Meni"
                 aria-controls="mobile-drawer"
                 aria-expanded={isOpen}
               >
-                <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? 'rotate-45 translate-y-[5px]' : ''}`}>
-                </span>
-                <span className={`w-6 h-[2px] bg-white rounded-full transition-opacity duration-300 my-[3px] ${isOpen ? 'opacity-0' : ''}`}>
-                </span>
-                <span className={`w-6 h-[2px] bg-white rounded-full transition-transform duration-300 ${isOpen ? '-rotate-45 -translate-y-[5px]' : ''}`}>
-                </span>
+                <div className="flex flex-col items-end gap-[5px]">
+                  <span className={`h-[2px] bg-current rounded-full transition-all duration-300 ${isOpen ? 'w-6 rotate-45 translate-y-[7px]' : 'w-6'}`}>
+                  </span>
+                  <span className={`h-[2px] bg-current rounded-full transition-all duration-300 ${isOpen ? 'w-0 opacity-0' : 'w-4'}`}>
+                  </span>
+                  <span className={`h-[2px] bg-current rounded-full transition-all duration-300 ${isOpen ? 'w-6 -rotate-45 -translate-y-[7px]' : 'w-5'}`}>
+                  </span>
+                </div>
               </button>
             )}
           </div>

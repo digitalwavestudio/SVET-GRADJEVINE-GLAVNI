@@ -65,7 +65,7 @@ export default function HeroSection() {
             style={{ animation: "heroContentIn 0.8s ease-out 0.2s both" }}
           >
 
-            <h1 className="font-headline text-3xl sm:text-5xl md:text-8xl font-black text-white leading-[1.1] mb-8 tracking-tighter uppercase relative">
+            <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.85] tracking-[-0.05em] uppercase relative mb-8">
               SVE ZA GRAĐEVINU
               <div>
                 <span className="text-secondary">NA JEDNOM MESTU</span>

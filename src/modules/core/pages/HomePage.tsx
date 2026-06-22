@@ -9,7 +9,6 @@ import PremiumJobs from '@/src/modules/core/components/home/PremiumJobs';
 import EquipmentSection from '@/src/modules/core/components/home/EquipmentSection';
 import CateringSection from '@/src/modules/core/components/home/CateringSection';
 import AboutSection from '@/src/modules/core/components/home/AboutSection';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
 
@@ -89,8 +88,6 @@ export default function HomePage() {
           dynamicViewsCount={dynamicViewsCount}
         />
       </div>
-
-      <CrossVerticalHub currentVertical="" />
 
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-px w-full bg-white/10"></div>
