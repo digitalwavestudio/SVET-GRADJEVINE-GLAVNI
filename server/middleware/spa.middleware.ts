@@ -722,6 +722,12 @@ export const createSpaMiddleware = () => {
   const distPath = path.join(process.cwd(), "dist");
 
   let cachedIndexHtml: string | null = null;
+  let cacheBuster = "1";
+  try {
+    const indexHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+    const match = indexHtml.match(/\/assets\/index-([^.]+)\.js/);
+    if (match) cacheBuster = match[1];
+  } catch {}
   const CACHE_TTL = 2 * 3600; // 2 hours for listing page SSR (was 30min — too many Firestore reads when cold)
   const CACHE_TTL_EMPTY = 4 * 3600; // 4 hours for empty geo/profession listings (no results = no need to re-check often)
   const redis = getRedis();
@@ -778,7 +784,7 @@ export const createSpaMiddleware = () => {
         return res.redirect(301, "/gradjevinske-masine");
       }
 
-      const cacheKey = `seo:page:${req.path}${req.query.page ? `?page=${req.query.page}` : ""}`;
+      const cacheKey = `seo:page:${cacheBuster}:${req.path}${req.query.page ? `?page=${req.query.page}` : ""}`;
       const now = Date.now();
 
       // Soft-404 Negative Cache Shield

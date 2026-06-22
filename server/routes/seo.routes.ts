@@ -1,5 +1,7 @@
 import { env } from "../config/env.ts";
 import { Router } from "express";
+import path from "path";
+import fs from "fs";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { SEODbService } from "../services/seo/seo-db.service.ts";
@@ -10,6 +12,13 @@ import { LockManager } from "../services/lock.service.ts";
 import { logger } from "../utils/logger.ts";
 
 export const seoRouter = Router();
+
+let cacheBuster = "1";
+try {
+  const indexHtml = fs.readFileSync(path.join(process.cwd(), "dist", "index.html"), "utf-8");
+  const match = indexHtml.match(/\/assets\/index-([^.]+)\.js/);
+  if (match) cacheBuster = match[1];
+} catch {}
 
 // Middleware to inject meta tags
 const injectMetaTags = async (req: import("express").Request & { CacheService?: typeof import("../services/cache.service.ts").CacheService }, res: import("express").Response, next: import("express").NextFunction) => {
@@ -39,7 +48,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
 
   const { CacheService } = await import("../services/cache.service.ts");
   const hubType = (req.params as Record<string, string>).hubType;
-  const cacheKey = `seo:html:${type}:${id || hubType || "index"}:${req.params.category || ""}:${req.params.city || ""}:${req.params.categoryOrCity || ""}`;
+  const cacheKey = `seo:html:${cacheBuster}:${type}:${id || hubType || "index"}:${req.params.category || ""}:${req.params.city || ""}:${req.params.categoryOrCity || ""}`;
 
   try {
     const cachedHtml = await CacheService.get<string>(cacheKey);
