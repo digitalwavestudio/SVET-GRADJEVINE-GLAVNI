@@ -42,8 +42,10 @@ export default defineConfig(({mode}) => {
     transformIndexHtml: {
       order: 'post',
       handler: (html: string) => {
+        // Keep modulepreload for vendor-core and vendor-firebase (needed immediately)
+        // Strip only heavy chart/animation/deferred chunks
         return html.replace(
-          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|firebase|animation|motion)[^"]*"[^>]*>\n?/g,
+          /<link rel="modulepreload"[^>]*href="[^"]*vendor-(?:charts|motion)[^"]*"[^>]*>\n?/g,
           ''
         );
       },
@@ -58,27 +60,39 @@ export default defineConfig(({mode}) => {
       handler: (html: string) => {
         const criticalCss = [
           '#root:empty{background-color:#0F1923;min-height:100vh}',
-          'body{background-color:#0F1923;margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif}',
+          'body{background-color:#0F1923;margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#e2e8f0;font-size:16px;line-height:1.5}',
           'nav.fixed.top-0{position:fixed;top:0;left:0;right:0;z-index:999;height:6rem;background:rgba(15,25,35,0.4);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,0.05)}',
           'nav.fixed.top-0 .flex{display:flex;align-items:center;gap:0.75rem}',
           'nav.fixed.top-0 img{width:160px;height:auto;max-height:4.5rem}',
           '.hero-gradient{background:linear-gradient(135deg,rgba(15,25,35,0.9) 0%,rgba(15,25,35,0.4) 50%,rgba(15,25,35,0.1) 100%)}',
           '.hero-bottom-fade{-webkit-mask-image:linear-gradient(to bottom,black 80%,transparent 100%);mask-image:linear-gradient(to bottom,black 80%,transparent 100%)}',
-          '.glass-panel{background:rgba(19,28,38,0.7);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}',
-          'h1.font-headline{font-family:Montserrat,sans-serif;font-weight:700}',
+          '.glass-panel{background:rgba(19,28,38,0.7);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.05)}',
+          'h1.font-headline{font-family:Montserrat,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:-0.02em}',
           'input,textarea{background:rgba(255,255,255,0.03);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.05)}',
+          '.scroll-fade-in{opacity:0;animation:fadeIn 0.6s ease-out forwards}',
+          '@keyframes fadeIn{to{opacity:1}}',
+          '@keyframes heroBgIn{to{opacity:1}}',
           '::-webkit-scrollbar{width:8px;height:8px}',
           '::-webkit-scrollbar-track{background:#0f1923}',
           '::-webkit-scrollbar-thumb{background:#24303d;border-radius:4px}',
+          'a{color:inherit;text-decoration:none}',
+          '*,:after,:before{box-sizing:border-box}',
+          '.text-white{color:#fff}.text-secondary{color:#f59e0b}.font-headline{font-family:Montserrat,sans-serif}.font-body{font-family:Inter,sans-serif}.text-sm{font-size:.875rem}.text-xl{font-size:1.25rem}.text-3xl{font-size:1.875rem}.uppercase{text-transform:uppercase}.tracking-tighter{letter-spacing:-.05em}.leading-\\[1\\.1\\]{line-height:1.1}.mb-8{margin-bottom:2rem}.relative{position:relative}',
+          '.bg-surface{background-color:#0F1923}',
         ].join('');
         html = html.replace(
           '<style>\n      #root:empty { background-color: #0F1923; min-height: 100vh; }\n    </style>',
           '<style>' + criticalCss + '</style>'
         );
-        // Remove media="print" onload from stylesheet links (CSP blocks inline handlers)
+        // Defer full CSS — load async via preload (non-blocking) to avoid render-blocking
         html = html.replace(
-          /<link rel="stylesheet" media="print" onload="this\.media='all'"/g,
-          '<link rel="stylesheet"'
+          /<link rel="stylesheet"[^>]*href="\/assets\/index-[^"]+\.css"[^>]*>/,
+          (match) => {
+            const href = match.match(/href="([^"]+)"/)?.[1];
+            if (!href) return match;
+            const id = 'full-css';
+            return `<link rel="preload" as="style" href="${href}" id="${id}"><script>document.getElementById('${id}')?.addEventListener('load',function(){this.rel='stylesheet'});<\/script><noscript>${match}<\/noscript>`;
+          }
         );
         return html;
       },

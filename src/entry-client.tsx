@@ -69,7 +69,6 @@ if (dehydratedState) {
 
 function Root() {
   const [persister, setPersister] = useState<any | null>(null);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -83,22 +82,15 @@ function Root() {
           },
         });
         if (mounted) setPersister(p);
-      } else {
-        if (mounted) setPersister(null);
       }
     } catch (e) {
       console.warn('Query persister init failed:', e);
-      if (mounted) setPersister(null);
-    } finally {
-      if (mounted) setReady(true);
     }
 
     return () => {
       mounted = false;
     };
   }, []);
-
-  if (!ready) return null;
 
   const content = (
     <ErrorBoundary>
