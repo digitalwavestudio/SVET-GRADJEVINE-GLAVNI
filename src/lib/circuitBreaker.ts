@@ -28,6 +28,8 @@ class ClientCircuitBreaker {
   private trippedAt: Map<ServiceGroup, number> = new Map();
   private cooldownMs = 30000; // 30 seconds cooldown
   private lastToastTimes = new Map<string, number>();
+  private isStorageFull = false;
+  private lastQuotaResetAttempt = 0;
 
   constructor() {
     this.history.set('ads', []);
@@ -204,36 +206,52 @@ class ClientCircuitBreaker {
     // Save successful responses to localStorage for offline fallback
     if (success && payload !== undefined && typeof window !== 'undefined') {
       const cacheKey = `sg_cb_cache:${url}`;
-      try {
-        // Memory Guard capacity verification & cleanup
-        this.runMemoryGuard();
+      
+      // Throttle attempts to write to localStorage if it is full to protect UI responsiveness
+      const isQuotaThrottled = this.isStorageFull && (Date.now() - this.lastQuotaResetAttempt < 60000);
+      
+      if (!isQuotaThrottled) {
+        try {
+          // Memory Guard capacity verification & cleanup
+          this.runMemoryGuard();
 
-        // Aggressive data slimming / compression
-        const finalPayload = this.slimPayload(url, payload);
+          // Aggressive data slimming / compression
+          const finalPayload = this.slimPayload(url, payload);
 
-        safeLocalStorage.setItem(cacheKey, JSON.stringify({
-          data: finalPayload,
-          timestamp: Date.now()
-        }));
-      } catch (err) {
-        // If quota exceeded, nuke all cache entries and retry once
-        if (err instanceof DOMException && err.name === 'QuotaExceededError') {
-          try {
-            for (let i = safeLocalStorage.length - 1; i >= 0; i--) {
-              const k = safeLocalStorage.key(i);
-              if (k?.startsWith('sg_cb_cache:')) safeLocalStorage.removeItem(k);
+          safeLocalStorage.setItem(cacheKey, JSON.stringify({
+            data: finalPayload,
+            timestamp: Date.now()
+          }));
+          this.isStorageFull = false; // Successfully written, storage is no longer full
+        } catch (err) {
+          // If quota exceeded, nuke all cache entries and retry once
+          if (err instanceof DOMException && (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+            this.isStorageFull = true;
+            this.lastQuotaResetAttempt = Date.now();
+            try {
+              // Fix index shifting bug by collecting keys first, then deleting
+              const keysToRemove: string[] = [];
+              for (let i = 0; i < safeLocalStorage.length; i++) {
+                const k = safeLocalStorage.key(i);
+                if (k?.startsWith('sg_cb_cache:')) {
+                  keysToRemove.push(k);
+                }
+              }
+              keysToRemove.forEach((k) => safeLocalStorage.removeItem(k));
+
+              // Aggressive data slimming / compression
+              const finalPayload = this.slimPayload(url, payload);
+              safeLocalStorage.setItem(cacheKey, JSON.stringify({
+                data: finalPayload,
+                timestamp: Date.now()
+              }));
+              this.isStorageFull = false; // Retry succeeded
+            } catch (e2) {
+              console.warn('[CircuitBreaker] Failed to cache even after clearing all cache:', e2);
             }
-            // Aggressive data slimming / compression
-            const finalPayload = this.slimPayload(url, payload);
-            safeLocalStorage.setItem(cacheKey, JSON.stringify({
-              data: finalPayload,
-              timestamp: Date.now()
-            }));
-          } catch (e2) {
-            console.warn('[CircuitBreaker] Failed to cache even after clearing all cache:', e2);
+          } else {
+            console.warn('[CircuitBreaker] Failed to cache response in safeLocalStorage:', err);
           }
-        } else {
-          console.warn('[CircuitBreaker] Failed to cache response in safeLocalStorage:', err);
         }
       }
     }
