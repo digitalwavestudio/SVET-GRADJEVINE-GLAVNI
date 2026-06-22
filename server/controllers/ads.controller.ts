@@ -76,7 +76,7 @@ export const getMyAds = async (
       try {
         const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
         const { myAdsResponseSchema } = await import("../dto/ads.dto.ts");
-        const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum, cursor as string, searchQ as string);
+        const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum);
 
         // Dijagnostika: ako je prazno, proveri da li uopste postoje dokumenti za ovog usera
         if (resPayload.docs.length === 0) {
@@ -101,7 +101,7 @@ export const getMyAds = async (
          console.error("[ADS] getMyAds error:", quotaError?.message || quotaError);
          if (quotaError?.stack) console.error("[ADS] getMyAds stack:", quotaError.stack);
          return res.status(503).json({ error: "Servis trenutno nedostupan. Molimo pokušajte kasnije.", docs: [], lastVisibleId: null, hasMore: false });
-      }
+       }
     }
 
     res.json(resultPayload);

@@ -20,7 +20,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
   const { data: statsData } = useDashboardMetrics();
   const { data: trends = [] } = useDashboardTrends();
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<RecentAd | null>(null);
-  const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('day');
+  const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('month');
   const profileScore = calculateProfileScore(user);
 
   const recentAds: RecentAd[] = Array.isArray(statsData?.recentAds) 
@@ -75,11 +75,6 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
             </div>
 
             <div className="flex items-center gap-3">
-              {(!charts?.dailyAnalytics || charts.dailyAnalytics.length === 0) && (
-                <span className="text-[8px] font-black text-[#FEBF0D]/75 bg-[#FEBF0D]/5 border border-[#FEBF0D]/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse">
-                  Privremeno nedostupno
-                </span>
-              )}
               <div className="flex p-1 bg-white/[0.02] border border-white/5 rounded-[8px]">
                 <button 
                   onClick={() => setTimeframe('day')}

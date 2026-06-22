@@ -95,7 +95,7 @@ export const CacheKeys = {
   adListing: (params: string) => `${CACHE_PREFIXES.AD_LISTING_PAGE}${params}`,
   dashboardStats: (userId: string) => `${CACHE_PREFIXES.DASHBOARD_STATS}${userId}`,
   employerStats: (uid: string) => `${CACHE_PREFIXES.EMPLOYER_STATS}${uid}`,
-  employerTrends: (uid: string) => `${CACHE_PREFIXES.EMPLOYER_TRENDS}${uid}`,
+  employerTrends: (uid: string) => `${CACHE_PREFIXES.EMPLOYER_TRENDS}v2:${uid}`,
   smartMatches: (uid: string) => `${CACHE_PREFIXES.SMART_MATCHES}${uid}`,
   viewThrottling: (ip: string, coll: string, id: string) =>
     `${CACHE_PREFIXES.METRICS_VIEW_CACHE}${ip}_${coll}_${id}`,

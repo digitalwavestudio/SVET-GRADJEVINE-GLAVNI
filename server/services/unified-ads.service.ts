@@ -112,93 +112,37 @@ export class UnifiedAdsService {
     return strategy.createAd(rawData, uid);
   }
 
-  static async getMyAds(uid: string, limitNum: number, cursor?: string, searchQ?: string) {
-    let q = db.collection("listings")
-      .where("authorId", "==", uid)
-      .where("status", "in", ["active", "pending", "pending_payment", "inactive", "draft", "rejected"])
-      .orderBy("createdAt", "desc");
-      
-    if (cursor) {
-      if (cursor.includes("|")) {
-        const [timeStr, id] = cursor.split("|");
-        const ts = firebaseAdmin.firestore.Timestamp.fromMillis(parseInt(timeStr, 10));
-        q = q.startAfter(ts, id);
-      } else if (cursor.match(/^\d+$/)) {
-         q = q.startAfter(firebaseAdmin.firestore.Timestamp.fromMillis(parseInt(cursor, 10)));
-      } else {
-         const cursorDoc = await db.collection("listings").doc(cursor).get();
-         if (cursorDoc.exists) {
-            q = q.startAfter(cursorDoc);
-         }
-      }
+  static async getMyAds(uid: string, limitNum: number) {
+    try {
+      const snap = await db.collection("listings")
+        .where("userId", "==", uid)
+        .get();
+
+      let docs: any[] = snap.docs
+        .sort((a, b) => {
+          const aTime = (a.data() as any).createdAt?.toMillis?.() || (a.data() as any).createdAt?._seconds * 1000 || 0;
+          const bTime = (b.data() as any).createdAt?.toMillis?.() || (b.data() as any).createdAt?._seconds * 1000 || 0;
+          return bTime - aTime;
+        })
+        .slice(0, limitNum)
+        .map((doc) => {
+          const data = doc.data();
+          const type = data.type || '';
+          let typeLabel = 'Oglas';
+          if (type === 'job') typeLabel = 'Posao';
+          else if (type === 'accommodation') typeLabel = 'Smestaj';
+          else if (type === 'machine') typeLabel = 'Masina';
+          else if (type === 'catering') typeLabel = 'Ketering';
+          else if (type === 'plot' || type === 'real_estate') typeLabel = 'Plac';
+          else if (type === 'company') typeLabel = 'Firma';
+          return { ...data, id: doc.id, typeLabel, postType: type || 'other' };
+        });
+
+      return { docs, lastVisibleId: null, hasMore: false };
+    } catch (e: any) {
+      console.error("[UnifiedAdsService] getMyAds error:", e?.message || e);
+      return { docs: [], lastVisibleId: null, hasMore: false };
     }
-    
-    const snap = await q
-      .orderBy(firebaseAdmin.firestore.FieldPath.documentId(), "desc")
-      .limit(searchQ ? 150 : limitNum) // Fetch more if searching
-      .select(
-        "title",
-        "price",
-        "location",
-        "type",
-        "status",
-        "createdAt",
-        "images",
-        "isPremium",
-        "isUrgent",
-        "comp",
-        "salary",
-        "logo",
-        "thumbnail",
-        "authorId",
-        "viewsCount",
-        "applicantsCount",
-        "category",
-        "grad",
-        "company"
-      )
-      .get();
-
-    const { ImageTransformer } = await import("../utils/image.transformer.ts");
-
-    let docs: (Listing & { typeLabel: string; postType: string })[] = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => {
-      const data = doc.data() as Listing;
-      let typeLabel = '';
-      let postType = data.type || '';
-
-      switch(data.type) {
-        case 'job': typeLabel = 'Posao'; break;
-        case 'accommodation': typeLabel = 'Sme┼ítaj'; break;
-        case 'machine': typeLabel = 'Ma┼íina'; break;
-        case 'catering': typeLabel = 'Ketering'; break;
-        case 'plot': 
-        case 'real_estate':
-          typeLabel = 'Plac'; break;
-        case 'company': typeLabel = 'Firma'; break;
-        default: typeLabel = 'Oglas'; postType = 'other';
-      }
-
-      return ImageTransformer.transformDocumentImages({
-        ...data,
-        id: doc.id,
-        typeLabel,
-        postType
-      }) as Listing & { typeLabel: string; postType: string };
-    });
-
-    if (searchQ) {
-      const lowQ = searchQ.toLowerCase();
-      docs = docs.filter(d => 
-        (d.title && d.title.toLowerCase().includes(lowQ)) || 
-        (d.comp && d.comp.toLowerCase().includes(lowQ))
-      ).slice(0, limitNum);
-    }
-
-    return {
-      docs,
-      lastVisibleId: docs.length === limitNum ? `${(docs[docs.length - 1] as any).createdAt?.toDate ? (docs[docs.length - 1] as any).createdAt.toDate().getTime() : ((docs[docs.length - 1] as any).createdAt || Date.now())}|${(docs[docs.length - 1] as any).id}` : null,
-      hasMore: docs.length === limitNum
-    };
   }
 
   static async updateAdById(id: string, updates: Record<string, any>, user: { uid: string; isAdmin?: boolean; role?: string }) {

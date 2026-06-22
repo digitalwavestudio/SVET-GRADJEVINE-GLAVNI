@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 import { useDebouncedDimensions } from '../hooks/useDebouncedDimensions';
-import ChartSkeleton from './dashboard/ChartSkeleton';
 
 interface AuthStat {
     name: string;
@@ -9,17 +8,12 @@ interface AuthStat {
     pregledi: number;
 }
 
-const fallbackData = [
-  { name: '01.05.', prijave: 0, pregledi: 0 },
-  { name: '02.05.', prijave: 0, pregledi: 0 },
-];
-
 export default function DashboardCharts({ data }: { data?: AuthStat[] }) {
   const { containerRef, dimensions } = useDebouncedDimensions(250);
 
   const chartData = useMemo(() => {
     const safeData = Array.isArray(data) ? data : [];
-    return safeData.length > 0 ? safeData : fallbackData;
+    return safeData.length > 0 ? safeData : [];
   }, [data]);
 
   // Memoize styling of elements to prevent re-renders
@@ -36,6 +30,14 @@ export default function DashboardCharts({ data }: { data?: AuthStat[] }) {
   }), []);
   const tooltipItemStyle = useMemo(() => ({ padding: '2px 0' }), []);
   const tooltipCursor = useMemo(() => ({ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }), []);
+
+  if (chartData.length === 0 && dimensions.width > 0) {
+    return (
+      <div ref={containerRef} className="w-full h-[250px] relative flex items-center justify-center">
+        <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Nema podataka za prikaz</span>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="w-full h-[250px] relative">
@@ -97,7 +99,9 @@ export default function DashboardCharts({ data }: { data?: AuthStat[] }) {
           />
         </AreaChart>
       ) : (
-        <ChartSkeleton />
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-5 h-5 border-2 border-white/10 border-t-[#FEBF0D] rounded-full animate-spin" />
+        </div>
       )}
     </div>
   );

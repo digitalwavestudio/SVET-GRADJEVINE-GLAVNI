@@ -107,8 +107,17 @@ export class DashboardService {
     const stats = statsResult.value;
     const analytics = analyticsResult.value;
 
-    let trends: { name: string; pregledi: number }[] = [];
-    if (Array.isArray(analytics)) {
+    let trends: { name: string; pregledi: number; prijave?: number }[] = [];
+    const hasEmployerTrends = Array.isArray(stats?.trends) && stats.trends.length > 0;
+    const hasAnalytics = Array.isArray(analytics) && analytics.length > 0;
+
+    if (hasEmployerTrends) {
+      trends = stats.trends.map((t: { name?: string; date?: string; pregledi?: number; views?: number; prijave?: number; applications?: number }) => ({
+        name: t.name || t.date || "",
+        pregledi: t.pregledi ?? t.views ?? 0,
+        prijave: t.prijave ?? t.applications ?? 0,
+      }));
+    } else if (hasAnalytics) {
       const startIdx = Math.max(0, analytics.length - 7);
       trends = analytics.reduce((acc: { name: string; pregledi: number }[], item: { date?: string; views?: number }, index: number) => {
         if (index >= startIdx) {

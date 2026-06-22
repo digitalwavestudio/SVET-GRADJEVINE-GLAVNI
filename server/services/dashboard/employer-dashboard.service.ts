@@ -188,24 +188,6 @@ export class DashboardEmployerService {
       const result = await CacheService.getOrSetSWR(
         cacheKey,
         async () => {
-          // Optimization from PROMPT 7: Use profile metadata to skip sub-doc reads if trends are stable
-          const memoryCached = employerTrendsMemoryCache.get(uid);
-          
-          const { userStatsLoader } = await import("../../utils/dataloader.ts");
-          const stats = await userStatsLoader.load(uid);
-          const lastUpdateRaw = (stats?.trendsLastUpdated || stats?.lastUpdated) as any;
-
-          if (memoryCached && memoryCached.length > 0 && lastUpdateRaw) {
-            const lastUpdateTime = typeof lastUpdateRaw === 'object' 
-              ? (lastUpdateRaw.toMillis?.() || (lastUpdateRaw as any)._seconds * 1000) 
-              : new Date(lastUpdateRaw as string | number).getTime();
-            
-            // Ako se trendovi nisu menjali u zadnja 24h, vraćamo keširanu verziju bez čitanja dokumenta
-            if (Date.now() - lastUpdateTime > 24 * 60 * 60 * 1000) {
-              return memoryCached;
-            }
-          }
-
           let history: Record<string, { prijave: number; pregledi: number }> = {};
           let isFirestoreHealthy = true;
           try {
@@ -239,10 +221,7 @@ export class DashboardEmployerService {
             .sort()
             .slice(-14)
             .map((date) => ({
-              name: new Date(date).toLocaleDateString("sr-RS", {
-                day: "2-digit",
-                month: "2-digit",
-              }),
+              name: date,
               prijave: trend[date].prijave,
               pregledi: trend[date].pregledi,
             }));
