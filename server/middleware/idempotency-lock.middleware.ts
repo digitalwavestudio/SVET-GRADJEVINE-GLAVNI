@@ -2,6 +2,16 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { RedisLockManager } from "../utils/redis-lock.ts";
 
+/**
+ * Per-route idempotency middleware based on a short-lived Redis lock.
+ *
+ * Distinct from `idempotency.middleware.ts` (global, which caches full responses
+ * via IdempotencyService). This one only guarantees that two identical
+ * state-changing requests cannot execute concurrently within the TTL window —
+ * useful for ad/application/user creation buttons that can be double-clicked.
+ *
+ * Moved from server/middlewares/ → server/middleware/ for folder consistency.
+ */
 interface IdempotencyOptions {
   ttl?: number; // TTL in seconds
 }
@@ -30,7 +40,7 @@ export const idempotency = (options: IdempotencyOptions = { ttl: 5 }) => {
 
     try {
       const lockId = await RedisLockManager.acquire(lockKey, ttlMs);
-      
+
       if (!lockId) {
         res.status(409).json({
           success: false,

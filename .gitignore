@@ -4,10 +4,19 @@ coverage/
 .DS_Store
 *.log
 .env
+.env.local
+.env.*.local
 !.env.example
 *.txt
 fix_*.ts
+# Secrets & service-account files (any extension / location)
 firebase-service-account.json
+*.service-account.json
+service-account*.json
+*.pem
+*.key
+google-services.json
+GoogleService-Info.plist
 
 
 # Build outputs

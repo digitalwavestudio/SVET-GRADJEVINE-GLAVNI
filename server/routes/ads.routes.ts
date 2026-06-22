@@ -21,7 +21,7 @@ import {
 } from "@svet-gradjevine/shared";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
 import { requestCoalescingMiddleware } from "../middleware/coalesce.middleware.ts";
-import { idempotency } from "../middlewares/idempotency.ts";
+import { idempotency } from "../middleware/idempotency-lock.middleware.ts";
 
 export const adsRouter = Router();
 

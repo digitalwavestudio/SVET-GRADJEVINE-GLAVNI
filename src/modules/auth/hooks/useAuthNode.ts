@@ -124,21 +124,29 @@ export function useAuthNode() {
     try {
       const fetchUserData = async () => {
          if (!isMountedFn.current) return;
-         
+
          // 1. FAST PATH: Check Custom Claims first (Zero DB reads if we have what we need)
-         const tokenResult = await firebaseUser.getIdTokenResult();
-         const claims = tokenResult.claims;
-         
-          const isAdminUser = !!claims.admin;
+         let tokenResult;
+         try {
+            tokenResult = await firebaseUser.getIdTokenResult();
+         } catch (e) {
+            console.warn('[AUTH] getIdTokenResult failed:', e);
+            if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
+            return;
+         }
+         // Defensive: claims may be undefined on rare token edge cases (logout race, refresh latency)
+         const claims = tokenResult?.claims ?? {};
+
+         const isAdminUser = !!claims.admin;
          const previewRole = isAdminUser ? safeStorage.getItem('admin_preview_role') : null;
-         
+
          if (claims.role) {
             // We have enough to show the UI
             setUser(prev => {
                // If we already have a user, don't revert fields that might be missing from claims
-               const baseUser = { 
+               const baseUser = {
                   ...prev,
-                  id: firebaseUser.uid, 
+                  id: firebaseUser.uid,
                   email: firebaseUser.email,
                   emailVerified: firebaseUser.emailVerified,
                   role: (previewRole || claims.role) as UserRole,
@@ -164,15 +172,16 @@ export function useAuthNode() {
 
          try {
             const meData = await apiClient.get<User>('/users/me');
-            if (meData) {
+            // Defensive: backend may return null/undefined if the profile is mid-deletion or quota-stopped
+            if (meData && typeof meData === 'object') {
                const isMeAdmin = meData.isAdmin || meData.role === 'admin';
                const currentPreviewRole = isMeAdmin ? safeStorage.getItem('admin_preview_role') : null;
-               
-               const combinedData = { 
-                  ...meData, 
-                  id: firebaseUser.uid, 
+
+               const combinedData = {
+                  ...meData,
+                  id: firebaseUser.uid,
                   emailVerified: firebaseUser.emailVerified,
-                  role: (currentPreviewRole || meData.role) as UserRole,
+                  role: (currentPreviewRole || meData.role || claims.role || 'standard') as UserRole,
                   isAdmin: isMeAdmin || !!claims.admin,
                 } as User;
                if (isMountedFn.current) {

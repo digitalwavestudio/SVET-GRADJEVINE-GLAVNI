@@ -5,7 +5,7 @@ import { requireAuth } from "../middleware/auth.middleware.ts";
 import { ApplicationsService } from "../services/applications.service.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { validateApplicationOwnership } from "../middleware/ownership.middleware.ts";
-import { idempotency } from "../middlewares/idempotency.ts";
+import { idempotency } from "../middleware/idempotency-lock.middleware.ts";
 import { z } from "zod";
 import { applicationActionSchema } from "@svet-gradjevine/shared";
 

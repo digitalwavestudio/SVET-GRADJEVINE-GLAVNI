@@ -1,52 +1,3 @@
-window.onerror = function(message, source, lineno, colno, error) {
-  const msgStr = String(message || '').toLowerCase();
-  if (
-    msgStr.includes('cannot set property fetch') ||
-    msgStr.includes('fetch of #<window>') ||
-    msgStr.includes('resizeobserver') ||
-    msgStr.includes('script error') ||
-    msgStr.includes('serviceworker') ||
-    msgStr.includes('abort')
-  ) {
-    console.warn('[Benign Platform Error Ignored]:', message);
-    return true; // Cancel error bubbling & console dump
-  }
-
-  try {
-    fetch('/api/dev/log-error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'window.onerror', message, source, lineno, colno, stack: error?.stack })
-    }).catch(() => console.warn('[Main] window.onerror log fetch failed'));
-  } catch (e) { console.error("[Main] window.onerror handler error:", e); }
-
-  console.error('[Main] Global Error:', { message, source, lineno, colno, stack: error?.stack });
-};
-window.addEventListener('unhandledrejection', function(event) {
-  const reasonStr = String(event.reason?.message || event.reason || '').toLowerCase();
-  if (
-    reasonStr.includes('cannot set property fetch') ||
-    reasonStr.includes('fetch of #<window>') ||
-    reasonStr.includes('resizeobserver') ||
-    reasonStr.includes('serviceworker') ||
-    reasonStr.includes('abort')
-  ) {
-    console.warn('[Benign Rejection Ignored]:', event.reason);
-    event.preventDefault();
-    event.stopPropagation();
-    return;
-  }
-
-  try {
-    fetch('/api/dev/log-error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'unhandledrejection', reason: event.reason?.message || String(event.reason), stack: event.reason?.stack })
-    }).catch(() => console.warn('[Main] unhandledrejection log fetch failed'));
-  } catch (e) { console.error("[Main] unhandledrejection handler error:", e); }
-
-  console.error('[Main] Unhandled Promise Rejection:', event.reason);
-});
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 // import { onCLS, onINP, onLCP } from 'web-vitals';
@@ -58,8 +9,13 @@ import { queryClient } from '@/src/lib/queryClient';
 import { initZodLocalization } from '@svet-gradjevine/shared';
 import { initFrontendTracing } from '@/src/lib/tracing';
 import { initErrorMonitor } from '@/src/lib/errorMonitor';
+import { installGlobalErrorHandler } from '@/src/lib/globalErrorHandler';
 import ErrorBoundary from '@/src/components/common/ErrorBoundary';
 import App from '@/src/App';
+
+// Install global error/rejection handlers BEFORE React boots up.
+// (Must run before any async work that could throw unhandled rejections.)
+installGlobalErrorHandler();
 
 initZodLocalization();
 // initFrontendTracing();
@@ -141,6 +97,9 @@ function Root() {
         client={queryClient}
         persistOptions={{
           persister,
+          // Bump buster on any breaking change to the persisted cache shape.
+          // Old/malformed entries (e.g. queryKey not an array) are wiped automatically.
+          buster: "v2-fix-dehydrate-null-queryKey-2026-06",
           maxAge: 1000 * 60 * 60 * 24,
           dehydrateOptions: {
             shouldDehydrateQuery: (query) => {

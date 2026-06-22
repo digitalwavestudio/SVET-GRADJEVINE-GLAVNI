@@ -22,7 +22,7 @@ import {
 } from "@svet-gradjevine/shared";
 import { authLimiter } from "../middleware/rate-limit.middleware.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
-import { idempotency } from "../middlewares/idempotency.ts";
+import { idempotency } from "../middleware/idempotency-lock.middleware.ts";
 import { UsersService } from "../services/users.service.ts";
 import { admin, getDb } from "../config/firebase.ts";
 import { AuditService, AuditAction } from "../services/audit.service.ts";

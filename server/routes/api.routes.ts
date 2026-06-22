@@ -94,18 +94,76 @@ import { SSEService } from "../services/sse.service.ts";
 
 export const apiRouter = Router();
 
-// --- DEV ERROR LOGGER FOR AI STUDIO ---
+// --- DEV ERROR LOGGER (dev only, bounded + async + rate-limited) ---
 import fs from 'fs';
 import path from 'path';
 
+const DEV_LOG_ENABLED = env.NODE_ENV !== "production";
+const DEV_LOG_PATH = path.join(process.cwd(), 'frontend_errors_dev.log');
+// Hard cap so the log file cannot grow unbounded (rotate-truncate at 5MB)
+const DEV_LOG_MAX_BYTES = 5 * 1024 * 1024;
+let devLogWriteLock = Promise.resolve();
+
+// Lightweight per-IP limiter (avoids pulling rate-limit-redis plumbing here)
+const devLogHits = new Map<string, { count: number; reset: number }>();
+const DEV_LOG_WINDOW_MS = 60_000;
+const DEV_LOG_MAX_PER_MIN = 20;
+
 apiRouter.post("/dev/log-error", (req, res) => {
-  try {
-    const logPath = path.join(process.cwd(), 'frontend_errors_dev.log');
-    const errStr = `\n[${new Date().toISOString()}] FRONTEND ERROR:\n${JSON.stringify(req.body, null, 2)}\n----------------------------------------\n`;
-    fs.appendFileSync(logPath, errStr);
-  } catch (e) {
-    console.error("Failed to write to frontend_errors_dev.log", e);
+  // Guard: never active in production
+  if (!DEV_LOG_ENABLED) return res.status(404).json({ error: "Not found" });
+
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded) as string || req.ip || 'unknown';
+
+  // In-memory rate limit per IP (prevents log flooding / event-loop DoS)
+  const now = Date.now();
+  const entry = devLogHits.get(ip);
+  if (!entry || now > entry.reset) {
+    devLogHits.set(ip, { count: 1, reset: now + DEV_LOG_WINDOW_MS });
+  } else {
+    entry.count++;
+    if (entry.count > DEV_LOG_MAX_PER_MIN) {
+      return res.status(429).json({ error: "Too many error logs" });
+    }
   }
+
+  // Bound payload size (refuse huge bodies that could be used to bloat the log)
+  const body = req.body;
+  if (body && typeof body === 'object') {
+    try {
+      const serialized = JSON.stringify(body);
+      if (serialized.length > 8192) {
+        return res.status(413).json({ error: "Payload too large for error log" });
+      }
+    } catch {
+      return res.status(400).json({ error: "Invalid payload" });
+    }
+  }
+
+  const errStr = `\n[${new Date().toISOString()}] FRONTEND ERROR:\n${JSON.stringify(body, null, 2)}\n----------------------------------------\n`;
+
+  // Serialize writes via a promise chain + async fs (no blocking event loop)
+  devLogWriteLock = devLogWriteLock
+    .then(() =>
+      new Promise<void>((resolve) => {
+        fs.stat(DEV_LOG_PATH, (statErr, stats) => {
+          const open = () =>
+            fs.appendFile(DEV_LOG_PATH, errStr, (e) => {
+              if (e) console.error("[dev/log-error] write failed:", e);
+              resolve();
+            });
+          if (statErr || !stats || stats.size < DEV_LOG_MAX_BYTES) {
+            open();
+          } else {
+            // Truncate (rotate) by overwriting instead of growing forever
+            fs.writeFile(DEV_LOG_PATH, errStr, () => resolve());
+          }
+        });
+      })
+    )
+    .catch(() => {});
+
   res.status(200).send("logged");
 });
 // --------------------------------------

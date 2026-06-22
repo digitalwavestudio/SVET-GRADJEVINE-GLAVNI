@@ -2,7 +2,7 @@ import React, { useRef, useEffect, Suspense, memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import CommandCenter from '@/src/components/CommandCenter';
-import ErrorBoundary from '@/src/components/ErrorBoundary';
+import ErrorBoundary from '@/src/components/common/ErrorBoundary';
 import { Sidebar } from './dashboard/Sidebar';
 import { DashboardTopHeader } from './dashboard/DashboardTopHeader';
 import { MobileHeader } from './dashboard/MobileHeader';

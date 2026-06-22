@@ -89,8 +89,11 @@ export const authMiddleware = async (
       if (!resolvedRole) {
         try {
           const cacheKey = `user:profile:cache:${decodedToken.uid}`;
+          // SECURITY: short TTL (5 min) so role/permission changes propagate quickly.
+          // ADR 003 says "no local caching for security logic" — this Redis cache is only
+          // a read-shield for Firestore, not the source of truth. Custom Claims remain authoritative.
           const cachedUser = await CacheService.get<{ role: string; permissions: string[] }>(cacheKey).catch(() => null);
-          
+
           if (cachedUser) {
             resolvedRole = cachedUser.role;
             resolvedPermissions = cachedUser.permissions;
@@ -106,7 +109,7 @@ export const authMiddleware = async (
                 await CacheService.set(authSessionKey, userData, 5 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set auth session:", e)); // 5 minute profile cache shield
               }
             }
-            
+
             if (decodedToken.admin || decodedToken.role === "admin" || userData?.isAdmin) {
               resolvedRole = "admin";
               resolvedPermissions = ["*"];
@@ -114,16 +117,16 @@ export const authMiddleware = async (
               resolvedRole = (userData?.role as string) || "standard";
               resolvedPermissions = (userData?.permissions as string[]) || AuthorizationService.getDefaultPermissions(resolvedRole);
             }
-            
-            // Keširamo u Redisu na 1 sat (60 * 60 * 1000 milisekundi)
-            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 60 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set user profile:", e));
+
+            // SECURITY: TTL 5 minuta (ne 1 sat) — demote/ban se prima maksimalno 5 min
+            await CacheService.set(cacheKey, { role: resolvedRole, permissions: resolvedPermissions }, 5 * 60 * 1000).catch((e: any) => logger.warn("[AuthMiddleware] Cache set user profile:", e));
           }
-          
+
           // Upisujemo Custom Claims, tako da svaki SLEDEĆI token koji klijent pošalje već nosi role & permissions
           // Time je auth provera zero-cost i nema stale state-a!
-          admin.auth().setCustomUserClaims(decodedToken.uid, { 
-            role: resolvedRole, 
-            permissions: resolvedPermissions 
+          admin.auth().setCustomUserClaims(decodedToken.uid, {
+            role: resolvedRole,
+            permissions: resolvedPermissions
           }).catch((e) => console.error("[AUTH] setCustomUserClaims failed in background:", e));
         } catch (e) {
           resolvedRole = "standard";

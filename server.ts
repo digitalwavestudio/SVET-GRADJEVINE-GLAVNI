@@ -215,13 +215,66 @@ async function startServer() {
 
     app.use(rateLimitShield);
 
+    // Content-Security-Policy: mirrors the meta tag in index.html, but enforced
+    // by the server too (defense-in-depth). 'unsafe-eval' only in dev (Vite),
+    // HMR websocket only in dev. Production tightens to unsafe-inline + known origins.
+    const isDev = env.NODE_ENV !== "production";
+    const cspDirectives = {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        ...(isDev ? ["'unsafe-eval'"] : []),
+        "https://apis.google.com",
+        "https://accounts.google.com",
+        "https://www.googletagmanager.com",
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+      ],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "blob:",
+        "https:", // Firebase Storage / user uploads / avatar providers
+      ],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: [
+        "'self'",
+        "https://api.svet-gradjevine.com",
+        "https://accounts.google.com",
+        "https://*.googleapis.com",
+        "https://*.firebaseapp.com",
+        "https://*.firebaseio.com",
+        "https://*.algolia.net",
+        "https://*.algolianet.com",
+        ...(isDev ? ["ws://localhost:24678", "ws://localhost:3000"] : []),
+      ],
+      frameSrc: [
+        "'self'",
+        "https://accounts.google.com",
+        "https://*.googleusercontent.com",
+        "https://*.firebaseapp.com",
+      ],
+      // Hard defenses (defense-in-depth)
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      ...(isDev ? {} : { upgradeInsecureRequests: [] }),
+    };
+
     app.use(
       helmet({
-        contentSecurityPolicy: false,
+        contentSecurityPolicy: { directives: cspDirectives, useDefaults: true },
         crossOriginEmbedderPolicy: false,
-        crossOriginResourcePolicy: false,
-        crossOriginOpenerPolicy: false,
-        xFrameOptions: false,
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+        crossOriginOpenerPolicy: { policy: "same-origin" },
+        // frame-ancestors 'none' in CSP supersedes X-Frame-Options; keep both for legacy browsers
+        xFrameOptions: { action: "deny" },
         referrerPolicy: { policy: "strict-origin-when-cross-origin" },
       }),
     );

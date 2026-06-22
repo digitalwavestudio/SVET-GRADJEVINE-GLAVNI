@@ -250,9 +250,17 @@ service cloud.firestore {
     }
 
     // --- SYSTEM & METRICS ---
-    match /_logs/{id} { 
-      allow write: if isValidId(id) && isEmailVerified() && incoming().message.size() <= 5000; // Impose size guard to prevent flood attacks
-      allow read: if isValidId(id) && isAdmin(); 
+    match /_logs/{id} {
+      // Ownership + size guard: only the authenticated author can write their own log entry,
+      // and the userId on the document must match auth.uid (prevents anonymous flooding).
+      allow write: if isValidId(id)
+        && isEmailVerified()
+        && incoming().userId is string
+        && incoming().userId == request.auth.uid
+        && incoming().message is string
+        && incoming().message.size() <= 5000
+        && request.resource.data.keys().size() <= 8;
+      allow read: if isValidId(id) && isAdmin();
     }
     match /_migrations/{id} { allow read, write: if false; }
     match /metadata/{id} { allow read: if isValidId(id); allow write: if false; }
