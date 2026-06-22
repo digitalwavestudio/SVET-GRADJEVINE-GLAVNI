@@ -1288,7 +1288,7 @@ ${breadcrumbHtml}
       }
 
       // Passthrough for SPA-only routes handled by React Router (no server pre-render needed)
-      const spaPassthroughPrefixes = ["/pretraga", "/profil"];
+      const spaPassthroughPrefixes = ["/pretraga", "/profil", "/postavi-oglas"];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
         return res.send(html);

@@ -15,11 +15,6 @@ export class SitemapService {
    */
   static async getSitemapManifest(): Promise<Record<string, number>> {
     const stats = await AdminStatsService.getGlobalStats();
-    
-    // We also fetch magazine stats to have a complete picture of the platform
-    const magazineStatsSnapshot = await db.doc("metadata/magazine_stats").get().catch(() => null);
-    const magazineStats = magazineStatsSnapshot?.exists ? magazineStatsSnapshot.data() : { totalArticles: 0 };
-
     return {
       jobs: Number(stats.totalJobs) || 0,
       machines: Number(stats.machinesCount) || 0,
@@ -29,7 +24,6 @@ export class SitemapService {
       marketplace: Number(stats.marketplaceCount) || 0,
       companies: Number(stats.companiesCount) || 0,
       masters: Number(stats.mastersCount) || 0,
-      magazine: Number(magazineStats?.totalArticles) || 0,
     };
   }
 
@@ -128,10 +122,8 @@ export class SitemapService {
           "/placevi",
           "/firme",
           "/majstori",
-          "/kompanije",
-          "/radnici",
-          "/za-poslodavce",
-          "/onama",
+          "/o-nama",
+          "/postavi-oglas",
           "/kontakt",
         ];
         const urls = staticPages.map((p) => `${this.domain}${p}`);
