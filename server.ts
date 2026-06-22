@@ -29,11 +29,16 @@ async function startServer() {
       return res.status(503).json({ error: "Service Unavailable", message: "Sistem se pokreće, pokušajte ponovo za par sekundi." });
     }
     
-    // Bots get 503 with Retry-After so they retry later instead of indexing the loading page
+    // Bots get the SPA shell during startup (no 503) so they never index error pages
     const ua = (req.headers["user-agent"] || "").toLowerCase();
     if (/bot|crawler|spider|gptbot|claudebot|perplexity|chatgpt|qwen/i.test(ua)) {
-      res.setHeader("Retry-After", "10");
-      return res.status(503).send("Service Unavailable - Server is starting up. Retry later.");
+      try {
+        const distPath = path.join(process.cwd(), "dist");
+        const shell = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+        return res.send(shell);
+      } catch {
+        return res.status(503).send("Service Unavailable");
+      }
     }
 
     // Stateless Loading Screen for human web requests (Auto-Refresh)
