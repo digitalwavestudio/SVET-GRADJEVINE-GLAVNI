@@ -1234,8 +1234,55 @@ ${breadcrumbHtml}
         }
       }
 
+      // Cene i statistika — SSR metadata
+      if (req.path.startsWith("/cene-i-statistika")) {
+        const parts = req.path.split("/").filter(Boolean);
+        const professionSlug = parts[1] || "";
+        const citySlug = parts[2] || "";
+        const professionName = professionSlug ? professionSlug.replace(/-/g, " ") : "";
+        const cityName = citySlug ? formatCity(citySlug) : "";
+
+        const pageTitle = professionName
+          ? cityName
+            ? `Cene i statistika — ${professionName} — ${cityName} | Svet Građevine`
+            : `Cene i statistika — ${professionName} | Svet Građevine`
+          : "Cene i statistika | Svet Građevine";
+        const pageDesc = professionName
+          ? cityName
+            ? `Pregled cena i statistike za ${professionName} u ${cityName}. Prosečne plate, broj oglasa i trendovi na Svet Građevine.`
+            : `Pregled cena i statistike za ${professionName}. Prosečne plate, broj oglasa i trendovi na Svet Građevine.`
+          : "Pregled cena i statistike za građevinske profesije. Prosečne plate, broj oglasa, potražnja i trendovi.";
+        const canonicalUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
+
+        let skeletonHtml = html;
+        skeletonHtml = skeletonHtml.replace(/<meta name="description"[^>]*\/?>/i, "");
+        skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${pageTitle}</title>`);
+        skeletonHtml = skeletonHtml.replace(
+          "</head>",
+          `<meta name="description" content="${pageDesc}" />
+<meta name="lastmod" content="${new Date().toISOString().split("T")[0]}" />
+<link rel="canonical" href="${canonicalUrl}" />
+<meta property="og:title" content="${pageTitle}" />
+<meta property="og:description" content="${pageDesc}" />
+<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:url" content="${canonicalUrl}" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${pageTitle}" />
+<meta name="twitter:description" content="${pageDesc}" />
+<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta name="robots" content="index, follow" />
+</head>`,
+        );
+        skeletonHtml = skeletonHtml.replace(
+          '<div id="root"></div>',
+          `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true"><main><h1>${pageTitle.replace(" | Svet Građevine", "")}</h1></main></div>`,
+        );
+        return res.send(skeletonHtml);
+      }
+
       // Passthrough for SPA-only routes handled by React Router (no server pre-render needed)
-      const spaPassthroughPrefixes = ["/pretraga", "/profil", "/cene-i-statistika"];
+      const spaPassthroughPrefixes = ["/pretraga", "/profil"];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
         return res.send(html);
