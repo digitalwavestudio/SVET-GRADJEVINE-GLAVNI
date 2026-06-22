@@ -17,7 +17,9 @@ const PaymentInstructionsModal = lazy(() => import('@/src/modules/ads/components
 
 const EmployerDashboardUI = memo(function EmployerDashboardUI() {
   const { user } = useAuth();
-  const { data: statsData } = useDashboardMetrics();
+  // isLoading = još uvek nema nikakvih podataka (prvo učitavanje)
+  // isFetching = pozadinski osvežava se, ali imamo stare podatke
+  const { data: statsData, isLoading } = useDashboardMetrics();
   const { data: trends = [] } = useDashboardTrends();
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<RecentAd | null>(null);
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('month');
@@ -136,22 +138,17 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-white/10 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">UKUPAN BROJ OBJAVA</div>
              <div>
-               <div className="text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-secondary transition-colors">
-                  {statsData?.totalAds !== undefined ? statsData.totalAds : "N/A"}
+               <div className={`text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-secondary transition-colors ${isLoading ? "animate-pulse" : ""}`}>
+                  {isLoading ? "…" : (statsData?.totalAds ?? 0)}
                 </div>
-                {statsData?.totalAds === undefined && (
-                 <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">
-                   Nedostupno
-                 </div>
-               )}
              </div>
           </div>
 
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-emerald-500/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">AKTIVNI PAKET</div>
              <div>
-               <div className="text-xl lg:text-2xl font-black text-emerald-400 tracking-tight uppercase">
-                  {statsData?.activePackage || "NEMA PAKETA"}
+               <div className={`text-xl lg:text-2xl font-black text-emerald-400 tracking-tight uppercase ${isLoading ? "animate-pulse" : ""}`}>
+                  {isLoading ? "…" : (statsData?.activePackage || "NEMA PAKETA")}
                 </div>
                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
                   {statsData?.activePackage && statsData.activePackage !== "Nema paketa" ? "AKTIVAN PAKET" : "PREMIUM PROMOCIJE"}
@@ -162,8 +159,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-purple-400/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">PREMIUM OGLASI</div>
              <div>
-               <div className="text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter">
-                  {statsData?.premiumAdsCount !== undefined ? statsData.premiumAdsCount : "0"}
+               <div className={`text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter ${isLoading ? "animate-pulse" : ""}`}>
+                  {isLoading ? "…" : (statsData?.premiumAdsCount ?? 0)}
                </div>
                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KUPLJENI ARTIKLI</div>
              </div>
@@ -172,8 +169,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-amber-500/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">INVESTIRANO (RSD)</div>
              <div>
-               <div className="text-2xl lg:text-3xl font-black text-amber-500 tracking-tighter">
-                  {statsData?.totalSpend !== undefined ? (statsData.totalSpend || 0).toLocaleString() : "N/A"}
+               <div className={`text-2xl lg:text-3xl font-black text-amber-500 tracking-tighter ${isLoading ? "animate-pulse" : ""}`}>
+                  {isLoading ? "…" : (statsData?.totalSpend ?? 0).toLocaleString()}
                </div>
                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">BEZBEDNI BUDŽET</div>
              </div>
@@ -182,14 +179,10 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="col-span-2 md:col-span-1 xl:col-span-1 bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-blue-400/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">NEOBRAĐENE PRIJAVE</div>
              <div>
-               <div className="text-3xl lg:text-4xl font-black text-blue-400 tracking-tighter">
-                  {statsData?.pendingApplications !== undefined ? statsData.pendingApplications : "N/A"}
+               <div className={`text-3xl lg:text-4xl font-black text-blue-400 tracking-tighter ${isLoading ? "animate-pulse" : ""}`}>
+                  {isLoading ? "…" : (statsData?.pendingApplications ?? 0)}
                 </div>
-                {statsData?.pendingApplications === undefined ? (
-                 <div className="text-[8px] font-mono font-bold text-red-500/80 uppercase mt-1 tracking-wider">NEDOSTUPNO</div>
-               ) : (
-                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KANDIDATI NA ČEKANJU</div>
-               )}
+                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KANDIDATI NA ČEKANJU</div>
              </div>
           </div>
         </motion.div>
@@ -203,7 +196,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                   <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">POSLEDNJI OBJAVLJENI OGLASI</h4>
                   <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest max-w-sm">Pregled nedavnih poslova i prijavljenih radnika.</p>
                 </div>
-                {!statsData && (
+                {!statsData && !isLoading && (
                   <span className="text-[8px] font-black text-orange-400 bg-orange-400/5 border border-orange-400/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse self-start sm:self-auto">
                     PRIVREMENO OGRANIČENO
                   </span>

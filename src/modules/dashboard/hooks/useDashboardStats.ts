@@ -173,7 +173,11 @@ export function useDashboardStats<TData = BffDashboardResponse>(select?: (data: 
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const uid = user?.id || user?.uid || "";
-  const role = user?.role || (user as { userType?: string })?.userType || "";
+  // Bitno: role može biti prazan dok se custom claims ne razreše. Dajemo
+  // stabilan fallback "unknown" kako queryKey ne bi varirao (prazan -> popunjen)
+  // i uzrokovao da React Query odbaci već učitane podatke i pokrene novi query.
+  // Server ionako čita pravu ulogu iz Firebase tokena, ne iz ovog ključa.
+  const role = user?.role || (user as { userType?: string })?.userType || "unknown";
 
   const [isVisible, setIsVisible] = useState(
     typeof document !== "undefined"
@@ -541,7 +545,10 @@ export function useDashboardStats<TData = BffDashboardResponse>(select?: (data: 
       return true;
     },
     throwOnError: true,
-    enabled: !!uid && !!role,
+    // Bitno: query se aktivira čim imamo uid. role ne sme biti uslov jer
+    // može biti prazan string dok se getIdTokenResult() ne razreši, što bi
+    // zauvek držalo dashboard u "N/A" stanju (query se nikada ne pokrene).
+    enabled: !!uid,
     select,
   }) as UseQueryResult<TData, Error>;
 }
