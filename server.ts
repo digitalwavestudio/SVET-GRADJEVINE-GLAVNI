@@ -264,12 +264,13 @@ async function startServer() {
       baseUri: ["'self'"],
       formAction: ["'self'"],
       frameAncestors: ["'none'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
       ...(isDev ? {} : { upgradeInsecureRequests: [] }),
     };
 
     app.use(
       helmet({
-        contentSecurityPolicy: { directives: cspDirectives, useDefaults: true },
+        contentSecurityPolicy: { directives: cspDirectives },
         crossOriginEmbedderPolicy: false,
         crossOriginResourcePolicy: { policy: "cross-origin" },
         crossOriginOpenerPolicy: { policy: "same-origin" },
