@@ -157,7 +157,8 @@ export const botPrerenderMiddleware = async (
 
       // Ako IP bot-a pogaÄ‘a preko 200 req per minute, smatramo ga eksplozivnim (moÅ¾emo da smanjimo ako treba)
       // I zaustavljamo request sa 429 Too Many Requests
-      if (hits > 200) {
+      const isSearchEngineBot = ["googlebot", "bingbot", "yandexbot", "duckduckbot", "ahrefsbot", "slurp", "baiduspider"].includes(botName);
+      if (!isSearchEngineBot && hits > 200) {
         if (DEV) console.info(
           `[Crawl Defense] Banning overly aggressive bot IP ${ip} (${botName}) for hitting > 200req/min.`,
         );
