@@ -115,7 +115,7 @@ export class UnifiedAdsService {
   static async getMyAds(uid: string, limitNum: number) {
     try {
       const snap = await db.collection("listings")
-        .where("userId", "==", uid)
+        .where("authorId", "==", uid)
         .get();
 
       let docs: any[] = snap.docs
