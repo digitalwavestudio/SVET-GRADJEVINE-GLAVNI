@@ -231,6 +231,7 @@ export const bffService = {
           }
 
           const urgentJobsMap = (ad: RawAdData): MappedAdData => ({
+            ...(ad as any),
             id: ad.id,
             title: ad.title || ad.name || "Oglas",
             loc:

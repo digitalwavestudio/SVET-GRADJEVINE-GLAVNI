@@ -1,9 +1,5 @@
 import { 
   Job, 
-  Machine, 
-  RealEstatePlot, 
-  Accommodation, 
-  CateringOffer,
   User
 } from "@svet-gradjevine/shared";
 import {
@@ -69,11 +65,11 @@ export interface HomepageDataResult {
   stats: HomepageStats;
   premiumJobs: MappedAdData[];
   urgentJobs: MappedAdData[];
-  latestMachines: Machine[];
-  latestRealEstate: RealEstatePlot[];
-  latestAccommodations: Accommodation[];
-  latestCaterings: CateringOffer[];
-  latestArticles: any[]; // Article types might not be DTO yet
+  latestMachines: Record<string, unknown>[];
+  latestRealEstate: Record<string, unknown>[];
+  latestAccommodations: Record<string, unknown>[];
+  latestCaterings: Record<string, unknown>[];
+  latestArticles: any[];
 }
 
 export interface DashboardQuickMetrics {
