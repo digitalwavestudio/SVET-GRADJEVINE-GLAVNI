@@ -16,8 +16,8 @@ export async function idempotencyMiddleware(
     return next();
   }
 
-  // Skip idempotency for read-only search endpoints (POST /api/search/*)
-  if (req.path.startsWith("/api/search/")) {
+  // Skip idempotency for read-only search endpoints (POST /api/search/*, /api/jobs/search)
+  if (req.path.startsWith("/api/search/") || req.path === "/api/jobs/search") {
     return next();
   }
 
