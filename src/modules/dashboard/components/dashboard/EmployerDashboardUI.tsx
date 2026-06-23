@@ -15,49 +15,9 @@ import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 const DashboardCharts = lazy(() => import('@/src/modules/dashboard/components/DashboardCharts'));
 const PaymentInstructionsModal = lazy(() => import('@/src/modules/ads/components/ads/PaymentInstructionsModal').then(module => ({ default: module.PaymentInstructionsModal })));
 
-const parseTrendDate = (value?: string) => {
-  if (!value) return null;
-
-  const timestamp = Date.parse(value);
-  if (!Number.isNaN(timestamp)) {
-    return timestamp;
-  }
-
-  const shortLabelMatch = value.match(/^(\d{1,2})\.\s*([^\s.]+)$/i);
-  if (!shortLabelMatch) {
-    return null;
-  }
-
-  const [, dayRaw, monthRaw] = shortLabelMatch;
-  const monthMap: Record<string, number> = {
-    jan: 0,
-    feb: 1,
-    mar: 2,
-    apr: 3,
-    maj: 4,
-    jun: 5,
-    jul: 6,
-    avg: 7,
-    sep: 8,
-    okt: 9,
-    nov: 10,
-    dec: 11,
-  };
-  const monthIndex = monthMap[monthRaw.toLowerCase()];
-  const day = Number(dayRaw);
-
-  if (monthIndex === undefined || Number.isNaN(day)) {
-    return null;
-  }
-
-  return new Date(new Date().getFullYear(), monthIndex, day).getTime();
-};
-
 const EmployerDashboardUI = memo(function EmployerDashboardUI() {
   const { user } = useAuth();
-  // isLoading = još uvek nema nikakvih podataka (prvo učitavanje)
-  // isFetching = pozadinski osvežava se, ali imamo stare podatke
-  const { data: statsData, isLoading } = useDashboardMetrics();
+  const { data: statsData } = useDashboardMetrics();
   const { data: trends = [] } = useDashboardTrends();
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<RecentAd | null>(null);
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('month');
@@ -77,24 +37,11 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
 
   const filteredTrends = useMemo(() => {
     const days = timeframe === 'day' ? 1 : timeframe === 'week' ? 7 : 30;
-    const safeTrends = Array.isArray(trends) ? (trends as ChartTrendData[]) : [];
-    const withTimestamps = safeTrends.map((trend, index) => ({
-      trend,
-      index,
-      timestamp: parseTrendDate(trend.date),
-    }));
-    const hasParsableDates = withTimestamps.some(({ timestamp }) => timestamp !== null);
-
-    if (!hasParsableDates) {
-      return safeTrends.slice(-days);
-    }
-
     const now = Date.now();
-    const rangeMs = days * 86400000;
-
-    return withTimestamps
-      .filter(({ timestamp }) => timestamp !== null && now - timestamp <= rangeMs)
-      .map(({ trend }) => trend);
+    return (trends as ChartTrendData[]).filter(t => {
+      const d = new Date(t.date);
+      return now - d.getTime() <= days * 86400000;
+    });
   }, [trends, timeframe]);
 
   const charts = { dailyAnalytics: Array.isArray(filteredTrends) ? (filteredTrends as ChartTrendData[]) : [] };
@@ -189,17 +136,22 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-white/10 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">UKUPAN BROJ OBJAVA</div>
              <div>
-               <div className={`text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-secondary transition-colors ${isLoading ? "animate-pulse" : ""}`}>
-                  {isLoading ? "…" : (statsData?.totalAds ?? 0)}
+               <div className="text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:text-secondary transition-colors">
+                  {statsData?.totalAds !== undefined ? statsData.totalAds : "N/A"}
                 </div>
+                {statsData?.totalAds === undefined && (
+                 <div className="text-[8px] font-bold text-[#FEBF0D]/80 uppercase mt-1 tracking-wider">
+                   Nedostupno
+                 </div>
+               )}
              </div>
           </div>
 
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-emerald-500/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">AKTIVNI PAKET</div>
              <div>
-               <div className={`text-xl lg:text-2xl font-black text-emerald-400 tracking-tight uppercase ${isLoading ? "animate-pulse" : ""}`}>
-                  {isLoading ? "…" : (statsData?.activePackage || "NEMA PAKETA")}
+               <div className="text-xl lg:text-2xl font-black text-emerald-400 tracking-tight uppercase">
+                  {statsData?.activePackage || "NEMA PAKETA"}
                 </div>
                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
                   {statsData?.activePackage && statsData.activePackage !== "Nema paketa" ? "AKTIVAN PAKET" : "PREMIUM PROMOCIJE"}
@@ -210,8 +162,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-purple-400/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">PREMIUM OGLASI</div>
              <div>
-               <div className={`text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter ${isLoading ? "animate-pulse" : ""}`}>
-                  {isLoading ? "…" : (statsData?.premiumAdsCount ?? 0)}
+               <div className="text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter">
+                  {statsData?.premiumAdsCount !== undefined ? statsData.premiumAdsCount : "0"}
                </div>
                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KUPLJENI ARTIKLI</div>
              </div>
@@ -220,8 +172,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-amber-500/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">INVESTIRANO (RSD)</div>
              <div>
-               <div className={`text-2xl lg:text-3xl font-black text-amber-500 tracking-tighter ${isLoading ? "animate-pulse" : ""}`}>
-                  {isLoading ? "…" : (statsData?.totalSpend ?? 0).toLocaleString()}
+               <div className="text-2xl lg:text-3xl font-black text-amber-500 tracking-tighter">
+                  {statsData?.totalSpend !== undefined ? (statsData.totalSpend || 0).toLocaleString() : "N/A"}
                </div>
                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">BEZBEDNI BUDŽET</div>
              </div>
@@ -230,10 +182,14 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="col-span-2 md:col-span-1 xl:col-span-1 bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-blue-400/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">NEOBRAĐENE PRIJAVE</div>
              <div>
-               <div className={`text-3xl lg:text-4xl font-black text-blue-400 tracking-tighter ${isLoading ? "animate-pulse" : ""}`}>
-                  {isLoading ? "…" : (statsData?.pendingApplications ?? 0)}
+               <div className="text-3xl lg:text-4xl font-black text-blue-400 tracking-tighter">
+                  {statsData?.pendingApplications !== undefined ? statsData.pendingApplications : "N/A"}
                 </div>
-                <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KANDIDATI NA ČEKANJU</div>
+                {statsData?.pendingApplications === undefined ? (
+                 <div className="text-[8px] font-mono font-bold text-red-500/80 uppercase mt-1 tracking-wider">NEDOSTUPNO</div>
+               ) : (
+                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KANDIDATI NA ČEKANJU</div>
+               )}
              </div>
           </div>
         </motion.div>
@@ -247,23 +203,15 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                   <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">POSLEDNJI OBJAVLJENI OGLASI</h4>
                   <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest max-w-sm">Pregled nedavnih poslova i prijavljenih radnika.</p>
                 </div>
-                {!statsData && !isLoading && (
+                {!statsData && (
                   <span className="text-[8px] font-black text-orange-400 bg-orange-400/5 border border-orange-400/10 px-3 py-1.5 rounded-full uppercase tracking-widest animate-pulse self-start sm:self-auto">
                     PRIVREMENO OGRANIČENO
                   </span>
                 )}
               </div>
 
-              {recentAds === undefined || recentAds === null ? (
-                <div className="bg-white/[0.01] border border-dashed border-white/5 rounded-[10px] p-12 text-center flex flex-col items-center gap-4">
-                  <span className="material-symbols-outlined text-white/10 text-4xl">cloud_off</span>
-                  <div className="space-y-1">
-                    <h5 className="text-white/60 text-xs font-black uppercase tracking-wider">Spisak oglasa je privremeno nedostupan</h5>
-                    <p className="text-white/20 text-[9px] uppercase tracking-widest max-w-xs mx-auto">Sistem je parcijalno uspeo da učita profil, ali ne i listu oglasa.</p>
-                  </div>
-                </div>
-              ) : recentAds.length > 0 ? (
-                <div ref={parentRef} className="max-h-[350px] overflow-y-auto no-scrollbar scroll-smooth pr-2">
+              {recentAds.length > 0 ? (
+                <div ref={parentRef} className="flex-1 overflow-y-auto no-scrollbar scroll-smooth pr-2">
                   <div className="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
                     {virtualizer.getVirtualItems().map((virtualItem) => {
                       const ad = recentAds[virtualItem.index];
@@ -349,7 +297,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                   </div>
                 </div>
               ) : (
-                <div className="border border-dashed border-white/10 rounded-[10px] p-12 text-center flex flex-col items-center justify-center gap-6 relative overflow-hidden group flex-1">
+                <div className="flex-1 bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 sm:p-8 md:p-12 text-center flex flex-col items-center justify-center gap-6 relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/[0.02] border border-white/10 flex items-center justify-center relative shadow-2xl">
                     <div className="absolute inset-0 border border-secondary/20 rounded-full animate-ping opacity-20"></div>

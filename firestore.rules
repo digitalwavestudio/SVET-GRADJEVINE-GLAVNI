@@ -245,7 +245,7 @@ service cloud.firestore {
       allow write: if false;
     }
     match /magazine_categories/{catId} {
-      allow read: if isAdmin();
+      allow read: if isValidId(catId);
       allow write: if false;
     }
 

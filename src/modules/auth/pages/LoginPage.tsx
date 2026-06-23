@@ -1,5 +1,5 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { sendPasswordResetEmail, signInWithPopup } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
@@ -88,7 +88,12 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await loginWithGoogle();
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        // Direct popup for development on localhost
+        await signInWithPopup(auth, googleProvider);
+      } else {
+        await loginWithGoogle();
+      }
     } catch (err: any) {
       const errorMsg = getErrorMessage(err);
       console.error('Google Login Error:', errorMsg);

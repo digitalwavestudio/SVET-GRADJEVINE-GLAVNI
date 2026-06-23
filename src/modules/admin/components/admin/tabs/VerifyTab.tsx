@@ -63,7 +63,7 @@ export function VerifyTab() {
     const comment = (action === "reject" ? prompt("Razlog odbijanja:") : "Odobreno") || "";
     if (action === "reject" && !comment) return;
     
-    processRequestMutation.mutate({ requestId, action, comment: comment || "" });
+    processRequestMutation.mutate({ requestId, action, comment });
   };
 
   if (isLoading) {

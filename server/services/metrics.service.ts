@@ -398,22 +398,9 @@ export class MetricsService {
       if (adId && aId !== adId) continue;
 
       if (!statsMap[date]) {
-        statsMap[date] = {
-          views: 0,
-          views_internal: 0,
-          views_external: 0,
-          views_direct: 0,
-          clicks: 0,
-          clicks_internal: 0,
-          clicks_external: 0,
-          clicks_direct: 0,
-          inquiries: 0,
-        };
+        statsMap[date] = { views: 0, clicks: 0, inquiries: 0 };
       }
       statsMap[date][`${type}s`] = (statsMap[date][`${type}s`] || 0) + count;
-      const source = parts[4] || "direct";
-      const sourceKey = `${type}s_${source}`;
-      statsMap[date][sourceKey] = (statsMap[date][sourceKey] || 0) + count;
     }
     return statsMap;
   }
@@ -454,23 +441,19 @@ export class MetricsService {
                 views: 0,
                 views_internal: 0,
                 views_external: 0,
-                views_direct: 0,
                 clicks: 0,
                 clicks_internal: 0,
                 clicks_external: 0,
-                clicks_direct: 0,
                 inquiries: 0,
               };
 
             statsMap[date].views += data.views || 0;
             statsMap[date].views_internal += data.views_internal || 0;
             statsMap[date].views_external += data.views_external || 0;
-            statsMap[date].views_direct += data.views_direct || 0;
 
             statsMap[date].clicks += data.clicks || 0;
             statsMap[date].clicks_internal += data.clicks_internal || 0;
             statsMap[date].clicks_external += data.clicks_external || 0;
-            statsMap[date].clicks_direct += data.clicks_direct || 0;
 
             statsMap[date].inquiries += data.inquiries || 0;
           });
@@ -490,11 +473,9 @@ export class MetricsService {
                 views: 0,
                 views_internal: 0,
                 views_external: 0,
-                views_direct: 0,
                 clicks: 0,
                 clicks_internal: 0,
                 clicks_external: 0,
-                clicks_direct: 0,
                 inquiries: 0,
               },
             );
@@ -519,13 +500,7 @@ export class MetricsService {
         return {
           ...item,
           views: (item.views || 0) + (p.views || 0),
-          views_internal: (item.views_internal || 0) + (p.views_internal || 0),
-          views_external: (item.views_external || 0) + (p.views_external || 0),
-          views_direct: (item.views_direct || 0) + (p.views_direct || 0),
           clicks: (item.clicks || 0) + (p.clicks || 0),
-          clicks_internal: (item.clicks_internal || 0) + (p.clicks_internal || 0),
-          clicks_external: (item.clicks_external || 0) + (p.clicks_external || 0),
-          clicks_direct: (item.clicks_direct || 0) + (p.clicks_direct || 0),
           inquiries: (item.inquiries || 0) + (p.inquiries || 0)
         };
       }

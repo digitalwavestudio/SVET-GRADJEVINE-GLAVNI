@@ -194,7 +194,7 @@ function DashboardContent() {
                 {!roles.isStandard && (
                   <DashboardGuard variant="inline" title="Greška u analitici">
                     <Suspense fallback={<AnalyticsSkeleton />}>
-                      <AnalyticsDashboardUI userId={user.id || user.uid || ''} />
+                      <AnalyticsDashboardUI userId={user.id} />
                     </Suspense>
                   </DashboardGuard>
                 )}
@@ -236,7 +236,7 @@ function DashboardContent() {
             {!roles.isStandard && !roles.isEmployerRole ? (
               <DashboardGuard variant="inline" title="Greška u analitici">
                 <Suspense fallback={<AnalyticsSkeleton />}>
-                  <AnalyticsDashboardUI userId={user.id || user.uid || ''} />
+                  <AnalyticsDashboardUI userId={user.id} />
                 </Suspense>
               </DashboardGuard>
             ) : null}

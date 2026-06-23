@@ -36,34 +36,6 @@ export class DashboardService {
   private static subRegistered = false;
   private static msgHandler: ((channel: string, message: string) => void) | null = null;
 
-  private static normalizeTrendEntry(
-    trend: { name?: string; date?: string; pregledi?: number; views?: number; prijave?: number; applications?: number }
-  ) {
-    return {
-      name: trend.name || trend.date || "",
-      pregledi: trend.pregledi ?? trend.views ?? 0,
-      prijave: trend.prijave ?? trend.applications ?? 0,
-    };
-  }
-
-  private static buildAnalyticsTrends(
-    analytics: Array<{ date?: string; views?: number; inquiries?: number }>
-  ) {
-    return analytics
-      .slice(-30)
-      .map((item) => ({
-        name: item.date || "",
-        pregledi: item.views || 0,
-        prijave: item.inquiries || 0,
-      }));
-  }
-
-  private static hasTrendActivity(
-    trends: Array<{ pregledi?: number; prijave?: number }>
-  ) {
-    return trends.some((trend) => (trend.pregledi || 0) > 0 || (trend.prijave || 0) > 0);
-  }
-
   static async aggregateDashboardData(userId: string, role: string, isAdmin: boolean, reqUser: UserMatchProfile | null = null) {
     try {
       const cached = (await CacheService.get(`bff_cache_tiered:${userId}`)) || 
@@ -138,23 +110,29 @@ export class DashboardService {
     let trends: { name: string; pregledi: number; prijave?: number }[] = [];
     const hasEmployerTrends = Array.isArray(stats?.trends) && stats.trends.length > 0;
     const hasAnalytics = Array.isArray(analytics) && analytics.length > 0;
-    const normalizedEmployerTrends = hasEmployerTrends
-      ? stats.trends.map((t: { name?: string; date?: string; pregledi?: number; views?: number; prijave?: number; applications?: number }) =>
-          this.normalizeTrendEntry(t)
-        )
-      : [];
-    const normalizedAnalyticsTrends = hasAnalytics
-      ? this.buildAnalyticsTrends(analytics as Array<{ date?: string; views?: number; inquiries?: number }>)
-      : [];
-    const employerTrendsHaveActivity = this.hasTrendActivity(normalizedEmployerTrends);
-    const analyticsHaveActivity = this.hasTrendActivity(normalizedAnalyticsTrends);
 
-    if (employerTrendsHaveActivity || (hasEmployerTrends && !analyticsHaveActivity)) {
-      trends = normalizedEmployerTrends;
+    if (hasEmployerTrends) {
+      trends = stats.trends.map((t: { name?: string; date?: string; pregledi?: number; views?: number; prijave?: number; applications?: number }) => ({
+        name: t.name || t.date || "",
+        pregledi: t.pregledi ?? t.views ?? 0,
+        prijave: t.prijave ?? t.applications ?? 0,
+      }));
     } else if (hasAnalytics) {
-      trends = normalizedAnalyticsTrends;
-    } else if (hasEmployerTrends) {
-      trends = normalizedEmployerTrends;
+      const startIdx = Math.max(0, analytics.length - 7);
+      trends = analytics.reduce((acc: { name: string; pregledi: number }[], item: { date?: string; views?: number }, index: number) => {
+        if (index >= startIdx) {
+          acc.push({
+            name: item.date
+              ? new Date(item.date).toLocaleDateString("sr-RS", {
+                  day: "2-digit",
+                  month: "short",
+                })
+              : "Unknown",
+            pregledi: item.views || 0,
+          });
+        }
+        return acc;
+      }, []);
     }
 
     return {
