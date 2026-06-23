@@ -50,7 +50,6 @@ export const canonicalHostMiddleware = (
 
   if (
     isProdEnv &&
-    host !== APP_CONFIG.DOMAIN &&
     host !== `www.${APP_CONFIG.DOMAIN}`
   ) {
     if (DEV) console.info(

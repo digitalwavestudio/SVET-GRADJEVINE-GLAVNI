@@ -96,6 +96,13 @@ function formatCity(slug: string): string {
   return CITY_DISPLAY[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
 }
 
+// Ensure SSR output always has a canonical link — critical for SEO to avoid duplicate pages
+function ensureCanonical(html: string, reqPath: string): string {
+  if (html.includes('rel="canonical"')) return html;
+  const canonicalUrl = `${APP_CONFIG.BASE_URL}${reqPath}`;
+  return html.replace("</head>", `<link rel="canonical" href="${canonicalUrl}" />\n</head>`);
+}
+
 // Strip existing <title> and <meta name="description"> before injecting SSR helmet output
 function stripHeadMeta(html: string): string {
   return html
@@ -968,6 +975,7 @@ export const createSpaMiddleware = () => {
           let finalHtml = stripHeadMeta(indexHtml)
             .replace('</head>', `${helmetContent}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+          finalHtml = ensureCanonical(finalHtml, req.path);
           res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
           const redisCache = getRedis();
           if (redisCache) {
@@ -1040,6 +1048,7 @@ export const createSpaMiddleware = () => {
               let finalHtml = stripHeadMeta(indexHtml)
                 .replace('</head>', `${helmetContent}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
                 .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+              finalHtml = ensureCanonical(finalHtml, req.path);
               res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
               const redisCache = getRedis();
               if (redisCache) {

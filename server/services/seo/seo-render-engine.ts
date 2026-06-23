@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { Request, Response } from "express";
+import { APP_CONFIG } from "../../../src/constants/config.ts";
 
 export interface SEOMetaData {
   title: string;
@@ -106,6 +107,7 @@ export class SEORenderEngine {
    */
   static generateDerivedTags(reqPath: string, host: string, paginationTags: string = ""): string {
     const isDetail = reqPath.includes("~");
+    const canonicalBase = APP_CONFIG.BASE_URL.replace(/\/$/, "");
 
     if (isDetail) {
       const segments = reqPath.split("/").filter(Boolean);
@@ -123,7 +125,7 @@ export class SEORenderEngine {
 
       const derivedTitle = `${titleWord} | Svet Građevine`;
       const derivedDesc = `Pogledajte detalje za ${titleWord} na portalu Svet Građevine - najvećem građevinskom portalu na Balkanu.`;
-      const derivedUrl = `https://${host}${reqPath}`;
+      const derivedUrl = `${canonicalBase}${reqPath}`;
       const defaultImage = "https://svetgradjevine.com/og-default.jpg";
 
       return `
@@ -137,9 +139,39 @@ export class SEORenderEngine {
         ${paginationTags}
       `.trim();
     } else {
-      const derivedTitle = `Svet Građevine | Građevinski Portal`;
-      const derivedDesc = `Najveći građevinski portal na Balkanu za poslove, majstore, mašine i nekretnine.`;
-      const derivedUrl = `https://${host}${reqPath}`;
+      // Generate specific title/description for known listing hub paths
+      const isGeoPage = reqPath.split("/").filter(Boolean).length > 1;
+      const pathPart = reqPath.split("/").filter(Boolean)[0] || "";
+      const lastPart = reqPath.split("/").filter(Boolean).pop() || "";
+
+      const hubLabels: Record<string, string> = {
+        poslovi: "Oglasi za posao u građevini",
+        "gradjevinske-masine": "Građevinske mašine",
+        masine: "Građevinske mašine",
+        smestaj: "Smeštaj za radnike",
+        ketering: "Ketering i ugostiteljstvo",
+        placevi: "Građevinsko zemljište",
+        "alat-i-oprema": "Alat i građevinska oprema",
+        firme: "Građevinske kompanije",
+        majstori: "Majstori u građevini",
+      };
+
+      let derivedTitle: string;
+      let derivedDesc: string;
+
+      if (isGeoPage && hubLabels[pathPart]) {
+        const readableLocation = lastPart.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        derivedTitle = `${hubLabels[pathPart]} u ${readableLocation} | Svet Građevine`;
+        derivedDesc = `Pregledajte ${hubLabels[pathPart].toLowerCase()} u ${readableLocation}. Pronađite najbolje ponude na Svet Građevine - vodećem građevinskom portalu.`;
+      } else if (hubLabels[pathPart]) {
+        derivedTitle = `${hubLabels[pathPart]} | Svet Građevine`;
+        derivedDesc = `${hubLabels[pathPart]} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Pregledajte sve oglase i pronađite najbolje ponude.`;
+      } else {
+        derivedTitle = `Svet Građevine | Građevinski Portal`;
+        derivedDesc = `Najveći građevinski portal na Balkanu za poslove, majstore, mašine i nekretnine.`;
+      }
+
+      const derivedUrl = `${canonicalBase}${reqPath}`;
 
       return `
         <title>${derivedTitle}</title>
@@ -166,7 +198,7 @@ export class SEORenderEngine {
     const baseHtml = await this.getBaseTemplate();
 
     const pathWithoutQuery = reqPath.split("?")[0].replace(/\/$/, "") || "/";
-    const canonicalBaseUrl = `https://${host}${pathWithoutQuery}`;
+    const canonicalBaseUrl = `${APP_CONFIG.BASE_URL.replace(/\/$/, "")}${pathWithoutQuery}`;
     
     const paginationTags = options.paginationTags !== undefined 
       ? options.paginationTags 

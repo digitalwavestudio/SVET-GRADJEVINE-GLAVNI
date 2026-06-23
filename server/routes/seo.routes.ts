@@ -86,9 +86,8 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
         const redirectUrl = parentRoute ? parentRoute.path : "/";
         return res.redirect(301, redirectUrl);
       } else {
-        res.status(410);
-        res.setHeader("X-Robots-Tag", "noindex");
-        return res.send(html);
+        // Instead of 410, fall through to SPA middleware — these are valid listing pages
+        return next();
       }
     }
 
