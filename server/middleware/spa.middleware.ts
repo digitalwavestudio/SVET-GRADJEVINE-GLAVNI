@@ -1189,9 +1189,23 @@ ${breadcrumbHtml}
         const adId = parts.length > 1 ? parts[parts.length - 1] : fullId;
 
         if (adId && collectionName) {
-          // If not bot, we return the cached static index.html instantly so browser can bootstrap Fast
+          // If not bot, we return the cached static index.html instantly so browser can bootstrap Fast.
+          // Inject a basic title from slug so AhrefsSpeedTest and other non-bot crawlers see a page title.
           if (!isBot && cachedIndexHtml) {
-            return res.send(cachedIndexHtml);
+            let slugPart = adId;
+            if (fullId.includes("~")) {
+              slugPart = fullId.split("~")[0];
+            }
+            const readableTitle = slugPart
+              .split("-")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ");
+            const title = `${readableTitle} | Svet Građevine`;
+            const nonBotHtml = cachedIndexHtml.replace(
+              /<title>.*?<\/title>/,
+              `<title>${title}</title>`,
+            );
+            return res.send(nonBotHtml);
           }
 
           // Generate dynamic metadata solely from route slugs to prevent synchronous database blockage
