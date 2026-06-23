@@ -1146,7 +1146,7 @@ export const createSpaMiddleware = () => {
           }
 
           const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
-          const canonicalSkeletonPath = CANONICAL_PATH_MAP[collectionName] || req.path;
+          const canonicalSkeletonPath = isPseoRoute ? req.path : (CANONICAL_PATH_MAP[collectionName] || req.path);
           const currentPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${canonicalSkeletonPath}?page=${pageNum}` : `${APP_CONFIG.BASE_URL}${canonicalSkeletonPath}`;
           const prevPageUrl = pageNum > 1 ? `${APP_CONFIG.BASE_URL}${canonicalSkeletonPath}?page=${pageNum - 1}` : null;
           let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
