@@ -16,8 +16,9 @@ export async function idempotencyMiddleware(
     return next();
   }
 
-  // Skip idempotency for read-only search endpoints (POST /api/search/*, /api/jobs/search)
-  if (req.path.startsWith("/api/search/") || req.path === "/api/jobs/search") {
+  // Skip idempotency for read-only search endpoints (POST)
+  const skipPaths = ["/api/search/", "/api/ads/search", "/api/jobs/search", "/api/users/search"];
+  if (skipPaths.some(p => req.path.startsWith(p))) {
     return next();
   }
 
@@ -26,8 +27,9 @@ export async function idempotencyMiddleware(
 
   if (!key) {
     if (req.user && req.user.uid) {
-      // Dinamički Debounce Lock (sprečava double-click na istu putanju unutar 10s)
-      key = `debounce:${req.user.uid}:${req.method}:${req.baseUrl}${req.path}`;
+      // Dinamički Debounce Lock sa body hash-om da razlikuje različite zahteve
+      const bodyHash = req.body ? JSON.stringify(req.body).length.toString(36) : "0";
+      key = `debounce:${req.user.uid}:${req.method}:${req.baseUrl}${req.path}:${bodyHash}`;
     } else {
       // Ako nema usera i nema headera - puštamo kroz system bez idempotency (nije osigurano ali je graceful)
       return next();
