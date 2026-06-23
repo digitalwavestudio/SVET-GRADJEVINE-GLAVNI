@@ -1,16 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  onIdTokenChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
-  signOut,
-  updateProfile,
-  getRedirectResult,
-  User as FirebaseUser
-} from 'firebase/auth';
-import { auth, googleProvider } from '@/src/lib/firebase';
+import type { User as FirebaseUser } from 'firebase/auth';
+import { getLazyAuth, getLazyGoogleProvider } from '@/src/lib/firebase';
 import { subscribeToOfflineStatus, subscribeToQuotaStatus } from '@/src/lib/errorUtils';
 import { partnerService } from '@/src/services/partnerService';
 import { User, UserRole } from '@/src/modules/core/types/user';
@@ -54,7 +44,8 @@ const safeStorage = {
 
 const syncUserStats = async (role: string) => {
   try {
-    const token = await auth.currentUser?.getIdToken();
+    const authInst = await getLazyAuth();
+    const token = await authInst.currentUser?.getIdToken();
     if (!token) return;
     await apiClient.post('/users/init', { role });
   } catch (e) {
@@ -303,11 +294,12 @@ export function useAuthNode() {
 
   useEffect(() => {
     let initTimeout: NodeJS.Timeout | null = null;
+    let unsubAuth: (() => void) | null = null;
+    let mounted = true;
 
-    // Guard: Pokrećemo bezbednosni timeout od 2000ms da bismo otkočili UI ukoliko Firebase Auth mrežni handshake visi (česta pojava u sandboxed iframe-ovima).
     if (loading) {
       initTimeout = setTimeout(() => {
-        if (isMountedFn.current) {
+        if (mounted) {
           console.warn('[AUTH_GUARD] Firebase Auth initialization threshold reached (2000ms). Unblocking UI.');
           setLoading(false);
           setIsInitializing(false);
@@ -315,36 +307,42 @@ export function useAuthNode() {
       }, 2000);
     }
 
-    const unsubscribeAuth = onIdTokenChanged(auth, async (firebaseUser) => {
-      // CLEAR TIMEOUT IMMEDIATELY when we get any signal from Firebase
-      if (initTimeout) {
-        clearTimeout(initTimeout);
-        initTimeout = null;
+    (async () => {
+      try {
+        const mod = await import('firebase/auth');
+        const authInst = await getLazyAuth();
+        if (!mounted) return;
+
+        unsubAuth = mod.onIdTokenChanged(authInst, async (firebaseUser) => {
+          if (initTimeout) { clearTimeout(initTimeout); initTimeout = null; }
+
+          if (firebaseUser) {
+            currentFbUser.current = firebaseUser;
+            subscribeToUser(firebaseUser);
+          } else {
+            currentFbUser.current = null;
+            if (unsubUserRef.current) unsubUserRef.current();
+
+            if (mounted) {
+              setUser(null);
+              safeStorage.removeItem(CACHE_KEY);
+              safeStorage.removeItem('svet_gradjevine_last_sync');
+              setLoading(false);
+              setIsInitializing(false);
+            }
+          }
+        });
+      } catch (err) {
+        console.error('[AUTH] Failed to initialize auth listener:', err);
+        if (mounted) { setLoading(false); setIsInitializing(false); }
       }
+    })();
 
-      if (firebaseUser) {
-        currentFbUser.current = firebaseUser;
-        subscribeToUser(firebaseUser);
-      } else {
-        currentFbUser.current = null;
-        if (unsubUserRef.current) unsubUserRef.current();
-        
-        if (isMountedFn.current) {
-           setUser(null);
-           safeStorage.removeItem(CACHE_KEY);
-           safeStorage.removeItem('svet_gradjevine_last_sync');
-           setLoading(false); 
-           setIsInitializing(false);
-        }
-      }
-    });
-
-      // Moved redirect handling to top-level effect
-
-      return () => {
-        if (initTimeout) clearTimeout(initTimeout);
-        unsubscribeAuth();
-      };
+    return () => {
+      mounted = false;
+      if (initTimeout) clearTimeout(initTimeout);
+      if (unsubAuth) unsubAuth();
+    };
   }, [subscribeToUser]);
 
 // Auth Methods
@@ -379,8 +377,15 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
 };
 
   useEffect(() => {
-    getRedirectResult(auth)
-      .then(async (result) => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const mod = await import('firebase/auth');
+        const authInst = await getLazyAuth();
+        if (!mounted) return;
+
+        const result = await mod.getRedirectResult(authInst);
         if (import.meta.env.DEV) console.log('[AUTH] getRedirectResult result:', result);
         if (result?.user && !redirectProcessed.current) {
           redirectProcessed.current = true;
@@ -388,7 +393,6 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
 
           const fbUser = result.user;
 
-          // Optimistic: set user immediately so redirect fires
           setUser({
             id: fbUser.uid,
             email: fbUser.email || '',
@@ -400,35 +404,37 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
             name: fbUser.displayName || '',
             photoURL: fbUser.photoURL || '',
           } as User);
-          if (isMountedFn.current) {
+          if (mounted) {
             setLoading(false);
             setIsInitializing(false);
           }
 
-          // Background: create server profile + refresh token
           initUser(fbUser).catch(() => {});
           fbUser.getIdToken(true).catch(() => {});
 
-          // Full profile sync in background
           subscribeToUser(fbUser);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.warn('[AUTH] getRedirectResult failed', err);
-      });
+      }
+    })();
+
+    return () => { mounted = false; };
   }, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
+      const mod = await import('firebase/auth');
+      const authInst = await getLazyAuth();
+      const provider = getLazyGoogleProvider();
       const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
-      // Na localhost-u popup ne radi zbog COOP headers — koristimo redirect
       if (isLocalhost) {
-        await signInWithRedirect(auth, googleProvider);
+        await mod.signInWithRedirect(authInst, provider);
         return;
       }
 
       try {
-        const result = await signInWithPopup(auth, googleProvider);
+        const result = await mod.signInWithPopup(authInst, provider);
         if (result.user) {
           const fbUser = result.user;
 
@@ -453,7 +459,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         }
       } catch (err: any) {
         if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {
-          signInWithRedirect(auth, googleProvider).catch(console.error);
+          mod.signInWithRedirect(authInst, provider).catch(console.error);
         } else {
           console.error('[AUTH] Popup login failed:', err);
           throw err;
@@ -466,7 +472,9 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
   const loginWithEmail = useCallback(async (email: string, pass: string) => {
     return traceAsync('auth_login_email', async () => {
       try {
-        const result = await signInWithEmailAndPassword(auth, email, pass);
+        const mod = await import('firebase/auth');
+        const authInst = await getLazyAuth();
+        const result = await mod.signInWithEmailAndPassword(authInst, email, pass);
           apiClient.post('/telemetry/auth', {
           userId: result.user.uid,
           authMethod: 'email',
@@ -486,10 +494,11 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
 
   const registerWithEmail = useCallback(async (email: string, pass: string, firstName: string, lastName: string, role: UserRole) => {
     return traceAsync('auth_register_email', async () => {
-      const result = await createUserWithEmailAndPassword(auth, email, pass);
+      const mod = await import('firebase/auth');
+      const authInst = await getLazyAuth();
+      const result = await mod.createUserWithEmailAndPassword(authInst, email, pass);
       const firebaseUser = result.user;
 
-      // BigQuery Auth Trace
       apiClient.post('/telemetry/auth', {
         userId: firebaseUser.uid,
         authMethod: 'email',
@@ -497,7 +506,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         status: 'success'
       }).catch(() => console.warn('[Auth] Telemetry register post failed'));
 
-      await updateProfile(firebaseUser, { displayName: `${firstName} ${lastName}` });
+      await mod.updateProfile(firebaseUser, { displayName: `${firstName} ${lastName}` });
 
       const newUser = {
         firstName, lastName, name: `${firstName} ${lastName}`, email,
@@ -506,7 +515,6 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         uid: firebaseUser.uid
       };
       
-      // API is still used for initialization to bootstrap robust backend state
       await apiClient.post('/users/init', newUser);
     });
   }, []);
@@ -515,7 +523,6 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
     let currentUserSnapshot: User | null = null;
     setUser(prev => { currentUserSnapshot = prev; return prev; });
     
-    // BigQuery Auth Trace
     if (currentUserSnapshot && (currentUserSnapshot as User).id) {
        apiClient.post('/telemetry/auth', {
          userId: (currentUserSnapshot as User).id,
@@ -525,16 +532,17 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
     }
 
     sessionStorage.removeItem('admin_promoted');
-    await signOut(auth);
+    const mod = await import('firebase/auth');
+    const authInst = await getLazyAuth();
+    await mod.signOut(authInst);
     setUser(null);
     safeStorage.removeItem(CACHE_KEY);
     safeStorage.removeItem('svet_gradjevine_last_sync');
     safeStorage.removeItem('admin_preview_role');
     
-    // Explicit Targeted Garbage Collection for user memory space
     if (currentUserSnapshot && (currentUserSnapshot as User).id) {
        queryClient.removeQueries({ queryKey: ['user-session', (currentUserSnapshot as User).id] });
-       queryClient.removeQueries({ queryKey: ['dashboard'] }); // bff
+       queryClient.removeQueries({ queryKey: ['dashboard'] });
     } else {
        queryClient.removeQueries({ queryKey: ['user-session'] });
     }
@@ -551,8 +559,9 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         targetRole ? { role: targetRole } : {}
       );
       if (data.success && data.newRole) {
-        if (auth.currentUser) {
-          await auth.currentUser.getIdToken(true);
+        const authInst = await getLazyAuth();
+        if (authInst.currentUser) {
+          await authInst.currentUser.getIdToken(true);
         }
         const updatedUser = { ...(userSnapshot as User), role: data.newRole };
         setUser(updatedUser);
@@ -706,7 +715,8 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
   }, [user, updateUser]);
 
   const getIdToken = useCallback(async () => {
-    return await auth.currentUser?.getIdToken();
+    const authInst = await getLazyAuth();
+    return await authInst.currentUser?.getIdToken();
   }, []);
 
   return {

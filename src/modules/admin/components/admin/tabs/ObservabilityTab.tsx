@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, 
   LineChart, Line, Legend, AreaChart, Area 
@@ -66,7 +66,7 @@ export function ObservabilityTab() {
     setIsRunningDiag(true);
     setDiagLogs([`[${new Date().toLocaleTimeString('sr-RS')}] Pokrećem dijagnostički proces i provere unutar doker kontejnera...`]);
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/monitoring/run-diagnostics', {
         method: 'POST',
         headers: {
@@ -92,7 +92,7 @@ export function ObservabilityTab() {
   const { data: diagnostics, isLoading: diagLoading } = useQuery<DiagnosticsData>({
     queryKey: ['admin', 'diagnostics'],
     queryFn: async () => {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/monitoring/diagnostics', { 
         headers: { 'Authorization': `Bearer ${token}` } 
       });
@@ -102,25 +102,25 @@ export function ObservabilityTab() {
     refetchInterval: false,
     refetchIntervalInBackground: false,
     staleTime: 30 * 60 * 1000,
-    enabled: !!auth.currentUser,
+    enabled: true,
   });
 
   const { data: dlqItems = [], isLoading: dlqLoading } = useQuery<DLQItem[]>({
     queryKey: queryKeys.admin.dlq,
     queryFn: async () => {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/dlq', { headers: { 'Authorization': `Bearer ${token}` } });
       return res.json();
     },
     refetchInterval: false,
     refetchIntervalInBackground: false,
     staleTime: 30 * 60 * 1000,
-    enabled: !!auth.currentUser,
+    enabled: true,
   });
 
   const resetCbMutation = useMutation({
     mutationFn: async (name: string) => {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       return fetch(`/api/admin/monitoring/circuit-breakers/${name}/reset`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -133,7 +133,7 @@ export function ObservabilityTab() {
 
   const retryMutation = useMutation({
     mutationFn: async ({ id, source }: { id: string, source: string }) => {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       return fetch(`/api/admin/dlq/${id}/retry`, {
         method: 'POST',
         headers: { 

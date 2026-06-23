@@ -1,5 +1,5 @@
 import { apiClient } from '@/src/lib/apiClient';
-import { auth } from "@/src/lib/firebase";
+import { getLazyAuth } from '@/src/lib/firebase';
 
 interface CompressionConfig {
   maxWidth: number;
@@ -93,7 +93,8 @@ export const uploadImageDirectly = async (file: File): Promise<string> => {
         });
 
     // Get auth token
-    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    const authInst = await getLazyAuth();
+    const token = authInst.currentUser ? await authInst.currentUser.getIdToken() : null;
 
     // Use Express API for all uploads to secure GCS and Local Disk Fallbacks
     const formData = new FormData();

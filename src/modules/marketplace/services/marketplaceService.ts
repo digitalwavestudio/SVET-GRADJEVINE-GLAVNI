@@ -1,4 +1,3 @@
-import { getAuth } from 'firebase/auth';
 import { handleFirestoreError, OperationType } from '@/src/lib/errorUtils';
 import { MarketplaceItem as SharedMarketplaceItem, MarketplaceFilters as SharedMarketplaceFilters, MarketplaceItemStatus } from '@svet-gradjevine/shared';
 import { viewStatsService } from '@/src/services/viewStatsService';
@@ -92,8 +91,7 @@ export const marketplaceService = {
   },
 
   async createItem(data: Partial<MarketplaceItem>) {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+    const currentUser = (await import('firebase/auth')).getAuth().currentUser;
     if (!currentUser) throw new Error('Niste prijavljeni.');
 
     // 1. Provera kredita pre trošenja billing kvote

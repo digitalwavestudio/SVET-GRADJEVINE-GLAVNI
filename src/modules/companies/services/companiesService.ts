@@ -1,4 +1,3 @@
-import { getAuth } from 'firebase/auth';
 import { handleFirestoreError, OperationType } from '@/src/lib/errorUtils';
 import { withRetry } from '@/src/lib/retry';
 import { isLaunchModeActive } from '@/src/services/platformService';
@@ -46,7 +45,7 @@ export const companiesService = {
 
   async create(data: Partial<Company>) {
     return withRetry(async () => {
-      const auth = getAuth();
+      const auth = (await import('firebase/auth')).getAuth();
       if (!auth.currentUser) throw new Error('Niste prijavljeni.');
       const result = await apiClient.post<{ id: string }>('/ads/create', { category: 'companies', data });
       return result.id;

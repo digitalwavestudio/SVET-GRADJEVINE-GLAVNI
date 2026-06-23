@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys, dashboardKeys } from '../lib/queryKeysFactory';
-import { auth } from '../lib/firebase';
+import { getLazyAuth } from '../lib/firebase';
 
 export function useRealtimeSync() {
   const { user } = useAuth();
@@ -39,7 +39,8 @@ export function useRealtimeSync() {
 
     const initSSE = async () => {
       try {
-        const token = await auth.currentUser?.getIdToken();
+        const authInst = await getLazyAuth();
+        const token = await authInst.currentUser?.getIdToken();
         if (!active) return;
 
         let url = '/api/stream';

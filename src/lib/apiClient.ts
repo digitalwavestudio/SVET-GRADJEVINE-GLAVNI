@@ -1,11 +1,9 @@
 import { ApiClient } from '@svet-gradjevine/api';
-import { auth } from './firebase';
+import { getLazyAuth } from './firebase';
 import { circuitBreaker } from './circuitBreaker';
 import { trackApiCall } from './performance';
 import { safeLocalStorage } from './safeStorage';
 
-// Generisi jedinstven ID uredjaja za session tracking,
-// sacuvaj u safeLocalStorage da bude postojan
 const getDeviceId = () => {
     let deviceId = safeLocalStorage.getItem('sg_device_id');
     if (!deviceId) {
@@ -18,8 +16,9 @@ const getDeviceId = () => {
 const baseClient = new ApiClient({
   baseUrl: import.meta.env.VITE_API_URL || '/api',
   getToken: async () => {
-    if (auth.currentUser) {
-      return await auth.currentUser.getIdToken();
+    const authInst = await getLazyAuth();
+    if (authInst?.currentUser) {
+      return await authInst.currentUser.getIdToken();
     }
     return null;
   },

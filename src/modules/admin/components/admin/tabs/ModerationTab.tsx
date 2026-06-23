@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { useAdminModeration } from '@/src/modules/admin/hooks/useAdminModeration';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import { moderationService } from '@/src/services/moderationService';
-import { getAuth } from 'firebase/auth';
 import { Skeleton } from '@/src/components/ui/Skeleton';
 import { apiClient } from '@/src/lib/apiClient';
 
@@ -36,8 +35,8 @@ export function ModerationTab({ getDetailLink }: ModerationTabProps) {
     }
     setProcessingId(id);
     try {
-      const auth = getAuth();
-      const adminId = auth.currentUser?.uid || 'system';
+      const { getAuth } = await import('firebase/auth');
+      const adminId = getAuth().currentUser?.uid || 'system';
 
       await moderationService.executeModerationAction({
         adminId,
@@ -65,8 +64,8 @@ export function ModerationTab({ getDetailLink }: ModerationTabProps) {
     if (reason === null) return;
     setProcessingId(id);
     try {
-      const auth = getAuth();
-      const adminId = auth.currentUser?.uid || 'system';
+      const { getAuth } = await import('firebase/auth');
+      const adminId = getAuth().currentUser?.uid || 'system';
 
       await moderationService.executeModerationAction({
         adminId,

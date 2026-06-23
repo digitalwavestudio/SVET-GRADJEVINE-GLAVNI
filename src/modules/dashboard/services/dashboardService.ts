@@ -1,4 +1,4 @@
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { apiClient } from '@/src/lib/apiClient';
 
 export class AppError extends Error {

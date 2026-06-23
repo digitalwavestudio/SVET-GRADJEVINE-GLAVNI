@@ -1,4 +1,3 @@
-import { getAuth } from 'firebase/auth';
 import { Accommodation as SharedAccommodation } from '@/src/modules/accommodations/types/models';
 import { EntityStatus } from '@/src/modules/core/types/common';
 import { viewStatsService } from '@/src/services/viewStatsService';
@@ -33,8 +32,7 @@ class AccommodationsService {
   }
 
   async create(acc: Partial<Accommodation>) {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+    const currentUser = (await import('firebase/auth')).getAuth().currentUser;
     if (!currentUser) throw new Error('Niste prijavljeni.');
 
     const { hasCredits, available } = await packageService.checkCredits(currentUser.uid);

@@ -6,7 +6,7 @@ import { DashboardLayout } from '@/src/modules/core';
 import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 import Spinner from '@/src/components/ui/Spinner';
 import { useAuth } from '@/src/context/AuthContext';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { uploadImage } from '@/src/lib/imageUtils';
 import { userProfileSchema } from '@/src/modules/auth';
 import { z } from 'zod';
@@ -354,7 +354,8 @@ export default function SettingsPage() {
                   </div>
                   <button 
                     onClick={async () => {
-                      if (!auth.currentUser) return;
+                      const authInst = await getLazyAuth();
+                      if (!authInst.currentUser) return;
                       try {
                         await apiClient.post('/user/force-sync', {});
                         toast.success('Zahtev za sinhronizaciju je poslat.');

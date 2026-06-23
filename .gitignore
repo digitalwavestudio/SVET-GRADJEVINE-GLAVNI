@@ -75,3 +75,5 @@ firestore_indexes.md
 vite.config.ts.timestamp-*
 
 disk_usage*
+
+/nul

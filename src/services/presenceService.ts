@@ -1,4 +1,3 @@
-import { getAuth } from "firebase/auth";
 import { apiClient } from '@/src/lib/apiClient';
 import { safeSessionStorage } from '@/src/lib/safeStorage';
 
@@ -13,8 +12,8 @@ export const presenceService = {
    */
   async updatePresence(status: 'online' | 'offline' = 'online'): Promise<void> {
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
+      const { getAuth } = await import('firebase/auth');
+      const user = getAuth().currentUser;
       if (!user) return;
 
       // Throttling: Only update if more than 3 minutes passed

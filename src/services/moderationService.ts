@@ -1,4 +1,4 @@
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { withRetry } from '@/src/lib/retry';
 import { BACKEND_TASKS } from '@/src/modules/core/types/backendTasks';
 import { ModerationActionContract } from '@/src/modules/dashboard/types/moderationContracts';

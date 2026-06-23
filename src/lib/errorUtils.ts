@@ -1,5 +1,8 @@
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { logger } from '@/src/lib/logger';
+
+let _authInstance: any = null;
+getLazyAuth().then(a => { _authInstance = a; });
 
 export enum OperationType {
   CREATE = 'create',
@@ -101,15 +104,16 @@ export function handleFirestoreError(
     return; // STOP RIGHT HERE - NO MORE LOGGING OR THROWING
   }
 
+  const cu = _authInstance?.currentUser;
   const errInfo: FirestoreErrorInfo = {
     error: errMessage,
     authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: (auth.currentUser as unknown as { tenantId?: string })?.tenantId || null,
-      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+      userId: cu?.uid,
+      email: cu?.email,
+      emailVerified: cu?.emailVerified,
+      isAnonymous: cu?.isAnonymous,
+      tenantId: (cu as unknown as { tenantId?: string })?.tenantId || null,
+      providerInfo: cu?.providerData?.map((provider: any) => ({
         providerId: provider.providerId,
         email: provider.email,
       })) || []

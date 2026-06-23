@@ -1,12 +1,11 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.webp';
 import { useToast } from '@/src/context/ToastContext';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { passwordRegex } from '@svet-gradjevine/shared';
 
@@ -87,7 +86,9 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      const userCred = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const { createUserWithEmailAndPassword, sendEmailVerification: _sendEmailVerification } = await import('firebase/auth');
+      const authInst = await getLazyAuth();
+      const userCred = await createUserWithEmailAndPassword(authInst, formData.email, formData.password);
       const user = userCred.user;
       const emailPrefix = formData.email.split('@')[0];
       const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
@@ -131,7 +132,7 @@ export default function RegisterPage() {
       }
       
       try {
-        await sendEmailVerification(user);
+        await _sendEmailVerification(user);
         addToast('Poslali smo vam email za potvrdu, proverite inbox', 'success');
       } catch (e) {
         console.error('Error sending verification', e);

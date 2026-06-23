@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { toast } from 'react-hot-toast';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 
 interface PricingTier {
   standard: number;
@@ -58,7 +58,7 @@ export function GlobalSettingsTab() {
 
   const fetchSettings = async () => {
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/settings/global', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -100,7 +100,7 @@ export function GlobalSettingsTab() {
     if (!settings) return;
     setSaving(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/settings/global', {
         method: 'PATCH',
         headers: { 

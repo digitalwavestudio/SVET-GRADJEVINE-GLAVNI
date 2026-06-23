@@ -1,12 +1,11 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { sendPasswordResetEmail } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.webp';
 import { useToast } from '@/src/context/ToastContext';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { getErrorMessage } from '@/src/lib/utils';
 
@@ -61,7 +60,9 @@ export default function LoginPage() {
     e.preventDefault();
     if (!resetEmail) return;
     try {
-      await sendPasswordResetEmail(auth, resetEmail);
+      const authInst = await getLazyAuth();
+      const { sendPasswordResetEmail } = await import('firebase/auth');
+      await sendPasswordResetEmail(authInst, resetEmail);
       addToast('Link za reset lozinke je poslat na vaš email', 'success');
       setIsResetOpen(false);
       setResetEmail('');

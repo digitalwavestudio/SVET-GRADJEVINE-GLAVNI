@@ -1,4 +1,3 @@
-import { getAuth } from 'firebase/auth';
 import { Machine as SharedMachine } from '@/src/modules/machines/types/models';
 import { EntityStatus } from '@/src/modules/core/types/common';
 import { viewStatsService } from '@/src/services/viewStatsService';
@@ -86,8 +85,7 @@ export const machinesService = {
   },
 
   async create(data: Partial<Machine>): Promise<string> {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+    const currentUser = (await import('firebase/auth')).getAuth().currentUser;
     if (!currentUser) throw new Error('Niste prijavljeni.');
 
     const { hasCredits, available } = await packageService.checkCredits(currentUser.uid);

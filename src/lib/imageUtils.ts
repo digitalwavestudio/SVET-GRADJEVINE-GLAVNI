@@ -1,6 +1,6 @@
 import imageCompression from "browser-image-compression";
 import { apiClient } from "@/src/lib/apiClient";
-import { auth } from "@/src/lib/firebase";
+import { getLazyAuth } from '@/src/lib/firebase';
 
 export type CompressionMode =
   | "avatar"
@@ -171,8 +171,9 @@ export async function uploadImage(
         );
 
     // Get auth token
-    const token = auth.currentUser
-      ? await auth.currentUser.getIdToken()
+    const authInst = await getLazyAuth();
+    const token = authInst.currentUser
+      ? await authInst.currentUser.getIdToken()
       : null;
 
     // Use Express API for all uploads to secure GCS and Local Disk Fallbacks

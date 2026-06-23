@@ -4,7 +4,7 @@ import Footer from '@/src/components/Footer';
 import Navbar from '@/src/components/Navbar';
 import { APP_CONFIG } from '@/src/constants/config';
 import { useAuth } from '@/src/context/AuthContext';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { partnerService } from '@/src/services/partnerService';
 
 type CheckoutStatus = 'initiated' | 'pending' | 'confirmed' | 'failed';
@@ -101,7 +101,7 @@ export default function CheckoutPage() {
     
     try {
       if (method === 'INVOICE/FAKTURA') {
-        const token = await auth.currentUser?.getIdToken();
+        const token = await (await getLazyAuth()).currentUser?.getIdToken();
         const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/checkout/generate-proforma`, {
           method: 'POST',
           headers: {

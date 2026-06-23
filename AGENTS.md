@@ -35,3 +35,34 @@ foreach ($idx in $json.indexes) {
 ## SEO / Rate Limiting
 
 AhrefsBot moved from BAD_BOTS to whitelisted search bots (`rate-limit-shield.middleware.ts`). SPA passthrough added for `/pretraga`, `/profil/*`, `/cene-i-statistika/*` so React Router can handle them instead of returning 404.
+
+## Ahrefs SEO Fixes (Session 3)
+
+### Canonical URL
+- **`spa.middleware.ts:1293`** — SPA passthrough (`/postavi-oglas`, `/pretraga`, `/profil`) sada dodaje `<link rel="canonical">` umesto slanja gole `index.html`
+- **`spa.middleware.ts:1084`** — Non-bot listing canonical: umesto `CANONICAL_PATH_MAP[collectionName]` (= `/poslovi` za sve), sada koristi `isPseoRoute ? req.path : ...` tako da geo hubovi (npr. `/poslovi/zidar/krusevac`) imaju canonical na tačan URL
+- **`spa.middleware.ts:1149`** — Isti fix za skeleton fallback path
+
+### Missing Title (Ahrefs "Missing")
+- **`spa.middleware.ts:1192-1194`** — Non-bot detail page slao `cachedIndexHtml` bez izmene title-a. Sada generiše slug-based title (npr. "Rukovalac Viljukarom Beograd | Svet Građevine")
+
+### 410 Gone na hub stranama
+- **`seo.middleware.ts:251`** — Uklonjen `detailEntityTypes` check. Svaki URL bez `~` u poslednjem segmentu se tretira kao hub strana i prosleđuje na `seoRouter` umesto da ide u `getAdMetaData` koji vraća 410
+
+## Page Speed / SSR
+
+- **`spa.middleware.ts:952-1004`** — Homepage: uklonjen `if (!isBot)` guard. Sada React SSR radi za SVE posetioce (ne samo botove). Clean shell je samo fallback ako SSR failuje.
+- **`spa.middleware.ts:1021-1089`** — Listing pages: isto — try SSR za svakoga, bot fallback vs non-bot clean shell.
+
+Pre: non-bot human dobijao prazan `<div id="root">` → 11.7s FCP dok JS ne hydratuje.
+Posle: HTML dolazi sa pre-rendered content-om → FCP dramatično bolji.
+
+## Bundle Size (Uncompressed, initial load ~1.6MB)
+- `vendor-core`: 460KB (React, Router, Query)
+- `vendor-firebase`: 242KB (Firebase SDK)
+- `vendor-other`: 263KB (misc vendors)
+- `vendor-data`: 146KB (date libs)
+- `vendor-ui`: 75KB
+- `vendor-firebase-auth`: 88KB
+- `index`: 314KB (app code)
+- `vendor-charts` (434KB) i `vendor-motion` (128KB) su lazy-loaded — ne utiču na initial load

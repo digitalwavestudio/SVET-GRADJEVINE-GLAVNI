@@ -1,4 +1,3 @@
-import { getAuth } from 'firebase/auth';
 import { withRetry } from '@/src/lib/retry';
 import { JobResponse, JobApplication } from '@/src/modules/jobs/types/models';
 import { EntityStatus } from '@/src/modules/core/types/common';
@@ -139,8 +138,7 @@ export const jobsService = {
   // --- ACTIONS ---
   async createJob(jobData: Partial<Job>): Promise<string> {
     return withRetry(async () => {
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
+      const currentUser = (await import('firebase/auth')).getAuth().currentUser;
       if (!currentUser) throw new Error('Niste prijavljeni.');
 
       // 1. Provera kredita

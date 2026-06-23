@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAuth } from "firebase/auth";
 import { apiClient } from "@/src/lib/apiClient";
 import type { UserProfile, FavoriteAd } from "@svet-gradjevine/shared";
 
@@ -14,8 +13,8 @@ export function useUserProfile(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return null;
       try {
-        const auth = getAuth();
-        const isMe = auth.currentUser?.uid === userId;
+        const { getAuth } = await import('firebase/auth');
+        const isMe = getAuth().currentUser?.uid === userId;
 
         const url = isMe ? `/users/me` : `/users/${userId}/public`;
 

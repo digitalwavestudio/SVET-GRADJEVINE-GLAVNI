@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { auth } from './firebase';
+import { getLazyAuth } from './firebase';
 
 export interface TelemetryItem {
   type: 'firestore' | 'performance' | 'error' | 'event' | 'auth';
@@ -78,7 +78,8 @@ class ExportService {
     this.batch = [];
 
     try {
-      const user = auth.currentUser;
+      const authInst = await getLazyAuth();
+      const user = authInst.currentUser;
       await apiClient.post('/telemetry/export', {
         userId: user?.uid,
         sessionId: this.sessionId,
@@ -97,13 +98,14 @@ class ExportService {
   /**
    * Use beacon API or simple fetch for reliable last-minute export
    */
-  private flushSync() {
+  private async flushSync() {
     if (this.batch.length === 0) return;
     
     const currentBatch = [...this.batch];
     this.batch = [];
 
-    const user = auth.currentUser;
+    const authInst = await getLazyAuth();
+    const user = authInst.currentUser;
     const payload = JSON.stringify({
       userId: user?.uid,
       sessionId: this.sessionId,

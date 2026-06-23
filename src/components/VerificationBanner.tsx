@@ -1,9 +1,8 @@
 
-import { sendEmailVerification } from 'firebase/auth';
 import { AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import React from 'react';
 import { useAuth } from '@/src/context/AuthContext';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 
 export const VerificationBanner: React.FC = () => {
   const { user, loading, isInitializing } = useAuth();
@@ -17,10 +16,12 @@ export const VerificationBanner: React.FC = () => {
   if (!user || user.role === 'admin' || user.emailVerified) return null;
 
   const handleResend = async () => {
-    if (!auth.currentUser) return;
+    const authInst = await getLazyAuth();
+    if (!authInst.currentUser) return;
     setLoadingResend(true);
     try {
-      await sendEmailVerification(auth.currentUser);
+      const { sendEmailVerification } = await import('firebase/auth');
+      await sendEmailVerification(authInst.currentUser);
       setSent(true);
       setTimeout(() => setSent(false), 5000);
     } catch (error) {

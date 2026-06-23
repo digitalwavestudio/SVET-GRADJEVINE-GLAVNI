@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { useAuth } from '@/src/context/AuthContext';
-import { getAuth } from 'firebase/auth';
 import { getPackageById } from '@/src/constants/adPackages';
 import { PaymentInstructions } from '@/src/modules/ads';
 
@@ -21,8 +20,8 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const handleUpgradeRequest = async () => {
     setIsLoading(true);
     try {
-      const auth = getAuth();
-      const token = await auth.currentUser?.getIdToken();
+      const { getAuth } = await import('firebase/auth');
+      const token = await getAuth().currentUser?.getIdToken();
       
       const res = await fetch('/api/ads/create', {
         method: 'POST',

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { auth } from '@/src/lib/firebase';
+import { getLazyAuth } from '@/src/lib/firebase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/src/lib/queryKeysFactory';
 import { 
@@ -30,7 +30,7 @@ export function ResilienceTab() {
   const { data: breakers = [], isLoading, refetch, isFetching } = useQuery<CircuitBreakerStats[]>({
     queryKey: queryKeys.admin.circuitBreakers,
     queryFn: async () => {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/circuit-breakers', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -40,12 +40,12 @@ export function ResilienceTab() {
     refetchInterval: false,
     refetchIntervalInBackground: false,
     staleTime: 30 * 60 * 1000,
-    enabled: !!auth.currentUser,
+    enabled: true,
   });
 
   const resetMutation = useMutation({
     mutationFn: async (payload: { name?: string; invalidateCache?: boolean; cachePrefix?: string }) => {
-      const token = await auth.currentUser?.getIdToken();
+      const token = await (await getLazyAuth()).currentUser?.getIdToken();
       const res = await fetch('/api/admin/circuit-breakers/reset', {
         method: 'POST',
         headers: {

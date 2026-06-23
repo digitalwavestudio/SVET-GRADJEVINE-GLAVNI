@@ -1,4 +1,3 @@
-import { getAuth } from 'firebase/auth';
 import { CateringOffer as SharedCateringOffer } from '@svet-gradjevine/shared';
 import { viewStatsService } from '@/src/services/viewStatsService';
 import { packageService } from '@/src/services/packageService';
@@ -80,8 +79,7 @@ export const cateringService = {
   },
 
   async create(data: Partial<CateringOffer>): Promise<string> {
-    const auth = getAuth();
-    const currentUser = auth.currentUser;
+    const currentUser = (await import('firebase/auth')).getAuth().currentUser;
     if (!currentUser) throw new Error('Niste prijavljeni.');
 
     const { hasCredits, available } = await packageService.checkCredits(currentUser.uid);
