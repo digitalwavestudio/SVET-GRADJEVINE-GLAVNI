@@ -345,17 +345,10 @@ useEffect(() => {
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
       try {
-        const result = await signInWithPopup(auth, googleProvider);
-        if (result.user) {
-          initUser(result.user, defaultRole);
-        }
+        await signInWithRedirect(auth, googleProvider);
       } catch (err: any) {
-        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {
-          signInWithRedirect(auth, googleProvider).catch(console.error);
-        } else {
-          console.error('[AUTH] Popup login failed:', err);
-          throw err;
-        }
+        console.error('[AUTH] Google login failed:', err);
+        throw err;
       }
     });
   }, []);

@@ -17,6 +17,7 @@ import { apiClient } from '@/src/lib/apiClient';
 import AnalyticsSkeleton from '@/src/modules/dashboard/components/dashboard/AnalyticsSkeleton';
 import { queryKeys } from "@/src/lib/queryKeysFactory";
 import { useDebouncedDimensions } from '../../hooks/useDebouncedDimensions';
+import { useAuth } from '@/src/context/AuthContext';
 
 interface AnalyticsDashboardUIProps {
   userId: string;
@@ -35,6 +36,8 @@ export interface AnalyticsMetricType {
 }
 
 export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIProps) {
+  const { user } = useAuth();
+  const effectiveUserId = userId || user?.id || user?.uid || '';
   const { ref: viewRef, inView } = useInView({
     triggerOnce: true,
     rootMargin: '200px 0px',
@@ -44,19 +47,19 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
   const { containerRef: pieChartRef, dimensions: pieChartDim } = useDebouncedDimensions(250);
 
   const { data: trendData = [], isLoading } = useQuery({
-    queryKey: queryKeys.analytics.detailed(userId),
+    queryKey: queryKeys.analytics.detailed(effectiveUserId),
     queryFn: async () => {
-      return await apiClient.get<AnalyticsMetricType[]>(`/metrics/user/${userId}?days=14`);
+      return await apiClient.get<AnalyticsMetricType[]>(`/metrics/user/${effectiveUserId}?days=30`);
     },
-    enabled: inView
+    enabled: inView && !!effectiveUserId
   });
 
   // Memoize mapped trend items
   const chartData = useMemo(() => {
     return trendData.map(item => ({
       name: new Date(item.date).toLocaleDateString('sr-RS', { day: '2-digit', month: 'short' }),
-      internal: (item.views_internal || 0) + (item.clicks_internal || 0),
-      external: (item.views_external || 0) + (item.clicks_external || 0) + (item.views_direct || 0) + (item.clicks_direct || 0),
+      platform: (item.views_internal || 0) + (item.views_direct || 0),
+      external: item.views_external || 0,
       clicks: item.clicks || 0,
       views: item.views || 0
     }));
@@ -64,14 +67,15 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
 
   // Memoize statistical calculations
   const totals = useMemo(() => {
-    const totalInternal = trendData.reduce((acc, curr) => acc + (curr.views_internal || 0) + (curr.clicks_internal || 0), 0);
-    const totalExternal = trendData.reduce((acc, curr) => acc + (curr.views_external || 0) + (curr.clicks_external || 0), 0);
-    const totalDirect = trendData.reduce((acc, curr) => acc + (curr.views_direct || 0) + (curr.clicks_direct || 0), 0);
+    const totalInternal = trendData.reduce((acc, curr) => acc + (curr.views_internal || 0), 0);
+    const totalExternal = trendData.reduce((acc, curr) => acc + (curr.views_external || 0), 0);
+    const totalDirect = trendData.reduce((acc, curr) => acc + (curr.views_direct || 0), 0);
     const totalClicks = trendData.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
     const totalViews = trendData.reduce((acc, curr) => acc + (curr.views || 0), 0);
+    const totalPlatform = totalInternal + totalDirect;
     const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : '0.00';
 
-    return { totalInternal, totalExternal, totalDirect, totalClicks, totalViews, ctr };
+    return { totalInternal, totalExternal, totalDirect, totalPlatform, totalClicks, totalViews, ctr };
   }, [trendData]);
 
   // Memoize PieChart datasets
@@ -135,7 +139,7 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
 
   if (!inView || isLoading) return <div ref={viewRef}><AnalyticsSkeleton /></div>;
 
-  const { totalInternal, totalExternal, totalDirect, totalClicks, totalViews, ctr } = totals;
+  const { totalInternal, totalExternal, totalDirect, totalPlatform, totalClicks, totalViews, ctr } = totals;
 
   return (
     <div ref={viewRef} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -189,8 +193,8 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
                 wrapperStyle={legendWrapperStyle} 
               />
               <Bar 
-                dataKey="internal" 
-                name="Pretraga na sajtu" 
+                dataKey="platform" 
+                name="Na platformi" 
                 fill="#3b82f6" 
                 radius={barRadius} 
                 barSize={mainChartDim.width < 500 ? 10 : 20} 
@@ -241,7 +245,7 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></div>
                 <span className="text-white/40">{item.name}</span>
               </div>
-              <span className="text-white">{((item.value / (totalInternal + totalExternal + totalDirect)) * 100).toFixed(1)}%</span>
+              <span className="text-white">{((item.value / Math.max(totalInternal + totalExternal + totalDirect, 1)) * 100).toFixed(1)}%</span>
             </div>
           ))}
         </div>
@@ -261,7 +265,7 @@ export default function AnalyticsDashboardUI({ userId }: AnalyticsDashboardUIPro
         </div>
         <div className="bg-[#0A0F14] border border-white/5 p-6 rounded-[10px] relative overflow-hidden group">
           <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">PREGLEDI NA PLATFORMI</div>
-          <div className="text-3xl font-black text-blue-400">{totalInternal.toLocaleString()}</div>
+          <div className="text-3xl font-black text-blue-400">{totalPlatform.toLocaleString()}</div>
           <div className="absolute top-0 right-0 w-16 h-16 bg-blue-400/5 blur-xl"></div>
         </div>
         <div className="bg-[#0A0F14] border border-white/5 p-6 rounded-[10px] relative overflow-hidden group">

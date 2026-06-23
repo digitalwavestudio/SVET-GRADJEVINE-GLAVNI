@@ -15,6 +15,44 @@ import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 const DashboardCharts = lazy(() => import('@/src/modules/dashboard/components/DashboardCharts'));
 const PaymentInstructionsModal = lazy(() => import('@/src/modules/ads/components/ads/PaymentInstructionsModal').then(module => ({ default: module.PaymentInstructionsModal })));
 
+const parseTrendDate = (value?: string) => {
+  if (!value) return null;
+
+  const timestamp = Date.parse(value);
+  if (!Number.isNaN(timestamp)) {
+    return timestamp;
+  }
+
+  const shortLabelMatch = value.match(/^(\d{1,2})\.\s*([^\s.]+)$/i);
+  if (!shortLabelMatch) {
+    return null;
+  }
+
+  const [, dayRaw, monthRaw] = shortLabelMatch;
+  const monthMap: Record<string, number> = {
+    jan: 0,
+    feb: 1,
+    mar: 2,
+    apr: 3,
+    maj: 4,
+    jun: 5,
+    jul: 6,
+    avg: 7,
+    sep: 8,
+    okt: 9,
+    nov: 10,
+    dec: 11,
+  };
+  const monthIndex = monthMap[monthRaw.toLowerCase()];
+  const day = Number(dayRaw);
+
+  if (monthIndex === undefined || Number.isNaN(day)) {
+    return null;
+  }
+
+  return new Date(new Date().getFullYear(), monthIndex, day).getTime();
+};
+
 const EmployerDashboardUI = memo(function EmployerDashboardUI() {
   const { user } = useAuth();
   // isLoading = još uvek nema nikakvih podataka (prvo učitavanje)
@@ -39,11 +77,24 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
 
   const filteredTrends = useMemo(() => {
     const days = timeframe === 'day' ? 1 : timeframe === 'week' ? 7 : 30;
+    const safeTrends = Array.isArray(trends) ? (trends as ChartTrendData[]) : [];
+    const withTimestamps = safeTrends.map((trend, index) => ({
+      trend,
+      index,
+      timestamp: parseTrendDate(trend.date),
+    }));
+    const hasParsableDates = withTimestamps.some(({ timestamp }) => timestamp !== null);
+
+    if (!hasParsableDates) {
+      return safeTrends.slice(-days);
+    }
+
     const now = Date.now();
-    return (trends as ChartTrendData[]).filter(t => {
-      const d = new Date(t.date);
-      return now - d.getTime() <= days * 86400000;
-    });
+    const rangeMs = days * 86400000;
+
+    return withTimestamps
+      .filter(({ timestamp }) => timestamp !== null && now - timestamp <= rangeMs)
+      .map(({ trend }) => trend);
   }, [trends, timeframe]);
 
   const charts = { dailyAnalytics: Array.isArray(filteredTrends) ? (filteredTrends as ChartTrendData[]) : [] };
