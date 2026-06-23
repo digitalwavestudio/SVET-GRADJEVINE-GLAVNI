@@ -301,7 +301,6 @@ export function useAuthNode() {
 
 const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
   if (autoInitAttempted.current) return;
-  autoInitAttempted.current = true;
   try {
     const token = await firebaseUser.getIdToken();
     const initRes = await fetch('/api/users/init', {
@@ -319,7 +318,9 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         freeAdsCount: 3
       })
     });
-    if (!initRes.ok) {
+    if (initRes.ok) {
+      autoInitAttempted.current = true;
+    } else {
       console.warn('[AUTH] Init failed:', initRes.status, await initRes.text().catch(() => ''));
     }
   } catch (err) {
@@ -329,12 +330,13 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
 
 useEffect(() => {
   getRedirectResult(auth)
-    .then((result) => {
+    .then(async (result) => {
       if (import.meta.env.DEV) console.log('[AUTH] getRedirectResult result:', result);
       if (result?.user && !redirectProcessed.current) {
         redirectProcessed.current = true;
         currentFbUser.current = result.user;
-        initUser(result.user);
+        await initUser(result.user);
+        await result.user.getIdToken(true);
         subscribeToUser(result.user);
       }
     })
@@ -347,7 +349,8 @@ useEffect(() => {
       try {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
-          initUser(result.user, defaultRole);
+          await initUser(result.user, defaultRole);
+          await result.user.getIdToken(true);
         }
       } catch (err: any) {
         if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {

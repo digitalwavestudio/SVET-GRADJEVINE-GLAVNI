@@ -51,24 +51,22 @@ usersRouter.post(
       }
 
       // 1. reCAPTCHA v3 Pre-flight Verification Check
+      // Non-fatal: Firebase Auth already verified the user. reCAPTCHA is defense-in-depth,
+      // not a hard gate — if token is missing or fails, log and proceed.
       const recaptchaToken = req.body.recaptchaToken || req.headers['x-recaptcha-token'];
-      if (env.RECAPTCHA_SECRET_KEY) {
-        if (!recaptchaToken) {
-          return res.status(400).json({ error: "Missing reCAPTCHA token." });
-        }
+      if (env.RECAPTCHA_SECRET_KEY && recaptchaToken) {
         try {
           const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`;
           const rcRes = await fetch(verifyUrl, { method: "POST" });
           const rcData = await rcRes.json() as { success: boolean; score: number };
           if (!rcData.success || rcData.score < 0.5) {
-            return res.status(403).json({ error: "reCAPTCHA verification failed. Suspected bot activity." });
+            logger.warn("[AUTH] reCAPTCHA score too low:", rcData.score);
           }
         } catch (err) {
           console.error("[AUTH] reCAPTCHA verify request failed:", err);
-          if (env.NODE_ENV === "production") {
-            return res.status(500).json({ error: "Internal reCAPTCHA verification service error." });
-          }
         }
+      } else if (env.RECAPTCHA_SECRET_KEY && !recaptchaToken) {
+        logger.warn("[AUTH] reCAPTCHA token missing — proceeding (Firebase Auth verified).");
       } else {
         logger.warn("[AUTH] RECAPTCHA_SECRET_KEY not set. Local development bypass enabled.");
       }
