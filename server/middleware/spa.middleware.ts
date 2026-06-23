@@ -964,8 +964,9 @@ export const createSpaMiddleware = () => {
         const ssrResult = await reactSsrPage(ssrUrl);
         if (ssrResult) {
           const { html, dehydratedState, helmetHtml } = ssrResult;
+          const helmetContent = helmetHtml || `<title>Svet Građevine - Portal za građevinske oglase</title>\n<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />`;
           let finalHtml = stripHeadMeta(indexHtml)
-            .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+            .replace('</head>', `${helmetContent}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
           res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
           const redisCache = getRedis();
@@ -980,9 +981,9 @@ export const createSpaMiddleware = () => {
         if (rendered) return res.send(rendered);
 
         // Clean shell fallback (no pre-rendered content)
-        const cleanHtml = indexHtml
-          .replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`)
-          .replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+        const cleanHtml = stripHeadMeta(indexHtml)
+          .replace("</head>", `<title>Svet Građevine - Portal za građevinske oglase</title>
+<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 <meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" />
 <meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
@@ -1035,8 +1036,9 @@ export const createSpaMiddleware = () => {
             if (ssrResult) {
               const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
               const { html, dehydratedState, helmetHtml } = ssrResult;
+              const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
               let finalHtml = stripHeadMeta(indexHtml)
-                .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+                .replace('</head>', `${helmetContent}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
                 .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
               res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
               const redisCache = getRedis();
