@@ -84,6 +84,14 @@ function getFormattedErrorMessage(error: unknown, fallbackMessage: string): stri
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
+      const errObj = error && typeof error === 'object' ? error as Record<string, unknown> : null;
+      const status = errObj?.status || errObj?.statusCode || errObj?.response?.status;
+      const errMsg = String(errObj?.message || '').toLowerCase();
+      // Ne prikazuj toast za 404, network greške i abort (korisnik ne treba da vidi ovo)
+      if (status === 404 || errMsg.includes('404') || errMsg.includes('not found') || errMsg.includes('failed to fetch') || errMsg.includes('network') || errMsg.includes('abort')) {
+        console.warn('[React Query] Suppressed error toast:', error);
+        return;
+      }
       console.error("[React Query] Global Query Error:", error);
       const message = getFormattedErrorMessage(
         error,

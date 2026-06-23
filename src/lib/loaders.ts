@@ -7,150 +7,189 @@ function getQC(context: unknown): QueryClient {
 }
 
 export const jobLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const searchParams = Object.fromEntries(url.searchParams.entries());
+  try {
+    const url = new URL(request.url);
+    const searchParams = Object.fromEntries(url.searchParams.entries());
 
-  const filters: Record<string, string> = { ...searchParams };
+    const filters: Record<string, string> = { ...searchParams };
 
-  if (params.zanimanje && params.zanimanje !== 'all') filters.title = params.zanimanje;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+    if (params.zanimanje && params.zanimanje !== 'all') filters.title = params.zanimanje;
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  const qc = getQC(context);
+    const qc = getQC(context);
 
-  const { jobsService } = await import('@/src/modules/jobs/services/jobsService');
-  const { statsService } = await import('@/src/services/statsService');
+    const { jobsService } = await import('@/src/modules/jobs/services/jobsService');
+    const { statsService } = await import('@/src/services/statsService');
 
-  // Prefetch jobs + stats/count PARALELNO — eliminiše waterfall na klijentu
-  await Promise.all([
-    qc.prefetchInfiniteQuery({
-      queryKey: queryKeys.jobs.list(filters),
-      queryFn: ({ pageParam = null }) => jobsService.fetchJobs(filters, pageParam),
-      initialPageParam: null,
-    }),
-    qc.prefetchQuery({
-      queryKey: ['stats', 'jobs'],
-      queryFn: () => statsService.getCachedStats('jobs'),
-      staleTime: 30 * 60 * 1000,
-    }),
-    qc.prefetchQuery({
-      queryKey: ['count', 'companies'],
-      queryFn: () => statsService.getCachedCount('companies'),
-      staleTime: 30 * 60 * 1000,
-    }),
-  ]);
+    await Promise.all([
+      qc.prefetchInfiniteQuery({
+        queryKey: queryKeys.jobs.list(filters),
+        queryFn: ({ pageParam = null }) => jobsService.fetchJobs(filters, pageParam),
+        initialPageParam: null,
+      }),
+      qc.prefetchQuery({
+        queryKey: ['stats', 'jobs'],
+        queryFn: () => statsService.getCachedStats('jobs'),
+        staleTime: 30 * 60 * 1000,
+      }),
+      qc.prefetchQuery({
+        queryKey: ['count', 'companies'],
+        queryFn: () => statsService.getCachedCount('companies'),
+        staleTime: 30 * 60 * 1000,
+      }),
+    ]);
 
-  return filters;
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] jobLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const masterLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { mastersService } = await import('@/src/modules/masters/services/mastersService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  
-  if (params.zanimanje && params.zanimanje !== 'all') filters.profession = params.zanimanje;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { mastersService } = await import('@/src/modules/masters/services/mastersService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    
+    if (params.zanimanje && params.zanimanje !== 'all') filters.profession = params.zanimanje;
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.masters.list(filters),
-    queryFn: ({ pageParam = null }) => mastersService.fetchMasters(filters, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.masters.list(filters),
+      queryFn: ({ pageParam = null }) => mastersService.fetchMasters(filters, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] masterLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const companiesLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { companiesService } = await import('@/src/modules/companies/services/companiesService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { companiesService } = await import('@/src/modules/companies/services/companiesService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.companies.list(filters),
-    queryFn: ({ pageParam = null }) => companiesService.fetchFiltered(filters, 24, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.companies.list(filters),
+      queryFn: ({ pageParam = null }) => companiesService.fetchFiltered(filters, 24, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] companiesLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const machinesLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { machinesService } = await import('@/src/modules/machines/services/machinesService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  
-  if (params.kategorija && params.kategorija !== 'all') filters.category = params.kategorija;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { machinesService } = await import('@/src/modules/machines/services/machinesService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    
+    if (params.kategorija && params.kategorija !== 'all') filters.category = params.kategorija;
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.machines.list(filters),
-    queryFn: ({ pageParam = null }) => machinesService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.machines.list(filters),
+      queryFn: ({ pageParam = null }) => machinesService.fetchFiltered(filters, 20, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] machinesLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const accommodationsLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { accommodationsService } = await import('@/src/modules/accommodations/services/accommodationsService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.tip && params.tip !== 'all') filters.type = params.tip;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { accommodationsService } = await import('@/src/modules/accommodations/services/accommodationsService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    if (params.tip && params.tip !== 'all') filters.type = params.tip;
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.accommodations.list(filters),
-    queryFn: ({ pageParam = null }) => accommodationsService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.accommodations.list(filters),
+      queryFn: ({ pageParam = null }) => accommodationsService.fetchFiltered(filters, 20, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] accommodationsLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const cateringLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { cateringService } = await import('@/src/modules/catering/services/cateringService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { cateringService } = await import('@/src/modules/catering/services/cateringService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.catering.list(filters),
-    queryFn: ({ pageParam = null }) => cateringService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.catering.list(filters),
+      queryFn: ({ pageParam = null }) => cateringService.fetchFiltered(filters, 20, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] cateringLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const realEstateLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { realEstateService } = await import('@/src/modules/real_estate/services/realEstateService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.namena && params.namena !== 'all') filters.purpose = params.namena;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { realEstateService } = await import('@/src/modules/real_estate/services/realEstateService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    if (params.namena && params.namena !== 'all') filters.purpose = params.namena;
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.realEstate.list(filters),
-    queryFn: ({ pageParam = null }) => realEstateService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.realEstate.list(filters),
+      queryFn: ({ pageParam = null }) => realEstateService.fetchFiltered(filters, 20, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] realEstateLoader failed, continuing:', err);
+    return {};
+  }
 };
 
 export const marketplaceLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { marketplaceService } = await import('@/src/modules/marketplace/services/marketplaceService');
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  
-  if (params.kategorija && params.kategorija !== 'all') filters.category = params.kategorija;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
+  try {
+    const { marketplaceService } = await import('@/src/modules/marketplace/services/marketplaceService');
+    const url = new URL(request.url);
+    const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
+    
+    if (params.kategorija && params.kategorija !== 'all') filters.category = params.kategorija;
+    if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.marketplace.list(filters),
-    queryFn: ({ pageParam = null }) => marketplaceService.getItems(filters, 24, pageParam),
-    initialPageParam: null,
-  });
-  
-  return filters;
+    await getQC(context).prefetchInfiniteQuery({
+      queryKey: queryKeys.marketplace.list(filters),
+      queryFn: ({ pageParam = null }) => marketplaceService.getItems(filters, 24, pageParam),
+      initialPageParam: null,
+    });
+    
+    return filters;
+  } catch (err) {
+    console.warn('[LOADER] marketplaceLoader failed, continuing:', err);
+    return {};
+  }
 };

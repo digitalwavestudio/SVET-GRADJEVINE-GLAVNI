@@ -484,9 +484,9 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
         titleAccent="Građevina"
         subtitle="Najveća baza poslova u građevinskom sektoru. Pronađi stalni zaposlenje ili angažman na projektu za svoj tim."
         stats={[
-          { label: "AKTIVNI OGLASI", value: jobStats?.total?.toLocaleString() || "1K+", icon: "work" },
-          { label: "KOMPANIJE", value: companyCount?.toLocaleString() || "400", icon: "business" },
-          { label: "NOVI DANAS", value: jobStats?.today?.toLocaleString() || "12", icon: "new_releases" }
+          { label: "AKTIVNI OGLASI", value: jobStats?.total != null ? jobStats.total.toLocaleString() : "1K+", icon: "work" },
+          { label: "KOMPANIJE", value: companyCount != null ? companyCount.toLocaleString() : "400", icon: "business" },
+          { label: "NOVI DANAS", value: jobStats?.today != null ? jobStats.today.toLocaleString() : "12", icon: "new_releases" }
         ]}
       >
         <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
