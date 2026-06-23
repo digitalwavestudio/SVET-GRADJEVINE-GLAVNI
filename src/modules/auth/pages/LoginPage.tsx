@@ -1,12 +1,12 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { sendPasswordResetEmail, signInWithPopup } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.webp';
 import { useToast } from '@/src/context/ToastContext';
-import { auth, googleProvider } from '@/src/lib/firebase';
+import { auth } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { getErrorMessage } from '@/src/lib/utils';
 
@@ -88,12 +88,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        // Direct popup for development on localhost
-        await signInWithPopup(auth, googleProvider);
-      } else {
-        await loginWithGoogle();
-      }
+      await loginWithGoogle();
     } catch (err: any) {
       const errorMsg = getErrorMessage(err);
       console.error('Google Login Error:', errorMsg);
