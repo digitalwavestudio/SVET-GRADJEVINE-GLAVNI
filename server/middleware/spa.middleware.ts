@@ -1292,7 +1292,12 @@ ${breadcrumbHtml}
       }
 
       // Passthrough for SPA-only routes handled by React Router (no server pre-render needed)
-      const spaPassthroughPrefixes = ["/pretraga", "/profil", "/postavi-oglas"];
+      const spaPassthroughPrefixes = [
+        "/pretraga", "/profil", "/postavi-oglas",
+        "/pravila-oglasavanja", "/privatnost", "/uslovi-koriscenja",
+        "/kalkulator", "/kalkulatori", "/digitalni-alati",
+        "/korisni-linkovi", "/zajednica", "/oprema",
+      ];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
         const passthroughHtml = html.replace(
