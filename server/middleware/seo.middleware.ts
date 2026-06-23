@@ -245,11 +245,10 @@ export const botPrerenderMiddleware = async (
       const baseEntity = pathParts[0];
 
       // LISTING/HUB PAGE DETECTION:
-      // If the last segment doesn't contain "~" and baseEntity isn't a known detail type,
-      // this is a P-SEO hub page (e.g. /poslovi/zidar/beograd), NOT a detail page.
+      // If the last segment doesn't contain "~", this is a P-SEO hub page
+      // (e.g. /gradjevinske-masine/beograd), NOT a detail page.
       // Pass through to seoRouter/createSpaMiddleware which handle these properly.
-      const detailEntityTypes = ["posao", "firma", "gradjevinske-masine", "masina", "nekretnine", "ketering", "smestaj", "majstor", "profil", "oglas"];
-      if (!idSegment.includes("~") && !detailEntityTypes.includes(baseEntity)) {
+      if (!idSegment.includes("~")) {
         return next();
       }
 
