@@ -40,6 +40,7 @@ export class JobsCoreService {
           "title",
           "name",
           "description",
+          "price",
           "location",
           "loc",
           "type",
