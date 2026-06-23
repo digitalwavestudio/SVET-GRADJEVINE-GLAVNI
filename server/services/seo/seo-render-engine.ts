@@ -230,11 +230,13 @@ export class SEORenderEngine {
       finalMetaTagsStr = indexTag + "\n" + this.generateDerivedTags(pathWithoutQuery, host, paginationTags);
     }
 
-    // Replace <!-- SSR_META --> trigger block
-    let renderedHtml = baseHtml.replace("<!-- SSR_META -->", finalMetaTagsStr);
+    // Strip original title/meta from base template before injecting SEO tags
+    let renderedHtml = baseHtml
+      .replace(/<title>.*?<\/title>/i, "")
+      .replace(/<meta\s+name=["']description["'][^>]*\/?>/gi, "");
     
-    // Zap some default client-side static title that may interfere with crawler bots
-    renderedHtml = renderedHtml.replace(/<title>.*?<\/title>/, "");
+    // Inject SEO tags before </head>
+    renderedHtml = renderedHtml.replace("</head>", `${finalMetaTagsStr}\n</head>`);
 
     // Inject bot skeletal HTML to prevent blank crawlers render
     if (meta && meta.botHtml) {
