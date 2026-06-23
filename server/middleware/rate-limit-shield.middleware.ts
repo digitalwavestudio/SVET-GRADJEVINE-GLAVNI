@@ -121,14 +121,23 @@ export const rateLimitShield = async (
       return res.status(403).send("Access denied. Crawler not allowed.");
     }
 
+    // Whitelisted bots get a generous global limit, but P-SEO paths need a stricter
+    // per-bot limit to avoid Cloud Run 503 floods during deep crawls
+    if (isWhitelistedBot && isExpensivePath) {
+      const pseoBotLimitKey = `shield:pseo_bot:${hashedIp}`;
+      const isAllowed = await RateLimiterService.isAllowed(pseoBotLimitKey, 10, 1);
+      if (!isAllowed) {
+        res.setHeader("Retry-After", "10");
+        return res.status(429).send("Rate limited: too many P-SEO requests. Please slow down.");
+      }
+    }
+
     // Check if it's a whitelisted bot to skip block limits and try to serve statically
     if (
       isWhitelistedBot &&
       req.method === "GET" &&
       !req.path.startsWith("/api")
     ) {
-      // Determine potential cache key based on SEO route logic
-      // This allows serving instantly with 0ms DB overhead for verified bots
       const parts = req.path.split("/").filter(Boolean);
       const type = parts[0];
       const id = parts[1];
@@ -146,7 +155,6 @@ export const rateLimitShield = async (
       ];
 
       if (allowedAdTypes.includes(type) && id) {
-        // Construct basic SEO cache key
         const cacheKey = `seo:html:${type}:${id}:::`;
         try {
           const cachedHtml = await CacheService.get<string>(cacheKey);
@@ -157,8 +165,6 @@ export const rateLimitShield = async (
           }
         } catch (e) { console.error("[RateLimit] Bot cache HIT path error:", e); }
       }
-
-      // If no cache, continue but skip global rate limiting
     }
 
     // 0.2 Honeypot Check (Anti-Spam Forme)

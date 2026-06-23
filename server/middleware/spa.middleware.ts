@@ -1172,7 +1172,7 @@ ${breadcrumbHtml}
             '<div id="root"></div>',
             `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true"><main><h1>${label}</h1><a href="${APP_CONFIG.BASE_URL}/">Svet Građevine</a></main></div>`,
           );
-          return res.send(skeletonHtml);
+          return res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400').send(skeletonHtml);
         }
 
         const parts = fullId.split("~");
