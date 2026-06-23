@@ -378,29 +378,72 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
   }
 };
 
-useEffect(() => {
-  getRedirectResult(auth)
-    .then(async (result) => {
-      if (import.meta.env.DEV) console.log('[AUTH] getRedirectResult result:', result);
-      if (result?.user && !redirectProcessed.current) {
-        redirectProcessed.current = true;
-        currentFbUser.current = result.user;
-        await initUser(result.user);
-        await result.user.getIdToken(true);
-        subscribeToUser(result.user);
-      }
-    })
-    .catch((err) => {
-      console.warn('[AUTH] getRedirectResult failed', err);
-    });
-}, [subscribeToUser]);
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (import.meta.env.DEV) console.log('[AUTH] getRedirectResult result:', result);
+        if (result?.user && !redirectProcessed.current) {
+          redirectProcessed.current = true;
+          currentFbUser.current = result.user;
+
+          const fbUser = result.user;
+
+          // Optimistic: set user immediately so redirect fires
+          setUser({
+            id: fbUser.uid,
+            email: fbUser.email || '',
+            emailVerified: fbUser.emailVerified,
+            role: 'standard' as UserRole,
+            isVerified: false,
+            isAdmin: false,
+            status: 'active',
+            name: fbUser.displayName || '',
+            photoURL: fbUser.photoURL || '',
+          } as User);
+          if (isMountedFn.current) {
+            setLoading(false);
+            setIsInitializing(false);
+          }
+
+          // Background: create server profile + refresh token
+          initUser(fbUser).catch(() => {});
+          fbUser.getIdToken(true).catch(() => {});
+
+          // Full profile sync in background
+          subscribeToUser(fbUser);
+        }
+      })
+      .catch((err) => {
+        console.warn('[AUTH] getRedirectResult failed', err);
+      });
+  }, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
       try {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
-          await initUser(result.user, defaultRole);
-          await result.user.getIdToken(true);
+          const fbUser = result.user;
+
+          // Optimistic: set user immediately so redirect fires without waiting on server
+          setUser({
+            id: fbUser.uid,
+            email: fbUser.email || '',
+            emailVerified: fbUser.emailVerified,
+            role: (defaultRole || 'standard') as UserRole,
+            isVerified: false,
+            isAdmin: false,
+            status: 'active',
+            name: fbUser.displayName || '',
+            photoURL: fbUser.photoURL || '',
+          } as User);
+          if (isMountedFn.current) {
+            setLoading(false);
+            setIsInitializing(false);
+          }
+
+          // Background: create server profile + refresh token for custom claims
+          initUser(fbUser, defaultRole).catch(() => {});
+          fbUser.getIdToken(true).catch(() => {});
         }
       } catch (err: any) {
         if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/popup-closed-by-user') {
