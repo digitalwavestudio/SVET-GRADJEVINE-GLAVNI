@@ -56,6 +56,15 @@ export class JobsCoreService {
           "plataMax",
           "salaryType",
           "benefits",
+          "benefiti",
+          "rawBenefits",
+          "smestaj",
+          "prevoz",
+          "hrana",
+          "housing",
+          "transport",
+          "food",
+          "topliObrok",
         )
         .get();
 
