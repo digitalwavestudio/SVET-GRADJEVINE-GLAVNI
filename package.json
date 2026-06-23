@@ -76,6 +76,7 @@
     "multer": "^2.1.1",
     "nodemailer": "^8.0.7",
     "pdfkit": "^0.18.0",
+    "picomatch": "^4.0.4",
     "rate-limit-redis": "^4.3.1",
     "react": "^19.0.0",
     "react-confetti": "^6.4.0",
