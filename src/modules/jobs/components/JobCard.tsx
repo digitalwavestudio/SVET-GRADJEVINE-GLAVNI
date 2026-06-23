@@ -103,17 +103,8 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           </div>
         </div>
 
-        {/* Middle Section: Location and Salary */}
-        <div className="flex flex-row items-center justify-between border-t border-b border-white/5 py-2.5 my-1 relative z-10 gap-2">
-          {/* Location ("Mesto rada") */}
-          <div className="flex flex-col">
-            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">Mesto rada</span>
-            <span itemProp="jobLocation" itemScope itemType="https://schema.org/Place" className="flex items-center gap-1 text-white/80 text-[10px] font-bold">
-              <span className="material-symbols-outlined text-[12px] text-secondary" aria-hidden="true">location_on</span>
-              <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="addressLocality">{friendlyLoc}</span></span>
-            </span>
-          </div>
-
+        {/* Middle Section: Salary only */}
+        <div className="flex flex-row items-center justify-end border-t border-b border-white/5 py-2.5 my-1 relative z-10 gap-2">
           {/* Salary / Payment */}
           <div className="text-right flex flex-col">
             <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">
@@ -125,17 +116,13 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           </div>
         </div>
 
-        {/* Benefits Section: smestaj, prevoz, hrana */}
+        {/* Benefits Section: smestaj, prevoz, hrana, views */}
         <div className="flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
           {(() => {
             const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
             const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
             const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
             const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
-
-            if (!hasSmestaj && !hasPrevoz && !hasHrana) {
-              return <div className="h-[22px] w-full"></div>;
-            }
 
             return (
               <>
@@ -154,6 +141,10 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                     <span className="material-symbols-outlined text-[10px]">restaurant</span> Hrana
                   </span>
                 )}
+                {/* Views count — mobile */}
+                <span className="inline-flex items-center gap-1 text-white/40 text-[8px] font-mono">
+                  <span className="material-symbols-outlined text-[10px] text-white/30">visibility</span> {job.viewsCount || 0}
+                </span>
               </>
             );
           })()}
@@ -255,29 +246,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
           {/* Tags/Benefits & Stats */}
           <div className="flex gap-4 flex-wrap mb-4 items-center">
-            <div className="flex flex-col">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none">Lokacija</span>
-              <span itemProp="jobLocation" itemScope itemType="https://schema.org/Place" className="flex items-center gap-1 text-white/60 text-[10px] font-bold">
-                <span className="material-symbols-outlined text-[14px] text-secondary" aria-hidden="true">location_on</span>
-                <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress"><span itemProp="addressLocality">{job.loc}</span></span>
-              </span>
-            </div>
-            
-            <div className="hidden md:flex flex-col border-l border-white/5 pl-4">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none">Pregledi</span>
-              <span className="flex items-center gap-1 text-white/60 text-[10px] font-mono">
-                <span className="material-symbols-outlined text-[14px] text-secondary">visibility</span> {job.viewsCount || 0}
-              </span>
-            </div>
-
-            <div className="hidden md:flex flex-col border-l border-white/5 pl-4">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none">Prijave</span>
-              <span className="flex items-center gap-1 text-white/60 text-[10px] font-mono">
-                <span className="material-symbols-outlined text-[14px] text-blue-400">group</span> {job.app || job.applicantsCount || 0}
-              </span>
-            </div>
-
-            {/* Benefits Section for Desktop */}
+            {/* Benefits: Smeštaj, Prevoz, Hrana */}
             <div className="hidden md:flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
               {(() => {
                 const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
@@ -310,6 +279,11 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                 );
               })()}
             </div>
+
+            {/* Views count — just icon + number */}
+            <span className="hidden md:flex items-center gap-1 text-white/40 text-[10px] font-mono border-l border-white/5 pl-4">
+              <span className="material-symbols-outlined text-[14px] text-white/30">visibility</span> {job.viewsCount || 0}
+            </span>
           </div>
         </div>
 
