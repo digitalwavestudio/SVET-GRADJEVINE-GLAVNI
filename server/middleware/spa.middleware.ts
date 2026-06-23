@@ -1081,7 +1081,7 @@ export const createSpaMiddleware = () => {
               // to avoid flash of server content before React hydration
               const fullTitle = `${matchedRoute.label} | Svet Građevine`;
               const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
-              const canonicalPath = CANONICAL_PATH_MAP[collectionName] || req.path;
+              const canonicalPath = isPseoRoute ? req.path : (CANONICAL_PATH_MAP[collectionName] || req.path);
               html = html.replace(/<meta name="description"[^>]*\/?>/gi, "");
               const cleanHtml = html
                 .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
@@ -1291,7 +1291,11 @@ ${breadcrumbHtml}
       const spaPassthroughPrefixes = ["/pretraga", "/profil", "/postavi-oglas"];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
-        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(html);
+        const passthroughHtml = html.replace(
+          "</head>",
+          `<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
+        );
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(passthroughHtml);
       }
 
       // Custom 404 for unmatched routes
