@@ -948,43 +948,19 @@ export const createSpaMiddleware = () => {
         return res.send(html);
       }
 
-      // Homepage: React SSR (fallback to string-based pre-render)
+      // Homepage: React SSR (fallback to clean shell)
       if (req.path === "/") {
-          if (!isBot) {
-            // Non-bot: serve clean SPA shell with meta tags (no pre-rendered content)
-            const cleanHtml = html
-              .replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`)
-              .replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
-<link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
-<meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" />
-<meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
-<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
-<meta property="og:url" content="${APP_CONFIG.BASE_URL}/" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Svet Građevine - Portal za građevinske oglase" />
-<meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
-<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
-</head>`);
-            return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(cleanHtml);
-          }
-
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
-
-        // Try React SSR first
         const scheme = req.get('x-forwarded-proto') || 'http';
         const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
         const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
         const ssrResult = await reactSsrPage(ssrUrl);
         if (ssrResult) {
           const { html, dehydratedState, helmetHtml } = ssrResult;
-
           let finalHtml = indexHtml
             .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-
           res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-
           const redisCache = getRedis();
           if (redisCache) {
             redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
@@ -996,11 +972,22 @@ export const createSpaMiddleware = () => {
         const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
         if (rendered) return res.send(rendered);
 
-        // Minimal fallback
-        html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
-        html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
-        html = html.replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><link rel="canonical" href="${APP_CONFIG.BASE_URL}/" /><meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" /><meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." /><meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" /><meta property="og:url" content="${APP_CONFIG.BASE_URL}/" /><meta property="og:type" content="website" /></head>`);
-        return res.send(html);
+        // Clean shell fallback (no pre-rendered content)
+        const cleanHtml = indexHtml
+          .replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`)
+          .replace("</head>", `<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
+<meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" />
+<meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:url" content="${APP_CONFIG.BASE_URL}/" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Svet Građevine - Portal za građevinske oglase" />
+<meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+</head>`);
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(cleanHtml);
       }
 
       if (matchedRoute) {
@@ -1033,30 +1020,27 @@ export const createSpaMiddleware = () => {
 
         if (isListingPage) {
           if (collectionName) {
-            if (isBot) {
-              const uaShort = userAgent.substring(0, 120);
-              console.log(`[SPA] Bot SSR: ${req.path} | UA: ${uaShort} | IP: ${req.ip || req.socket.remoteAddress}`);
-
-              // Try React SSR first
-              const scheme = req.get('x-forwarded-proto') || 'http';
-              const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
-              const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
-              const ssrResult = await reactSsrPage(ssrUrl);
-              if (ssrResult) {
-                const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
-                const { html, dehydratedState, helmetHtml } = ssrResult;
-                let finalHtml = indexHtml
-                  .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
-                  .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-                res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-                const redisCache = getRedis();
-                if (redisCache) {
-                  redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
-                }
-                return res.send(finalHtml);
+            // Try React SSR for all visitors (not just bots)
+            const scheme = req.get('x-forwarded-proto') || 'http';
+            const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+            const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+            const ssrResult = await reactSsrPage(ssrUrl);
+            if (ssrResult) {
+              const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+              const { html, dehydratedState, helmetHtml } = ssrResult;
+              let finalHtml = indexHtml
+                .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+                .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+              res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+              const redisCache = getRedis();
+              if (redisCache) {
+                redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
               }
+              return res.send(finalHtml);
+            }
 
-              // Fallback: string-based pre-render
+            if (isBot) {
+              // Bot fallback: string-based pre-render
               const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
 
               // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
@@ -1077,8 +1061,7 @@ export const createSpaMiddleware = () => {
               );
               if (rendered) return res.send(rendered);
             } else {
-              // Non-bot: serve clean SPA shell with meta tags (no pre-rendered listing content)
-              // to avoid flash of server content before React hydration
+              // Non-bot fallback: serve clean SPA shell with meta tags
               const fullTitle = `${matchedRoute.label} | Svet Građevine`;
               const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
               const canonicalPath = isPseoRoute ? req.path : (CANONICAL_PATH_MAP[collectionName] || req.path);
