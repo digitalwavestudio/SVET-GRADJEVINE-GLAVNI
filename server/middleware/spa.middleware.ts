@@ -966,7 +966,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
 </head>`);
-            return res.send(cleanHtml);
+            return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(cleanHtml);
           }
 
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
@@ -1098,7 +1098,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="${baseDesc}" />
 <meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
 </head>`);
-              return res.send(cleanHtml);
+              return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(cleanHtml);
             }
           }
 
@@ -1291,7 +1291,7 @@ ${breadcrumbHtml}
       const spaPassthroughPrefixes = ["/pretraga", "/profil", "/postavi-oglas"];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
-        return res.send(html);
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(html);
       }
 
       // Custom 404 for unmatched routes
