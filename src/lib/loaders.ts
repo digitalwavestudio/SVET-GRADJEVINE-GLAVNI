@@ -7,21 +7,38 @@ function getQC(context: unknown): QueryClient {
 }
 
 export const jobLoader = async ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const { jobsService } = await import('@/src/modules/jobs/services/jobsService');
   const url = new URL(request.url);
   const searchParams = Object.fromEntries(url.searchParams.entries());
-  
+
   const filters: Record<string, string> = { ...searchParams };
-  
+
   if (params.zanimanje && params.zanimanje !== 'all') filters.title = params.zanimanje;
   if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  await getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.jobs.list(filters),
-    queryFn: ({ pageParam = null }) => jobsService.fetchJobs(filters, pageParam),
-    initialPageParam: null,
-  });
-  
+  const qc = getQC(context);
+
+  const { jobsService } = await import('@/src/modules/jobs/services/jobsService');
+  const { statsService } = await import('@/src/services/statsService');
+
+  // Prefetch jobs + stats/count PARALELNO — eliminiše waterfall na klijentu
+  await Promise.all([
+    qc.prefetchInfiniteQuery({
+      queryKey: queryKeys.jobs.list(filters),
+      queryFn: ({ pageParam = null }) => jobsService.fetchJobs(filters, pageParam),
+      initialPageParam: null,
+    }),
+    qc.prefetchQuery({
+      queryKey: ['stats', 'jobs'],
+      queryFn: () => statsService.getCachedStats('jobs'),
+      staleTime: 30 * 60 * 1000,
+    }),
+    qc.prefetchQuery({
+      queryKey: ['count', 'companies'],
+      queryFn: () => statsService.getCachedCount('companies'),
+      staleTime: 30 * 60 * 1000,
+    }),
+  ]);
+
   return filters;
 };
 

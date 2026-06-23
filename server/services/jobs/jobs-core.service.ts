@@ -40,7 +40,6 @@ export class JobsCoreService {
           "title",
           "name",
           "description",
-          "price",
           "location",
           "loc",
           "type",
@@ -53,19 +52,10 @@ export class JobsCoreService {
           "salary",
           "sal",
           "logo",
-          "benefits",
           "plataMin",
           "plataMax",
           "salaryType",
-          "smestaj",
-          "prevoz",
-          "hrana",
-          "housing",
-          "transport",
-          "food",
-          "topliObrok",
-          "benefiti",
-          "rawBenefits",
+          "benefits",
         )
         .get();
 
