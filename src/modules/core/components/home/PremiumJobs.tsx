@@ -169,7 +169,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                     <div className="flex gap-4 md:gap-7 items-start md:items-center w-full min-w-0">
                       
                       {/* Logo */}
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full p-1 md:p-1.5 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.08)] relative z-10 flex items-center justify-center overflow-hidden">
+                      <div className="w-[64px] h-[64px] min-w-[64px] max-w-[64px] md:w-[80px] md:h-[80px] md:min-w-[80px] md:max-w-[80px] bg-white rounded-full p-1 md:p-1.5 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.08)] relative z-10 flex items-center justify-center overflow-hidden">
                         {job.logo ? (
                           <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full p-1" loading="lazy" />
                         ) : (

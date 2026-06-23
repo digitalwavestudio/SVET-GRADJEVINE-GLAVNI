@@ -24,8 +24,8 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
   const getSalaryDisplay = () => {
     if (job.plataMin != null) {
       const min = Number(job.plataMin).toLocaleString();
-      const max = job.plataMax != null ? ` - ${Number(job.plataMax).toLocaleString()}` : '';
-      return `${min}${max} EUR`;
+      const max = job.plataMax != null ? ` – ${Number(job.plataMax).toLocaleString()}` : '';
+      return `${min}${max} €`;
     }
     return job.sal || job.salary || 'Dogovor';
   };
@@ -107,17 +107,17 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         <div className="flex flex-row items-center justify-end border-t border-b border-white/5 py-2.5 my-1 relative z-10 gap-2">
           {/* Salary / Payment */}
           <div className="text-right flex flex-col">
-            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none">
+            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none font-sans">
               {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
             </span>
-            <span className="text-secondary font-black text-base font-mono leading-none">
+            <span className="text-secondary font-black text-lg font-sans leading-none tracking-tight">
               {getSalaryDisplay()}
             </span>
           </div>
         </div>
 
-        {/* Benefits Section: smestaj, prevoz, hrana, views */}
-        <div className="flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
+        {/* Benefits Section: smestaj, prevoz, hrana */}
+        <div className="flex flex-wrap gap-1.5 relative z-10 min-h-[22px] items-center">
           {(() => {
             const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
             const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
@@ -141,9 +141,9 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                     <span className="material-symbols-outlined text-[10px]">restaurant</span> Hrana
                   </span>
                 )}
-                {/* Views count — mobile */}
-                <span className="inline-flex items-center gap-1 text-white/40 text-[8px] font-mono">
-                  <span className="material-symbols-outlined text-[10px] text-white/30">visibility</span> {job.viewsCount || 0}
+                {/* Views — desno, plavo */}
+                <span className="inline-flex items-center gap-1 text-blue-400 text-[8px] font-mono ml-auto">
+                  <span className="material-symbols-outlined text-[10px] text-blue-400">visibility</span> {job.viewsCount || 0}
                 </span>
               </>
             );
@@ -281,20 +281,20 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             </div>
 
             {/* Views count — just icon + number */}
-            <span className="hidden md:flex items-center gap-1 text-white/40 text-[10px] font-mono border-l border-white/5 pl-4">
-              <span className="material-symbols-outlined text-[14px] text-white/30">visibility</span> {job.viewsCount || 0}
+            <span className="hidden md:flex items-center gap-1 text-blue-400 text-[10px] font-mono border-l border-white/5 pl-4">
+              <span className="material-symbols-outlined text-[14px] text-blue-400">visibility</span> {job.viewsCount || 0}
             </span>
           </div>
         </div>
 
         {/* Action Section */}
         <div className={`${viewMode === 'list' ? 'md:min-w-[150px] md:text-right flex md:flex-col items-center md:items-end justify-between w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-white/5' : 'mt-auto pt-4 border-t border-white/5 flex items-center justify-between'} relative z-10`}>
-          <div className="flex flex-col items-start md:items-end">
-            <div className="text-secondary font-black text-xl mb-1 font-mono">
+          <div className="flex flex-col items-center md:items-center">
+            <div className="text-secondary font-black text-2xl mb-1 font-sans tracking-tight">
               {getSalaryDisplay()}
             </div>
             {viewMode === 'list' && (
-              <div className="text-white/30 text-[9px] font-bold uppercase tracking-widest mb-3 font-mono">
+              <div className="text-white/30 text-[9px] font-bold uppercase tracking-widest mb-3 font-sans">
                 {job.time}
               </div>
             )}
