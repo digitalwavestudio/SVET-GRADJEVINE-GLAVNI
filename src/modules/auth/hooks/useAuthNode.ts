@@ -419,12 +419,19 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
   }, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
     return traceAsync('auth_login_google', async () => {
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
+      // Na localhost-u popup ne radi zbog COOP headers — koristimo redirect
+      if (isLocalhost) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+
       try {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
           const fbUser = result.user;
 
-          // Optimistic: set user immediately so redirect fires without waiting on server
           setUser({
             id: fbUser.uid,
             email: fbUser.email || '',
@@ -441,7 +448,6 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
             setIsInitializing(false);
           }
 
-          // Background: create server profile + refresh token for custom claims
           initUser(fbUser, defaultRole).catch(() => {});
           fbUser.getIdToken(true).catch(() => {});
         }
