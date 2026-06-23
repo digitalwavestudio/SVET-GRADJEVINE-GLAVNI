@@ -278,7 +278,7 @@ async function startServer() {
         contentSecurityPolicy: { directives: cspDirectives },
         crossOriginEmbedderPolicy: false,
         crossOriginResourcePolicy: { policy: "cross-origin" },
-        crossOriginOpenerPolicy: { policy: "same-origin" },
+        crossOriginOpenerPolicy: { policy: "unsafe-none" },
         // frame-ancestors 'none' in CSP supersedes X-Frame-Options; keep both for legacy browsers
         xFrameOptions: { action: "deny" },
         referrerPolicy: { policy: "strict-origin-when-cross-origin" },

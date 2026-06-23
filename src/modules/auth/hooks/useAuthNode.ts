@@ -131,7 +131,23 @@ export function useAuthNode() {
             tokenResult = await firebaseUser.getIdTokenResult();
          } catch (e) {
             console.warn('[AUTH] getIdTokenResult failed:', e);
-            if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
+            if (isMountedFn.current) {
+               setUser(prev => {
+                  if (prev) return prev;
+                  return {
+                     id: firebaseUser.uid,
+                     email: firebaseUser.email || '',
+                     emailVerified: firebaseUser.emailVerified,
+                     role: 'standard' as UserRole,
+                     isVerified: false,
+                     isAdmin: false,
+                     status: 'active',
+                     name: firebaseUser.displayName || '',
+                     photoURL: firebaseUser.photoURL || '',
+                  } as User;
+               });
+               setLoading(false); setIsInitializing(false);
+            }
             return;
          }
          // Defensive: claims may be undefined on rare token edge cases (logout race, refresh latency)
@@ -196,7 +212,23 @@ export function useAuthNode() {
                  setLoading(false); setIsInitializing(false);
                }
             } else {
-               if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
+               if (isMountedFn.current) {
+                  setUser(prev => {
+                     if (prev) return prev;
+                     return {
+                        id: firebaseUser.uid,
+                        email: firebaseUser.email || '',
+                        emailVerified: firebaseUser.emailVerified,
+                        role: (claims?.role || 'standard') as UserRole,
+                        isVerified: false,
+                        isAdmin: false,
+                        status: 'active',
+                        name: firebaseUser.displayName || '',
+                        photoURL: firebaseUser.photoURL || '',
+                     } as User;
+                  });
+                  setLoading(false); setIsInitializing(false);
+               }
             }
          } catch(err: any) {
             const error = err as any;
@@ -237,7 +269,25 @@ export function useAuthNode() {
                   console.warn("[AUTH] Auto-init after redirect failed:", initErr);
                }
             }
-            if (isMountedFn.current) { setLoading(false); setIsInitializing(false); }
+            // Fallback: ako ni claims ni /users/me nisu uspeli, setuj usera iz Firebase Auth podataka
+            // da bi se prekinuo loop i dozvolio redirect na dashboard
+            if (isMountedFn.current) {
+               setUser(prev => {
+                  if (prev) return prev;
+                  return {
+                     id: firebaseUser.uid,
+                     email: firebaseUser.email || '',
+                     emailVerified: firebaseUser.emailVerified,
+                     role: (claims?.role || 'standard') as UserRole,
+                     isVerified: false,
+                     isAdmin: false,
+                     status: 'active',
+                     name: firebaseUser.displayName || '',
+                     photoURL: firebaseUser.photoURL || '',
+                  } as User;
+               });
+               setLoading(false); setIsInitializing(false);
+            }
          }
       };
 
