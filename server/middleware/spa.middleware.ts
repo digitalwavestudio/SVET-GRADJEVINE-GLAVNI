@@ -96,6 +96,13 @@ function formatCity(slug: string): string {
   return CITY_DISPLAY[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
 }
 
+// Strip existing <title> and <meta name="description"> before injecting SSR helmet output
+function stripHeadMeta(html: string): string {
+  return html
+    .replace(/<title>.*?<\/title>/i, "")
+    .replace(/<meta\s+name=["']description["'][^>]*\/?>/gi, "");
+}
+
 // Map SEO route collection names to Firestore "listings" type discriminator
 const COLLECTION_TO_TYPE: Record<string, string> = {
   jobs: "job",
@@ -957,7 +964,7 @@ export const createSpaMiddleware = () => {
         const ssrResult = await reactSsrPage(ssrUrl);
         if (ssrResult) {
           const { html, dehydratedState, helmetHtml } = ssrResult;
-          let finalHtml = indexHtml
+          let finalHtml = stripHeadMeta(indexHtml)
             .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
           res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
@@ -1028,7 +1035,7 @@ export const createSpaMiddleware = () => {
             if (ssrResult) {
               const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
               const { html, dehydratedState, helmetHtml } = ssrResult;
-              let finalHtml = indexHtml
+              let finalHtml = stripHeadMeta(indexHtml)
                 .replace('</head>', `${helmetHtml}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
                 .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
               res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
@@ -1208,7 +1215,7 @@ ${breadcrumbHtml}
 
           const detailLastmod = new Date().toISOString().split("T")[0];
 
-          let skeletonHtml = html;
+          let skeletonHtml = stripHeadMeta(html);
           skeletonHtml = skeletonHtml.replace(
             /<title>.*?<\/title>/,
             `<title>${title}</title>`,
@@ -1312,7 +1319,11 @@ ${breadcrumbHtml}
         );
       res.status(404).send(notFoundHtml);
     } catch (err) {
-      res.status(500).send("Internal Server Error");
+      console.error("[SPA] Unhandled error for", req.path, err);
+      if (!res.headersSent) {
+        const fallback = cachedIndexHtml || '<!DOCTYPE html><html lang="sr"><head><title>Svet Građevine</title></head><body><div id="root"></div></body></html>';
+        res.status(500).send(fallback);
+      }
     }
   });
 
