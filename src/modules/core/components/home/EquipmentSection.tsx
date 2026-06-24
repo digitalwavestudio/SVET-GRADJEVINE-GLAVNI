@@ -12,10 +12,10 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#38bdf8] font-black tracking-[0.2em] uppercase text-sm block">Teška Mehanizacija</span>
-                <span className="material-symbols-outlined text-[#38bdf8] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>precision_manufacturing</span>
+                <span className="text-[#38bdf8] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Teška Mehanizacija</span>
+                <span className="material-symbols-outlined text-[#38bdf8] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>engineering</span>
               </div>
-              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#38bdf8_0%,#ffffff_60%)] mb-4">GRAĐEVINSKE MAŠINE</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#38bdf8_0%,#ffffff_60%)] mb-4">GRAĐEVINSKE MAŠINE</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Pronađite bagere, kranove, utovarivače i ostalu opremu za vaš sledeći projekat.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
@@ -28,7 +28,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               {latestMachines.length > 0 ? (
                 <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-8 scroll-smooth w-full h-full">
                   {latestMachines.map((machine: any, idx: number) => (
-                  <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-[85vw] md:w-auto h-full flex flex-col">
+                  <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-full md:w-auto h-full flex flex-col">
                     <div className="h-48 overflow-hidden relative shrink-0">
                       <OptimizedImage src={machine.images?.[0] || ""} fallbackType="machine" alt={machine.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         
@@ -74,7 +74,6 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                   <p className="text-on-surface-variant text-base">Oglasa za građevinske mašine trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
                 </div>
               )}
-              <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#0A0F14] to-transparent pointer-events-none z-10 md:hidden"></div>
             </div>
             {/* Category Sidebar */}
             <div className="bg-surface-container-low p-6 sm:p-10 rounded-[10px] border border-white/10 flex flex-col relative shadow-xl overflow-hidden group/sidebar h-full">
@@ -130,10 +129,10 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#22c55e] font-black tracking-[0.2em] uppercase text-sm block">Nepokretnosti</span>
-                <span className="material-symbols-outlined text-[#22c55e] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>terrain</span>
+                <span className="text-[#22c55e] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Nepokretnosti</span>
+                <span className="material-symbols-outlined text-[#22c55e] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>terrain</span>
               </div>
-              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#22c55e_0%,#ffffff_60%)] mb-4">PLACEVI I LOKACIJE</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#22c55e_0%,#ffffff_60%)] mb-4">PLACEVI I LOKACIJE</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Investicione prilike širom regiona. Pronađite idealno zemljište za gradnju.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
@@ -144,7 +143,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           <div className="relative w-full">
             <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-12 scroll-smooth w-full">
               {latestRealEstate.length > 0 ? latestRealEstate.map((plot: any, idx: number) => (
-              <div key={plot.id || idx} className="relative rounded-[10px] overflow-hidden h-[420px] sm:h-[500px] group shadow-2xl cursor-pointer shrink-0 w-[85vw] md:w-auto" onClick={() => navigate(`/placevi/${plot.id}`)}>
+              <div key={plot.id || idx} className="relative rounded-[10px] overflow-hidden h-[420px] sm:h-[500px] group shadow-2xl cursor-pointer shrink-0 w-full md:w-auto" onClick={() => navigate(`/placevi/${plot.id}`)}>
                 <OptimizedImage src={plot.images?.[0] || ""} fallbackType="real_estate" alt={plot.title || 'Plac'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   
                 <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent opacity-95 group-hover:opacity-100 transition-opacity"></div>
@@ -178,7 +177,6 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               </div>
             )}
             </div>
-            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
           <Link 
             to="/postavi-oglas"

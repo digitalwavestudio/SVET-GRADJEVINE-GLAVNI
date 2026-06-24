@@ -543,11 +543,7 @@ input, textarea {
     margin-bottom: 1.25rem !important;
   }
 
-  /* 7. Premium Oglasi (Stavke 23-25) */
-  .w-\[85vw\].min-w-\[270px\] {
-    width: 90vw !important;
-    min-width: 270px !important;
-  }
+
   .px-4.py-6.md\:px-7.md\:py-9 {
     padding: 1.25rem !important;
     flex-direction: column !important;

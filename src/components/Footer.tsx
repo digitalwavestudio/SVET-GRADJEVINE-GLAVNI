@@ -11,19 +11,19 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer role="contentinfo" className="bg-[#0a1016] w-full pt-16 md:pt-24 pb-24 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
+    <footer role="contentinfo" className="bg-[#0a1016] w-full pt-10 md:pt-24 pb-24 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       {/* Background glow for luxury feel */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
 
       <div className="max-w-[1920px] mx-auto w-full relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 mb-12 lg:mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8 lg:gap-8 mb-8 lg:mb-16">
           {/* Brand Column */}
-          <div className="sm:col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left">
-            <Link to="/" className="flex items-center gap-3 group mb-6 lg:mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg" aria-label="Svet Građevine home">
-              <img width="800" height="600" decoding="async" src={logoUrl || logoImage} alt="Svet Građevine Logo" loading="lazy" className="w-[180px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
+          <div className="col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <Link to="/" className="flex items-center gap-3 group mb-4 lg:mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg" aria-label="Svet Građevine home">
+              <img width="800" height="600" decoding="async" src={logoUrl || logoImage} alt="Svet Građevine Logo" loading="lazy" className="w-[160px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
             </Link>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6 lg:mb-8 max-w-sm">
+            <p className="hidden sm:block text-slate-400 text-sm leading-relaxed mb-6 lg:mb-8 max-w-sm">
               Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-slate-200">najbolje građevinske poslove</strong>, pouzdane <strong className="font-bold text-slate-200">majstore i radnike</strong>, iznajmite mehanizaciju ili pronađite adekvatan smeštaj i placeve.
             </p>
             <div className="flex items-center justify-center sm:justify-start gap-4">
@@ -40,11 +40,11 @@ export default function Footer() {
           </div>
 
           {/* Categories Columns */}
-          <div className="sm:col-span-2 lg:col-span-4 mt-4 sm:mt-0">
-            <h4 className="text-secondary font-black text-xs tracking-widest uppercase mb-5 flex items-center justify-center sm:justify-start gap-2">
-              <span className="w-2 h-2 rounded-full bg-secondary/70"></span> Kategorije
+          <div className="col-span-2 lg:col-span-4 mt-2 sm:mt-0">
+            <h4 className="text-secondary font-black text-[10px] sm:text-xs tracking-widest uppercase mb-4 flex items-center justify-center sm:justify-start gap-2">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Kategorije
             </h4>
-            <ul className="grid grid-cols-2 gap-y-4 gap-x-4">
+            <ul className="grid grid-cols-2 gap-y-2 gap-x-2 sm:gap-x-4">
               {[
                 { path: 'poslovi', label: 'Poslovi' },
                 { path: 'majstori', label: 'Majstori' },
@@ -58,7 +58,7 @@ export default function Footer() {
                 { path: 'kalkulator', label: 'AI Kalkulator' }
               ].map((item) => (
                 <li key={item.path} className="flex items-center justify-center sm:justify-start text-center sm:text-left">
-                  <Link to={`/${item.path}`} className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium cursor-pointer touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label={item.label}>
+                  <Link to={`/${item.path}`} className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium cursor-pointer touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label={item.label}>
                     {item.label}
                   </Link>
                 </li>
@@ -67,14 +67,14 @@ export default function Footer() {
           </div>
 
           {/* Company Column */}
-          <div className="col-span-1 lg:col-span-2 flex flex-col items-center sm:items-start">
-            <h4 className="text-secondary font-black text-xs tracking-widest uppercase mb-5 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-secondary/70"></span> Kompanija
+          <div className="col-span-1 lg:col-span-2 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <h4 className="text-secondary font-black text-[10px] sm:text-xs tracking-widest uppercase mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Kompanija
             </h4>
-            <ul className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
-              <li><Link to="/o-nama" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="O nama">O nama</Link></li>
-              <li><Link to="/kontakt" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
-              <li><Link to="/korisni-linkovi" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
+            <ul className="space-y-2 flex flex-col items-center sm:items-start">
+              <li><Link to="/o-nama" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="O nama">O nama</Link></li>
+              <li><Link to="/kontakt" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
+              <li><Link to="/korisni-linkovi" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
               <li>
                 <div className="text-[#b35b10]/50 text-[16px] leading-[20px] font-black tracking-widest flex flex-wrap items-center justify-center sm:justify-start gap-1 uppercase relative group/partner cursor-default">
                   Partner
@@ -94,22 +94,22 @@ export default function Footer() {
                   </div>
                 </div>
               </li>
-              <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-sm flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Predaj oglas"><span className="material-symbols-outlined text-[16px]">add_circle</span> Predaj oglas</Link></li>
+              <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-[15px] flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Predaj oglas"><span className="material-symbols-outlined text-[18px]">add_circle</span> Predaj oglas</Link></li>
               {user && (user.role === 'admin' || user.isAdmin) && (
-                <li><Link to="/admin" className="text-red-400 hover:text-red-300 font-black transition-colors text-sm flex items-center gap-1 mt-2 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Admin Hub"><span className="material-symbols-outlined text-[16px]">terminal</span> Admin Hub</Link></li>
+                <li><Link to="/admin" className="text-red-400 hover:text-red-300 font-black transition-colors text-[15px] flex items-center gap-1 mt-2 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Admin Hub"><span className="material-symbols-outlined text-[18px]">terminal</span> Admin Hub</Link></li>
               )}
             </ul>
           </div>
 
           {/* Legal Info Column */}
-          <div className="col-span-1 lg:col-span-2 flex flex-col items-center sm:items-start">
-            <h4 className="text-secondary font-black text-xs tracking-widest uppercase mb-5 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-secondary/70"></span> Pravne Info
+          <div className="col-span-1 lg:col-span-2 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <h4 className="text-secondary font-black text-[10px] sm:text-xs tracking-widest uppercase mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Pravne Info
             </h4>
-            <ul className="space-y-4 text-center sm:text-left flex flex-col items-center sm:items-start">
-              <li><Link to="/privatnost" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Privatnost">Privatnost</Link></li>
-              <li><Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Uslovi korišćenja">Uslovi korišćenja</Link></li>
-              <li><Link to="/pravila-oglasavanja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Pravila oglašavanja">Pravila oglašavanja</Link></li>
+            <ul className="space-y-2 flex flex-col items-center sm:items-start">
+              <li><Link to="/privatnost" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Privatnost">Privatnost</Link></li>
+              <li><Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Uslovi korišćenja">Uslovi korišćenja</Link></li>
+              <li><Link to="/pravila-oglasavanja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Pravila oglašavanja">Pravila oglašavanja</Link></li>
             </ul>
           </div>
         </div>

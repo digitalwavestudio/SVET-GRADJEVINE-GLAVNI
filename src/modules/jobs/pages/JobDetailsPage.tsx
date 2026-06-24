@@ -221,7 +221,7 @@ export default function JobDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-white selection:bg-secondary selection:text-slate-950 pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#0B0F19] font-sans text-white selection:bg-yellow-500 selection:text-slate-950 pb-20 md:pb-0">
       <SeoHead
         title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : `${displayTitle} ${jobData.location ? `- ${jobData.location}` : ''} - Svet Građevine`}
         description={cleanDescription.substring(0, 160)}
@@ -235,7 +235,7 @@ export default function JobDetailsPage() {
         <AdminCommandCenter jobData={jobData} deleteJob={deleteJob} />
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+      <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32 mb-8">
         <Breadcrumbs items={[
           { label: 'Poslovi', path: '/poslovi' },
           ...(jobData.locationSlug ? [{ label: jobData.location, path: `/poslovi/${jobData.locationSlug}` }] : []),
@@ -244,42 +244,40 @@ export default function JobDetailsPage() {
         ]} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-12">
-        <div className="bg-slate-900/50 border border-white/5 rounded-[20px] p-6 sm:p-10 lg:p-12 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-secondary via-amber-500 to-transparent"></div>
-          <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start lg:items-center">
-            <div className="lg:col-span-8 space-y-6">
-              <div className="flex flex-wrap items-center gap-3">
+      {/* Modern Header Hero */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 mb-12 mt-24 md:mt-0">
+        <div className="relative border border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-3xl p-4 sm:p-8 lg:p-12 overflow-hidden shadow-2xl">
+          {/* Subtle Glow Background */}
+          <div className="absolute top-0 left-1/4 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent"></div>
+          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+            <div className="space-y-6 flex-1">
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-2">
                 {jobData.isPremium && (
-                  <span className="bg-secondary text-slate-950 px-4 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-secondary/20">
-                    ★ PREMIUM POSAO
+                  <span className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 text-yellow-400 border border-yellow-500/20 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
+                    <Zap size={14} className="fill-yellow-500" /> PREMIUM POSAO
                   </span>
                 )}
                 {jobData.isUrgent && (
-                  <span className="bg-red-500/20 text-red-500 border border-red-500/30 px-4 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <Zap size={14} className="fill-red-500" />
-                    URGENTNO
+                  <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Zap size={14} className="fill-red-500" /> URGENTNO
                   </span>
                 )}
-                <span className="px-4 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest border bg-white/5 text-white/60 border-white/10">
-                  {getEngagementLabel(jobData.tipAngazmana, jobData.customEngagement).toUpperCase()}
-                </span>
-                <span className="px-4 py-1.5 rounded-[8px] text-[10px] font-black uppercase tracking-widest border bg-white/5 text-white/60 border-white/10 flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[14px] text-secondary">visibility</span>
-                  {(jobData.viewsCount || 0) + (isTrackedInSession ? 1 : 0)} PREGLEDA
-                </span>
               </div>
 
-              <div className="space-y-4">
-                <h1 id="job-title" className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase leading-[1] text-white">
+              {/* Title */}
+              <div className="space-y-4 max-w-4xl">
+                <h1 id="job-title" className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
                   {displayTitle}
                 </h1>
-
-                  <div className="flex flex-wrap items-center gap-4 text-white/60 font-bold text-xs uppercase tracking-widest">
+                
+                {/* Meta info */}
+                <div className="flex flex-wrap items-center gap-4 text-white/50 font-medium text-sm">
                   {jobData.companyId ? (
-                    <Link to={`/firma/${jobData.companyId}`} className="flex items-center gap-2 text-secondary hover:text-white transition-colors">
+                    <Link to={`/firma/${jobData.companyId}`} className="flex items-center gap-2 hover:text-white transition-colors">
                       <Building2 size={16} />
                       <span>{jobData.comp || jobData.companyName || 'Privatni Poslodavac'}</span>
                     </Link>
@@ -291,50 +289,41 @@ export default function JobDetailsPage() {
                   )}
                   {jobData.location && (
                     <>
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/15" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                       <span className="flex items-center gap-2">
-                        <MapPin size={16} className="text-secondary" />
+                        <MapPin size={16} />
                         <span>{jobData.location}</span>
                       </span>
                     </>
                   )}
-                  {jobData.tacnaLokacija && (
-                    <>
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/15" />
-                      <span className="text-white/45 normal-case font-medium">{jobData.tacnaLokacija}</span>
-                    </>
-                  )}
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                  <span className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px]">visibility</span>
+                    <span>{(jobData.viewsCount || 0) + (isTrackedInSession ? 1 : 0)} pregleda</span>
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="lg:col-span-4 flex justify-end gap-3 w-full lg:w-auto">
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 w-full lg:w-auto shrink-0 mt-4 lg:mt-0">
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleToggleFavorite}
-                className={`w-14 h-14 rounded-[10px] flex items-center justify-center border transition-all duration-300 ${
+                className={`flex-1 lg:flex-none h-12 px-6 rounded-xl flex items-center justify-center gap-2 border transition-all duration-300 font-semibold text-sm shadow-sm ${
                   isSaved
-                    ? 'bg-red-500/10 border-red-500/50 text-red-500 shadow-lg shadow-red-500/20'
-                    : 'bg-white/5 border-white/10 text-white/40 hover:text-white hover:border-white/20'
+                    ? 'bg-red-500/10 border-red-500/30 text-red-500 hover:bg-red-500/20 shadow-red-500/10'
+                    : 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={isSaved ? 'saved' : 'unsaved'}
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 1.5, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  >
-                    <Heart fill={isSaved ? "currentColor" : "none"} size={24} />
-                  </motion.div>
-                </AnimatePresence>
+                <Heart fill={isSaved ? "currentColor" : "none"} size={18} />
+                <span>{isSaved ? 'Sačuvano' : 'Sačuvaj'}</span>
               </motion.button>
 
               <button
                 onClick={() => setShowReportModal(true)}
-                className="w-14 h-14 rounded-[10px] bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-red-500 hover:border-red-500/20 transition-all"
+                className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-red-400 hover:border-red-400/30 hover:bg-red-500/10 transition-all"
                 title="Prijavi oglas"
               >
                 <span className="material-symbols-outlined">flag</span>
@@ -344,94 +333,87 @@ export default function JobDetailsPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12" itemScope itemType="https://schema.org/JobPosting">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-10" itemScope itemType="https://schema.org/JobPosting">
         <meta itemProp="title" content={displayTitle} />
         <meta itemProp="datePosted" content={getDatePosted()} />
 
-        <article className="lg:col-span-8 space-y-12">
+        <article className="lg:col-span-8 space-y-8">
           <MediaGallery images={jobData.images || []} title={displayTitle} imageStatus={jobData.imageStatus} />
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-secondary/20 transition-all group">
-              <div className="w-10 h-10 rounded-[8px] bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
-                <Wallet size={20} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">
+          {/* Unified Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+            <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
+              <div className="flex items-center gap-2 text-white/40 mb-2">
+                <Wallet size={16} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">
                   {jobData.salaryType === 'hourly' ? 'Satnica' : 'Mesečna plata'}
                 </span>
-                <span className="text-base sm:text-xl font-black text-secondary tracking-tight break-words">
+              </div>
+              <span className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600">
                   {jobData.plataMin != null
-                    ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} EUR`
+                    ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} €`
                     : 'Po dogovoru'}
-                  {jobData.plataMin != null && (jobData.salaryType === 'hourly' ? ' / sat' : ' / mesec')}
-                </span>
+              </span>
+            </div>
+            
+            <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
+              <div className="flex items-center gap-2 text-white/40 mb-2">
+                <Clock size={16} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Tip angažmana</span>
               </div>
+              <span className="text-sm font-bold text-white">
+                {getEngagementLabel(jobData.tipAngazmana, jobData.customEngagement)}
+              </span>
             </div>
 
-            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
-              <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
-                <Clock size={20} className="stroke-[2.5]" />
+            <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
+              <div className="flex items-center gap-2 text-white/40 mb-2">
+                <Briefcase size={16} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Iskustvo</span>
               </div>
-              <div>
-                <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Tip angažmana / Radno vreme</span>
-                <span className="text-base sm:text-lg font-black text-white tracking-tight uppercase">
-                  {getEngagementLabel(jobData.tipAngazmana, jobData.customEngagement)}
-                </span>
-              </div>
+              <span className="text-sm font-bold text-white">
+                {getExperienceLabel(jobData.iskustvo)}
+              </span>
             </div>
 
-            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
-              <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
-                <Briefcase size={20} className="stroke-[2.5]" />
+            <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
+              <div className="flex items-center gap-2 text-white/40 mb-2">
+                <Calendar size={16} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Isplata</span>
               </div>
-              <div>
-                <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Potrebno Iskustvo</span>
-                <span className="text-base sm:text-lg font-black text-white tracking-tight uppercase">
-                  {getExperienceLabel(jobData.iskustvo)}
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-slate-900/50 border border-white/5 p-4 sm:p-6 rounded-[12px] flex flex-col justify-between min-h-[120px] sm:h-36 hover:border-white/15 transition-all">
-              <div className="w-10 h-10 rounded-[8px] bg-white/5 flex items-center justify-center text-white/60 shrink-0">
-                <Calendar size={20} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <span className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Dinamika Isplate</span>
-                <span className="text-base sm:text-lg font-black text-white tracking-tight uppercase">
-                  {getPaymentDynamicsLabel(jobData.dinamikaIsplate)}
-                </span>
-              </div>
+              <span className="text-sm font-bold text-white">
+                {getPaymentDynamicsLabel(jobData.dinamikaIsplate)}
+              </span>
             </div>
           </div>
 
-          <section className="bg-slate-900/50 border border-white/5 rounded-[16px] p-6 sm:p-10 space-y-6">
-            <div className="flex items-center gap-4 border-b border-white/5 pb-6">
-              <div className="w-12 h-12 rounded-[10px] bg-secondary/10 flex items-center justify-center text-secondary">
-                <Briefcase size={22} />
+          {/* Description Section */}
+          <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-10 space-y-6">
+            <h2 id="section-description" className="text-xl font-bold text-white flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60">
+                <Briefcase size={20} />
               </div>
-              <h2 id="section-description" className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">Opis Posla</h2>
-            </div>
-            <div itemProp="description" className="text-base sm:text-lg text-white/70 leading-relaxed font-medium whitespace-pre-wrap">
+              Opis Posla
+            </h2>
+            <div itemProp="description" className="text-base text-white/70 leading-relaxed whitespace-pre-wrap font-medium break-words [overflow-wrap:anywhere]">
               {displayDescription || 'Opis posla trenutno nije unet od strane poslodavca.'}
             </div>
           </section>
 
-          <section className="bg-slate-900/50 border border-white/5 rounded-[16px] p-6 sm:p-10 space-y-8">
-            <div className="flex items-center gap-4 border-b border-white/5 pb-6">
-              <div className="w-12 h-12 rounded-[10px] bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                <span className="material-symbols-outlined text-[24px]">fact_check</span>
+          {/* Benefits Section */}
+          <section className="bg-white/[0.02] border border-white/5 rounded-3xl p-4 sm:p-6 lg:p-10 space-y-6 sm:space-y-8">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <ShieldCheck size={20} />
               </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">Obezbeđeni Uslovi Rada i Benefiti</h2>
-                <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">Svi uslovi definisani od strane poslodavca</p>
-              </div>
-            </div>
+              Obezbeđeni Uslovi Rada
+            </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 auto-rows-fr">
               {BENEFITS.map(benefit => {
                 const isProvided = jobData.benefits?.includes(benefit.slug) || jobData.benefiti?.includes(benefit.slug) || jobData.rawBenefits?.includes(benefit.slug);
+                if (!isProvided) return null;
+
                 const icon = benefit.slug === 'smestaj' ? 'home_work' : 
                   benefit.slug === 'topli-obrok' ? 'restaurant' : 
                   benefit.slug === 'pauza-za-kafu' ? 'coffee' :
@@ -441,86 +423,72 @@ export default function JobDetailsPage() {
                   benefit.slug === 'prijava-ugovor' ? 'shield_person' :
                   benefit.slug === 'placen-prekovremeni' ? 'more_time' :
                   benefit.slug === 'pomoc-pri-vizi' ? 'public' : 'check_circle';
+                
                 return (
                   <div
                     key={benefit.slug}
-                    className={`p-5 rounded-[10px] border flex items-center justify-between transition-all duration-300 ${
-                      isProvided
-                        ? 'bg-emerald-500/[0.03] border-emerald-500/15 text-white'
-                        : 'bg-red-500/[0.01] border-white/5 text-white/40'
-                    }`}
+                    className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex items-center gap-3 text-emerald-400 hover:bg-emerald-500/10 transition-colors h-full min-h-[72px]"
                   >
-                    <div className="flex items-center gap-3.5 flex-1">
-                      <span className={`material-symbols-outlined text-2xl ${isProvided ? 'text-emerald-400' : 'text-white/20'}`}>
-                        {icon}
-                      </span>
-                      <span className="font-bold text-xs uppercase tracking-widest">{benefit.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 justify-end">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center border ${
-                        isProvided
-                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                          : 'bg-red-500/10 border-red-500/30 text-red-400'
-                      }`}>
-                        <span className="material-symbols-outlined text-[14px] font-black">
-                          {isProvided ? 'check' : 'close'}
-                        </span>
-                      </div>
-                    </div>
+                    <span className="material-symbols-outlined text-[22px]">
+                      {icon}
+                    </span>
+                    <span className="font-semibold text-sm text-white/90">{benefit.name}</span>
                   </div>
                 );
               })}
-            </div>
-          </section>
-
-          <section className="bg-slate-900/50 border border-white/5 rounded-[16px] overflow-hidden">
-            <div className="relative p-6 sm:p-10 border-b border-white/5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-[10px] bg-blue-500/10 flex items-center justify-center text-blue-400">
-                      <MapPin size={22} />
-                    </div>
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">Tačna Lokacija i Mapa</h2>
-                      <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">LOKACIJA ZA RAD I GPS PLANIRANJE RUTE</p>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 pointer-events-none rounded-[16px] bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 opacity-10 blur-3xl" />
+              
+              {!BENEFITS.some(b => jobData.benefits?.includes(b.slug) || jobData.benefiti?.includes(b.slug) || jobData.rawBenefits?.includes(b.slug)) && (
+                <div className="col-span-full text-white/40 text-sm font-medium p-4 border border-white/5 rounded-xl bg-white/[0.01]">
+                  Poslodavac nije eksplicitno izdvojio posebne benefite.
                 </div>
-
-            <div className="h-96 w-full bg-slate-900 relative">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder={0}
-                scrolling="no"
-                marginHeight={0}
-                marginWidth={0}
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(jobData.tacnaLokacija || jobData.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
-                className="absolute inset-0 grayscale contrast-125 hover:grayscale-0 transition-all duration-700"
-                title="Mesto rada"
-              ></iframe>
-              <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_80px_rgba(0,0,0,0.7)]"></div>
-            </div>
-
-            <div className="p-6 bg-slate-900/80 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="text-center sm:text-left">
-                <h4 className="text-white font-black text-sm uppercase tracking-wider mb-1">Mesto i okolina gradilišta</h4>
-                <p className="text-white/40 text-xs font-bold uppercase">{jobData.tacnaLokacija || jobData.location}</p>
-              </div>
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(jobData.tacnaLokacija || jobData.location)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto bg-secondary hover:bg-yellow-400 text-slate-950 font-black px-8 py-4 rounded-[10px] flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-secondary/15"
-              >
-                <span className="material-symbols-outlined text-[18px]">directions</span>
-                <span>ZAPOČNI GPS NAVIGACIJU</span>
-              </a>
+              )}
             </div>
           </section>
 
-          <div className="relative mt-12">
-            <div className="absolute -top-8 left-0 w-full h-8 pointer-events-none bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 opacity-10 blur-3xl" />
+          {/* Map Section */}
+          {(jobData.tacnaLokacija || jobData.location) && (
+            <section className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
+              <div className="p-6 sm:p-8 border-b border-white/5 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                    <MapPin size={20} />
+                  </div>
+                  Lokacija
+                </h2>
+              </div>
+              <div className="h-64 sm:h-[300px] w-full relative">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  frameBorder={0}
+                  scrolling="no"
+                  marginHeight={0}
+                  marginWidth={0}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(jobData.tacnaLokacija || jobData.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                  className="absolute inset-0 grayscale contrast-125 opacity-70 hover:grayscale-0 hover:opacity-100 hover:contrast-100 transition-all duration-700"
+                  title="Mesto rada"
+                ></iframe>
+                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_50px_rgba(11,15,25,0.8)]"></div>
+              </div>
+              <div className="p-6 sm:p-8 bg-white/[0.01] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-1 block">Tačna adresa</span>
+                  <p className="text-white/90 text-sm font-medium">{jobData.tacnaLokacija || jobData.location}</p>
+                </div>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(jobData.tacnaLokacija || jobData.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                >
+                  <MapPin size={16} />
+                  <span>Otvori mapu</span>
+                </a>
+              </div>
+            </section>
+          )}
+
+          <div className="pt-4">
             <SimilarJobsSlider
               jobData={jobData}
               displaySimilarJobs={similarJobs}
@@ -529,125 +497,118 @@ export default function JobDetailsPage() {
           </div>
         </article>
 
-        <aside className="lg:col-span-4 space-y-6" aria-label="Kontakt i prijava">
-          <div className="sticky top-24 space-y-6">
-            <div className="bg-slate-900/50 border border-white/5 rounded-[16px] p-6 sm:p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[80px] rounded-full -mr-16 -mt-16 pointer-events-none"></div>
-
-              <div className="relative z-10 space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-[10px] bg-secondary/10 flex items-center justify-center border border-secondary/20 overflow-hidden shadow-inner">
-                    <Avatar name={jobData.comp || jobData.companyName || jobData.authorName || 'Anonimni Korisnik'} url={jobData.logo || jobData.companyLogo} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest block mb-1">OGLAŠAVAČ</span>
-                    <h3 className="text-base font-black text-white tracking-tight uppercase leading-snug">
-                      {jobData.comp || jobData.companyName || jobData.authorName || 'Privatni poslodavac'}
-                    </h3>
-                    {jobData.isCompanyVerified && (
-                      <div className="flex items-center gap-1.5 mt-1 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-[4px] w-fit">
-                        <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
-                        <span className="text-[7.5px] font-black tracking-widest uppercase text-green-400">Verifikovan</span>
-                      </div>
-                    )}
-                  </div>
+        {/* Sidebar */}
+        <aside className="lg:col-span-4" aria-label="Kontakt i prijava">
+          <div className="sticky top-28 space-y-6">
+            
+            {/* Employer Card */}
+            <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 sm:p-8 backdrop-blur-xl">
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-24 h-24 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center mb-4 shadow-xl">
+                  <Avatar name={jobData.comp || jobData.companyName || jobData.authorName || 'Anonimni Korisnik'} url={jobData.logo || jobData.companyLogo} className="w-full h-full object-cover" />
                 </div>
-
-                <div className="h-px bg-white/5" />
-
-                {isLoggedIn ? (
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <a
-                        href={showPhone ? `tel:${phoneNumber}` : '#'}
-                        onClick={(e) => {
-                          if (!showPhone) {
-                            e.preventDefault();
-                            setShowPhone(true);
-                            if (navigator.clipboard) {
-                              navigator.clipboard.writeText(phoneNumber).catch(() => console.warn('[JobDetails] Clipboard write failed'));
-                            }
-                          }
-                        }}
-                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-950 py-5 rounded-[10px] font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-yellow-500/10"
-                      >
-                        <Phone size={18} fill="currentColor" />
-                        {showPhone ? `Tel: ${phoneNumber}` : 'POZOVI POSLODAVCA'}
-                      </a>
-                      <div className="grid grid-cols-2 gap-3">
-                        <a
-                          href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-600/20 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">chat</span>
-                          WhatsApp
-                        </a>
-                        <a
-                          href={`https://viber.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-purple-600/10 hover:bg-purple-600/20 text-purple-400 border border-purple-600/20 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">call</span>
-                          Viber
-                        </a>
-                      </div>
-                    </div>
-                    <button
-                      onClick={handleStartChat}
-                      className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/5 py-4 rounded-[10px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-3"
-                    >
-                      <MessageSquare size={16} />
-                      Pošalji Poruku na sajtu
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <p className="text-white/40 text-xs font-bold uppercase tracking-wider text-center">Kontakt podaci su zaštićeni</p>
-                    <div className="w-full bg-white/5 py-5 rounded-[10px] font-black text-lg flex items-center justify-center gap-3 blur-md opacity-40 select-none border border-white/5">
-                      <Phone size={18} />
-                      <span>+381 6X XXX XXX</span>
-                    </div>
-                    <button
-                      onClick={() => navigate('/prijava')}
-                      className="w-full bg-secondary hover:bg-yellow-400 text-slate-950 py-5 rounded-[10px] font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-secondary/15"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">lock</span>
-                      Prijavi se za kontakt
-                    </button>
+                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1.5 block">Oglašavač</span>
+                <h3 className="text-lg font-black text-white">
+                  {jobData.comp || jobData.companyName || jobData.authorName || 'Privatni poslodavac'}
+                </h3>
+                {jobData.isCompanyVerified && (
+                  <div className="inline-flex items-center gap-1.5 mt-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-medium">
+                    <ShieldCheck size={14} />
+                    <span>Verifikovan poslodavac</span>
                   </div>
                 )}
               </div>
+
+              <div className="h-px w-full bg-white/5 mb-8" />
+
+              {isLoggedIn ? (
+                <div className="space-y-3">
+                  <a
+                    href={showPhone ? `tel:${phoneNumber}` : '#'}
+                    onClick={(e) => {
+                      if (!showPhone) {
+                        e.preventDefault();
+                        setShowPhone(true);
+                        if (navigator.clipboard) {
+                          navigator.clipboard.writeText(phoneNumber).catch(() => {});
+                        }
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-slate-950 h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20"
+                  >
+                    <Phone size={18} />
+                    {showPhone ? `Tel: ${phoneNumber}` : 'Prikaži Telefon'}
+                  </a>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/20 text-[#25D366] h-12 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare size={16} />
+                      WhatsApp
+                    </a>
+                    <a
+                      href={`https://viber.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#7360F2]/10 hover:bg-[#7360F2]/20 border border-[#7360F2]/20 text-[#7360F2] h-12 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2"
+                    >
+                      <Phone size={16} />
+                      Viber
+                    </a>
+                  </div>
+                  
+                  <button
+                    onClick={handleStartChat}
+                    className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white h-12 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 mt-2"
+                  >
+                    <MessageSquare size={16} />
+                    Pošalji poruku na sajtu
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="text-center">
+                    <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">Kontakt podaci zaštićeni</p>
+                    <div className="w-full bg-white/5 border border-white/10 h-14 rounded-xl font-bold text-lg flex items-center justify-center gap-3 blur-[3px] opacity-50 select-none">
+                      <Phone size={18} />
+                      <span>+381 6X XXX XXX</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate('/prijava')}
+                    className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">lock_open</span>
+                    Prijavi se za kontakt
+                  </button>
+                </div>
+              )}
             </div>
 
+            {/* Apply Button */}
             {!hasApplied && !isOwner && (
               <motion.button
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleApply}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 text-white py-6 rounded-[12px] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-500/10 transition-all flex items-center justify-center gap-3"
+                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white h-16 rounded-2xl font-bold text-sm tracking-wider shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2"
               >
                 PRIJAVI SE NA OGLAS
               </motion.button>
             )}
             {hasApplied && (
-              <div className="w-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 py-6 rounded-[12px] font-black text-sm uppercase tracking-widest text-center">
-                PRIJAVA JE POSLATA
+              <div className="w-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 h-16 rounded-2xl font-bold text-sm tracking-wider flex items-center justify-center gap-2">
+                <ShieldCheck size={20} />
+                PRIJAVA POSLATA
               </div>
             )}
-
-            <div className="bg-slate-900/50 border border-white/5 rounded-[12px] p-6">
-              <div className="flex gap-4 items-start">
-                <div className="p-3 rounded-[10px] bg-white/5 text-secondary">
-                  <ShieldCheck size={20} />
-                </div>
-                <div>
-                  <h4 className="text-[11px] font-black text-white uppercase tracking-widest mb-1">BEZBEDNA TRGOVINA</h4>
-                  <p className="text-[10px] text-white/40 leading-relaxed font-bold">Nikada ne uplaćujte novac unapred pre nego što se uverite u kvalitet usluge ili proizvoda.</p>
-                </div>
-              </div>
-            </div>
+            
+            <p className="text-center text-[10px] text-white/30 font-medium px-4">
+              Nikada ne uplaćujte novac unapred pre nego što se uverite u kvalitet usluge ili postojanje posla.
+            </p>
           </div>
         </aside>
       </main>

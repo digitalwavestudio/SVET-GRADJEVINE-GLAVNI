@@ -65,54 +65,108 @@ export const MobileBottomNav: React.FC = () => {
 
   return (
     <>
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-t border-white/5 pb-safe-bottom">
-      <div className="flex justify-around items-center h-16 px-2 relative">
+    {/* Ultra-Premium Full-Width Bottom Nav */}
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0B101A]/90 backdrop-blur-2xl border-t border-white/5 pb-safe-bottom shadow-[0_-20px_40px_rgba(0,0,0,0.6)]">
+      {/* High-end glossy top edge */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FEBF0D]/30 to-transparent"></div>
+      
+      <div className="flex justify-between items-center h-[76px] px-1 relative">
+        
+        {/* Početna */}
         <NavLink 
           to="/" 
           className={({ isActive }) => 
-            `flex flex-col items-center justify-center w-12 h-12 transition-colors ${isActive ? 'text-secondary' : 'text-white/40 hover:text-white/70'}`
+            `flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 relative group ${isActive ? 'text-[#FEBF0D]' : 'text-slate-400 hover:text-white'}`
           }
         >
-          <span className="material-symbols-outlined text-2xl">home</span>
-          <span className="text-[8px] font-black uppercase tracking-widest mt-1">Početna</span>
+          {({ isActive }) => (
+            <>
+              {/* Active Top Line Indicator */}
+              {isActive && (
+                <div className="absolute top-0 w-1/2 h-[2px] bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] rounded-b-full shadow-[0_0_12px_rgba(254,191,13,0.8)]"></div>
+              )}
+              {/* Modern Icon Container */}
+              <div className="flex items-center justify-center w-11 h-11 rounded-[16px] transition-all duration-300 bg-transparent group-hover:bg-white/5">
+                <span className={`material-symbols-outlined text-[24px] transition-all duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(254,191,13,0.5)] text-[#FEBF0D]' : 'group-active:scale-90'}`} style={{ fontVariationSettings: isActive ? '"FILL" 1, "wght" 600' : '"FILL" 0, "wght" 300' }}>home</span>
+              </div>
+              <span className="text-[9px] font-bold uppercase tracking-widest mt-0.5 relative z-10 transition-colors duration-300">Početna</span>
+            </>
+          )}
         </NavLink>
 
+        {/* Pretraga */}
         <button
           onClick={() => setIsSearchOpen(true)}
-          className="flex flex-col items-center justify-center w-12 h-12 transition-colors text-white/40 hover:text-white/70"
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 relative group ${isSearchOpen ? 'text-[#FEBF0D]' : 'text-slate-400 hover:text-white'}`}
         >
-          <span className="material-symbols-outlined text-2xl">search</span>
-          <span className="text-[8px] font-black uppercase tracking-widest mt-1">Pretraga</span>
+          {/* Active Top Line Indicator */}
+          {isSearchOpen && (
+            <div className="absolute top-0 w-1/2 h-[2px] bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] rounded-b-full shadow-[0_0_12px_rgba(254,191,13,0.8)]"></div>
+          )}
+          {/* Modern Icon Container */}
+          <div className="flex items-center justify-center w-11 h-11 rounded-[16px] transition-all duration-300 bg-transparent group-hover:bg-white/5">
+            <span className={`material-symbols-outlined text-[24px] transition-all duration-300 ${isSearchOpen ? 'scale-110 drop-shadow-[0_0_8px_rgba(254,191,13,0.5)] text-[#FEBF0D]' : 'group-active:scale-90'}`} style={{ fontVariationSettings: isSearchOpen ? '"FILL" 1, "wght" 600' : '"FILL" 0, "wght" 300' }}>search</span>
+          </div>
+          <span className="text-[9px] font-bold uppercase tracking-widest mt-0.5 relative z-10 transition-colors duration-300">Pretraga</span>
         </button>
 
-        {/* Highlighted Post Ad Action */}
-        <div className="relative -top-4">
-            <NavLink 
-              to="/postavi-oglas" 
-              className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] text-slate-950 rounded-full shadow-[0_0_20px_rgba(254,191,13,0.4)] border-4 border-slate-950 transition-transform active:scale-95 animate-pulse-gold"
-            >
-            <span className="material-symbols-outlined text-3xl font-black">add</span>
+        {/* Highlighted Premium Post Ad Button */}
+        <div className="relative -top-6 flex justify-center flex-[1.2] pointer-events-none">
+          {/* Ambient Glow */}
+          <div className="absolute top-4 w-[46px] h-[46px] bg-[#FEBF0D] rounded-full blur-[16px] opacity-40 animate-pulse-gold"></div>
+          
+          <NavLink 
+            to="/postavi-oglas" 
+            className="pointer-events-auto flex items-center justify-center w-[60px] h-[60px] bg-gradient-to-tr from-[#FEBF0D] via-[#F8A010] to-[#E58900] text-[#0A0F14] rounded-full shadow-[0_8px_20px_rgba(254,191,13,0.4),inset_0_2px_6px_rgba(255,255,255,0.5)] border-[5px] border-[#0B101A] ring-1 ring-white/10 transition-all duration-300 active:scale-90 hover:scale-105 group relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none"></div>
+            
+            <span className="material-symbols-outlined text-[36px] font-black group-hover:rotate-90 transition-transform duration-500 relative z-10 drop-shadow-sm">add</span>
           </NavLink>
         </div>
 
+        {/* Poruke */}
         <NavLink 
           to={messagesPath} 
           className={({ isActive }) => 
-            `flex flex-col items-center justify-center w-12 h-12 transition-colors ${isActive ? 'text-secondary' : 'text-white/40 hover:text-white/70'}`
+            `flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 relative group ${isActive ? 'text-[#FEBF0D]' : 'text-slate-400 hover:text-white'}`
           }
         >
-          <span className="material-symbols-outlined text-2xl">chat_bubble</span>
-          <span className="text-[8px] font-black uppercase tracking-widest mt-1">Poruke</span>
+          {({ isActive }) => (
+            <>
+              {/* Active Top Line Indicator */}
+              {isActive && (
+                <div className="absolute top-0 w-1/2 h-[2px] bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] rounded-b-full shadow-[0_0_12px_rgba(254,191,13,0.8)]"></div>
+              )}
+              {/* Modern Icon Container */}
+              <div className="flex items-center justify-center w-11 h-11 rounded-[16px] transition-all duration-300 bg-transparent group-hover:bg-white/5">
+                <span className={`material-symbols-outlined text-[24px] transition-all duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(254,191,13,0.5)] text-[#FEBF0D]' : 'group-active:scale-90'}`} style={{ fontVariationSettings: isActive ? '"FILL" 1, "wght" 600' : '"FILL" 0, "wght" 300' }}>chat_bubble</span>
+              </div>
+              <span className="text-[9px] font-bold uppercase tracking-widest mt-0.5 relative z-10 transition-colors duration-300">Poruke</span>
+            </>
+          )}
         </NavLink>
 
+        {/* Nalog */}
         <NavLink 
           to={dashboardPath} 
           className={({ isActive }) => 
-            `flex flex-col items-center justify-center w-12 h-12 transition-colors ${isActive ? 'text-secondary' : 'text-white/40 hover:text-white/70'}`
+            `flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 relative group ${isActive ? 'text-[#FEBF0D]' : 'text-slate-400 hover:text-white'}`
           }
         >
-          <span className="material-symbols-outlined text-2xl">dashboard</span>
-          <span className="text-[8px] font-black uppercase tracking-widest mt-1">Dashboard</span>
+          {({ isActive }) => (
+            <>
+              {/* Active Top Line Indicator */}
+              {isActive && (
+                <div className="absolute top-0 w-1/2 h-[2px] bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] rounded-b-full shadow-[0_0_12px_rgba(254,191,13,0.8)]"></div>
+              )}
+              {/* Modern Icon Container */}
+              <div className="flex items-center justify-center w-11 h-11 rounded-[16px] transition-all duration-300 bg-transparent group-hover:bg-white/5">
+                <span className={`material-symbols-outlined text-[24px] transition-all duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(254,191,13,0.5)] text-[#FEBF0D]' : 'group-active:scale-90'}`} style={{ fontVariationSettings: isActive ? '"FILL" 1, "wght" 600' : '"FILL" 0, "wght" 300' }}>person</span>
+              </div>
+              <span className="text-[9px] font-bold uppercase tracking-widest mt-0.5 relative z-10 transition-colors duration-300">Nalog</span>
+            </>
+          )}
         </NavLink>
       </div>
     </div>

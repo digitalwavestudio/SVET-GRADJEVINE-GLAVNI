@@ -162,18 +162,6 @@ export default function Navbar() {
           )}
 
           <div className="flex items-center gap-3 lg:gap-4 lg:ml-2">
-            {/* Mobile Postavi Oglas Shortcut */}
-            {!isDesktop && (
-              <Button
-                to="/postavi-oglas"
-                variant="nav-premium"
-                icon="add_circle"
-                className="!min-h-0 !min-w-0 !h-12 !py-1 !px-3 text-[10px] uppercase font-black tracking-wider shadow-md flex items-center justify-center"
-              >
-                Postavi oglas
-              </Button>
-            )}
-
             {isDesktop && (
               <div className="flex items-center gap-3">
                 <Button
@@ -201,21 +189,21 @@ export default function Navbar() {
             {!isDesktop && (
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex flex-col justify-center items-center rounded-[10px] border transition-all duration-300 z-[200] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95 touch-target ${
+                className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 z-[200] focus:outline-none active:scale-95 touch-target ${
                   isOpen 
-                    ? 'bg-secondary/15 border-secondary/50 text-secondary shadow-[0_0_15px_rgba(254,191,13,0.15)]' 
-                    : 'bg-white/[0.02] backdrop-blur-md border-white/10 text-white hover:border-secondary/30 hover:bg-secondary/5'
+                    ? 'text-yellow-500 bg-yellow-500/10' 
+                    : 'text-white hover:bg-white/5'
                 }`}
                 aria-label="Meni"
                 aria-controls="mobile-drawer"
                 aria-expanded={isOpen}
               >
-                <div className="flex flex-col items-end gap-[5px]">
-                  <span className={`h-[2px] bg-current rounded-full transition-all duration-300 ${isOpen ? 'w-6 rotate-45 translate-y-[7px]' : 'w-6'}`}>
+                <div className="relative w-10 h-10 flex items-center justify-center">
+                  <span className={`material-symbols-outlined absolute transition-all duration-300 ${isOpen ? 'rotate-90 opacity-0 scale-50' : 'rotate-0 opacity-100 scale-100'} text-[44px] font-normal leading-none`}>
+                    menu
                   </span>
-                  <span className={`h-[2px] bg-current rounded-full transition-all duration-300 ${isOpen ? 'w-0 opacity-0' : 'w-4'}`}>
-                  </span>
-                  <span className={`h-[2px] bg-current rounded-full transition-all duration-300 ${isOpen ? 'w-6 -rotate-45 -translate-y-[7px]' : 'w-5'}`}>
+                  <span className={`material-symbols-outlined absolute transition-all duration-300 ${isOpen ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'} text-[36px] font-light leading-none`}>
+                    close
                   </span>
                 </div>
               </button>

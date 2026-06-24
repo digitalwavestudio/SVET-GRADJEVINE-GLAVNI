@@ -49,7 +49,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary">
+    <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary overflow-x-hidden">
       <SeoHead 
         title="Početna | Svet Građevine"
         description="Najveća platforma za građevinsku industriju u Srbiji. Poslovi, firme, majstori, mašine, smeštaj i ketering — sve na jednom mestu."

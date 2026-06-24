@@ -127,76 +127,57 @@ export default function CtaSection() {
           <span className="material-symbols-outlined text-[400px] text-white select-none">architecture</span>
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
-        <div className="relative z-10 w-full max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7 space-y-8">
+        <div className="relative z-10 w-full max-w-7xl mx-auto min-w-0">
+          <div className="grid lg:grid-cols-12 gap-12 items-center w-full min-w-0">
+            <div className="lg:col-span-7 space-y-8 min-w-0">
               <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 Pridruži se liderima
               </span>
-              <h1 className="font-headline font-black text-5xl md:text-7xl text-white leading-[1.05] tracking-tighter uppercase relative">
-                POSTANITE DEO <br />
-                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">GRAĐEVINSKE MREŽE</span>
+              <h1 className="font-headline font-black text-xl min-[300px]:text-2xl min-[360px]:text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-[1.05] tracking-tighter uppercase relative w-full min-w-0">
+                POSTANITE DEO <br className="hidden sm:block" />
+                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] block min-[450px]:inline">GRAĐEVINSKE MREŽE</span>
               </h1>
-              <p className="text-slate-400 text-lg md:text-xl max-w-2xl leading-relaxed font-medium">
+              <p className="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed font-medium">
                 Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full">
                 <Button 
                   to="/registracija" 
                   variant="primary" 
                   icon="person_add" 
-                  className="px-10 py-5 text-lg shadow-[0_20px_40px_rgba(254,191,13,0.2)]"
+                  className="px-4 sm:px-10 py-4 sm:py-5 text-sm sm:text-lg shadow-[0_20px_40px_rgba(254,191,13,0.2)] whitespace-normal text-center h-auto min-h-[56px]"
                 >
                   REGISTRUJTE SE BESPLATNO
                 </Button>
                 <Button 
                   to="/postavi-oglas" 
                   variant="secondary" 
-                  className="px-10 py-5 text-lg"
+                  className="px-4 sm:px-10 py-4 sm:py-5 text-sm sm:text-lg whitespace-normal text-center h-auto min-h-[56px]"
                 >
                   PREDAJ OGLAS
-                  <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                  <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform shrink-0">arrow_forward</span>
                 </Button>
               </div>
             </div>
             {/* Visual Grid (Tactical UI) */}
-            <div className="lg:col-span-5 relative w-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="lg:col-span-5 relative w-full min-w-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full min-w-0">
                 {/* Stats Card */}
-                <div className="glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 shadow-2xl h-fit mt-0 sm:mt-6">
+                <div className="col-span-1 sm:col-span-2 glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 shadow-2xl h-fit mt-0 sm:mt-6 w-full">
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
                     <span className="material-symbols-outlined text-6xl text-white">groups</span>
                   </div>
                   <div className="w-10 h-1.5 bg-blue-500 mb-6 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-                  <h3 className="text-3xl font-headline font-black text-white mb-1 leading-none tracking-tight">{dynamicWorkersCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-500 text-[10px] uppercase tracking-[0.2em] font-black">Aktivnih Majstora</p>
+                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1 leading-none tracking-tight">{dynamicWorkersCount.toLocaleString('sr-RS')}+</h3>
+                  <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.2em] font-black break-words">Aktivnih Majstora</p>
                 </div>
-
-                <div className="relative rounded-[10px] overflow-hidden shadow-2xl mt-0 sm:mt-8 border border-white/10 group h-48 md:h-64 bg-slate-900/50">
-                  <OptimizedImage 
-                    src="/assets/blueprint-background.jpg" 
-                    fallbackType="company" 
-                    alt="Pozadina" 
-                    className="w-full h-full object-cover opacity-50 grayscale mix-blend-overlay" 
-                    containerClassName="w-full h-full"
-                  /> 
-                    
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-4 left-4">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                      <span className="text-[8px] font-black text-white uppercase tracking-tighter shadow-sm">Verified Professional</span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Testimonial Card Slider */}
                 <div 
-                  className="col-span-1 sm:col-span-2 glass-card p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(59,130,246,0.25)]"
+                  className="order-first sm:order-none col-span-1 sm:col-span-2 glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(59,130,246,0.25)] w-full"
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-5">
-                    <span className="material-symbols-outlined text-8xl text-white">format_quote</span>
+                  <div className="absolute top-0 right-0 p-4 sm:p-6 opacity-5">
+                    <span className="material-symbols-outlined text-6xl sm:text-8xl text-white">format_quote</span>
                   </div>
                   
                   <div key={currentIndex} className="animate-testimonial-in">
@@ -239,18 +220,18 @@ export default function CtaSection() {
                 </div>
 
                 {/* Secondary Stats */}
-                <div className="glass-card p-8 rounded-[10px] border border-white/10 group hover:border-blue-500/50 transition-all duration-500 shadow-xl relative overflow-hidden">
+                <div className="glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 group hover:border-blue-500/50 transition-all duration-500 shadow-xl relative overflow-hidden w-full">
                   <div className="w-8 h-1 bg-blue-500 mb-6 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
                   <span className="material-symbols-outlined text-blue-500 mb-6 block text-4xl group-hover:scale-110 transition-transform">business_center</span>
-                  <h3 className="text-3xl font-headline font-black text-white mb-1">{dynamicFirmsCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-500 text-[10px] uppercase tracking-widest font-black">Kompanija</p>
+                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1">{dynamicFirmsCount.toLocaleString('sr-RS')}+</h3>
+                  <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words">Kompanija</p>
                 </div>
 
-                <div className="glass-card p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-0 sm:translate-y-6">
+                <div className="glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-0 sm:translate-y-6 w-full">
                   <div className="w-8 h-1 bg-secondary mb-6 rounded-full shadow-[0_0_10px_rgba(254,191,13,0.5)]"></div>
                   <span className="material-symbols-outlined text-secondary mb-6 block text-4xl group-hover:rotate-12 transition-transform">construction</span>
-                  <h3 className="text-3xl font-headline font-black text-white mb-1">{totalAdsCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-500 text-[10px] uppercase tracking-widest font-black">Otvorenih Projekata</p>
+                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1">{totalAdsCount.toLocaleString('sr-RS')}+</h3>
+                  <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words">Otvorenih Projekata</p>
                 </div>
               </div>
             </div>

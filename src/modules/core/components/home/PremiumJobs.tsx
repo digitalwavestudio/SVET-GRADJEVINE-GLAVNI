@@ -103,16 +103,15 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#D4AF37] font-black tracking-[0.2em] uppercase text-sm block">Ekskluzivne Prilike</span>
-                <span className="material-symbols-outlined text-[#D4AF37] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>workspace_premium</span>
+                <span className="text-[#D4AF37] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Ekskluzivne Prilike</span>
+                <span className="material-symbols-outlined text-[#D4AF37] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>workspace_premium</span>
               </div>
-              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#D4AF37_0%,#ffffff_60%)] mb-4">PREMIUM OGLASI</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#D4AF37_0%,#ffffff_60%)] mb-4">PREMIUM PONUDA</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Najbolje rangirani i istaknuti oglasi proverenih kompanija.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>
           <div className="overflow-hidden relative w-full">
-            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#0F1923] to-transparent pointer-events-none z-10 md:hidden"></div>
             {premiumJobs && premiumJobs.length > 0 ? (
             <div className="flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max">
               {Array(4).fill(premiumJobs).flat().map((job: any, idx: number) => {
@@ -143,9 +142,9 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       handleCardClick(url, { job });
                     }
                   }}
-                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 w-[85vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer h-[400px] md:h-[360px]"
+                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative flex flex-col shrink-0 w-[90vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer min-h-[320px] h-auto md:h-[360px]"
                 >
-                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col rounded-[10px] border border-white/5 w-full h-full relative">
+                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col rounded-[10px] border border-white/5 w-full h-full relative flex-1">
                     
                     {/* Top Row: Logo + Header info */}
                     <div className="flex gap-4 md:gap-7 items-start md:items-center w-full min-w-0">
@@ -163,7 +162,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
 
                       {/* Title & Desc */}
                       <div className="flex-1 min-w-0 font-sans text-left">
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 relative z-10 w-full">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between md:gap-2 gap-1.5 mb-1.5 md:mb-1.5 relative z-10 w-full items-start md:flex-wrap">
                           <div className="flex items-center gap-1.5 animate-blink">
                             <span className="material-symbols-outlined text-yellow-500 text-base md:text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                             <span className="text-yellow-500 text-[11px] md:text-sm font-black uppercase tracking-widest">
@@ -176,7 +175,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-1 truncate">
+                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-2 md:line-clamp-1 break-words">
                           {displayTitle}
                         </h3>
                         
@@ -187,7 +186,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                     </div>
 
                     {/* Middle Row: Tags */}
-                    <div className="flex flex-col gap-2 w-full relative z-10 py-10">
+                    <div className="flex flex-col gap-2 w-full relative z-10 py-3 md:py-10">
                       {getFriendlyEngagement(job) && (
                         <div className="flex">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
@@ -230,15 +229,15 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                     {/* Bottom Row: Footer Row */}
                     <div className="flex-1 flex flex-col justify-end">
                       <div className="border-t border-white/5" />
-                      <div className="flex justify-between items-center w-full relative z-10 pt-3 pb-1">
-                      <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-[10px] md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
+                      <div className="flex flex-col-reverse md:flex-row md:justify-between items-start md:items-center w-full relative z-10 pt-3 pb-1 gap-4 md:gap-0">
+                      <button className="w-full md:w-auto justify-center md:justify-start bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-xs md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
                         {job.type === 'company' || job.isPremiumPartner ? 'POGLEDAJ FIRMU' : 'POGLEDAJ OGLAS'}
                         <span className="material-symbols-outlined text-sm hidden md:block">arrow_forward</span>
                       </button>
                       {getFriendlySalary(job) && (
-                        <div className="flex flex-col items-end justify-center min-w-[90px]">
+                        <div className="flex flex-col items-end justify-center min-w-[90px] w-full md:w-auto">
                           <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Zarada</span>
-                          <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-3xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
+                          <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-2xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
                             {getFriendlySalary(job)}
                           </span>
                         </div>

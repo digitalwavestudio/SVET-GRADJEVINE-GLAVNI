@@ -12,10 +12,10 @@ export default function CateringSection({ latestAccommodations = [], latestCater
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#9fcaff] font-black tracking-[0.2em] uppercase text-sm block">Odmor i Stanovanje</span>
-                <span className="material-symbols-outlined text-[#9fcaff] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>hotel</span>
+                <span className="text-[#9fcaff] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Odmor i Stanovanje</span>
+                <span className="material-symbols-outlined text-[#9fcaff] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>hotel</span>
               </div>
-              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#9fcaff_0%,#ffffff_60%)] mb-4">SMEŠTAJ RADNIKA</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#9fcaff_0%,#ffffff_60%)] mb-4">SMEŠTAJ RADNIKA</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Obezbedite kvalitetan smeštaj i odmor vašim timovima blizu gradilišta.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
@@ -27,7 +27,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
             <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-3 md:gap-8 scroll-smooth w-full">
               {latestAccommodations.length > 0 ? latestAccommodations.map((acc: any, idx: number) => (
                <div key={acc.id || idx}
-                 className="bg-surface rounded-[10px] border border-outline-variant/10 overflow-hidden group hover:-translate-y-6 transition-all duration-500 cursor-pointer shrink-0 w-[85vw] md:w-auto"
+                 className="bg-surface rounded-[10px] border border-outline-variant/10 overflow-hidden group hover:-translate-y-6 transition-all duration-500 cursor-pointer shrink-0 w-full md:w-auto"
                  onClick={() => navigate(`/smestaj/${acc.id}`)}
                >
                  <div className="h-64 relative">
@@ -78,7 +78,6 @@ export default function CateringSection({ latestAccommodations = [], latestCater
               </div>
             )}
             </div>
-            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-[#111a22] to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
           <Link 
             to="/postavi-oglas"
@@ -95,10 +94,10 @@ export default function CateringSection({ latestAccommodations = [], latestCater
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#2dd4bf] font-black tracking-[0.2em] uppercase text-sm block">Ishrana na Terenu</span>
-                <span className="material-symbols-outlined text-[#2dd4bf] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>restaurant</span>
+                <span className="text-[#2dd4bf] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Ishrana na Terenu</span>
+                <span className="material-symbols-outlined text-[#2dd4bf] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>restaurant</span>
               </div>
-              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#2dd4bf_0%,#ffffff_60%)] mb-4">KETERING ZA GRADILIŠTA</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#2dd4bf_0%,#ffffff_60%)] mb-4">KETERING ZA GRADILIŠTA</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Topli obroci i redovna ishrana obezbeđeni direktno na radnom mestu.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
@@ -110,7 +109,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
             <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-3 md:gap-8 scroll-smooth w-full">
               {latestCaterings.length > 0 ? latestCaterings.map((cat: any, idx: number) => (
             <div key={cat.id || idx}
-              className="bg-surface-container-low rounded-[10px] border border-white/5 overflow-hidden group hover:border-secondary/30 transition-all duration-500 cursor-pointer shadow-2xl relative shrink-0 w-[85vw] md:w-auto"
+              className="bg-surface-container-low rounded-[10px] border border-white/5 overflow-hidden group hover:border-secondary/30 transition-all duration-500 cursor-pointer shadow-2xl relative shrink-0 w-full md:w-auto"
               onClick={() => navigate(`/ketering/provajder/${cat.id}`)}
             >
               <div className="absolute inset-0 blueprint-bg opacity-20 pointer-events-none"></div>
@@ -189,7 +188,6 @@ export default function CateringSection({ latestAccommodations = [], latestCater
               </div>
             )}
             </div>
-            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
           <Link 
             to="/postavi-oglas"

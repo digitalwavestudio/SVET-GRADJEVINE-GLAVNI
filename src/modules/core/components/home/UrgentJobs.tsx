@@ -33,10 +33,10 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
           <div className="flex justify-between items-start mb-12">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#ff512f] font-black tracking-[0.2em] uppercase text-sm block">Premium Prioritet</span>
-                <span className="material-symbols-outlined text-[#ff512f] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>local_fire_department</span>
+                <span className="text-[#ff512f] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Premium Prioritet</span>
+                <span className="material-symbols-outlined text-[#ff512f] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>bolt</span>
               </div>
-              <h2 className="font-headline text-4xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4">HITNI OGLASI</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4">HITNI OGLASI</h2>
               <p className="text-on-surface-variant text-lg max-w-xl">Ponude i poslovi koji zahtevaju najbržu reakciju na tržištu.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>

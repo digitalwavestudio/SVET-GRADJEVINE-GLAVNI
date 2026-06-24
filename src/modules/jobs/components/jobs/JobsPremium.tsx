@@ -127,8 +127,8 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
             <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
               {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
                 .map((job, idx) => (
-                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-[400px] md:h-[360px] ${isExpanded ? 'w-full' : 'w-[90vw] sm:min-w-[340px] md:min-w-[620px] md:w-[620px]'}`}>
-                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col rounded-[10px] border border-white/5 w-full h-full relative">
+                <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative flex flex-col shrink-0 min-h-[320px] h-auto md:h-[360px] ${isExpanded ? 'w-full' : 'w-[90vw] sm:min-w-[340px] md:min-w-[620px] md:w-[620px]'}`}>
+                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col rounded-[10px] border border-white/5 w-full h-full relative flex-1">
                     
                     {/* Top Row: Logo + Header info */}
                     <div className="flex gap-4 md:gap-7 items-start md:items-center w-full min-w-0">
@@ -150,7 +150,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
 
                       {/* Title & Desc */}
                       <div className="flex-1 min-w-0 font-sans">
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 relative z-10 w-full">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between md:gap-2 gap-1.5 mb-1.5 md:mb-1.5 relative z-10 w-full items-start md:flex-wrap">
                           <div className="flex items-center gap-1.5 animate-blink">
                             <span className="material-symbols-outlined text-yellow-500 text-base md:text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                             <span className="text-yellow-500 text-[11px] md:text-sm font-black uppercase tracking-widest">Premium Oglas</span>
@@ -161,7 +161,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-1 truncate">
+                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-2 md:line-clamp-1 break-words">
                           <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
                             {job.title?.replace(' — ', ' ') || 'Premium Posao'}
                           </Link>
@@ -174,7 +174,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                     </div>
 
                     {/* Middle Row: Tags */}
-                    <div className="flex flex-col gap-2 w-full relative z-10 py-10">
+                    <div className="flex flex-col gap-2 w-full relative z-10 py-3 md:py-10">
                       {getFriendlyEngagement(job) && (
                         <div className="flex">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
@@ -217,15 +217,15 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                     {/* Bottom Row: Footer Row */}
                     <div className="flex-1 flex flex-col justify-end">
                       <div className="border-t border-white/5" />
-                      <div className="flex justify-between items-center w-full relative z-10 pt-3 pb-1">
-                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-[10px] md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
+                      <div className="flex flex-col-reverse md:flex-row md:justify-between items-start md:items-center w-full relative z-10 pt-3 pb-1 gap-4 md:gap-0">
+                        <button className="w-full md:w-auto justify-center md:justify-start bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-xs md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
                           APLICIRAJ
                           <span className="material-symbols-outlined text-sm hidden md:block">arrow_forward</span>
                         </button>
                         {getFriendlySalary(job) && (
-                          <div className="flex flex-col items-end justify-center min-w-[90px]">
+                          <div className="flex flex-col items-end justify-center min-w-[90px] w-full md:w-auto">
                             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Zarada</span>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-3xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-2xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
                               {getFriendlySalary(job)}
                             </span>
                           </div>
