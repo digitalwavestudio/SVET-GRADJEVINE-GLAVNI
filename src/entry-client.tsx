@@ -92,10 +92,10 @@ function Root() {
     };
   }, []);
 
-  return (
+  return persister ? (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={persister ? {
+      persistOptions={{
         persister,
         maxAge: 1000 * 60 * 60 * 24,
         dehydrateOptions: {
@@ -112,7 +112,7 @@ function Root() {
             });
           },
         },
-      } : undefined as any}
+      }}
     >
       <ErrorBoundary>
         <HelmetProvider>
@@ -120,6 +120,14 @@ function Root() {
         </HelmetProvider>
       </ErrorBoundary>
     </PersistQueryClientProvider>
+  ) : (
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
+      </ErrorBoundary>
+    </QueryClientProvider>
   );
 }
 
@@ -134,7 +142,13 @@ if (!rootElement) {
     </StrictMode>
   );
   if (hasSsr) {
-    hydrateRoot(rootElement, app);
+    hydrateRoot(rootElement, app, {
+      onRecoverableError(error) {
+        const err = error as { message?: string; digest?: string };
+        if (err.message?.includes('#418') || err.digest?.includes('418')) return;
+        console.error(error);
+      }
+    });
   } else {
     createRoot(rootElement).render(app);
   }

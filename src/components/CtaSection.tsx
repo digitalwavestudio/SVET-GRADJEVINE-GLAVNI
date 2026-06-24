@@ -130,7 +130,7 @@ export default function CtaSection() {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 min-w-0">
           <div className="grid lg:grid-cols-12 gap-12 items-stretch w-full min-w-0">
             <div className="lg:col-span-7 flex flex-col space-y-8 min-w-0 pt-4 h-full">
-              <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+              <span className="self-start inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 Pridruži se liderima
               </span>
