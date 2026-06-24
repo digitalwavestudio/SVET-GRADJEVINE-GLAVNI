@@ -128,8 +128,8 @@ export default function CtaSection() {
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 min-w-0">
-          <div className="grid lg:grid-cols-12 gap-12 items-start w-full min-w-0">
-            <div className="lg:col-span-7 space-y-8 min-w-0 pt-4">
+          <div className="grid lg:grid-cols-12 gap-12 items-stretch w-full min-w-0">
+            <div className="lg:col-span-7 flex flex-col space-y-8 min-w-0 pt-4 h-full">
               <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 Pridruži se liderima
@@ -141,7 +141,7 @@ export default function CtaSection() {
               <p className="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed font-medium">
                 Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full">
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Button 
                   to="/registracija" 
                   variant="primary" 
