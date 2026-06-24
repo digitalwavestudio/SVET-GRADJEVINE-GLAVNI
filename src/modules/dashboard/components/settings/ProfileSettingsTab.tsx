@@ -37,12 +37,12 @@ export function ProfileSettingsTab({
                 containerClassName="w-full h-full"
               /> 
             ) : (
-              <span className="text-6xl font-black text-slate-950">{formData.name.charAt(0) || 'U'}</span>
+              <span className="text-6xl font-black !text-black">{formData.name.charAt(0) || 'U'}</span>
             )}
           </div>
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-3 -right-3 w-12 h-12 bg-secondary text-slate-950 rounded-[10px] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
+            className="absolute -bottom-3 -right-3 w-12 h-12 bg-secondary !text-black rounded-[10px] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
           >
             <input 
               type="file" 

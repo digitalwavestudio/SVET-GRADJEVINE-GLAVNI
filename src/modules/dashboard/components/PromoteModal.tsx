@@ -101,7 +101,7 @@ export default function PromoteModal({ isOpen, onClose, entityId, collection, is
                       className={`w-full py-3 rounded-[10px] font-black uppercase tracking-widest text-[10px] transition-all ${
                         loading ? 'bg-white/5 text-white/40 cursor-not-allowed' :
                         cantAfford ? 'bg-error/10 text-error cursor-not-allowed border border-error/20' : 
-                        'bg-secondary text-slate-950 hover:bg-yellow-400'
+                        'bg-secondary !text-black hover:bg-yellow-400'
                       }`}
                     >
                       {loading ? 'PRIČEKAJTE' : cantAfford ? 'NEMA SREDSTAVA' : 'KUPI'}

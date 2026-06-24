@@ -54,7 +54,7 @@ export default function ShareModal({ isOpen, onClose, profileUrl }: ShareModalPr
               <button 
                 onClick={handleCopy}
                 className={`px-4 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${
-                  copied ? 'bg-green-500 text-white' : 'bg-secondary text-slate-950 hover:bg-yellow-400'
+                  copied ? 'bg-green-500 text-white' : 'bg-secondary !text-black hover:bg-yellow-400'
                 }`}
               >
                 {copied ? 'KOPIRANO' : 'KOPIRAJ'}

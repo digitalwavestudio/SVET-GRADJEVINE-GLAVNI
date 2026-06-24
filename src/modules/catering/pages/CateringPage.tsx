@@ -241,7 +241,7 @@ export default function CateringPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
+              className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
           <Button 
@@ -476,7 +476,7 @@ const CateringCard = React.memo(({ cat }: { cat: CateringOffer }) => {
              </div>
            )}
            {cat.isPremium && (
-             <div className="bg-secondary text-slate-950 text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 uppercase tracking-widest shadow-lg w-fit">
+             <div className="bg-secondary !text-black text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 uppercase tracking-widest shadow-lg w-fit">
                ⭐ PREMIUM
              </div>
            )}

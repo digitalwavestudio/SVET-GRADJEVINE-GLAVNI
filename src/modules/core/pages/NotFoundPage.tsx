@@ -26,7 +26,7 @@ export default function NotFoundPage() {
                 {/* Overlay UI elements */}
                 <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
                 <div className="absolute top-4 right-4 flex gap-2">
-                  <span className="bg-secondary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-950">Danger Zone</span>
+                  <span className="bg-secondary px-3 py-1 text-[10px] font-black uppercase tracking-widest !text-black">Danger Zone</span>
                 </div>
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="flex items-center gap-4">
@@ -61,7 +61,7 @@ export default function NotFoundPage() {
             
             {/* Action Cluster */}
             <div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 justify-center md:justify-start mt-12">
-              <Link className="w-full sm:w-[220px] px-4 py-4 bg-secondary text-slate-950 font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2 hover:bg-yellow-400 transition-all active:scale-95 rounded" to="/">
+              <Link className="w-full sm:w-[220px] px-4 py-4 bg-secondary !text-black font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2 hover:bg-yellow-400 transition-all active:scale-95 rounded" to="/">
                 <span className="material-symbols-outlined text-xl">home</span>
                 Početna
               </Link>

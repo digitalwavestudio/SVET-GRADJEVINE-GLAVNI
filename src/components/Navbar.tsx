@@ -130,34 +130,24 @@ export default function Navbar() {
             </div>
           )}
 
-          {!isBot && isDesktop && (
+          {!isBot && isDesktop && user && (
             <div className="flex items-center justify-center min-w-[60px] mx-4">
-              {user ? (
-                <Link
-                  to="/kontrolna-tabla"
-                  className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden"
-                  title="Kontrolna Tabla"
-                >
-                  {profileSrc && !imgError ? (
-                    <img
-                      src={profileSrc}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                      onError={() => setImgError(true)}
-                    />
-                  ) : (
-                    <span className="text-sm font-black text-slate-950">{userInitial}</span>
-                  )}
-                </Link>
-              ) : (
-                <Button
-                  to="/prijava"
-                  variant="ghost"
-                  className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-surface-container-low border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-secondary hover:bg-secondary/10 shadow-lg"
-                  title="Prijavi se"
-                  icon="person"
-                />
-              )}
+              <Link
+                to="/kontrolna-tabla"
+                className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden"
+                title="Kontrolna Tabla"
+              >
+                {profileSrc && !imgError ? (
+                  <img
+                    src={profileSrc}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
+                  <span className="text-sm font-black !text-black">{userInitial}</span>
+                )}
+              </Link>
             </div>
           )}
 
@@ -284,7 +274,7 @@ export default function Navbar() {
             <Link
               to="/postavi-oglas"
               onClick={() => setIsOpen(false)}
-              className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] text-slate-950 rounded-[12px] text-center font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10"
+              className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-[12px] text-center font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10"
             >
               <span className="material-symbols-outlined text-sm">add_circle</span>
               Postavi Oglas

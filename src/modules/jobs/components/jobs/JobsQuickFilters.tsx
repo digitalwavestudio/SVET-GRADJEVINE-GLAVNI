@@ -30,7 +30,7 @@ export const JobsQuickFilters: React.FC<QuickFiltersProps> = ({
           <button 
             key={loc.slug}
             onClick={() => toggleLocation(loc.slug)}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${selectedLocations.includes(loc.slug) ? 'bg-secondary text-slate-950 border-secondary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${selectedLocations.includes(loc.slug) ? 'bg-secondary !text-black border-secondary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
           >
             {loc.name}
           </button>
@@ -40,7 +40,7 @@ export const JobsQuickFilters: React.FC<QuickFiltersProps> = ({
           <button 
             key={sector.slug}
             onClick={() => handleSectorChange(selectedSector === sector.slug ? null : sector.slug)}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${selectedSector === sector.slug ? 'bg-secondary text-slate-950 border-secondary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${selectedSector === sector.slug ? 'bg-secondary !text-black border-secondary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
           >
             {sector.name.split(' (')[0]}
           </button>

@@ -91,7 +91,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   ].map((feature, i) => (
                     <div key={i} className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-[10px]">
                       <div className="w-6 h-6 bg-secondary rounded-full flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined text-slate-950 text-xs font-black">check</span>
+                        <span className="material-symbols-outlined !text-black text-xs font-black">check</span>
                       </div>
                       <span className="text-[10px] font-black text-white uppercase tracking-widest">{feature}</span>
                     </div>
@@ -102,7 +102,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                   <button 
                     onClick={handleUpgradeRequest}
                     disabled={isLoading}
-                    className="w-full py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3"
+                    className="w-full py-5 bg-secondary !text-black font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3"
                   >
                     {isLoading ? 'OBRADA...' : `UNAPREDI NALOG ZA ${premiumPartnerPkg.price}`}
                   </button>
@@ -132,7 +132,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 <div className="mt-10 flex flex-col items-center">
                    <button 
                      onClick={onClose}
-                     className="w-full py-5 bg-white text-slate-950 font-black rounded-[10px] text-xs uppercase tracking-[0.2em] shadow-xl"
+                     className="w-full py-5 bg-white !text-black font-black rounded-[10px] text-xs uppercase tracking-[0.2em] shadow-xl"
                    >
                      RAZUMEM, ZATVORI I IDI NA PROFIL
                    </button>

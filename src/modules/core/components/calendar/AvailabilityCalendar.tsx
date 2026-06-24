@@ -281,7 +281,7 @@ export function AvailabilityCalendar({
             </div>
             <button 
               onClick={handleBookClick}
-              className="w-full md:w-auto px-6 py-3 bg-secondary text-slate-950 font-black text-[10px] uppercase tracking-widest rounded-[6px] hover:bg-yellow-400 transition-colors shadow-[0_0_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2"
+              className="w-full md:w-auto px-6 py-3 bg-secondary !text-black font-black text-[10px] uppercase tracking-widest rounded-[6px] hover:bg-yellow-400 transition-colors shadow-[0_0_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2"
             >
               <MessageSquare size={14} />
               Pošalji Upit za Ove Datume

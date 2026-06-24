@@ -16,7 +16,7 @@ export default function PartnerHubUI({ user }: PartnerHubUIProps) {
       <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] rounded-[10px] p-10 relative overflow-hidden shadow-[0_0_50px_rgba(254,191,13,0.15)] flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/20 rounded-full blur-3xl"></div>
         <div className="relative z-10 w-full md:w-auto">
-          <h3 className="text-slate-950 font-black text-4xl uppercase tracking-tighter mb-2">PARTNER HUB</h3>
+          <h3 className="!text-black font-black text-4xl uppercase tracking-tighter mb-2">PARTNER HUB</h3>
           <p className="text-slate-900/80 font-bold text-xs tracking-widest uppercase">Klijenti dobijaju 30% popusta, a ti 20% od svake uplate!</p>
         </div>
         <div className="flex items-center gap-2 bg-[#0A0F14] p-2 rounded-[10px] w-full md:w-auto relative z-10">

@@ -167,7 +167,7 @@ export default function CateringDetailPage() {
                     KETERING SERVIS
                   </span>
                   {catering.isPremium && (
-                    <span className="bg-[#ffad3a] text-slate-950 px-3 py-1 rounded-full text-[10px] font-black tracking-widest flex items-center gap-1">
+                    <span className="bg-[#ffad3a] !text-black px-3 py-1 rounded-full text-[10px] font-black tracking-widest flex items-center gap-1">
                       <Star size={10} fill="currentColor" /> PREMIUM
                     </span>
                   )}

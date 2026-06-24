@@ -134,10 +134,10 @@ export function MarketingTab() {
 
           <button
             onClick={generateSitemap}
-            className="mt-8 w-full bg-blue-500 hover:bg-blue-400 text-slate-950 font-black py-5 rounded-[10px] transition-all text-xs tracking-widest uppercase flex flex-col items-center gap-1 shadow-lg shadow-blue-500/20"
+            className="mt-8 w-full bg-blue-500 hover:bg-blue-400 !text-black font-black py-5 rounded-[10px] transition-all text-xs tracking-widest uppercase flex flex-col items-center gap-1 shadow-lg shadow-blue-500/20"
           >
             <span>PREUZMI SITEMAP.XML</span>
-            <span className="text-[9px] text-slate-950/60 font-bold tracking-widest">
+            <span className="text-[9px] !text-black/60 font-bold tracking-widest">
               ZA GOOGLE SEARCH CONSOLE
             </span>
           </button>
@@ -234,7 +234,7 @@ export function MarketingTab() {
           <button
             onClick={handleUpdatePromo}
             disabled={updateConfigMutation.isPending || configLoading}
-            className="w-full mt-8 bg-secondary text-slate-950 font-black py-5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(254,191,13,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-8 bg-secondary !text-black font-black py-5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(254,191,13,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="material-symbols-outlined text-lg">save</span>
             {updateConfigMutation.isPending

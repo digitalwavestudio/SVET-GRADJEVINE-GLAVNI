@@ -33,7 +33,7 @@ export function Step2Marketplace({ nextStep, prevStep }: { nextStep?: () => void
                <button
                  type="button"
                  onClick={() => setValue('marketCondition', 'novo')}
-                 className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('marketCondition') === 'novo' ? 'bg-secondary border-secondary text-slate-950 shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
+                 className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('marketCondition') === 'novo' ? 'bg-secondary border-secondary !text-black shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
                >
                  <span className="material-symbols-outlined text-2xl">new_releases</span>
                  <span className="text-[10px] font-black uppercase tracking-widest">Novo</span>
@@ -41,7 +41,7 @@ export function Step2Marketplace({ nextStep, prevStep }: { nextStep?: () => void
                <button
                  type="button"
                  onClick={() => setValue('marketCondition', 'polovno')}
-                 className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('marketCondition') === 'polovno' ? 'bg-secondary border-secondary text-slate-950 shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
+                 className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('marketCondition') === 'polovno' ? 'bg-secondary border-secondary !text-black shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
                >
                  <span className="material-symbols-outlined text-2xl">history</span>
                  <span className="text-[10px] font-black uppercase tracking-widest">Polovno</span>

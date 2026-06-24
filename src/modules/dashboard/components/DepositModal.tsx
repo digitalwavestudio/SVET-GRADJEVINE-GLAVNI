@@ -99,7 +99,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
               <button 
                 onClick={handleClose}
-                className="w-full py-4 rounded-[10px] bg-secondary text-slate-950 font-black uppercase tracking-widest hover:bg-yellow-400 transition-all"
+                className="w-full py-4 rounded-[10px] bg-secondary !text-black font-black uppercase tracking-widest hover:bg-yellow-400 transition-all"
               >
                 Razumeo sam / U redu
               </button>
@@ -116,7 +116,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
               </div>
 
               <div className="mb-6 flex p-1 bg-white/5 rounded-[12px]">
-                <div className="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 bg-secondary text-slate-950 shadow-md transform scale-[1.02]">
+                <div className="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 bg-secondary !text-black shadow-md transform scale-[1.02]">
                   <span className="material-symbols-outlined text-[16px]">receipt_long</span> Faktura / uplatnica
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                     onClick={() => setAmount(preset)}
                     className={`py-3 rounded-[10px] border font-black tracking-widest transition-all ${
                       amount === preset 
-                        ? 'bg-secondary text-slate-950 border-secondary' 
+                        ? 'bg-secondary !text-black border-secondary' 
                         : 'bg-white/5 text-white border-white/10 hover:border-white/20 hover:bg-white/10'
                     }`}
                   >
@@ -156,7 +156,7 @@ export default function DepositModal({ isOpen, onClose }: DepositModalProps) {
                 className={`w-full py-4 rounded-[10px] font-black uppercase tracking-widest transition-all ${
                   loading || amount < 500
                     ? 'bg-white/10 text-white/40 cursor-not-allowed'
-                    : 'bg-secondary text-slate-950 hover:bg-yellow-400'
+                    : 'bg-secondary !text-black hover:bg-yellow-400'
                 }`}
               >
                 {loading ? 'PRIČEKAJTE...' : `GENERIŠI UPLATNICU ZA ${amount.toLocaleString()} RSD`}

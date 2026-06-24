@@ -18,7 +18,7 @@ export function DashboardAdActions({ ad, size = 'md', collection, onPromote, onA
     <>
       <button 
         onClick={() => onPromote(ad.id, collection, false)}
-        className={`${btnSize} rounded-[10px] flex items-center justify-center transition-all ${ad.isPremium ? 'bg-secondary text-slate-950 font-bold' : 'bg-white/5 text-secondary border border-white/10 hover:bg-secondary hover:text-slate-950'}`}
+        className={`${btnSize} rounded-[10px] flex items-center justify-center transition-all ${ad.isPremium ? 'bg-secondary !text-black font-bold' : 'bg-white/5 text-secondary border border-white/10 hover:bg-secondary hover:!text-black'}`}
         title={ad.isPremium ? 'Premium oglas' : 'Izdvoj kao Premium'}
       >
         <span className={`material-symbols-outlined ${iconSize}`} style={ad.isPremium ? { fontVariationSettings: "'FILL' 1" } : {}}>hotel_class</span>

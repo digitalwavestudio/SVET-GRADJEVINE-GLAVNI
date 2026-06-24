@@ -41,7 +41,7 @@ export function MyAdsHeader({
           </div>
         </motion.div>
 
-        <Link to="/postavi-oglas" className="bg-secondary text-slate-950 font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase flex items-center gap-3 shadow-sm shadow-secondary/10">
+        <Link to="/postavi-oglas" className="bg-secondary !text-black font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase flex items-center gap-3 shadow-sm shadow-secondary/10">
           <span className="material-symbols-outlined">add</span>
           NOVI OGLAS
         </Link>
@@ -61,13 +61,13 @@ export function MyAdsHeader({
         <div className="flex bg-neutral-900/40 p-1 border border-white/5 rounded-[10px] gap-1 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
             <button 
               onClick={() => setStatusFilter('all')}
-              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'all' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
+              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'all' ? 'bg-secondary !text-black shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
             >
               Svi
             </button>
             <button 
               onClick={() => setStatusFilter('active')}
-              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'active' ? 'bg-secondary text-slate-950 shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
+              className={`flex-1 sm:flex-initial px-3 py-2 sm:px-5 sm:py-3 rounded-[8px] text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === 'active' ? 'bg-secondary !text-black shadow-md shadow-secondary/10' : 'text-white/40 hover:text-white/80'}`}
             >
               Aktivni
             </button>

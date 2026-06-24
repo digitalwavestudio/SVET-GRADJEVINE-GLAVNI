@@ -62,7 +62,7 @@ export function Step3({
                               : [...current, sub];
                             setValue('companySubCats', next);
                           }}
-                          className={`px-6 py-3 rounded-[10px] border-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isSelected ? 'bg-secondary border-secondary text-slate-950 shadow-[0_0_20px_rgba(254,191,13,0.3)]' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                          className={`px-6 py-3 rounded-[10px] border-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${isSelected ? 'bg-secondary border-secondary !text-black shadow-[0_0_20px_rgba(254,191,13,0.3)]' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
                         >
                           {sub}
                         </button>
@@ -154,7 +154,7 @@ export function Step3({
                         <button 
                           type="button"
                           onClick={() => document.getElementById('portfolio-upload')?.click()}
-                          className="px-6 py-3 bg-secondary text-slate-950 font-black rounded-[10px] text-[10px] uppercase tracking-widest hover:bg-yellow-400 transition-all"
+                          className="px-6 py-3 bg-secondary !text-black font-black rounded-[10px] text-[10px] uppercase tracking-widest hover:bg-yellow-400 transition-all"
                         >
                           DODAJ SLIKE PROJEKATA
                         </button>

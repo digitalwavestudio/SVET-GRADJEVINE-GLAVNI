@@ -32,12 +32,12 @@ export function CompanyHeroSection({ company, isTrackedInSession }: CompanyHeroS
               {company.logo ? (
                 <img width="800" height="600" decoding="async" src={company.logo} alt="Logo" className="w-full h-full object-contain" loading="lazy" />
               ) : (
-                <span className="text-4xl md:text-6xl font-black text-slate-950">{company.name?.charAt(0) || 'C'}</span>
+                <span className="text-4xl md:text-6xl font-black !text-black">{company.name?.charAt(0) || 'C'}</span>
               )}
             </div>
             {company.isPremiumPartner && (
               <div className="absolute -top-3 -right-3 w-10 h-10 bg-secondary rounded-full border-4 border-[#0F1923] flex items-center justify-center shadow-lg" title="Premium Partner">
-                <span className="material-symbols-outlined text-slate-950 font-black text-sm">workspace_premium</span>
+                <span className="material-symbols-outlined !text-black font-black text-sm">workspace_premium</span>
               </div>
             )}
           </div>
@@ -84,7 +84,7 @@ export function CompanyHeroSection({ company, isTrackedInSession }: CompanyHeroS
           <div className="hidden lg:block pb-5">
              <a 
                href={`tel:${company.phone}`}
-               className="flex h-16 items-center gap-4 bg-secondary text-slate-950 px-8 rounded-[10px] font-black text-xs tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all hover:scale-105 active:scale-95 shadow-2xl"
+               className="flex h-16 items-center gap-4 bg-secondary !text-black px-8 rounded-[10px] font-black text-xs tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all hover:scale-105 active:scale-95 shadow-2xl"
              >
                <span className="material-symbols-outlined font-black">call</span>
                KONTAKTIRAJ FIRMU

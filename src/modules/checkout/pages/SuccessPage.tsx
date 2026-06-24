@@ -53,7 +53,7 @@ export default function SuccessPage() {
                 </p>
                 <button 
                   onClick={() => navigate('/dashboard')}
-                  className="w-full bg-secondary text-slate-950 font-black py-4 rounded-[10px] uppercase tracking-widest text-xs hover:bg-yellow-400 transition-all"
+                  className="w-full bg-secondary !text-black font-black py-4 rounded-[10px] uppercase tracking-widest text-xs hover:bg-yellow-400 transition-all"
                 >
                   Nazad na Dashboard
                 </button>

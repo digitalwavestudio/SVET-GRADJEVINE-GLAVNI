@@ -115,7 +115,7 @@ export function BroadcastTab() {
              <button 
                onClick={handleSend}
                disabled={isSending}
-               className="w-full mt-8 bg-blue-500 text-slate-950 font-black py-5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-white disabled:opacity-50 transition-all flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.3)] cursor-pointer"
+               className="w-full mt-8 bg-blue-500 !text-black font-black py-5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-white disabled:opacity-50 transition-all flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.3)] cursor-pointer"
              >
                 <span className="material-symbols-outlined text-lg">{isSending ? 'hourglass_empty' : 'rocket_launch'}</span>
                 {isSending ? 'SLANJE U TOKU...' : 'POŠALJI BROADCAST'}

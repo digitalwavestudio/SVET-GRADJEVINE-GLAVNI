@@ -191,7 +191,7 @@ export default function ApplicationsPage() {
                               </button>
                             </div>
                             {col.id === 'accepted' && (
-                              <button className="w-full py-2 bg-white/5 rounded-[10px] flex items-center justify-center gap-2 hover:bg-secondary hover:text-slate-950 text-secondary text-[9px] font-bold transition-all uppercase tracking-widest border border-white/5" onClick={async () => {
+                              <button className="w-full py-2 bg-white/5 rounded-[10px] flex items-center justify-center gap-2 hover:bg-secondary hover:!text-black text-secondary text-[9px] font-bold transition-all uppercase tracking-widest border border-white/5" onClick={async () => {
                                  if (!user) return;
                                  try {
                                  await startConversation(application.applicantId, { id: application.jobId, type: 'job', title: application.jobTitle || 'Nepoznata pozicija' }, 'Zdravo, želimo da vas obavestimo da je vaša prijava za poziciju prihvaćena! Pozdrav.');
@@ -205,7 +205,7 @@ export default function ApplicationsPage() {
                               </button>
                             )}
                             <div className="relative group/menu w-full">
-                              <button className="w-full py-2 bg-white/5 rounded-[10px] flex items-center justify-center gap-2 hover:bg-secondary hover:text-slate-950 text-xs font-bold transition-all uppercase tracking-widest text-white/60">
+                              <button className="w-full py-2 bg-white/5 rounded-[10px] flex items-center justify-center gap-2 hover:bg-secondary hover:!text-black text-xs font-bold transition-all uppercase tracking-widest text-white/60">
                                 Promeni status <span className="material-symbols-outlined text-sm">expand_more</span>
                               </button>
                               <div className="absolute bottom-full left-0 mb-2 w-full bg-[#141B23] border border-white/10 rounded-[10px] shadow-2xl opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-50 p-2">

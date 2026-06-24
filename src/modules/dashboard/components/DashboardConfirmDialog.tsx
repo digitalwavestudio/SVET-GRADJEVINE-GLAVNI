@@ -65,7 +65,7 @@ export function DashboardConfirmDialog({
               <button
                 type="button"
                 onClick={async () => { await onConfirm(); }}
-                className={`px-5 py-3 rounded-[8px] text-[10px] font-black uppercase tracking-widest transition-all ${isDanger ? 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/10' : 'bg-secondary hover:bg-yellow-400 text-slate-950 shadow-lg shadow-secondary/10'}`}
+                className={`px-5 py-3 rounded-[8px] text-[10px] font-black uppercase tracking-widest transition-all ${isDanger ? 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/10' : 'bg-secondary hover:bg-yellow-400 !text-black shadow-lg shadow-secondary/10'}`}
               >
                 {actionLabel}
               </button>

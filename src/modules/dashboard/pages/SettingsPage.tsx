@@ -269,7 +269,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection(section.id as "profile" | "cv" | "applications")}
                   className={`w-full flex items-center gap-4 px-6 py-4 rounded-[10px] transition-all text-[10px] font-black tracking-widest uppercase ${
                     activeSection === section.id 
-                      ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
+                      ? 'bg-secondary !text-black shadow-lg shadow-secondary/10' 
                       : 'text-white/40 hover:text-white hover:bg-white/5'
                   }`}
                 >
@@ -339,7 +339,7 @@ export default function SettingsPage() {
                 <button 
                   onClick={handleSave}
                   disabled={isSaving || user?.syncStatus === 'syncing'}
-                  className="w-full md:w-auto bg-secondary text-slate-950 font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full md:w-auto bg-secondary !text-black font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                   {isSaving && <Spinner className="w-4 h-4" />}
                   {isSaving ? 'ČUVANJE...' : user?.syncStatus === 'syncing' ? 'SINHRONIZACIJA...' : 'SAČUVAJ IZMENE'}

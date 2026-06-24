@@ -149,7 +149,7 @@ const renderCalculator = () => {
 };
 
   return (
-    <div className="bg-[#070B0F] min-h-screen text-white font-sans selection:bg-secondary selection:text-slate-950">
+    <div className="bg-[#070B0F] min-h-screen text-white font-sans selection:bg-secondary selection:!text-black">
       <SeoHead 
         title="Građevinski Kalkulatori | Svet Građevine"
         description="Besplatni kalkulatori za građevinu: izračunajte resurse za fasadu, zidanje, keramiku, beton, gips, moleraj, podove, krov, behaton i hidroizolaciju."
@@ -185,7 +185,7 @@ const renderCalculator = () => {
                   onClick={() => setActiveTab(tab)}
                   className={`px-8 py-4 rounded-[10px] text-xs font-black tracking-[0.2em] uppercase transition-all ${
                     activeTab === tab 
-                      ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/20 scale-105' 
+                      ? 'bg-secondary !text-black shadow-lg shadow-secondary/20 scale-105' 
                       : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
                   }`}
                 >
@@ -345,7 +345,7 @@ const renderCalculator = () => {
                     <button
                       type="submit"
                       disabled={rfqSubmitting}
-                      className="w-full bg-secondary hover:bg-yellow-500 text-slate-950 font-black text-xs tracking-widest uppercase py-4 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-full bg-secondary hover:bg-yellow-500 !text-black font-black text-xs tracking-widest uppercase py-4 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       {rfqSubmitting ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

@@ -78,7 +78,7 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
                       }`}
                     >
                       {pkg.popular && (
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-slate-950 text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">NAJPOPULARNIJE</span>
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary !text-black text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">NAJPOPULARNIJE</span>
                       )}
                       <div className="text-3xl font-black text-white mb-1">{pkg.ads}</div>
                       <div className="text-[9px] font-black text-white/40 uppercase tracking-widest mb-4">OGLASA</div>
@@ -92,7 +92,7 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
                   <button 
                     disabled={!selectedPackage}
                     onClick={() => setStep('payment')}
-                    className="w-full py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all shadow-lg shadow-secondary/20 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full py-5 bg-secondary !text-black font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all shadow-lg shadow-secondary/20 disabled:opacity-50 disabled:hover:scale-100"
                   >
                     NASTAVI NA PLAĆANJE
                   </button>
@@ -138,7 +138,7 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
                 <button 
                   onClick={handlePurchase}
                   disabled={isLoading}
-                  className="w-full py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3"
+                  className="w-full py-5 bg-secondary !text-black font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all shadow-lg shadow-secondary/20 flex items-center justify-center gap-3"
                 >
                   {isLoading ? (
                     <>
@@ -169,7 +169,7 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
 
                 <button 
                   onClick={onClose}
-                  className="w-full py-5 bg-white text-slate-950 font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all"
+                  className="w-full py-5 bg-white !text-black font-black rounded-[10px] text-xs uppercase tracking-[0.2em] hover:scale-[1.02] transition-all"
                 >
                   NAZAD NA KOMANDNU TABLU
                 </button>

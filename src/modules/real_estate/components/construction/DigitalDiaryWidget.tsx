@@ -20,7 +20,7 @@ export function DigitalDiaryWidget({
          <h2 className="text-lg font-black uppercase tracking-widest">
            DIGITALNI DNEVNIK I OBRAČUN
          </h2>
-         <button className="px-5 py-2.5 bg-secondary text-slate-950 hover:bg-yellow-400 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg shadow-secondary/10">
+         <button className="px-5 py-2.5 bg-secondary !text-black hover:bg-yellow-400 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg shadow-secondary/10">
            <span className="material-symbols-outlined text-[16px]">download</span>
            <span className="hidden sm:inline">IZVEZI ZA KNJIGOVOĐU</span>
          </button>

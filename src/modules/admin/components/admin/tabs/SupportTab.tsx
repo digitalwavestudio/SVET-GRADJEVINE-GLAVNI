@@ -110,7 +110,7 @@ export function SupportTab(_props: SupportTabProps) {
                   <button className="px-4 py-2 bg-white/5 rounded-[10px] text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-colors">ZATVORI TIKET</button>
                   <button className="px-4 py-2 bg-white/5 rounded-[10px] text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-colors">PROSLEDI FINANSIJAMA</button>
                </div>
-               <button className="bg-secondary text-slate-950 font-black px-6 py-3 rounded-[10px] hover:bg-yellow-400 transition-all text-xs tracking-widest uppercase flex items-center gap-2">
+               <button className="bg-secondary !text-black font-black px-6 py-3 rounded-[10px] hover:bg-yellow-400 transition-all text-xs tracking-widest uppercase flex items-center gap-2">
                   <span className="material-symbols-outlined text-lg">send</span>
                   POŠALJI ODGOVOR
                </button>

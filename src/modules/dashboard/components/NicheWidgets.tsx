@@ -43,7 +43,7 @@ export default function NicheWidgets({ niche, roleData }: WidgetProps) {
           <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">DNEVNI MENI MENADŽER</h3>
           <button 
             onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 bg-secondary/10 text-secondary text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-secondary hover:text-slate-950 transition-all"
+            className="px-4 py-2 bg-secondary/10 text-secondary text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-secondary hover:!text-black transition-all"
           >
             {isEditing ? 'SAČUVAJ' : 'PREGLEDAJ'}
           </button>

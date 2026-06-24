@@ -66,7 +66,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                        <span className="text-xs text-on-surface-variant block uppercase">Cena</span>
                        <span className="text-xl font-black">{acc.price ? `€${acc.price} / noć` : 'Po upitu'}</span>
                      </div>
-                     <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] text-slate-950 px-6 py-2 rounded-[10px] font-bold uppercase hover:from-[#fb8c00] hover:to-[#ffeb3b] hover:shadow-lg hover:shadow-secondary/20 transition-all duration-300">Detalji</button>
+                     <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] !text-black px-6 py-2 rounded-[10px] font-bold uppercase hover:from-[#fb8c00] hover:to-[#ffeb3b] hover:shadow-lg hover:shadow-secondary/20 transition-all duration-300">Detalji</button>
                    </div>
                  </div>
                </div>
@@ -81,7 +81,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
           </div>
           <Link 
             to="/postavi-oglas"
-            className="w-full mt-8 bg-secondary text-slate-950 font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA SMEŠTAJ
           </Link>
@@ -141,7 +141,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                     <h3 className="text-xl sm:text-2xl font-black text-white uppercase leading-tight group-hover:text-secondary transition-colors line-clamp-2">{cat.title || cat.companyName}</h3>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-secondary to-orange-500 text-slate-950 px-4 py-3 rounded-[10px] -mt-8 relative shadow-xl shadow-orange-500/20 border-4 border-surface-container-low flex flex-col items-center group-hover:-translate-y-2 transition-transform duration-300 shrink-0">
+                  <div className="bg-gradient-to-br from-secondary to-orange-500 !text-black px-4 py-3 rounded-[10px] -mt-8 relative shadow-xl shadow-orange-500/20 border-4 border-surface-container-low flex flex-col items-center group-hover:-translate-y-2 transition-transform duration-300 shrink-0">
                     <span className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-0.5">Od</span>
                     <span className="text-xl font-black leading-none">{cat.price || cat.mealPrice || '---'}</span>
                     <span className="text-[10px] font-bold mt-0.5">RSD</span>
@@ -174,7 +174,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
                     <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                     <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Profesionalni Ketering</span>
                   </div>
-                  <div className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center group-hover:bg-secondary group-hover:text-slate-950 transition-colors border border-white/10">
+                  <div className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center group-hover:bg-secondary group-hover:!text-black transition-colors border border-white/10">
                     <span className="material-symbols-outlined text-sm">arrow_forward</span>
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
           </div>
           <Link 
             to="/postavi-oglas"
-            className="w-full mt-8 bg-secondary text-slate-950 font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA KETERING
           </Link>

@@ -35,7 +35,7 @@ export function Step2Company({ nextStep, prevStep }: { nextStep?: () => void; pr
               onClick={() => handleCompanyMainCatToggle(cat.id)}
               className={`flex items-center gap-4 p-6 rounded-[10px] border-2 text-left transition-all duration-300 ${formData.companyMainCats?.includes(cat.id) ? 'border-secondary bg-secondary/10' : 'border-white/5 bg-white/5 hover:border-white/20'}`}
             >
-              <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center border ${formData.companyMainCats?.includes(cat.id) ? 'bg-secondary border-secondary text-slate-950' : 'bg-surface-container-high border-white/10 text-secondary'}`}>
+              <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center border ${formData.companyMainCats?.includes(cat.id) ? 'bg-secondary border-secondary !text-black' : 'bg-surface-container-high border-white/10 text-secondary'}`}>
                 <span className="material-symbols-outlined text-xl">{cat.icon}</span>
               </div>
               <span className={`text-sm font-black uppercase tracking-tight font-headline ${formData.companyMainCats?.includes(cat.id) ? 'text-secondary' : 'text-white'}`}>{cat.name}</span>

@@ -221,7 +221,7 @@ export default function JobDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] font-sans text-white selection:bg-yellow-500 selection:text-slate-950 pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#0B0F19] font-sans text-white selection:bg-yellow-500 selection:!text-black pb-20 md:pb-0">
       <SeoHead
         title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : `${displayTitle} ${jobData.location ? `- ${jobData.location}` : ''} - Svet Građevine`}
         description={cleanDescription.substring(0, 160)}
@@ -534,7 +534,7 @@ export default function JobDetailsPage() {
                         }
                       }
                     }}
-                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-slate-950 h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20"
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 !text-black h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20"
                   >
                     <Phone size={18} />
                     {showPhone ? `Tel: ${phoneNumber}` : 'Prikaži Telefon'}

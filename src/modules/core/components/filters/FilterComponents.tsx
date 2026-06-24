@@ -25,7 +25,7 @@ export const FilterSidebar = ({ children }: { children: React.ReactNode }) => {
           <div className="pt-4 border-t border-white/5 bg-slate-950">
             <button
               onClick={() => setIsOpen(false)}
-              className="w-full py-4 bg-secondary text-slate-950 font-black rounded-[10px] uppercase tracking-widest text-xs"
+              className="w-full py-4 bg-secondary !text-black font-black rounded-[10px] uppercase tracking-widest text-xs"
             >
               Prikaži rezultate
             </button>
@@ -138,7 +138,7 @@ export const FilterSelect = ({ className, value, onChange, children, ...props }:
           <div
             key={i}
             onClick={() => handleSelect(opt.value)}
-            className={`px-4 py-3.5 text-base cursor-pointer transition-colors ${opt.value == value ? 'bg-secondary text-slate-950 font-black' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
+            className={`px-4 py-3.5 text-base cursor-pointer transition-colors ${opt.value == value ? 'bg-secondary !text-black font-black' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
           >
             {opt.label}
           </div>
@@ -209,7 +209,7 @@ export const FilterCheckbox = ({ label, checked, onChange }: { label: string, ch
         className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer" 
         type="checkbox" 
       />
-      <span className="material-symbols-outlined absolute text-base text-slate-950 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300">check</span>
+      <span className="material-symbols-outlined absolute text-base !text-black opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300">check</span>
     </div>
     <span className={`text-base transition-colors duration-300 ${checked ? 'text-white font-bold' : 'text-white/50 group-hover:text-white/90'}`}>{label}</span>
   </label>
@@ -286,7 +286,7 @@ export const SortingBar = ({ currentSort, options, onChange }: {
           onClick={() => onChange(opt.value)}
           className={`flex-1 sm:flex-initial px-3 py-2 sm:px-4 sm:py-2 rounded-sm text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${
             currentSort === opt.value 
-            ? 'bg-secondary text-slate-950 shadow-sm shadow-secondary/20' 
+            ? 'bg-secondary !text-black shadow-sm shadow-secondary/20' 
             : 'text-white/40 hover:bg-white/5 hover:text-white/60'
           }`}
         >
@@ -312,10 +312,10 @@ export const FilterCTA = ({
 }) => (
   <div className="bg-gradient-to-br from-secondary to-yellow-600 p-8 rounded-[10px] shadow-2xl relative overflow-hidden group mt-6 border border-white/5">
     <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-      <span className="material-symbols-outlined text-9xl text-slate-950">{icon}</span>
+      <span className="material-symbols-outlined text-9xl !text-black">{icon}</span>
     </div>
-    <h3 className="text-slate-950 font-black text-xl uppercase leading-tight mb-3 relative z-10 italic tracking-tight">{title}</h3>
-    <p className="text-slate-950/70 text-[10px] font-bold mb-6 relative z-10 leading-relaxed uppercase tracking-wide">{description}</p>
+    <h3 className="!text-black font-black text-xl uppercase leading-tight mb-3 relative z-10 italic tracking-tight">{title}</h3>
+    <p className="!text-black/70 text-[10px] font-bold mb-6 relative z-10 leading-relaxed uppercase tracking-wide">{description}</p>
     <button
       onClick={onClick}
       className="w-full bg-slate-950 text-secondary font-black py-4 rounded-[10px] text-xs uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg block text-center relative z-10"

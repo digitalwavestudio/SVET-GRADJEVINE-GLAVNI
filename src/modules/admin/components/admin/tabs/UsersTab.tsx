@@ -154,7 +154,7 @@ export function UsersTab(_props: UsersTabProps) {
                              <div className="flex gap-2">
                              <button
                                onClick={() => setFundingUser({ id: u.id, name: userName })}
-                               className="w-10 h-10 bg-secondary/10 text-secondary hover:bg-secondary hover:text-slate-950 rounded-[10px] transition-all flex items-center justify-center p-0"
+                               className="w-10 h-10 bg-secondary/10 text-secondary hover:bg-secondary hover:!text-black rounded-[10px] transition-all flex items-center justify-center p-0"
                                title="Manuelna dopuna novčanika"
                              >
                                 <span className="material-symbols-outlined text-lg">account_balance_wallet</span>

@@ -199,7 +199,7 @@ export function Step2Plot({ nextStep, prevStep }: { nextStep?: () => void; prevS
                 key={r.id}
                 type="button"
                 onClick={() => setValue('plotAccessRoad', r.id)}
-                className={`py-4 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-[10px] ${watch('plotAccessRoad') === r.id ? 'bg-secondary border-secondary text-slate-950' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/10'}`}
+                className={`py-4 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-[10px] ${watch('plotAccessRoad') === r.id ? 'bg-secondary border-secondary !text-black' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/10'}`}
               >
                 {r.name.split(' (')[0]}
               </button>

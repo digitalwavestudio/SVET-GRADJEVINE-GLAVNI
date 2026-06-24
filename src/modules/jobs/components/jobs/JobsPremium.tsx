@@ -144,7 +144,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                             containerClassName="w-full h-full"
                           />
                         ) : (
-                          <div className="w-full h-full bg-slate-950/5 rounded-full flex items-center justify-center text-slate-950 font-black text-lg md:text-2xl">{getInitials(job.comp)}</div>
+                          <div className="w-full h-full bg-slate-950/5 rounded-full flex items-center justify-center !text-black font-black text-lg md:text-2xl">{getInitials(job.comp)}</div>
                         )}
                       </div>
 
@@ -218,7 +218,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                     <div className="flex-1 flex flex-col justify-end">
                       <div className="border-t border-white/5" />
                       <div className="flex flex-col-reverse md:flex-row md:justify-between items-start md:items-center w-full relative z-10 pt-3 pb-1 gap-4 md:gap-0">
-                        <button className="w-full md:w-auto justify-center md:justify-start bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-xs md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
+                        <button className="w-full md:w-auto justify-center md:justify-start bg-gradient-to-br from-secondary to-yellow-600 !text-black font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-xs md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
                           APLICIRAJ
                           <span className="material-symbols-outlined text-sm hidden md:block">arrow_forward</span>
                         </button>

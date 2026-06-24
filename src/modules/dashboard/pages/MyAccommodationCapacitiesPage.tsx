@@ -83,7 +83,7 @@ export default function MyAccommodationCapacitiesPage() {
                     <Link to={detailUrl} className="px-6 py-3 bg-white/5 border border-white/10 hover:bg-white/10 rounded-[10px] text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center gap-2">
                       <span className="material-symbols-outlined text-base">open_in_new</span> Vidi oglas
                     </Link>
-                    <Link to={`/postavi-oglas?edit=true&id=${ad.id}&type=smestaj`} className="px-6 py-3 bg-secondary text-slate-950 rounded-[10px] text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 transition-all flex items-center gap-2">
+                    <Link to={`/postavi-oglas?edit=true&id=${ad.id}&type=smestaj`} className="px-6 py-3 bg-secondary !text-black rounded-[10px] text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 transition-all flex items-center gap-2">
                       <span className="material-symbols-outlined text-base">edit</span> Uredi
                     </Link>
                   </div>

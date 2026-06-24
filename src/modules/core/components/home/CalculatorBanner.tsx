@@ -13,7 +13,7 @@ export default function CalculatorBanner() {
           <Link to="/kalkulatori" className="relative z-10 flex flex-col lg:flex-row items-center gap-8 md:gap-12 group">
             {/* Icon Box */}
             <div className="w-24 h-24 rounded-[10px] bg-gradient-to-br from-secondary to-orange-400 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 group-hover:-rotate-6 transition-transform duration-500">
-              <Calculator className="text-slate-950 w-12 h-12" />
+              <Calculator className="!text-black w-12 h-12" />
             </div>
             
             {/* Content */}
@@ -27,7 +27,7 @@ export default function CalculatorBanner() {
             </div>
             
             {/* Action */}
-            <div className="w-max mx-auto lg:mx-0 shrink-0 flex items-center justify-center gap-3 bg-white/5 hover:bg-secondary px-4 md:px-8 py-3 md:py-4 rounded-[10px] border border-white/10 text-white hover:text-slate-950 font-black uppercase tracking-widest text-xs md:text-sm transition-all duration-500 group-hover:scale-105">
+            <div className="w-max mx-auto lg:mx-0 shrink-0 flex items-center justify-center gap-3 bg-white/5 hover:bg-secondary px-4 md:px-8 py-3 md:py-4 rounded-[10px] border border-white/10 text-white hover:!text-black font-black uppercase tracking-widest text-xs md:text-sm transition-all duration-500 group-hover:scale-105">
               Isprobaj odmah 
               <div className="bg-white/10 p-1.5 md:p-2 rounded-[10px] group-hover:bg-slate-950 group-hover:text-white transition-colors">
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />

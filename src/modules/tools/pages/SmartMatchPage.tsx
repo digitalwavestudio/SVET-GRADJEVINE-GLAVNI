@@ -67,18 +67,18 @@ export default function SmartMatchPage() {
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center gap-2 bg-slate-950/20 backdrop-blur-md px-4 py-2 rounded-full mb-8">
-                <span className="material-symbols-outlined text-slate-950 text-sm">bolt</span>
-                <span className="text-[10px] font-black text-slate-950 uppercase tracking-widest">NAJBOLJI IZBOR ZA VAS</span>
+                <span className="material-symbols-outlined !text-black text-sm">bolt</span>
+                <span className="text-[10px] font-black !text-black uppercase tracking-widest">NAJBOLJI IZBOR ZA VAS</span>
               </div>
-              <h2 className="text-5xl font-black text-slate-950 tracking-tighter uppercase leading-none mb-6">
+              <h2 className="text-5xl font-black !text-black tracking-tighter uppercase leading-none mb-6">
                 {matchedJobs[0]?.title}
               </h2>
               <div className="flex flex-wrap gap-4 mb-10">
-                <div className="flex items-center gap-2 text-slate-950/70 font-bold text-xs uppercase tracking-widest">
+                <div className="flex items-center gap-2 !text-black/70 font-bold text-xs uppercase tracking-widest">
                   <span className="material-symbols-outlined text-lg">location_on</span>
                   {matchedJobs[0]?.loc}
                 </div>
-                <div className="flex items-center gap-2 text-slate-950/70 font-bold text-xs uppercase tracking-widest">
+                <div className="flex items-center gap-2 !text-black/70 font-bold text-xs uppercase tracking-widest">
                   <span className="material-symbols-outlined text-lg">payments</span>
                   {(matchedJobs[0] as any)?.salary || (matchedJobs[0] as any)?.sal}
                 </div>
@@ -101,7 +101,7 @@ export default function SmartMatchPage() {
                     stroke="currentColor"
                     strokeWidth="12"
                     fill="transparent"
-                    className="text-slate-950/10"
+                    className="!text-black/10"
                   />
                   <motion.circle
                     cx="96"
@@ -114,12 +114,12 @@ export default function SmartMatchPage() {
                     initial={{ strokeDashoffset: 552.92 }}
                     animate={{ strokeDashoffset: 552.92 - (552.92 * matchedJobs[0]?.matchPercentage) / 100 }}
                     transition={{ duration: 2, ease: "easeOut" }}
-                    className="text-slate-950"
+                    className="!text-black"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-5xl font-black text-slate-950 tracking-tighter">{matchedJobs[0]?.matchPercentage}%</span>
-                  <span className="text-[10px] font-black text-slate-950/40 uppercase tracking-widest">MATCH</span>
+                  <span className="text-5xl font-black !text-black tracking-tighter">{matchedJobs[0]?.matchPercentage}%</span>
+                  <span className="text-[10px] font-black !text-black/40 uppercase tracking-widest">MATCH</span>
                 </div>
               </div>
             </div>

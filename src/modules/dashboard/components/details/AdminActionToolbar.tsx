@@ -77,7 +77,7 @@ export default function AdminActionToolbar({
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onTogglePremium}
-            className="px-6 py-3 bg-secondary text-slate-950 rounded-[10px] font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all"
+            className="px-6 py-3 bg-secondary !text-black rounded-[10px] font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all"
           >
             AKTIVIRAJ VIP
           </motion.button>

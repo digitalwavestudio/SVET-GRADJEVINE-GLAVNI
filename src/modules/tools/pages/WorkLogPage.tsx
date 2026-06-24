@@ -65,7 +65,7 @@ export default function WorkLogPage() {
               className={`w-full py-6 rounded-[10px] text-xs font-black tracking-[0.2em] uppercase transition-all shadow-2xl ${
                 isShiftActive 
                   ? 'bg-error text-white shadow-error/20 hover:bg-red-600' 
-                  : 'bg-green-500 text-slate-950 shadow-green-500/20 hover:bg-green-400'
+                  : 'bg-green-500 !text-black shadow-green-500/20 hover:bg-green-400'
               }`}
             >
               {isShiftActive ? 'ZAVRŠI SMENU' : 'ZAPOČNI SMENU'}

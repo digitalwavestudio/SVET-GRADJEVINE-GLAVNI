@@ -31,7 +31,7 @@ const StandardDashboardUI = memo(function StandardDashboardUI() {
           </p>
           
           <div className="flex flex-col items-center gap-4 w-full justify-center mt-6">
-            <Link to="/postavi-oglas" className="w-full md:w-auto px-16 py-6 bg-secondary text-slate-950 font-black rounded-[10px] text-base tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3">
+            <Link to="/postavi-oglas" className="w-full md:w-auto px-16 py-6 bg-secondary !text-black font-black rounded-[10px] text-base tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3">
               <span className="material-symbols-outlined text-2xl">add_circle</span>
               POSTAVI OGLAS
             </Link>
@@ -77,7 +77,7 @@ const StandardDashboardUI = memo(function StandardDashboardUI() {
 
                 {/* Dugme za poziv na akciju sa desne strane */}
                 <div className="shrink-0 w-full xl:w-auto flex justify-center">
-                  <div className="w-full xl:w-auto px-8 py-4 bg-secondary text-slate-950 font-black rounded-[10px] text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-xl shadow-secondary/10 group-hover:bg-yellow-400 group-hover:shadow-secondary/25 flex items-center justify-center gap-2">
+                  <div className="w-full xl:w-auto px-8 py-4 bg-secondary !text-black font-black rounded-[10px] text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-xl shadow-secondary/10 group-hover:bg-yellow-400 group-hover:shadow-secondary/25 flex items-center justify-center gap-2">
                     ZAPOČNI
                     <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:translate-x-2">arrow_forward</span>
                   </div>

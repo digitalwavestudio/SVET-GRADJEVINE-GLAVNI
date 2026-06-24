@@ -135,7 +135,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-body selection:bg-secondary selection:text-slate-950 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-950 text-white font-body selection:bg-secondary selection:!text-black flex flex-col md:flex-row">
       
       {/* Hamburger / Top Bar for Mobile */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#0A0F14] sticky top-0 z-40">

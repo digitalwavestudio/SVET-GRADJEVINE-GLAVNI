@@ -183,7 +183,7 @@ export default function MyApplicationsPage() {
                       {app.status}
                     </span>
                     {app.status === 'PRIHVAĆENO' && (
-                       <Link to="/poruke" className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary hover:bg-secondary hover:text-slate-950 transition-colors border border-secondary/20 shrink-0" title="Započni konverzaciju">
+                       <Link to="/poruke" className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary hover:bg-secondary hover:!text-black transition-colors border border-secondary/20 shrink-0" title="Započni konverzaciju">
                          <span className="material-symbols-outlined text-sm">chat</span>
                        </Link>
                     )}

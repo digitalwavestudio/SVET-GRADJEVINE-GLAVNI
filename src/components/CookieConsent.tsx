@@ -46,7 +46,7 @@ export default function CookieConsent() {
               </Link>
               <button 
                 onClick={handleAccept}
-                className="w-full sm:w-auto px-8 py-3 rounded-[10px] bg-orange-500 text-slate-950 font-black text-sm tracking-widest hover:bg-orange-400 hover:scale-105 transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] uppercase"
+                className="w-full sm:w-auto px-8 py-3 rounded-[10px] bg-orange-500 !text-black font-black text-sm tracking-widest hover:bg-orange-400 hover:scale-105 transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] uppercase"
               >
                 Prihvatam
               </button>

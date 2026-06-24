@@ -120,23 +120,23 @@ export default function CtaSection() {
   return (
     <>
       {/* Hero Section with Architectural CTA */}
-      <section className="relative min-h-[921px] bg-[#0F1923] overflow-hidden flex items-center py-20 px-4 md:px-8">
+      <section className="relative min-h-[921px] bg-[#0F1923] overflow-hidden flex items-center py-20">
         {/* Background Elements */}
         <div className="absolute inset-0 blueprint-bg opacity-30"></div>
         <div className="absolute -right-20 top-1/4 opacity-10 pointer-events-none transform rotate-12 scale-150">
           <span className="material-symbols-outlined text-[400px] text-white select-none">architecture</span>
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
-        <div className="relative z-10 w-full max-w-7xl mx-auto min-w-0">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 min-w-0">
           <div className="grid lg:grid-cols-12 gap-12 items-center w-full min-w-0">
             <div className="lg:col-span-7 space-y-8 min-w-0">
               <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 Pridruži se liderima
               </span>
-              <h1 className="font-headline font-black text-xl min-[300px]:text-2xl min-[360px]:text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-[1.05] tracking-tighter uppercase relative w-full min-w-0">
+              <h1 className="font-headline font-black text-[clamp(1.5rem,5vw,4.5rem)] text-white mb-6 leading-[1.05] tracking-tighter uppercase relative w-full min-w-0">
                 POSTANITE DEO <br className="hidden sm:block" />
-                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] block min-[450px]:inline">GRAĐEVINSKE MREŽE</span>
+                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] block sm:inline">GRAĐEVINSKE MREŽE</span>
               </h1>
               <p className="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed font-medium">
                 Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.

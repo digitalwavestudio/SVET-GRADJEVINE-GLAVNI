@@ -141,7 +141,7 @@ export default function MachineDetailsPage() {
   }, [machine]);
 
   return (
-    <div className="min-h-screen bg-[#050f19] text-[#dce6f5] font-body selection:bg-secondary selection:text-slate-950">
+    <div className="min-h-screen bg-[#050f19] text-[#dce6f5] font-body selection:bg-secondary selection:!text-black">
       <SeoHead 
         title={`${machine.adTitle} | Građevinske Mašine`}
         description={`Detalji za: ${machine.adTitle}. ${mCategory} - ${mSubCategory}. Lokacija: ${LOCATIONS.find(l => l.slug === machine.locationSlug)?.name}. ${machine.adType === 'prodaja' ? `Cena: ${machine.price}€` : machine.pricePerDay ? `Cena: ${machine.pricePerDay}€ / dan` : ''}`}
@@ -171,7 +171,7 @@ export default function MachineDetailsPage() {
           <div className="lg:col-span-8 space-y-6">
             <div className="flex flex-wrap items-center gap-3">
               {machine.isPremium && (
-                <span className="bg-secondary text-slate-950 px-4 py-1.5 rounded-[10px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-secondary/20">
+                <span className="bg-secondary !text-black px-4 py-1.5 rounded-[10px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-secondary/20">
                   ★ PREMIUM OGLAS
                 </span>
               )}

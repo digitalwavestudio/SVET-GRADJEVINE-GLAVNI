@@ -35,7 +35,7 @@ export function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#070B0F] text-white font-sans selection:bg-secondary selection:text-slate-950">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#070B0F] text-white font-sans selection:bg-secondary selection:!text-black">
       <CommandCenter />
 
       {/* Mobile Header */}

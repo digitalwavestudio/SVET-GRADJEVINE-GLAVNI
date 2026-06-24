@@ -52,9 +52,9 @@ export const KeramikaCalculator = React.memo(({ keramikaKvadratura, setKeramikaK
                id="rfq-btn-KERAMIKA"
                type="button"
                onClick={() => onOpenRfq(results, 'Keramika')}
-               className="w-full mt-8 flex items-center justify-center gap-3 bg-gradient-to-r from-secondary to-yellow-500 hover:from-yellow-500 hover:to-secondary text-slate-950 font-black text-xs tracking-[0.15em] uppercase py-5 px-6 rounded-[10px] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/10 group cursor-pointer"
+               className="w-full mt-8 flex items-center justify-center gap-3 bg-gradient-to-r from-secondary to-yellow-500 hover:from-yellow-500 hover:to-secondary !text-black font-black text-xs tracking-[0.15em] uppercase py-5 px-6 rounded-[10px] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/10 group cursor-pointer"
              >
-               <ShoppingCart className="w-5 h-5 text-slate-950 stroke-[2.5]" />
+               <ShoppingCart className="w-5 h-5 !text-black stroke-[2.5]" />
                Pošalji specifikaciju na B2B tender
              </button>
           </div>

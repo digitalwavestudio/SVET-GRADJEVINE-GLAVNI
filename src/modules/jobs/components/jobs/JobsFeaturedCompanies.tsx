@@ -70,7 +70,7 @@ export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ co
                   </div>
                   
                   {/* Button */}
-                  <button className="w-full py-3 rounded-[10px] bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest hover:from-white hover:to-slate-300 transition-all duration-500 group/btn">
+                  <button className="w-full py-3 rounded-[10px] bg-gradient-to-br from-secondary to-yellow-600 !text-black flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest hover:from-white hover:to-slate-300 transition-all duration-500 group/btn">
                     Pogledaj profil
                     <span className="material-symbols-outlined text-[16px] group-hover/btn:translate-x-1 transition-transform duration-500">arrow_forward</span>
                   </button>

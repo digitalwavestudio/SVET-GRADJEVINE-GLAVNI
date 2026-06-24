@@ -179,7 +179,7 @@ export function CompanyAdsTabsContent({
                       containerClassName="w-full h-full"
                       isProcessing={acc.imageStatus === 'processing'}
                     />
-                    <div className="absolute top-4 left-4 bg-secondary px-4 py-1.5 rounded-[10px] text-[10px] font-black uppercase text-slate-950 tracking-widest shadow-xl">
+                    <div className="absolute top-4 left-4 bg-secondary px-4 py-1.5 rounded-[10px] text-[10px] font-black uppercase !text-black tracking-widest shadow-xl">
                       €{acc.price} / {acc.priceType === 'perPerson' ? 'OSOBI' : 'OBJ'}
                     </div>
                   </div>

@@ -87,7 +87,7 @@ export function MessageInput({
         <button 
           type="submit"
           disabled={!newMessage.trim()}
-          className="w-12 h-12 md:w-14 md:h-14 bg-secondary text-slate-950 rounded-[10px] md:rounded-[10px] flex items-center justify-center hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed group shrink-0"
+          className="w-12 h-12 md:w-14 md:h-14 bg-secondary !text-black rounded-[10px] md:rounded-[10px] flex items-center justify-center hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed group shrink-0"
         >
           <span className="material-symbols-outlined font-black group-hover:translate-x-1 transition-transform">send</span>
         </button>

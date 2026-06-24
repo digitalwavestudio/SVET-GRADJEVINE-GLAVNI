@@ -60,7 +60,7 @@ export function CompanySidebar({ company }: CompanySidebarProps) {
                 <div className="pt-8 w-full">
                    <a 
                      href={`tel:${company.phone}`}
-                     className="flex w-full h-18 items-center justify-center gap-4 bg-secondary text-slate-950 rounded-[10px] font-black text-xs tracking-widest uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/10"
+                     className="flex w-full h-18 items-center justify-center gap-4 bg-secondary !text-black rounded-[10px] font-black text-xs tracking-widest uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/10"
                    >
                      <span className="material-symbols-outlined">chat</span>
                      UPUTI UPIT FIRMI

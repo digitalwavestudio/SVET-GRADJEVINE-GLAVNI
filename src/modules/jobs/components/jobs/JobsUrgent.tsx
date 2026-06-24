@@ -48,7 +48,7 @@ export const JobsUrgent: React.FC<JobsUrgentProps> = ({ jobs, isExpanded, setIsE
                 <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[12px]">payments</span> {job.sal}</span>
               </p>
               <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/10 relative z-10 mt-auto">
-                <div className="w-10 h-10 bg-white rounded-[10px] flex items-center justify-center font-bold text-slate-950 overflow-hidden shrink-0 shadow-lg shadow-black/10 p-1">
+                <div className="w-10 h-10 bg-white rounded-[10px] flex items-center justify-center font-bold !text-black overflow-hidden shrink-0 shadow-lg shadow-black/10 p-1">
                   {job.logo ? (
                     <OptimizedImage 
                       src={job.logo} 

@@ -198,7 +198,7 @@ export function VerifyTab() {
                         <button
                           onClick={() => handleAction(r.id, "approve")}
                           disabled={processingId === r.id}
-                          className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all bg-green-500 text-slate-950 hover:bg-green-400 disabled:opacity-50"
+                          className="flex-1 md:flex-none px-4 md:px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all bg-green-500 !text-black hover:bg-green-400 disabled:opacity-50"
                         >
                           {processingId === r.id ? "..." : "ODOBRI"}
                         </button>

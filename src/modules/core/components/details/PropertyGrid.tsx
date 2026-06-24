@@ -27,7 +27,7 @@ export default function PropertyGrid({ items }: PropertyGridProps) {
               : 'bg-surface-container-highest/30 border border-outline-variant/10'
           }`}
         >
-          <div className={`p-2 rounded-[10px] w-fit ${item.highlight ? 'bg-secondary text-slate-950' : 'bg-surface-container-highest text-white/40'}`}>
+          <div className={`p-2 rounded-[10px] w-fit ${item.highlight ? 'bg-secondary !text-black' : 'bg-surface-container-highest text-white/40'}`}>
             <item.icon size={18} className="group-hover:scale-110 transition-transform" />
           </div>
           <div className="flex flex-col">

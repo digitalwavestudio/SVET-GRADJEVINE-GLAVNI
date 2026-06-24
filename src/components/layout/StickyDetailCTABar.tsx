@@ -64,7 +64,7 @@ export const StickyDetailCTABar: React.FC<StickyDetailCTABarProps> = ({
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleCall}
-            className={`py-2.5 px-4 bg-secondary text-slate-950 font-black rounded-[8px] text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 shadow-lg shadow-secondary/15 shrink-0 ${!ctaText ? 'flex-grow' : ''}`}
+            className={`py-2.5 px-4 bg-secondary !text-black font-black rounded-[8px] text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 shadow-lg shadow-secondary/15 shrink-0 ${!ctaText ? 'flex-grow' : ''}`}
           >
             <Phone size={12} fill="currentColor" />
             POZOVI

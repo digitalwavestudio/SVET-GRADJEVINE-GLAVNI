@@ -42,7 +42,7 @@ export default function B2BTendersPage() {
             <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">B2B TENDERI</h1>
             <p className="text-white/40 font-bold text-xs tracking-[0.2em] uppercase">MREŽA PODIZVOĐAČA I VELIKIH PROJEKATA</p>
           </div>
-          <button className="w-full sm:w-auto bg-secondary text-slate-950 font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 flex items-center justify-center gap-2">
+          <button className="w-full sm:w-auto bg-secondary !text-black font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase shadow-2xl shadow-secondary/20 flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-sm">post_add</span> RASPIS TENDERA
           </button>
         </div>
@@ -55,7 +55,7 @@ export default function B2BTendersPage() {
               onClick={() => setActiveTab(tab)}
               className={`px-6 py-3 rounded-[10px] text-[10px] font-black tracking-widest uppercase transition-all ${
                 activeTab === tab 
-                  ? 'bg-white text-slate-950 shadow-lg' 
+                  ? 'bg-white !text-black shadow-lg' 
                   : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
               }`}
             >
@@ -114,7 +114,7 @@ export default function B2BTendersPage() {
                 </div>
                 
                 <div className="col-span-2 md:col-span-1 xl:col-span-1">
-                  <button className="w-full bg-white/5 hover:bg-secondary text-white hover:text-slate-950 border border-white/10 hover:border-secondary transition-all px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase flex items-center justify-center gap-2 group-hover:bg-secondary group-hover:text-slate-950">
+                  <button className="w-full bg-white/5 hover:bg-secondary text-white hover:!text-black border border-white/10 hover:border-secondary transition-all px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase flex items-center justify-center gap-2 group-hover:bg-secondary group-hover:!text-black">
                     <span className="material-symbols-outlined text-sm">lock</span>
                     POŠALJI PONUDU
                   </button>

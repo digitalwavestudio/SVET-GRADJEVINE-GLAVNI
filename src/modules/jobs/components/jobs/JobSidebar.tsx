@@ -46,7 +46,7 @@ export function JobSidebar({
                   containerClassName="w-full h-full"
                 />
               ) : (
-                <div className="w-full h-full bg-slate-950/5 rounded-[10px] flex items-center justify-center text-slate-950 font-black text-xl">
+                <div className="w-full h-full bg-slate-950/5 rounded-[10px] flex items-center justify-center !text-black font-black text-xl">
                   {jobData.companyId ? jobData.companyDetails?.initials : (jobData.authorName ? jobData.authorName.charAt(0) : 'S')}
                 </div>
               )}

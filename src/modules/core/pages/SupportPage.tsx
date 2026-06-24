@@ -115,7 +115,7 @@ export default function SupportPage() {
                   {CardComponent === 'a' ? (
                     <a
                       href={item.action}
-                      className="inline-flex items-center justify-center gap-1.5 w-full bg-white/5 group-hover:bg-secondary group-hover:text-slate-950 text-white font-black py-3 rounded-[4px] text-xs tracking-[0.15em] uppercase transition-all duration-300 shadow-md"
+                      className="inline-flex items-center justify-center gap-1.5 w-full bg-white/5 group-hover:bg-secondary group-hover:!text-black text-white font-black py-3 rounded-[4px] text-xs tracking-[0.15em] uppercase transition-all duration-300 shadow-md"
                     >
                       <span>{item.actionLabel}</span>
                       <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -194,7 +194,7 @@ export default function SupportPage() {
             </p>
             <a 
               href="/kontakt" 
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-secondary to-orange-500 text-slate-950 font-black px-12 py-5 rounded-[4px] hover:from-secondary/90 hover:to-orange-500/90 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs tracking-[0.2em] uppercase shadow-lg shadow-secondary/20"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-secondary to-orange-500 !text-black font-black px-12 py-5 rounded-[4px] hover:from-secondary/90 hover:to-orange-500/90 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs tracking-[0.2em] uppercase shadow-lg shadow-secondary/20"
             >
               <span className="material-symbols-outlined text-sm">mail</span>
               KONTAKTIRAJTE NAS

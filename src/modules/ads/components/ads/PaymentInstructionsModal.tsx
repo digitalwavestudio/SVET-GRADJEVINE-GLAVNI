@@ -57,7 +57,7 @@ export function PaymentInstructionsModal({ isOpen, onClose, ad }: PaymentInstruc
             <div className="mt-10 flex flex-col items-center">
                <button 
                  onClick={onClose}
-                 className="w-full py-5 bg-white text-slate-950 font-black rounded-[10px] text-xs uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] transition-transform"
+                 className="w-full py-5 bg-white !text-black font-black rounded-[10px] text-xs uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] transition-transform"
                >
                  RAZUMEM, ZATVORI
                </button>

@@ -63,7 +63,7 @@ export function JobApplicationModal({
           <button 
             type="submit" 
             disabled={isApplying}
-            className={`w-full py-4 rounded-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors ${isApplying ? 'bg-secondary/50 text-slate-800 cursor-not-allowed' : 'bg-secondary text-slate-950 hover:bg-yellow-400'}`}
+            className={`w-full py-4 rounded-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors ${isApplying ? 'bg-secondary/50 text-slate-800 cursor-not-allowed' : 'bg-secondary !text-black hover:bg-yellow-400'}`}
           >
             {isApplying ? 'Šaljem prijavu...' : 'Pošalji prijavu'}
             {!isApplying && <span className="material-symbols-outlined">send</span>}

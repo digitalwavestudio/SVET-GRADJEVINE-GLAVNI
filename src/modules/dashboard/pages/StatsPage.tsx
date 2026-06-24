@@ -148,7 +148,7 @@ export default function StatsPage() {
               {/* CTA */}
               <Link 
                 to={item.link}
-                className="inline-flex items-center gap-3 bg-secondary text-slate-950 px-8 py-4 rounded-[10px] font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-xl shadow-secondary/10"
+                className="inline-flex items-center gap-3 bg-secondary !text-black px-8 py-4 rounded-[10px] font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-xl shadow-secondary/10"
               >
                 {item.linkText}
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>

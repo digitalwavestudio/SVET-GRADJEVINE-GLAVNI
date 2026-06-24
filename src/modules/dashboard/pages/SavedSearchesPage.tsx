@@ -101,7 +101,7 @@ export default function SavedSearchesPage() {
                   <div className="flex gap-3 mt-auto">
                     <button 
                       onClick={() => handleRunSearch(search)}
-                      className="flex-1 py-4 bg-secondary text-slate-950 text-[10px] font-black uppercase tracking-[0.2em] rounded-[10px] hover:bg-yellow-400 transition-all text-center"
+                      className="flex-1 py-4 bg-secondary !text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-[10px] hover:bg-yellow-400 transition-all text-center"
                     >
                       INSTANT PREGLED
                     </button>

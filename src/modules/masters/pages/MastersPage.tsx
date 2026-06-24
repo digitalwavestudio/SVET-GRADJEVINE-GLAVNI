@@ -225,7 +225,7 @@ export default function MastersPage() {
               value={localSearchTerm}
               onChange={(e) => setLocalSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
+              className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
           <Button 
@@ -528,7 +528,7 @@ export default function MastersPage() {
                 <button
                   onClick={() => loadMore()}
                   disabled={loading}
-                  className="bg-secondary text-slate-950 px-12 h-14 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[0_10px_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                  className="bg-secondary !text-black px-12 h-14 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[0_10px_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                 >
                   {loading ? 'UČITAVANJE...' : 'PRIKAŽI JOŠ KANDIDATA'}
                 </button>

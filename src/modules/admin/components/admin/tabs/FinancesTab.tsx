@@ -316,7 +316,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                   <button
                     onClick={searchUser}
                     disabled={searching || !topupEmail.trim()}
-                    className="bg-secondary text-slate-950 px-4 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center gap-1"
+                    className="bg-secondary !text-black px-4 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center gap-1"
                   >
                     {searching ? (
                       <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
@@ -380,7 +380,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                   <button
                     onClick={handleTopup}
                     disabled={topupLoading || topupAmount <= 0}
-                    className="w-full bg-secondary text-slate-950 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full bg-secondary !text-black py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {topupLoading ? (
                       <>
@@ -410,7 +410,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
             <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center justify-between">
               ZAHTEVI ZA DOPUNU WALLET-A
               {pendingDeposits.length > 0 && (
-                <span className="bg-secondary text-slate-950 text-[10px] px-2 py-1 rounded-full">
+                <span className="bg-secondary !text-black text-[10px] px-2 py-1 rounded-full">
                   {pendingDeposits.length} na čekanju
                 </span>
               )}
@@ -590,7 +590,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                           <button
                             onClick={() => ctx.id && handleConfirm(ctx.id)}
                             disabled={confirmPayment.isPending}
-                            className="bg-secondary text-slate-950 text-[9px] font-black px-3 py-2 rounded-[5px] uppercase tracking-tighter hover:bg-yellow-400 transition-all disabled:opacity-50"
+                            className="bg-secondary !text-black text-[9px] font-black px-3 py-2 rounded-[5px] uppercase tracking-tighter hover:bg-yellow-400 transition-all disabled:opacity-50"
                           >
                             {confirmPayment.isPending ? "..." : "Aktiviraj"}
                           </button>

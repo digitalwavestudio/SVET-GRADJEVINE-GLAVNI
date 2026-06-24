@@ -93,7 +93,7 @@ export default function CVGeneratorPage() {
               <span className="material-symbols-outlined">save</span>
               {isSaving ? 'ČUVANJE...' : 'SAČUVAJ NA PROFILU'}
             </button>
-            <button className="bg-secondary text-slate-950 font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase flex items-center gap-3 shadow-2xl shadow-secondary/20">
+            <button className="bg-secondary !text-black font-black px-8 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-[0.2em] uppercase flex items-center gap-3 shadow-2xl shadow-secondary/20">
               <span className="material-symbols-outlined">download</span>
               PREUZMI PDF
             </button>
@@ -317,7 +317,7 @@ export default function CVGeneratorPage() {
 
           {/* Preview Side */}
           <div className="sticky top-8">
-            <div className="bg-white rounded-[10px] p-12 text-slate-950 shadow-2xl min-h-[800px] flex flex-col">
+            <div className="bg-white rounded-[10px] p-12 !text-black shadow-2xl min-h-[800px] flex flex-col">
               {/* CV Header */}
               <div className="flex justify-between items-start border-b-4 border-slate-950 pb-10 mb-10">
                 <div>

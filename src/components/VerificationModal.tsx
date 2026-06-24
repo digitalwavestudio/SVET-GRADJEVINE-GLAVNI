@@ -129,7 +129,7 @@ export default function VerificationModal({ isOpen, onClose }: VerificationModal
 
                   <div className="flex gap-4">
                     <button onClick={() => setStep('choice')} className="flex-1 py-5 bg-white/5 text-white font-black rounded-[10px] text-[10px] tracking-[0.2em] uppercase hover:bg-white/10 transition-all">NAZAD</button>
-                    <button onClick={handleMasterUpgrade} className="flex-[2] py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-[10px] tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20">POTVRDI I NASTAVI</button>
+                    <button onClick={handleMasterUpgrade} className="flex-[2] py-5 bg-secondary !text-black font-black rounded-[10px] text-[10px] tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20">POTVRDI I NASTAVI</button>
                   </div>
                 </div>
               )}

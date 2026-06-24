@@ -194,7 +194,7 @@ export const MobileBottomNav: React.FC = () => {
             {/* AI Icon */}
             <div className="w-20 h-20 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] rounded-[20px] flex items-center justify-center mb-12 shadow-[0_0_40px_rgba(254,191,13,0.3)] animate-pulse-gold border border-white/20 relative">
                <div className="absolute inset-0 rounded-[20px] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
-               <span className="material-symbols-outlined text-slate-950 text-4xl" style={{ fontVariationSettings: '"FILL" 1' }}>auto_awesome</span>
+               <span className="material-symbols-outlined !text-black text-4xl" style={{ fontVariationSettings: '"FILL" 1' }}>auto_awesome</span>
             </div>
             
             {/* Title & Description */}

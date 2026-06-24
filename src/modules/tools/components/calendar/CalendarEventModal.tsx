@@ -114,7 +114,7 @@ export function CalendarEventModal({
             const alarmCheckbox = document.getElementById('event_alarm_check') as HTMLInputElement;
             onAddEvent(alarmCheckbox?.checked || false);
           }}
-          className="w-full bg-secondary text-slate-950 font-black uppercase tracking-[0.2em] text-[11px] py-5 rounded-[10px] mt-12 transition-all shadow-[0_0_40px_rgba(247,150,26,0.3)] hover:shadow-[0_0_50px_rgba(247,150,26,0.5)]"
+          className="w-full bg-secondary !text-black font-black uppercase tracking-[0.2em] text-[11px] py-5 rounded-[10px] mt-12 transition-all shadow-[0_0_40px_rgba(247,150,26,0.3)] hover:shadow-[0_0_50px_rgba(247,150,26,0.5)]"
         >
           DODAJ U KALENDAR
         </button>

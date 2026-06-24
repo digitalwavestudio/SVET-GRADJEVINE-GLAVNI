@@ -279,7 +279,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                               {ad.status === 'pending_payment' && (
                                 <button 
                                   onClick={() => setSelectedAdForPayment(ad)}
-                                  className="flex-1 sm:flex-none px-4 py-2 bg-orange-500 text-slate-950 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-orange-400 transition-colors flex items-center justify-center gap-2"
+                                  className="flex-1 sm:flex-none px-4 py-2 bg-orange-500 !text-black text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-orange-400 transition-colors flex items-center justify-center gap-2"
                                 >
                                   <span className="material-symbols-outlined text-sm">payments</span>
                                   UPLATI
@@ -309,7 +309,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                       KREIRAJTE SVOJ PRVI OGLAS KAKO BI PRIVUKLI NOVE KANDIDATE.
                     </p>
                   </div>
-                  <Link to="/postavi-oglas" className="mt-2 bg-secondary text-slate-950 text-[9px] font-black uppercase tracking-widest px-6 py-3 sm:px-8 sm:py-4 rounded-[10px] transition-all shadow-xl shadow-secondary/20 hover:bg-yellow-400 relative z-10 w-full sm:w-auto">
+                  <Link to="/postavi-oglas" className="mt-2 bg-secondary !text-black text-[9px] font-black uppercase tracking-widest px-6 py-3 sm:px-8 sm:py-4 rounded-[10px] transition-all shadow-xl shadow-secondary/20 hover:bg-yellow-400 relative z-10 w-full sm:w-auto">
                     KREIRAJ OGLAS SADA
                   </Link>
                 </div>

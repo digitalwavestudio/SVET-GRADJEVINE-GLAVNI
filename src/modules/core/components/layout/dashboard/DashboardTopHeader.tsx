@@ -139,7 +139,7 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
     <header className="hidden md:flex h-20 border-b border-white/5 bg-[#070B0F] sticky top-0 z-40 w-full">
       <div className="w-full max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-end h-full">
         <div className="flex items-center gap-6">
-          <Link to="/postavi-oglas" className="hidden lg:flex items-center gap-2 bg-secondary text-slate-950 px-5 py-2 rounded-[10px] font-black text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all shadow-sm shadow-secondary/10">
+          <Link to="/postavi-oglas" className="hidden lg:flex items-center gap-2 bg-secondary !text-black px-5 py-2 rounded-[10px] font-black text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all shadow-sm shadow-secondary/10">
             <span className="material-symbols-outlined text-lg">add_circle</span>
             POSTAVI OGLAS
           </Link>
@@ -154,7 +154,7 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
             />
             <button 
               onClick={() => setShowNotifications(!showNotifications)}
-              className={`relative p-2.5 rounded-[10px] transition-all ${showNotifications ? 'bg-secondary text-slate-950' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`relative p-2.5 rounded-[10px] transition-all ${showNotifications ? 'bg-secondary !text-black' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <span className="material-symbols-outlined">notifications</span>
               {unreadCount > 0 && <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-secondary rounded-full border-2 border-[#070B0F]"></span>}
@@ -243,7 +243,7 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
                {profileSrc && !imgError ? (
                    <img width="800" height="600" decoding="async" src={profileSrc} alt="Profile" className="w-full h-full object-contain" referrerPolicy="no-referrer" loading="lazy" onError={() => setImgError(true)} /> 
                  ) : (
-                   <span className="font-black text-slate-950 text-lg">{userInitial}</span>
+                   <span className="font-black !text-black text-lg">{userInitial}</span>
                  )}
                 {/* Subtle upload indicator */}
                 <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

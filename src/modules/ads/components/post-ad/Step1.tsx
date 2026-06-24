@@ -181,7 +181,7 @@ export function Step1({
                       key={p.id}
                       type="button"
                       onClick={() => setValue('plotPurpose', p.id)}
-                      className={`py-6 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-xs flex flex-col items-center justify-center gap-3 ${plotPurpose === p.id ? 'bg-secondary border-secondary text-slate-950 shadow-lg shadow-secondary/20' : 'bg-white/5 border-white/5 text-[#a2acb9] hover:border-white/20'}`}
+                      className={`py-6 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-xs flex flex-col items-center justify-center gap-3 ${plotPurpose === p.id ? 'bg-secondary border-secondary !text-black shadow-lg shadow-secondary/20' : 'bg-white/5 border-white/5 text-[#a2acb9] hover:border-white/20'}`}
                     >
                       <span className="material-symbols-outlined text-3xl">
                         {p.id === 'građevinsko' ? 'home' : p.id === 'industrijsko' ? 'factory' : 'agriculture'}

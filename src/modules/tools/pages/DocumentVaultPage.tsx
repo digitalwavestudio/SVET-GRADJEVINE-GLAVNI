@@ -69,7 +69,7 @@ export default function DocumentVaultPage() {
                 <button className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-[10px] hover:bg-white/10 transition-colors text-white/40">
                   <span className="material-symbols-outlined text-lg">filter_list</span>
                 </button>
-                <button className="bg-secondary text-slate-950 text-[10px] font-black tracking-widest uppercase px-6 rounded-[10px] hover:bg-yellow-400 flex items-center gap-2 transition-colors">
+                <button className="bg-secondary !text-black text-[10px] font-black tracking-widest uppercase px-6 rounded-[10px] hover:bg-yellow-400 flex items-center gap-2 transition-colors">
                   <span className="material-symbols-outlined text-lg">upload</span>
                   OTPREMI
                 </button>
@@ -90,7 +90,7 @@ export default function DocumentVaultPage() {
                     <div>
                       <div className="text-xs font-black text-white tracking-widest uppercase mb-1 flex items-center gap-2">
                         {file.name}
-                        {file.tag && <span className="bg-secondary text-slate-950 px-2 py-0.5 rounded text-[8px]">{file.tag}</span>}
+                        {file.tag && <span className="bg-secondary !text-black px-2 py-0.5 rounded text-[8px]">{file.tag}</span>}
                       </div>
                       <div className="flex text-[9px] font-bold text-white/40 tracking-widest uppercase gap-4">
                         <span>{file.date}</span>

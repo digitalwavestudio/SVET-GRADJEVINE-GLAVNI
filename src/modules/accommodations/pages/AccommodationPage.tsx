@@ -268,7 +268,7 @@ export default function AccommodationPage() {
               type="text"
               placeholder="ISTRAŽI DOSTUPNE LOKACIJE I KAPACITETE..."
               readOnly
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6 cursor-pointer" 
+              className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6 cursor-pointer" 
             />
           </div>
           <Button 
@@ -336,7 +336,7 @@ export default function AccommodationPage() {
                   <button 
                     key={val}
                     onClick={() => setMinBeds(minBeds === val ? '' : val)}
-                    className={`h-11 rounded-[10px] text-[11px] font-black border transition-all duration-300 flex items-center justify-center ${minBeds === val ? 'bg-secondary border-secondary text-slate-950 shadow-[0_0_20px_rgba(254,191,13,0.3)] scale-105' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20 hover:bg-white/10'}`}
+                    className={`h-11 rounded-[10px] text-[11px] font-black border transition-all duration-300 flex items-center justify-center ${minBeds === val ? 'bg-secondary border-secondary !text-black shadow-[0_0_20px_rgba(254,191,13,0.3)] scale-105' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20 hover:bg-white/10'}`}
                   >
                     {val}+
                   </button>
@@ -366,7 +366,7 @@ export default function AccommodationPage() {
             <div className="grid grid-cols-2 gap-3">
               <button 
                 onClick={() => setFilterType('all')}
-                className={`py-6 px-4 rounded-[12px] border transition-all duration-300 flex flex-col items-center gap-3 text-center ${filterType === 'all' ? 'bg-secondary border-secondary text-slate-950 shadow-xl' : 'bg-[#13212e]/40 border-white/5 text-white/40 hover:border-white/20 hover:bg-[#192735]/60'}`}
+                className={`py-6 px-4 rounded-[12px] border transition-all duration-300 flex flex-col items-center gap-3 text-center ${filterType === 'all' ? 'bg-secondary border-secondary !text-black shadow-xl' : 'bg-[#13212e]/40 border-white/5 text-white/40 hover:border-white/20 hover:bg-[#192735]/60'}`}
               >
                 <span className="material-symbols-outlined text-2xl">grid_view</span>
                 <span className="text-[9px] font-black uppercase tracking-widest leading-tight">Svi<br/>objekti</span>
@@ -375,7 +375,7 @@ export default function AccommodationPage() {
                 <button 
                   key={type.id}
                   onClick={() => setFilterType(filterType === type.slug ? 'all' : type.slug)}
-                  className={`py-6 px-4 rounded-[12px] border transition-all duration-300 flex flex-col items-center gap-3 text-center ${filterType === type.slug ? 'bg-secondary border-secondary text-slate-950 shadow-xl' : 'bg-[#13212e]/40 border-white/5 text-white/40 hover:border-white/20 hover:bg-[#192735]/60'}`}
+                  className={`py-6 px-4 rounded-[12px] border transition-all duration-300 flex flex-col items-center gap-3 text-center ${filterType === type.slug ? 'bg-secondary border-secondary !text-black shadow-xl' : 'bg-[#13212e]/40 border-white/5 text-white/40 hover:border-white/20 hover:bg-[#192735]/60'}`}
                 >
                   <span className="material-symbols-outlined text-2xl">{type.icon}</span>
                   <span className="text-[9px] font-black uppercase tracking-widest leading-tight line-clamp-2 h-6 flex items-center justify-center">
@@ -648,7 +648,7 @@ const AccommodationCard = React.memo(({ acc, viewMode }: { acc: any; viewMode: '
             </span>
           )}
           {acc.isPremium && (
-            <span className="bg-secondary text-slate-950 font-black px-2 py-0.5 text-[8px] tracking-widest rounded-sm shadow-lg flex items-center gap-1 w-fit uppercase">
+            <span className="bg-secondary !text-black font-black px-2 py-0.5 text-[8px] tracking-widest rounded-sm shadow-lg flex items-center gap-1 w-fit uppercase">
               <span className="material-symbols-outlined text-[10px]">star</span> PREMIUM
             </span>
           )}

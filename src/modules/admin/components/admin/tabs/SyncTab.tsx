@@ -257,7 +257,7 @@ export function SyncTab() {
           <button
             onClick={handleReindex}
             disabled={reindexing}
-            className="mt-6 w-full px-6 py-4 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-[10px] hover:bg-white/90 disabled:opacity-50 transition-all"
+            className="mt-6 w-full px-6 py-4 bg-white !text-black font-black uppercase text-xs tracking-widest rounded-[10px] hover:bg-white/90 disabled:opacity-50 transition-all"
           >
             {reindexing
               ? "Reindeksiranje u toku..."
@@ -344,7 +344,7 @@ export function SyncTab() {
                             e.stopPropagation();
                             handleRetryDlq(doc.id, doc.source);
                           }}
-                          className="px-4 py-2 bg-secondary text-slate-950 text-[10px] font-black uppercase rounded-full hover:bg-yellow-400 transition-all"
+                          className="px-4 py-2 bg-secondary !text-black text-[10px] font-black uppercase rounded-full hover:bg-yellow-400 transition-all"
                         >
                           Retry
                         </button>

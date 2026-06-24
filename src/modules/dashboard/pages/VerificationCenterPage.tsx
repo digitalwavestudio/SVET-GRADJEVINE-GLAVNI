@@ -86,7 +86,7 @@ export default function VerificationCenterPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full bg-secondary text-slate-950 font-black py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-widest uppercase shadow-2xl shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-secondary !text-black font-black py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-[10px] tracking-widest uppercase shadow-2xl shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'SLANJE...' : 'POŠALJI ZAHTEV ZA VERIFIKACIJU'}
             </button>

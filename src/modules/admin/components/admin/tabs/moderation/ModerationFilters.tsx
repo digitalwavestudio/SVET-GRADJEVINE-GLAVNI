@@ -34,7 +34,7 @@ export function ModerationFilters({ pendingCount, localQuery, setLocalQuery, onR
         <button className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all">FILTRIRAJ</button>
         <button 
           onClick={onRefresh}
-          className="px-6 py-3 bg-secondary text-slate-950 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
+          className="px-6 py-3 bg-secondary !text-black rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
         >
           OSVEŽI RED
         </button>

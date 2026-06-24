@@ -163,11 +163,11 @@ export function CalendarSidebar({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-secondary rounded-[10px] p-8 relative overflow-hidden text-slate-950 shadow-2xl"
+            className="bg-secondary rounded-[10px] p-8 relative overflow-hidden !text-black shadow-2xl"
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-black text-xl tracking-tighter uppercase">{selectedDay}. APRIL</h3>
-              <button onClick={() => setSelectedDay(null)} className="material-symbols-outlined text-slate-950/40 hover:text-slate-950">close</button>
+              <button onClick={() => setSelectedDay(null)} className="material-symbols-outlined !text-black/40 hover:!text-black">close</button>
             </div>
             
             <div className="space-y-3">

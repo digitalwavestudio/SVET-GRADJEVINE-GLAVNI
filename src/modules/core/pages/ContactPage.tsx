@@ -164,7 +164,7 @@ export default function ContactPage() {
               </div>
               <button 
                 disabled={isSubmitting || isSuccess}
-                className={`w-full flex font-bold py-4 rounded-[10px] transition-all duration-300 active:scale-95 uppercase tracking-widest items-center justify-center gap-2 disabled:opacity-50 ${isSuccess ? 'bg-green-600 text-white' : 'bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] hover:from-[#fb8c00] hover:to-[#ffeb3b] text-slate-950 hover:shadow-lg hover:shadow-secondary/30 hover:-translate-y-1'}`} 
+                className={`w-full flex font-bold py-4 rounded-[10px] transition-all duration-300 active:scale-95 uppercase tracking-widest items-center justify-center gap-2 disabled:opacity-50 ${isSuccess ? 'bg-green-600 text-white' : 'bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] hover:from-[#fb8c00] hover:to-[#ffeb3b] !text-black hover:shadow-lg hover:shadow-secondary/30 hover:-translate-y-1'}`} 
                 type="submit"
               >
                 {isSuccess ? (

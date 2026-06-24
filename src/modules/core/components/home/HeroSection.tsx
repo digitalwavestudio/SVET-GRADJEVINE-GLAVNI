@@ -14,15 +14,15 @@ import { CategoryNodes } from "@/src/modules/core/components/home/hero/CategoryN
 import { HeroFilters } from "@/src/modules/core/components/home/hero/HeroFilters";
 import { Button } from "@/src/components/ui/Button";
 
-const placeholderMap = {
-  poslovi: "Traži posao... npr. Inženjer",
-  majstori: "Traži majstora... npr. Moler",
-  firme: "Traži firmu... npr. Izvođači",
-  smestaj: "Traži smeštaj... npr. Kontejner",
-  ketering: "Traži ketering... npr. Obroci",
-  "alat-i-oprema": "Traži alat... npr. Polovni",
-  masine: "Traži mašinu... npr. Bager",
-  placevi: "Traži plac... npr. Zemljište",
+const placeholderMap: Record<string, string> = {
+  poslovi: "Traži posao...",
+  majstori: "Traži majstora...",
+  firme: "Traži firmu...",
+  smestaj: "Traži smeštaj...",
+  ketering: "Traži ketering...",
+  "alat-i-oprema": "Traži alat...",
+  masine: "Traži mašinu...",
+  placevi: "Traži plac...",
 };
 
 export default function HeroSection() {
@@ -71,7 +71,7 @@ export default function HeroSection() {
                 <span className="text-secondary">NA JEDNOM MESTU</span>
               </div>
             </h1>
-            <p className="text-sm sm:text-lg text-slate-200 max-w-3xl mb-12 font-medium leading-relaxed relative">
+            <p className="text-base sm:text-xl md:text-2xl text-slate-200 max-w-4xl mb-12 font-medium leading-relaxed relative">
               Poslovi, mašine, placevi, ketering, smeštaj, baza majstora i
               kompanije - jedinstven sistem za brze povezivanje i efikasnije
               poslovanje.
@@ -97,22 +97,21 @@ export default function HeroSection() {
                         type="text"
                         value={globalQuery}
                         onChange={(e) => setGlobalQuery(e.target.value)}
-                        placeholder={placeholderMap[activeTab]}
+                        placeholder={placeholderMap[activeTab as string] || "Traži..."}
                         autoComplete="off"
                         spellCheck="false"
-                        className="w-full bg-transparent border-none focus:ring-0 focus:shadow-none text-white placeholder-white/70 focus:placeholder-white text-[11px] sm:text-base md:text-xl font-headline font-black italic tracking-tight py-2 md:py-6 px-0 outline-none uppercase transition-all text-ellipsis"
+                        className="w-full !bg-transparent !border-none !backdrop-blur-none focus:ring-0 focus:shadow-none text-white placeholder-white/70 focus:placeholder-white text-xs sm:text-base md:text-xl font-medium tracking-wide py-2 md:py-6 px-2 md:px-4 outline-none transition-all text-ellipsis"
                       />
                     </div>
 
                     <Button
                       type="submit"
-                      className="h-10 sm:h-14 md:h-16 bg-secondary text-[#0d151c] px-3 sm:px-6 md:px-8 rounded-[8px] font-headline font-black uppercase italic tracking-tighter text-xs sm:text-base md:text-lg transition-all duration-500 hover:bg-[#ffad3a] active:scale-95 flex items-center justify-center gap-2 group/btn shrink-0 mr-1 md:mr-4 border-none"
+                      className="h-10 sm:h-14 md:h-16 bg-secondary !text-black px-4 sm:px-6 md:px-8 rounded-[8px] font-black uppercase tracking-wider text-xs sm:text-sm md:text-base transition-all duration-500 hover:bg-[#ffad3a] active:scale-95 flex items-center justify-center gap-2 group/btn shrink-0 mr-1 md:mr-4 border-none"
                     >
                       <span className="hidden sm:inline">Pretraži</span>
                       <ArrowRight
-                        size={16}
-                        className="sm:w-[18px] sm:h-[18px] group-hover/btn:translate-x-2 transition-transform duration-500"
-                        strokeWidth={3}
+                        size={20}
+                        className="group-hover/btn:translate-x-1 group-active/btn:translate-x-2 transition-transform duration-300"
                       />
                     </Button>
 
@@ -136,11 +135,12 @@ export default function HeroSection() {
               <div className="flex justify-center mb-10 relative z-30">
                 <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => setShowFilters(!showFilters)}
                   className={`h-12 md:h-16 px-4 md:px-10 rounded-[10px] border transition-all duration-500 flex items-center justify-center gap-2 md:gap-4 group/filter overflow-hidden relative shadow-lg ${
                     showFilters
-                      ? "bg-secondary/10 border-secondary text-secondary shadow-gold-glow-subtle"
-                      : "bg-transparent border-white/10 text-white/80 hover:text-white hover:border-secondary/50 hover:bg-white/5"
+                      ? "bg-secondary/10 border-secondary !text-secondary shadow-gold-glow-subtle"
+                      : "bg-transparent border-white/10 !text-white hover:!text-white hover:border-secondary/50 hover:bg-white/5"
                   }`}
                 >
                   <div className="absolute inset-x-0 bottom-0 h-1 bg-secondary transform scale-x-0 transition-transform duration-500 group-hover/filter:scale-x-100 opacity-20"></div>
@@ -148,8 +148,8 @@ export default function HeroSection() {
                     size={18}
                     className={`md:w-5 md:h-5 ${
                       showFilters
-                        ? "text-secondary"
-                        : "text-white/80 group-hover/filter:text-white"
+                        ? "!text-secondary"
+                        : "!text-white group-hover/filter:!text-white"
                     }`}
                   />
                   <span className="font-headline font-black uppercase italic tracking-tighter text-sm md:text-lg">
@@ -157,7 +157,7 @@ export default function HeroSection() {
                   </span>
                   <ChevronDown
                     size={16}
-                    className={`md:w-4 md:h-4 transition-transform duration-500 ${showFilters ? "rotate-180 text-secondary" : "text-white/80 group-hover/filter:text-white"}`}
+                    className={`md:w-4 md:h-4 transition-transform duration-500 ${showFilters ? "rotate-180 !text-secondary" : "!text-white group-hover/filter:!text-white"}`}
                   />
                 </Button>
               </div>

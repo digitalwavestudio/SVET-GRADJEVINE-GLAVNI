@@ -106,7 +106,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               
               <Link 
                 to="/gradjevinske-masine"
-                className="w-full mt-10 py-4 md:py-5 flex items-center justify-center gap-2 uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-secondary text-slate-950 hover:bg-yellow-400 transition-all duration-500 rounded-[12px] shadow-lg hover:scale-[1.02]"
+                className="w-full mt-10 py-4 md:py-5 flex items-center justify-center gap-2 uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-secondary !text-black hover:bg-yellow-400 transition-all duration-500 rounded-[12px] shadow-lg hover:scale-[1.02]"
               >
                 Sve mašine
                 <span className="material-symbols-outlined text-sm">arrow_right_alt</span>
@@ -116,7 +116,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           
           <Link 
             to="/postavi-oglas"
-            className="w-full mt-8 bg-secondary text-slate-950 font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA MAŠINE
           </Link>
@@ -165,7 +165,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                     <span className="text-2xl sm:text-3xl font-black shrink-0">
                       {plot.price ? `€${plot.price.toLocaleString()}` : 'Po upitu'}
                     </span>
-                    <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] text-slate-950 px-5 py-2.5 sm:px-8 sm:py-3 rounded-[10px] font-black hover:from-[#fb8c00] hover:to-[#ffeb3b] transition-all duration-300 uppercase shadow-lg shadow-yellow-500/20 text-sm sm:text-base shrink-0">Detalji</button>
+                    <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] !text-black px-5 py-2.5 sm:px-8 sm:py-3 rounded-[10px] font-black hover:from-[#fb8c00] hover:to-[#ffeb3b] transition-all duration-300 uppercase shadow-lg shadow-yellow-500/20 text-sm sm:text-base shrink-0">Detalji</button>
                   </div>
                 </div>
               </div>

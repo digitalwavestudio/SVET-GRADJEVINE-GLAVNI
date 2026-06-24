@@ -164,7 +164,7 @@ export function GlobalSettingsTab() {
         <button 
           onClick={handleSave}
           disabled={saving}
-          className="px-10 py-4 bg-secondary text-slate-950 font-black rounded-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+          className="px-10 py-4 bg-secondary !text-black font-black rounded-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
         >
           {saving ? 'ČUVANJE...' : 'SAČUVAJ IZMENE'}
         </button>

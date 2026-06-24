@@ -102,7 +102,7 @@ export function AdminAddFundsModal({ isOpen, onClose, targetUserId, targetUserNa
             <button 
               onClick={handleFund}
               disabled={loading || amount <= 0}
-              className="flex-1 py-4 bg-secondary text-slate-950 hover:bg-yellow-400 font-black uppercase tracking-widest text-[10px] rounded-[10px] transition-all disabled:opacity-50"
+              className="flex-1 py-4 bg-secondary !text-black hover:bg-yellow-400 font-black uppercase tracking-widest text-[10px] rounded-[10px] transition-all disabled:opacity-50"
             >
               {loading ? 'PRIČEKAJTE...' : `DODAJ`}
             </button>

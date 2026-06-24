@@ -47,8 +47,8 @@ export default function StickyContactCard({
         <div className="bg-secondary p-8 rounded-[10px] flex flex-col gap-1 shadow-sm">
           <span className="text-[10px] font-black text-slate-900/40 uppercase tracking-widest">TRAŽENA CENA</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-black text-slate-950 tracking-tighter">{price}</span>
-            <span className="text-xl font-bold text-slate-950/60 uppercase tracking-widest">{currency}</span>
+            <span className="text-4xl font-black !text-black tracking-tighter">{price}</span>
+            <span className="text-xl font-bold !text-black/60 uppercase tracking-widest">{currency}</span>
           </div>
         </div>
       )}
@@ -69,7 +69,7 @@ export default function StickyContactCard({
                 </div>
               )}
               {isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-secondary text-slate-950 p-1.5 rounded-[10px] border-2 border-surface-container-highest shadow-xl">
+                <div className="absolute -bottom-1 -right-1 bg-secondary !text-black p-1.5 rounded-[10px] border-2 border-surface-container-highest shadow-xl">
                   <ShieldCheck size={12} fill="currentColor" />
                 </div>
               )}
@@ -99,7 +99,7 @@ export default function StickyContactCard({
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={handleCall}
-              className="w-full bg-secondary hover:bg-secondary/90 text-slate-950 py-5 rounded-[10px] font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg shadow-secondary/5"
+              className="w-full bg-secondary hover:bg-secondary/90 !text-black py-5 rounded-[10px] font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-lg shadow-secondary/5"
             >
               <Phone size={18} fill="currentColor" />
               POZOVI OGLAŠIVAČA

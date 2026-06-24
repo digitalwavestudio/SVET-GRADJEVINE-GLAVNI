@@ -185,12 +185,12 @@ export default function CommandCenter() {
                               </div>
                               <div className="flex flex-col items-start">
                                 <span className={`text-[11px] font-black uppercase tracking-widest ${
-                                  isSelected ? 'text-slate-950' : 'text-white/60 group-hover:text-white'
+                                  isSelected ? '!text-black' : 'text-white/60 group-hover:text-white'
                                 }`}>
                                   {cmd.label}
                                 </span>
                                 <span className={`text-[9px] font-bold uppercase tracking-tighter ${
-                                  isSelected ? 'text-slate-950/40' : 'text-white/20'
+                                  isSelected ? '!text-black/40' : 'text-white/20'
                                 }`}>
                                   {cmd.category}
                                 </span>
@@ -200,8 +200,8 @@ export default function CommandCenter() {
                                   layoutId="active-indicator"
                                   className="ml-auto flex items-center gap-2"
                                 >
-                                  <span className="text-[9px] font-black text-slate-950/60 uppercase tracking-widest">POKRENI</span>
-                                  <span className="material-symbols-outlined text-slate-950 text-sm">keyboard_return</span>
+                                  <span className="text-[9px] font-black !text-black/60 uppercase tracking-widest">POKRENI</span>
+                                  <span className="material-symbols-outlined !text-black text-sm">keyboard_return</span>
                                 </motion.div>
                               )}
                             </button>

@@ -275,8 +275,8 @@ export default function CalendarPage() {
                    <span className="material-symbols-outlined">notifications_active</span>
                 </div>
                 <div>
-                   <span className="text-[9px] font-black text-slate-950/40 uppercase tracking-[0.2em] block">AKTIVAN ALARM</span>
-                   <span className="text-sm font-black text-slate-950 uppercase tracking-tighter">DANAS JE ROK ZA ISPLATU!</span>
+                   <span className="text-[9px] font-black !text-black/40 uppercase tracking-[0.2em] block">AKTIVAN ALARM</span>
+                   <span className="text-sm font-black !text-black uppercase tracking-tighter">DANAS JE ROK ZA ISPLATU!</span>
                 </div>
              </div>
              <button 

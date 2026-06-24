@@ -204,7 +204,7 @@ export function CalendarGrid({
                         <span className="material-symbols-outlined text-[10px] absolute -top-4 left-0 text-orange-500">receipt_long</span>
                       )}
                       {e.type === 'phase' && isStart && (
-                        <span className="absolute left-2 top-0 text-[7px] font-black text-slate-950 truncate max-w-full">
+                        <span className="absolute left-2 top-0 text-[7px] font-black !text-black truncate max-w-full">
                           {e.title}
                         </span>
                       )}

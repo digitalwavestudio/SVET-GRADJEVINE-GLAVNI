@@ -160,7 +160,7 @@ export default function CheckoutPage() {
   const currentTotal = priceAfterDiscount + tax;
 
   return (
-    <div className="bg-[#070B0F] min-h-screen text-white font-sans selection:bg-secondary selection:text-slate-950 flex flex-col">
+    <div className="bg-[#070B0F] min-h-screen text-white font-sans selection:bg-secondary selection:!text-black flex flex-col">
       <Navbar />
       
       <div className="flex-1 my-10 max-w-7xl mx-auto w-full px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-32">
@@ -239,7 +239,7 @@ export default function CheckoutPage() {
                   <button 
                     disabled={isProcessing}
                     onClick={() => handleSuccessfulPayment('INVOICE/FAKTURA')} 
-                    className="w-full bg-white hover:bg-slate-200 text-slate-950 font-black py-6 rounded-[10px] transition-all flex items-center justify-center gap-3 group disabled:opacity-50"
+                    className="w-full bg-white hover:bg-slate-200 !text-black font-black py-6 rounded-[10px] transition-all flex items-center justify-center gap-3 group disabled:opacity-50"
                   >
                     <span className="material-symbols-outlined group-hover:scale-110 transition-transform">receipt</span>
                     <span className="tracking-[0.2em] uppercase text-sm">

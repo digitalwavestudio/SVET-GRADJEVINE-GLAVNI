@@ -220,7 +220,7 @@ function CompaniesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
+              className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
           <Button 
@@ -427,7 +427,7 @@ function CompaniesPage() {
                               PIB PROVEREN
                             </div>
                             {(company as any).isPremiumPartner && (
-                              <div className="flex items-center gap-1 bg-secondary text-slate-950 px-2 py-0.5 rounded-sm text-[8px] font-black uppercase tracking-widest shadow-lg shadow-secondary/20">
+                              <div className="flex items-center gap-1 bg-secondary !text-black px-2 py-0.5 rounded-sm text-[8px] font-black uppercase tracking-widest shadow-lg shadow-secondary/20">
                                 <span className="material-symbols-outlined text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                                 PREMIUM
                               </div>
@@ -442,7 +442,7 @@ function CompaniesPage() {
                               {company.logo ? (
                                 <OptimizedImage src={company.logo} alt="Logo" className="w-full h-full object-contain" containerClassName="w-full h-full" />
                               ) : (
-                                <span className="text-slate-950 font-black text-xl">{company.name.charAt(0)}</span>
+                                <span className="!text-black font-black text-xl">{company.name.charAt(0)}</span>
                               )}
                             </div>
                             <div className="flex-1 pb-1">
@@ -514,7 +514,7 @@ function CompaniesPage() {
                       <button
                         onClick={() => loadMore()}
                         disabled={loading}
-                        className="bg-secondary flex items-center gap-2 text-slate-950 font-black px-8 py-4 rounded-[10px] text-xs uppercase tracking-widest hover:bg-yellow-400 transition-all disabled:opacity-50"
+                        className="bg-secondary flex items-center gap-2 !text-black font-black px-8 py-4 rounded-[10px] text-xs uppercase tracking-widest hover:bg-yellow-400 transition-all disabled:opacity-50"
                       >
                         {loading && <Spinner className="w-4 h-4" />}
                         {loading ? 'UČITAVANJE...' : 'Učitaj još'}

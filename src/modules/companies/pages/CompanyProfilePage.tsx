@@ -109,7 +109,7 @@ export default function CompanyProfilePage() {
   ]);
 
   return (
-    <div className="bg-[#0F1923] text-white font-body selection:bg-secondary selection:text-slate-950 min-h-screen">
+    <div className="bg-[#0F1923] text-white font-body selection:bg-secondary selection:!text-black min-h-screen">
       {isAdmin && company && (
         <div className="fixed bottom-0 left-0 right-0 z-[100] bg-slate-900 border-t border-white/10 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
           <div className="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-white">
@@ -129,7 +129,7 @@ export default function CompanyProfilePage() {
               <button 
                 onClick={() => handleAdminAction('premium')}
                 disabled={isUpdatingStatus}
-                className={`${company.isPremiumPartner ? 'bg-secondary text-slate-950 font-bold' : 'bg-white/10 text-secondary border border-secondary/30'} hover:scale-105 px-6 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all`}
+                className={`${company.isPremiumPartner ? 'bg-secondary !text-black font-bold' : 'bg-white/10 text-secondary border border-secondary/30'} hover:scale-105 px-6 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all`}
               >
                 {company.isPremiumPartner ? '★ PREMIUM' : 'POSTAVI PREMIUM'}
               </button>

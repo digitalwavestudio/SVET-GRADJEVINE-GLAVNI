@@ -26,7 +26,7 @@ export function Step2Machines({ nextStep, prevStep }: { nextStep?: () => void; p
               <button
                 type="button"
                 onClick={() => setValue('machAdType', 'prodaja')}
-                className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('machAdType') === 'prodaja' ? 'bg-secondary border-secondary text-slate-950 shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
+                className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('machAdType') === 'prodaja' ? 'bg-secondary border-secondary !text-black shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
               >
                 <span className="material-symbols-outlined text-2xl">sell</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">Prodaja</span>
@@ -34,7 +34,7 @@ export function Step2Machines({ nextStep, prevStep }: { nextStep?: () => void; p
               <button
                 type="button"
                 onClick={() => setValue('machAdType', 'iznajmljivanje')}
-                className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('machAdType') === 'iznajmljivanje' ? 'bg-secondary border-secondary text-slate-950 shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
+                className={`flex-1 py-4 flex flex-col items-center justify-center gap-2 rounded-[10px] border-2 transition-all ${watch('machAdType') === 'iznajmljivanje' ? 'bg-secondary border-secondary !text-black shadow-lg shadow-secondary/20 scale-[0.98]' : 'border-transparent text-white hover:bg-white/[0.02]'}`}
               >
                 <span className="material-symbols-outlined text-2xl">calendar_clock</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">Iznajmljivanje</span>

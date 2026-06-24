@@ -96,7 +96,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                 height={36}
               />
             ) : (
-              <div className="w-full h-full bg-slate-950/5 rounded-md flex items-center justify-center text-slate-950 font-black text-xs">
+              <div className="w-full h-full bg-slate-950/5 rounded-md flex items-center justify-center !text-black font-black text-xs">
                 {getInitials(job.comp)}
               </div>
             )}
@@ -189,7 +189,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               height={80}
             />
           ) : (
-            <div className="w-full h-full bg-slate-950/5 rounded-[10px] flex items-center justify-center text-slate-950 font-black text-xl">
+            <div className="w-full h-full bg-slate-950/5 rounded-[10px] flex items-center justify-center !text-black font-black text-xl">
               {getInitials(job.comp)}
             </div>
           )}

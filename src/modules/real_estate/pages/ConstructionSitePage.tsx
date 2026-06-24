@@ -434,7 +434,7 @@ export default function ConstructionSitePage() {
                 setEditingSiteId(null);
               }}
               className={`flex items-center gap-2 min-w-max px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${
-                isAllSites ? 'bg-secondary text-slate-950 shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'
+                isAllSites ? 'bg-secondary !text-black shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'
               }`}
             >
               <span className="text-[14px]">🌍</span> SVA GRADILIŠTA
@@ -450,7 +450,7 @@ export default function ConstructionSitePage() {
                   }
                 }}
                 className={`flex items-center gap-2 min-w-max px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${
-                  activeSiteId === site.id ? 'bg-secondary text-slate-950 shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'
+                  activeSiteId === site.id ? 'bg-secondary !text-black shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {editingSiteId === site.id ? (

@@ -131,7 +131,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
                           : 'Po dogovoru'}
                   </p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 group-hover:bg-yellow-400 group-hover:text-slate-950 transition-all duration-300 -rotate-45 group-hover:rotate-0 border border-white/10 group-hover:border-yellow-400">
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50 group-hover:bg-yellow-400 group-hover:!text-black transition-all duration-300 -rotate-45 group-hover:rotate-0 border border-white/10 group-hover:border-yellow-400">
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </div>
               </div>

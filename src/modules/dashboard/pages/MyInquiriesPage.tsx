@@ -60,7 +60,7 @@ export default function MyInquiriesPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
                 activeTab === tab.id
-                  ? 'bg-secondary text-slate-950 shadow-lg'
+                  ? 'bg-secondary !text-black shadow-lg'
                   : 'text-white/40 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -92,7 +92,7 @@ export default function MyInquiriesPage() {
                           conv.adType === 'plots' ? 'landscape' : 'mail'}
                        </span>
                        {conv.unreadCount && conv.unreadCount[user?.id || ''] > 0 && (
-                         <div className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-slate-950 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-[#0A0F14]">
+                         <div className="absolute -top-1 -right-1 w-5 h-5 bg-secondary !text-black rounded-full flex items-center justify-center text-[10px] font-black border-2 border-[#0A0F14]">
                             {conv.unreadCount[user?.id || '']}
                          </div>
                        )}

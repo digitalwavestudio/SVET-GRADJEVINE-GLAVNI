@@ -194,7 +194,7 @@ export function ObservabilityTab() {
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id as any)}
-                className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${activeView === tab.id ? 'bg-secondary text-slate-950' : 'text-white/40 hover:text-white'}`}
+                className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${activeView === tab.id ? 'bg-secondary !text-black' : 'text-white/40 hover:text-white'}`}
               >
                 {tab.label}
               </button>
@@ -500,7 +500,7 @@ export function ObservabilityTab() {
                   type="button"
                   onClick={handleRunDiagnostics}
                   disabled={isRunningDiag}
-                  className="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 disabled:bg-white/10 disabled:text-white/30 text-slate-950 text-[10px] font-black uppercase tracking-widest rounded transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 disabled:bg-white/10 disabled:text-white/30 !text-black text-[10px] font-black uppercase tracking-widest rounded transition-all flex items-center justify-center gap-2"
                 >
                   <span className={`material-symbols-outlined text-[16px] ${isRunningDiag ? 'animate-spin' : ''}`}>
                     {isRunningDiag ? 'sync' : 'play_arrow'}
@@ -574,7 +574,7 @@ export function ObservabilityTab() {
                         <td className="px-8 py-6">
                            <button 
                              onClick={() => handleRetry(item.id, item.source || 'outbox')}
-                             className="px-4 py-2 bg-white text-slate-950 text-[9px] font-black uppercase tracking-widest rounded transition-all hover:bg-secondary"
+                             className="px-4 py-2 bg-white !text-black text-[9px] font-black uppercase tracking-widest rounded transition-all hover:bg-secondary"
                            >
                              RETRY
                            </button>

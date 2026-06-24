@@ -114,7 +114,7 @@ export default function OfferModal({ isOpen, onClose, onSend, recipientName }: O
 
             <button 
               type="submit"
-              className="w-full py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-[10px] tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-xl shadow-secondary/20 flex items-center justify-center gap-3"
+              className="w-full py-5 bg-secondary !text-black font-black rounded-[10px] text-[10px] tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-xl shadow-secondary/20 flex items-center justify-center gap-3"
             >
               <span className="material-symbols-outlined">send</span>
               POŠALJI ZVANIČNU PONUDU

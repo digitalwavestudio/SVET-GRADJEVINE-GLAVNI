@@ -218,7 +218,7 @@ const MarketplaceItemDetailsPage = () => {
         </article>
 
         <aside className="space-y-8" aria-label="Informacije o prodavcu">
-          <Card className="glass-card p-10 border-none shadow-2xl bg-secondary rounded-[10px] text-slate-950 relative overflow-hidden group">
+          <Card className="glass-card p-10 border-none shadow-2xl bg-secondary rounded-[10px] !text-black relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
               <User className="w-32 h-32" />
             </div>
@@ -231,7 +231,7 @@ const MarketplaceItemDetailsPage = () => {
               
               <div className="mb-8">
                  <p className="text-3xl font-black italic uppercase tracking-tight leading-none mb-2">{item.seller}</p>
-                 <Badge variant="outline" className="bg-slate-950/10 text-slate-950 border-slate-950/20 px-3 py-1 font-bold text-[9px] uppercase tracking-widest">
+                 <Badge variant="outline" className="bg-slate-950/10 !text-black border-slate-950/20 px-3 py-1 font-bold text-[9px] uppercase tracking-widest">
                    PROVEREN PRODAVAC
                  </Badge>
               </div>
@@ -249,7 +249,7 @@ const MarketplaceItemDetailsPage = () => {
                     PIŠI NA WHATSAPP
                   </a>
                 )}
-                <Button className="w-full h-16 bg-white/20 hover:bg-white/30 text-slate-950 border-none font-black text-sm uppercase tracking-widest rounded-[10px]">
+                <Button className="w-full h-16 bg-white/20 hover:bg-white/30 !text-black border-none font-black text-sm uppercase tracking-widest rounded-[10px]">
                   POŠALJI PORUKU
                 </Button>
               </div>

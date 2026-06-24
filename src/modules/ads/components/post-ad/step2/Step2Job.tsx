@@ -32,14 +32,14 @@ export function Step2Job({ nextStep, prevStep }: { nextStep?: () => void; prevSt
             <button
               type="button"
               onClick={() => setValue('salaryType', 'hourly')}
-              className={`px-4 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${watch('salaryType') === 'hourly' ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/20' : 'text-on-surface-variant/40 hover:text-white'}`}
+              className={`px-4 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${watch('salaryType') === 'hourly' ? 'bg-secondary !text-black shadow-lg shadow-secondary/20' : 'text-on-surface-variant/40 hover:text-white'}`}
             >
               Satnica
             </button>
             <button
               type="button"
               onClick={() => setValue('salaryType', 'monthly')}
-              className={`px-4 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${watch('salaryType') === 'monthly' ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/20' : 'text-on-surface-variant/40 hover:text-white'}`}
+              className={`px-4 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all ${watch('salaryType') === 'monthly' ? 'bg-secondary !text-black shadow-lg shadow-secondary/20' : 'text-on-surface-variant/40 hover:text-white'}`}
             >
               Plata
             </button>

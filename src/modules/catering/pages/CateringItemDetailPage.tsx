@@ -155,7 +155,7 @@ export default function CateringItemDetailPage() {
               animate={{ opacity: 1, x: 0 }}
               className="relative group overflow-hidden rounded-[10px] border border-white/10 shadow-2xl"
             >
-              <div className="absolute top-6 left-6 z-10 bg-secondary text-slate-950 px-4 py-1.5 rounded-[10px] flex items-center gap-2 shadow-xl">
+              <div className="absolute top-6 left-6 z-10 bg-secondary !text-black px-4 py-1.5 rounded-[10px] flex items-center gap-2 shadow-xl">
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">Verifikovan Obrok</span>
               </div>
@@ -203,7 +203,7 @@ export default function CateringItemDetailPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/kontakt" className="flex-1 bg-secondary text-slate-950 py-5 rounded-[10px] font-black uppercase tracking-[0.2em] text-xs hover:bg-yellow-400 active:scale-95 transition-all shadow-lg shadow-secondary/20 block text-center">
+                <Link to="/kontakt" className="flex-1 bg-secondary !text-black py-5 rounded-[10px] font-black uppercase tracking-[0.2em] text-xs hover:bg-yellow-400 active:scale-95 transition-all shadow-lg shadow-secondary/20 block text-center">
                   Pošalji Upit
                 </Link>
                 <a href="tel:+381601234567" className="flex-1 border border-white/10 bg-white/5 text-white py-5 rounded-[10px] font-black uppercase tracking-[0.2em] text-xs hover:bg-white/10 active:scale-95 transition-all block text-center">
@@ -350,7 +350,7 @@ export default function CateringItemDetailPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="absolute bottom-4 left-4">
-                    <span className="bg-secondary text-slate-950 text-[10px] font-black px-3 py-1.5 rounded uppercase tracking-widest shadow-xl">
+                    <span className="bg-secondary !text-black text-[10px] font-black px-3 py-1.5 rounded uppercase tracking-widest shadow-xl">
                       {offer.price} RSD
                     </span>
                   </div>

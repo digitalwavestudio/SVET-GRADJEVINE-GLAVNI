@@ -27,7 +27,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       color: 'text-amber-400 border-amber-500/20 hover:border-amber-400 hover:shadow-amber-500/10',
       bgGlow: 'bg-amber-500/10',
       tagColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-      btnBg: 'bg-amber-400 text-slate-950 hover:bg-amber-300',
+      btnBg: 'bg-amber-400 !text-black hover:bg-amber-300',
       benefits: ['Lični online portfolio radova', 'Direktan kontakt sa firmama', 'Bez posrednika i provizija']
     },
     {
@@ -39,7 +39,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
       bgGlow: 'bg-emerald-500/10',
       tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      btnBg: 'bg-emerald-400 text-slate-950 hover:bg-emerald-300',
+      btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
       benefits: ['Neograničeno postavljanje oglasa', 'Pristup bazi aktivnih radnika', 'Statistika pregleda i prijava']
     },
     {
@@ -51,7 +51,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       color: 'text-sky-400 border-sky-500/20 hover:border-sky-400 hover:shadow-sky-500/10',
       bgGlow: 'bg-sky-500/10',
       tagColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
-      btnBg: 'bg-sky-400 text-slate-950 hover:bg-sky-300',
+      btnBg: 'bg-sky-400 !text-black hover:bg-sky-300',
       benefits: ['Direktan kontakt sa firmama', 'Isticanje lokacije i kapaciteta', 'Popunjenost tokom cele godine']
     },
     {
@@ -63,7 +63,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       color: 'text-orange-400 border-orange-500/20 hover:border-orange-400 hover:shadow-orange-500/10',
       bgGlow: 'bg-orange-500/10',
       tagColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-      btnBg: 'bg-orange-400 text-slate-950 hover:bg-orange-300',
+      btnBg: 'bg-orange-400 !text-black hover:bg-orange-300',
       benefits: ['Pregledan katalog mašina', 'Cenovnik najma po danu/satu', 'Direktni upiti od izvođača']
     },
     {
@@ -75,7 +75,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       color: 'text-amber-500 border-amber-600/20 hover:border-amber-500 hover:shadow-amber-500/10',
       bgGlow: 'bg-amber-600/10',
       tagColor: 'bg-amber-600/10 text-amber-500 border-amber-600/20',
-      btnBg: 'bg-amber-500 text-slate-950 hover:bg-amber-400',
+      btnBg: 'bg-amber-500 !text-black hover:bg-amber-400',
       benefits: ['Kreiranje dnevnih menija', 'Dugoročni ugovori sa firmama', 'Povećanje obima porudžbina']
     },
     {
@@ -87,7 +87,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
       bgGlow: 'bg-emerald-500/10',
       tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      btnBg: 'bg-emerald-400 text-slate-950 hover:bg-emerald-300',
+      btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
       benefits: ['Detaljne specifikacije zemljišta', 'Lokacijski prikaz i plan zone', 'Direktan kontakt sa investitorima']
     },
     {
@@ -137,7 +137,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
             {/* Tooltip za Coming Soon ulogu na hover */}
             {role.isComingSoon && (
               <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <div className="bg-amber-500 text-slate-950 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-md shadow-lg border border-amber-400">
+                <div className="bg-amber-500 !text-black font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-md shadow-lg border border-amber-400">
                   STIŽE USKORO
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
                     <span className="material-symbols-outlined text-lg">hourglass_empty</span>
                   </button>
                   {/* Hover popup stilizovan kao na footeru svetlog moda */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-amber-500 border border-amber-400 text-slate-950 rounded-lg shadow-2xl opacity-0 invisible group-hover/btn:opacity-100 group-hover/btn:visible transition-all duration-300 z-50 text-center pointer-events-none">
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-amber-500 border border-amber-400 !text-black rounded-lg shadow-2xl opacity-0 invisible group-hover/btn:opacity-100 group-hover/btn:visible transition-all duration-300 z-50 text-center pointer-events-none">
                     <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-1">OBAVEŠTENJE</div>
                     <p className="text-[10px] font-black uppercase tracking-wider leading-tight">
                       Partner / Affiliate opcija stiže uskoro na platformu!

@@ -73,7 +73,7 @@ export default function SignupBanner() {
               <Link 
                 to="/registracija"
                 onClick={() => setIsVisible(false)}
-                className="w-full sm:w-auto py-3.5 px-8 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] hover:from-white hover:to-white text-slate-950 rounded-[16px] lg:rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all shadow-[0_10px_30px_rgba(254,191,13,0.3)] hover:shadow-[0_10px_30px_rgba(255,255,255,0.3)] text-center flex items-center justify-center gap-2 active:scale-95"
+                className="w-full sm:w-auto py-3.5 px-8 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] hover:from-white hover:to-white !text-black rounded-[16px] lg:rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all shadow-[0_10px_30px_rgba(254,191,13,0.3)] hover:shadow-[0_10px_30px_rgba(255,255,255,0.3)] text-center flex items-center justify-center gap-2 active:scale-95"
               >
                 <span className="material-symbols-outlined text-base">redeem</span>
                 Preuzmi Kredite

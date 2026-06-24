@@ -50,7 +50,7 @@ export const VerticalCTA: React.FC<VerticalCTAProps> = ({
         </p>
         <Link 
           to={buttonLink} 
-          className="inline-flex h-14 bg-secondary text-slate-950 px-10 rounded-[12px] font-headline font-black uppercase italic tracking-tighter text-base hover:bg-white hover:scale-105 active:scale-95 transition-all duration-500 items-center gap-3"
+          className="inline-flex h-14 bg-secondary !text-black px-10 rounded-[12px] font-headline font-black uppercase italic tracking-tighter text-base hover:bg-white hover:scale-105 active:scale-95 transition-all duration-500 items-center gap-3"
         >
           {buttonText}
           <motion.span

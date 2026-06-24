@@ -118,7 +118,7 @@ export function SiteLogisticsPlanner({ recentAds = [] }: SiteLogisticsPlannerPro
               <button 
                 type="submit"
                 disabled={isSearching || !address.trim()}
-                className="w-full sm:w-auto px-6 py-4 bg-secondary text-slate-950 font-black text-[10px] uppercase tracking-widest rounded-[8px] hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-4 bg-secondary !text-black font-black text-[10px] uppercase tracking-widest rounded-[8px] hover:bg-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2"
               >
                 {isSearching ? (
                   <>

@@ -282,7 +282,7 @@ export default function MyCompanyPage() {
           <button 
             type="submit"
             disabled={saving}
-            className="bg-secondary text-slate-950 font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-xs tracking-widest uppercase disabled:opacity-50"
+            className="bg-secondary !text-black font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-xs tracking-widest uppercase disabled:opacity-50"
           >
             {saving ? 'ČUVANJE...' : 'SAČUVAJ IZMENE'}
           </button>
@@ -395,7 +395,7 @@ export default function MyCompanyPage() {
                        type="button"
                        key={sub}
                        onClick={() => toggleSubCategory(sub)}
-                       className={`px-4 py-2 rounded-[10px] text-[9px] font-black uppercase tracking-widest border transition-all ${subCategories?.includes(sub) ? 'bg-secondary text-slate-950 border-secondary' : 'bg-white/5 text-white/40 border-white/10 hover:border-white/30'}`}
+                       className={`px-4 py-2 rounded-[10px] text-[9px] font-black uppercase tracking-widest border transition-all ${subCategories?.includes(sub) ? 'bg-secondary !text-black border-secondary' : 'bg-white/5 text-white/40 border-white/10 hover:border-white/30'}`}
                      >
                        {sub}
                      </button>

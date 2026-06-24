@@ -72,7 +72,7 @@ export default function AccountSettingsPage() {
                 onClick={() => setActiveSection(section.id as 'security' | 'notifications' | 'deactivate')}
                 className={`w-full flex items-center gap-4 px-6 py-4 rounded-[6px] transition-all text-[10px] font-black tracking-widest uppercase ${
                   activeSection === section.id 
-                    ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10' 
+                    ? 'bg-secondary !text-black shadow-lg shadow-secondary/10' 
                     : 'text-white/40 hover:text-white hover:bg-white/5'
                 }`}
               >

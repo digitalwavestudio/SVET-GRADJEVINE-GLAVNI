@@ -30,7 +30,7 @@ export function AdminLaunchGuard({
          className={`px-8 py-4 rounded-[10px] text-xs font-black uppercase tracking-widest transition-all ${
             launchMode 
             ? 'bg-red-500 hover:bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' 
-            : 'bg-green-500 hover:bg-green-600 text-slate-950 shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+            : 'bg-green-500 hover:bg-green-600 !text-black shadow-[0_0_20px_rgba(34,197,94,0.4)]'
          }`}
        >
          {isUpdatingLaunchMode ? 'AŽURIRANJE...' : (launchMode ? 'ZATVORI REGISTRACIJE' : 'OTVORI REGISTRACIJE')}

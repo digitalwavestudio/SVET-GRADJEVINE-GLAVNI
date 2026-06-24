@@ -125,7 +125,7 @@ export default function AiAssistant({ user }: AiAssistantProps) {
           <button
             type="submit"
             disabled={!aiInput.trim() || isAiProcessing}
-            className="absolute right-2 w-10 h-10 bg-secondary rounded-[10px] flex items-center justify-center text-slate-950 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-400 transition-colors"
+            className="absolute right-2 w-10 h-10 bg-secondary rounded-[10px] flex items-center justify-center !text-black disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-400 transition-colors"
           >
             {isAiProcessing ? (
                <span className="material-symbols-outlined text-sm animate-spin">refresh</span>

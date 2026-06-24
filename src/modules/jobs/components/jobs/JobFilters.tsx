@@ -163,7 +163,7 @@ export function JobFilters({
           <div className="space-y-1 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
             <div 
               onClick={() => setSelectedProfession(null)}
-              className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === null ? 'bg-secondary text-slate-950 font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+              className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === null ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
             >
               Sva zanimanja
             </div>
@@ -171,7 +171,7 @@ export function JobFilters({
               <div 
                 key={prof.slug} 
                 onClick={() => setSelectedProfession(prof.slug)}
-                className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === prof.slug ? 'bg-secondary text-slate-950 font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+                className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === prof.slug ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
               >
                 {prof.name}
               </div>

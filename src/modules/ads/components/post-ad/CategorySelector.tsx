@@ -71,7 +71,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 className={`p-10 rounded-[10px] border-2 text-left cursor-pointer transition-all duration-500 group relative overflow-hidden ${selectedCategory === opt.id ? "border-secondary bg-secondary/5" : "border-white/5 bg-white/[0.02] hover:border-secondary/50 hover:bg-secondary/5"}`}
               >
                 <div className={`w-16 h-16 rounded-[10px] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform border ${selectedCategory === opt.id ? "bg-secondary border-secondary" : "bg-surface-container-high border-white/10"}`}>
-                  <span className={`material-symbols-outlined text-3xl ${selectedCategory === opt.id ? "text-slate-950" : "text-secondary"}`}>{opt.icon}</span>
+                  <span className={`material-symbols-outlined text-3xl ${selectedCategory === opt.id ? "!text-black" : "text-secondary"}`}>{opt.icon}</span>
                 </div>
                 <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 font-headline transition-colors ${selectedCategory === opt.id ? "text-secondary" : "text-white"}`}>{opt.title}</h3>
                 <p className="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">{opt.subtitle}</p>

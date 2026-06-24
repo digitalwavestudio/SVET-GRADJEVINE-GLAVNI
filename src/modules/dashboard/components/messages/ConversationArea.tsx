@@ -94,7 +94,7 @@ export function ConversationArea({
           {isEmployer && (
             <button 
               onClick={() => setIsOfferModalOpen(true)}
-              className="bg-secondary text-slate-950 font-black px-3 py-2 md:px-5 md:py-2.5 rounded-[10px] md:rounded-[10px] hover:bg-yellow-400 transition-all text-[9px] md:text-[10px] tracking-widest uppercase flex items-center gap-1 md:gap-2 shadow-lg shadow-secondary/10"
+              className="bg-secondary !text-black font-black px-3 py-2 md:px-5 md:py-2.5 rounded-[10px] md:rounded-[10px] hover:bg-yellow-400 transition-all text-[9px] md:text-[10px] tracking-widest uppercase flex items-center gap-1 md:gap-2 shadow-lg shadow-secondary/10"
             >
               <span className="material-symbols-outlined text-sm md:text-lg">description</span>
               <span className="hidden sm:inline">POŠALJI PONUDU</span>
@@ -102,7 +102,7 @@ export function ConversationArea({
             </button>
           )}
           <div className="hidden sm:flex items-center gap-2">
-            <button className="w-10 h-10 md:w-11 md:h-11 rounded-[10px] md:rounded-[10px] bg-white/5 flex items-center justify-center text-white/40 hover:bg-secondary hover:text-slate-950 transition-all">
+            <button className="w-10 h-10 md:w-11 md:h-11 rounded-[10px] md:rounded-[10px] bg-white/5 flex items-center justify-center text-white/40 hover:bg-secondary hover:!text-black transition-all">
               <span className="material-symbols-outlined text-[18px]">call</span>
             </button>
           </div>
@@ -179,7 +179,7 @@ export function ConversationArea({
 
                     {!isMe && (
                       <div className="grid grid-cols-2 gap-3">
-                        <button onClick={handleAcceptOffer} className="py-3 bg-secondary text-slate-950 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg hover:scale-[1.02] active:scale-95">PRIHVATI</button>
+                        <button onClick={handleAcceptOffer} className="py-3 bg-secondary !text-black text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg hover:scale-[1.02] active:scale-95">PRIHVATI</button>
                         <button className="py-3 bg-white/5 text-white/40 text-[9px] font-black rounded-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">ODBIJ</button>
                       </div>
                     )}
@@ -203,7 +203,7 @@ export function ConversationArea({
                 ) : (
                   <div className={`px-6 py-4 rounded-[10px] text-sm font-bold leading-relaxed shadow-xl ${
                     isMe 
-                      ? 'bg-secondary text-slate-950 rounded-tr-none' 
+                      ? 'bg-secondary !text-black rounded-tr-none' 
                       : 'bg-[#141B23] border border-white/5 text-white/90 rounded-tl-none'
                   }`}>
                     {msg.text}

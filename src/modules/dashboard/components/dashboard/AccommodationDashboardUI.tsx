@@ -39,7 +39,7 @@ const AccommodationDashboardUI = memo(function AccommodationDashboardUI({ setIsU
           </p>
           
           <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
-            <Link to="/postavi-oglas" className="w-full md:w-auto px-10 py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-sm tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3">
+            <Link to="/postavi-oglas" className="w-full md:w-auto px-10 py-5 bg-secondary !text-black font-black rounded-[10px] text-sm tracking-[0.2em] uppercase hover:bg-yellow-400 transition-all shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3">
               <span className="material-symbols-outlined text-xl">add_circle</span>
               POSTAVI OGLAS
             </Link>
@@ -56,7 +56,7 @@ const AccommodationDashboardUI = memo(function AccommodationDashboardUI({ setIsU
            <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
               <div className="flex justify-between items-center mb-8">
                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">MOJI OBJEKTI</h2>
-                 <Link to="/postavi-oglas" className="bg-secondary text-slate-950 font-black px-6 py-2.5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all">DODAJ NOVI</Link>
+                 <Link to="/postavi-oglas" className="bg-secondary !text-black font-black px-6 py-2.5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all">DODAJ NOVI</Link>
               </div>
 
               <div className="space-y-4">

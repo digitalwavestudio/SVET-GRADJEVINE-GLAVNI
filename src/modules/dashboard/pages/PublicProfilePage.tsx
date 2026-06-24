@@ -76,7 +76,7 @@ export default function PublicProfilePage() {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white gap-6">
         <h1 className="text-4xl font-black uppercase">PROFIL NIJE PRONAĐEN</h1>
-        <Link to="/" className="bg-secondary text-slate-950 px-8 py-4 rounded-[10px] font-black uppercase text-xs">Vrati se na početnu</Link>
+        <Link to="/" className="bg-secondary !text-black px-8 py-4 rounded-[10px] font-black uppercase text-xs">Vrati se na početnu</Link>
       </div>
     );
   }
@@ -128,7 +128,7 @@ export default function PublicProfilePage() {
               <button 
                 onClick={() => onAdminAction('premium')}
                 disabled={isUpdating}
-                className={`${profile.isPremiumProfile ? 'bg-secondary text-slate-950 font-bold' : 'bg-white/10 text-secondary border border-secondary/30'} hover:scale-105 px-6 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all`}
+                className={`${profile.isPremiumProfile ? 'bg-secondary !text-black font-bold' : 'bg-white/10 text-secondary border border-secondary/30'} hover:scale-105 px-6 py-2 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all`}
               >
                 {profile.isPremiumProfile ? '★ VIP AKTIVAN' : 'DAJ VIP STATUS'}
               </button>
@@ -176,7 +176,7 @@ export default function PublicProfilePage() {
                         containerClassName="w-full h-full"
                       />
                    ) : (
-                      <div className="w-full h-full bg-slate-100 flex items-center justify-center text-6xl font-black text-slate-950 rounded-[10px]">
+                      <div className="w-full h-full bg-slate-100 flex items-center justify-center text-6xl font-black !text-black rounded-[10px]">
                          {displayName.charAt(0)}
                       </div>
                    )}
@@ -192,7 +192,7 @@ export default function PublicProfilePage() {
                       <div className="flex justify-center md:justify-start">
                         <Link 
                           to={`/firma/${companyId}`}
-                          className="inline-flex items-center gap-2 bg-secondary text-slate-950 px-3 py-1.5 rounded-[10px] text-[9px] font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg shadow-secondary/10"
+                          className="inline-flex items-center gap-2 bg-secondary !text-black px-3 py-1.5 rounded-[10px] text-[9px] font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg shadow-secondary/10"
                         >
                           <span className="material-symbols-outlined text-xs">business_center</span>
                           Pogledaj profil firme
@@ -458,14 +458,14 @@ export default function PublicProfilePage() {
                    </div>
                 </section>
                 
-                <section className="bg-white text-slate-950 rounded-[10px] p-10 shadow-2xl flex flex-col gap-6">
-                   <h3 className="text-[10px] font-black text-slate-950/20 uppercase tracking-[0.2em]">KONTAKT</h3>
-                   <p className="text-sm font-bold uppercase tracking-tight text-slate-950/60 leading-relaxed">
+                <section className="bg-white !text-black rounded-[10px] p-10 shadow-2xl flex flex-col gap-6">
+                   <h3 className="text-[10px] font-black !text-black/20 uppercase tracking-[0.2em]">KONTAKT</h3>
+                   <p className="text-sm font-bold uppercase tracking-tight !text-black/60 leading-relaxed">
                       ZAINTERESOVANI STE ZA SARADNJU? POŠALJITE PORUKU ILI POZOVITE DIREKTNO.
                    </p>
                    <button className="w-full py-5 bg-slate-950 text-white font-black rounded-[10px] text-[10px] uppercase tracking-widest hover:scale-[1.02] transition-transform">POŠALJI PORUKU</button>
                    {String(profile.phone || (profile.cvData as { phone?: string })?.phone || '') && (
-                      <a href={`tel:${String(profile.phone || (profile.cvData as { phone?: string })?.phone || '')}`} className="w-full py-5 bg-secondary text-slate-950 font-black rounded-[10px] text-[10px] text-center uppercase tracking-widest hover:scale-[1.02] transition-transform shadow-xl shadow-secondary/10">POZOVI ODMAH</a>
+                      <a href={`tel:${String(profile.phone || (profile.cvData as { phone?: string })?.phone || '')}`} className="w-full py-5 bg-secondary !text-black font-black rounded-[10px] text-[10px] text-center uppercase tracking-widest hover:scale-[1.02] transition-transform shadow-xl shadow-secondary/10">POZOVI ODMAH</a>
                    )}
                 </section>
              </div>

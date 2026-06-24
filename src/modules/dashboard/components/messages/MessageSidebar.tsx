@@ -48,7 +48,7 @@ export function MessageSidebar({
       <div className="p-4 md:p-8 border-b border-white/5">
         <div className="flex items-center justify-between mb-4 md:mb-6">
           <h2 className="font-black tracking-tighter uppercase text-xl md:text-2xl">PORUKE</h2>
-          <button className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-secondary hover:text-slate-950 transition-all">
+          <button className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-secondary hover:!text-black transition-all">
             <span className="material-symbols-outlined text-lg">edit_square</span>
           </button>
         </div>
@@ -83,7 +83,7 @@ export function MessageSidebar({
               )}
               <div className="relative shrink-0">
                 <div className={`w-14 h-14 rounded-[10px] flex items-center justify-center font-black text-xl uppercase transition-all ${
-                  activeConversationId === conv.id || unread > 0 ? 'bg-secondary text-slate-950' : 'bg-white/5 text-white/20 group-hover:bg-white/10'
+                  activeConversationId === conv.id || unread > 0 ? 'bg-secondary !text-black' : 'bg-white/5 text-white/20 group-hover:bg-white/10'
                 }`}>
                   {partnerName ? partnerName.charAt(0) : 'K'}
                 </div>

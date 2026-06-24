@@ -126,7 +126,7 @@ export default function CVEditor() {
             <span className="material-symbols-outlined text-sm">save</span>
             {isSaving ? '...' : 'SAČUVAJ'}
           </button>
-          <button className="bg-secondary text-slate-950 font-black px-6 py-3 rounded-[10px] hover:bg-yellow-400 transition-all text-[9px] tracking-[0.2em] uppercase flex items-center gap-2 shadow-2xl shadow-secondary/20">
+          <button className="bg-secondary !text-black font-black px-6 py-3 rounded-[10px] hover:bg-yellow-400 transition-all text-[9px] tracking-[0.2em] uppercase flex items-center gap-2 shadow-2xl shadow-secondary/20">
             <span className="material-symbols-outlined text-sm">download</span>
             PDF
           </button>
@@ -412,7 +412,7 @@ export default function CVEditor() {
         </div>
 
         {/* Preview Side */}
-        <div className="bg-white rounded-[10px] p-8 text-slate-950 shadow-2xl aspect-[1/1.414] flex flex-col scale-[0.95] origin-top border border-slate-100 overflow-hidden">
+        <div className="bg-white rounded-[10px] p-8 !text-black shadow-2xl aspect-[1/1.414] flex flex-col scale-[0.95] origin-top border border-slate-100 overflow-hidden">
           {/* CV Header */}
           <div className="flex justify-between items-start border-b-2 border-slate-950 pb-4 mb-4">
             <div>

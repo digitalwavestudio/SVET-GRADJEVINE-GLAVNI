@@ -125,11 +125,11 @@ export function ResilienceTab() {
   const getBadgeColor = (state: string) => {
     switch (state) {
       case 'CLOSED':
-        return 'bg-green-500 text-slate-950';
+        return 'bg-green-500 !text-black';
       case 'OPEN':
         return 'bg-red-500 text-white animate-pulse';
       case 'HALF_OPEN':
-        return 'bg-amber-500 text-slate-950';
+        return 'bg-amber-500 !text-black';
       default:
         return 'bg-white/10 text-white/50';
     }
@@ -331,7 +331,7 @@ export function ResilienceTab() {
             onClick={() => handleClearCache(cachePrefix)}
             type="button"
             disabled={resetMutation.isPending}
-            className="py-3 bg-secondary hover:bg-secondary/90 active:bg-secondary/80 text-slate-950 font-black text-xs uppercase tracking-widest rounded transition-colors flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(254,191,13,0.15)] disabled:opacity-50"
+            className="py-3 bg-secondary hover:bg-secondary/90 active:bg-secondary/80 !text-black font-black text-xs uppercase tracking-widest rounded transition-colors flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(254,191,13,0.15)] disabled:opacity-50"
           >
             <Trash2 className="w-4 h-4" />
             {cachePrefix ? `IZBACI PREFIKS: ${cachePrefix}` : 'ISPRAZNI CELOKUPAN KEŠ'}

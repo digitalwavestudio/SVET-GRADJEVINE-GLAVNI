@@ -18,13 +18,13 @@ export function PaymentInstructions({ amount, referenceNumber, targetName }: Pay
       <div className="flex gap-2 bg-black/40 p-2 rounded-[10px]">
         <button 
           onClick={() => setPaymentTab('uplatnica')}
-          className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${paymentTab === 'uplatnica' ? 'bg-secondary text-slate-950 shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+          className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${paymentTab === 'uplatnica' ? 'bg-secondary !text-black shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
         >
           Uplatnica (Fizička lica)
         </button>
         <button 
           onClick={() => setPaymentTab('faktura')}
-          className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${paymentTab === 'faktura' ? 'bg-secondary text-slate-950 shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+          className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-[10px] transition-all flex items-center justify-center gap-2 ${paymentTab === 'faktura' ? 'bg-secondary !text-black shadow-lg' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
         >
           Predračun (Pravna lica)
         </button>

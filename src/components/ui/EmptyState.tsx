@@ -20,7 +20,7 @@ export default function EmptyState({ icon: Icon, title, description, actionLabel
       {actionLabel && actionLink && (
         <Link 
           to={actionLink} 
-          className="bg-secondary text-slate-950 px-6 py-2 rounded-[10px] font-bold hover:bg-secondary/90 transition-all"
+          className="bg-secondary !text-black px-6 py-2 rounded-[10px] font-bold hover:bg-secondary/90 transition-all"
         >
           {actionLabel}
         </Link>

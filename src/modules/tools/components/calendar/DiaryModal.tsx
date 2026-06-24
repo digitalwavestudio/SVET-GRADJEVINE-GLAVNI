@@ -91,7 +91,7 @@ export function DiaryModal({
                 onSave();
                 onClose();
               }}
-              className="bg-secondary text-slate-950 font-black uppercase tracking-widest text-[11px] py-4 px-10 rounded-[10px] transition-all shadow-[0_0_30px_rgba(247,150,26,0.2)] hover:shadow-[0_0_40px_rgba(247,150,26,0.4)]"
+              className="bg-secondary !text-black font-black uppercase tracking-widest text-[11px] py-4 px-10 rounded-[10px] transition-all shadow-[0_0_30px_rgba(247,150,26,0.2)] hover:shadow-[0_0_40px_rgba(247,150,26,0.4)]"
             >
               SAČUVAJ DNEVNIK
             </button>

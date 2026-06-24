@@ -248,7 +248,7 @@ export default function FavoritesPage() {
                 onClick={() => setFilterType(cat.id)}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all ${
                   filterType === cat.id 
-                    ? 'bg-secondary text-slate-950 shadow-lg shadow-secondary/10 px-6' 
+                    ? 'bg-secondary !text-black shadow-lg shadow-secondary/10 px-6' 
                     : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
                 }`}
               >
@@ -310,7 +310,7 @@ export default function FavoritesPage() {
                 <div className="flex gap-3">
                   <Link 
                     to={getAdLink(ad)}
-                    className="flex-1 py-4 bg-secondary text-slate-950 text-[10px] font-black uppercase tracking-[0.2em] rounded-[10px] hover:bg-yellow-400 transition-all text-center"
+                    className="flex-1 py-4 bg-secondary !text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-[10px] hover:bg-yellow-400 transition-all text-center"
                   >
                     POGLEDAJ
                   </Link>

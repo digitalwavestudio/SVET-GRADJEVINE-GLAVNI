@@ -86,7 +86,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                       {ad.salary && <><br />Cena/Plata: {ad.salary}</>}
                     </p>
                     <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/10 mt-auto relative z-20">
-                      <div className="w-10 h-10 bg-white rounded-[10px] flex items-center justify-center font-bold text-slate-950 overflow-hidden shrink-0 shadow-lg shadow-black/10 p-1 pointer-events-none">
+                      <div className="w-10 h-10 bg-white rounded-[10px] flex items-center justify-center font-bold !text-black overflow-hidden shrink-0 shadow-lg shadow-black/10 p-1 pointer-events-none">
                         {ad.logo ? (
                           <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain aspect-square" alt={`Logo firme ${ad.comp}`} referrerPolicy="no-referrer" />
                         ) : (

@@ -68,7 +68,7 @@ const NicheDashboardUI = memo(function NicheDashboardUI({ setIsUpgradeOpen, dash
          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
             <div className="flex justify-between items-center mb-8">
                <h2 className="text-2xl font-black text-white uppercase tracking-tight">UPRAVLJANJE OGLASIMA</h2>
-               <Link to="/postavi-oglas" className="bg-secondary text-slate-950 font-black px-6 py-2.5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all">DODAJ NOVI</Link>
+               <Link to="/postavi-oglas" className="bg-secondary !text-black font-black px-6 py-2.5 rounded-[10px] text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all">DODAJ NOVI</Link>
             </div>
 
             <div className="space-y-4">

@@ -56,7 +56,7 @@ export function ModerationEditModal({
           <button 
             onClick={onSave}
             disabled={processingId === editingItem.id}
-            className="px-8 py-3 bg-secondary text-slate-950 font-black rounded-[10px] text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all text-center flex items-center justify-center disabled:opacity-50"
+            className="px-8 py-3 bg-secondary !text-black font-black rounded-[10px] text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all text-center flex items-center justify-center disabled:opacity-50"
           >
             {processingId === editingItem.id ? 'ČUVANJE...' : 'SAČUVAJ OGLAS'}
           </button>

@@ -86,7 +86,7 @@ export function AdminSidebar({
       <div className="flex items-center justify-between mb-8 md:mb-16">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-secondary rounded-[10px] flex items-center justify-center shadow-[0_0_30px_rgba(254,191,13,0.3)]">
-            <span className="material-symbols-outlined text-slate-950 text-3xl font-bold">terminal</span>
+            <span className="material-symbols-outlined !text-black text-3xl font-bold">terminal</span>
           </div>
           <div>
             <h1 className="text-xl font-black tracking-tighter uppercase leading-none">ADMIN <span className="text-secondary">HUB</span></h1>
@@ -112,7 +112,7 @@ export function AdminSidebar({
             onClick={() => setActiveTab(item.id)}
             className={`w-full flex items-center gap-4 px-4 py-3 md:px-6 md:py-4 rounded-[10px] transition-all group ${
               activeTab === item.id 
-                ? 'bg-secondary text-slate-950 shadow-xl shadow-secondary/10' 
+                ? 'bg-secondary !text-black shadow-xl shadow-secondary/10' 
                 : 'text-white/40 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -132,7 +132,7 @@ export function AdminSidebar({
       <div className="mt-auto border-t border-white/5 pt-8 space-y-4">
         <Link 
           to="/" 
-          className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-[10px] text-xs font-black uppercase tracking-widest text-secondary hover:bg-secondary hover:text-slate-950 transition-all shadow-md active:scale-95"
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-[10px] text-xs font-black uppercase tracking-widest text-secondary hover:bg-secondary hover:!text-black transition-all shadow-md active:scale-95"
         >
           <span className="material-symbols-outlined text-lg">home</span>
           <span>VRATI SE NA POČETNU</span>

@@ -224,7 +224,7 @@ export function Step4({
                       className={`block relative p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-500 group ${borderBgClass}`}
                     >
                       {pkg.recommended && (
-                        <div className="absolute -top-3 right-6 bg-secondary text-slate-950 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
+                        <div className="absolute -top-3 right-6 bg-secondary !text-black text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
                           ★ PREPORUČENO
                         </div>
                       )}
@@ -546,7 +546,7 @@ export function Step4({
                        className={`block relative p-6 rounded-[10px] border-2 cursor-pointer transition-all duration-500 group ${borderBgClass}`}
                      >
                        {pkg.recommended && (
-                         <div className="absolute -top-3 right-6 bg-secondary text-slate-950 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
+                         <div className="absolute -top-3 right-6 bg-secondary !text-black text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg z-10">
                            ★ PREPORUČENO
                          </div>
                        )}

@@ -277,7 +277,7 @@ export default function MarketplacePage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-              className="w-full bg-transparent border-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
+              className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
             />
           </div>
           <Button 
@@ -376,7 +376,7 @@ export default function MarketplacePage() {
                         
                         {/* Action Overlays */}
                         <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
-                           <span className="px-2 py-0.5 bg-secondary text-slate-950 rounded-sm text-[8px] font-black tracking-widest uppercase shadow-lg">
+                           <span className="px-2 py-0.5 bg-secondary !text-black rounded-sm text-[8px] font-black tracking-widest uppercase shadow-lg">
                              {MARKETPLACE_CATEGORIES.find(c => c.id === item.categoryId)?.shortName || item.categoryId}
                            </span>
                            {item.isUrgent && (

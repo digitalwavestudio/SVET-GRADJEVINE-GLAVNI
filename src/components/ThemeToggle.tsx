@@ -14,7 +14,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = "mt-8" }) => {
         onClick={() => theme === 'light' && toggleTheme()}
         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 ${
           theme === 'dark' 
-            ? 'bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 shadow-md' 
+            ? 'bg-gradient-to-br from-secondary to-yellow-600 !text-black shadow-md' 
             : 'text-on-surface-variant hover:text-on-surface'
         }`}
       >
@@ -23,7 +23,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = "mt-8" }) => {
       <button 
         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 relative group/tooltip ${
           theme === 'light' 
-            ? 'bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 shadow-md' 
+            ? 'bg-gradient-to-br from-secondary to-yellow-600 !text-black shadow-md' 
             : 'text-on-surface-variant hover:text-on-surface'
         }`}
       >

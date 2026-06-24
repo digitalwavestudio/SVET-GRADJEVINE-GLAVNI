@@ -57,7 +57,7 @@ export const UnifiedFilterBar: React.FC<UnifiedFilterBarProps> = ({
       <div className="w-full md:w-auto self-end mt-4 md:mt-0">
         <button
           onClick={onApplyFilters}
-          className="bg-secondary text-slate-950 h-12 px-10 rounded-[10px] font-black uppercase text-[10px] tracking-widest hover:bg-white transition-all shadow-xl shadow-secondary/10 flex items-center justify-center gap-2 w-full md:w-auto"
+          className="bg-secondary !text-black h-12 px-10 rounded-[10px] font-black uppercase text-[10px] tracking-widest hover:bg-white transition-all shadow-xl shadow-secondary/10 flex items-center justify-center gap-2 w-full md:w-auto"
         >
           <span className="material-symbols-outlined text-lg">filter_alt</span>
           PRIMENI FILTERE

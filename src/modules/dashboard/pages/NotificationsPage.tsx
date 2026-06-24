@@ -71,7 +71,7 @@ export default function NotificationsPage() {
               <span className="material-symbols-outlined text-red-500/40 text-5xl mb-4">error_outline</span>
               <p className="text-sm font-black text-white/30 uppercase tracking-widest">Greška pri učitavanju</p>
               <p className="text-[11px] text-white/20 font-medium mt-2 mb-6">Pokušajte ponovo.</p>
-              <button onClick={fetchActivities} className="px-6 py-3 bg-secondary/10 text-secondary text-[10px] font-black rounded-[10px] uppercase tracking-widest hover:bg-secondary hover:text-slate-950 transition-all">POKUŠAJ PONOVO</button>
+              <button onClick={fetchActivities} className="px-6 py-3 bg-secondary/10 text-secondary text-[10px] font-black rounded-[10px] uppercase tracking-widest hover:bg-secondary hover:!text-black transition-all">POKUŠAJ PONOVO</button>
             </div>
           ) : activities.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
