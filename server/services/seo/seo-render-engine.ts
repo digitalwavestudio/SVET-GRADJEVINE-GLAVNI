@@ -357,13 +357,23 @@ export class SEORenderEngine {
     // Inject SEO tags before </head>
     renderedHtml = renderedHtml.replace("</head>", `${finalMetaTagsStr}\n</head>`);
 
-    // Inject breadcrumb navigation links so every page has real internal HTML links
+    // Inject breadcrumb navigation links — OUTSIDE <div id="root"> so React hydration doesn't break
     const breadcrumbNav = this.generateBreadcrumbNav(pathWithoutQuery);
     const crossLinks = this.generateHubCrossLinks(pathWithoutQuery);
-    renderedHtml = renderedHtml.replace(
-      '<div id="root"></div>',
-      `<div id="root">${meta?.botHtml || breadcrumbNav}${crossLinks}</div>`
-    );
+    const navHtml = `${breadcrumbNav}${crossLinks}`;
+    if (meta?.botHtml) {
+      // Detail pages: botHtml goes INSIDE root (SSR React content)
+      renderedHtml = renderedHtml.replace(
+        '<div id="root"></div>',
+        `<div id="root">${meta.botHtml}</div>${navHtml}`
+      );
+    } else {
+      // Hub pages: no SSR content, breadcrumbs go after empty root (visible to crawlers, ignored by React)
+      renderedHtml = renderedHtml.replace(
+        '<div id="root"></div>',
+        `<div id="root"></div>${navHtml}`
+      );
+    }
 
     return renderedHtml;
   }

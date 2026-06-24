@@ -195,7 +195,7 @@ function injectEmptyRootLinks(html: string, reqPath: string): string {
   const content = `${breadcrumbHtml}${crossLinks}`;
   return html.replace(
     '<div id="root"></div>',
-    `<div id="root">${content}</div>`
+    `<div id="root"></div>${content}`
   );
 }
 
@@ -1279,7 +1279,7 @@ ${breadcrumbHtml}
           );
           skeletonHtml = skeletonHtml.replace(
             '<div id="root"></div>',
-            `<div id="root">${SEORenderEngine.generateBreadcrumbNav(req.path)}</div>`,
+            `<div id="root"></div>${SEORenderEngine.generateBreadcrumbNav(req.path)}`,
           );
           return res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400').send(skeletonHtml);
         }
@@ -1395,7 +1395,7 @@ ${breadcrumbHtml}
         );
         skeletonHtml = skeletonHtml.replace(
           '<div id="root"></div>',
-          `<div id="root">${SEORenderEngine.generateBreadcrumbNav(req.path)}</div>`,
+          `<div id="root"></div>${SEORenderEngine.generateBreadcrumbNav(req.path)}`,
         );
         return res.send(skeletonHtml);
       }
@@ -1430,7 +1430,7 @@ ${breadcrumbHtml}
         )
         .replace(
           '<div id="root"></div>',
-          `<div id="root"><main style="text-align:center;padding:4rem 1rem"><h1>404</h1><p>Stranica nije pronađena.</p><a href="/">Početna stranica</a></main></div>`,
+          `<div id="root"></div><main style="text-align:center;padding:4rem 1rem"><h1>404</h1><p>Stranica nije pronađena.</p><a href="/">Početna stranica</a></main>`,
         );
       res.status(404).send(notFoundHtml);
     } catch (err) {
