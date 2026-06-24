@@ -128,8 +128,8 @@ export default function CtaSection() {
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 min-w-0">
-          <div className="grid lg:grid-cols-12 gap-12 items-center w-full min-w-0">
-            <div className="lg:col-span-7 space-y-8 min-w-0">
+          <div className="grid lg:grid-cols-12 gap-12 items-start w-full min-w-0">
+            <div className="lg:col-span-7 space-y-8 min-w-0 pt-4">
               <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 Pridruži se liderima
@@ -227,7 +227,7 @@ export default function CtaSection() {
                   <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words">Kompanija</p>
                 </div>
 
-                <div className="glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-0 sm:translate-y-6 w-full">
+                <div className="glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-0 w-full">
                   <div className="w-8 h-1 bg-secondary mb-6 rounded-full shadow-[0_0_10px_rgba(254,191,13,0.5)]"></div>
                   <span className="material-symbols-outlined text-secondary mb-6 block text-4xl group-hover:rotate-12 transition-transform">construction</span>
                   <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1">{totalAdsCount.toLocaleString('sr-RS')}+</h3>
