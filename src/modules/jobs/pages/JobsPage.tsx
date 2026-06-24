@@ -211,7 +211,7 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
   }, [searchParamsStr, grad, zanimanje]);
 
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [sortBy, setSortBy] = useState<'newest' | 'salary-desc' | 'urgent'>('newest');
+  const [sortBy, setSortBy] = useState<'newest' | 'salary-desc' | 'expiring' | 'premium' | 'urgent'>('newest');
   const [aiQuery, setAiQuery] = useState('');
   const [isAiSearching, setIsAiSearching] = useState(false);
 
@@ -330,6 +330,16 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
     let result = applyLocalFilters(jobs);
     if (sortBy === 'salary-desc') {
       result = [...result].sort((a, b) => (Number(b.plataMax || b.plataMin || 0)) - (Number(a.plataMax || a.plataMin || 0)));
+    } else if (sortBy === 'expiring') {
+      const now = Date.now();
+      const parseExp = (j: any) => {
+        if (!j.expiresAt) return Infinity;
+        const ts = typeof j.expiresAt === 'object' && j.expiresAt?.toDate ? j.expiresAt.toDate().getTime() : new Date(j.expiresAt).getTime();
+        return isNaN(ts) ? Infinity : ts;
+      };
+      result = [...result].sort((a, b) => parseExp(a) - parseExp(b));
+    } else if (sortBy === 'premium') {
+      result = [...result].sort((a, b) => (b.isPremium ? 1 : 0) - (a.isPremium ? 1 : 0));
     } else if (sortBy === 'urgent') {
       result = [...result].sort((a, b) => (b.isUrgent ? 1 : 0) - (a.isUrgent ? 1 : 0));
     }
@@ -599,7 +609,7 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
+              <div className="hidden md:flex items-center gap-6">
                 <div className="flex bg-[#13212e]/60 backdrop-blur-md border border-white/5 rounded-lg p-1 gap-1">
                   <button 
                     onClick={() => setViewMode('grid')}
@@ -625,7 +635,9 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
               options={[
                 { value: 'newest', label: 'NAJNOVIJE' },
                 { value: 'salary-desc', label: 'NAJVEĆA PLATA' },
-                { value: 'urgent', label: 'HITNI POSLOVI' }
+                { value: 'expiring', label: 'USKORO ISTIČU' },
+                { value: 'premium', label: 'PREMIUM OGLASI' },
+                { value: 'urgent', label: 'HITNI OGLASI' }
               ]}
               onChange={(val) => setSortBy(val as any)}
             />

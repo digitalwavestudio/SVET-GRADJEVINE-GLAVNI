@@ -35,7 +35,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
       {/* Mobile Card Layout */}
       <article 
         itemScope itemType="https://schema.org/JobPosting"
-        className={`md:hidden group relative glass-card rounded-[10px] p-4 flex flex-col gap-3 transition-all duration-500 overflow-hidden ${job.isPremium ? 'border-2 border-yellow-500/80 bg-secondary/[0.03] shadow-[0_0_20px_rgba(234,179,8,0.2)]' : 'border border-white/5'}`}
+        className={`md:hidden group relative glass-card rounded-[10px] p-4 flex flex-col gap-3 transition-all duration-500 overflow-hidden ${job.isPremium ? 'border-[0.8px] border-yellow-500/30 bg-secondary/[0.02] shadow-[0_0_15px_rgba(234,179,8,0.15)]' : 'border border-white/5'}`}
       >
         {createdDate && (
           <>
@@ -52,7 +52,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         )}
 
         {/* Top Header Row: Title/Company on Left, Logo on Right */}
-        <div className="flex items-start justify-between gap-3 relative z-10 min-h-[56px]">
+        <div className="flex items-start justify-between gap-3 relative z-10">
           <div className="flex-grow min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               {job.isUrgent && (
@@ -71,11 +71,11 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
             <div className="flex items-center gap-1.5 mt-1 flex-wrap">
               {job.companyId ? (
-                <Link to={`/firma/${job.companyId}`} className="text-secondary text-[10px] font-bold uppercase tracking-wider hover:underline">
+                <Link to={`/firma/${job.companyId}`} className="text-secondary text-[12px] font-bold uppercase tracking-wider hover:underline">
                   {job.comp}
                 </Link>
               ) : (
-                <span className="text-secondary text-[10px] font-bold uppercase tracking-wider">{job.comp}</span>
+                <span className="text-secondary text-[12px] font-bold uppercase tracking-wider">{job.comp}</span>
               )}
               {job.isCompanyVerified && (
                 <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -103,14 +103,18 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           </div>
         </div>
 
-        {/* Middle Section: Salary only */}
-        <div className="flex flex-row items-center justify-end border-t border-b border-white/5 py-2.5 my-1 relative z-10 gap-2">
+        {/* Middle Section: Views + Salary */}
+        <div className="flex flex-row items-center justify-between border-t border-b border-white/5 py-2.5 my-1 relative z-10 gap-2">
+          {/* Views — levo, plavo */}
+          <span className="inline-flex items-center gap-1 text-blue-400 text-[8px] font-mono">
+            <span className="material-symbols-outlined text-[12px] text-blue-400">visibility</span> {job.viewsCount || 0}
+          </span>
           {/* Salary / Payment */}
-          <div className="text-right flex flex-col">
-            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-0.5 leading-none font-sans">
+          <div className="text-right flex flex-col items-end">
+            <span className="text-[8px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none font-sans">
               {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
             </span>
-            <span className="text-secondary font-black text-lg font-sans leading-none tracking-tight">
+            <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] font-black text-lg font-sans leading-none tracking-tight">
               {getSalaryDisplay()}
             </span>
           </div>
@@ -141,10 +145,6 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                     <span className="material-symbols-outlined text-[10px]">restaurant</span> Hrana
                   </span>
                 )}
-                {/* Views — desno, plavo */}
-                <span className="inline-flex items-center gap-1 text-blue-400 text-[8px] font-mono ml-auto">
-                  <span className="material-symbols-outlined text-[10px] text-blue-400">visibility</span> {job.viewsCount || 0}
-                </span>
               </>
             );
           })()}
@@ -161,7 +161,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
       {/* Desktop Card Layout */}
       <article 
         itemScope itemType="https://schema.org/JobPosting"
-        className={`hidden md:flex group relative h-full glass-card rounded-[10px] transition-all duration-500 overflow-hidden ${viewMode === 'list' ? 'p-5 flex-row items-center gap-5' : 'p-5 flex-col'} ${job.isPremium ? 'border-2 border-yellow-500/80 bg-secondary/[0.03] shadow-[0_0_20px_rgba(234,179,8,0.2)] hover:border-yellow-400 hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:-translate-y-1' : 'border border-white/5 hover:border-secondary/30 hover:shadow-[0_0_30px_rgba(254,191,13,0.05)] hover:-translate-y-1'}`}
+        className={`hidden md:flex group relative h-full glass-card rounded-[10px] transition-all duration-500 overflow-hidden ${viewMode === 'list' ? 'p-5 flex-row items-center gap-5' : 'p-5 flex-col items-center text-center'} ${job.isPremium ? 'border-[0.8px] border-yellow-500/30 bg-secondary/[0.02] shadow-[0_0_15px_rgba(234,179,8,0.15)] hover:border-yellow-400/60 hover:shadow-[0_0_20px_rgba(234,179,8,0.2)] hover:-translate-y-1' : 'border border-white/5 hover:border-secondary/30 hover:shadow-[0_0_30px_rgba(254,191,13,0.05)] hover:-translate-y-1'}`}
       >
         {createdDate && (
           <>
@@ -170,7 +170,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50"></div>
             )}
             {(new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000) && (
-              <span className="absolute top-4 right-4 bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] z-20">
+              <span className="absolute top-3 right-3 bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] z-20">
                 NOVO
               </span>
             )}
@@ -178,7 +178,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         )}
 
         {/* Logo Section */}
-        <div className={`${viewMode === 'list' ? 'w-20 h-20' : 'w-16 h-16 mb-4'} shrink-0 bg-white rounded-[10px] p-2 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform duration-500 relative z-10 overflow-hidden`}>
+        <div className={`${viewMode === 'list' ? 'w-20 h-20' : 'w-14 h-14 mb-3'} shrink-0 bg-white rounded-[10px] p-2 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform duration-500 relative z-10 overflow-hidden`}>
           {job.logo ? (
             <OptimizedImage
               src={job.logo}
@@ -201,153 +201,158 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         </div>
         
         {/* Content Section */}
-        <div className="flex-grow w-full relative z-10">
-          <div className="flex flex-col mb-3">
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <h3 itemProp="title" className={`${viewMode === 'list' ? 'text-xl' : 'text-lg'} font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug`}>
-                <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
-                  {job.title}
-                </Link>
-              </h3>
-              {job.isUrgent && (
-                <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] shadow-lg shadow-red-500/20 flex items-center gap-1">
-                  🔥 HITNO
-                </span>
-              )}
-              {job.isPremium && <PremiumBadge />}
-            </div>
-            <div className="flex items-center gap-2">
-              {job.companyId ? (
-                <div className="flex items-center gap-1" itemProp="hiringOrganization" itemScope itemType="https://schema.org/Organization">
-                  <Link itemProp="url" to={`/firma/${job.companyId}`} className="text-secondary text-[10px] font-bold uppercase tracking-widest opacity-80 hover:underline relative z-20">
-                    <span itemProp="name">{job.comp}</span>
-                  </Link>
-                  {job.isCompanyVerified && (
-                    <div className="hidden md:flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-2 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                      <span className="text-[7px] font-black tracking-[0.15em] uppercase text-green-400">Verifikovan</span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center gap-1" itemProp="hiringOrganization" itemScope itemType="https://schema.org/Organization">
-                  <span itemProp="name" className="text-secondary text-[10px] font-bold uppercase tracking-widest opacity-80">{job.comp}</span>
-                  {job.isCompanyVerified && (
-                    <div className="hidden md:flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-2 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                      <span className="text-[7px] font-black tracking-[0.15em] uppercase text-green-400">Verifikovan</span>
-                    </div>
-                  )}
-                </div>
-              )}
-              <span className="text-white/40 text-[9px] font-bold uppercase tracking-widest">{job.cat}</span>
-            </div>
+        <div className={`flex-grow w-full relative z-10 ${viewMode === 'grid' ? 'flex flex-col items-center' : ''}`}>
+            {/* Title + Badges + Salary row */}
+          <div className={`flex items-center gap-3 mb-1 flex-wrap ${viewMode === 'grid' ? 'justify-center' : ''}`}>
+            <h3 itemProp="title" className={`${viewMode === 'list' ? 'text-xl' : 'text-sm'} font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug`}>
+              <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
+                {job.title}
+              </Link>
+            </h3>
+            {job.isUrgent && (
+              <span className="bg-red-600 text-white text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] shadow-lg shadow-red-500/20 flex items-center gap-1">
+                🔥 HITNO
+              </span>
+            )}
+            {job.isPremium && <PremiumBadge />}
+            {viewMode === 'list' && (
+              <span className="ml-auto text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] font-black text-xl font-sans tracking-tight">
+                {getSalaryDisplay()}
+              </span>
+            )}
           </div>
 
-          {/* Tags/Benefits & Stats */}
-          <div className="flex gap-4 flex-wrap mb-4 items-center">
-            {/* Benefits: Smeštaj, Prevoz, Hrana */}
-            <div className="hidden md:flex flex-wrap gap-1.5 relative z-10 min-h-[22px]">
+          {/* Company */}
+          <div className={`flex items-center gap-2 mb-2 ${viewMode === 'grid' ? 'justify-center' : ''}`}>
+            {job.companyId ? (
+              <div className="flex items-center gap-1" itemProp="hiringOrganization" itemScope itemType="https://schema.org/Organization">
+                <Link itemProp="url" to={`/firma/${job.companyId}`} className="text-secondary text-[10px] font-bold uppercase tracking-widest opacity-90 hover:underline relative z-20">
+                  <span itemProp="name">{job.comp}</span>
+                </Link>
+                {job.isCompanyVerified && (
+                  <div className="hidden md:flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-1.5 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
+                    <span className="text-[7px] font-black tracking-[0.15em] uppercase text-green-400">Verifikovan</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1" itemProp="hiringOrganization" itemScope itemType="https://schema.org/Organization">
+                <span itemProp="name" className="text-secondary text-[10px] font-bold uppercase tracking-widest opacity-90">{job.comp}</span>
+                {job.isCompanyVerified && (
+                  <div className="hidden md:flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-1.5 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
+                    <span className="text-[7px] font-black tracking-[0.15em] uppercase text-green-400">Verifikovan</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Benefits + Views + POGLEDAJ row */}
+          {viewMode === 'list' ? (
+            <div className="hidden md:flex items-center justify-between gap-2">
+              <div className="flex gap-1.5 items-center flex-wrap">
+                {(() => {
+                  const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
+                  const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
+                  const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
+                  const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
+                  return (
+                    <>
+                      {hasSmestaj && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 text-green-400 text-[8px] rounded-full font-bold uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-[9px]">home</span> Smeštaj
+                        </span>
+                      )}
+                      {hasPrevoz && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] rounded-full font-bold uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-[9px]">commute</span> Prevoz
+                        </span>
+                      )}
+                      {hasHrana && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[8px] rounded-full font-bold uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-[9px]">restaurant</span> Hrana
+                        </span>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="inline-flex items-center gap-1 text-blue-400 text-[10px] font-mono">
+                  <span className="material-symbols-outlined text-[14px] text-blue-400">visibility</span> {job.viewsCount || 0}
+                </span>
+                <Link 
+                  to={buildJobUrl(job)}
+                  state={{ job: {
+                    title: job.title,
+                    company: job.comp,
+                    location: job.loc,
+                    tacnaLokacija: job.tacnaLokacija,
+                    type: job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug,
+                    start: 'Odmah',
+                    salary: job.sal,
+                    time: job.time,
+                    status: job.status,
+                    isPremium: job.isPremium,
+                    isUrgent: job.isUrgent
+                  }}}
+                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-black px-5 py-2.5 rounded-[10px] border border-white/10 transition-all uppercase tracking-widest text-[10px]"
+                >
+                  POGLEDAJ 
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className={`flex gap-1.5 items-center flex-wrap ${viewMode === 'grid' ? 'justify-center mb-3' : ''}`}>
               {(() => {
                 const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
                 const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
                 const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
                 const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
-
-                if (!hasSmestaj && !hasPrevoz && !hasHrana) {
-                  return <div className="h-[22px] w-full"></div>;
-                }
-
                 return (
                   <>
                     {hasSmestaj && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 text-green-400 text-[9px] rounded-full font-bold uppercase tracking-wider">
-                        <span className="material-symbols-outlined text-[10px]">home</span> Smeštaj
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 text-green-400 text-[8px] rounded-full font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[9px]">home</span> Smeštaj
                       </span>
                     )}
                     {hasPrevoz && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] rounded-full font-bold uppercase tracking-wider">
-                        <span className="material-symbols-outlined text-[10px]">commute</span> Prevoz
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] rounded-full font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[9px]">commute</span> Prevoz
                       </span>
                     )}
                     {hasHrana && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[9px] rounded-full font-bold uppercase tracking-wider">
-                        <span className="material-symbols-outlined text-[10px]">restaurant</span> Hrana
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[8px] rounded-full font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[9px]">restaurant</span> Hrana
                       </span>
                     )}
+                    <span className="inline-flex items-center gap-1 text-blue-400 text-[9px] font-mono ml-auto">
+                      <span className="material-symbols-outlined text-[12px] text-blue-400">visibility</span> {job.viewsCount || 0}
+                    </span>
                   </>
                 );
               })()}
             </div>
-
-            {/* Views count — just icon + number */}
-            <span className="hidden md:flex items-center gap-1 text-blue-400 text-[10px] font-mono border-l border-white/5 pl-4">
-              <span className="material-symbols-outlined text-[14px] text-blue-400">visibility</span> {job.viewsCount || 0}
-            </span>
-          </div>
-        </div>
-
-        {/* Action Section */}
-        <div className={`${viewMode === 'list' ? 'md:min-w-[150px] md:text-right flex md:flex-col items-center md:items-end justify-between w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-white/5' : 'mt-auto pt-4 border-t border-white/5 flex items-center justify-between'} relative z-10`}>
-          <div className="flex flex-col items-center md:items-center">
-            <div className="text-secondary font-black text-2xl mb-1 font-sans tracking-tight">
-              {getSalaryDisplay()}
-            </div>
-            {viewMode === 'list' && (
-              <div className="text-white/30 text-[9px] font-bold uppercase tracking-widest mb-3 font-sans">
-                {job.time}
-              </div>
-            )}
-          </div>
-          
-          {viewMode === 'list' ? (
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                to={`/cene-i-statistika/${job.professionSlug || job.profession || ''}${(job.locationSlug || job.loc || job.location) ? `/${job.locationSlug || job.loc || job.location}` : ''}`}
-                className="text-white/30 hover:text-secondary text-[9px] font-black uppercase tracking-widest transition-colors px-2"
-                title="Pogledaj cene i statistiku"
-              >
-                CENE
-              </Link>
-              <Link 
-                to={buildJobUrl(job)}
-                state={{ job: {
-                  title: job.title,
-                  company: job.comp,
-                  location: job.loc,
-                  tacnaLokacija: job.tacnaLokacija,
-                  type: job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug,
-                  start: 'Odmah',
-                  salary: job.sal,
-                  time: job.time,
-                  status: job.status,
-                  isPremium: job.isPremium,
-                  isUrgent: job.isUrgent
-                }}}
-                className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-black px-6 py-3 rounded-[10px] border border-white/10 transition-all uppercase tracking-widest text-[10px]"
-              >
-                POGLEDAJ 
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                to={`/cene-i-statistika/${job.professionSlug || job.profession || ''}${(job.locationSlug || job.loc || job.location) ? `/${job.locationSlug || job.loc || job.location}` : ''}`}
-                className="text-white/20 hover:text-secondary text-[8px] font-black uppercase tracking-widest transition-colors"
-                title="Pogledaj cene i statistiku"
-              >
-                CENE
-              </Link>
-              <Link 
-                to={buildJobUrl(job)}
-                className="w-10 h-10 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center text-white hover:bg-white/10 hover:text-secondary transition-all"
-              >
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
-            </div>
           )}
         </div>
+
+        {/* Action Section (grid only) */}
+        {viewMode !== 'list' && (
+          <div className="w-full mt-auto pt-3 border-t border-white/5 flex items-center justify-between relative z-10">
+            <div className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] font-black text-xl font-sans tracking-tight">
+              {getSalaryDisplay()}
+            </div>
+            <Link 
+              to={buildJobUrl(job)}
+              className="w-10 h-10 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center text-white hover:bg-white/10 hover:text-secondary transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </Link>
+          </div>
+        )}
       </article>
     </>
   );

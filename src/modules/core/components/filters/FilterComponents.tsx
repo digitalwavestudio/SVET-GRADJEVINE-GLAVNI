@@ -294,9 +294,6 @@ export const SortingBar = ({ currentSort, options, onChange }: {
         </button>
       ))}
     </div>
-    <div className="hidden md:flex items-center gap-4 px-4 border-l border-white/5">
-       <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Smart Sort Aktivan</span>
-    </div>
   </div>
 );
 

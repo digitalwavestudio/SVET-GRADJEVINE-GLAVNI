@@ -24,30 +24,12 @@ const getFriendlyLocation = (job: any) => {
 };
 
 const getFriendlyCategory = (job: any) => {
-  if (job.type === 'job') {
-    const profSlug = job.professionSlug;
-    if (profSlug) {
-      for (const sector in PROFESSIONS) {
-        const found = PROFESSIONS[sector].find(p => p.slug === profSlug || p.id === profSlug);
-        if (found) return found.name;
-      }
-    }
-    
-    const sectSlug = job.sectorSlug || job.categorySlug || job.sector;
-    if (sectSlug) {
-      const found = CORE_SECTORS.find(s => s.slug === sectSlug || s.id === sectSlug);
-      if (found) return found.name;
-    }
-    
-    return 'Građevinski posao';
-  }
-  
+  if (job.type === 'job') return 'Gruba gradnja';
   if (job.type === 'machine') return 'Građevinska mašina';
   if (job.type === 'real_estate') return 'Plac / Zemljište';
   if (job.type === 'company') return 'Firma';
   if (job.type === 'accommodation') return 'Smeštaj za radnike';
   if (job.type === 'catering') return 'Ketering';
-  
   return 'Premium oglas';
 };
 
@@ -146,7 +128,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
               {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
                 .map((job, idx) => (
                 <div key={`${job.id}-${idx}`} className={`gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative block shrink-0 h-[400px] md:h-[360px] ${isExpanded ? 'w-full' : 'w-[90vw] sm:min-w-[340px] md:min-w-[620px] md:w-[620px]'}`}>
-                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col justify-between rounded-[10px] border border-white/5 w-full h-full relative">
+                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col rounded-[10px] border border-white/5 w-full h-full relative">
                     
                     {/* Top Row: Logo + Header info */}
                     <div className="flex gap-4 md:gap-7 items-start md:items-center w-full min-w-0">
@@ -169,17 +151,17 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                       {/* Title & Desc */}
                       <div className="flex-1 min-w-0 font-sans">
                         <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5 relative z-10 w-full">
-                          <div className="flex items-center gap-1 animate-blink">
-                            <span className="material-symbols-outlined text-yellow-500 text-sm md:text-base" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
-                            <span className="text-yellow-500 text-[10px] md:text-xs font-black uppercase tracking-widest">Premium Oglas</span>
+                          <div className="flex items-center gap-1.5 animate-blink">
+                            <span className="material-symbols-outlined text-yellow-500 text-base md:text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                            <span className="text-yellow-500 text-[11px] md:text-sm font-black uppercase tracking-widest">Premium Oglas</span>
                           </div>
                           {/* Category Badge on Mobile/Desktop */}
-                          <span className="bg-gradient-to-r from-[#D4AF37]/10 to-[#FDE68A]/5 text-[#D4AF37] border border-[#D4AF37]/20 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider whitespace-nowrap shadow-[0_0_10px_rgba(212,175,55,0.05)]">
+                          <span className="bg-gradient-to-r from-[#D4AF37]/10 to-[#FDE68A]/5 text-[#D4AF37] border border-[#D4AF37]/20 px-2.5 md:px-3.5 py-1 md:py-1 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-wider whitespace-nowrap shadow-[0_0_10px_rgba(212,175,55,0.05)]">
                             {getFriendlyCategory(job)}
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-2">
+                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-1 truncate">
                           <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
                             {job.title?.replace(' — ', ' ') || 'Premium Posao'}
                           </Link>
@@ -191,8 +173,8 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                       </div>
                     </div>
 
-                    {/* Middle Row: Tags (Vertically Centered) */}
-                    <div className="flex flex-col gap-2 w-full relative z-10 my-auto py-4">
+                    {/* Middle Row: Tags */}
+                    <div className="flex flex-col gap-2 w-full relative z-10 py-10">
                       {getFriendlyEngagement(job) && (
                         <div className="flex">
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
@@ -232,21 +214,23 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                       })()}
                     </div>
 
-                    {/* Bottom Row: Footer Row (Pinned to Bottom) */}
-                    <div className="flex justify-between items-center w-full relative z-10 pt-4 border-t border-white/5 mt-auto">
-                      <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-[10px] md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
-                        APLICIRAJ
-                        <span className="material-symbols-outlined text-sm hidden md:block">arrow_forward</span>
-                      </button>
-                      
-                      {getFriendlySalary(job) && (
-                        <div className="flex flex-col items-end justify-center min-w-[90px]">
-                          <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Zarada</span>
-                          <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-3xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
-                            {getFriendlySalary(job)}
-                          </span>
-                        </div>
-                      )}
+                    {/* Bottom Row: Footer Row */}
+                    <div className="flex-1 flex flex-col justify-end">
+                      <div className="border-t border-white/5" />
+                      <div className="flex justify-between items-center w-full relative z-10 pt-3 pb-1">
+                        <button className="bg-gradient-to-br from-secondary to-yellow-600 text-slate-950 font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-[10px] md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
+                          APLICIRAJ
+                          <span className="material-symbols-outlined text-sm hidden md:block">arrow_forward</span>
+                        </button>
+                        {getFriendlySalary(job) && (
+                          <div className="flex flex-col items-end justify-center min-w-[90px]">
+                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Zarada</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-3xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
+                              {getFriendlySalary(job)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
