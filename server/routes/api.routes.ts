@@ -474,6 +474,13 @@ apiRouter.use("/analytics", analyticsRouter);
 apiRouter.use("/telemetry", telemetryRouter);
 apiRouter.use("/system", systemRouter);
 
+// Frontend error logging (used by entry-client.tsx window.onerror handler)
+apiRouter.post("/dev/log-error", async (req, res) => {
+  const { message, source, lineno, colno, stack } = req.body || {};
+  console.error(`[FRONTEND ERROR] ${message || "unknown"}`, { source, lineno, colno, stack });
+  res.json({ success: true });
+});
+
 apiRouter.post("/logs", async (req, res) => {
   const { level, message, context, uid, url } = req.body;
   const logPrefix = `[FRONTEND LOG] [${level || "INFO"}]`;

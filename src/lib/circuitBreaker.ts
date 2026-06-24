@@ -247,7 +247,7 @@ class ClientCircuitBreaker {
               }));
               this.isStorageFull = false; // Retry succeeded
             } catch (e2) {
-              console.warn('[CircuitBreaker] Failed to cache even after clearing all cache:', e2);
+              // localStorage is genuinely full — skip caching silently
             }
           } else {
             console.warn('[CircuitBreaker] Failed to cache response in safeLocalStorage:', err);
