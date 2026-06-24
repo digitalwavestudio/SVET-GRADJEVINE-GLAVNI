@@ -84,7 +84,7 @@ function getFormattedErrorMessage(error: unknown, fallbackMessage: string): stri
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
-      const errObj = error && typeof error === 'object' ? error as Record<string, unknown> : null;
+      const errObj = error && typeof error === 'object' ? error as { status?: number; statusCode?: number; response?: { status?: number }; message?: string } : null;
       const status = errObj?.status || errObj?.statusCode || errObj?.response?.status;
       const errMsg = String(errObj?.message || '').toLowerCase();
       // Ne prikazuj toast za 404, network greške i abort (korisnik ne treba da vidi ovo)

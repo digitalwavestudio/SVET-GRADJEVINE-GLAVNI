@@ -15,9 +15,17 @@ async function startServer() {
   // Phase 0: Absolute Liveness Priority
   app.get("/api/health", (_req, res) => res.json({ status: "ok", mode, commit: "00527a4", premiumFix: true }));
   app.get("/api/system/liveness", (_req, res) => res.status(200).send("OK"));
-  app.get("/api/system/readiness", (_req, res) => {
+  app.get("/api/system/readiness", async (_req, res) => {
     if (!isReady) return res.status(503).json({ error: "Service Unavailable", message: "Sistem se pokreće, pokušajte ponovo za par sekundi." });
-    res.json({ database: true, redis: true, resources: true });
+
+    const { getRedis } = await import("./server/utils/redis.ts");
+    const { db } = await import("./server/config/firebase.ts");
+
+    const redisOk = await getRedis()?.ping().then(() => true).catch(() => false) ?? false;
+    const firestoreOk = await db.collection("users").limit(1).get().then(() => true).catch(() => false);
+
+    const allOk = redisOk && firestoreOk;
+    res.status(allOk ? 200 : 503).json({ database: firestoreOk, redis: redisOk, resources: true });
   });
 
   // Stateless Guard middleware to prevent 404s and connection starvation

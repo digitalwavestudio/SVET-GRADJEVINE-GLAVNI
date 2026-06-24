@@ -1,6 +1,8 @@
 import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
 import { AuditService, AuditAction } from "../audit.service.ts";
 import { CacheService } from "../cache.service.ts";
+import { CacheKeys } from "../../constants/cache-keys.ts";
+import { employerStatsMemoryCache } from "../dashboard/dashboard-lru.ts";
 import { FinancialLedgerService, TransactionType } from "../ledger.service.ts";
 
 export class AdminFinanceService {
@@ -101,7 +103,24 @@ export class AdminFinanceService {
         lastPaymentAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
       });
+
+      // 3. Update pre-aggregated user_stats so dashboard sees it
+      const userStatsRef = db.collection("user_stats").doc(userId);
+      transaction.set(userStatsRef, {
+        activePackage: packageId,
+        packageExpiry: packageExpiry,
+        lastPaymentAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        lastPaymentAmount: data.amount || 0,
+        lastPaymentType: "package_purchase",
+        lastPaymentStatus: "completed",
+        updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
     });
+
+    // Evict dashboard + user_stats cache
+    await CacheService.delete(CacheKeys.employerStats(userId)).catch(() => {});
+    await CacheService.delete(`user_stats_${userId}`).catch(() => {});
+    employerStatsMemoryCache.delete(userId);
 
     await AuditService.logAction(
       adminId,

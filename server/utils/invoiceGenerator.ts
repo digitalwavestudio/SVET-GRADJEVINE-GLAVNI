@@ -83,12 +83,6 @@ export async function generateProformaInvoice(
 
     // --- Totals ---
     y += 20;
-    doc.text("Osnovica:", 350, y);
-    doc.text(`${data.subtotal.toFixed(2)} EUR`, 450, y);
-    y += 15;
-    doc.text("PDV (20%):", 350, y);
-    doc.text(`${data.vat.toFixed(2)} EUR`, 450, y);
-    y += 15;
     doc.fontSize(12).font("Helvetica-Bold").text("UKUPNO ZA UPLATU:", 300, y);
     doc.text(`${data.total.toFixed(2)} EUR`, 450, y);
 

@@ -207,6 +207,7 @@ export class UnifiedSearchFirestore {
           q = q.startAfter(parsedToken.isPremium, createdAtVal, parsedToken.id);
         } else {
           // Fallback for legacy simple ID-only cursors
+          const isProfileSearch = false;
           const collectionName = isProfileSearch
             ? "users"
             : [

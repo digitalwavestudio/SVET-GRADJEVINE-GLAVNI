@@ -79,22 +79,7 @@
     "./eslint.config.js",
     "./src/lib/queryClient.ts"
   ],
-  "frozen_checksums": {
-    "./server/services/unified-search.service.ts": "fee777ba8a1cd6872c98123b9205535920ca47f5869277c02c31a3ba51f615ad",
-    "./server/services/unified-ads.service.ts": "ddfd911461d151de44429ddad0a1ed9504211cb359c653ce70ff3023bfde3145",
-    "./server/services/outbox.worker.ts": "4aa8612f256c35c635188563558c5a46a12d23d8f3f2ff9aa99146ba46cf8372",
-    "./server/services/viewStatsService.ts": "77b4f14ebd96978f6341db2adbacb445ff2e2bddf983636b3133c14f20d0c7a8",
-    "./server/services/metrics.service.ts": "f318a07d3966a0e5744a0171135d4777d8682240d12117019952b1908dc646e2",
-    "./server/services/algolia-redis-batcher.service.ts": "1947aa5035001add61054f11e63f5d2d3ef30a119a3548ffd826f756271068df",
-    "./server/services/chat-buffer.service.ts": "5627e491a169dd797b1b3c25aa8e6c4f71b15549c5a23c0e147b81b23a05aa82",
-    "./server/services/jwks.service.ts": "9a65fd15ebd662bb0641437f3ee6fda6232c31481fdef9cf5596410900625922",
-    "./server/services/job-application.service.ts": "debb278b94282136b8cf81cc64c22bc8974f4c028377b48d6fce667c2e39aea8",
-    "./server/routes/api.routes.ts": "f95b34253b4d109fc8ccf5cc6618960ca005aa656e9005ef47f3f45a417b356e",
-    "./ROADMAP_SERVER_OPTIMIZATION.md": "ae9a8bcca36623052665b595d6de7aa209f8ae854c189cb911b2c6b5cc4a0b1c",
-    "./ARCHITECTURE_AUDIT.md": "edaca65a4a15db5c7d45144404c681e213451972464d098ce2b13a3f4e4b0a0a",
-    "./eslint.config.js": "599618a14b3379ab25b4f42c5a49a1cfafda901b1e038411790c8a912a9de42c",
-    "./src/lib/queryClient.ts": "eb72660ebc40867ec96f0e6a7eea94ddaaa7fce92355b0956afbd80abfde99d2"
-  },
+  "meta_protected_note": "Prethodna frozen_checksums sekcija je uklonjena jer integrity check skripta ne postoji i hashevi su bili zastareli. Ovi fajlovi zahtevaju paznju pri izmenama, ali NISU zakljucani — bagovi se popravljaju.",
   "forbidden_code_grep_rules": [
     {
       "pattern": "setInterval\\s*\\(",

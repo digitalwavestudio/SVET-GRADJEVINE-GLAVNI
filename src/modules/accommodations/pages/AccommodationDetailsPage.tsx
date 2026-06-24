@@ -187,7 +187,7 @@ export default function AccommodationDetailsPage() {
             </div>
             <div className="text-right">
               <div className="text-[#ffad3a] text-3xl font-black tracking-tighter">{accommodation.price}€ <span className="text-sm font-normal text-[#a2acb9]">/ {accommodation.priceType === 'perPerson' ? 'po osobi' : 'za ceo objekat'}</span></div>
-              <div className="text-[#a2acb9] text-xs uppercase tracking-widest mt-1">PDV uključen u cenu</div>
+              <div className="text-[#a2acb9] text-xs uppercase tracking-widest mt-1">Cena za prikazani period</div>
             </div>
           </div>
         </motion.div>
@@ -388,7 +388,7 @@ export default function AccommodationDetailsPage() {
                     <h4 className="font-black text-sm uppercase text-white mb-1">Račun / Faktura</h4>
                     <p className="text-xs text-[#a2acb9] leading-relaxed">
                       {accommodation.invoiceAvailable 
-                        ? 'Dostupno za firme. Mogućnost plaćanja preko žiro računa sa PDV-om.' 
+                        ? 'Dostupno za firme. Mogućnost plaćanja preko žiro računa.' 
                         : 'Izdavanje fakture trenutno nije podržano za ovaj objekat.'}
                     </p>
                   </div>

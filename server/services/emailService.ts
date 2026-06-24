@@ -21,8 +21,9 @@ export const emailService = {
     try {
       // Simulation when SMTP credentials are missing
       if (!env.SMTP_USER || !env.SMTP_PASS) {
-        if (env.NODE_ENV !== "production") console.log(`[EMAIL SIMULACIJA] To: ${to} | Subject: ${subject}`);
-        return { success: true, simulated: true };
+        const msg = `[EMAIL] SMTP nije konfigurisan - email nije poslat: ${to} | ${subject}`;
+        console.warn(msg);
+        return { success: false, simulated: true };
       }
 
       await transporter.sendMail({
@@ -135,8 +136,9 @@ export const emailService = {
 
     try {
       if (!env.SMTP_USER || !env.SMTP_PASS) {
-        if (env.NODE_ENV !== "production") console.log(`[EMAIL SIMULACIJA] To: ${to} | Subject: Predračun ${invoiceNumber} | PDF attachment included`);
-        return { success: true, simulated: true };
+        const msg = `[EMAIL] SMTP nije konfigurisan - predračun nije poslat: ${to} | Predračun ${invoiceNumber}`;
+        console.warn(msg);
+        return { success: false, simulated: true };
       }
 
       await transporter.sendMail({

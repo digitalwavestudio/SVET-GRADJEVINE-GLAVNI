@@ -156,8 +156,7 @@ export default function CheckoutPage() {
   const basePrice = selectedPackage.price;
   const discountAmount = basePrice * discountApplied;
   const priceAfterDiscount = basePrice - discountAmount;
-  const tax = priceAfterDiscount * 0.20; // 20% PDV
-  const currentTotal = priceAfterDiscount + tax;
+  const currentTotal = priceAfterDiscount;
 
   return (
     <div className="bg-[#070B0F] min-h-screen text-white font-sans selection:bg-secondary selection:!text-black flex flex-col">
@@ -283,13 +282,6 @@ export default function CheckoutPage() {
                   <div className="text-sm font-black">-{discountAmount.toFixed(2)} €</div>
                 </div>
               )}
-              
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="text-sm font-bold text-white/60 uppercase tracking-tight">PDV (20%)</div>
-                </div>
-                <div className="text-sm font-bold text-white/60">{tax.toFixed(2)} €</div>
-              </div>
             </div>
 
             <div className="border-t border-secondary/20 pt-6">

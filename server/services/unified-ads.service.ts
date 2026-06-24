@@ -1,6 +1,8 @@
 // ≡ƒ¢í∩╕Å [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
+
+type RawAdData = Record<string, unknown>;
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { AuditService, AuditAction } from "./audit.service.ts";
 import { Logger } from "../utils/logger.ts";

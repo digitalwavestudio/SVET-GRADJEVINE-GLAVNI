@@ -62,8 +62,8 @@ checkoutRouter.post(
         Date.now() + 7 * 24 * 60 * 60 * 1000,
       ).toLocaleDateString("sr-RS");
 
-      const vat = amount * 0.2;
-      const subtotal = amount - vat;
+      const vat = 0;
+      const subtotal = amount;
 
       const invoiceData = {
         invoiceNumber,

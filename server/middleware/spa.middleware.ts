@@ -8,6 +8,7 @@ import { getRedis } from "../utils/redis.ts";
 
 const SSR_DIST_DIR = path.resolve(process.cwd(), "dist-ssr");
 const SSR_ENTRY_PATH = path.join(SSR_DIST_DIR, "entry-server.mjs");
+const SSR_CACHE_KEY = `file:///${SSR_ENTRY_PATH.replace(/\\/g, '/')}?v=${Date.now()}`;
 
 interface SsrResult {
   html: string;
@@ -54,7 +55,7 @@ async function reactSsrPage(fullUrl: string): Promise<SsrResult | null> {
       } as any;
       globalThis.document = mockDoc as any;
 
-      const ssrModule = await import(/* @vite-ignore */ `file:///${SSR_ENTRY_PATH.replace(/\\/g, '/')}`);
+      const ssrModule = await import(/* @vite-ignore */ SSR_CACHE_KEY);
       return await ssrModule.render(fullUrl);
     } finally {
       globalThis.fetch = origFetch;
@@ -858,7 +859,7 @@ export const createSpaMiddleware = () => {
           .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
           .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
            .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
-          const gaId = env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY";
+          const gaId = (env as any).VITE_GA_MEASUREMENT_ID || (env as any).GA_MEASUREMENT_ID || "G-SVV63518LY";
           cachedIndexHtml = cachedIndexHtml.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
       }
       let html = cachedIndexHtml;

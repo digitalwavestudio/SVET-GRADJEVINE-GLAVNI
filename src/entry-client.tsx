@@ -92,43 +92,35 @@ function Root() {
     };
   }, []);
 
-  const content = (
-    <ErrorBoundary>
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
-    </ErrorBoundary>
-  );
-
-  if (persister) {
-    return (
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{
-          persister,
-          maxAge: 1000 * 60 * 60 * 24,
-          dehydrateOptions: {
-            shouldDehydrateQuery: (query) => {
-              if (!query?.queryKey || !Array.isArray(query.queryKey)) return false;
-              const keysToPersist = ['premium-partners', 'categories', 'static-config', 'configs'];
-              return keysToPersist.some((key) => {
-                const stringKey = typeof key === 'string' ? key : JSON.stringify(key);
-                return query.queryKey.some((qk) => {
-                  if (qk === null || qk === undefined) return false;
-                  const qkStr = typeof qk === 'string' ? qk : JSON.stringify(qk);
-                  return qkStr.includes(stringKey);
-                });
+  return (
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={persister ? {
+        persister,
+        maxAge: 1000 * 60 * 60 * 24,
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            if (!query?.queryKey || !Array.isArray(query.queryKey)) return false;
+            const keysToPersist = ['premium-partners', 'categories', 'static-config', 'configs'];
+            return keysToPersist.some((key) => {
+              const stringKey = typeof key === 'string' ? key : JSON.stringify(key);
+              return query.queryKey.some((qk) => {
+                if (qk === null || qk === undefined) return false;
+                const qkStr = typeof qk === 'string' ? qk : JSON.stringify(qk);
+                return qkStr.includes(stringKey);
               });
-            },
+            });
           },
-        }}
-      >
-        {content}
-      </PersistQueryClientProvider>
-    );
-  }
-
-  return <QueryClientProvider client={queryClient}>{content}</QueryClientProvider>;
+        },
+      } : undefined as any}
+    >
+      <ErrorBoundary>
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
+      </ErrorBoundary>
+    </PersistQueryClientProvider>
+  );
 }
 
 const rootElement = document.getElementById('root');
