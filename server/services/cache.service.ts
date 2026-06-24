@@ -56,9 +56,11 @@ export class CacheService {
 
   private static get redisClient() {
     const cl = DatabaseManager.getRegionalRedisConnection();
-    // If it's a real redis instance but disconnected, treat as no redis so L1 works properly
-    if (cl && typeof cl.status === 'string' && cl.status !== 'ready' && cl.status !== 'connecting') {
-      return null;
+    if (!cl) return null;
+    if (typeof cl.status === 'string') {
+      // Proxy with "end" status still routes to InMemoryFallback — locking works within process
+      if (cl.status === 'end') return cl;
+      if (cl.status !== 'ready' && cl.status !== 'connecting') return null;
     }
     return cl;
   }

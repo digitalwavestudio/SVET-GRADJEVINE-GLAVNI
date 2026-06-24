@@ -80,12 +80,19 @@ export default function MastersPage() {
   }, [gradSlug, zanimanjeSlug, searchParamsStr]);
 
   const { data, isLoading: loading, fetchNextPage: loadMore, hasNextPage } = useMastersList(activeFilters);
+  const { data: premiumData } = useMastersList({ ...activeFilters, isPremiumProfile: true }, { enabled: true } as any);
   const isDeepPagingLimitReached = Boolean(hasNextPage && data?.pages && data.pages.length >= 11);
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
   const masters = useMemo(() => {
-    const list = data?.pages.flatMap(page => page?.docs || []) || [];
-    return [...list].sort((a, b) => (b.isPremiumProfile ? 1 : 0) - (a.isPremiumProfile ? 1 : 0));
-  }, [data]);
+    const regular = data?.pages.flatMap(page => page?.docs || []) || [];
+    const premium = premiumData?.pages.flatMap(page => page?.docs || []) || [];
+    const seen = new Set<string | undefined>();
+    return [...premium, ...regular].filter(m => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+  }, [data, premiumData]);
 
   const handleApplyFilters = useCallback(() => {
     const desiredProf = localSelectedProfession === 'SVE' ? null : localSelectedProfession;
