@@ -228,20 +228,23 @@ export function useCheckApplied(jobId: string, userId: string) {
 }
 
 export function useSimilarJobs(
-  _jobId: string,
-  _locationSlug?: string,
-  _professionSlug?: string,
+  jobId: string,
+  locationSlug?: string,
+  professionSlug?: string,
 ) {
-  // For now we simply show the latest jobs from the public feed.
-  // The hook ignores the specific jobId and returns up to 8 recent listings.
+  const filters: Record<string, unknown> = { status: 'active' };
+  if (professionSlug) filters.title = professionSlug;
+  if (locationSlug) filters.location = locationSlug;
+  const hasFilters = !!professionSlug || !!locationSlug;
+
   return useQuery<JobResponse[], Error>({
-    queryKey: queryKeys.jobs.all,
+    queryKey: [...queryKeys.jobs.similar(jobId), locationSlug, professionSlug],
     queryFn: async () => {
-      const response = await jobsService.fetchJobs({ status: 'active' }, null, 20);
-      return (response.items || []).slice(0, 8);
+      const response = await jobsService.fetchJobs(filters, null, 12);
+      return (response.items || []).filter(j => j.id !== jobId).slice(0, 8);
     },
-    enabled: true,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: hasFilters,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

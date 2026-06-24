@@ -12,8 +12,7 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
       const timer = setTimeout(() => setShowSplash(false), 300);
       return () => clearTimeout(timer);
     }
-    // Maximum splash screen duration: 800ms (not 3500ms)
-    const timer = setTimeout(() => setShowSplash(false), 800);
+    const timer = setTimeout(() => setShowSplash(false), 200);
     return () => clearTimeout(timer);
   }, [loading, user]);
 

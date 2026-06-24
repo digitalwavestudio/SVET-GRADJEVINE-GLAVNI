@@ -82,7 +82,10 @@ export default function MastersPage() {
   const { data, isLoading: loading, fetchNextPage: loadMore, hasNextPage } = useMastersList(activeFilters);
   const isDeepPagingLimitReached = Boolean(hasNextPage && data?.pages && data.pages.length >= 11);
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
-  const masters = data?.pages.flatMap(page => page?.docs || []) || [];
+  const masters = useMemo(() => {
+    const list = data?.pages.flatMap(page => page?.docs || []) || [];
+    return [...list].sort((a, b) => (b.isPremiumProfile ? 1 : 0) - (a.isPremiumProfile ? 1 : 0));
+  }, [data]);
 
   const handleApplyFilters = useCallback(() => {
     const desiredProf = localSelectedProfession === 'SVE' ? null : localSelectedProfession;

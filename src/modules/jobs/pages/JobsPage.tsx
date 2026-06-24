@@ -21,7 +21,7 @@ import { ActiveFilterChips, MarketStatsWidget, SortingBar } from '@/src/modules/
 import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
 import { BENEFITS, LOCATIONS, SECTORS } from '@/src/constants/taxonomy';
-import { useJobs } from '@/src/modules/jobs/hooks/useJobs';
+import { useJobs, usePremiumJobs, useUrgentJobs } from '@/src/modules/jobs/hooks/useJobs';
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 
 const AnalyticsDashboardUI = lazy(() => import('@/src/components/AnalyticsDashboardUI').then(m => ({ default: m.AnalyticsDashboardUI })));
@@ -83,8 +83,10 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
 
-  const premiumJobs = useMemo(() => jobs.filter(j => j.isPremium === true).slice(0, 6), [jobs]);
-  const urgentJobs = useMemo(() => jobs.filter(j => j.isUrgent === true).slice(0, 6), [jobs]);
+  const { data: premiumData } = usePremiumJobs(sanitizedFilters, 6, { enabled: !loadingJobs });
+  const { data: urgentData } = useUrgentJobs(sanitizedFilters, 6, { enabled: !loadingJobs });
+  const premiumJobs = useMemo(() => premiumData?.pages.flatMap(p => p.items) || [], [premiumData]);
+  const urgentJobs = useMemo(() => urgentData?.pages.flatMap(p => p.items) || [], [urgentData]);
 
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
@@ -307,50 +309,26 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
     searchParamsStr
   ]);
 
-  const applyLocalFilters = useCallback((jobList: any[]) => {
-    let result = jobList || [];
-    if (salaryRange[0] > 0 || salaryRange[1] < 5000) {
-      result = result.filter(j => {
-        const minPlata = Number(j.plataMin) || 0;
-        const maxPlata = Number(j.plataMax) || Number(j.plataMin) || 0;
-        if (!minPlata) return false;
-        return minPlata >= salaryRange[0] && maxPlata <= salaryRange[1];
-      });
-    }
-    if (selectedBenefits.length > 0) {
-      result = result.filter(j => {
-        if (!j.benefits || j.benefits.length === 0) return false;
-        return selectedBenefits.some(benefit => j.benefits.includes(benefit));
-      });
-    }
-    return result;
-  }, [salaryRange, selectedBenefits]);
-
   const filteredJobs = useMemo(() => {
-    let result = applyLocalFilters(jobs);
+    const result = [...jobs];
     if (sortBy === 'salary-desc') {
-      result = [...result].sort((a, b) => (Number(b.plataMax || b.plataMin || 0)) - (Number(a.plataMax || a.plataMin || 0)));
+      result.sort((a, b) => (Number(b.plataMax || b.plataMin || 0)) - (Number(a.plataMax || a.plataMin || 0)));
     } else if (sortBy === 'expiring') {
-      const now = Date.now();
       const parseExp = (j: any) => {
         if (!j.expiresAt) return Infinity;
         const ts = typeof j.expiresAt === 'object' && j.expiresAt?.toDate ? j.expiresAt.toDate().getTime() : new Date(j.expiresAt).getTime();
         return isNaN(ts) ? Infinity : ts;
       };
-      result = [...result].sort((a, b) => parseExp(a) - parseExp(b));
+      result.sort((a, b) => parseExp(a) - parseExp(b));
     } else if (sortBy === 'premium') {
-      result = [...result].sort((a, b) => (b.isPremium ? 1 : 0) - (a.isPremium ? 1 : 0));
+      result.sort((a, b) => (b.isPremium ? 1 : 0) - (a.isPremium ? 1 : 0));
     } else if (sortBy === 'urgent') {
-      result = [...result].sort((a, b) => (b.isUrgent ? 1 : 0) - (a.isUrgent ? 1 : 0));
+      result.sort((a, b) => (b.isUrgent ? 1 : 0) - (a.isUrgent ? 1 : 0));
     }
     return result;
-  }, [jobs, debouncedSearchQuery, salaryRange, selectedBenefits, sortBy]);
-  const filteredPremiumJobs = useMemo(() => {
-    const res = applyLocalFilters(premiumJobs).filter((j: any) => j.isPremium === true);
-    console.log("JobsPage filteredPremiumJobs:", res.length, "raw premiumJobs:", premiumJobs.length, "all raw jobs:", jobs.length);
-    return res;
-  }, [premiumJobs, debouncedSearchQuery, salaryRange, selectedBenefits, jobs]);
-  const filteredUrgentJobs = useMemo(() => applyLocalFilters(urgentJobs).filter((j: any) => j.isUrgent === true), [urgentJobs, debouncedSearchQuery, salaryRange, selectedBenefits]);
+  }, [jobs, sortBy]);
+  const filteredPremiumJobs = premiumJobs;
+  const filteredUrgentJobs = urgentJobs;
 
   // Reset page when filters change (Not needed anymore with server-side pagination)
   
@@ -475,7 +453,7 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
       name: job.title,
       url: `${APP_CONFIG.BASE_URL}${buildJobUrl(job)}`,
       description: job.description,
-      image: job.image
+      image: job.images?.[0]
     })),
     {
       name: "Oglasi za Posao | Svet Građevine",
