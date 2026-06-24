@@ -113,7 +113,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           </div>
           <div className="overflow-hidden relative w-full">
             {premiumJobs && premiumJobs.length > 0 ? (
-            <div className="flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max">
+            <div className="flex gap-8 animate-[scroll_60s_linear_infinite] md:animate-[scroll_150s_linear_infinite] hover:[animation-play-state:paused] w-max">
               {Array(4).fill(premiumJobs).flat().map((job: any, idx: number) => {
                 const url = (() => {
                   try {
@@ -132,65 +132,74 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                 const displayTitle = (job.title || job.name || 'Premium Oglas').replace(' — ', ' ');
 
                 return (
-                <Link 
-                  to={url}
+                <Link
                   key={`${job.id}-${idx}`}
-                  title={displayTitle}
+                  to={url}
                   onClick={(e) => {
-                    if (handleCardClick) {
+                    if (job.type === 'job' || !job.type) {
                       e.preventDefault();
                       handleCardClick(url, { job });
                     }
                   }}
-                  className="gold-glow bg-gradient-to-b from-yellow-500/20 to-transparent p-[2px] rounded-[10px] group/card relative flex flex-col shrink-0 w-[90vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer min-h-[320px] h-auto md:h-[360px]"
+                  className="group/card relative flex flex-col shrink-0 min-h-[320px] h-auto md:h-[360px] rounded-[16px] transition-all duration-500 overflow-hidden border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1 w-[90vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer"
                 >
-                  <div className="bg-[#0F1923] p-5 md:p-7 flex flex-col rounded-[10px] border border-white/5 w-full h-full relative flex-1">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
+                  <div className="p-5 md:p-7 flex flex-col w-full h-full relative flex-1 z-10">
                     
                     {/* Top Row: Logo + Header info */}
                     <div className="flex gap-4 md:gap-7 items-start md:items-center w-full min-w-0">
                       
                       {/* Logo */}
-                      <div className="w-[64px] h-[64px] min-w-[64px] max-w-[64px] md:w-[80px] md:h-[80px] md:min-w-[80px] md:max-w-[80px] bg-white rounded-full p-1 md:p-1.5 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.08)] relative z-10 flex items-center justify-center overflow-hidden">
+                      <div className="w-[64px] h-[64px] min-w-[64px] max-w-[64px] md:w-[72px] md:h-[72px] md:min-w-[72px] md:max-w-[72px] bg-white rounded-full p-1.5 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
                         {job.logo ? (
-                          <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full p-1" loading="lazy" />
+                          <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full" loading="lazy" />
                         ) : (
-                          <div className="w-full h-full bg-slate-950/5 rounded-full flex items-center justify-center !text-black font-black text-lg md:text-2xl">
+                          <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-lg md:text-2xl">
                             {job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}
                           </div>
                         )}
+                        {job.isCompanyVerified && (
+                          <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border border-white shadow-[0_0_10px_rgba(34,197,94,0.5)] z-20">
+                            <span className="material-symbols-outlined text-white text-[8px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          </div>
+                        )}
                       </div>
-
+                      
                       {/* Title & Desc */}
                       <div className="flex-1 min-w-0 font-sans text-left">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between md:gap-2 gap-1.5 mb-1.5 md:mb-1.5 relative z-10 w-full items-start md:flex-wrap">
-                          <div className="flex items-center gap-1.5 animate-blink">
-                            <span className="material-symbols-outlined text-yellow-500 text-base md:text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
-                            <span className="text-yellow-500 text-[11px] md:text-sm font-black uppercase tracking-widest">
-                              {job.type === 'company' || job.isPremiumPartner ? 'Premium Partner' : 'Premium Oglas'}
-                            </span>
-                          </div>
+                        <div className="flex flex-col md:flex-row md:items-center justify-between md:gap-2 gap-1.5 mb-2 relative z-10 w-full items-start md:flex-wrap">
+                          <span className="bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] md:text-[10px] font-black px-2 md:px-2.5 py-0.5 md:py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(254,191,13,0.2)]">
+                            <span className="material-symbols-outlined text-[10px] md:text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> 
+                            {job.type === 'company' || job.isPremiumPartner ? 'Premium Partner' : 'Premium Oglas'}
+                          </span>
                           {/* Category Badge on Mobile/Desktop */}
-                          <span className="bg-gradient-to-r from-[#D4AF37]/10 to-[#FDE68A]/5 text-[#D4AF37] border border-[#D4AF37]/20 px-2.5 md:px-3.5 py-1 md:py-1 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-wider whitespace-nowrap shadow-[0_0_10px_rgba(212,175,55,0.05)]">
+                          <span className="bg-white/5 border border-white/10 text-slate-300 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider whitespace-nowrap shadow-sm">
                             {getFriendlyCategory(job)}
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-2 md:line-clamp-1 break-words">
+                        <h3 className="text-base md:text-2xl font-black text-white group-hover/card:text-secondary transition-colors duration-300 mb-1 uppercase line-clamp-2 md:line-clamp-1 break-words tracking-tight">
                           {displayTitle}
                         </h3>
+
+                        <div className="mb-2">
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs md:text-[13px] font-black uppercase tracking-widest relative z-20">
+                            {job.comp || 'Svet Građevine'}
+                          </span>
+                        </div>
                         
-                        <p className="text-slate-400 text-xs md:text-sm line-clamp-2 md:line-clamp-3 pr-2">
+                        <p className="text-slate-400 text-xs md:text-sm line-clamp-2 md:line-clamp-2 pr-2">
                           {(job.description || job.body || job.content || job.opis || '')?.replace(/<[^>]*>?/gm, '') || 'Istražite najbolju priliku iz naše premium ponude proverenih kompanija.'}
                         </p>
                       </div>
                     </div>
 
                     {/* Middle Row: Tags */}
-                    <div className="flex flex-col gap-2 w-full relative z-10 py-3 md:py-10">
+                    <div className="flex flex-col gap-2 w-full relative z-10 py-3 md:py-6">
                       {getFriendlyEngagement(job) && (
                         <div className="flex">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
-                            <span className="material-symbols-outlined text-[12px] md:text-[14px] text-white/40">schedule</span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
+                            <span className="material-symbols-outlined text-[12px] text-white/40">schedule</span>
                             {getFriendlyEngagement(job)}
                           </span>
                         </div>
@@ -207,18 +216,18 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                         return (
                           <div className="flex flex-wrap gap-2 items-center">
                             {hasSmestaj && (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-[12px] md:text-[14px] text-green-400">home</span> Smeštaj
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
+                                <span className="material-symbols-outlined text-[12px] text-green-400">home</span> Smeštaj
                               </span>
                             )}
                             {hasPrevoz && (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-[12px] md:text-[14px] text-blue-400">commute</span> Prevoz
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
+                                <span className="material-symbols-outlined text-[12px] text-blue-400">commute</span> Prevoz
                               </span>
                             )}
                             {hasHrana && (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/[0.03] border border-white/5 text-white/70 text-[9px] md:text-[10px] rounded-full font-bold uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-[12px] md:text-[14px] text-yellow-400">restaurant</span> Hrana
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
+                                <span className="material-symbols-outlined text-[12px] text-yellow-400">restaurant</span> Hrana
                               </span>
                             )}
                           </div>
@@ -228,16 +237,17 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
 
                     {/* Bottom Row: Footer Row */}
                     <div className="flex-1 flex flex-col justify-end">
-                      <div className="border-t border-white/5" />
-                      <div className="flex flex-col-reverse md:flex-row md:justify-between items-start md:items-center w-full relative z-10 pt-3 pb-1 gap-4 md:gap-0">
-                      <button className="w-full md:w-auto justify-center md:justify-start bg-gradient-to-br from-secondary to-yellow-600 !text-black font-black px-4 py-2.5 md:px-6 md:py-3 rounded-[10px] hover:from-yellow-500 hover:to-yellow-700 hover:-translate-y-1 transition-all text-xs md:text-sm uppercase shadow-lg shadow-yellow-500/20 flex items-center gap-2 shrink-0">
+                      <div className="flex flex-col-reverse md:flex-row md:justify-between items-start md:items-center w-full relative z-10 pt-3 gap-4 md:gap-0">
+                      <div className="w-full md:w-auto justify-center md:justify-start bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black px-5 py-3 rounded-[10px] transition-all text-[10px] md:text-xs uppercase tracking-widest flex items-center gap-2 shrink-0 relative z-20 shadow-sm">
                         {job.type === 'company' || job.isPremiumPartner ? 'POGLEDAJ FIRMU' : 'POGLEDAJ OGLAS'}
-                        <span className="material-symbols-outlined text-sm hidden md:block">arrow_forward</span>
-                      </button>
+                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                      </div>
                       {getFriendlySalary(job) && (
                         <div className="flex flex-col items-end justify-center min-w-[90px] w-full md:w-auto">
-                          <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-0.5">Zarada</span>
-                          <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-2xl md:text-4xl font-black font-headline tracking-tighter leading-none whitespace-nowrap">
+                          <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                            {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
+                          </span>
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] text-2xl md:text-3xl font-black font-sans leading-none tracking-tight whitespace-nowrap">
                             {getFriendlySalary(job)}
                           </span>
                         </div>

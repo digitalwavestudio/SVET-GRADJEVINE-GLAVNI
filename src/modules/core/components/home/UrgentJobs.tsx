@@ -61,51 +61,66 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                 return (
                   <div 
                     key={ad.id}
-                    className="relative bg-surface-container-lowest p-6 rounded-[10px] border border-error/20 hover:border-error/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.12)] transition-all duration-500 group flex flex-col h-full"
+                    className="group relative flex flex-col shrink-0 h-full rounded-[16px] transition-all duration-500 overflow-hidden border border-red-500/30 bg-gradient-to-br from-red-500/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(239,68,68,0.05)] hover:border-red-500/60 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] hover:-translate-y-1"
                   >
                     <Link 
                       to={url} 
-                      onClick={() => {
+                      onClick={(e) => {
                          if (ad.type === 'job' || !ad.type) {
+                           e.preventDefault();
                            if (typeof handleCardClick === 'function') handleCardClick(url, { job: ad });
                          }
                       }}
-                      className="absolute inset-0 z-10 rounded-[10px]"
+                      className="absolute inset-0 z-10 rounded-[16px]"
                       aria-label={`Pogledaj oglas ${ad.title}`}
                     />
-                    <div className="flex justify-between items-start mb-4 relative z-20 pointer-events-none">
-                      <div className="flex items-center gap-2">
-                        <span className="bg-error text-white text-[10px] font-black px-3 py-1 rounded-[10px] uppercase tracking-tighter animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.4)]">HITNO</span>
-                        <span className="bg-white/10 text-white/90 border border-white/20 text-[10px] font-black px-3 py-1 rounded-[10px] uppercase tracking-tighter">{typeLabels[ad.type] || 'OGLAS'}</span>
+                    
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50 z-0"></div>
+                    
+                    <div className="p-5 flex flex-col w-full h-full relative z-20 pointer-events-none">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex flex-col gap-1.5">
+                          <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.1)] w-max">
+                            <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
+                          </span>
+                          <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">{ad.time || 'Danas'}</span>
+                        </div>
+                        
+                        <div className="w-[48px] h-[48px] min-w-[48px] max-w-[48px] bg-white rounded-full p-1 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
+                          {ad.logo ? (
+                            <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain rounded-full" alt={`Logo firme ${ad.comp}`} referrerPolicy="no-referrer" />
+                          ) : (
+                            <span className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xs">{(ad.comp?.charAt(0) || 'S')}</span>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-on-surface-variant text-sm whitespace-nowrap ml-2">{ad.time || 'Danas'}</span>
-                    </div>
-                    <h3 className="font-bold text-xl mb-2 group-hover:text-primary transition-colors line-clamp-2 relative z-20 pointer-events-none">{ad.title}</h3>
-                    <p className="text-on-surface-variant text-sm mb-6 flex-grow relative z-20 pointer-events-none">
-                      Lokacija: {ad.loc}
-                      {ad.salary && <><br />Cena/Plata: {ad.salary}</>}
-                    </p>
-                    <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/10 mt-auto relative z-20">
-                      <div className="w-10 h-10 bg-white rounded-[10px] flex items-center justify-center font-bold !text-black overflow-hidden shrink-0 shadow-lg shadow-black/10 p-1 pointer-events-none">
-                        {ad.logo ? (
-                          <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain aspect-square" alt={`Logo firme ${ad.comp}`} referrerPolicy="no-referrer" />
-                        ) : (
-                          <span className="font-black text-xs">{(ad.comp?.charAt(0) || 'S')}</span>
+
+                      <h3 className="font-black text-lg md:text-xl text-white mb-1 uppercase line-clamp-2 tracking-tight group-hover:text-red-400 transition-colors duration-300">
+                        {ad.title}
+                      </h3>
+                      
+                      <div className="mb-4 relative z-20">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 via-red-200 to-white text-[10px] md:text-xs font-black uppercase tracking-widest">
+                          {ad.comp || 'Svet Građevine'}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col gap-2 mb-4 mt-auto">
+                        <span className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-[12px] text-red-400">location_on</span> {ad.loc}
+                        </span>
+                        {ad.salary && (
+                          <span className="flex items-center gap-1.5 text-slate-300 text-[10px] font-bold uppercase tracking-wider">
+                            <span className="material-symbols-outlined text-[12px] text-secondary">payments</span> {ad.salary}
+                          </span>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-1.5 min-w-0 w-full">
-                        <Link 
-                          to={`/firma/${ad.authorId || ad.id}`} 
-                          className="text-xs font-bold uppercase hover:text-primary transition-colors line-clamp-1 relative z-20 max-w-[110px] sm:max-w-none truncate"
-                        >
-                          {ad.comp}
-                        </Link>
-                        {ad.isCompanyVerified && (
-                          <div className="flex items-center gap-1.5 bg-[#0A1A0F]/90 border border-green-500/30 backdrop-blur-xl px-1.5 py-0.5 rounded-[4px] shadow-[0_0_15px_rgba(34,197,94,0.1)] shrink-0">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                            <span className="text-[7.5px] font-black tracking-[0.15em] uppercase text-green-400">Verifikovan</span>
-                          </div>
-                        )}
+
+                      <div className="pt-4 border-t border-white/5 relative z-10 flex items-center justify-center pointer-events-auto">
+                        <div className="w-full justify-center bg-white/5 group-hover:bg-white/10 text-white border border-white/10 font-black px-4 py-2.5 rounded-[10px] transition-all text-[10px] uppercase tracking-widest flex items-center gap-2 relative z-20 shadow-sm">
+                           POGLEDAJ OGLAS
+                           <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                        </div>
                       </div>
                     </div>
                   </div>
