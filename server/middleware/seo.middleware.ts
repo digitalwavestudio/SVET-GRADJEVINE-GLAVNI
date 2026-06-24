@@ -3,11 +3,12 @@ import { APP_CONFIG } from "../../src/constants/config.ts";
 import { env } from "../config/env.ts";
 import { getRedis } from "../utils/redis.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
-
 import { eventBus } from "../events/event-bus.ts";
 import { SEORenderEngine, SEOMetaData } from "../services/seo/seo-render-engine.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 import { logger } from "../utils/logger.ts";
+import fs from "fs";
+import path from "path";
 
 const DEV = env.NODE_ENV !== "production";
 
@@ -80,7 +81,8 @@ export const botPrerenderMiddleware = async (
   const redis = getRedis();
   if (redis) {
     try {
-      const cachedHtml = await redis.get(`seo_render_cache:${req.path}`);
+      const jsHash = (() => { try { const m = fs.readFileSync(path.join(process.cwd(), "dist", "index.html"), "utf-8").match(/\/assets\/index-([^.]+)\.js/); return m ? m[1] : "1"; } catch { return "1"; } })();
+      const cachedHtml = await redis.get(`seo_render_cache:${jsHash}:${req.path}`);
       if (cachedHtml) {
         if (DEV) console.info(`[SEO Bot L1 Cache] Serving cached HTML for bot on path ${req.path}`);
         res.setHeader("Content-Type", "text/html");

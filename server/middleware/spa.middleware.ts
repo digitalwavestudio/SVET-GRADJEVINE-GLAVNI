@@ -5,6 +5,7 @@ import fs from "fs";
 import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { getRedis } from "../utils/redis.ts";
+import { SEORenderEngine } from "../services/seo/seo-render-engine.ts";
 
 const SSR_DIST_DIR = path.resolve(process.cwd(), "dist-ssr");
 const SSR_ENTRY_PATH = path.join(SSR_DIST_DIR, "entry-server.mjs");
@@ -15,6 +16,55 @@ interface SsrResult {
   dehydratedState: unknown;
   helmetHtml: string;
   status: number;
+}
+
+function sanitizeDehydratedState(state: unknown): unknown {
+  if (!state || typeof state !== 'object') return state;
+  const obj = state as Record<string, unknown>;
+  if (obj.queries && Array.isArray(obj.queries)) {
+    return {
+      ...obj,
+      queries: obj.queries.map((q: any) => {
+        if (!q?.state?.data) return q;
+        const data = q.state.data;
+        if (Array.isArray(data)) {
+          return { ...q, state: { ...q.state, data: data.map(stripLargeFields) } };
+        }
+        if (data.pages && Array.isArray(data.pages)) {
+          return {
+            ...q,
+            state: {
+              ...q.state,
+              data: {
+                ...data,
+                pages: data.pages.map((p: any) => {
+                  if (!p) return p;
+                  if (p.items && Array.isArray(p.items)) {
+                    return { ...p, items: p.items.map(stripLargeFields) };
+                  }
+                  if (p.docs && Array.isArray(p.docs)) {
+                    return { ...p, docs: p.docs.map(stripLargeFields) };
+                  }
+                  return stripLargeFields(p);
+                }),
+              },
+            },
+          };
+        }
+        return q;
+      }),
+    };
+  }
+  return state;
+}
+
+function stripLargeFields(item: any): any {
+  if (!item || typeof item !== 'object') return item;
+  const cleaned = { ...item };
+  delete cleaned.description;
+  delete cleaned.opis;
+  delete cleaned.searchableText;
+  return cleaned;
 }
 
 async function reactSsrPage(fullUrl: string): Promise<SsrResult | null> {
@@ -55,8 +105,13 @@ async function reactSsrPage(fullUrl: string): Promise<SsrResult | null> {
       } as any;
       globalThis.document = mockDoc as any;
 
+      // Timeout guard: abort SSR after 10 seconds to prevent Cloud Run 503s
       const ssrModule = await import(/* @vite-ignore */ SSR_CACHE_KEY);
-      return await ssrModule.render(fullUrl);
+      const renderPromise = ssrModule.render(fullUrl) as Promise<SsrResult>;
+      const timeoutPromise = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('[SSR] Timeout after 10s')), 10000)
+      );
+      return await Promise.race([renderPromise, timeoutPromise]);
     } finally {
       globalThis.fetch = origFetch;
       globalThis.window = origWindow;
@@ -109,6 +164,39 @@ function stripHeadMeta(html: string): string {
   return html
     .replace(/<title>.*?<\/title>/i, "")
     .replace(/<meta\s+name=["']description["'][^>]*\/?>/gi, "");
+}
+
+// Remove all but the last meta description tag (fixes duplicates from SSR Helmet + server fallback)
+function dedupeMetaDescriptions(html: string): string {
+  const matches = [...html.matchAll(/<meta\s+name=["']description["'][^>]*\/?>/gi)];
+  if (matches.length <= 1) return html;
+  for (let i = 0; i < matches.length - 1; i++) {
+    html = html.replace(matches[i][0], "");
+  }
+  return html;
+}
+
+function dedupeAll(html: string): string {
+  return dedupeTitles(dedupeMetaDescriptions(html));
+}
+function dedupeTitles(html: string): string {
+  const matches = [...html.matchAll(/<title>.*?<\/title>/gi)];
+  if (matches.length <= 1) return html;
+  for (let i = 0; i < matches.length - 1; i++) {
+    html = html.replace(matches[i][0], "");
+  }
+  return html;
+}
+
+function injectEmptyRootLinks(html: string, reqPath: string): string {
+  const breadcrumbHtml = SEORenderEngine.generateBreadcrumbNav(reqPath);
+  const crossLinks = SEORenderEngine.generateHubCrossLinks(reqPath);
+  if (!breadcrumbHtml && !crossLinks) return html;
+  const content = `${breadcrumbHtml}${crossLinks}`;
+  return html.replace(
+    '<div id="root"></div>',
+    `<div id="root">${content}</div>`
+  );
 }
 
 // Map SEO route collection names to Firestore "listings" type discriminator
@@ -772,6 +860,10 @@ export const createSpaMiddleware = () => {
       if (req.path.startsWith("/api")) {
         return res.status(404).json({ error: "Not Found" });
       }
+      // Static assets (JS, CSS, images, fonts) that weren't found by express.static → plain 404, not HTML
+      if (/\.(js|css|png|jpg|jpeg|webp|svg|ico|woff2?|ttf|eot|map)$/i.test(req.path)) {
+        return res.status(404).type("text/plain").send("Not Found");
+      }
       // ads.txt — served from dist/static or as fallback
       if (req.path === "/ads.txt") {
         res.header("Content-Type", "text/plain; charset=utf-8");
@@ -960,6 +1052,7 @@ export const createSpaMiddleware = () => {
           "</head>",
           `<meta name="description" content="${meta.desc}" /><link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" /></head>`,
         );
+        html = injectEmptyRootLinks(html, req.path);
         return res.send(html);
       }
 
@@ -973,10 +1066,12 @@ export const createSpaMiddleware = () => {
         if (ssrResult) {
           const { html, dehydratedState, helmetHtml } = ssrResult;
           const helmetContent = helmetHtml || `<title>Svet Građevine - Portal za građevinske oglase</title>\n<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />`;
-          let finalHtml = stripHeadMeta(indexHtml)
-            .replace('</head>', `${helmetContent}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+          let finalHtml = stripHeadMeta(indexHtml);
+          const ssrDataScript = isBot ? '' : `<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState: sanitizeDehydratedState(dehydratedState) })}</script>`;
+          finalHtml = finalHtml
+            .replace('</head>', `${helmetContent}${ssrDataScript}</head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-          finalHtml = ensureCanonical(finalHtml, req.path);
+          finalHtml = dedupeAll(ensureCanonical(finalHtml, req.path));
           res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
           const redisCache = getRedis();
           if (redisCache) {
@@ -987,10 +1082,10 @@ export const createSpaMiddleware = () => {
 
         // Fallback: string-based pre-render
         const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
-        if (rendered) return res.send(rendered);
+        if (rendered) return res.send(dedupeAll(rendered));
 
         // Clean shell fallback (no pre-rendered content)
-        const cleanHtml = stripHeadMeta(indexHtml)
+        const cleanHtml = injectEmptyRootLinks(stripHeadMeta(indexHtml)
           .replace("</head>", `<title>Svet Građevine - Portal za građevinske oglase</title>
 <meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
@@ -1003,8 +1098,8 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:title" content="Svet Građevine - Portal za građevinske oglase" />
 <meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
-</head>`);
-        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(cleanHtml);
+</head>`), req.path);
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeAll(cleanHtml));
       }
 
       if (matchedRoute) {
@@ -1046,8 +1141,10 @@ export const createSpaMiddleware = () => {
               const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
               const { html, dehydratedState, helmetHtml } = ssrResult;
               const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
-              let finalHtml = stripHeadMeta(indexHtml)
-                .replace('</head>', `${helmetContent}<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState })}</script></head>`)
+              let finalHtml = stripHeadMeta(indexHtml);
+              const ssrDataScript = isBot ? '' : `<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState: sanitizeDehydratedState(dehydratedState) })}</script>`;
+              finalHtml = finalHtml
+                .replace('</head>', `${helmetContent}${ssrDataScript}</head>`)
                 .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
               finalHtml = ensureCanonical(finalHtml, req.path);
               res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
@@ -1100,7 +1197,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="${baseDesc}" />
 <meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
 </head>`);
-              return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(cleanHtml);
+              return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(cleanHtml, req.path));
             }
           }
 
@@ -1182,7 +1279,7 @@ ${breadcrumbHtml}
           );
           skeletonHtml = skeletonHtml.replace(
             '<div id="root"></div>',
-            `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true"><main><h1>${label}</h1><a href="${APP_CONFIG.BASE_URL}/">Svet Građevine</a></main></div>`,
+            `<div id="root">${SEORenderEngine.generateBreadcrumbNav(req.path)}</div>`,
           );
           return res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400').send(skeletonHtml);
         }
@@ -1252,7 +1349,7 @@ ${breadcrumbHtml}
           const rendered = await backgroundPreRenderDetailPage(cacheKey, indexHtmlForDetailBg, collectionName, adId, req.path, matchedRoute, CACHE_TTL);
           if (rendered) return res.send(rendered);
 
-          return res.send(skeletonHtml);
+          return res.send(injectEmptyRootLinks(skeletonHtml, req.path));
         }
       }
 
@@ -1298,7 +1395,7 @@ ${breadcrumbHtml}
         );
         skeletonHtml = skeletonHtml.replace(
           '<div id="root"></div>',
-          `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true"><main><h1>${pageTitle.replace(" | Svet Građevine", "")}</h1></main></div>`,
+          `<div id="root">${SEORenderEngine.generateBreadcrumbNav(req.path)}</div>`,
         );
         return res.send(skeletonHtml);
       }
@@ -1312,9 +1409,10 @@ ${breadcrumbHtml}
       ];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
-        const passthroughHtml = html.replace(
+        const robotsMeta = req.path.startsWith("/profil/") ? `<meta name="robots" content="noindex, follow" />\n` : "";
+        const passthroughHtml = injectEmptyRootLinks(html, req.path).replace(
           "</head>",
-          `<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
+          `${robotsMeta}<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
         );
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(passthroughHtml);
       }

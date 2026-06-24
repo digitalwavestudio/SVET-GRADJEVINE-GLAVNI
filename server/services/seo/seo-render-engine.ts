@@ -105,6 +105,125 @@ export class SEORenderEngine {
   /**
    * Evaluates and produces derived meta tags when metadata is not yet compiled in SEO background loop (Cold Cache)
    */
+  private static readonly POPULAR_CITIES = [
+    "beograd", "novi-sad", "nis", "kragujevac", "subotica",
+    "zrenjanin", "pancevo", "cacak", "novi-pazar", "sabac",
+    "valjevo", "leskovac", "kraljevo", "smederevo", "vranje",
+  ];
+
+  private static readonly HUB_CATEGORIES: Record<string, { label: string; slug: string }[]> = {
+    poslovi: [
+      { label: "Svi poslovi", slug: "poslovi" },
+    ],
+    majstori: [
+      { label: "Svi majstori", slug: "majstori" },
+    ],
+    "gradjevinske-masine": [
+      { label: "Sve mašine", slug: "gradjevinske-masine" },
+    ],
+    masine: [
+      { label: "Sve mašine", slug: "masine" },
+    ],
+    smestaj: [
+      { label: "Sav smeštaj", slug: "smestaj" },
+    ],
+    ketering: [
+      { label: "Sav ketering", slug: "ketering" },
+    ],
+    placevi: [
+      { label: "Svi placevi", slug: "placevi" },
+    ],
+    "alat-i-oprema": [
+      { label: "Sva oprema", slug: "alat-i-oprema" },
+    ],
+    firme: [
+      { label: "Sve firme", slug: "firme" },
+    ],
+    "cene-i-statistika": [
+      { label: "Cene i statistika", slug: "cene-i-statistika" },
+    ],
+  };
+
+  /**
+   * Generates HTML cross-link section with popular cities and related categories
+   * so every hub page has many incoming and outgoing internal links.
+   */
+  static generateHubCrossLinks(reqPath: string): string {
+    const segments = reqPath.split("/").filter(Boolean);
+    if (segments.length === 0) return "";
+
+    const mainCategory = segments[0];
+    const lastSegment = segments[segments.length - 1];
+    const isCity = this.POPULAR_CITIES.includes(lastSegment);
+    const isHub = !reqPath.includes("~") && (this.HUB_CATEGORIES[mainCategory] || Object.keys(this.HUB_CATEGORIES).includes(mainCategory));
+
+    if (!isHub) return "";
+
+    let html = "";
+
+    // Other cities for same category
+    if (isCity) {
+      html += '<div style="margin:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;font-size:14px">';
+      html += "<strong>Ostali gradovi:</strong> ";
+      const cityLinks = this.POPULAR_CITIES
+        .filter(c => c !== lastSegment)
+        .map(c => {
+          const label = c.replace(/-/g, " ").replace(/\b\w/g, x => x.toUpperCase());
+          return `<a href="/${segments.slice(0, -1).join("/")}/${c}" style="margin:0 4px">${label}</a>`;
+        });
+      html += cityLinks.join(" · ");
+      html += "</div>";
+    }
+
+    // Related categories for same city
+    const citySegment = isCity ? lastSegment : segments[1];
+    if (citySegment && this.POPULAR_CITIES.includes(citySegment)) {
+      html += '<div style="margin:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;font-size:14px">';
+      html += "<strong>Povezane kategorije:</strong> ";
+      const related = Object.entries(this.HUB_CATEGORIES)
+        .filter(([key]) => key !== mainCategory)
+        .map(([_, cats]) => cats[0])
+        .filter(c => c.slug)
+        .map(c => `<a href="/${c.slug}/${citySegment}" style="margin:0 4px">${c.label} u ${citySegment.replace(/-/g, " ").replace(/\b\w/g, x => x.toUpperCase())}</a>`);
+      html += related.join(" · ");
+      html += "</div>";
+    }
+
+    return html;
+  }
+
+  /**
+   * Generates HTML breadcrumb <nav> with real <a> links for internal linking.
+   * Crawlers follow these links → orphan pages become linked.
+   */
+  static generateBreadcrumbNav(reqPath: string): string {
+    const segments = reqPath.split("/").filter(Boolean);
+    if (segments.length === 0) return "";
+    const hubLabels: Record<string, string> = {
+      poslovi: "Poslovi",
+      "gradjevinske-masine": "Građevinske mašine",
+      masine: "Građevinske mašine",
+      smestaj: "Smeštaj",
+      ketering: "Ketering",
+      placevi: "Građevinsko zemljište",
+      "alat-i-oprema": "Alat i oprema",
+      firme: "Firme",
+      majstori: "Majstori",
+      "cene-i-statistika": "Cene i statistika",
+    };
+    const label = (s: string) => hubLabels[s] || s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    let trail = `<a href="/">Početna</a> / `;
+    for (let i = 0; i < segments.length; i++) {
+      const parentPath = "/" + segments.slice(0, i + 1).join("/");
+      if (i < segments.length - 1) {
+        trail += `<a href="${parentPath}">${label(segments[i])}</a> / `;
+      } else {
+        trail += `<span>${label(segments[i])}</span>`;
+      }
+    }
+    return `<nav aria-label="Breadcrumb" style="padding:1rem;font-size:14px;color:#666">${trail}</nav>`;
+  }
+
   static generateDerivedTags(reqPath: string, host: string, paginationTags: string = ""): string {
     const isDetail = reqPath.includes("~");
     const canonicalBase = APP_CONFIG.BASE_URL.replace(/\/$/, "");
@@ -238,13 +357,13 @@ export class SEORenderEngine {
     // Inject SEO tags before </head>
     renderedHtml = renderedHtml.replace("</head>", `${finalMetaTagsStr}\n</head>`);
 
-    // Inject bot skeletal HTML to prevent blank crawlers render
-    if (meta && meta.botHtml) {
-      renderedHtml = renderedHtml.replace(
-        '<div id="root"></div>',
-        `<div id="root">${meta.botHtml}</div>`
-      );
-    }
+    // Inject breadcrumb navigation links so every page has real internal HTML links
+    const breadcrumbNav = this.generateBreadcrumbNav(pathWithoutQuery);
+    const crossLinks = this.generateHubCrossLinks(pathWithoutQuery);
+    renderedHtml = renderedHtml.replace(
+      '<div id="root"></div>',
+      `<div id="root">${meta?.botHtml || breadcrumbNav}${crossLinks}</div>`
+    );
 
     return renderedHtml;
   }

@@ -188,6 +188,7 @@ export function useAuthNode() {
                   ...meData,
                   id: firebaseUser.uid,
                   emailVerified: firebaseUser.emailVerified,
+                  photoURL: firebaseUser.photoURL || meData.photoURL || '',
                   role: (currentPreviewRole || meData.role || claims.role || 'standard') as UserRole,
                   isAdmin: isMeAdmin || !!claims.admin,
                 } as User;
@@ -426,13 +427,6 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
       const mod = await import('firebase/auth');
       const authInst = await getLazyAuth();
       const provider = getLazyGoogleProvider();
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-
-      if (isLocalhost) {
-        await mod.signInWithRedirect(authInst, provider);
-        return;
-      }
-
       try {
         const result = await mod.signInWithPopup(authInst, provider);
         if (result.user) {

@@ -125,7 +125,10 @@ export const rateLimitShield = async (
     // per-bot limit to avoid Cloud Run 503 floods during deep crawls
     if (isWhitelistedBot && isExpensivePath) {
       const pseoBotLimitKey = `shield:pseo_bot:${hashedIp}`;
-      const isAllowed = await RateLimiterService.isAllowed(pseoBotLimitKey, 10, 1);
+      // Search engine bots (Google, Bing, Ahrefs) need higher limits for deep crawls
+      const limit = isWhitelistedSearchBot ? 200 : 10;
+      const windowSec = isWhitelistedSearchBot ? 1 : 1;
+      const isAllowed = await RateLimiterService.isAllowed(pseoBotLimitKey, limit, windowSec);
       if (!isAllowed) {
         res.setHeader("Retry-After", "10");
         return res.status(429).send("Rate limited: too many P-SEO requests. Please slow down.");
