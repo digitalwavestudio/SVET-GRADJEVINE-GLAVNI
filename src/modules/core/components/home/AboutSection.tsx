@@ -33,8 +33,8 @@ export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamic
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-              <Link to="/firme" className="col-span-1 md:col-span-2 glass-card p-6 md:p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-secondary transition-all duration-500 min-h-[220px] md:min-h-[260px] flex flex-col justify-end shadow-sm">
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60"></div>
+              <Link to="/firme" className="col-span-1 md:col-span-2 p-6 md:p-8 rounded-[16px] border border-secondary/20 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 relative overflow-hidden group hover:border-secondary/60 transition-all duration-500 min-h-[220px] md:min-h-[260px] flex flex-col justify-end shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:shadow-[0_0_30px_rgba(254,191,13,0.2)] hover:-translate-y-1">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
                 
                 <div className="relative z-10">
                   <div className="w-12 h-1.5 bg-secondary mb-6 rounded-full shadow-[0_0_15px_rgba(254,191,13,0.5)]"></div>
@@ -57,24 +57,26 @@ export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamic
                 </div>
               </Link>
 
-              <Link to="/poslovi" className="glass-card p-6 md:p-8 rounded-[10px] border border-white/10 group hover:border-blue-500 transition-all duration-500 shadow-sm relative overflow-hidden flex flex-col">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl group-hover:bg-blue-500/10 transition-colors"></div>
+              <Link to="/poslovi" className="p-6 md:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 relative overflow-hidden flex flex-col">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50 z-0"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl group-hover:bg-blue-500/10 transition-colors pointer-events-none"></div>
                 <div className="w-10 h-1.5 bg-blue-500 mb-6 rounded-full relative z-10 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
                 <span className="material-symbols-outlined text-blue-500 mb-6 block text-4xl relative z-10 group-hover:scale-110 transition-transform duration-300">work_history</span>
                 <h4 className="text-xl font-black text-white uppercase mb-2 tracking-tighter relative z-10">Najnoviji poslovi</h4>
-                <div className="mt-auto flex items-center gap-2 relative z-10">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  <span className="text-slate-500 text-[9px] uppercase tracking-widest font-black">Dnevno ažurirano</span>
+                <div className="mt-auto flex items-center gap-2 relative z-10 pt-4">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                  <span className="text-slate-400 text-[9px] uppercase tracking-widest font-black">Dnevno ažurirano</span>
                 </div>
               </Link>
 
-              <Link to="/oprema" className="glass-card p-6 md:p-8 rounded-[10px] border border-white/10 group hover:border-secondary transition-all duration-500 shadow-sm relative overflow-hidden flex flex-col">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-3xl group-hover:bg-secondary/10 transition-colors"></div>
-                <div className="w-10 h-1.5 bg-secondary mb-6 rounded-full relative z-10 shadow-[0_0_15px_rgba(254,191,13,0.5)]"></div>
-                <span className="material-symbols-outlined text-secondary mb-6 block text-4xl relative z-10 group-hover:rotate-12 transition-transform duration-300">precision_manufacturing</span>
+              <Link to="/oprema" className="p-6 md:p-8 rounded-[16px] border border-orange-500/20 bg-gradient-to-br from-orange-500/5 via-slate-900 to-slate-950 group hover:border-orange-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(249,115,22,0.1)] hover:shadow-[0_0_30px_rgba(249,115,22,0.2)] hover:-translate-y-1 relative overflow-hidden flex flex-col">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent opacity-50 z-0"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-3xl group-hover:bg-orange-500/10 transition-colors pointer-events-none"></div>
+                <div className="w-10 h-1.5 bg-orange-500 mb-6 rounded-full relative z-10 shadow-[0_0_15px_rgba(249,115,22,0.5)]"></div>
+                <span className="material-symbols-outlined text-orange-500 mb-6 block text-4xl relative z-10 group-hover:rotate-12 transition-transform duration-300">precision_manufacturing</span>
                 <h4 className="text-xl font-black text-white uppercase mb-2 tracking-tighter relative z-10">Mehanizacija</h4>
-                <div className="mt-auto relative z-10">
-                  <span className="text-slate-500 text-[9px] uppercase tracking-widest font-black">Top ponude</span>
+                <div className="mt-auto relative z-10 pt-4">
+                  <span className="text-slate-400 text-[9px] uppercase tracking-widest font-black">Top ponude</span>
                 </div>
               </Link>
             </div>

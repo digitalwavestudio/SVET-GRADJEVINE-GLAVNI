@@ -4,13 +4,17 @@ import { useAuth } from "@/src/context/AuthContext";
 import { useBrandLogo } from "@/src/context/BrandContext";
 import { useBotDetector } from "@/src/hooks/useBotDetector";
 import { Button } from "@/src/components/ui/Button";
+import { useDashboardNavigation } from "@/src/modules/dashboard/hooks/useDashboardNavigation";
 import logoImage from "@/src/assets/images/logo.webp";
 
 export default function Navbar() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { logoUrl } = useBrandLogo();
   const isBot = useBotDetector();
+  const { getNavItems } = useDashboardNavigation();
+  const navItems = getNavItems((user as any)?.role || (user as any)?.userType || 'standard');
+
   const [isOpen, setIsOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
@@ -131,10 +135,10 @@ export default function Navbar() {
           )}
 
           {!isBot && isDesktop && user && (
-            <div className="flex items-center justify-center min-w-[60px] mx-4">
+            <div className="relative flex items-center justify-center min-w-[60px] mx-4 group/avatar">
               <Link
                 to="/kontrolna-tabla"
-                className="group w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden"
+                className="w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden transition-all"
                 title="Kontrolna Tabla"
               >
                 {profileSrc && !imgError ? (
@@ -148,6 +152,49 @@ export default function Navbar() {
                   <span className="text-sm font-black !text-black">{userInitial}</span>
                 )}
               </Link>
+
+              {/* Avatar Dropdown */}
+              <div className="absolute top-[120%] right-0 mt-2 w-[240px] bg-[#131c26] border border-white/10 rounded-md shadow-2xl opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50 overflow-hidden flex flex-col">
+                <div className="px-4 py-3 border-b border-white/10 bg-white/5">
+                  <span className="block text-[10px] text-white/50 font-black uppercase tracking-widest mb-1">Prijavljeni ste kao</span>
+                  <span className="block text-sm text-white font-black truncate">{user.firstName} {user.lastName}</span>
+                </div>
+                
+                <div className="py-2 max-h-[350px] overflow-y-auto no-scrollbar">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className="flex items-center justify-between px-4 py-2 hover:bg-white/5 text-slate-300 hover:text-white transition-colors group/item"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-[18px] opacity-70 group-hover/item:opacity-100 group-hover/item:text-secondary">{item.icon}</span>
+                        <span className="text-[11px] font-black tracking-wider uppercase">{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className="bg-secondary text-black text-[10px] font-black px-1.5 rounded-sm">{item.badge}</span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="py-2 border-t border-white/10 bg-black/20">
+                  <Link
+                    to="/podesavanja"
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-white/5 text-slate-300 hover:text-white transition-colors group/item"
+                  >
+                    <span className="material-symbols-outlined text-[18px] opacity-70 group-hover/item:opacity-100 group-hover/item:text-secondary">settings</span>
+                    <span className="text-[11px] font-black tracking-wider uppercase">PODEŠAVANJA</span>
+                  </Link>
+                  <button
+                    onClick={() => logout()}
+                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-colors group/item text-left"
+                  >
+                    <span className="material-symbols-outlined text-[18px] opacity-70 group-hover/item:opacity-100">logout</span>
+                    <span className="text-[11px] font-black tracking-wider uppercase">ODJAVA</span>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

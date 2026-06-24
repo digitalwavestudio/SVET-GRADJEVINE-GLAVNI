@@ -142,29 +142,29 @@ export default function CtaSection() {
                 Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
-                <Button 
-                  to="/registracija" 
-                  variant="primary" 
-                  icon="person_add" 
-                  className="px-4 sm:px-10 py-4 sm:py-5 text-sm sm:text-lg shadow-[0_20px_40px_rgba(254,191,13,0.2)] whitespace-normal text-center h-auto min-h-[56px]"
+                <Link 
+                  to="/registracija"
+                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:shadow-[0_10px_40px_rgba(59,130,246,0.5)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] overflow-hidden w-full sm:w-auto"
                 >
-                  REGISTRUJTE SE BESPLATNO
-                </Button>
-                <Button 
-                  to="/postavi-oglas" 
-                  variant="secondary" 
-                  className="px-4 sm:px-10 py-4 sm:py-5 text-sm sm:text-lg whitespace-normal text-center h-auto min-h-[56px]"
+                  <div className="absolute inset-0 rounded-[12px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full ease-out"></div>
+                  <span className="material-symbols-outlined relative z-10">person_add</span>
+                  <span className="relative z-10 tracking-wide">REGISTRUJTE SE BESPLATNO</span>
+                </Link>
+                <Link 
+                  to="/postavi-oglas"
+                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-secondary hover:bg-yellow-400 text-slate-900 font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(254,191,13,0.2)] hover:shadow-[0_10px_40px_rgba(254,191,13,0.4)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] w-full sm:w-auto"
                 >
-                  PREDAJ OGLAS
-                  <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform shrink-0">arrow_forward</span>
-                </Button>
+                  <span className="material-symbols-outlined relative z-10" style={{ fontVariationSettings: "'FILL' 0" }}>add_circle</span>
+                  <span className="tracking-wide relative z-10">POSTAVI OGLAS</span>
+                </Link>
               </div>
             </div>
             {/* Visual Grid (Tactical UI) */}
             <div className="lg:col-span-5 relative w-full min-w-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full min-w-0">
                 {/* Stats Card */}
-                <div className="col-span-1 sm:col-span-2 glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 relative overflow-hidden group hover:border-blue-500/50 transition-all duration-500 shadow-2xl h-fit mt-0 sm:mt-6 w-full">
+                <div className="col-span-1 sm:col-span-2 p-4 sm:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 relative overflow-hidden group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 h-fit mt-0 sm:mt-6 w-full">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50 z-0"></div>
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
                     <span className="material-symbols-outlined text-6xl text-white">groups</span>
                   </div>
@@ -174,9 +174,10 @@ export default function CtaSection() {
                 </div>
                 {/* Testimonial Card Slider */}
                 <div 
-                  className="order-first sm:order-none col-span-1 sm:col-span-2 glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 relative overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_50px_-12px_rgba(59,130,246,0.25)] w-full"
+                  className="order-first sm:order-none col-span-1 sm:col-span-2 p-4 sm:p-8 rounded-[16px] border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 via-slate-900 to-slate-950 relative overflow-hidden cursor-pointer transition-all duration-500 shadow-[0_4px_20px_rgba(99,102,241,0.1)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:border-indigo-500/60 hover:-translate-y-1 w-full group"
                 >
-                  <div className="absolute top-0 right-0 p-4 sm:p-6 opacity-5">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50 z-0"></div>
+                  <div className="absolute top-0 right-0 p-4 sm:p-6 opacity-5 group-hover:opacity-20 transition-opacity">
                     <span className="material-symbols-outlined text-6xl sm:text-8xl text-white">format_quote</span>
                   </div>
                   
@@ -220,18 +221,20 @@ export default function CtaSection() {
                 </div>
 
                 {/* Secondary Stats */}
-                <div className="glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 group hover:border-blue-500/50 transition-all duration-500 shadow-xl relative overflow-hidden w-full">
+                <div className="p-4 sm:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 relative overflow-hidden w-full flex flex-col">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50 z-0"></div>
                   <div className="w-8 h-1 bg-blue-500 mb-6 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
                   <span className="material-symbols-outlined text-blue-500 mb-6 block text-4xl group-hover:scale-110 transition-transform">business_center</span>
-                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1">{dynamicFirmsCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words">Kompanija</p>
+                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1 tracking-tight">{dynamicFirmsCount.toLocaleString('sr-RS')}+</h3>
+                  <p className="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words pt-2">Kompanija</p>
                 </div>
 
-                <div className="glass-card p-4 sm:p-8 rounded-[10px] border border-white/10 group hover:border-secondary/50 transition-all duration-500 shadow-xl relative overflow-hidden translate-y-0 w-full">
+                <div className="p-4 sm:p-8 rounded-[16px] border border-secondary/20 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 group hover:border-secondary/60 transition-all duration-500 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:shadow-[0_0_30px_rgba(254,191,13,0.2)] hover:-translate-y-1 relative overflow-hidden w-full flex flex-col">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
                   <div className="w-8 h-1 bg-secondary mb-6 rounded-full shadow-[0_0_10px_rgba(254,191,13,0.5)]"></div>
                   <span className="material-symbols-outlined text-secondary mb-6 block text-4xl group-hover:rotate-12 transition-transform">construction</span>
-                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1">{totalAdsCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words">Otvorenih Projekata</p>
+                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1 tracking-tight">{totalAdsCount.toLocaleString('sr-RS')}+</h3>
+                  <p className="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words pt-2">Otvorenih Projekata</p>
                 </div>
               </div>
             </div>

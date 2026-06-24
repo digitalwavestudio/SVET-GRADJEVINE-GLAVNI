@@ -9,9 +9,13 @@ export default function TrustSection() {
   return (
     <section className="bg-transparent py-16 border-t border-white/5 overflow-hidden min-h-[300px] flex flex-col justify-center">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-8 w-full">
-        <p className="text-slate-500 text-center font-bold text-[10px] uppercase tracking-[0.4em] mb-12">
-          Poverenje su nam ukazali lideri industrije
-        </p>
+        <div className="flex items-center gap-4 sm:gap-6 justify-center mb-16 relative z-20">
+          <div className="h-[1px] w-8 sm:w-16 md:w-24 bg-gradient-to-r from-transparent to-white/20"></div>
+          <p className="text-white/40 font-black text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.5em] leading-none text-center">
+            Poverenje su nam ukazali lideri industrije
+          </p>
+          <div className="h-[1px] w-8 sm:w-16 md:w-24 bg-gradient-to-l from-transparent to-white/20"></div>
+        </div>
         
         <div className="relative group">
           {/* Fading Edges */}
@@ -26,7 +30,7 @@ export default function TrustSection() {
               {[...displayPartners, ...displayPartners].map((partner, idx) => (
                 <div 
                   key={`${partner.id}-${idx}`}
-                  className="flex items-center gap-4 group/item grayscale hover:grayscale-0 transition-all duration-500 opacity-30 hover:opacity-100 cursor-pointer flex-shrink-0"
+                  className="flex items-center gap-4 group/item grayscale hover:grayscale-0 transition-all duration-500 opacity-40 hover:opacity-100 cursor-pointer flex-shrink-0 hover:drop-shadow-[0_0_15px_rgba(254,191,13,0.3)]"
                 >
                   {partner.logo ? (
                     <img 
@@ -38,12 +42,9 @@ export default function TrustSection() {
                       className="h-8 md:h-10 w-auto object-contain filter brightness-200"
                     />
                   ) : (
-                    <div className="flex items-center gap-3">
-                      <span className="material-symbols-outlined text-white text-3xl opacity-50 group-hover/item:text-secondary">business</span>
-                      <span className="text-white font-headline font-black text-xl md:text-3xl tracking-tighter italic uppercase whitespace-nowrap">
-                        {partner.name}
-                      </span>
-                    </div>
+                    <span className="text-white/60 font-headline font-black text-2xl md:text-3xl tracking-tighter uppercase whitespace-nowrap group-hover/item:text-white transition-colors duration-500">
+                      {partner.name}
+                    </span>
                   )}
                 </div>
               ))}
