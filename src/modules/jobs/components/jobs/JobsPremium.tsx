@@ -122,7 +122,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
             <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
           </div>
         </div>
-        <div className={`relative w-full ${isExpanded ? '' : 'overflow-hidden'}`}>
+        <div className={`relative w-full ${isExpanded ? '' : 'overflow-hidden py-8 -my-8'}`}>
           {jobs.length > 0 ? (
             <div className={isExpanded ? "grid grid-cols-1 xl:grid-cols-2 gap-8" : "flex gap-8 animate-[scroll_60s_linear_infinite] hover:[animation-play-state:paused] w-max"}>
               {(isExpanded ? jobs : Array(4).fill(jobs.slice(0, 4)).flat())
