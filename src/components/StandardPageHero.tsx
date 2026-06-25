@@ -69,7 +69,7 @@ export function StandardPageHero({
             <div className="md:h-full flex items-center">
               {badge && (
                 <div className="flex items-center gap-4">
-                  <div className="h-px w-10 bg-secondary/30"></div>
+                  <div className="hidden md:block h-px w-10 bg-secondary/30"></div>
                   <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">
                     {badge}
                   </span>
