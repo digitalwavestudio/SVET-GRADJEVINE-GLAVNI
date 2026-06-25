@@ -93,7 +93,7 @@ export function ModerationQueueItem({
             className="flex-[2] py-4 bg-green-500 !text-black font-black rounded-[10px] text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 shadow-xl shadow-green-500/20 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100"
           >
             {processingId === item.id ? (
-              <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
             ) : (
               <>
                 <span className="material-symbols-outlined text-lg">check_circle</span>
@@ -106,3 +106,4 @@ export function ModerationQueueItem({
     </div>
   );
 }
+

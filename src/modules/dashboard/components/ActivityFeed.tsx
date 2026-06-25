@@ -42,7 +42,7 @@ const ActivityFeed = memo(function ActivityFeed() {
   }, [loadMoreActivities]);
 
   if (isLoading && (!activities || activities.length === 0)) {
-     return <div className="animate-pulse flex items-center justify-center p-12"><div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div></div>;
+     return <div className="animate-pulse flex items-center justify-center p-12"><span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span></div>;
   }
 
   if (!activities || activities.length === 0) {
@@ -128,3 +128,4 @@ const ActivityFeed = memo(function ActivityFeed() {
 });
 
 export default ActivityFeed;
+

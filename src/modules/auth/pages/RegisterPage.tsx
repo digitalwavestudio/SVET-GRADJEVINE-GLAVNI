@@ -50,7 +50,7 @@ export default function RegisterPage() {
   if (authLoading) {
     return (
       <div className="bg-surface min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+        <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
       </div>
     );
   }
@@ -367,3 +367,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

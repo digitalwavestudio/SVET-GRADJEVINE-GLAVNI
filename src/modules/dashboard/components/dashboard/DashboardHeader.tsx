@@ -134,7 +134,7 @@ export default React.memo(function DashboardHeader({
               {/* Loader tokom uploada */}
               {isUploading && (
                 <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
                 </div>
               )}
             </div>
@@ -154,7 +154,7 @@ export default React.memo(function DashboardHeader({
               {/* Loader tokom uploada */}
               {isUploading && (
                 <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
                 </div>
               )}
             </div>
@@ -229,3 +229,4 @@ export default React.memo(function DashboardHeader({
     </div>
   );
 });
+

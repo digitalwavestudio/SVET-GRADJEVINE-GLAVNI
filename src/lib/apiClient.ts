@@ -17,8 +17,13 @@ const baseClient = new ApiClient({
   baseUrl: import.meta.env.VITE_API_URL || '/api',
   getToken: async () => {
     const authInst = await getLazyAuth();
-    if (authInst?.currentUser) {
-      return await authInst.currentUser.getIdToken();
+    if (authInst) {
+      if (authInst.authStateReady) {
+        await authInst.authStateReady();
+      }
+      if (authInst.currentUser) {
+        return await authInst.currentUser.getIdToken();
+      }
     }
     return null;
   },

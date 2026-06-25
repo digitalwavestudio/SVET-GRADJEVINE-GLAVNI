@@ -319,7 +319,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                     className="bg-secondary !text-black px-4 py-3 rounded-[10px] text-[10px] font-black uppercase tracking-wider hover:bg-yellow-400 transition-all disabled:opacity-50 flex items-center gap-1"
                   >
                     {searching ? (
-                      <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
                     ) : (
                       <span className="material-symbols-outlined text-sm">search</span>
                     )}
@@ -384,7 +384,7 @@ export function FinancesTab({ stats }: FinancesTabProps) {
                   >
                     {topupLoading ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
                         OBRADA...
                       </>
                     ) : (
@@ -624,3 +624,4 @@ export function FinancesTab({ stats }: FinancesTabProps) {
     </motion.div>
   );
 }
+

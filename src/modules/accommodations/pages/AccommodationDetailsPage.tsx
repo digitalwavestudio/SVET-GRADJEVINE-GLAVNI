@@ -98,7 +98,7 @@ export default function AccommodationDetailsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050f19] flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-[#ffad3a] border-t-transparent rounded-full"></div>
+        <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
       </div>
     );
   }
@@ -523,3 +523,4 @@ export default function AccommodationDetailsPage() {
     </div>
   );
 }
+

@@ -142,7 +142,7 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
                 >
                   {isLoading ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
                       OBRADA...
                     </>
                   ) : (
@@ -181,3 +181,4 @@ export default function CreditModal({ isOpen, onClose }: CreditModalProps) {
     </AnimatePresence>
   );
 }
+

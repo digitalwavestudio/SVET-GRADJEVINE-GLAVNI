@@ -154,7 +154,7 @@ export default function SavedSearchesPage() {
               <div className="flex-1 overflow-y-auto p-8 bg-black/20">
                  {isSearching ? (
                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                      <div className="w-10 h-10 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">SINHRONIZACIJA SA BAZOM...</p>
                    </div>
                  ) : searchResults.length > 0 ? (
@@ -206,3 +206,4 @@ export default function SavedSearchesPage() {
     </DashboardLayout>
   );
 }
+

@@ -38,7 +38,7 @@ export default function SignupBanner() {
           : "translate-y-[200px] opacity-0 scale-95"
       }`}
     >
-          <div className="w-full max-w-5xl bg-slate-950/80 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5),_0_0_40px_rgba(254,191,13,0.15)] rounded-[24px] lg:rounded-full p-6 lg:p-4 lg:pr-6 flex flex-col lg:flex-row items-center justify-between gap-6 pointer-events-auto relative overflow-hidden ring-1 ring-white/5">
+          <div className={`w-full max-w-5xl bg-slate-950/80 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5),_0_0_40px_rgba(254,191,13,0.15)] rounded-[24px] lg:rounded-full p-6 lg:p-4 lg:pr-6 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden ring-1 ring-white/5 ${isVisible ? 'pointer-events-auto' : 'pointer-events-none'}`}>
             
             {/* Ambient Glows */}
             <div className="absolute -top-32 -left-32 w-64 h-64 bg-[#FEBF0D]/10 blur-[100px] pointer-events-none rounded-full"></div>

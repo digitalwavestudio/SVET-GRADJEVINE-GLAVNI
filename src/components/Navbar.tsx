@@ -39,6 +39,10 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
   const [imgError, setImgError] = useState(false);
   const profileSrc = user?.businessProfile?.logo || user?.photoURL || "";
   const userInitial = ((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "") || "UP").toUpperCase();
@@ -71,7 +75,7 @@ export default function Navbar() {
 <nav className="bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all">
       <div className="flex justify-between items-center px-4 sm:px-8 h-full max-w-7xl mx-auto w-full">
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 -ml-5 sm:ml-0">
             <Link to="/" className="flex items-center group">
               <img
                 src={logoUrl || logoImage}
@@ -262,34 +266,33 @@ export default function Navbar() {
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-2xl" onClick={() => setIsOpen(false)} />
 
           {/* Drawer Content */}
-          <div className={`relative w-full h-[100dvh] flex flex-col px-4 pt-24 pb-[calc(1.5rem+env(safe-area-inset-bottom))] transition-transform duration-500 ease-[0.16, 1, 0.3, 1] ${isOpen ? 'translate-x-0' : 'translate-x-8'}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`absolute inset-0 flex flex-col px-4 pt-24 pb-8 transition-transform duration-500 ease-[0.16, 1, 0.3, 1] ${isOpen ? 'translate-x-0' : 'translate-x-8'}`}>
             
             {/* Scrollable Nav Links */}
-            <div className="flex-1 overflow-y-auto flex flex-col gap-2 mb-6 scrollbar-hide pb-4">
-              <nav role="menu" className="flex flex-col gap-2">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 mb-4 scrollbar-hide">
+              <nav role="menu" className="flex flex-col gap-1">
                 {[ 
-                  { path: "/", label: "Naslovna", icon: "home" },
-                  { path: "/poslovi", label: "Poslovi", icon: "work" },
-                  { path: "/majstori", label: "Majstori", icon: "construction" },
-                  { path: "/firme", label: "Firme", icon: "business" },
-                  { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
-                  { path: "/ketering", label: "Ketering", icon: "restaurant" },
-                  { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
-                  { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
-                  { path: "/placevi", label: "Placevi", icon: "terrain" }
+                  { path: "/", label: "Naslovna" },
+                  { path: "/poslovi", label: "Poslovi" },
+                  { path: "/majstori", label: "Majstori" },
+                  { path: "/firme", label: "Firme" },
+                  { path: "/smestaj", label: "Smeštaj" },
+                  { path: "/ketering", label: "Ketering" },
+                  { path: "/alat-i-oprema", label: "Alat i oprema" },
+                  { path: "/gradjevinske-masine", label: "Građevinske mašine" },
+                  { path: "/placevi", label: "Placevi" }
                 ].map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
                     role="menuitem"
-                    className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target justify-start ${
+                    className={`flex items-center py-3 px-4 min-h-12 rounded-[12px] text-sm font-semibold transition-all justify-start ${
                       isActive(link.path)
                         ? "text-secondary bg-secondary/10 border border-secondary/20"
                         : "text-slate-300 hover:bg-white/5 border border-transparent"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-xl w-6 text-center opacity-80" aria-hidden="true">{link.icon}</span>
                     {link.label}
                   </Link>
                 ))}
@@ -297,42 +300,39 @@ export default function Navbar() {
             </div>
 
             {/* Fixed Footer actions */}
-            <div className="flex flex-col gap-3 pt-4 border-t border-white/10 shrink-0">
+            <div className="flex flex-col gap-3 pt-4 border-t border-white/10 shrink-0 relative z-20">
               {!isBot && (
                 <>
                   {user ? (
-                    <Link
-                    to="/kontrolna-tabla"
-                    onClick={() => setIsOpen(false)}
-                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-base">dashboard</span>
-                    Dashboard ({user.firstName || 'Korisnik'})
-                  </Link>
-                ) : (
-                  <Link
-                    to="/prijava"
-                    onClick={() => setIsOpen(false)}
-                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-base">login</span>
-                    Prijavi se
-                  </Link>
-                )}
-              </>
-            )}
+                    <a
+                      href="/kontrolna-tabla"
+                      className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-base">dashboard</span>
+                      Dashboard ({user.firstName || 'Korisnik'})
+                    </a>
+                  ) : (
+                    <a
+                      href="/prijava"
+                      className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-base">login</span>
+                      Prijavi se
+                    </a>
+                  )}
+                </>
+              )}
 
-            <Link
-              to="/postavi-oglas"
-              onClick={() => setIsOpen(false)}
-              className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-[12px] text-center font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10 mt-3"
-            >
-              <span className="material-symbols-outlined text-base">add_circle</span>
-              Postavi Oglas
-            </Link>
+              <a
+                href="/postavi-oglas"
+                className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-[12px] text-center font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10 mt-2 mb-safe-bottom"
+              >
+                <span className="material-symbols-outlined text-base">add_circle</span>
+                Postavi Oglas
+              </a>
+            </div>
           </div>
         </div>
-      </div>
       )}
     </>
   );

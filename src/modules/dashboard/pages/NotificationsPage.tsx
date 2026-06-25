@@ -64,7 +64,7 @@ export default function NotificationsPage() {
         <div className="bg-[#0A0F14] border border-white/5 rounded-3xl overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -102,3 +102,4 @@ export default function NotificationsPage() {
     </DashboardLayout>
   );
 }
+

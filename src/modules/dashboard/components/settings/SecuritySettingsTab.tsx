@@ -50,7 +50,7 @@ const SessionManager = () => {
 
       <div className="space-y-4">
         {loading ? (
-          <div className="h-20 flex items-center justify-center"><div className="w-5 h-5 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div></div>
+          <div className="h-20 flex items-center justify-center"><span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span></div>
         ) : sessions.length === 0 ? (
           <div className="text-gray-500 text-sm text-center py-4">Nema aktivnih sesija.</div>
         ) : (
@@ -125,3 +125,4 @@ export function SecuritySettingsTab() {
     </motion.div>
   );
 }
+

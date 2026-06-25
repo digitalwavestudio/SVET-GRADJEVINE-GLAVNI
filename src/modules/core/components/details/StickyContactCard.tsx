@@ -96,6 +96,13 @@ export default function StickyContactCard({
 
           {/* Action Buttons */}
           <div className="space-y-3">
+            {phone && (
+              <div className="flex flex-col items-center justify-center gap-1 mb-4 py-3 border border-white/5 bg-white/[0.02] rounded-[10px]">
+                <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">BROJ TELEFONA</span>
+                <span className="text-xl font-black text-white tracking-wider">{phone}</span>
+              </div>
+            )}
+            
             <motion.button
               whileTap={{ scale: 0.98 }}
               onClick={handleCall}

@@ -569,17 +569,25 @@ export default function ConstructionMachinesPage() {
                       )}
 
                       {/* Image Module */}
-                      <div className="h-52 relative overflow-hidden">
-                        <Link onMouseEnter={() => prefetch('machine', machine.id)} to={`/gradjevinske-masine/${machine.id}?ref=algolia`} className="block h-full">
+                      <div className="h-52 relative overflow-hidden bg-[#050f19] flex items-center justify-center">
+                        <Link onMouseEnter={() => prefetch('machine', machine.id)} to={`/gradjevinske-masine/${machine.id}?ref=algolia`} className="block w-full h-full relative">
                           {machine.images?.[0] ? (
-                            <OptimizedImage
-                              src={machine.images?.[0]}
-                              placeholder={machine.imagePlaceholders?.[0]}
-                              alt={machine.adTitle || 'Mašina'}
-                              className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                              containerClassName="h-full w-full"
-                              isProcessing={machine.imageStatus === 'processing'}
-                            />
+                            <>
+                              {/* Background Blur */}
+                              <img 
+                                src={machine.images[0]} 
+                                className="absolute inset-0 w-full h-full object-cover opacity-20 blur-2xl scale-125 pointer-events-none" 
+                                alt="" aria-hidden="true" 
+                              />
+                              <OptimizedImage
+                                src={machine.images?.[0]}
+                                placeholder={machine.imagePlaceholders?.[0]}
+                                alt={machine.adTitle || 'Mašina'}
+                                className="relative z-10 w-full h-full object-contain p-2 drop-shadow-2xl transition-all duration-700 hover:scale-[1.03]"
+                                containerClassName="h-full w-full"
+                                isProcessing={machine.imageStatus === 'processing'}
+                              />
+                            </>
                           ) : (
                             <div className="w-full h-full bg-[#050f19] flex items-center justify-center">
                               <span className="material-symbols-outlined text-4xl text-white/5 italic">construction</span>

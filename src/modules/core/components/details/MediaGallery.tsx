@@ -36,14 +36,27 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
   return (
     <div className="space-y-4">
       {/* Main Image Container */}
-      <div className="relative aspect-[16/9] rounded-[10px] overflow-hidden bg-surface-container-low group shadow-sm">
+      <div className="relative aspect-[4/3] md:aspect-[16/9] lg:aspect-[21/9] rounded-[10px] overflow-hidden bg-[#0a0a0a] group shadow-2xl flex items-center justify-center">
         <AnimatePresence mode="wait">
+          {/* Blurred Background to Fill Aspect Ratio gaps */}
+          <motion.img
+            key={`blur-${activeIndex}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            src={images[activeIndex]}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover blur-[40px] scale-125 opacity-30 select-none pointer-events-none"
+            aria-hidden="true"
+          />
+          {/* Sharp Subject Image */}
           <motion.img
             key={activeIndex}
-            initial={{ opacity: 0, scale: 1.05 }}
+            initial={{ opacity: 0, scale: 1.02 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.3 }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={(event, info) => {
@@ -56,7 +69,7 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
             }}
             src={images[activeIndex]}
             alt={`${title || 'Media'} ${activeIndex + 1}`}
-            className="w-full h-full object-cover cursor-grab active:cursor-grabbing"
+            className="relative z-10 w-full h-full object-contain cursor-grab active:cursor-grabbing drop-shadow-2xl"
             fetchPriority="high"
             decoding="async"
             loading="eager"

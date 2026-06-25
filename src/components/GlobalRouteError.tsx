@@ -45,7 +45,7 @@ export default function GlobalRouteError() {
   if (isChunkError) {
     return (
       <div className="min-h-screen bg-surface flex flex-col items-center justify-center text-center p-6">
-        <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin mb-4"></div>
+        <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
         <p className="text-on-surface/70">Ažuriranje aplikacije u toku...</p>
       </div>
     );
@@ -85,3 +85,4 @@ export default function GlobalRouteError() {
     </div>
   );
 }
+

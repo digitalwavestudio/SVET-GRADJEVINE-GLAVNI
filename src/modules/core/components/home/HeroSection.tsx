@@ -5,9 +5,6 @@ import {
   ArrowRight,
   SlidersHorizontal,
   ChevronDown,
-  Users,
-  Cpu,
-  BookOpen,
 } from "lucide-react";
 import { useHeroSearch, HeroTabType } from "@/src/modules/core/hooks/useHeroSearch";
 import { CategoryNodes } from "@/src/modules/core/components/home/hero/CategoryNodes";
@@ -132,7 +129,7 @@ export default function HeroSection() {
               />
 
               {/* Detached Secondary Action: Filters Toggle */}
-              <div className="flex justify-center mb-10 relative z-30">
+              <div className="flex justify-center mt-8 md:mt-0 mb-10 relative z-30">
                 <Button
                   type="button"
                   variant="ghost"
@@ -171,45 +168,7 @@ export default function HeroSection() {
               />
             </div>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-6 md:gap-10 px-4 pt-12 border-t border-white/5">
-              <Link
-                to="/zajednica"
-                className="text-sm md:text-base font-headline italic uppercase tracking-tighter font-black text-slate-500 hover:text-secondary transition-colors flex items-center gap-2 group"
-              >
-                <Users
-                  size={18}
-                  className="group-hover:scale-110 transition-transform stroke-[3]"
-                />{" "}
-                Preporuke & Zajednica
-              </Link>
-              <Link
-                to="/digitalni-alati"
-                className="text-sm md:text-base font-headline italic uppercase tracking-tighter font-black text-slate-500 hover:text-secondary transition-colors flex items-center gap-2 group"
-              >
-                <Cpu
-                  size={18}
-                  className="group-hover:scale-110 transition-transform stroke-[3]"
-                />{" "}
-                Digitalni Alati
-              </Link>
-              <div className="relative group/mag">
-                <div className="text-sm md:text-base font-headline italic uppercase tracking-tighter font-black text-slate-600 cursor-default flex items-center gap-2 group-hover/mag:text-secondary/50 transition-colors">
-                  <BookOpen
-                    size={18}
-                    className="stroke-[3]"
-                  />{" "}
-                  Magazini i blogovi
-                </div>
-                
-                {/* Discrete HUD Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/mag:opacity-100 transition-all duration-300 scale-95 group-hover/mag:scale-100 z-50">
-                  <div className="bg-[#050F19] border border-secondary/30 px-3 py-1.5 rounded-sm shadow-xl flex items-center gap-2 whitespace-nowrap">
-                    <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></div>
-                    <span className="text-white font-headline font-black italic uppercase tracking-tighter text-[10px]">Modul u pripremi</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>

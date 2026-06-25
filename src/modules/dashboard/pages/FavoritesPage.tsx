@@ -273,7 +273,7 @@ export default function FavoritesPage() {
         </div>
 
         {loading ? (
-          <div className="py-20 text-center"><div className="w-10 h-10 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+          <div className="py-20 text-center"><span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span></div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAndSortedAds.map((val: unknown, i: number) => {
@@ -397,3 +397,4 @@ export default function FavoritesPage() {
     </DashboardLayout>
   );
 }
+

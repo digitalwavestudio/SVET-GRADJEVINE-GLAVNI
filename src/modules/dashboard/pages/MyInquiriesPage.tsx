@@ -72,7 +72,7 @@ export default function MyInquiriesPage() {
 
         {loading ? (
           <div className="py-20 flex justify-center">
-            <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
@@ -137,3 +137,4 @@ export default function MyInquiriesPage() {
     </DashboardLayout>
   );
 }
+
