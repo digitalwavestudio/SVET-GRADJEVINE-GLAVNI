@@ -293,7 +293,7 @@ export default function Navbar() {
           </div>
 
           {/* Footer actions inside drawer */}
-          <div className="flex flex-col gap-4 pt-6 border-t border-white/5">
+          <div className="flex flex-col gap-4 pt-6 border-t border-white/5 mt-auto" onClick={(e) => e.stopPropagation()}>
             {!isBot && (
               <>
                 {user ? (
