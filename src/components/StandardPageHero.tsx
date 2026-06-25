@@ -93,8 +93,8 @@ export function StandardPageHero({
             {/* Subtitle Zone - Row 3 (120px) */}
             <div className="md:h-full">
               {subtitle && (
-                <div className="relative pl-8 h-full border-l border-secondary/30 flex items-center">
-                  <p className="text-[10px] md:text-xs font-bold text-white/40 max-w-xl leading-relaxed uppercase tracking-[0.3em]">
+                <div className="relative pl-6 md:pl-8 h-full border-l-2 border-secondary/30 flex items-center">
+                  <p className="text-base sm:text-xl md:text-2xl text-slate-200 max-w-3xl font-medium leading-relaxed">
                     {subtitle}
                   </p>
                 </div>
