@@ -264,6 +264,7 @@ async function startServer() {
         "https://*.firebaseio.com",
         "https://*.algolia.net",
         "https://*.algolianet.com",
+        "https://fonts.gstatic.com",
         ...(isDev ? ["ws://localhost:24678", "ws://localhost:3000"] : []),
       ],
       frameSrc: [

@@ -235,7 +235,7 @@ export default function JobDetailsPage() {
         <AdminCommandCenter jobData={jobData} deleteJob={deleteJob} />
       )}
 
-      <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32 mb-8">
+      <div className={`hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${user?.isAdmin ? 'mt-8' : 'mt-32'} mb-8`}>
         <Breadcrumbs items={[
           { label: 'Poslovi', path: '/poslovi' },
           ...(jobData.locationSlug ? [{ label: jobData.location, path: `/poslovi/${jobData.locationSlug}` }] : []),
@@ -245,7 +245,7 @@ export default function JobDetailsPage() {
       </div>
 
       {/* Modern Header Hero */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 mb-12 mt-24 md:mt-0">
+      <div className={`max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 mb-12 ${user?.isAdmin ? 'mt-8 md:mt-0' : 'mt-32 md:mt-12'}`}>
         <div className="relative border border-white/5 bg-white/[0.02] backdrop-blur-xl rounded-3xl p-4 sm:p-8 lg:p-12 overflow-hidden shadow-2xl">
           {/* Subtle Glow Background */}
           <div className="absolute top-0 left-1/4 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-yellow-500/30 to-transparent"></div>

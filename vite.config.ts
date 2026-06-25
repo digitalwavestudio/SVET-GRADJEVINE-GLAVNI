@@ -120,7 +120,7 @@ export default defineConfig(({mode}) => {
               urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'firebase-storage-cache',
+                cacheName: 'firebase-storage-cache-v2',
                 expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
                 cacheableResponse: { statuses: [0, 200] }
               }
@@ -129,7 +129,7 @@ export default defineConfig(({mode}) => {
               urlPattern: /^https:\/\/api\.svet-gradjevine\.com\/.*/i,
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'api-cache',
+                cacheName: 'api-cache-v2',
                 expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 },
                 networkTimeoutSeconds: 4,
                 cacheableResponse: { statuses: [0, 200] }
@@ -139,7 +139,7 @@ export default defineConfig(({mode}) => {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'google-fonts-stylesheets',
+                cacheName: 'google-fonts-stylesheets-v2',
                 expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 }
               }
             },
@@ -147,7 +147,7 @@ export default defineConfig(({mode}) => {
               urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'google-fonts-webfonts',
+                cacheName: 'google-fonts-webfonts-v2',
                 expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 60 }
               }
             }

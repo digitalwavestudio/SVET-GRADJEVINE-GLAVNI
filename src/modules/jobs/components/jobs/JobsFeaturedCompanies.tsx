@@ -9,7 +9,7 @@ interface JobsFeaturedCompaniesProps {
 
 export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ companies, getInitials }) => {
   return (
-    <section className="py-20 relative overflow-hidden bg-[#0a0f14]">
+    <section className="py-20 relative overflow-hidden bg-transparent">
       {/* Background Effects */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-secondary/10 to-transparent"></div>
@@ -18,27 +18,24 @@ export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ co
       <div className="max-w-7xl mx-auto px-8 relative z-10 mb-16">
         <div className="flex flex-col items-center justify-center gap-6">
           <div className="flex items-center gap-4">
-            <div className="h-[1px] w-12 md:w-24 bg-gradient-to-r from-transparent via-secondary/50 to-secondary"></div>
-            <div className="w-3 h-3 bg-secondary rotate-45 shadow-[0_0_15px_rgba(254,191,13,0.5)]"></div>
-            <div className="h-[1px] w-12 md:w-24 bg-gradient-to-l from-transparent via-secondary/50 to-secondary"></div>
+             <div className="w-12 h-[2px] bg-secondary/50"></div>
+             <h2 className="text-center text-3xl md:text-4xl font-headline font-black uppercase tracking-tighter text-white">
+               Istaknuti <span className="text-secondary">poslodavci</span>
+             </h2>
+             <div className="w-12 h-[2px] bg-secondary/50"></div>
           </div>
-          <h2 className="text-center text-4xl md:text-5xl font-headline font-black uppercase tracking-tighter text-white">
-            Istaknuti <span className="text-secondary drop-shadow-[0_0_10px_rgba(254,191,13,0.3)]">poslodavci</span>
-          </h2>
+          <p className="text-on-surface-variant text-sm tracking-widest uppercase font-bold text-center">Kompanije koje trenutno traže radnike</p>
         </div>
       </div>
       
       <div className="overflow-hidden relative w-full z-10">
-        {/* Fade edges */}
-        <div className="absolute top-0 bottom-0 left-0 w-24 md:w-64 bg-gradient-to-r from-[#0a0f14] via-[#0a0f14]/90 to-transparent z-20 pointer-events-none"></div>
-        <div className="absolute top-0 bottom-0 right-0 w-24 md:w-64 bg-gradient-to-l from-[#0a0f14] via-[#0a0f14]/90 to-transparent z-20 pointer-events-none"></div>
         
         <div className="flex gap-8 md:gap-10 animate-[scroll_90s_linear_infinite] hover:[animation-play-state:paused] w-max px-12 py-12 group">
           {companies.map((company, idx) => (
             <Link to={company.id ? `/firma/${company.id}` : `/firme`} key={idx} className="relative w-[280px] md:w-[340px] shrink-0 group/employer block">
-              <div className="bg-[#111a22] rounded-[10px] border border-secondary/30 transition-all duration-500 overflow-hidden flex flex-col h-full shadow-[0_0_30px_rgba(254,191,13,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.1)] hover:border-white/40 group-hover/employer:-translate-y-3">
+              <div className="bg-surface rounded-2xl border border-white/5 transition-all duration-500 overflow-hidden flex flex-col h-full hover:bg-surface-variant hover:border-white/10 group-hover/employer:-translate-y-2 group-hover/employer:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
                 {/* Cover Image */}
-                <div className="relative h-32 w-full overflow-hidden bg-slate-900 border-b border-white/10">
+                <div className="relative h-32 w-full overflow-hidden bg-background border-b border-white/5">
                   <OptimizedImage 
                     src={company.logo || company.images?.[0]} 
                     fallbackType="company" 
@@ -47,14 +44,14 @@ export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ co
                     containerClassName="w-full h-full"
                   /> 
                     
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111a22] via-[#111a22]/50 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
                 </div>
                 
                 {/* Content */}
                 <div className="relative px-6 pb-6 flex flex-col flex-grow -mt-10 z-10">
                   {/* Logo & Rating */}
                   <div className="flex items-end justify-between mb-4">
-                    <div className="w-20 h-20 bg-[#0a0f14] rounded-[10px] flex items-center justify-center p-2.5 border-4 border-secondary/20 shadow-xl overflow-hidden shrink-0 group-hover/employer:border-white/40 transition-all duration-500">
+                    <div className="w-20 h-20 bg-background rounded-xl flex items-center justify-center p-2 border border-white/10 shadow-xl overflow-hidden shrink-0 group-hover/employer:border-white/20 transition-all duration-500">
                       {company.logo ? (
                          <img width="800" height="600" decoding="async" src={company.logo} alt="Logo" className="w-full h-full object-contain" loading="lazy" />
                       ) : (
@@ -64,15 +61,15 @@ export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ co
                   </div>
                   
                   {/* Name */}
-                  <div className="mb-10">
-                    <h3 className="text-xl font-black font-headline text-secondary uppercase tracking-tight group-hover/employer:text-white transition-colors line-clamp-1">{company.name}</h3>
-                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-1 group-hover/employer:text-secondary transition-colors">{company.website}</p>
+                  <div className="mb-8">
+                    <h3 className="text-lg font-black font-headline text-white uppercase tracking-tight group-hover/employer:text-secondary transition-colors line-clamp-1">{company.name}</h3>
+                    <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.2em] mt-1 group-hover/employer:text-white/60 transition-colors">{company.website || 'PROFIL KOMPANIJE'}</p>
                   </div>
                   
                   {/* Button */}
-                  <button className="w-full py-3 rounded-[10px] bg-gradient-to-br from-secondary to-yellow-600 !text-black flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest hover:from-white hover:to-slate-300 transition-all duration-500 group/btn">
+                  <button className="w-full py-2.5 rounded-lg bg-white/5 border border-white/5 text-white flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300 group/btn mt-auto">
                     Pogledaj profil
-                    <span className="material-symbols-outlined text-[16px] group-hover/btn:translate-x-1 transition-transform duration-500">arrow_forward</span>
+                    <span className="material-symbols-outlined text-[16px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
                   </button>
                 </div>
               </div>
