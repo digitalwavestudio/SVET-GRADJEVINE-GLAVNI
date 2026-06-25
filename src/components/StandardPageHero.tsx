@@ -66,7 +66,7 @@ export function StandardPageHero({
             className="flex-2 max-w-4xl col-start-1 animate-fade-in-up"
           >
             {/* Badge Zone - Row 1 (40px) */}
-            <div className="md:h-full flex items-center">
+            <div className="md:h-full flex items-center mb-6 md:mb-0">
               {badge && (
                 <div className="flex items-center gap-4">
                   <div className="hidden md:block h-px w-10 bg-secondary/30"></div>
