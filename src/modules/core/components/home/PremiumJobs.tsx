@@ -111,7 +111,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>
-          <div className="overflow-hidden relative w-full">
+          <div className="overflow-hidden relative w-full py-8 -my-8">
             {premiumJobs && premiumJobs.length > 0 ? (
             <div className="flex gap-8 animate-[scroll_60s_linear_infinite] md:animate-[scroll_150s_linear_infinite] hover:[animation-play-state:paused] w-max">
               {Array(4).fill(premiumJobs).flat().map((job: any, idx: number) => {

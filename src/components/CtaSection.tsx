@@ -152,7 +152,7 @@ export default function CtaSection() {
                 </Link>
                 <Link 
                   to="/postavi-oglas"
-                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-secondary hover:bg-yellow-400 text-slate-900 font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(254,191,13,0.2)] hover:shadow-[0_10px_40px_rgba(254,191,13,0.4)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] w-full sm:w-auto"
+                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-secondary hover:bg-yellow-400 !text-black font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(254,191,13,0.2)] hover:shadow-[0_10px_40px_rgba(254,191,13,0.4)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] w-full sm:w-auto"
                 >
                   <span className="material-symbols-outlined relative z-10" style={{ fontVariationSettings: "'FILL' 0" }}>add_circle</span>
                   <span className="tracking-wide relative z-10">POSTAVI OGLAS</span>
