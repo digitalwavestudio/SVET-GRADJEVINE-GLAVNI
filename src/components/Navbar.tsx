@@ -254,14 +254,18 @@ export default function Navbar() {
         <div 
           role="dialog"
           aria-modal="true"
-          onClick={() => setIsOpen(false)}
-          className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl overflow-y-auto transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
-            isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
+          className={`fixed inset-0 z-[150] transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
+            isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <div className="flex flex-col min-h-full p-6 pt-24 pb-[calc(2rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
-            <div className="flex-1 flex flex-col gap-2 mb-6">
-              {/* Nav links */}
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-2xl" onClick={() => setIsOpen(false)} />
+
+          {/* Drawer Content */}
+          <div className={`relative w-full h-[100dvh] flex flex-col px-4 pt-24 pb-[calc(1.5rem+env(safe-area-inset-bottom))] transition-transform duration-500 ease-[0.16, 1, 0.3, 1] ${isOpen ? 'translate-x-0' : 'translate-x-8'}`} onClick={(e) => e.stopPropagation()}>
+            
+            {/* Scrollable Nav Links */}
+            <div className="flex-1 overflow-y-auto flex flex-col gap-2 mb-6 scrollbar-hide pb-4">
               <nav role="menu" className="flex flex-col gap-2">
                 {[ 
                   { path: "/", label: "Naslovna", icon: "home" },
@@ -285,34 +289,33 @@ export default function Navbar() {
                         : "text-slate-300 hover:bg-white/5 border border-transparent"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-lg" aria-hidden="true">{link.icon}</span>
-                    <span className="sr-only">{link.label}</span>
+                    <span className="material-symbols-outlined text-xl w-6 text-center opacity-80" aria-hidden="true">{link.icon}</span>
                     {link.label}
                   </Link>
                 ))}
               </nav>
             </div>
 
-            {/* Footer actions inside drawer */}
-            <div className="flex flex-col gap-4 pt-6 border-t border-white/5 mt-auto">
+            {/* Fixed Footer actions */}
+            <div className="flex flex-col gap-3 pt-4 border-t border-white/10 shrink-0">
               {!isBot && (
                 <>
                   {user ? (
                     <Link
                     to="/kontrolna-tabla"
                     onClick={() => setIsOpen(false)}
-                    className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-sm">dashboard</span>
+                    <span className="material-symbols-outlined text-base">dashboard</span>
                     Dashboard ({user.firstName || 'Korisnik'})
                   </Link>
                 ) : (
                   <Link
                     to="/prijava"
                     onClick={() => setIsOpen(false)}
-                    className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-sm">login</span>
+                    <span className="material-symbols-outlined text-base">login</span>
                     Prijavi se
                   </Link>
                 )}
@@ -322,9 +325,9 @@ export default function Navbar() {
             <Link
               to="/postavi-oglas"
               onClick={() => setIsOpen(false)}
-              className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-[12px] text-center font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10"
+              className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-[12px] text-center font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10 mt-3"
             >
-              <span className="material-symbols-outlined text-sm">add_circle</span>
+              <span className="material-symbols-outlined text-base">add_circle</span>
               Postavi Oglas
             </Link>
           </div>
