@@ -7,7 +7,11 @@ import { PremiumBadge } from '@/src/components/ui/PremiumBadge';
 
 const getInitials = (name?: string) => {
   if (!name) return "SG";
-  return name.substring(0, 2).toUpperCase();
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) {
+    return parts[0].substring(0, 2).toUpperCase();
+  }
+  return (parts[0][0] + parts[1][0]).toUpperCase();
 };
 
 export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; viewMode: 'list' | 'grid'; prefetch: (t: string, id?: string) => void }) => {
@@ -31,6 +35,13 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
   };
 
   const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
+
+  const fallbackAuthor = job.authorName || job.userName || job.creatorName || job.contactName || job.contactPerson || job?.contact?.name || job?.contact?.person || job?.user?.name || job?.user?.displayName || 'Anonimni Korisnik';
+
+  const rawComp = job.comp || job.company || job.companyName;
+  const companyNameDisplay = (rawComp && rawComp.toLowerCase() !== 'kompanija' && rawComp.toLowerCase() !== 'company') 
+    ? rawComp 
+    : fallbackAuthor;
 
   return (
     <>
@@ -60,7 +71,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             />
           ) : (
             <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xs">
-              {getInitials(job.comp)}
+              {getInitials(companyNameDisplay)}
             </div>
           )}
         </div>
@@ -100,10 +111,10 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           <div className="flex items-center gap-1">
             {job.companyId ? (
               <Link to={`/firma/${job.companyId}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] hover:brightness-110 text-xs font-black uppercase tracking-widest relative z-20">
-                {job.comp}
+                {companyNameDisplay}
               </Link>
             ) : (
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest">{job.comp}</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest">{companyNameDisplay}</span>
             )}
             {job.isCompanyVerified && (
               <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -203,7 +214,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             />
           ) : (
             <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xl">
-              {getInitials(job.comp)}
+              {getInitials(companyNameDisplay)}
             </div>
           )}
           {job.isCompanyVerified && (
@@ -249,7 +260,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             {job.companyId ? (
               <div className="flex items-center gap-1" itemProp="hiringOrganization" itemScope itemType="https://schema.org/Organization">
                 <Link itemProp="url" to={`/firma/${job.companyId}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] hover:brightness-110 text-xs font-black uppercase tracking-widest relative z-20">
-                  <span itemProp="name">{job.comp}</span>
+                  <span itemProp="name">{companyNameDisplay}</span>
                 </Link>
                 {job.isCompanyVerified && (
                   <span className="material-symbols-outlined text-green-500 text-[12px] font-black ml-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
@@ -257,7 +268,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               </div>
             ) : (
               <div className="flex items-center gap-1" itemProp="hiringOrganization" itemScope itemType="https://schema.org/Organization">
-                <span itemProp="name" className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest">{job.comp}</span>
+                <span itemProp="name" className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest">{companyNameDisplay}</span>
                 {job.isCompanyVerified && (
                   <span className="material-symbols-outlined text-green-500 text-[12px] font-black ml-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 )}
@@ -304,7 +315,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                   to={buildJobUrl(job)}
                   state={{ job: {
                     title: job.title,
-                    company: job.comp,
+                    company: companyNameDisplay,
                     location: job.loc,
                     tacnaLokacija: job.tacnaLokacija,
                     type: job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug,

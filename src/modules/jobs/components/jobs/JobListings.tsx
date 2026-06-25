@@ -10,7 +10,11 @@ import { Briefcase } from 'lucide-react';
 
 const getInitials = (name?: string) => {
   if (!name) return '??';
-  return name.substring(0, 2).toUpperCase();
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) {
+    return parts[0].substring(0, 2).toUpperCase();
+  }
+  return (parts[0][0] + parts[1][0]).toUpperCase();
 };
 
 // You might need to import or tweak the types depending on how they are defined in your app

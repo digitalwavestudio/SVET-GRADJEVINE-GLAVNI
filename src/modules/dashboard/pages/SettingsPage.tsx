@@ -145,11 +145,13 @@ export default function SettingsPage() {
       
       if (!result.success) {
         const newErrors: Record<string, string> = {};
-        result.error.issues.forEach(issue => {
+        const errorDetails = result.error.issues.map(issue => {
           newErrors[issue.path[0] as string] = issue.message;
-        });
+          return `${issue.path[0]}: ${issue.message}`;
+        }).join(', ');
+        
         setErrors(newErrors);
-        throw new Error('Molimo ispravite greške u formi.');
+        throw new Error(`Molimo ispravite greške u formi. Razlog: ${errorDetails}`);
       }
 
       const score = calculateScore(formData);
