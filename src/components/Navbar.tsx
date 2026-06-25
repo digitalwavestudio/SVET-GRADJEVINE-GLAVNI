@@ -255,49 +255,50 @@ export default function Navbar() {
           role="dialog"
           aria-modal="true"
           onClick={() => setIsOpen(false)}
-          className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl flex flex-col p-8 pt-24 transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
+          className={`fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-2xl overflow-y-auto transition-all duration-500 ease-[0.16, 1, 0.3, 1] ${
             isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
           }`}
         >
-          <div className="flex-1 min-h-[350px] flex flex-col gap-2 overflow-y-auto pr-2 mb-6" onClick={(e) => e.stopPropagation()}>
-            {/* Nav links */}
-                <nav role="menu" className="flex flex-col gap-2">
-                  {[ 
-                    { path: "/", label: "Naslovna", icon: "home" },
-                    { path: "/poslovi", label: "Poslovi", icon: "work" },
-                    { path: "/majstori", label: "Majstori", icon: "construction" },
-                    { path: "/firme", label: "Firme", icon: "business" },
-                    { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
-                    { path: "/ketering", label: "Ketering", icon: "restaurant" },
-                    { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
-                    { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
-                    { path: "/placevi", label: "Placevi", icon: "terrain" }
-                  ].map((link) => (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      onClick={() => setIsOpen(false)}
-                      role="menuitem"
-                      className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target justify-start ${
-                        isActive(link.path)
-                          ? "text-secondary bg-secondary/10 border border-secondary/20"
-                          : "text-slate-300 hover:bg-white/5 border border-transparent"
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-lg" aria-hidden="true">{link.icon}</span>
-                      <span className="sr-only">{link.label}</span>
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-          </div>
-
-          {/* Footer actions inside drawer */}
-          <div className="flex flex-col gap-4 pt-6 border-t border-white/5 mt-auto" onClick={(e) => e.stopPropagation()}>
-            {!isBot && (
-              <>
-                {user ? (
+          <div className="flex flex-col min-h-full p-6 pt-24 pb-[calc(2rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
+            <div className="flex-1 flex flex-col gap-2 mb-6">
+              {/* Nav links */}
+              <nav role="menu" className="flex flex-col gap-2">
+                {[ 
+                  { path: "/", label: "Naslovna", icon: "home" },
+                  { path: "/poslovi", label: "Poslovi", icon: "work" },
+                  { path: "/majstori", label: "Majstori", icon: "construction" },
+                  { path: "/firme", label: "Firme", icon: "business" },
+                  { path: "/smestaj", label: "Smeštaj", icon: "hotel" },
+                  { path: "/ketering", label: "Ketering", icon: "restaurant" },
+                  { path: "/alat-i-oprema", label: "Alat i oprema", icon: "storefront" },
+                  { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
+                  { path: "/placevi", label: "Placevi", icon: "terrain" }
+                ].map((link) => (
                   <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    role="menuitem"
+                    className={`flex items-center gap-4 py-3 px-4 min-h-12 rounded-[12px] text-sm font-bold transition-all touch-target justify-start ${
+                      isActive(link.path)
+                        ? "text-secondary bg-secondary/10 border border-secondary/20"
+                        : "text-slate-300 hover:bg-white/5 border border-transparent"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-lg" aria-hidden="true">{link.icon}</span>
+                    <span className="sr-only">{link.label}</span>
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            {/* Footer actions inside drawer */}
+            <div className="flex flex-col gap-4 pt-6 border-t border-white/5 mt-auto">
+              {!isBot && (
+                <>
+                  {user ? (
+                    <Link
                     to="/kontrolna-tabla"
                     onClick={() => setIsOpen(false)}
                     className="w-full py-3.5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-xs flex items-center justify-center gap-2"

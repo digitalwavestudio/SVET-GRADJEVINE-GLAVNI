@@ -106,8 +106,8 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                 <span className="text-[#D4AF37] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Ekskluzivne Prilike</span>
                 <span className="material-symbols-outlined text-[#D4AF37] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>workspace_premium</span>
               </div>
-              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#D4AF37_0%,#ffffff_60%)] mb-4">PREMIUM PONUDA</h2>
-              <p className="text-on-surface-variant text-lg max-w-xl">Najbolje rangirani i istaknuti oglasi proverenih kompanija.</p>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#D4AF37_0%,#ffffff_60%)] mb-4 leading-[1.05] drop-shadow-sm">PREMIUM PONUDA</h2>
+              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Najbolje rangirani i istaknuti oglasi proverenih kompanija.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>

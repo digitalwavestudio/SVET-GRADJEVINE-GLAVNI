@@ -134,11 +134,11 @@ export default function CtaSection() {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 Pridruži se liderima
               </span>
-              <h1 className="font-headline font-black text-[clamp(1.5rem,5vw,4.5rem)] text-white mb-6 leading-[1.05] tracking-tighter uppercase relative w-full min-w-0">
+              <h1 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-white mb-6 leading-[1.05] relative w-full min-w-0 drop-shadow-sm">
                 POSTANITE DEO <br className="hidden sm:block" />
                 NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] block sm:inline">GRAĐEVINSKE MREŽE</span>
               </h1>
-              <p className="text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl leading-relaxed font-medium">
+              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">
                 Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
