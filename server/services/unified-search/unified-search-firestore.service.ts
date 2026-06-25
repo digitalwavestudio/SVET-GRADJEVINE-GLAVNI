@@ -40,10 +40,20 @@ export class UnifiedSearchFirestore {
 
   private static applyCommonSortAndSelect(q: FirebaseFirestore.Query): FirebaseFirestore.Query {
     return q
-      .orderBy("isPremium", "desc")
       .orderBy("createdAt", "desc")
       .orderBy(FieldPath.documentId(), "desc")
       .select(...this.SEARCH_FIELDS);
+  }
+
+  private static sortWithPremium(docs: UnifiedSearchDoc[]): UnifiedSearchDoc[] {
+    return docs.sort((a, b) => {
+      const aP = (a as any).isPremium ? 1 : 0;
+      const bP = (b as any).isPremium ? 1 : 0;
+      if (bP !== aP) return bP - aP;
+      const aT = (a as any).createdAt?.toMillis?.() || (a as any).createdAt || 0;
+      const bT = (b as any).createdAt?.toMillis?.() || (b as any).createdAt || 0;
+      return bT - aT;
+    });
   }
 
   private static buildBaseQuery(
@@ -86,7 +96,7 @@ export class UnifiedSearchFirestore {
       q = db.collection(category);
     }
 
-    if (!filtersAny.showAllStatuses) q = q.where("status", "==", "active");
+    if (!filtersAny.showAllStatuses) q = q.where("status", "in", ["active", "approved"]);
 
     const targetedLoc = filtersAny.locationSlug || filtersAny.location;
     if (targetedLoc && targetedLoc !== "SVE") {
@@ -106,8 +116,7 @@ export class UnifiedSearchFirestore {
     if (filtersAny.isPremiumPartner)
       q = q.where("isPremiumPartner", "==", true);
     if (filtersAny.isVerified) q = q.where("isVerified", "==", true);
-    if (filtersAny.isUrgent) q = q.where("isUrgent", "==", true);
-    if (filtersAny.isPremium) q = q.where("isPremium", "==", true);
+    // isUrgent and isPremium filtered in-memory after query (no composite index for orderBy)
 
     if (filtersAny.mainCategory)
       q = q.where("mainCategories", "array-contains", filtersAny.mainCategory);
@@ -199,12 +208,12 @@ export class UnifiedSearchFirestore {
         
         // 🚀 OPTIMIZATION: If we have sort keys in the token, we use startAfter(values) 
         // to bypass the extra .get() call, saving 1 Read per page.
-        if (parsedToken.isPremium !== undefined && parsedToken.createdAt !== undefined) {
+        if (parsedToken.createdAt !== undefined) {
           const createdAtVal = typeof parsedToken.createdAt === 'number' 
             ? Timestamp.fromMillis(parsedToken.createdAt)
             : parsedToken.createdAt;
           
-          q = q.startAfter(parsedToken.isPremium, createdAtVal, parsedToken.id);
+          q = q.startAfter(createdAtVal, parsedToken.id);
         } else {
           // Fallback for legacy simple ID-only cursors
           const isProfileSearch = false;
@@ -246,9 +255,9 @@ export class UnifiedSearchFirestore {
       const snap = await q.get();
       
       const hasMore = snap.docs.length > pageSize;
-      const actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
+      let actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
 
-      const docs: UnifiedSearchDoc[] = actualDocs.map((doc: QueryDocumentSnapshot) =>
+      let docs: UnifiedSearchDoc[] = actualDocs.map((doc: QueryDocumentSnapshot) =>
           UnifiedSearchUtils.mapToListing(
               ImageTransformer.transformDocumentImages({
                 id: doc.id,
@@ -256,6 +265,19 @@ export class UnifiedSearchFirestore {
               })
             )
       );
+
+      if (filtersAny.isPremium) {
+        const before = docs.length;
+        docs = docs.filter((d: any) => d.isPremium === true);
+        console.log(`[PREMIUM_DEBUG] Filtered ${before} → ${docs.length} docs (isPremium filter), sample isPremium values:`, docs.slice(0,3).map(d => (d as any).isPremium));
+      }
+      if (filtersAny.isUrgent) {
+        const before = docs.length;
+        docs = docs.filter((d: any) => d.isUrgent === true);
+        console.log(`[URGENT_DEBUG] Filtered ${before} → ${docs.length} docs (isUrgent filter)`);
+      }
+
+      docs = this.sortWithPremium(docs);
 
       const rawLastVisibleDoc = actualDocs.length > 0 ? actualDocs[actualDocs.length - 1] : null;
       let secureNextCursor = null;
@@ -265,8 +287,6 @@ export class UnifiedSearchFirestore {
         const tokenObj = { 
           id: rawLastVisibleDoc.id, 
           p: currentPage + 1,
-          // Encode sort keys to avoid .get() on next page call
-          isPremium: d.isPremium || false,
           createdAt: d.createdAt?.toDate ? d.createdAt.toDate().getTime() : d.createdAt 
         };
         secureNextCursor =
@@ -338,17 +358,17 @@ export class UnifiedSearchFirestore {
 
       const snap = await q.get();
 
-      const allDocs: UnifiedSearchDoc[] = snap.docs.map((doc: QueryDocumentSnapshot) =>
+      const allDocs: UnifiedSearchDoc[] = this.sortWithPremium(snap.docs.map((doc: QueryDocumentSnapshot) =>
           UnifiedSearchUtils.mapToListing(
               ImageTransformer.transformDocumentImages({
                 id: doc.id,
                 ...doc.data(),
               })
             )
-      );
+      ));
 
       const searchKeyword = (filtersAny.search || "").toLowerCase().trim();
-      const filteredDocs = allDocs.filter((doc: any) => {
+      let filteredDocs = allDocs.filter((doc: any) => {
         if (!searchKeyword) return true;
         const titleMatch = doc.title && String(doc.title).toLowerCase().includes(searchKeyword);
         const compMatch = doc.comp && String(doc.comp).toLowerCase().includes(searchKeyword);
@@ -357,6 +377,9 @@ export class UnifiedSearchFirestore {
         const opisMatch = doc.opis && String(doc.opis).toLowerCase().includes(searchKeyword);
         return titleMatch || compMatch || nameMatch || descMatch || opisMatch;
       });
+
+      if (filtersAny.isPremium) filteredDocs = filteredDocs.filter((d: any) => d.isPremium === true);
+      if (filtersAny.isUrgent) filteredDocs = filteredDocs.filter((d: any) => d.isUrgent === true);
 
       const offset = (currentPage - 1) * pageSize;
       const paginatedDocs = filteredDocs.slice(offset, offset + pageSize);

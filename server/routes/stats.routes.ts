@@ -93,7 +93,7 @@ statsRouter.get("/pseo-insights", async (req, res, next) => {
       async () => {
         let queryRef: import("firebase-admin/firestore").Query = db
           .collection(collection as string)
-          .where("status", "==", "active");
+          .where("status", "in", ["active", "approved"]);
 
         if (grad) {
           queryRef = queryRef.where("locationSlug", "==", grad);

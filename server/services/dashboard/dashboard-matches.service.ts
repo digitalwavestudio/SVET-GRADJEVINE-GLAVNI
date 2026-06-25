@@ -52,7 +52,7 @@ export class DashboardSmartMatchService {
               const qSmartJobs = db
                 .collection("listings")
                 .where("type", "==", "job")
-                .where("status", "==", "active")
+                .where("status", "in", ["active", "approved"])
                 .orderBy("createdAt", "desc")
                 .limit(50);
 

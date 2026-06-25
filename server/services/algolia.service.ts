@@ -388,7 +388,7 @@ export const syncAdToIndex = async (
 ): Promise<void> => {
   const targetIndex = getValidIndexName(indexName);
 
-  if (adData.status !== "active") {
+  if (adData.status !== "active" && adData.status !== "approved") {
     await deleteAdFromIndex(targetIndex, adId);
     return;
   }
@@ -431,7 +431,7 @@ export const syncAdsToIndex = async (
   if (!client) return;
 
   try {
-    const activeList = objects.filter((obj) => obj.data.status === "active");
+    const activeList = objects.filter((obj) => obj.data.status === "active" || obj.data.status === "approved");
 
     const fullObjects = activeList
       .filter(obj => !obj.data._isPartialUpdate)
@@ -451,7 +451,7 @@ export const syncAdsToIndex = async (
       });
 
     const inactiveIds = objects
-      .filter((obj) => obj.data.status !== "active")
+      .filter((obj) => obj.data.status !== "active" && obj.data.status !== "approved")
       .map((obj) => obj.id);
 
     // Using client.saveObjects for full updates

@@ -162,7 +162,7 @@ export class DashboardPrewarmService {
           try {
             const snap = await db.collection("listings")
               .where("authorId", "in", chunk)
-              .where("status", "==", "active")
+              .where("status", "in", ["active", "approved"])
               .limit(100)
               .get();
             snap.docs.forEach(doc => {

@@ -170,7 +170,7 @@ export const getPublicProfile = async (
         // Fetch user's active ads
         const snap = await db.collection("listings")
           .where("authorId", "==", id)
-          .where("status", "==", "active")
+          .where("status", "in", ["active", "approved"])
           .orderBy("createdAt", "desc")
           .limit(100)
           .get();

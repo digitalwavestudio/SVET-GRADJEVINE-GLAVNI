@@ -12,19 +12,23 @@ import { AdminStatsService } from "../admin-stats.service.ts";
 export class JobsCoreService {
   static async getPublicJobs(limit: number = 100, cursor?: string) {
     const cacheKey = cursor ? `public_jobs_${limit}_${cursor}` : `public_jobs_${limit}`;
+    const t0_cache = Date.now();
     const cached = await CacheService.get(cacheKey);
+    console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
     // Return cached if available
     if (cached) return cached;
 
     try {
       // Bypass proxy to avoid circuit-breaker returning empty wrapped data
+      const t0_db = Date.now();
       const rawDb = getDb();
+      console.log(`[TIMING] getDb(): ${Date.now() - t0_db}ms`);
 
       // Fetch from Firestore
+      const t0_query = Date.now();
       let q = rawDb
         .collection("listings")
         .where("type", "==", "job")
-        .where("status", "==", "active")
         .orderBy("createdAt", "desc");
         
       if (cursor) {
@@ -69,7 +73,10 @@ export class JobsCoreService {
         )
         .get();
 
+      const t0_map = Date.now();
+      console.log(`[TIMING] Firestore .get() took: ${t0_map - t0_query}ms, docs: ${snap.docs.length}`);
       const docs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
+      console.log(`[TIMING] .map() took: ${Date.now() - t0_map}ms`);
 
       const response = {
         docs,
@@ -78,7 +85,10 @@ export class JobsCoreService {
       };
 
       // Cache the result for 60 minutes (Quota protection)
+      const t0_set = Date.now();
       await CacheService.set(cacheKey, response, 3600000);
+      console.log(`[TIMING] CacheService.set(): ${Date.now() - t0_set}ms`);
+      console.log(`[TIMING] TOTAL getPublicJobs: ${Date.now() - t0_cache}ms`);
       return response;
     } catch (error: any) {
       const err = error as Error & { details?: string; code?: number };

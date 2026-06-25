@@ -139,7 +139,7 @@ export class UnifiedSearchAlgolia {
           );
 
           if (!filters.showAllStatuses)
-            docs = docs.filter((d: UnifiedSearchDoc) => d.status === "active" || d.status === "published");
+            docs = docs.filter((d: UnifiedSearchDoc) => d.status === "active" || d.status === "approved" || d.status === "published");
 
           const algoliaHasMore = searchResult.page < searchResult.nbPages - 1;
           const algoliaLastVisible = algoliaHasMore

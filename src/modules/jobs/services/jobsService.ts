@@ -102,6 +102,12 @@ export const jobsService = {
               const data = await apiClient.get<JobSearchApiResponse>('/jobs');
               console.info("[JOBS_CLIENT] GET /api/jobs response:", data ? `ok (${data.docs?.length || 0} docs)` : "null/undefined");
               if (data && data.docs) {
+                  if (data.docs.length > 0) {
+                    const first = data.docs[0] as any;
+                    console.log("[JOBS_DEBUG] First doc fields:", Object.keys(first).join(","));
+                    console.log("[JOBS_DEBUG] benefits:", JSON.stringify(first.benefits), "benefiti:", JSON.stringify(first.benefiti), "rawBenefits:", JSON.stringify(first.rawBenefits));
+                    console.log("[JOBS_DEBUG] smestaj:", first.smestaj, "prevoz:", first.prevoz, "hrana:", first.hrana);
+                  }
                   // Moguće da backend vraća više docova, sečemo na pageSize. Paginate on client za primer feed brzinu.
                   const items = validateList(jobExtendedSchema, data.docs.slice(0, validPageSize));
                   const docs = data.docs;

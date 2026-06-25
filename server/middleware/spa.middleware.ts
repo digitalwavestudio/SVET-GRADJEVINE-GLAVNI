@@ -277,7 +277,7 @@ async function backgroundPreRenderListingHub(
 
   try {
     let query: FirebaseFirestore.Query = resolveFirestoreQuery(collectionName)
-      .where("status", "==", "active")
+      .where("status", "in", ["active", "approved"])
       .orderBy("createdAt", "desc");
 
     const categoryField = COLLECTION_CATEGORY_FIELD[collectionName];

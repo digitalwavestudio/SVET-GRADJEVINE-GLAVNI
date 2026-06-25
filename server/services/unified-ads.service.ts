@@ -229,7 +229,7 @@ export class UnifiedAdsService {
         const snap = await db
           .collection("listings")
           .where("type", "==", "company")
-          .where("status", "==", "active")
+          .where("status", "in", ["active", "approved"])
           .where("isPremium", "==", true)
           .orderBy("createdAt", "desc")
           .limit(20)
@@ -370,9 +370,9 @@ export class UnifiedAdsService {
       else if (category === "realEstate") entityType = "realEstate";
       else if (category === "jobs") entityType = "job";
 
-      q = q.where("type", "==", entityType).where("status", "==", "active");
+      q = q.where("type", "==", entityType).where("status", "in", ["active", "approved"]);
     } else {
-      q = q.where("status", "==", "active");
+      q = q.where("status", "in", ["active", "approved"]);
     }
 
     q = q.orderBy("createdAt", "desc");

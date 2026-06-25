@@ -404,9 +404,9 @@ export class CacheService {
            redisPayload = "GZ64:" + compressed;
         }
 
-        // Fizički TTL produžen za 30 dana (Stale-Cache prozor preživljavanja)
-        const staleRetentionMs = 30 * 24 * 60 * 60 * 1000;
-        await client.set(routedKey, redisPayload, "PX", ttlMs + staleRetentionMs);
+        const staleRetentionMs = 20 * 24 * 60 * 60 * 1000;
+        const redisPx = Math.min(ttlMs + staleRetentionMs, 2_147_483_647);
+        await client.set(routedKey, redisPayload, "PX", redisPx);
       } catch (err) {
         console.error("[CacheService] Redis set error:", err);
       }

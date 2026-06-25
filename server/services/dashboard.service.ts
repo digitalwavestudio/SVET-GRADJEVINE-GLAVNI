@@ -244,14 +244,14 @@ export class DashboardService {
       try {
         const activeListingsSnap = await db.collection("listings")
           .where("authorId", "==", uid)
-          .where("status", "==", "active")
+          .where("status", "in", ["active", "approved"])
           .count()
           .get();
         const activeCount = activeListingsSnap.data().count;
 
         const latestSnap = await db.collection("listings")
           .where("authorId", "==", uid)
-          .where("status", "in", ["active", "paused", "rejected"])
+          .where("status", "in", ["active", "approved", "paused", "rejected"])
           .orderBy("createdAt", "desc")
           .limit(10)
           .select(

@@ -686,9 +686,9 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
 
               try {
                 const resultPromise = value.apply(target, unwrappedArgs) as Promise<unknown>;
-                let timeoutMs = 8000;
-                if (targetPath.startsWith('settings/')) timeoutMs = 8000;
-                else if (targetPath.startsWith('metadata/')) timeoutMs = 8000;
+                let timeoutMs = 30000;
+                if (targetPath.startsWith('settings/')) timeoutMs = 15000;
+                else if (targetPath.startsWith('metadata/')) timeoutMs = 15000;
 
                 const finalPromise = withTimeout(
                   resultPromise,
@@ -826,9 +826,9 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
             if (prop === 'get') {
               const targetMetadata = target as FirestoreObjectMetadata;
               const targetPath = getTargetPath(targetMetadata);
-              let timeoutMs = 8000; // Increased base timeout to 8s to prevent false trips during connection setup
-              if (targetPath && targetPath.startsWith('settings/')) timeoutMs = 8000;
-              else if (targetPath && targetPath.startsWith('metadata/')) timeoutMs = 8000;
+              let timeoutMs = 30000;
+              if (targetPath && targetPath.startsWith('settings/')) timeoutMs = 15000;
+              else if (targetPath && targetPath.startsWith('metadata/')) timeoutMs = 15000;
 
               finalPromise = withTimeout(
                 result,
@@ -1069,7 +1069,7 @@ function wrapTransaction(transaction: admin.firestore.Transaction | Record<strin
             if (prop === 'get') {
               const ref = ((args[0] as admin.firestore.DocumentReference) || {}) as any;
               const refPath = typeof ref.path === 'string' ? ref.path : "";
-              const timeoutMs = refPath.startsWith('metadata/') ? 5000 : 10000;
+              const timeoutMs = refPath.startsWith('metadata/') ? 15000 : 30000;
 
               finalPromise = withTimeout(
                 result,
