@@ -146,8 +146,9 @@ export default function SettingsPage() {
       if (!result.success) {
         const newErrors: Record<string, string> = {};
         const errorDetails = result.error.issues.map(issue => {
-          newErrors[issue.path[0] as string] = issue.message;
-          return `${issue.path[0]}: ${issue.message}`;
+          const field = String(issue.path[0] ?? 'forma');
+          newErrors[field] = issue.message;
+          return `${field}: ${issue.message}`;
         }).join(', ');
         
         setErrors(newErrors);

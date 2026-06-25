@@ -29,7 +29,11 @@ export const MobileHeader: React.FC = () => {
             <span className="text-[8px] font-bold text-secondary tracking-[0.2em] uppercase">{isEmployer ? 'POSLODAVAC' : 'MREŽA GRADNJE'}</span>
          </div>
        </Link>
-       <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-white/60 hover:text-white">
+       <button
+         onClick={() => setIsMobileMenuOpen(true)}
+         className="p-2 text-white/60 hover:text-white"
+         aria-label="Otvori meni"
+       >
          <span className="material-symbols-outlined">menu</span>
        </button>
     </div>

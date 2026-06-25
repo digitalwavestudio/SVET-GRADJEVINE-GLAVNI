@@ -24,6 +24,7 @@ export const userProfileSchema = z.object({
   instagram: z.string().max(500).or(z.literal('')).optional(),
   photoURL: z.string().max(2083).or(z.literal('')).optional(),
   profession: z.string().max(200).optional(),
+  company: z.string().max(200).optional(),
   city: z.string().max(100).optional(),
   bio: z.string().max(5000).optional(),
   profileScore: z.number().optional(),
@@ -33,7 +34,7 @@ export const userProfileSchema = z.object({
   isVerified: z.boolean().optional(),
   verifiedAt: z.any().optional(), // Firebase timestamp or ISO string
   pib: z.string().optional()
-});
+}).passthrough(); // allow extra fields without failing
 
 export type UserBusinessProfileValues = z.infer<typeof userBusinessProfileSchema>;
 export type UserProfileValues = z.infer<typeof userProfileSchema>;

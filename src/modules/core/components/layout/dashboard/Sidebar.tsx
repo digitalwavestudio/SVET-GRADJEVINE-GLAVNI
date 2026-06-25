@@ -77,6 +77,34 @@ export const Sidebar = memo(({
          </button>
       </div>
 
+      {/* User Header kartica — samo mobile, da opleti hamburger meni */}
+      <div className="md:hidden px-4 pb-4">
+        <div className="relative p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
+          <div className="absolute -top-8 -right-8 w-24 h-24 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+              {(user as any)?.businessProfile?.logo || user.photoURL ? (
+                <img
+                  src={(user as any)?.businessProfile?.logo || user.photoURL}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-black !text-black">
+                  {userName.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="block text-sm text-white font-black truncate leading-tight">{userName}</span>
+            </div>
+            <span className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/60">
+              {role}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Admin Role Switcher — only in dev mode */}
       {import.meta.env.DEV && isAdmin && (
         <div className="px-6 mb-6 space-y-2">
@@ -107,7 +135,7 @@ export const Sidebar = memo(({
           
           const linkClassName = isNadzorniCentar
             ? 'flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative bg-gradient-to-r from-[#0061a5] to-[#60a5fa] text-white hover:from-[#00518c] hover:to-[#5095ea] shadow-lg shadow-[#0061a5]/20 font-black'
-            : `flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative ${
+            : `group/item flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-200 relative ${
                 isActive 
                   ? 'bg-secondary !text-black shadow-lg shadow-secondary/10' 
                   : 'text-white/50 hover:text-white hover:bg-white/5'
@@ -121,7 +149,10 @@ export const Sidebar = memo(({
               onClick={() => setIsMobileMenuOpen(false)}
               className={linkClassName}
             >
-              <span className={`material-symbols-outlined text-xl ${isNadzorniCentar ? 'text-white' : isActive ? '!text-black' : 'opacity-60 group-hover:opacity-100'}`}>
+              {!isNadzorniCentar && !isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-6 bg-secondary rounded-r-full transition-all duration-300" />
+              )}
+              <span className={`material-symbols-outlined text-xl transition-all duration-200 ${isNadzorniCentar ? 'text-white' : isActive ? '!text-black' : 'opacity-60 group-hover:opacity-100 group-hover/item:scale-110'}`}>
                 {item.icon}
               </span>
               <span className={`text-[11px] font-black tracking-[0.1em] uppercase ${isNadzorniCentar ? 'text-white' : ''}`}>{item.label}</span>
@@ -135,21 +166,26 @@ export const Sidebar = memo(({
         })}
       </nav>
 
+      {/* Suptilan tanki divider između menija i footer akcija (samo mobile) */}
+      <div className="md:hidden mx-6 h-px bg-white/10" />
+
       {/* Bottom Actions */}
       <div className="p-6 border-t border-white/5 space-y-2">
         <Link
           to="/podesavanja"
           onClick={() => setIsMobileMenuOpen(false)}
-          className="flex items-center gap-3 px-4 py-3 rounded-[10px] text-white/50 hover:text-white hover:bg-white/5 transition-all group"
+          className="group/item flex items-center gap-3 px-4 py-3 rounded-[10px] text-white/50 hover:text-white hover:bg-white/5 transition-all duration-200 relative"
         >
-          <span className="material-symbols-outlined text-xl opacity-60 group-hover:opacity-100">settings</span>
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-6 bg-secondary rounded-r-full transition-all duration-300" />
+          <span className="material-symbols-outlined text-xl opacity-60 group-hover:opacity-100 group-hover/item:scale-110 transition-all duration-200">settings</span>
           <span className="text-[11px] font-black tracking-[0.1em] uppercase">PODEŠAVANJA</span>
         </Link>
         <button
           onClick={() => { setIsMobileMenuOpen(false); logoutAndRedirect(); }}
-          className="flex items-center gap-3 px-4 py-3 rounded-[10px] text-white/50 hover:text-error hover:bg-error/5 transition-all group w-full text-left"
+          className="group/item flex items-center gap-3 px-4 py-3 rounded-[10px] text-white/50 hover:text-error hover:bg-error/5 transition-all duration-200 relative w-full text-left"
         >
-          <span className="material-symbols-outlined text-xl opacity-60 group-hover:opacity-100">logout</span>
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-6 bg-red-500 rounded-r-full transition-all duration-300" />
+          <span className="material-symbols-outlined text-xl opacity-60 group-hover:opacity-100 group-hover/item:scale-110 transition-all duration-200">logout</span>
           <span className="text-[11px] font-black tracking-[0.1em] uppercase">ODJAVA</span>
         </button>
       </div>

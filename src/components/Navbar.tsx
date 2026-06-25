@@ -47,6 +47,11 @@ export default function Navbar() {
   const profileSrc = user?.businessProfile?.logo || user?.photoURL || "";
   const userInitial = ((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "") || "UP").toUpperCase();
 
+  // Ime za prikaz: za firme (poslodavce) prioritet na ime firme, inače ime i prezime
+  const displayName = (user as any)?.role === 'poslodavac'
+    ? (user?.company || (user as any)?.businessProfile?.companyName || user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Korisnik')
+    : (user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Korisnik');
+
   // Reset imgError when URL changes
   useEffect(() => {
     setImgError(false);
@@ -72,7 +77,7 @@ export default function Navbar() {
 
   return (
     <>
-<nav className="bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all">
+<nav className={`bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all ${isOpen ? 'opacity-0 pointer-events-none' : ''}`}>
       <div className="flex justify-between items-center px-4 sm:px-8 h-full max-w-7xl mx-auto w-full">
 
           <div className="flex items-center gap-2 -ml-5 sm:ml-0">
@@ -157,46 +162,91 @@ export default function Navbar() {
                 )}
               </Link>
 
-              {/* Avatar Dropdown */}
-              <div className="absolute top-[120%] right-0 mt-2 w-[240px] bg-[#131c26] border border-white/10 rounded-md shadow-2xl opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50 overflow-hidden flex flex-col">
-                <div className="px-4 py-3 border-b border-white/10 bg-white/5">
-                  <span className="block text-[10px] text-white/50 font-black uppercase tracking-widest mb-1">Prijavljeni ste kao</span>
-                  <span className="block text-sm text-white font-black truncate">{user.firstName} {user.lastName}</span>
-                </div>
-                
-                <div className="py-2 max-h-[350px] overflow-y-auto no-scrollbar">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className="flex items-center justify-between px-4 py-2 hover:bg-white/5 text-slate-300 hover:text-white transition-colors group/item"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-[18px] opacity-70 group-hover/item:opacity-100 group-hover/item:text-secondary">{item.icon}</span>
-                        <span className="text-[11px] font-black tracking-wider uppercase">{item.label}</span>
-                      </div>
-                      {item.badge && (
-                        <span className="bg-secondary text-black text-[10px] font-black px-1.5 rounded-sm">{item.badge}</span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
+              {/* Avatar Dropdown — moderan redizajn */}
+              <div className="absolute top-[calc(100%+12px)] right-0 w-[288px] opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50">
+                <div className="relative bg-[#0d141b] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col">
+                  {/* Glow linija na vrhu */}
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
 
-                <div className="py-2 border-t border-white/10 bg-black/20">
-                  <Link
-                    to="/podesavanja"
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-white/5 text-slate-300 hover:text-white transition-colors group/item"
-                  >
-                    <span className="material-symbols-outlined text-[18px] opacity-70 group-hover/item:opacity-100 group-hover/item:text-secondary">settings</span>
-                    <span className="text-[11px] font-black tracking-wider uppercase">PODEŠAVANJA</span>
-                  </Link>
-                  <button
-                    onClick={() => logout()}
-                    className="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-colors group/item text-left"
-                  >
-                    <span className="material-symbols-outlined text-[18px] opacity-70 group-hover/item:opacity-100">logout</span>
-                    <span className="text-[11px] font-black tracking-wider uppercase">ODJAVA</span>
-                  </button>
+                  {/* User Header sa gradient pozadinom */}
+                  <div className="relative px-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
+                    <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="relative flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                        {profileSrc && !imgError ? (
+                          <img
+                            src={profileSrc}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                            onError={() => setImgError(true)}
+                          />
+                        ) : (
+                          <span className="text-sm font-black !text-black">{userInitial}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">Prijavljeni ste kao</span>
+                        <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
+                      </div>
+                      {(user as any)?.role && (
+                        <span className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/60">
+                          {(user as any).role}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Nav Items */}
+                  <div className="py-2 max-h-[340px] overflow-y-auto no-scrollbar">
+                    <div className="px-2 space-y-0.5">
+                      {navItems.map((item) => {
+                        const active = isActive(item.path);
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                              active
+                                ? "bg-secondary/10 text-white"
+                                : "text-slate-400 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active ? "h-6 bg-secondary" : "h-0 bg-secondary group-hover/item:h-5"}`} />
+                            <span className={`material-symbols-outlined text-[20px] transition-all duration-200 group-hover/item:scale-110 ${active ? "text-secondary opacity-100" : "opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary"}`}>{item.icon}</span>
+                            <span className="text-[11px] font-black tracking-wider uppercase flex-1">{item.label}</span>
+                            {item.badge && (
+                              <span className="bg-secondary text-black text-[10px] font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center leading-none flex items-center justify-center">{item.badge}</span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Suptilan tanki divider između opcija i footer akcija */}
+                  <div className="mx-4 h-px bg-white/10" />
+
+                  {/* Footer: Podešavanja & Odjava (bez pozadine) */}
+                  <div className="py-2">
+                    <div className="px-2 space-y-0.5">
+                      <Link
+                        to="/podesavanja"
+                        className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+                      >
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-secondary rounded-r-full transition-all duration-300" />
+                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary transition-all duration-200 group-hover/item:scale-110">settings</span>
+                        <span className="text-[11px] font-black tracking-wider uppercase">Podešavanja</span>
+                      </Link>
+                      <button
+                        onClick={() => logout()}
+                        className="group/item relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 text-left"
+                      >
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-red-500 rounded-r-full transition-all duration-300" />
+                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:scale-110 transition-all duration-200">logout</span>
+                        <span className="text-[11px] font-black tracking-wider uppercase">Odjava</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -253,7 +303,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Drawer Overlay — moderan redizajn */}
       {!isDesktop && (
         <div 
           role="dialog"
@@ -267,57 +317,102 @@ export default function Navbar() {
 
           {/* Drawer Content */}
           <div className={`absolute inset-0 flex flex-col px-4 pt-24 pb-8 transition-transform duration-500 ease-[0.16, 1, 0.3, 1] ${isOpen ? 'translate-x-0' : 'translate-x-8'}`}>
-            
+
+            {/* User / Greeting Header kartica */}
+            {user ? (
+              <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
+                <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                    {profileSrc && !imgError ? (
+                      <img
+                        src={profileSrc}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                        onError={() => setImgError(true)}
+                      />
+                    ) : (
+                      <span className="text-base font-black !text-black">{userInitial}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">Prijavljeni ste kao</span>
+                    <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
+                <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 shadow-lg">
+                    <span className="material-symbols-outlined text-white/70">construction</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-sm text-white font-black leading-tight">Dobrodošli na Svet Građevine</span>
+                    <span className="block text-[10px] text-white/50 font-bold uppercase tracking-widest mt-0.5">Prijavite se za pristup svemu</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Scrollable Nav Links */}
-            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 mb-4 scrollbar-hide">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 mb-4 scrollbar-hide no-scrollbar">
               <nav role="menu" className="flex flex-col gap-1">
                 {[ 
-                  { path: "/", label: "Naslovna" },
-                  { path: "/poslovi", label: "Poslovi" },
-                  { path: "/majstori", label: "Majstori" },
-                  { path: "/firme", label: "Firme" },
-                  { path: "/smestaj", label: "Smeštaj" },
-                  { path: "/ketering", label: "Ketering" },
-                  { path: "/alat-i-oprema", label: "Alat i oprema" },
-                  { path: "/gradjevinske-masine", label: "Građevinske mašine" },
-                  { path: "/placevi", label: "Placevi" }
-                ].map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    onClick={() => setIsOpen(false)}
-                    role="menuitem"
-                    className={`flex items-center py-3 px-4 min-h-12 rounded-[12px] text-sm font-semibold transition-all justify-start ${
-                      isActive(link.path)
-                        ? "text-secondary bg-secondary/10 border border-secondary/20"
-                        : "text-slate-300 hover:bg-white/5 border border-transparent"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                  { path: "/", label: "Naslovna", icon: "home" },
+                  { path: "/poslovi", label: "Poslovi", icon: "work" },
+                  { path: "/majstori", label: "Majstori", icon: "engineering" },
+                  { path: "/firme", label: "Firme", icon: "domain" },
+                  { path: "/smestaj", label: "Smeštaj", icon: "bed" },
+                  { path: "/ketering", label: "Ketering", icon: "restaurant" },
+                  { path: "/alat-i-oprema", label: "Alat i oprema", icon: "build" },
+                  { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing" },
+                  { path: "/placevi", label: "Placevi", icon: "location_on" }
+                ].map((link) => {
+                  const active = isActive(link.path);
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setIsOpen(false)}
+                      role="menuitem"
+                      className={`group/item relative flex items-center gap-3 py-3 px-4 min-h-12 rounded-xl text-sm font-bold transition-all duration-200 justify-start ${
+                        active
+                          ? "bg-secondary/10 text-white"
+                          : "text-slate-300 hover:bg-white/5 hover:text-white"
+                      }`}
+                    >
+                      <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active ? "h-7 bg-secondary" : "h-0 bg-secondary group-hover/item:h-6"}`} />
+                      <span className={`material-symbols-outlined text-[22px] transition-all duration-200 ${active ? "text-secondary opacity-100" : "opacity-50 group-hover/item:opacity-100 group-hover/item:text-secondary group-hover/item:scale-110"}`}>{link.icon}</span>
+                      <span className="uppercase tracking-wider flex-1">{link.label}</span>
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 
             {/* Fixed Footer actions */}
-            <div className="flex flex-col gap-3 pt-4 border-t border-white/10 shrink-0 relative z-20">
+            <div className="flex flex-col gap-3 shrink-0 relative z-20">
               {!isBot && (
                 <>
                   {user ? (
                     <a
                       href="/kontrolna-tabla"
-                      className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full py-4 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-sm flex items-center justify-center gap-2 transition-all duration-200"
                     >
-                      <span className="material-symbols-outlined text-base">dashboard</span>
-                      Dashboard ({user.firstName || 'Korisnik'})
+                      <span className="material-symbols-outlined text-lg">dashboard</span>
+                      KONTROLNA TABLA
                     </a>
                   ) : (
                     <a
                       href="/prijava"
-                      className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[12px] text-center font-bold text-sm flex items-center justify-center gap-2"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full py-4 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-sm flex items-center justify-center gap-2 transition-all duration-200"
                     >
-                      <span className="material-symbols-outlined text-base">login</span>
-                      Prijavi se
+                      <span className="material-symbols-outlined text-lg">login</span>
+                      PRIJAVI SE
                     </a>
                   )}
                 </>
@@ -325,9 +420,10 @@ export default function Navbar() {
 
               <a
                 href="/postavi-oglas"
-                className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-[12px] text-center font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10 mt-2 mb-safe-bottom"
+                onClick={() => setIsOpen(false)}
+                className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-2xl text-center font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:-translate-y-0.5 transition-all duration-200 mt-1 mb-safe-bottom"
               >
-                <span className="material-symbols-outlined text-base">add_circle</span>
+                <span className="material-symbols-outlined text-lg">add_circle</span>
                 Postavi Oglas
               </a>
             </div>
