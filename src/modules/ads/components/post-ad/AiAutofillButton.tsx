@@ -8,10 +8,11 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [filledFields, setFilledFields] = useState<string[] | null>(null);
-  const { setValue } = useFormContext();
+  const formContext = useFormContext();
+  const setValue = formContext?.setValue;
 
   const handleGenerate = async () => {
-    if (!description.trim()) return;
+    if (!description.trim() || !setValue) return;
     setIsLoading(true);
     setFilledFields(null);
 
