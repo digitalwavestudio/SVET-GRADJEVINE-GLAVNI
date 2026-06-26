@@ -27,6 +27,7 @@ export class JobsCoreService {
       const t0_query = Date.now();
       let q = rawDb
         .collection("listings")
+        .where("type", "==", "job")
         .orderBy("createdAt", "desc");
         
       if (cursor) {
