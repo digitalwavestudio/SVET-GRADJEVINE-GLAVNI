@@ -23,7 +23,7 @@ export const callGeminiAPI = async (prompt: string) => {
   }
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: prompt,
     });
     return response.text;
@@ -41,7 +41,7 @@ export const parseSearchIntent = async (query: string) => {
   }
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: `Analiziraj upit za portal "Svet Građevine" i pretvori ga u strukturirane filtere.
       Upit: "${query}"
 
