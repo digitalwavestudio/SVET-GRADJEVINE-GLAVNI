@@ -212,7 +212,7 @@ const COLLECTION_TO_TYPE: Record<string, string> = {
 function resolveFirestoreQuery(collectionName: string) {
   const typeVal = COLLECTION_TO_TYPE[collectionName];
   if (typeVal) {
-    return db.collection("listings").where("type", "==", typeVal);
+    return db.collectionGroup("listings").where("type", "==", typeVal);
   }
   return db.collection(collectionName);
 }
@@ -763,7 +763,7 @@ async function backgroundPreRenderHomepage(
   const redis = getRedis();
 
   try {
-    const snapshot = await db.collection("listings")
+    const snapshot = await db.collectionGroup("listings")
       .orderBy("createdAt", "desc")
       .limit(6)
       .get();
