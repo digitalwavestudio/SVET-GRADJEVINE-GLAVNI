@@ -21,6 +21,7 @@ export class RedirectService {
   };
 
   private static readonly PREFIX_MAPPINGS: Record<string, string> = {
+    "/posao/": "/poslovi/",
     "/lokacija/": "/poslovi/",
     "/delatnost/": "/poslovi/",
     "/poslodavac/": "/firma/",
