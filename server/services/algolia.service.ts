@@ -253,8 +253,7 @@ export const searchAdsIndex = async (
 
   const targetIndex = getValidIndexName(indexName);
 
-  // Base filters include active status
-  const baseFilters = "status:active";
+  const baseFilters = "(status:active OR status:approved)";
   const combinedFacetFilters =
     facetFilters.length > 0 ? `(${facetFilters.join(" AND ")})` : "";
   const combinedNumericFilters =

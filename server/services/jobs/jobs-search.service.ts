@@ -11,7 +11,7 @@ export class JobsSearchService {
     let { pageSize } = validatedInfo as { pageSize?: number };
     pageSize = pageSize || 24;
 
-    const allowed = await RateLimiterService.isAllowed(`search:${ipStr}`, 2, 1);
+    const allowed = await RateLimiterService.isAllowed(`search:${ipStr}`, 10, 1);
     if (!allowed) {
       throw new AppError("Previše zahteva. Sačekajte trenutak.", 429);
     }

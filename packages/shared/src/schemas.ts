@@ -40,7 +40,7 @@ export const jobSchema = z.object({
   food: z.boolean().optional(),
   topliObrok: z.boolean().optional(),
   email: z.string().email().or(z.literal('')).optional().or(z.null()),
-  status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
+  status: z.enum(['active', 'approved', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
   companyId: z.string().nullable().optional(),
   paket: z.string().optional(),
   isPremium: z.boolean().optional(),
@@ -263,7 +263,7 @@ export const adBaseSchema = z.object({
   phone: z.string().optional(),
   viber: z.boolean().optional(),
   whatsapp: z.boolean().optional(),
-  status: z.enum(['active', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
+  status: z.enum(['active', 'approved', 'pending', 'pending_payment', 'rejected', 'draft', 'archived']).optional(),
   paket: z.string().optional(),
 });
 

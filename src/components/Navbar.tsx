@@ -185,14 +185,13 @@ export default function Navbar() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">Prijavljeni ste kao</span>
+                        {(user as any)?.role && (
+                          <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">
+                            {(user as any).role}
+                          </span>
+                        )}
                         <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
                       </div>
-                      {(user as any)?.role && (
-                        <span className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/60">
-                          {(user as any).role}
-                        </span>
-                      )}
                     </div>
                   </div>
 
@@ -205,7 +204,7 @@ export default function Navbar() {
                           <Link
                             key={item.path}
                             to={item.path}
-                            className={`group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                            className={`group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 w-[250px] mx-auto ${
                               active
                                 ? "bg-secondary/10 text-white"
                                 : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -227,23 +226,24 @@ export default function Navbar() {
                   <div className="mx-4 h-px bg-white/10" />
 
                   {/* Footer: Podešavanja & Odjava (bez pozadine) */}
-                  <div className="py-2">
-                    <div className="px-2 space-y-0.5">
+                  <div className="pb-2 pt-1 w-full text-center">
+                    <div className="px-2 space-y-0.5 w-full">
                       <Link
                         to="/podesavanja"
-                        className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+                        className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 w-[250px] mx-auto"
                       >
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-secondary rounded-r-full transition-all duration-300" />
-                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary transition-all duration-200 group-hover/item:scale-110">settings</span>
-                        <span className="text-[11px] font-black tracking-wider uppercase">Podešavanja</span>
+                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary transition-all duration-200 group-hover/item:scale-110 shrink-0">settings</span>
+                        <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Podešavanja</span>
                       </Link>
                       <button
+                        type="button"
                         onClick={() => logout()}
-                        className="group/item relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 text-left"
+                        className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-red-400/80 hover:text-red-400 hover:bg-red-500/10 w-[250px] mx-auto text-left"
                       >
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-red-500 rounded-r-full transition-all duration-300" />
-                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:scale-110 transition-all duration-200">logout</span>
-                        <span className="text-[11px] font-black tracking-wider uppercase">Odjava</span>
+                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:scale-110 transition-all duration-200 shrink-0">logout</span>
+                        <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Odjava</span>
                       </button>
                     </div>
                   </div>
@@ -321,7 +321,7 @@ export default function Navbar() {
             {/* User / Greeting Header kartica */}
             {user ? (
               <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
-                <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-secondary/20 to-transparent blur-xl pointer-events-none" />
                 <div className="relative flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
                     {profileSrc && !imgError ? (
@@ -343,7 +343,7 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
-                <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-secondary/20 to-transparent blur-xl pointer-events-none" />
                 <div className="relative flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 shadow-lg">
                     <span className="material-symbols-outlined text-white/70">construction</span>
