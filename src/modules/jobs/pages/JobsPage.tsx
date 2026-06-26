@@ -21,7 +21,7 @@ import { ActiveFilterChips, MarketStatsWidget, SortingBar } from '@/src/modules/
 import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
 import { BENEFITS, LOCATIONS, PROFESSIONS, SECTORS } from '@/src/constants/taxonomy';
-import { useJobs, usePremiumJobs, useUrgentJobs } from '@/src/modules/jobs/hooks/useJobs';
+import { useJobs } from '@/src/modules/jobs/hooks/useJobs';
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 
 const AnalyticsDashboardUI = lazy(() => import('@/src/components/AnalyticsDashboardUI').then(m => ({ default: m.AnalyticsDashboardUI })));
@@ -87,10 +87,8 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const isDeepPagingLimitReached = false;
   const loadMore = useCallback(() => setVisibleCount(prev => prev + 10), []);
 
-  const { data: premiumData } = usePremiumJobs(sanitizedFilters, 6, { enabled: !loadingJobs });
-  const { data: urgentData } = useUrgentJobs(sanitizedFilters, 6, { enabled: !loadingJobs });
-  const premiumJobs = useMemo(() => premiumData?.pages.flatMap(p => p.items) || [], [premiumData]);
-  const urgentJobs = useMemo(() => urgentData?.pages.flatMap(p => p.items) || [], [urgentData]);
+  const premiumJobs = useMemo(() => jobs.filter((j: any) => j.isPremium), [jobs]);
+  const urgentJobs = useMemo(() => jobs.filter((j: any) => j.isUrgent), [jobs]);
 
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
