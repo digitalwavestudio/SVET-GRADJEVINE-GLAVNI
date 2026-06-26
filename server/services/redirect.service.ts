@@ -2,6 +2,8 @@
 export class RedirectService {
   private static readonly MAPPINGS: Record<string, string> = {
     "/poslovi/": "/poslovi",
+    "/posao": "/poslovi",
+    "/posao/": "/poslovi",
     "/poslodavci/": "/firme",
     "/gradjevinske-firme/": "/firme",
     "/kontakt/": "/kontakt",
