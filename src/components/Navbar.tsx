@@ -169,8 +169,8 @@ export default function Navbar() {
                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
 
                   {/* User Header sa gradient pozadinom */}
-                  <div className="relative px-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
-                    <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                  <div className="relative pl-2 pr-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
+                    <div className="absolute -top-12 -left-10 w-56 h-48 bg-secondary/20 rounded-full blur-[40px] pointer-events-none" />
                     <div className="relative flex items-center gap-3">
                       <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
                         {profileSrc && !imgError ? (

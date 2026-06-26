@@ -105,11 +105,10 @@ async function reactSsrPage(fullUrl: string): Promise<SsrResult | null> {
       } as any;
       globalThis.document = mockDoc as any;
 
-      // Timeout guard: abort SSR after 10 seconds to prevent Cloud Run 503s
       const ssrModule = await import(/* @vite-ignore */ SSR_CACHE_KEY);
       const renderPromise = ssrModule.render(fullUrl) as Promise<SsrResult>;
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error('[SSR] Timeout after 10s')), 10000)
+        setTimeout(() => reject(new Error('[SSR] Timeout after 30s')), 30000)
       );
       return await Promise.race([renderPromise, timeoutPromise]);
     } finally {
