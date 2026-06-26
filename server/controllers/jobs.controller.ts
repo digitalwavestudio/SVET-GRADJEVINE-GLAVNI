@@ -12,7 +12,8 @@ export const getPublicJobs = async (
   next: NextFunction,
 ) => {
   try {
-    const limit = 100;
+    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 10, 1), 50);
+    const limit = pageSize + 1;
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;
 
@@ -25,7 +26,12 @@ export const getPublicJobs = async (
       hasMore: boolean;
       warning?: string;
       isOptimized?: boolean;
-    } = result;
+    } = { ...result, hasMore: result.docs.length > pageSize };
+
+    if (finalResult.hasMore) {
+      finalResult.docs = result.docs.slice(0, pageSize);
+      finalResult.lastVisible = finalResult.docs.length > 0 ? finalResult.docs[finalResult.docs.length - 1].id : null;
+    }
 
     if (platform === "mobile" && result && result.docs) {
       finalResult = {
