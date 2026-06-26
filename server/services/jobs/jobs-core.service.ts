@@ -28,6 +28,7 @@ export class JobsCoreService {
       let q = rawDb
         .collection("listings")
         .where("type", "==", "job")
+        .where("status", "in", ["active", "approved"])
         .orderBy("createdAt", "desc");
         
       if (cursor) {
