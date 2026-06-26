@@ -164,6 +164,108 @@ export const moderateImage = async (imageUrl: string) => {
   }
 };
 
+export const generateAdFromDescription = async (description: string, category: string) => {
+  const ai = getGenAI();
+  if (!ai) {
+    logger.warn("[AI] Gemini unavailable, returning empty ad data.");
+    return { opis: description };
+  }
+
+  const categoryFields: Record<string, string> = {
+    job: `location (grad slug), sector (slug), profession (slug), opis (detaljan opis posla na srpskom), plataMin (broj), plataMax (broj), dinamikaIsplate (slug: dnevno/nedeljno/mesecno), iskustvo (slug: bez-iskustva/pocetnik/srednji-nivo/ekspert), tipAngazmana (slug), benefits (array stringova)`,
+    machines: `location (grad slug), machCategory (slug), machSubCategory (slug), machBrand (string), machModel (string), machAdType (prodaja ili iznajmljivanje), machPrice (broj), machYear (broj), machHours (broj, radni sati), machFuel (slug goriva), opis (detaljan opis na srpskom)`,
+    accommodation: `location (grad slug), accType (slug tipa smestaja), totalBeds (broj), availableBeds (broj), price (broj), priceType (perPerson ili perNight), opis (detaljan opis na srpskom), amenities (array stringova)`,
+    catering: `location (grad slug), catKitchenType (slug), catMinOrder (broj), catPricePerMeal (broj), catDeliveryZone (string), opis (detaljan opis na srpskom)`,
+    plot: `location (grad slug), plotPurpose (slug), plotArea (broj), plotAreaUnit (ari ili ha), plotPrice (broj), opis (detaljan opis na srpskom), plotInfrastructure (objekat sa boolean poljima: struja, voda, kanalizacija, gas, optika)`,
+    marketplace: `location (grad slug), marketCategory (slug), title (string), marketCondition (novo ili polovno), marketValue (broj), opis (detaljan opis na srpskom)`,
+    company: `location (grad slug), companyName (string), companyDescription (string), opis (detaljan opis na srpskom), companyMainCats (array stringova), companyWorkingHours (string)`,
+  };
+
+  const fields = categoryFields[category] || categoryFields.job;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `Korisnik zeli da postavi oglas na gradjevinskom portalu "Svet Građevine" u kategoriji "${category}".
+
+Korisnikov opis: "${description}"
+
+Na osnovu opisa, popuni sledeca polja za ovu kategoriju:
+${fields}
+
+Vazna pravila:
+1. location je uvek slug grada (npr. "beograd", "nis", "novi-sad", "kragujevac")
+2. Ako korisnik nije specificirao neko polje, ostavi ga null ili prazan string
+3. opis treba da bude detaljan i profesionalan tekst na SRPSKOM, prosiren na osnovu korisnikovog opisa, minimum 50 karaktera (imas slobodu da dodas relevantne detalje)
+4. Sve stringove vrati na srpskom jeziku
+5. Ako korisnik kaze "mašina" bez detalja, machCategory postavi "ostalo", machAdType postavi "prodaja"
+6. Za poslove: ako nije navedena plata, ostavi null; ako nije naveden sektor, postavi "ostalo"
+
+Odgovori iskljucivo u JSON formatu sa ovim poljima.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            location: { type: Type.STRING, nullable: true },
+            opis: { type: Type.STRING },
+            sector: { type: Type.STRING, nullable: true },
+            profession: { type: Type.STRING, nullable: true },
+            plataMin: { type: Type.NUMBER, nullable: true },
+            plataMax: { type: Type.NUMBER, nullable: true },
+            dinamikaIsplate: { type: Type.STRING, nullable: true },
+            iskustvo: { type: Type.STRING, nullable: true },
+            tipAngazmana: { type: Type.STRING, nullable: true },
+            machCategory: { type: Type.STRING, nullable: true },
+            machSubCategory: { type: Type.STRING, nullable: true },
+            machBrand: { type: Type.STRING, nullable: true },
+            machModel: { type: Type.STRING, nullable: true },
+            machAdType: { type: Type.STRING, nullable: true },
+            machPrice: { type: Type.NUMBER, nullable: true },
+            machYear: { type: Type.NUMBER, nullable: true },
+            machHours: { type: Type.NUMBER, nullable: true },
+            machFuel: { type: Type.STRING, nullable: true },
+            accType: { type: Type.STRING, nullable: true },
+            totalBeds: { type: Type.NUMBER, nullable: true },
+            availableBeds: { type: Type.NUMBER, nullable: true },
+            price: { type: Type.NUMBER, nullable: true },
+            priceType: { type: Type.STRING, nullable: true },
+            catKitchenType: { type: Type.STRING, nullable: true },
+            catMinOrder: { type: Type.NUMBER, nullable: true },
+            catPricePerMeal: { type: Type.NUMBER, nullable: true },
+            catDeliveryZone: { type: Type.STRING, nullable: true },
+            plotPurpose: { type: Type.STRING, nullable: true },
+            plotArea: { type: Type.NUMBER, nullable: true },
+            plotAreaUnit: { type: Type.STRING, nullable: true },
+            plotPrice: { type: Type.NUMBER, nullable: true },
+            marketCategory: { type: Type.STRING, nullable: true },
+            title: { type: Type.STRING, nullable: true },
+            marketCondition: { type: Type.STRING, nullable: true },
+            marketValue: { type: Type.NUMBER, nullable: true },
+            companyName: { type: Type.STRING, nullable: true },
+            companyDescription: { type: Type.STRING, nullable: true },
+            companyWorkingHours: { type: Type.STRING, nullable: true },
+            benefits: { type: Type.ARRAY, items: { type: Type.STRING }, nullable: true },
+            amenities: { type: Type.ARRAY, items: { type: Type.STRING }, nullable: true },
+            companyMainCats: { type: Type.ARRAY, items: { type: Type.STRING }, nullable: true },
+          },
+          required: ["opis"],
+        },
+      },
+    });
+
+    const jsonStr = response.text?.trim() || "{}";
+    try {
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      return { opis: description };
+    }
+  } catch (error) {
+    console.error("Gemini API error in generateAdFromDescription:", error);
+    return { opis: description };
+  }
+};
+
 export const processDashboardCommand = async (input: string, context?: any) => {
   const ai = getGenAI();
   if (!ai) {

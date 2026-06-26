@@ -57,6 +57,17 @@ AhrefsBot moved from BAD_BOTS to whitelisted search bots (`rate-limit-shield.mid
 Pre: non-bot human dobijao prazan `<div id="root">` → 11.7s FCP dok JS ne hydratuje.
 Posle: HTML dolazi sa pre-rendered content-om → FCP dramatično bolji.
 
+## Cloud Run / Infra
+
+- **Memory**: 1GB (512MB nije dovoljno — OOM SIGABRT kad Redis padne)
+- **Concurrency**: 40 (sa 80 je pritisak prevelik po instanci)
+- **VPC Connector**: `svet-gradevine-connector` (us-west1, range 10.8.0.0/28)
+- **Cloud NAT**: `svet-gradevine-nat` sa statičkom IP `8.235.34.194`
+- **Cloud Router**: `svet-gradevine-router`
+- **Redis host**: `spotted-loaf-funny-63490.db.redis.io:14446` — zaštićen lozinkom, firewall mora da pusti Cloud Run egress (static IP gore)
+
+Ako deploy ruši **503 / SIGABRT**, prvo proveri Redis konekciju. Ako Redis ne radi, app radi u in-memory modu i troši više RAM-a.
+
 ## Bundle Size (Uncompressed, initial load ~1.6MB)
 - `vendor-core`: 460KB (React, Router, Query)
 - `vendor-firebase`: 242KB (Firebase SDK)

@@ -5,6 +5,7 @@ import {
   parseSearchIntent,
   processDashboardCommand,
   moderateImage,
+  generateAdFromDescription,
 } from "../services/ai.service.ts";
 
 export const aiRouter = Router();
@@ -58,6 +59,28 @@ aiRouter.post("/search-intent", async (req, res, next) => {
     res.json(parsedData);
   } catch (error) {
     console.error("AI service error:", error);
+    res.status(500).json({ error: "AI service error" });
+  }
+});
+
+// POST /api/ai/generate-ad
+// Ulaz: { description: string, category: string }
+// Izlaz: { [fieldName]: value }
+aiRouter.post("/generate-ad", async (req, res, next) => {
+  try {
+    const { description, category } = req.body;
+
+    if (!description || description.trim().length === 0) {
+      return res.status(400).json({ error: "Description je obavezan" });
+    }
+    if (!category || category.trim().length === 0) {
+      return res.status(400).json({ error: "Category je obavezan" });
+    }
+
+    const adData = await generateAdFromDescription(description, category);
+    res.json(adData);
+  } catch (error) {
+    console.error("AI generate-ad error:", error);
     res.status(500).json({ error: "AI service error" });
   }
 });

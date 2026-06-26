@@ -13,6 +13,7 @@ import { usePostAdController } from "@/src/modules/ads/hooks/usePostAdController
 import { usePlatformSettings } from "@/src/modules/dashboard/hooks/useMyAds";
 import { SuccessState } from "@/src/modules/ads/components/post-ad/SuccessState";
 import { CategorySelector } from "@/src/modules/ads/components/post-ad/CategorySelector";
+import { AiAutofillButton } from "@/src/modules/ads/components/post-ad/AiAutofillButton";
 import { AdOverlays } from "@/src/modules/ads/components/post-ad/AdOverlays";
 import {
   jobSchema as jobSchema,
@@ -241,6 +242,8 @@ export default function PostAdPage() {
           </form>
         </FormProvider>
       </div>
+
+      {selectedCategory && <AiAutofillButton selectedCategory={selectedCategory} />}
     </div>
   );
 }
