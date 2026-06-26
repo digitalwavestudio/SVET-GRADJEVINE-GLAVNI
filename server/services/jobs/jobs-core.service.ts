@@ -26,7 +26,7 @@ export class JobsCoreService {
       // Fetch from Firestore
       const t0_query = Date.now();
       let q = rawDb
-        .collection("listings")
+        .collectionGroup("listings")
         .where("type", "==", "job")
         .where("status", "in", ["active", "approved"])
         .orderBy("createdAt", "desc");
