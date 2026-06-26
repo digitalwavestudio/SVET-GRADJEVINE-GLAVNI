@@ -101,7 +101,7 @@ export const jobsService = {
         if (f[key] !== undefined) cleanFilters[key] = f[key];
       }
       const data = isEmptyFilter && !filters?.searchQuery
-        ? await apiClient.get<JobSearchApiResponse>('/jobs?pageSize=200')
+        ? await apiClient.get<JobSearchApiResponse>('/jobs?pageSize=50')
         : await apiClient.post<JobSearchApiResponse>('/jobs/search', { 
             searchQuery: (filters?.searchQuery as string | undefined) || "", 
             filters: cleanFilters, 

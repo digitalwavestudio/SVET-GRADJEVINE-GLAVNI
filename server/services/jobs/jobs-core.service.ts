@@ -15,8 +15,7 @@ export class JobsCoreService {
     const t0_cache = Date.now();
     const cached = await CacheService.get(cacheKey);
     console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
-    // Skip cache in development to avoid stale data
-    if (process.env.NODE_ENV !== "development" && cached) return cached;
+    if (cached) return cached;
 
     try {
       // Bypass proxy to avoid circuit-breaker returning empty wrapped data

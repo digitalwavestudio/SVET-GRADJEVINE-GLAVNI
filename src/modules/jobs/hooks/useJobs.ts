@@ -52,7 +52,7 @@ export function useJobs(filters: Record<string, unknown>, options?: Record<strin
     },
     initialPageParam: null as string | null,
     getNextPageParam: () => undefined,
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 min
     ...options,
   });
 }
