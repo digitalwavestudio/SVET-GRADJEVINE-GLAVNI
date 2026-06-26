@@ -300,7 +300,7 @@ async function backgroundPreRenderListingHub(
       "professionSlug", "machineType", "condition", "fuelType", "area",
     );
 
-    const pageSize = 20;
+    const pageSize = 15;
     const maxPage = 50;
 
     if (cursor) {

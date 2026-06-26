@@ -40,21 +40,19 @@ export function useJobs(filters: Record<string, unknown>, options?: Record<strin
           if (import.meta.env.DEV) console.log("[useJobs] Using hydrated INITIAL_STATE");
           const payload: JobsListResponse = {
             items: (state.docs || state.items || []) as JobResponse[],
-            lastVisible: (state.lastVisibleId || state.lastVisible || null) as string | null,
-            hasMore: (state.hasMore || false) as boolean,
-            totalHits: state.totalHits as number | undefined,
+            lastVisible: null,
+            hasMore: false,
           };
           // Clear it so we don't reuse it for different calls later
           customWindow.INITIAL_STATE = null;
           return payload;
         }
       }
-      return jobsService.fetchJobs(filters, pageParam as string | null, 10) as Promise<JobsListResponse>;
+      return jobsService.fetchJobs(filters, pageParam as string | null) as Promise<JobsListResponse>;
     },
     initialPageParam: null as string | null,
-    getNextPageParam: (lastPage: JobsListResponse) =>
-      lastPage?.hasMore ? lastPage.lastVisible : undefined,
-    staleTime: 5 * 60 * 1000, // 5 min
+    getNextPageParam: () => undefined,
+    staleTime: 0,
     ...options,
   });
 }

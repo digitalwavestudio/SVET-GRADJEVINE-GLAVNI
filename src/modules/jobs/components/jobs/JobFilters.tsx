@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LOCATIONS, SECTORS, PROFESSIONS, BENEFITS } from '@/src/constants/taxonomy';
-import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterCheckbox, FilterCTA, MarketStatsWidget } from '@/src/modules/core/components/filters/FilterComponents';
+import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterCTA } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,17 +36,38 @@ export function JobFilters({
   handleApplyFilters
 }: JobFiltersProps) {
   const navigate = useNavigate();
+  const [professionSearch, setProfessionSearch] = useState('');
+
+  let allProfessions: { slug: string; name: string; sectorSlug: string }[] = [];
+  if (selectedSector) {
+    allProfessions = (PROFESSIONS[selectedSector] || []).map(p => ({ ...p, sectorSlug: selectedSector }));
+  } else {
+    Object.entries(PROFESSIONS).forEach(([sectorSlug, prods]) => {
+      prods.forEach(p => allProfessions.push({ ...p, sectorSlug }));
+    });
+  }
+
+  const filteredProfessions = professionSearch
+    ? allProfessions.filter(p => p.name.toLowerCase().includes(professionSearch.toLowerCase()))
+    : allProfessions;
 
   return (
     <FilterSidebar>
-      <MarketStatsWidget 
-        stats={{ 
-          total: stats.total, 
-          trend: stats.today.toString(), 
-          category: "PROJEKATA" 
-        }} 
+      {/* Clear All Button - Always visible at the top */}
+      <FilterClearButton 
+        onClick={() => {
+          setFilterRadius('50');
+          setSearchQuery('');
+          handleSectorChange(null);
+          setSelectedProfession(null);
+          setSelectedLocations([]);
+          setSelectedBenefits([]);
+          setSalaryRange([0, 5000]);
+          handleApplyFilters();
+        }}
       />
-      {/* Location Filter - At the very top */}
+
+      {/* Location Filter */}
       <FilterSection title="Lokacija">
         <div className="space-y-4">
           <LocationCombobox 
@@ -80,7 +101,7 @@ export function JobFilters({
         </div>
       </FilterSection>
 
-      {/* Salary Filter - Directly below Location */}
+      {/* Salary Filter */}
       <FilterSection title="Plata">
         <div className="flex justify-between items-center mb-6">
           <span className="text-[10px] text-white/40 font-bold uppercase">Raspon (Eura)</span>
@@ -120,22 +141,6 @@ export function JobFilters({
         </div>
       </FilterSection>
 
-      {/* Clear All Button */}
-      {(searchQuery || selectedSector || selectedLocations.length > 0 || filterRadius !== '50' || selectedBenefits.length > 0 || salaryRange[0] > 0 || salaryRange[1] < 5000) && (
-        <FilterClearButton 
-          onClick={() => {
-            setFilterRadius('50');
-            setSearchQuery('');
-            handleSectorChange(null);
-            setSelectedProfession(null);
-            setSelectedLocations([]);
-            setSelectedBenefits([]);
-            setSalaryRange([0, 5000]);
-            handleApplyFilters();
-          }}
-        />
-      )}
-
       {/* Sector Filter */}
       <FilterSection title="Sektor">
         <div className="space-y-3">
@@ -158,32 +163,61 @@ export function JobFilters({
       </FilterSection>
 
       {/* Profession Filter */}
-      {selectedSector && (
-        <FilterSection title="Zanimanje">
-          <div className="space-y-1 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-            <div 
-              onClick={() => setSelectedProfession(null)}
-              className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === null ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
-            >
-              Sva zanimanja
-            </div>
-            {PROFESSIONS[selectedSector]?.map((prof) => (
-              <div 
-                key={prof.slug} 
-                onClick={() => setSelectedProfession(prof.slug)}
-                className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === prof.slug ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
-              >
-                {prof.name}
-              </div>
-            ))}
+      <FilterSection title="Zanimanje">
+        <div className="mb-3">
+          <input 
+            type="text"
+            value={professionSearch}
+            onChange={(e) => setProfessionSearch(e.target.value)}
+            placeholder="Pretraži zanimanja..."
+            className="w-full bg-slate-900 border border-white/5 hover:border-secondary/30 rounded-[10px] px-4 py-3 text-sm text-white outline-none focus:border-secondary/80 focus:bg-slate-950 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] placeholder:text-white/30 transition-all"
+          />
+        </div>
+        {professionSearch || selectedSector ? (
+        <div className="space-y-1 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+          <div 
+            onClick={() => { setSelectedProfession(null); setProfessionSearch(''); }}
+            className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === null ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+          >
+            Sva zanimanja
           </div>
-        </FilterSection>
-      )}
+          {filteredProfessions.map((prof) => (
+            <div 
+              key={prof.slug}
+              onClick={() => {
+                setProfessionSearch('');
+                if (prof.slug === selectedProfession) {
+                  setSelectedProfession(null);
+                } else {
+                  if (!selectedSector || prof.sectorSlug !== selectedSector) {
+                    handleSectorChange(prof.sectorSlug);
+                  }
+                  setSelectedProfession(prof.slug);
+                }
+              }}
+              className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === prof.slug ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+            >
+              {!selectedSector && prof.sectorSlug && (
+                <span className="text-[8px] text-white/20 uppercase tracking-wider mr-2">
+                  [{SECTORS.find(s => s.slug === prof.sectorSlug)?.name || prof.sectorSlug}]
+                </span>
+              )}
+              {prof.name}
+            </div>
+          ))}
+          {filteredProfessions.length === 0 && (
+            <div className="text-xs text-white/30 text-center py-4">Nema rezultata za "{professionSearch}"</div>
+          )}
+        </div>
+        ) : (
+          <div className="text-xs text-white/30 text-center py-4">Izaberite sektor ili ukucajte zanimanje</div>
+        )}
+      </FilterSection>
 
       {/* Benefits Filter */}
       <FilterSection title="Benefiti">
         <div className="space-y-4">
-          {BENEFITS.slice(0, 6).map((benefit) => (
+          {BENEFITS.map((benefit) => (
             <FilterToggle 
               key={benefit.slug} 
               label={benefit.name} 
@@ -195,7 +229,6 @@ export function JobFilters({
       </FilterSection>
 
       {/* Job Alert Card */}
-              
       <FilterCTA 
         title="POSTAVITE OGLAS ZA POSAO"
         description="PRONAĐITE NAJBOLJE MAJSTORE, INŽENJERE I STRUČNE TIMOVE ZA VAŠE PROJEKTE."

@@ -12,7 +12,7 @@ export const getPublicJobs = async (
   next: NextFunction,
 ) => {
   try {
-    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 10, 1), 50);
+    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 10, 1), 200);
     const limit = pageSize + 1;
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;
@@ -30,7 +30,8 @@ export const getPublicJobs = async (
 
     if (finalResult.hasMore) {
       finalResult.docs = result.docs.slice(0, pageSize);
-      finalResult.lastVisible = finalResult.docs.length > 0 ? finalResult.docs[finalResult.docs.length - 1].id : null;
+      // Koristi cursorDocId koji je servis izračunao PRE sortiranja
+      finalResult.lastVisible = (result as any)._cursorDocId || null;
     }
 
     if (platform === "mobile" && result && result.docs) {
@@ -59,16 +60,18 @@ export const searchJobs = async (
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
     const platform = req.headers["x-client-platform"];
 
+    const pageSize = Math.min(Math.max(Number(validated?.pageSize) || 24, 1), 50);
+
     // CACHING LOGIC FOR HOMEPAGE PREVIEWS (Plan 2 Optimization)
     const isPremiumHomepage =
       validated?.filters?.isPremium === true &&
       validated?.filters?.status === "active" &&
-      validated?.pageSize === 6 &&
+      pageSize === 6 &&
       !validated?.searchQuery;
     const isUrgentHomepage =
       validated?.filters?.isUrgent === true &&
       validated?.filters?.status === "active" &&
-      validated?.pageSize === 6 &&
+      pageSize === 6 &&
       !validated?.searchQuery;
 
     let cacheKey = null;
@@ -90,20 +93,25 @@ export const searchJobs = async (
       apiKey: env.ALGOLIA_API_KEY,
     };
 
+    // Pass original pageSize (Firestore service internally does N+1 for hasMore detection)
     const result = await JobsService.searchJobs(
       validated,
       ipStr,
       useAlgoliaOptions,
     );
 
-    // BFF logic: Transform based on platform
+    // BFF logic: Transform based on platform + map lastVisibleId → lastVisible
     let finalResult: {
       docs: any[];
       lastVisible: string | null;
       hasMore: boolean;
       totalHits?: number;
       isOptimized?: boolean;
-    } = result;
+    } = {
+      ...result,
+      lastVisible: result.lastVisible || null,
+      hasMore: result.hasMore || false,
+    };
 
     if (platform === "mobile" && result && result.docs) {
       finalResult = {
@@ -114,7 +122,6 @@ export const searchJobs = async (
     }
 
     if (cacheKey) {
-      // Cache for 15 minutes to save Firestore Reads
       await CacheService.set(cacheKey, finalResult, 15 * 60 * 1000);
     }
 

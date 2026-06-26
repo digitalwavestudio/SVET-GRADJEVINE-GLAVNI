@@ -16,9 +16,8 @@ export async function idempotencyMiddleware(
     return next();
   }
 
-  // Skip idempotency for read-only search endpoints (POST)
-  const skipPaths = ["/api/search/", "/api/ads/search", "/api/jobs/search", "/api/users/search"];
-  if (skipPaths.some(p => req.path.startsWith(p))) {
+  // Skip idempotency for read-only search/filter endpoints (POST)
+  if (req.path.includes("/search")) {
     return next();
   }
 

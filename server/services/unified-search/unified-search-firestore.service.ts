@@ -41,7 +41,6 @@ export class UnifiedSearchFirestore {
   private static applyCommonSortAndSelect(q: FirebaseFirestore.Query): FirebaseFirestore.Query {
     return q
       .orderBy("createdAt", "desc")
-      .orderBy(FieldPath.documentId(), "desc")
       .select(...this.SEARCH_FIELDS);
   }
 
@@ -201,22 +200,32 @@ export class UnifiedSearchFirestore {
 
     if (firestoreCursorId) {
       if (!checkQuotaStatus()) {
-        const decodedStr = Buffer.from(
-          lastVisibleId!.replace("cursor_", ""),
-          "base64",
-        ).toString("utf-8");
-        const parsedToken = JSON.parse(decodedStr);
+        let parsedToken: { id?: string; createdAt?: number | unknown } | null = null;
         
-        // 🚀 OPTIMIZATION: If we have sort keys in the token, we use startAfter(values) 
-        // to bypass the extra .get() call, saving 1 Read per page.
-        if (parsedToken.createdAt !== undefined) {
+        // Attempt to parse as cursor_ token first
+        if (lastVisibleId?.startsWith("cursor_")) {
+          try {
+            const decodedStr = Buffer.from(
+              lastVisibleId.replace("cursor_", ""),
+              "base64",
+            ).toString("utf-8");
+            parsedToken = JSON.parse(decodedStr);
+          } catch {
+            // Fall through to plain-ID fallback
+          }
+        }
+
+        if (parsedToken?.createdAt !== undefined) {
+          // 🚀 OPTIMIZATION: If we have sort keys in the token, use startAfter(values)
+          // to bypass the extra .get() call, saving 1 Read per page.
           const createdAtVal = typeof parsedToken.createdAt === 'number' 
             ? Timestamp.fromMillis(parsedToken.createdAt)
             : parsedToken.createdAt;
           
-          q = q.startAfter(createdAtVal, parsedToken.id);
+          q = q.startAfter(createdAtVal);
         } else {
-          // Fallback for legacy simple ID-only cursors
+          // Fallback for plain document IDs (from GET /api/jobs public feed)
+          const plainId = parsedToken?.id || firestoreCursorId;
           const isProfileSearch = false;
           const collectionName = isProfileSearch
             ? "users"
@@ -235,7 +244,7 @@ export class UnifiedSearchFirestore {
               : category;
           const lastDoc = await db
             .collection(collectionName)
-            .doc(firestoreCursorId)
+            .doc(plainId)
             .get();
           if (lastDoc.exists) q = q.startAfter(lastDoc);
         }

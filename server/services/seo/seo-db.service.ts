@@ -167,7 +167,7 @@ export class SEODbService {
         const searchResult = await UnifiedSearchService.search(
           stateCategory,
           { ...stateFilters, skipCount: true },
-          10,
+          15,
         );
         initialState = { searchResult };
       } catch (err) {

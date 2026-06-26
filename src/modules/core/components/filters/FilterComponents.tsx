@@ -3,29 +3,83 @@ import { createPortal } from 'react-dom';
 
 export const FilterSidebar = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [translateY, setTranslateY] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const diff = e.touches[0].clientY - touchStart;
+    if (diff > 0) setTranslateY(diff);
+  };
+
+  const handleTouchEnd = () => {
+    if (translateY > 100) {
+      setIsOpen(false);
+    }
+    setTranslateY(0);
+  };
 
   return (
     <>
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Filter Trigger */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-secondary text-black font-black text-xs uppercase tracking-widest px-6 py-4 rounded-full shadow-[0_10px_40px_rgba(254,191,13,0.3)] hover:bg-yellow-500 transition-all flex items-center gap-3"
+      >
+        <span className="material-symbols-outlined text-lg">filter_list</span>
+        Filteri
+      </button>
+
+      {/* Mobile Backdrop */}
       {isOpen && (
-        <div className="md:hidden fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex flex-col p-6 animate-in fade-in duration-200">
-          <div className="w-12 h-1 bg-white/25 rounded-full mx-auto mb-4 cursor-pointer" onClick={() => setIsOpen(false)}></div>
-          <div className="flex justify-between items-center pb-4 border-b border-white/5 mb-6">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Pretraga i Filteri</span>
+        <div
+          className="md:hidden fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[110] bg-slate-950 border-t border-white/10 rounded-t-3xl flex flex-col animate-in slide-in-from-bottom duration-300"
+          style={{
+            maxHeight: '80vh',
+            transform: `translateY(${translateY}px)`,
+            transition: translateY === 0 ? 'none' : 'none',
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Drag Handle */}
+          <div className="flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing shrink-0">
+            <div className="w-12 h-1.5 bg-white/20 rounded-full" />
+          </div>
+
+          {/* Header */}
+          <div className="flex justify-between items-center px-6 pb-4 border-b border-white/5 shrink-0">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Filteri</span>
             <button
               onClick={() => setIsOpen(false)}
-              className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white"
+              className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all"
             >
               <span className="material-symbols-outlined text-lg">close</span>
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto space-y-6 pb-12 pr-1 custom-scrollbar">
+
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto px-6 pb-8 pt-4 space-y-6 custom-scrollbar">
             {children}
           </div>
-          <div className="pt-4 border-t border-white/5 bg-slate-950">
+
+          {/* Apply Button */}
+          <div className="px-6 pb-6 pt-4 border-t border-white/5 shrink-0 bg-slate-950">
             <button
               onClick={() => setIsOpen(false)}
-              className="w-full py-4 bg-secondary !text-black font-black rounded-[10px] uppercase tracking-widest text-xs"
+              className="w-full py-4 bg-secondary !text-black font-black rounded-[10px] uppercase tracking-widest text-xs hover:bg-yellow-500 transition-all"
             >
               Prikaži rezultate
             </button>

@@ -86,55 +86,33 @@ export const jobsService = {
 
   async fetchJobs(
     filters: Record<string, unknown> | null | undefined,
-    lastVisible: string | { id: string } | null = null,
-    pageSize = 20
+    _lastVisible?: string | { id: string } | null,
+    _pageSize?: number
   ): Promise<JobsListResponse> {
-    const validPageSize = typeof pageSize === 'number' && pageSize > 0 ? pageSize : 20;
     return withRetry(async () => {
-      // Optimizacija: Ako nema filtera (osim status/pageSize), povucite iz in-memory javnog feed-a
       const metaKeys = ['status', 'pageSize', 'lastVisibleId'];
       const filterKeys = Object.keys(filters || {}).filter(k => !metaKeys.includes(k));
       const isEmptyFilter = !filters || filterKeys.length === 0;
-      
-      if (isEmptyFilter && !lastVisible && !filters?.searchQuery) {
-          try {
-              console.info(`[JOBS_CLIENT] Calling GET /api/jobs?pageSize=${validPageSize}...`);
-              const data = await apiClient.get<JobSearchApiResponse>('/jobs', { params: { pageSize: validPageSize } });
-              console.info("[JOBS_CLIENT] GET /api/jobs response:", data ? `ok (${data.docs?.length || 0} docs)` : "null/undefined");
-              if (data && data.docs) {
-                  if (data.docs.length > 0) {
-                    const first = data.docs[0] as any;
-                    console.log("[JOBS_DEBUG] First doc fields:", Object.keys(first).join(","));
-                    console.log("[JOBS_DEBUG] benefits:", JSON.stringify(first.benefits), "benefiti:", JSON.stringify(first.benefiti), "rawBenefits:", JSON.stringify(first.rawBenefits));
-                    console.log("[JOBS_DEBUG] smestaj:", first.smestaj, "prevoz:", first.prevoz, "hrana:", first.hrana);
-                  }
-                  const items = validateList(jobExtendedSchema, data.docs);
-                  const totalHitsCount = typeof data.totalHits === 'number' ? data.totalHits : undefined;
-                  return {
-                      items,
-                      lastVisible: data.lastVisible || null,
-                      hasMore: data.hasMore || false,
-                      totalHits: totalHitsCount
-                  };
-              }
-          } catch(e) {
-              console.warn("Public feed load error", e);
-          }
-      }
 
-      const lastVisibleId = lastVisible ? (typeof lastVisible === 'string' ? lastVisible : lastVisible.id) : null;
-      const data = await apiClient.post<JobSearchApiResponse>('/jobs/search', { 
-          searchQuery: (filters?.searchQuery as string | undefined) || "", 
-          filters, 
-          lastVisibleId, 
-          pageSize: validPageSize 
-      });
-      
+      const allowedFilterKeys = ['status', 'searchQuery', 'locationSlug', 'professionSlug', 'sector', 'engagement', 'experience', 'minSalary', 'maxSalary', 'isPremium', 'isUrgent', 'isPremiumPartner', 'isVerified', 'showAllStatuses', 'companyId'];
+      const f = filters || {} as Record<string, unknown>;
+      const cleanFilters: Record<string, unknown> = {};
+      for (const key of allowedFilterKeys) {
+        if (f[key] !== undefined) cleanFilters[key] = f[key];
+      }
+      const data = isEmptyFilter && !filters?.searchQuery
+        ? await apiClient.get<JobSearchApiResponse>('/jobs?pageSize=200')
+        : await apiClient.post<JobSearchApiResponse>('/jobs/search', { 
+            searchQuery: (filters?.searchQuery as string | undefined) || "", 
+            filters: cleanFilters, 
+            pageSize: 50
+          });
+
       return {
         items: validateList(jobExtendedSchema, data?.docs || []),
-        lastVisible: data?.lastVisible || null,
-        hasMore: data?.hasMore || false,
-        totalHits: data?.totalHits
+        lastVisible: null,
+        hasMore: false,
+        totalHits: data?.totalHits as number | undefined
       };
     });
   },

@@ -15,8 +15,8 @@ export class JobsCoreService {
     const t0_cache = Date.now();
     const cached = await CacheService.get(cacheKey);
     console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
-    // Return cached if available
-    if (cached) return cached;
+    // Skip cache in development to avoid stale data
+    if (process.env.NODE_ENV !== "development" && cached) return cached;
 
     try {
       // Bypass proxy to avoid circuit-breaker returning empty wrapped data
@@ -28,11 +28,18 @@ export class JobsCoreService {
       const t0_query = Date.now();
       let q = rawDb
         .collection("listings")
-        .where("type", "==", "job")
         .orderBy("createdAt", "desc");
         
       if (cursor) {
-        const cursorDoc = await rawDb.collection("listings").doc(cursor).get();
+        let docId = cursor;
+        if (typeof cursor === "string" && cursor.startsWith("cursor_")) {
+          try {
+            const decoded = Buffer.from(cursor.replace("cursor_", ""), "base64").toString("utf-8");
+            const parsed = JSON.parse(decoded);
+            if (parsed.id) docId = parsed.id;
+          } catch {}
+        }
+        const cursorDoc = await rawDb.collection("listings").doc(docId).get();
         if (cursorDoc.exists) {
             q = q.startAfter(cursorDoc);
         }
@@ -75,15 +82,28 @@ export class JobsCoreService {
 
       const t0_map = Date.now();
       console.log(`[TIMING] Firestore .get() took: ${t0_map - t0_query}ms, docs: ${snap.docs.length}`);
-      const docs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
-      console.log(`[TIMING] .map() took: ${Date.now() - t0_map}ms`);
+      const rawDocs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
+      // cursorDoc je poslednji dokument koji TREBA da ostane na ovoj strani (pageSize-ti u query order-u)
+      // Ovaj ID čuvamo PRE sortiranja da bi startAfter() radio korektno
+      const pageSize = limit - 1;
+      const cursorDocId = rawDocs.length > pageSize ? rawDocs[pageSize - 1].id : null;
+      // Sort premiums and urgent first (samo za prikaz)
+      rawDocs.sort((a: any, b: any) => {
+        if (a.isPremium && !b.isPremium) return -1;
+        if (!a.isPremium && b.isPremium) return 1;
+        if (a.isUrgent && !b.isUrgent) return -1;
+        if (!a.isUrgent && b.isUrgent) return 1;
+        return 0;
+      });
+      console.log(`[TIMING] .map()+sort took: ${Date.now() - t0_map}ms`);
 
       const response = {
-        docs,
-        lastVisible: docs.length === limit ? docs[docs.length - 1].id : null,
-        hasMore: docs.length === limit,
+        docs: rawDocs,
+        _cursorDocId: cursorDocId,
+        lastVisible: cursorDocId,
+        hasMore: rawDocs.length > pageSize,
       };
-
+      
       // Cache the result for 60 minutes (Quota protection)
       const t0_set = Date.now();
       await CacheService.set(cacheKey, response, 3600000);

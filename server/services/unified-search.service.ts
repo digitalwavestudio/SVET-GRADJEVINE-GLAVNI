@@ -117,15 +117,18 @@ export class UnifiedSearchService {
         }
 
         // --- PAGINATION SECURITY: Deep Offset Block ---
-        const MAX_PAGES = 12; // Amazon/Google pattern (10-15 pages max)
+        const MAX_PAGES = 20; // Amazon/Google pattern (10-15 pages max)
         let firestoreCursorId = lastVisibleId;
         let currentPage = 1;
+        let skipAlgolia = false;
 
         if (
           lastVisibleId &&
           typeof lastVisibleId === "string" &&
           lastVisibleId.startsWith("cursor_")
         ) {
+          // cursor_ token = came from Firestore executeFirestoreSearch.
+          // Algolia can't use this — skip to Firestore.
           try {
             const decodedStr = Buffer.from(
               lastVisibleId.replace("cursor_", ""),
@@ -134,6 +137,7 @@ export class UnifiedSearchService {
             const parsedToken = JSON.parse(decodedStr);
             firestoreCursorId = parsedToken.id;
             currentPage = parsedToken.p;
+            skipAlgolia = true;
           } catch (e) {
             this.logger.warn(`Invalid cursor token attempt: ${lastVisibleId}`);
             return {
@@ -144,8 +148,13 @@ export class UnifiedSearchService {
             };
           }
         } else if (lastVisibleId && !isNaN(Number(lastVisibleId))) {
+          // Numeric cursor = Algolia page number → use Algolia
           currentPage = Number(lastVisibleId);
           firestoreCursorId = lastVisibleId;
+        } else if (lastVisibleId) {
+          // Plain doc ID = came from GET /api/jobs (getPublicJobs).
+          // Algolia can't use this — skip to Firestore.
+          skipAlgolia = true;
         }
 
         // Deep Pagination Block for crawlers / search bots to protect Firestore quotas under 50k RPS
@@ -170,18 +179,21 @@ export class UnifiedSearchService {
         }
         // ----------------------------------------------
 
-        const algoliaResult = await UnifiedSearchAlgolia.executeAlgoliaSearch(
-          category,
-          entityType,
-          filtersAny,
-          pageSize,
-          currentPage,
-          this.logger,
-          lastVisibleId
-        );
+        // cursor_ token ili plain doc ID → došlo iz Firestore-a, Algolia ne razume → skip
+        if (!skipAlgolia) {
+          const algoliaResult = await UnifiedSearchAlgolia.executeAlgoliaSearch(
+            category,
+            entityType,
+            filtersAny,
+            pageSize,
+            currentPage,
+            this.logger,
+            lastVisibleId
+          );
 
-        if (algoliaResult && algoliaResult.docs && algoliaResult.docs.length > 0) {
-          return algoliaResult;
+          if (algoliaResult && algoliaResult.docs && algoliaResult.docs.length > 0) {
+            return algoliaResult;
+          }
         }
 
         // COMPLEX non-search queries (geo, radius) → fallback cache ili prazno

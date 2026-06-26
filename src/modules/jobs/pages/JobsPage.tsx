@@ -78,10 +78,14 @@ function JobsPage() {
   return cleaned;
 }, [activeFilters]);
 
-const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = useJobs(sanitizedFilters);
-  const isDeepPagingLimitReached = Boolean(hasNextPage && data?.pages && data.pages.length >= 11);
-  const hasMore = hasNextPage && !isDeepPagingLimitReached;
+const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
+  const [visibleCount, setVisibleCount] = useState(15);
+  useEffect(() => setVisibleCount(15), [jobs]);
+  const displayedJobs = useMemo(() => jobs.slice(0, visibleCount), [jobs, visibleCount]);
+  const hasMore = visibleCount < jobs.length;
+  const isDeepPagingLimitReached = false;
+  const loadMore = useCallback(() => setVisibleCount(prev => prev + 10), []);
 
   const { data: premiumData } = usePremiumJobs(sanitizedFilters, 6, { enabled: !loadingJobs });
   const { data: urgentData } = useUrgentJobs(sanitizedFilters, 6, { enabled: !loadingJobs });
@@ -91,7 +95,7 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
 
-  const totalJobsCount = data?.pages[0]?.totalHits ?? (isEmptyFilter ? jobStats?.total : jobs.length) ?? jobs.length;
+  const totalJobsCount = jobs.length;
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; path?: string }[] = [];
@@ -511,7 +515,7 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
         titleAccent="Građevina"
         subtitle="Najveća baza poslova u građevinskom sektoru. Pronađi stalni zaposlenje ili angažman na projektu za svoj tim."
         stats={[
-          { label: "AKTIVNI OGLASI", value: jobStats?.total != null ? jobStats.total.toLocaleString() : "1K+", icon: "work" },
+          { label: "AKTIVNI OGLASI", value: totalJobsCount.toLocaleString(), icon: "work" },
           { label: "KOMPANIJE", value: companyCount != null ? companyCount.toLocaleString() : "400", icon: "business" },
           { label: "NOVI DANAS", value: jobStats?.today != null ? jobStats.today.toLocaleString() : "12", icon: "new_releases" }
         ]}
@@ -684,7 +688,7 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
             <JobListings
               viewMode={viewMode}
               setViewMode={setViewMode}
-              filteredJobs={filteredJobs}
+              filteredJobs={displayedJobs}
               filteredPremiumJobs={filteredPremiumJobs}
               filteredUrgentJobs={filteredUrgentJobs}
               jobs={jobs}
