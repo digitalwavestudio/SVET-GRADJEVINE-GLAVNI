@@ -50,6 +50,10 @@ export class UnifiedSearchService {
   private static l1ShieldCache = new Map<string, { data: UnifiedSearchResult; expiry: number }>();
   private static readonly L1_SHIELD_TTL = 5 * 60 * 1000; // 5 min protection
 
+  static clearL1ShieldCache(): void {
+    this.l1ShieldCache.clear();
+  }
+
   static analyzeQueryComplexity(filters: UnifiedSearchFilters): "SIMPLE" | "COMPLEX" {
     return UnifiedSearchUtils.analyzeQueryComplexity(filters);
   }

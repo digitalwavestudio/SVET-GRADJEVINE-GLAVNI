@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { generateProfessionalServiceListSchema } from '@/src/lib/seoSchema';
 import DynamicSEO from '@/src/components/DynamicSEO';
+import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
 import SeoContentBlock from '@/src/components/SeoContentBlock';
@@ -206,6 +207,25 @@ export default function MastersPage() {
     }
   ), [masters, locName, profName, gradSlug, zanimanjeSlug]);
 
+  const breadcrumbItems = useMemo(() => {
+    const items: { label: string; path?: string }[] = [];
+    const hasZanimanje = zanimanjeSlug && zanimanjeSlug !== 'SVE';
+    const hasGrad = gradSlug && gradSlug !== 'all';
+    if (hasZanimanje || hasGrad) {
+      items.push({ label: 'Majstori', path: '/majstori' });
+    }
+    if (hasZanimanje) {
+      items.push({ label: profName || zanimanjeSlug!, path: hasGrad ? `/majstori/${zanimanjeSlug}` : undefined });
+    }
+    if (hasGrad) {
+      items.push({ label: locName || gradSlug! });
+    }
+    if (items.length === 0) {
+      items.push({ label: 'Majstori' });
+    }
+    return items;
+  }, [zanimanjeSlug, gradSlug, profName, locName]);
+
   return (
     <div className="bg-surface min-h-screen text-on-surface font-sans selection:bg-secondary selection:text-on-secondary">
       <DynamicSEO
@@ -214,6 +234,8 @@ export default function MastersPage() {
         zanimanje={zanimanjeSlug ?? undefined}
         jsonLd={[itemListSchema]}
       />
+
+      <Breadcrumbs items={breadcrumbItems} />
 
       <StandardPageHero
         badge="GRAĐEVINSKA INDUSTRIJA — SRBIJA & REGION"

@@ -63,6 +63,10 @@ export class CacheInvalidationService {
       CACHE_PREFIXES.SWR_ENVELOPE + CACHE_PREFIXES.HOMEPAGE_PREMIUM_JOBS,
       CACHE_PREFIXES.HOMEPAGE_URGENT_JOBS,
       CACHE_PREFIXES.SWR_ENVELOPE + CACHE_PREFIXES.HOMEPAGE_URGENT_JOBS,
+      CACHE_PREFIXES.UNIFIED_SEARCH_JOB,
+      CACHE_PREFIXES.UNIFIED_SEARCH,
+      CACHE_PREFIXES.SWR_ENVELOPE + CACHE_PREFIXES.UNIFIED_SEARCH,
+      CACHE_PREFIXES.FALLBACK_SEARCH,
       CACHE_PREFIXES.MY_ADS + uid,
       CACHE_PREFIXES.PUBLIC_PROFILE_ADS + uid,
       CACHE_PREFIXES.ADMIN_GLOBAL_STATS,
@@ -78,6 +82,14 @@ export class CacheInvalidationService {
     try {
       const { clearL1HomepageCache } = await import("./bff.service.ts");
       clearL1HomepageCache();
+    } catch {
+      // ignore import error
+    }
+
+    // Clear L1 shield cache in unified search (in-memory, never auto-invalidated)
+    try {
+      const { UnifiedSearchService } = await import("./unified-search.service.ts");
+      UnifiedSearchService.clearL1ShieldCache();
     } catch {
       // ignore import error
     }

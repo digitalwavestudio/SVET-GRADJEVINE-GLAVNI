@@ -141,7 +141,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       handleCardClick(url, { job });
                     }
                   }}
-                  className="group/card relative flex flex-col shrink-0 min-h-[320px] h-auto md:h-[360px] rounded-[16px] transition-all duration-500 overflow-hidden border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1 w-[90vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer"
+                  className="group/card relative flex flex-col shrink-0 min-h-[320px] h-full md:min-h-[360px] rounded-[16px] transition-all duration-500 overflow-hidden border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1 w-[90vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer"
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
                   <div className="p-5 md:p-7 flex flex-col w-full h-full relative flex-1 z-10">

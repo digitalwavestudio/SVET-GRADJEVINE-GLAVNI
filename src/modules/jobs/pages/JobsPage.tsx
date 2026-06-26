@@ -20,7 +20,7 @@ import { JobsFeaturedCompanies } from '@/src/modules/jobs/components/jobs/JobsFe
 import { ActiveFilterChips, MarketStatsWidget, SortingBar } from '@/src/modules/core/components/filters/FilterComponents';
 import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
-import { BENEFITS, LOCATIONS, SECTORS } from '@/src/constants/taxonomy';
+import { BENEFITS, LOCATIONS, PROFESSIONS, SECTORS } from '@/src/constants/taxonomy';
 import { useJobs, usePremiumJobs, useUrgentJobs } from '@/src/modules/jobs/hooks/useJobs';
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 
@@ -92,6 +92,43 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
   const { data: companyCount } = useCount('companies');
 
   const totalJobsCount = data?.pages[0]?.totalHits ?? (isEmptyFilter ? jobStats?.total : jobs.length) ?? jobs.length;
+
+  const breadcrumbItems = useMemo(() => {
+    const items: { label: string; path?: string }[] = [];
+    const hasZanimanje = zanimanje && zanimanje !== 'SVE';
+    const hasGrad = grad && grad !== 'all';
+    let professionName: string | undefined;
+    if (hasZanimanje) {
+      const found = Object.values(PROFESSIONS).flat().find(p => p.slug === zanimanje);
+      professionName = found?.shortName || found?.name || zanimanje;
+    }
+    const gradName = hasGrad ? LOCATIONS.find(l => l.slug === grad)?.name : undefined;
+    if (hasZanimanje || hasGrad) {
+      items.push({ label: 'Poslovi', path: '/poslovi' });
+    }
+    if (hasZanimanje) {
+      items.push({ label: professionName || zanimanje!, path: hasGrad ? `/poslovi/${zanimanje}` : undefined });
+    }
+    if (hasGrad) {
+      items.push({ label: gradName || grad! });
+    }
+    if (items.length === 0) {
+      items.push({ label: 'Poslovi' });
+    }
+    return items;
+  }, [zanimanje, grad]);
+
+  const relatedSearches = useMemo(() => {
+    const hasZanimanje = zanimanje && zanimanje !== 'SVE';
+    const hasGrad = grad && grad !== 'all';
+    if (!hasZanimanje && !hasGrad) return null;
+    const allProfessions = Object.values(PROFESSIONS).flat();
+    const currentSector = hasZanimanje ? Object.entries(PROFESSIONS).find(([, ps]) => ps.some(p => p.slug === zanimanje))?.[0] : undefined;
+    const sameSectorProfessions = currentSector ? PROFESSIONS[currentSector].filter(p => p.slug !== zanimanje).slice(0, 5) : [];
+    const sameProfessionLocations = hasZanimanje ? LOCATIONS.filter(l => l.slug !== grad).slice(0, 6) : [];
+    const otherProfessionsInLocation = hasGrad ? allProfessions.filter(p => p.slug !== zanimanje).slice(0, 6) : [];
+    return { sameSectorProfessions, sameProfessionLocations, otherProfessionsInLocation, hasZanimanje, hasGrad };
+  }, [zanimanje, grad]);
 
   // Filter states initialized from URL params
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -466,6 +503,8 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
     <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary min-h-screen">
       <DynamicSEO type="poslovi" grad={grad ?? undefined} zanimanje={zanimanje ?? undefined} jsonLd={[itemListSchema]} />
 
+      <Breadcrumbs items={breadcrumbItems} />
+
       <StandardPageHero
         badge="Oglasi za Posao"
         title="Poslovi"
@@ -666,6 +705,62 @@ const { data, isLoading: loadingJobs, fetchNextPage: loadMore, hasNextPage } = u
           </div>
         </div>
       </main>
+
+      {/* SLICNE PRETRAGE - INTERNAL LINKS */}
+      {relatedSearches && (() => {
+        const { sameSectorProfessions, sameProfessionLocations, otherProfessionsInLocation, hasZanimanje, hasGrad } = relatedSearches;
+        const professionName = hasZanimanje ? Object.values(PROFESSIONS).flat().find(p => p.slug === zanimanje)?.shortName || zanimanje : null;
+        const gradName = hasGrad ? LOCATIONS.find(l => l.slug === grad)?.name : null;
+        
+        return (
+          <section className="max-w-7xl mx-auto px-4 md:px-8 py-16 border-t border-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {hasZanimanje && sameProfessionLocations.length > 0 && (
+                <div>
+                  <h3 className="text-secondary uppercase text-[10px] font-black tracking-[0.2em] mb-4">{professionName} u drugim gradovima</h3>
+                  <ul className="space-y-2">
+                    {sameProfessionLocations.map(loc => (
+                      <li key={loc.slug}>
+                        <Link to={`/poslovi/${zanimanje}/${loc.slug}`} className="text-white/40 hover:text-secondary text-sm transition-colors">
+                          {professionName} – {loc.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {hasGrad && otherProfessionsInLocation.length > 0 && (
+                <div>
+                  <h3 className="text-secondary uppercase text-[10px] font-black tracking-[0.2em] mb-4">Drugi poslovi u {gradName}</h3>
+                  <ul className="space-y-2">
+                    {otherProfessionsInLocation.map(prof => (
+                      <li key={prof.slug}>
+                        <Link to={`/poslovi/${prof.slug}/${grad}`} className="text-white/40 hover:text-secondary text-sm transition-colors">
+                          {prof.shortName || prof.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {hasZanimanje && sameSectorProfessions.length > 0 && (
+                <div>
+                  <h3 className="text-secondary uppercase text-[10px] font-black tracking-[0.2em] mb-4">Srodne kategorije</h3>
+                  <ul className="space-y-2">
+                    {sameSectorProfessions.map(prof => (
+                      <li key={prof.slug}>
+                        <Link to={`/poslovi/${prof.slug}${hasGrad ? `/${grad}` : ''}`} className="text-white/40 hover:text-secondary text-sm transition-colors">
+                          {prof.shortName || prof.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* FEATURED COMPANIES LOGO CLOUD */}
       <JobsFeaturedCompanies 

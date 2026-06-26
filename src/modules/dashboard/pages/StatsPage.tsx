@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { LOCATIONS, PROFESSIONS } from '@/src/constants/taxonomy';
+import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import { useDocumentHead } from '@/src/hooks/useDocumentHead';
 import { createFAQSchema } from '@/src/lib/seo/schemas';
 import { useStatsCounts, usePseoInsights } from '@/src/modules/dashboard/hooks/useStats';
@@ -11,6 +12,28 @@ export default function StatsPage() {
   
   const zanimanjeName = zanimanje ? Object.values(PROFESSIONS).flat().find(p => p.slug === zanimanje)?.name : '';
   const gradName = grad ? LOCATIONS.find(l => l.slug === grad)?.name : '';
+
+  const breadcrumbItems = useMemo(() => {
+    const items: { label: string; path?: string }[] = [];
+    const hasZanimanje = zanimanje;
+    const hasGrad = grad;
+    if (hasZanimanje || hasGrad) {
+      items.push({ label: 'Cene i statistika', path: '/cene-i-statistika' });
+    }
+    if (hasZanimanje) {
+      items.push({
+        label: zanimanjeName || zanimanje!,
+        path: hasGrad ? `/cene-i-statistika/${zanimanje}` : undefined
+      });
+    }
+    if (hasGrad) {
+      items.push({ label: gradName || grad! });
+    }
+    if (items.length === 0) {
+      items.push({ label: 'Cene i statistika' });
+    }
+    return items;
+  }, [zanimanje, grad, zanimanjeName, gradName]);
 
   const { data: counts = { jobs: 0, accommodations: 0, machines: 0, masters: 0 } } = useStatsCounts();
   
@@ -74,6 +97,7 @@ export default function StatsPage() {
 
   return (
     <div className="bg-surface min-h-screen pt-32 pb-24">
+      <Breadcrumbs items={breadcrumbItems} />
 
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
