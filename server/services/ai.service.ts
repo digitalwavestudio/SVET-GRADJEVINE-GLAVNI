@@ -113,7 +113,7 @@ export const moderateImage = async (imageUrl: string) => {
       return { isSafe: true, confidence: 1 };
     }
     const result = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: {
         parts: [
           {
@@ -172,7 +172,7 @@ export const processDashboardCommand = async (input: string, context?: any) => {
   }
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: `The user typed the following command: "${input}". Provide a helpful and brief response simulating an advanced AI assistant answering the command. Context: ${JSON.stringify(context || {})}`,
     });
     return response.text || "Komanda je obrađena.";
