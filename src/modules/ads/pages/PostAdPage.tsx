@@ -240,10 +240,10 @@ export default function PostAdPage() {
               />
             )}
           </form>
+
+          {selectedCategory && <AiAutofillButton selectedCategory={selectedCategory} />}
         </FormProvider>
       </div>
-
-      {selectedCategory && <AiAutofillButton selectedCategory={selectedCategory} />}
     </div>
   );
 }
