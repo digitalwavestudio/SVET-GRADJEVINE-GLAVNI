@@ -239,9 +239,10 @@ export default function PostAdPage() {
                 setStep={setStep}
               />
             )}
+            <div className="absolute top-5 right-5 z-20">
+              {selectedCategory && <AiAutofillButton selectedCategory={selectedCategory} />}
+            </div>
           </form>
-
-          {selectedCategory && <AiAutofillButton selectedCategory={selectedCategory} />}
         </FormProvider>
       </div>
     </div>

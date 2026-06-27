@@ -63,9 +63,10 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-secondary text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(254,191,13,0.3)] hover:shadow-[0_0_30px_rgba(254,191,13,0.5)] hover:scale-110 transition-all duration-300 group"
+        className="flex items-center gap-2 px-4 py-2.5 bg-secondary/10 border border-secondary/30 rounded-[10px] text-secondary text-xs font-black uppercase tracking-wider hover:bg-secondary/20 hover:border-secondary/50 transition-all group"
       >
-        <span className="material-symbols-outlined text-2xl group-hover:animate-pulse">auto_awesome</span>
+        <span className="material-symbols-outlined text-lg group-hover:animate-pulse">auto_awesome</span>
+        AI Autofill
       </button>
 
       <AnimatePresence>
