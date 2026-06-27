@@ -8,6 +8,7 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [filledFields, setFilledFields] = useState<string[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const formContext = useFormContext();
   const setValue = formContext?.setValue;
 
@@ -15,8 +16,16 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
     if (!description.trim() || !setValue) return;
     setIsLoading(true);
     setFilledFields(null);
+    setError(null);
 
     const result = await generateAdData(description, selectedCategory);
+    
+    if (result._error) {
+      setError(result._error);
+      setIsLoading(false);
+      return;
+    }
+
     const filled: string[] = [];
 
     Object.entries(result).forEach(([key, value]) => {
@@ -132,7 +141,20 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
                 </button>
               </div>
 
-              {filledFields && (
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-[10px] flex items-start gap-2"
+                >
+                  <span className="material-symbols-outlined text-red-500 text-base mt-0.5">error</span>
+                  <div>
+                    <p className="text-sm text-red-400 font-bold">{error}</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {filledFields && filledFields.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

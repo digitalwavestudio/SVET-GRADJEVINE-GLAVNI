@@ -22,6 +22,6 @@ export async function generateAdData(description: string, category: string): Pro
         return data;
     } catch (err) {
         console.error("AI generate-ad error:", err);
-        return { opis: description };
+        return { _error: "AI servis trenutno nije dostupan" };
     }
 }

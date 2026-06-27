@@ -194,12 +194,12 @@ Na osnovu opisa, popuni sledeca polja za ovu kategoriju:
 ${fields}
 
 Vazna pravila:
-1. location je uvek slug grada (npr. "beograd", "nis", "novi-sad", "kragujevac")
-2. Ako korisnik nije specificirao neko polje, ostavi ga null ili prazan string
-3. opis treba da bude detaljan i profesionalan tekst na SRPSKOM, prosiren na osnovu korisnikovog opisa, minimum 50 karaktera (imas slobodu da dodas relevantne detalje)
-4. Sve stringove vrati na srpskom jeziku
-5. Ako korisnik kaze "mašina" bez detalja, machCategory postavi "ostalo", machAdType postavi "prodaja"
-6. Za poslove: ako nije navedena plata, ostavi null; ako nije naveden sektor, postavi "ostalo"
+1. location je uvek TACAN slug grada (samo: "beograd", "novi-sad", "nis", "kragujevac", "cacak", "kraljevo", "subotica", "pancevo", "krusevac", "leskovac", "vranje", "sabac", "novi-pazar", "uzice", "ostalo-u-srbiji", "rad-na-terenu", "nemacka", "austrija", "slovenija", "hrvatska")
+2. sector (samo za job) mora biti TACAN slug: "gruba-gradnja", "zavrsni-radovi", "instalacije-i-tehnika", "niskogradnja", "rukovaoc-gradjevinskom-mehanizacijom", "metal-i-bravarija", "inzenjering", "ostalo"
+3. profession (samo za job) mapiraj iz opisa na TACAN slug profesije (npr. "zidar", "tesar", "armirac", "betonirac", "krovopokrivac", "fasader", "malteros", "keramicar", "parketar", "moler", "stolar", "elektricar", "vodoinstalater")
+4. Ako korisnik nije specificirao neko polje, ostavi ga null
+5. opis treba da bude detaljan i profesionalan tekst na SRPSKOM, prosiren na osnovu korisnikovog opisa, minimum 50 karaktera
+6. Ako korisnik kaze "mašina" bez detalja, machCategory postavi "ostalo", machAdType postavi "prodaja"
 
 Odgovori iskljucivo u JSON formatu sa ovim poljima.`,
       config: {
