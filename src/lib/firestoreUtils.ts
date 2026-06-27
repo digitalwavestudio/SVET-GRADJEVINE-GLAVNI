@@ -13,7 +13,7 @@ export const USER_WHITELIST = [
 
 export const ADS_WHITELIST = [
   'title', 'description', 'locationSlug', 'sectorSlug', 'professionSlug', 
-  'plataMin', 'plataMax', 'engagementSlug', 'experienceSlug', 'benefits',
+  'plataMin', 'plataMax', 'benefits',
   'categorySlug', 'brandSlug', 'price', 'priceType', 'weightKg', 'year',
   'areaM2', 'totalBeds', 'availableBeds', 'amenities', 'images', 'updatedAt',
   'typeSlug', 'pricePerMeal', 'status'

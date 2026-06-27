@@ -259,6 +259,7 @@ export function Step3({
               </div>
             </div>
 
+            {selectedCategory !== 'job' && (
             <div className="p-8 bg-white/[0.02] rounded-[10px] border border-white/5 mt-6 group hover:bg-white/[0.04] transition-all">
               <div className="flex flex-col md:flex-row items-start gap-8">
                 <div className="w-20 h-20 bg-secondary/10 rounded-[10px] flex items-center justify-center shrink-0 border border-secondary/20">
@@ -321,6 +322,7 @@ export function Step3({
                 </div>
               </div>
             </div>
+            )}
           </div>
 
           <div className="mt-16 flex flex-col-reverse md:flex-row justify-between gap-4">

@@ -3,7 +3,6 @@ import { motion } from "motion/react";
 import { useFormContext } from "react-hook-form";
 import { UI_TOKENS } from "@/src/lib/uiTokens";
 import {
-  ENGAGEMENT_TYPES,
   ACCOMMODATION_AMENITIES,
   BENEFITS,
 } from "@/src/constants/taxonomy";
@@ -415,32 +414,28 @@ export function Step4({
                               : `${formData.plataMin} - ${formData.plataMax} EUR`}
                       </span>
                     </div>
+                    {selectedCategory === "accommodation" ? (
                     <div>
-                      <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block mb-2">
-                        {selectedCategory === "accommodation"
-                          ? "Kapacitet"
-                          : selectedCategory === "catering"
-                            ? "Min. porudžbina"
-                            : selectedCategory === "machines"
-                              ? "Cena"
-                              : "Angažman"}
-                      </span>
+                      <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block mb-2">Kapacitet</span>
                       <span className="font-bold text-white uppercase text-xs tracking-widest">
-                        {selectedCategory === "accommodation"
-                          ? `${formData.totalBeds} ležajeva (${formData.availableBeds || formData.totalBeds} slobodno)`
-                          : selectedCategory === "catering"
-                            ? `${formData.catMinOrder} obroka`
-                            : selectedCategory === "machines"
-                              ? formData.machAdType === "prodaja"
-                                ? `${formData.machPrice} EUR`
-                                : `${formData.machPricePerDay} EUR / dan`
-                              : formData.tipAngazmana === "upisi"
-                                ? formData.customEngagement
-                                : ENGAGEMENT_TYPES.find(
-                                    (t) => t.slug === formData.tipAngazmana,
-                                  )?.name}
+                        {formData.totalBeds} ležajeva ({formData.availableBeds || formData.totalBeds} slobodno)
                       </span>
                     </div>
+                    ) : selectedCategory === "catering" ? (
+                    <div>
+                      <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block mb-2">Min. porudžbina</span>
+                      <span className="font-bold text-white uppercase text-xs tracking-widest">{formData.catMinOrder} obroka</span>
+                    </div>
+                    ) : selectedCategory === "machines" ? (
+                    <div>
+                      <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block mb-2">Cena</span>
+                      <span className="font-bold text-white uppercase text-xs tracking-widest">
+                        {formData.machAdType === "prodaja"
+                          ? `${formData.machPrice} EUR`
+                          : `${formData.machPricePerDay} EUR / dan`}
+                      </span>
+                    </div>
+                    ) : null}
                   </div>
                   {selectedCategory !== "catering" &&
                     selectedCategory !== "machines" && (

@@ -23,8 +23,7 @@ export interface SEOEntityData {
   companyId?: string;
   comp?: string;
   companyName?: string;
-  tipAngazmana?: string;
-  iskustvo?: string;
+
   salary?: string | number;
   plataMin?: number;
   plataMax?: number;
@@ -194,8 +193,7 @@ export class SEOSchemaService {
         validThrough: new Date(
           Date.now() + 60 * 24 * 60 * 60 * 1000,
         ).toISOString(),
-        employmentType:
-          data.tipAngazmana === " honorarno" ? "PART_TIME" : "FULL_TIME",
+        employmentType: "FULL_TIME",
         hiringOrganization: {
           "@type": "Organization",
           "@id": companyId

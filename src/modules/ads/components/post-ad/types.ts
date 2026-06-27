@@ -64,9 +64,7 @@ export interface FormDataState {
   plataMax: string;
   salaryType: 'hourly' | 'monthly';
   dinamikaIsplate: string;
-  iskustvo: string;
-  tipAngazmana: string;
-  customEngagement: string;
+
   benefits: string[];
 
   // Accommodation

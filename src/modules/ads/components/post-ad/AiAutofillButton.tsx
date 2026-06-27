@@ -72,10 +72,9 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-secondary/10 border border-secondary/30 rounded-[10px] text-secondary text-xs font-black uppercase tracking-wider hover:bg-secondary/20 hover:border-secondary/50 transition-all group"
+        className="group flex w-full md:w-auto bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] hover:from-[#fb8c00] hover:to-[#ffeb3b] !text-black px-5 py-6 md:py-3 rounded-[10px] font-bold transition-all duration-300 hover:shadow-lg hover:shadow-secondary/30 text-sm md:text-[11px] uppercase tracking-widest items-center justify-center leading-[1.1] text-center hover:-translate-y-0.5 active:scale-95"
       >
-        <span className="material-symbols-outlined text-lg group-hover:animate-pulse">auto_awesome</span>
-        AI Autofill
+        AI popunjavanje<br />oglasa
       </button>
 
       <AnimatePresence>
@@ -95,12 +94,9 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20">
-                  <span className="material-symbols-outlined text-secondary">auto_awesome</span>
-                </div>
                 <div>
-                  <h3 className="text-lg font-black uppercase tracking-tight font-headline">AI Autofill</h3>
-                  <p className="text-xs text-white/40">Opiši oglas, AI popunjava formu</p>
+                  <h3 className="text-lg font-black uppercase tracking-tight font-headline">AI popunjavanje oglasa</h3>
+                  <p className="text-xs text-white/40">Opišite oglas običnim tekstom, a veštačka inteligencija automatski popunjava lokaciju, sektor, zanimanje, platu i ostala polja forme</p>
                 </div>
               </div>
 

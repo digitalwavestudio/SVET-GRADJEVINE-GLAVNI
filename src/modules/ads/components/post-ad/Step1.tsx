@@ -3,6 +3,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MACHINE_CATEGORIES, MACHINE_SUBCATEGORIES } from '@/src/constants/machineTaxonomy';
 import { TaxonomyItem, ACCOMMODATION_TYPES, KITCHEN_TYPES, LOCATIONS, PROFESSIONS, REAL_ESTATE_PURPOSES, SECTORS, MARKETPLACE_CATEGORIES } from '@/src/constants/taxonomy';
+import { AiAutofillButton } from '@/src/modules/ads/components/post-ad/AiAutofillButton';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { Input } from '@/src/components/ui/form/Input';
 import { Select } from '@/src/components/ui/form/Select';
@@ -32,11 +33,14 @@ export function Step1({
       {/* STEP 1 - Company */}
       {selectedCategory === 'company' && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20">
+          <div className="flex items-start md:items-center gap-4 mb-10 flex-wrap">
+            <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20 shrink-0">
               <span className="material-symbols-outlined text-secondary">business_center</span>
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Osnovne informacije o firmi</h2>
+            <div className="w-full md:w-auto md:ml-auto mt-3 md:mt-0">
+              <AiAutofillButton selectedCategory={selectedCategory} />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -88,13 +92,16 @@ export function Step1({
       {/* STEP 1 - Generic Listings */}
       {selectedCategory !== 'company' && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20">
+          <div className="flex items-start md:items-center gap-4 mb-10 flex-wrap">
+            <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20 shrink-0">
               <span className="material-symbols-outlined text-secondary">
                 {selectedCategory === 'accommodation' ? 'home' : 'search'}
               </span>
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Osnovne informacije</h2>
+            <div className="w-full md:w-auto md:ml-auto mt-3 md:mt-0">
+              <AiAutofillButton selectedCategory={selectedCategory} />
+            </div>
           </div>
           
           <div className="space-y-8">

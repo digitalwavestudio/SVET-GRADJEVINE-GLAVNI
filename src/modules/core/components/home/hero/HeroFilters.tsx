@@ -5,7 +5,6 @@ import {
   Tractor,
   Map,
   Store,
-  Sparkles,
   MapPin,
   Layers,
   Users,
@@ -15,8 +14,6 @@ import CustomSelect from "@/src/modules/core/components/home/CustomSelect";
 import {
   SECTORS,
   LOCATIONS,
-  ENGAGEMENT_TYPES,
-  EXPERIENCE_LEVELS,
   REAL_ESTATE_PURPOSES,
   MARKETPLACE_CATEGORIES,
 } from "@/src/constants/taxonomy";
@@ -38,10 +35,7 @@ interface HeroFiltersProps {
     setSelectedSector: (val: string) => void;
     selectedProfession: string;
     setSelectedProfession: (val: string) => void;
-    selectedEngagement: string;
-    setSelectedEngagement: (val: string) => void;
-    selectedExperience: string;
-    setSelectedExperience: (val: string) => void;
+
     selectedMainCat: string;
     setSelectedMainCat: (val: string) => void;
     selectedSize: string;
@@ -71,10 +65,7 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
     setSelectedSector,
     selectedProfession,
     setSelectedProfession,
-    selectedEngagement,
-    setSelectedEngagement,
-    selectedExperience,
-    setSelectedExperience,
+
     selectedMainCat,
     setSelectedMainCat,
     selectedSize,
@@ -142,32 +133,7 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
                     label="Lokacija"
                   />
                 </div>
-                {activeTab === "poslovi" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
-                    <CustomSelect
-                      value={selectedEngagement}
-                      onChange={setSelectedEngagement}
-                      options={ENGAGEMENT_TYPES.map((t: any) => ({
-                        value: t.slug,
-                        label: t.name,
-                      }))}
-                      placeholder="Svi tipovi angažmana"
-                      icon={<Users size={20} />}
-                      label="Tip posla"
-                    />
-                    <CustomSelect
-                      value={selectedExperience}
-                      onChange={setSelectedExperience}
-                      options={EXPERIENCE_LEVELS.map((e: any) => ({
-                        value: e.slug,
-                        label: e.name,
-                      }))}
-                      placeholder="Bilo koje iskustvo"
-                      icon={<Sparkles size={20} />}
-                      label="Nivo iskustva"
-                    />
-                  </div>
-                )}
+
               </div>
             ) : activeTab === "firme" ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

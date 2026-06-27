@@ -318,7 +318,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                     company: companyNameDisplay,
                     location: job.loc,
                     tacnaLokacija: job.tacnaLokacija,
-                    type: job.engagementSlug === 'puno-radno-vreme' ? 'FULL TIME' : job.engagementSlug,
+
                     start: 'Odmah',
                     salary: job.sal,
                     time: job.time,

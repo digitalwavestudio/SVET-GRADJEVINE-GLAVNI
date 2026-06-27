@@ -94,10 +94,6 @@ export function JobSidebar({
               <dt className="text-on-surface-variant font-bold">Satnica:</dt>
               <dd className="text-white font-medium">{jobData.companyDetails?.hourlyRate || 'Po dogovoru'}</dd>
             </div>
-            <div className="flex justify-between items-center text-sm pb-2">
-              <dt className="text-on-surface-variant font-bold">Radno vreme:</dt>
-              <dd className="text-white font-medium">{jobData.companyDetails?.workingHours || jobData.type}</dd>
-            </div>
           </dl>
           <div className="flex items-center gap-2 mt-4 mb-8 text-[11px] font-bold text-secondary bg-secondary/5 py-2 px-3 rounded-[10px] border border-secondary/10 w-fit">
             <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>bolt</span>

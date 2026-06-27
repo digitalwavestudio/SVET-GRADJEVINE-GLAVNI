@@ -13,7 +13,6 @@ import { usePostAdController } from "@/src/modules/ads/hooks/usePostAdController
 import { usePlatformSettings } from "@/src/modules/dashboard/hooks/useMyAds";
 import { SuccessState } from "@/src/modules/ads/components/post-ad/SuccessState";
 import { CategorySelector } from "@/src/modules/ads/components/post-ad/CategorySelector";
-import { AiAutofillButton } from "@/src/modules/ads/components/post-ad/AiAutofillButton";
 import { AdOverlays } from "@/src/modules/ads/components/post-ad/AdOverlays";
 import {
   jobSchema as jobSchema,
@@ -239,9 +238,6 @@ export default function PostAdPage() {
                 setStep={setStep}
               />
             )}
-            <div className="absolute top-5 right-5 z-20">
-              {selectedCategory && <AiAutofillButton selectedCategory={selectedCategory} />}
-            </div>
           </form>
         </FormProvider>
       </div>

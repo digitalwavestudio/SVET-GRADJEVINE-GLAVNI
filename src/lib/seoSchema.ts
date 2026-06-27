@@ -52,7 +52,6 @@ export interface JobPostingSchema {
   locationSlug?: string;
   sector?: string;
   professionSlug?: string;
-  tipAngazmana?: string;
   plataMin?: number | string;
   plataMax?: number | string;
   salary?: number | string;
@@ -174,7 +173,7 @@ export const generateJobSchema = (jobData: JobPostingSchema) => {
         : jobData.createdAt instanceof Date
           ? jobData.createdAt.toISOString()
           : new Date().toISOString(),
-    "employmentType": sanitizeInput(jobData.tipAngazmana || jobData.employmentType || "FULL_TIME"),
+    "employmentType": "FULL_TIME",
     "industry": "Construction",
     "occupationalCategory": sanitizeInput(jobData.professionSlug || jobData.sector || "Construction Worker")
   };

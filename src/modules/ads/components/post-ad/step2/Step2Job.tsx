@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { useFormContext } from 'react-hook-form';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
-import { PAYMENT_DYNAMICS, EXPERIENCE_LEVELS, BENEFITS } from '@/src/constants/taxonomy';
+import { PAYMENT_DYNAMICS, BENEFITS } from '@/src/constants/taxonomy';
 import { Input } from '@/src/components/ui/form/Input';
 import { Select } from '@/src/components/ui/form/Select';
 
@@ -82,22 +82,6 @@ export function Step2Job({ nextStep, prevStep }: { nextStep?: () => void; prevSt
                   className: dyn.slug === 'po-m2' ? 'text-secondary' : undefined 
                 }))}
             placeholder="Izaberite dinamiku"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Select
-            name="iskustvo"
-            label="Izaberite nivo iskustva"
-            icon="military_tech"
-            options={EXPERIENCE_LEVELS.map(exp => ({ value: exp.slug, label: exp.name }))}
-          />
-
-          <Input
-            name="tipAngazmana"
-            label="Radno vreme"
-            icon="badge"
-            placeholder="npr. 09-17h, smenski rad, vikendom..."
           />
         </div>
 

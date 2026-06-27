@@ -194,8 +194,7 @@ export function mapEditItemToFormData(
       plataMin: min || '',
       plataMax: max || '',
       dinamikaIsplate: 'mesecna', 
-      iskustvo: item.experienceSlug || '',
-      tipAngazmana: item.engagementSlug || 'puno-radno-vreme',
+
       benefits: item.benefits || [],
       opis: item.description || '', 
       phone: item.telefon || item.phone || '',

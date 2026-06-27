@@ -203,7 +203,7 @@ export class SEOMetaService {
 
     switch (type) {
       case "jobs":
-        return `Ovaj poslovni oglas (ID: ${id}) objavljen ${date} nudi poziciju za "${title}" u mestu ${loc} za kompenzaciju: ${price}. ${contact} Kompanija: ${data.companyName || "nepoznata"}. Iskustvo: ${data.iskustvo || "Nije navedeno"}.`;
+        return `Ovaj poslovni oglas (ID: ${id}) objavljen ${date} nudi poziciju za "${title}" u mestu ${loc} za kompenzaciju: ${price}. ${contact} Kompanija: ${data.companyName || "nepoznata"}.`;
       case "companies":
         return `Ovo je kompanija "${title}" (ID: ${id}) na lokaciji ${loc}. Adresa: ${data.address || "nije navedena"}. PIB: ${data.pib || "nije naveden"}. Zapošljava: ${data.employeeCount || "N/A"} radnika.`;
       case "plots":
@@ -323,8 +323,6 @@ export class SEOMetaService {
       details = `
         <p itemprop="hiringOrganization"><strong>Kompanija:</strong> ${data.companyName || "Svet Građevine"}</p>
         <p itemprop="jobLocation"><strong>Lokacija:</strong> ${data.location || data.loc || "Srbija"}</p>
-        <p itemprop="employmentType"><strong>Tip angažmana:</strong> ${data.tipAngazmana || "N/A"}</p>
-        <p itemprop="experienceRequirements"><strong>Iskustvo:</strong> ${data.iskustvo || "N/A"}</p>
         ${data.salary ? `<p itemprop="baseSalary"><strong>Plata:</strong> ${data.salary}</p>` : ""}
       `;
     } else if (type === "companies") {

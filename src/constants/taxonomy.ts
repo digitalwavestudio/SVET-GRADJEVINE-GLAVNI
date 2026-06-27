@@ -148,11 +148,6 @@ export const PROFESSIONS: Record<string, TaxonomyItem[]> = {
 
 // Deleted LOCATIONS here because it was moved above for consistency
 
-export const EXPERIENCE_LEVELS: TaxonomyItem[] = [
-  { id: 'bez-iskustva', slug: 'bez-iskustva', name: 'Može i bez iskustva' },
-  { id: 'potrebno-iskustvo', slug: 'potrebno-iskustvo', name: 'Potrebno iskustvo' },
-];
-
 export const PAYMENT_DYNAMICS: TaxonomyItem[] = [
   { id: 'dnevna', slug: 'dnevna', name: 'Dnevna isplata' },
   { id: 'nedeljna', slug: 'nedeljna', name: 'Nedeljna isplata' },
@@ -171,13 +166,6 @@ export const BENEFITS: TaxonomyItem[] = [
   { id: 'prijava-ugovor', slug: 'prijava-ugovor', name: 'Prijava' },
   { id: 'placen-prekovremeni', slug: 'placen-prekovremeni', name: 'Plaćen prekovremeni rad' },
   { id: 'pomoc-pri-vizi', slug: 'pomoc-pri-vizi', name: 'Pomoć pri vizi / radnoj dozvoli' },
-];
-
-export const ENGAGEMENT_TYPES: TaxonomyItem[] = [
-  { id: '8-16', slug: '8-16', name: '8-16' },
-  { id: '7-17', slug: '7-17', name: '7 do 17' },
-  { id: 'puno-radno-vreme', slug: 'puno-radno-vreme', name: 'Puno radno vreme' },
-  { id: 'upisi', slug: 'upisi', name: 'Upis' },
 ];
 
 export const COMPANY_TYPES: TaxonomyItem[] = [

@@ -210,8 +210,7 @@ interface JobData {
   locationSlug?: string;
   sal?: number | string;
   salary?: number | string;
-  experienceSlug?: string;
-  engagementSlug?: string;
+
   benefits?: string[];
   description?: string;
   telefon?: string;

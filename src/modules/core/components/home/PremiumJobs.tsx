@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { buildJobUrl } from '@/src/lib/seo';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
-import { LOCATIONS, PROFESSIONS, CORE_SECTORS, ENGAGEMENT_TYPES } from '@/src/constants/taxonomy';
+import { LOCATIONS, PROFESSIONS, CORE_SECTORS } from '@/src/constants/taxonomy';
 
 const getFriendlyLocation = (job: any) => {
   const slug = job.locationSlug || job.location || job.loc || job.lokacijaStr;
@@ -72,26 +72,6 @@ const getFriendlySalary = (job: any) => {
   }
   
   return null;
-};
-
-const getFriendlyEngagement = (job: any) => {
-  if (job.type && job.type !== 'job') {
-    return null;
-  }
-  const slug = job.tipAngazmana || job.engagementSlug || job.engagement || job.time;
-  const custom = job.customEngagement || job.radnoVreme;
-  
-  if (slug === 'upisi') return custom || 'Radno vreme';
-  if (!slug) return custom || 'Puno radno vreme';
-  
-  if (typeof slug === 'string') {
-    const cleanSlug = slug.toLowerCase().trim();
-    const found = ENGAGEMENT_TYPES.find(e => e.slug === cleanSlug || e.id === cleanSlug);
-    if (found) return found.name;
-    return slug.replace(/-/g, ' ').charAt(0).toUpperCase() + slug.slice(1).toLowerCase().replace(/-/g, ' ');
-  }
-  
-  return custom || 'Puno radno vreme';
 };
 
 export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
@@ -196,15 +176,6 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
 
                     {/* Middle Row: Tags */}
                     <div className="flex flex-col gap-2 w-full relative z-10 py-3 md:py-6">
-                      {getFriendlyEngagement(job) && (
-                        <div className="flex">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                            <span className="material-symbols-outlined text-[12px] text-white/40">schedule</span>
-                            {getFriendlyEngagement(job)}
-                          </span>
-                        </div>
-                      )}
-                      
                       {(() => {
                         const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
                         const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;

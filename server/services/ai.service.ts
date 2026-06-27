@@ -172,7 +172,7 @@ export const generateAdFromDescription = async (description: string, category: s
   }
 
   const categoryFields: Record<string, string> = {
-    job: `location (grad slug), sector (slug), profession (slug), opis (detaljan opis posla na srpskom), plataMin (broj), plataMax (broj), dinamikaIsplate (slug: dnevno/nedeljno/mesecno), iskustvo (slug: bez-iskustva/pocetnik/srednji-nivo/ekspert), tipAngazmana (slug), benefits (array stringova)`,
+    job: `location (grad slug), sector (slug), profession (slug), opis (detaljan opis posla na srpskom), plataMin (broj), plataMax (broj), dinamikaIsplate (slug: dnevno/nedeljno/mesecno), benefits (array stringova)`,
     machines: `location (grad slug), machCategory (slug), machSubCategory (slug), machBrand (string), machModel (string), machAdType (prodaja ili iznajmljivanje), machPrice (broj), machYear (broj), machHours (broj, radni sati), machFuel (slug goriva), opis (detaljan opis na srpskom)`,
     accommodation: `location (grad slug), accType (slug tipa smestaja), totalBeds (broj), availableBeds (broj), price (broj), priceType (perPerson ili perNight), opis (detaljan opis na srpskom), amenities (array stringova)`,
     catering: `location (grad slug), catKitchenType (slug), catMinOrder (broj), catPricePerMeal (broj), catDeliveryZone (string), opis (detaljan opis na srpskom)`,
@@ -195,8 +195,16 @@ ${fields}
 
 Vazna pravila:
 1. location je uvek TACAN slug grada (samo: "beograd", "novi-sad", "nis", "kragujevac", "cacak", "kraljevo", "subotica", "pancevo", "krusevac", "leskovac", "vranje", "sabac", "novi-pazar", "uzice", "ostalo-u-srbiji", "rad-na-terenu", "nemacka", "austrija", "slovenija", "hrvatska")
-2. sector (samo za job) mora biti TACAN slug: "gruba-gradnja", "zavrsni-radovi", "instalacije-i-tehnika", "niskogradnja", "rukovaoc-gradjevinskom-mehanizacijom", "metal-i-bravarija", "inzenjering", "ostalo"
-3. profession (samo za job) mapiraj iz opisa na TACAN slug profesije (npr. "zidar", "tesar", "armirac", "betonirac", "krovopokrivac", "fasader", "malteros", "keramicar", "parketar", "moler", "stolar", "elektricar", "vodoinstalater")
+2. sector (samo za job) MORA biti TACAN slug. Sektori sa profesijama:
+   - "gruba-gradnja": zidar, tesar, armirač, betonirac, krovopokrivac, masinski-malter, fizicki-radnik, pomocni-radnik, univerzalac-majstor
+   - "zavrsni-radovi": moler, gipsar, fasader, keramicar, parketar, izolater, podopolagac, monter-kamena, fizicki-radnik, pomocni-radnik
+   - "instalacije-i-tehnika": vodoinstalater, elektricar, instalater-grejanja, instalater-solarnih-panela, hvac-tehnicar, fizicki-radnik
+   - "metal-i-bravarija": zavarivac, bravar, LIMAR, montazer-celicnih-konstrukcija, antikorozista, fizicki-radnik
+   - "niskogradnja": asfalter, putar, cevopolagac, radnik-na-niskogradnji, geobusac, fizicki-radnik
+   - "rukovaoc-gradjevinskom-mehanizacijom": rukovalac-bagerom, rukovalac-kranom, rukovalac-viljuskarom, vozac-kamiona
+   - "inzenjering": gradjevinski-inzenjer-visokogradnja, arhitekta, geodeta, sef-gradilista, projekt-menadzer
+   - "ostalo": cuvar-gradilista, radnik-na-ciscenju, bastovan, fizicki-radnik, pomocni-radnik
+3. profession (samo za job) MORA biti TACAN slug iz liste iznad - PRONADJI najblizi po zanimanju (npr. "limar" -> "limar", "krović" -> "krovopokrivac", "šofer" -> "vozac-kamiona")
 4. Ako korisnik nije specificirao neko polje, ostavi ga null
 5. opis treba da bude detaljan i profesionalan tekst na SRPSKOM, prosiren na osnovu korisnikovog opisa, minimum 50 karaktera
 6. Ako korisnik kaze "mašina" bez detalja, machCategory postavi "ostalo", machAdType postavi "prodaja"
@@ -214,8 +222,7 @@ Odgovori iskljucivo u JSON formatu sa ovim poljima.`,
             plataMin: { type: Type.NUMBER, nullable: true },
             plataMax: { type: Type.NUMBER, nullable: true },
             dinamikaIsplate: { type: Type.STRING, nullable: true },
-            iskustvo: { type: Type.STRING, nullable: true },
-            tipAngazmana: { type: Type.STRING, nullable: true },
+
             machCategory: { type: Type.STRING, nullable: true },
             machSubCategory: { type: Type.STRING, nullable: true },
             machBrand: { type: Type.STRING, nullable: true },

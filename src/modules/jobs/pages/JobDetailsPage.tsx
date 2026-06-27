@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import ReportModal from '@/src/components/ReportModal';
 import SeoHead from '@/src/components/SeoHead';
 import { APP_CONFIG } from '@/src/constants/config';
-import { ENGAGEMENT_TYPES, EXPERIENCE_LEVELS, PAYMENT_DYNAMICS } from '@/src/constants/taxonomy';
+import { PAYMENT_DYNAMICS } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
 import { useMessages } from '@/src/context/MessagesContext';
 import { useTrackView } from '@/src/hooks/useTrackView';
@@ -37,17 +37,6 @@ import {
 } from 'lucide-react';
 import Avatar from '@/src/components/ui/Avatar';
 import { toast } from 'react-hot-toast';
-
-const getEngagementLabel = (slug?: string, customVal?: string) => {
-  if (slug === 'upisi') return customVal || 'Radno vreme';
-  const item = ENGAGEMENT_TYPES.find(t => t.slug === slug);
-  return item ? item.name : (slug ? slug.replace(/-/g, ' ') : 'Puno radno vreme');
-};
-
-const getExperienceLabel = (slug?: string) => {
-  const item = EXPERIENCE_LEVELS.find(t => t.slug === slug);
-  return item ? item.name : (slug ? slug.replace(/-/g, ' ') : 'Nije navedeno');
-};
 
 const getPaymentDynamicsLabel = (slug?: string) => {
   const item = PAYMENT_DYNAMICS.find(t => t.slug === slug);
@@ -356,25 +345,7 @@ export default function JobDetailsPage() {
               </span>
             </div>
             
-            <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
-              <div className="flex items-center gap-2 text-white/40 mb-2">
-                <Clock size={16} />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Tip angažmana</span>
-              </div>
-              <span className="text-sm font-bold text-white">
-                {getEngagementLabel(jobData.tipAngazmana, jobData.customEngagement)}
-              </span>
-            </div>
 
-            <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
-              <div className="flex items-center gap-2 text-white/40 mb-2">
-                <Briefcase size={16} />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Iskustvo</span>
-              </div>
-              <span className="text-sm font-bold text-white">
-                {getExperienceLabel(jobData.iskustvo)}
-              </span>
-            </div>
 
             <div className="bg-[#0B0F19] p-5 md:p-6 flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
               <div className="flex items-center gap-2 text-white/40 mb-2">

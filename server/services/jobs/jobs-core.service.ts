@@ -206,8 +206,7 @@ export class JobsCoreService {
         locationSlug: sanitizeInput(jobPayload.locationSlug || ""),
         sectorSlug: jobPayload.sectorSlug || "",
         professionSlug: jobPayload.professionSlug || "",
-        engagementSlug: jobPayload.engagementSlug || "",
-        experienceSlug: jobPayload.experienceSlug || "",
+
         // type: jobPayload.type || '',
         salary: jobPayload.salary || "",
         salaryType: jobPayload.salaryType || "",

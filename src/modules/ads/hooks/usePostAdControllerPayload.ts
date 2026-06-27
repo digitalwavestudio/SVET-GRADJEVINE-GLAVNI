@@ -30,8 +30,7 @@ export const applyPayloadTransform = (selectedCategory: string | null, sData: Re
       
       sector: sData.sector,
       profession: sData.profession,
-      tipAngazmana: sData.tipAngazmana,
-      iskustvo: sData.iskustvo,
+
       dinamikaIsplate: sData.dinamikaIsplate || 'Dogovor',
       plataMin: Number(sData.plataMin) || 0,
       plataMax: Number(sData.plataMax) || 0,

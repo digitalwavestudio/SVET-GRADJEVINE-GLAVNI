@@ -24,8 +24,7 @@ export function useHeroSearch() {
   // Poslovi / Majstori Filters
   const [selectedSector, setSelectedSector] = useState("");
   const [selectedProfession, setSelectedProfession] = useState("");
-  const [selectedEngagement, setSelectedEngagement] = useState("");
-  const [selectedExperience, setSelectedExperience] = useState("");
+
 
   // Firme Filters
   const [selectedMainCat, setSelectedMainCat] = useState("");
@@ -53,8 +52,7 @@ export function useHeroSearch() {
               sector: selectedSector,
               profession: selectedProfession,
               location: selectedLocation,
-              engagement: selectedEngagement,
-              experience: selectedExperience,
+
             },
           },
         });
@@ -149,10 +147,7 @@ export function useHeroSearch() {
       setSelectedSector,
       selectedProfession,
       setSelectedProfession,
-      selectedEngagement,
-      setSelectedEngagement,
-      selectedExperience,
-      setSelectedExperience,
+
       selectedMainCat,
       setSelectedMainCat,
       selectedSize,
