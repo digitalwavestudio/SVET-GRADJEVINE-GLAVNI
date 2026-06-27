@@ -68,6 +68,69 @@ Posle: HTML dolazi sa pre-rendered content-om → FCP dramatično bolji.
 
 Ako deploy ruši **503 / SIGABRT**, prvo proveri Redis konekciju. Ako Redis ne radi, app radi u in-memory modu i troši više RAM-a.
 
+## 🛑 PREMIUM JOBS FIX (Session 4 — commit 85dc579) — NE DIRATI!
+
+⚠️ **Ovo je build koji radi! Ako se premium oglasi ili lista oglasa ponovo sjebu, vrati se na ovaj commit!**
+
+### Problem (pre fixa)
+1. **Premium poslovi nisu bili na `/poslovi`** — homepage ih je prikazivao (4 premium posla), ali na stranici poslova premium sekcija (`JobsPremium`) je bila prazna
+2. **Premium poslovi nisu bili na vrhu glavne liste** — trebalo je da budu prvi u listingu
+3. **Fast-Path cache je gušio premium upit** — Firestore dokument `metadata/promoted_ads_fastpath` imao je `premium: []` (prazan niz), i sistem je verovao tom praznom nizu umesto da pita Firestore
+
+### Root Cause #1: Fast-Path prazan niz
+**Fajl:** `server/services/unified-ads.service.ts` (linija 63-69)
+
+`getCachedMetadata()` je čitao Fast-Path dokument iz Firestore-a (`metadata/promoted_ads_fastpath`). Na njemu je polje `premium: []` (prazan niz). JS tretira `[]` kao truthy, pa je `actualData = []` i sistem je vraćao prazan niz — **bez da ikad pozove pravi Firestore upit**.
+
+Kad je Firestore bio spor (>100ms), Fast-Path timeout od 100ms je istekao i sistem je ipak pitao pravu bazu — zato je juče radilo a danas ne (posle deploy-a indeksa, Firestore je brži od 100ms).
+
+**Fix:** Dodata provera `if (Array.isArray(actualData) && actualData.length === 0)` — ako je prazan niz, ignoriše se i ide na pravi upit.
+
+### Root Cause #2: Premium poslovi nisu u prvih 101
+**Fajl:** `server/controllers/jobs.controller.ts` (linija 15) i `src/modules/jobs/pages/JobsPage.tsx`
+
+`getPublicJobs()` vraća prvih N najskorijih poslova po `createdAt DESC`. Premium poslovi su bili stariji od 101. najskorijeg posla → nisu ni učitani → `jobs.filter(j => j.isPremium)` na frontendu prazan.
+
+**Fix (frontend):** Umesto da filtrira premium iz main upita, sada se koristi `usePremiumJobs` hook koji šalje `isPremium: true` filter direktno u Firestore. Dobjjeni premium poslovi se dodaju na početak `allJobsPremiumFirst` niza (bez duplikata po `id`).
+
+### Root Cause #3: Limit 101 je mali
+**Fajl:** `server/controllers/jobs.controller.ts` (linija 15)
+
+`pageSize` cap sa 100 podignut na 1000.
+
+### Šta je menjano (4 fajla)
+
+| Fajl | Linija | Promena |
+|---|---|---|
+| `server/services/unified-ads.service.ts` | 63-69 | Dodata provera za prazan niz u Fast-Path-u |
+| `server/services/unified-ads.service.ts` | ~294 | Dodat `[PREMIUM_DEBUG]` log za `getPromotedAds` |
+| `server/services/jobs/jobs-core.service.ts` | ~15 | Cache key `v2` bump + debug logovi |
+| `server/controllers/jobs.controller.ts` | 15 | `100` → `1000` (max pageSize) |
+| `src/modules/jobs/pages/JobsPage.tsx` | 24 | Dodat `usePremiumJobs` import |
+| `src/modules/jobs/pages/JobsPage.tsx` | 83-89 | Dodat `usePremiumJobs` hook + `allJobsPremiumFirst` merge |
+| `src/modules/jobs/pages/JobsPage.tsx` | 93-94 | `displayedJobs` i `hasMore` koriste `allJobsPremiumFirst` |
+| `src/modules/jobs/pages/JobsPage.tsx` | 101 | `totalJobsCount` koristi `allJobsPremiumFirst` |
+| `src/modules/jobs/pages/JobsPage.tsx` | 697 | `jobs` prop → `allJobsPremiumFirst` |
+
+### Kako premium poslovi SADA rade (flow)
+1. `JobsPage` poziva `usePremiumJobs(sanitizedFilters, 12)` → šalje API zahtev sa `isPremium: true` filterom
+2. Backend (`UnifiedSearchService.search("job", filters)`) dodaje `.where("isPremium", "==", true)` na Firestore upit — **ne zavisi od `createdAt` redosleda**
+3. Fast-Path više ne vraća prazan niz → pravi upit uvek ide u Firestore
+4. Frontend spaja: `allJobsPremiumFirst = [...premiumJobs, ...nonPremiumJobs]`
+5. `displayedJobs` i `hasMore` računaju iz `allJobsPremiumFirst`
+6. Premium poslovi su na vrhu glavne liste
+
+### Ako se opet sjebe
+- **Proveri server log za `[PREMIUM_DEBUG]`** linije — da li se uopšte izvršava premium upit?
+- **Proveri Fast-Path:** u Firestore konzoli vidi `metadata/promoted_ads_fastpath` — ako `premium` polje postoji i prazno je, to je uzrok
+- **Proveri da li premium poslovi postoje uopšte:** pretraži `listings` kolekciju sa `isPremium == true && type == "job"`
+- **Vrati se na commit:** `git checkout 85dc579`
+
+### VAŽNO: NE DIRAJ
+- `usePremiumJobs` hook i `allJobsPremiumFirst` merge logiku u `JobsPage.tsx`
+- Fast-Path empty array guard u `unified-ads.service.ts`
+- pageSize cap 1000 u `jobs.controller.ts`
+
 ## Bundle Size (Uncompressed, initial load ~1.6MB)
 - `vendor-core`: 460KB (React, Router, Query)
 - `vendor-firebase`: 242KB (Firebase SDK)
