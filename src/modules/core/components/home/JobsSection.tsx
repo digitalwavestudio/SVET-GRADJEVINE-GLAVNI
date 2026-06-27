@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CORE_SECTORS } from '@/src/constants/taxonomy';
 
 const getFriendlySalary = (job: any) => {
   const salary = job.salary || job.sal || job.price;
@@ -45,103 +44,58 @@ export default function JobsSection({ latestJobs = [] }: any) {
             Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
           </Link>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          <div className="lg:col-span-2 relative w-full h-full flex flex-col">
-            {latestJobs.length > 0 ? (
-              <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-8 scroll-smooth w-full h-full">
-                {latestJobs.map((job: any, idx: number) => {
-                  const salary = getFriendlySalary(job);
-                  const location = getFriendlyLocation(job);
-                  return (
-                  <div key={job.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-full md:w-auto h-full flex flex-col cursor-pointer hover:border-secondary/30 transition-all duration-300" onClick={() => navigate(`/poslovi/${job.id}`)}>
-                    <div className="p-6 flex flex-col flex-1 justify-between">
-                      <div>
-                        <div className="flex items-center justify-between gap-2 mb-3">
-                          {job.isPremium && (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: '"FILL" 1' }}>workspace_premium</span>
-                              Premium
-                            </span>
-                          )}
-                          <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 ml-auto">{job.typeSlug || 'Posao'}</span>
-                        </div>
-                        <h3 className="font-bold text-lg mb-3 uppercase line-clamp-2 group-hover:text-secondary transition-colors">{job.title}</h3>
-                        <div className="flex items-center gap-4 text-on-surface-variant text-sm mb-4">
-                          <span className="flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[16px]">location_on</span>
-                            {location}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center mt-4 pt-4 border-t border-outline-variant/10">
-                        <div className="flex items-center gap-3">
-                          {job.logo && (
-                            <div className="w-10 h-10 rounded-[10px] overflow-hidden bg-surface-container-lowest border border-outline-variant/10 shrink-0">
-                              <img src={job.logo} alt="" className="w-full h-full object-cover" />
-                            </div>
-                          )}
-                          <div>
-                            <span className="text-sm font-bold text-white block">{job.comp || 'Poslodavac'}</span>
-                            {salary && (
-                              <span className="text-lg font-black text-secondary">{salary}</span>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          aria-label={`Pogledaj detalje ${job.title}`}
-                          className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20"
-                        >
-                          <span className="material-symbols-outlined group-hover/btn:text-on-secondary transition-colors text-white">chevron_right</span>
-                        </button>
-                      </div>
+
+        {latestJobs.length > 0 ? (
+          <div className="space-y-4">
+            {latestJobs.map((job: any, idx: number) => {
+              const salary = getFriendlySalary(job);
+              const location = getFriendlyLocation(job);
+              return (
+                <div
+                  key={job.id || idx}
+                  className="bg-surface-container-lowest rounded-[10px] border border-outline-variant/10 hover:border-secondary/30 transition-all duration-300 cursor-pointer flex items-center gap-4 md:gap-6 p-4 md:p-6"
+                  onClick={() => navigate(`/poslovi/${job.id}`)}
+                >
+                  {job.logo && (
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-[10px] overflow-hidden bg-surface-container-lowest border border-outline-variant/10 shrink-0">
+                      <img src={job.logo} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-base md:text-lg uppercase truncate group-hover:text-secondary transition-colors">{job.title}</h3>
+                    <div className="flex items-center gap-3 md:gap-4 text-on-surface-variant text-xs md:text-sm mt-1">
+                      {job.comp && <span className="font-medium truncate">{job.comp}</span>}
+                      <span className="flex items-center gap-1 shrink-0">
+                        <span className="material-symbols-outlined text-[14px]">location_on</span>
+                        {location}
+                      </span>
                     </div>
                   </div>
-                )})}
-              </div>
-            ) : (
-              <div className="bg-surface-container-lowest p-12 rounded-[10px] border border-white/5 text-center w-full flex flex-col items-center justify-center min-h-[350px] h-full flex-1">
-                <span className="material-symbols-outlined text-white/10 text-6xl mb-4" style={{ fontVariationSettings: '"FILL" 1' }}>work_history</span>
-                <h3 className="font-black text-2xl text-white/50 mb-2 uppercase tracking-tighter">Trenutno nema poslova</h3>
-                <p className="text-on-surface-variant text-base">Oglasa za posao trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
-              </div>
-            )}
+                  <div className="text-right shrink-0">
+                    {salary && (
+                      <div className="text-base md:text-lg font-black text-secondary">{salary}</div>
+                    )}
+                    {job.isPremium && (
+                      <div className="text-[10px] font-black uppercase tracking-widest text-secondary mt-1">Premium</div>
+                    )}
+                  </div>
+                  <button
+                    aria-label={`Pogledaj detalje ${job.title}`}
+                    className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20 shrink-0"
+                  >
+                    <span className="material-symbols-outlined group-hover/btn:text-on-secondary transition-colors text-white">chevron_right</span>
+                  </button>
+                </div>
+              );
+            })}
           </div>
-          <div className="bg-surface-container-low p-6 sm:p-10 rounded-[10px] border border-white/10 flex flex-col relative shadow-xl overflow-hidden group/sidebar h-full">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] pointer-events-none group-hover/sidebar:bg-blue-500/20 transition-colors duration-500"></div>
-            <div className="absolute top-0 left-0 w-[2px] bg-blue-500 h-0 group-hover/sidebar:h-full transition-all duration-700"></div>
-
-            <h3 className="text-sm font-black text-white uppercase tracking-[0.3em] mb-10 border-b border-white/10 pb-5">
-              Kategorije Poslova
-            </h3>
-            <ul className="space-y-3 flex-1 flex flex-col justify-center">
-              {CORE_SECTORS.slice(0, 6).map((sector, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between items-center p-5 rounded-[12px] bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/20 hover:translate-x-1 transition-all duration-300 cursor-pointer group/item"
-                  onClick={() => navigate(`/poslovi?sektor=${sector.slug}`)}
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-blue-500 text-lg">{sector.icon || 'work'}</span>
-                    <span className="group-hover/item:text-white transition-colors uppercase font-black text-sm tracking-widest text-[#B4B9BE]">
-                      {sector.name}
-                    </span>
-                  </span>
-                  <span className="material-symbols-outlined text-lg text-white/20 group-hover/item:text-secondary group-hover/item:translate-x-1 transition-all duration-300">
-                    arrow_forward
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              to="/poslovi"
-              className="w-full mt-10 py-4 md:py-5 flex items-center justify-center gap-2 uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-secondary !text-black hover:bg-yellow-400 transition-all duration-500 rounded-[12px] shadow-lg hover:scale-[1.02]"
-            >
-              Svi poslovi
-              <span className="material-symbols-outlined text-sm">arrow_right_alt</span>
-            </Link>
+        ) : (
+          <div className="bg-surface-container-lowest p-12 rounded-[10px] border border-white/5 text-center w-full flex flex-col items-center justify-center min-h-[350px]">
+            <span className="material-symbols-outlined text-white/10 text-6xl mb-4" style={{ fontVariationSettings: '"FILL" 1' }}>work_history</span>
+            <h3 className="font-black text-2xl text-white/50 mb-2 uppercase tracking-tighter">Trenutno nema poslova</h3>
+            <p className="text-on-surface-variant text-base">Oglasa za posao trenutno nema u bazi podataka. Pokušajte malo kasnije.</p>
           </div>
-        </div>
+        )}
 
         <Link
           to="/postavi-oglas"
