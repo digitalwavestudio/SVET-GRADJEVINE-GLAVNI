@@ -69,6 +69,7 @@ export interface HomepageDataResult {
   latestRealEstate: Record<string, unknown>[];
   latestAccommodations: Record<string, unknown>[];
   latestCaterings: Record<string, unknown>[];
+  latestJobs: Record<string, unknown>[];
   latestArticles: any[];
 }
 

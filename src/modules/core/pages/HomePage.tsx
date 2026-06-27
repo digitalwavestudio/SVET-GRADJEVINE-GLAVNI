@@ -8,6 +8,7 @@ import UrgentJobs from '@/src/modules/core/components/home/UrgentJobs';
 import PremiumJobs from '@/src/modules/core/components/home/PremiumJobs';
 import EquipmentSection from '@/src/modules/core/components/home/EquipmentSection';
 import CateringSection from '@/src/modules/core/components/home/CateringSection';
+import JobsSection from '@/src/modules/core/components/home/JobsSection';
 import AboutSection from '@/src/modules/core/components/home/AboutSection';
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
@@ -24,6 +25,7 @@ export default function HomePage() {
   const latestRealEstate = bffData?.latestRealEstate || [];
   const latestAccommodations = bffData?.latestAccommodations || [];
   const latestCaterings = bffData?.latestCaterings || [];
+  const latestJobs = bffData?.latestJobs || [];
 
   // Dynamic Statistics from BFF Aggregated Data
   const statsValues = useMemo(() => ({
@@ -68,6 +70,10 @@ export default function HomePage() {
 
       <div className="scroll-fade-in">
         <PremiumJobs premiumJobs={premiumJobs} handleCardClick={handleCardClick} />
+      </div>
+
+      <div className="scroll-fade-in">
+        <JobsSection latestJobs={latestJobs} />
       </div>
 
       <div className="scroll-fade-in">
