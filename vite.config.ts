@@ -91,7 +91,7 @@ export default defineConfig(({mode}) => {
             const href = match.match(/href="([^"]+)"/)?.[1];
             if (!href) return match;
             const id = 'full-css';
-            return `<link rel="preload" as="style" href="${href}" id="${id}"><script>document.getElementById('${id}')?.addEventListener('load',function(){this.rel='stylesheet'});<\/script><noscript>${match}<\/noscript>`;
+            return `<link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"><noscript>${match}<\/noscript>`;
           }
         );
         return html;

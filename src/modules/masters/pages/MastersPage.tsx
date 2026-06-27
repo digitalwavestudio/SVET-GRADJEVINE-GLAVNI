@@ -22,6 +22,7 @@ import { useDebounce } from '@/src/hooks/useDebounce';
 import { useCollectionStats, useRoleStats, useFilteredCount } from '@/src/hooks/useCollectionStats';
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
+import { AiSearchBar } from '@/src/components/AiSearchBar';
 import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 
 export default function MastersPage() {
@@ -248,26 +249,29 @@ export default function MastersPage() {
           { label: "PREPORUKE", value: recommendationCount?.toLocaleString() || "12k", icon: "recommend" }
         ]}
       >
-        <div className="mt-8 flex flex-col md:flex-row gap-4 max-w-4xl w-full">
-          <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
-            <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
-            <input
-              type="text"
-              placeholder="PRETRAŽI PO ZANATU ILI IMENU..."
-              value={localSearchTerm}
-              onChange={(e) => setLocalSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-              className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
-            />
+        <div className="mt-8 flex flex-col gap-4 max-w-4xl w-full">
+          <AiSearchBar vertical="masters" />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 bg-[#13212e]/40 backdrop-blur-3xl border border-white/5 rounded-[10px] flex items-center pl-4 md:pl-8 p-1 shadow-3xl transition-all focus-within:border-secondary/50 focus-within:bg-[#192735]/60 hover:bg-[#192735]/40 group">
+              <span className="material-symbols-outlined text-secondary text-2xl font-black group-focus-within:rotate-12 transition-transform">search</span>
+              <input
+                type="text"
+                placeholder="PRETRAŽI PO ZANATU ILI IMENU..."
+                value={localSearchTerm}
+                onChange={(e) => setLocalSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
+                className="w-full !bg-transparent !border-none !backdrop-blur-none outline-none text-white placeholder:text-white/20 text-[10px] font-black uppercase tracking-[0.2em] py-4 md:py-5 px-3 md:px-6" 
+              />
+            </div>
+            <Button 
+              onClick={handleApplyFilters}
+              variant="primary"
+              className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
+              icon="search"
+            >
+              PRETRAŽI
+            </Button>
           </div>
-          <Button 
-            onClick={handleApplyFilters}
-            variant="primary"
-            className="w-full md:w-auto px-12 h-16 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_20px_40px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none"
-            icon="search"
-          >
-            PRETRAŽI
-          </Button>
         </div>
       </StandardPageHero>
 
