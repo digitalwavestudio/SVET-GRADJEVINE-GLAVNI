@@ -12,7 +12,7 @@ export const getPublicJobs = async (
   next: NextFunction,
 ) => {
   try {
-    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 10, 1), 100);
+    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 10, 1), 1000);
     const limit = pageSize + 1;
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;

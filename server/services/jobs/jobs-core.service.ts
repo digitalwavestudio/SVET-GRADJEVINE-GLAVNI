@@ -11,11 +11,15 @@ import { AdminStatsService } from "../admin-stats.service.ts";
 
 export class JobsCoreService {
   static async getPublicJobs(limit: number = 100, cursor?: string) {
-    const cacheKey = cursor ? `public_jobs_${limit}_${cursor}` : `public_jobs_${limit}`;
+    const cacheKey = cursor ? `public_jobs_${limit}_${cursor}` : `public_jobs_v2_${limit}`;
     const t0_cache = Date.now();
     const cached = await CacheService.get(cacheKey);
     console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
-    if (cached) return cached;
+    if (cached) {
+      const samplePremium = (cached as any).docs?.slice(0, 5).filter((d: any) => d.isPremium).length;
+      console.log(`[PREMIUM_DEBUG] Cached data: ${(cached as any).docs?.length || 0} docs, premium in first 5: ${samplePremium}`);
+      return cached;
+    }
 
     try {
       // Bypass proxy to avoid circuit-breaker returning empty wrapped data
@@ -84,6 +88,8 @@ export class JobsCoreService {
       const t0_map = Date.now();
       console.log(`[TIMING] Firestore .get() took: ${t0_map - t0_query}ms, docs: ${snap.docs.length}`);
       const rawDocs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
+      const premiumSample = rawDocs.slice(0, 10).filter((d: any) => d.isPremium).length;
+      console.log(`[PREMIUM_DEBUG] Raw Firestore docs: ${rawDocs.length}, isPremium in first 10: ${premiumSample}, sample isPremium values:`, rawDocs.slice(0, 5).map((d: any) => ({ id: d.id, isPremium: d.isPremium, isUrgent: d.isUrgent })));
       // cursorDoc je poslednji dokument koji TREBA da ostane na ovoj strani (pageSize-ti u query order-u)
       // Ovaj ID čuvamo PRE sortiranja da bi startAfter() radio korektno
       const pageSize = limit - 1;

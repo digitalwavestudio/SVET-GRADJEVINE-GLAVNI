@@ -21,7 +21,7 @@ import { ActiveFilterChips, MarketStatsWidget, SortingBar } from '@/src/modules/
 import { Button } from '@/src/components/ui/Button';
 import { APP_CONFIG } from '@/src/constants/config';
 import { BENEFITS, LOCATIONS, PROFESSIONS, SECTORS } from '@/src/constants/taxonomy';
-import { useJobs } from '@/src/modules/jobs/hooks/useJobs';
+import { useJobs, usePremiumJobs } from '@/src/modules/jobs/hooks/useJobs';
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 
 const AnalyticsDashboardUI = lazy(() => import('@/src/components/AnalyticsDashboardUI').then(m => ({ default: m.AnalyticsDashboardUI })));
@@ -80,20 +80,25 @@ function JobsPage() {
 
 const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
+  const { data: premiumQueryData } = usePremiumJobs(sanitizedFilters, 12);
+  const premiumJobs = useMemo(() => premiumQueryData?.pages.flatMap(page => page.items) || [], [premiumQueryData]);
+  const urgentJobs = useMemo(() => jobs.filter((j: any) => j.isUrgent), [jobs]);
+  const allJobsPremiumFirst = useMemo(() => {
+    const premiumIds = new Set(premiumJobs.map(j => j.id));
+    return [...premiumJobs, ...jobs.filter(j => !premiumIds.has(j.id))];
+  }, [premiumJobs, jobs]);
+
   const [visibleCount, setVisibleCount] = useState(15);
-  useEffect(() => setVisibleCount(15), [jobs]);
-  const displayedJobs = useMemo(() => jobs.slice(0, visibleCount), [jobs, visibleCount]);
-  const hasMore = visibleCount < jobs.length;
+  useEffect(() => setVisibleCount(15), [allJobsPremiumFirst]);
+  const displayedJobs = useMemo(() => allJobsPremiumFirst.slice(0, visibleCount), [allJobsPremiumFirst, visibleCount]);
+  const hasMore = visibleCount < allJobsPremiumFirst.length;
   const isDeepPagingLimitReached = false;
   const loadMore = useCallback(() => setVisibleCount(prev => prev + 10), []);
-
-  const premiumJobs = useMemo(() => jobs.filter((j: any) => j.isPremium), [jobs]);
-  const urgentJobs = useMemo(() => jobs.filter((j: any) => j.isUrgent), [jobs]);
 
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
 
-  const totalJobsCount = jobs.length;
+  const totalJobsCount = allJobsPremiumFirst.length;
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; path?: string }[] = [];
@@ -689,7 +694,7 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
               filteredJobs={displayedJobs}
               filteredPremiumJobs={filteredPremiumJobs}
               filteredUrgentJobs={filteredUrgentJobs}
-              jobs={jobs}
+              jobs={allJobsPremiumFirst}
               loadingJobs={loadingJobs}
               hasMore={hasMore}
               loadMore={loadMore}

@@ -60,14 +60,18 @@ export class UnifiedAdsService {
                    ]).catch(() => null);
                 }
 
-               if (doc && doc.exists) {
-                 const d = doc.data();
-                 const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
-                 if (actualData) {
-                   console.log(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
-                   return actualData;
-                 }
-               }
+                if (doc && doc.exists) {
+                  const d = doc.data();
+                  const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
+                  if (actualData) {
+                    if (Array.isArray(actualData) && actualData.length === 0) {
+                      console.log(`[UnifiedAdsService] L0 Fast-Path empty array for ${cacheKey}, skipping`);
+                    } else {
+                      console.log(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
+                      return actualData;
+                    }
+                  }
+                }
              } catch (e: unknown) {
                const err = e instanceof Error ? e : new Error(String(e));
                console.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
@@ -289,6 +293,10 @@ export class UnifiedAdsService {
               createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt,
             };
           });
+
+          if (options.isPremium && results.length > 0) {
+            console.log(`[PREMIUM_DEBUG] getPromotedAds found ${results.length} premium docs, types:`, results.map((r: any) => ({ id: r.id, type: r.type, isPremium: r.isPremium, title: r.title })));
+          }
 
           return results;
       }, finalFallback);
