@@ -213,7 +213,16 @@ async function computeAndSaveFastPath(platform: string): Promise<void> {
       snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
     );
     const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData).map((j) =>
-      snippet(j, ["id", "title", "images", "location", "salary", "comp", "logo", "createdAt", "typeSlug", "isPremium"])
+      snippet(j, [
+        "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
+        "loc", "location",
+        "sal", "salary", "plataMin", "plataMax", "salaryType",
+        "comp", "company", "companyName", "companyId", "isCompanyVerified",
+        "logo", "logoPlaceholder", "authorName",
+        "benefits", "benefiti", "rawBenefits",
+        "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
+        "viewsCount", "cat", "status"
+      ])
     );
 
     const result: HomepageDataResult = {
@@ -523,7 +532,21 @@ export const bffService = {
             snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
           );
           const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData).map((j) =>
-            snippet(j, ["id", "title", "images", "location", "salary", "comp", "logo", "createdAt", "typeSlug", "isPremium"])
+            snippet(j, [
+              "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
+              // Lokacija
+              "loc", "location",
+              // Satnica / Plata
+              "sal", "salary", "plataMin", "plataMax", "salaryType",
+              // Kompanija / Logo
+              "comp", "company", "companyName", "companyId", "isCompanyVerified",
+              "logo", "logoPlaceholder", "authorName",
+              // Benefiti
+              "benefits", "benefiti", "rawBenefits",
+              "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
+              // Ostalo
+              "viewsCount", "cat", "status"
+            ])
           );
           const latestArticles: any[] = [];
 

@@ -1,35 +1,14 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-
-const getFriendlySalary = (job: any) => {
-  const salary = job.salary || job.sal || job.price;
-  if (salary !== undefined && salary !== null) {
-    if (typeof salary === 'number') return `${salary.toLocaleString()} €`;
-    if (typeof salary === 'string') {
-      let clean = salary.replace(/€/g, '').trim() + ' €';
-      return clean;
-    }
-    return String(salary);
-  }
-  return null;
-};
-
-const getFriendlyLocation = (job: any) => {
-  const loc = job.loc || job.location || job.grad;
-  if (!loc) return 'Srbija';
-  if (typeof loc === 'string') return loc.charAt(0).toUpperCase() + loc.slice(1).toLowerCase();
-  if (typeof loc === 'object' && loc !== null) {
-    if ('address' in loc) return (loc as any).address;
-    if ('name' in loc) return (loc as any).name;
-  }
-  return 'Srbija';
-};
+import React, { useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { JobCard } from '@/src/modules/jobs/components/JobCard';
 
 export default function JobsSection({ latestJobs = [] }: any) {
-  const navigate = useNavigate();
+  const prefetch = useCallback((_type: string, _id?: string) => {}, []);
+
   return (
     <section className="py-12 md:py-24 bg-surface-container-lowest">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-3">
@@ -46,48 +25,12 @@ export default function JobsSection({ latestJobs = [] }: any) {
         </div>
 
         {latestJobs.length > 0 ? (
-          <div className="space-y-4">
-            {latestJobs.map((job: any, idx: number) => {
-              const salary = getFriendlySalary(job);
-              const location = getFriendlyLocation(job);
-              return (
-                <div
-                  key={job.id || idx}
-                  className="bg-surface-container-lowest rounded-[10px] border border-outline-variant/10 hover:border-secondary/30 transition-all duration-300 cursor-pointer flex items-center gap-4 md:gap-6 p-4 md:p-6"
-                  onClick={() => navigate(`/poslovi/${job.id}`)}
-                >
-                  {job.logo && (
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-[10px] overflow-hidden bg-surface-container-lowest border border-outline-variant/10 shrink-0">
-                      <img src={job.logo} alt="" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-base md:text-lg uppercase truncate group-hover:text-secondary transition-colors">{job.title}</h3>
-                    <div className="flex items-center gap-3 md:gap-4 text-on-surface-variant text-xs md:text-sm mt-1">
-                      {job.comp && <span className="font-medium truncate">{job.comp}</span>}
-                      <span className="flex items-center gap-1 shrink-0">
-                        <span className="material-symbols-outlined text-[14px]">location_on</span>
-                        {location}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    {salary && (
-                      <div className="text-base md:text-lg font-black text-secondary">{salary}</div>
-                    )}
-                    {job.isPremium && (
-                      <div className="text-[10px] font-black uppercase tracking-widest text-secondary mt-1">Premium</div>
-                    )}
-                  </div>
-                  <button
-                    aria-label={`Pogledaj detalje ${job.title}`}
-                    className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20 shrink-0"
-                  >
-                    <span className="material-symbols-outlined group-hover/btn:text-on-secondary transition-colors text-white">chevron_right</span>
-                  </button>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 gap-4">
+            {latestJobs.map((job: any, idx: number) => (
+              <div key={job.id || idx}>
+                <JobCard job={job} viewMode="list" prefetch={prefetch} />
+              </div>
+            ))}
           </div>
         ) : (
           <div className="bg-surface-container-lowest p-12 rounded-[10px] border border-white/5 text-center w-full flex flex-col items-center justify-center min-h-[350px]">
