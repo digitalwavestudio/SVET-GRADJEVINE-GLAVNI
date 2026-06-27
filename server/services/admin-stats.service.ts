@@ -277,6 +277,15 @@ export class AdminStatsService {
       if (doc.exists) {
         const d = doc.data();
         if (d) {
+          const lowJobs = (d.totalJobs || 0) < 50;
+          const lowCompanies = (d.companiesCount || 0) < 10;
+          const lowUsers = (d.totalUsers || 0) < 50;
+          if (lowJobs || lowCompanies || lowUsers) {
+            console.warn(`[AdminStatsService] admin_stats values suspiciously low (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}). Auto-triggering reconciliation.`);
+            this.reconcileGlobalStats().catch(err => {
+              console.error("[AdminStatsService] Auto-reconciliation failed:", err);
+            });
+          }
           if (redis) {
             await redis.set("admin_global_metrics:cache", JSON.stringify(d), "EX", 3600);
           }
@@ -341,7 +350,7 @@ export class AdminStatsService {
     try {
       // 1. Precise aggregations using count() (Safest & Cheapest - 1 read per 1k docs)
       const counts: Record<string, number> = {};
-      const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace"];
+      const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace", "company"];
       
       for (const cat of categories) {
         const snap = await db.collection("listings").where("type", "==", cat).count().get();
@@ -362,6 +371,7 @@ export class AdminStatsService {
 
       const reconciledStats = {
         totalJobs: counts.total_jobs || 0,
+        companiesCount: counts.total_companies || 0,
         machinesCount: counts.total_machines || 0,
         accommodationsCount: counts.total_accommodations || 0,
         cateringCount: counts.total_caterings || 0,
