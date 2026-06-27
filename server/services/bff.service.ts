@@ -580,8 +580,8 @@ export const bffService = {
           data: result,
           expiry: Date.now() + L1_HOMEPAGE_TTL,
         });
-        // Fire background Fast-Path computation if CacheService returned empty
-        if (!result.latestJobs?.length && !result.latestMachines?.length) {
+        // Fire background Fast-Path computation if jobs missing (other categories may have loaded)
+        if (!result.latestJobs?.length) {
           computeAndSaveFastPath(platform).catch(() => {});
         }
       }
