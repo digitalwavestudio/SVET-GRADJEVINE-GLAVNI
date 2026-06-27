@@ -253,10 +253,13 @@ async function startServer() {
         "data:",
         "blob:",
         "https:", // Firebase Storage / user uploads / avatar providers
+        "https://www.svetgradjevine.com",
+        "https://lh3.googleusercontent.com",
       ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: [
         "'self'",
+        "https://www.svetgradjevine.com",
         "https://api.svet-gradjevine.com",
         "https://accounts.google.com",
         "https://*.googleapis.com",
@@ -265,6 +268,7 @@ async function startServer() {
         "https://*.algolia.net",
         "https://*.algolianet.com",
         "https://fonts.gstatic.com",
+        "wss://*",
         ...(isDev ? ["ws://localhost:24678", "ws://localhost:3000"] : []),
       ],
       frameSrc: [
@@ -273,6 +277,8 @@ async function startServer() {
         "https://*.googleusercontent.com",
         "https://*.firebaseapp.com",
       ],
+      // PWA manifest
+      manifestSrc: ["'self'"],
       // Hard defenses (defense-in-depth)
       objectSrc: ["'none'"],
       baseUri: ["'self'"],

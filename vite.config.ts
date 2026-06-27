@@ -114,7 +114,7 @@ export default defineConfig(({mode}) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
           navigateFallbackDenylist: [/^\/__/],
           maximumFileSizeToCacheInBytes: 10000000,
-          navigationPreload: true,
+          navigationPreload: false,
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
