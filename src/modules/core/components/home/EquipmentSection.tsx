@@ -15,7 +15,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                 <span className="text-[#38bdf8] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Teška Mehanizacija</span>
                 <span className="material-symbols-outlined text-[#38bdf8] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>engineering</span>
               </div>
-              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#38bdf8_0%,#ffffff_60%)] mb-4 leading-[1.05] drop-shadow-sm">GRAĐEVINSKE MAŠINE</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-[1000] md:font-[950] uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#38bdf8_0%,#ffffff_60%)] mb-4 leading-tight drop-shadow-sm">GRAĐEVINSKE<br className="md:hidden" /> MAŠINE</h2>
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Pronađite bagere, kranove, utovarivače i ostalu opremu za vaš sledeći projekat.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
@@ -132,7 +132,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                 <span className="text-[#22c55e] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Nepokretnosti</span>
                 <span className="material-symbols-outlined text-[#22c55e] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>terrain</span>
               </div>
-              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#22c55e_0%,#ffffff_60%)] mb-4 leading-[1.05] drop-shadow-sm">PLACEVI I LOKACIJE</h2>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-[1000] md:font-[950] uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#22c55e_0%,#ffffff_60%)] mb-4 leading-tight drop-shadow-sm">PLACEVI I<br className="md:hidden" /> LOKACIJE</h2>
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Investicione prilike širom regiona. Pronađite idealno zemljište za gradnju.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
