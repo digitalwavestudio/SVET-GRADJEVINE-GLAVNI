@@ -8,7 +8,7 @@ import { AuditService, AuditAction } from "./audit.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError } from "../utils/appError.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
-import { AdStrategyFactory } from "./ads/strategy-factory.ts";
+import { BaseAdStrategy } from "./ads/base-ad.strategy.ts";
 import { Listing } from "../types/ads.ts";
 
 /**
@@ -18,103 +18,56 @@ import { Listing } from "../types/ads.ts";
 export class UnifiedAdsService {
   private static logger = new Logger({ service: "UnifiedAdsService" });
 
-  // L1 Hard Cache (Shield) specifically for homepage performance
-  private static l1ShieldCache = new Map<string, { data: any; expiry: number }>();
-  private static inflightPromises = new Map<string, Promise<any>>();
-  private static readonly L1_SHIELD_TTL = 60 * 1000; // 1 minute protection
+  private static readonly CATEGORY_MAP: Record<string, { category: string; entityType: string }> = {
+    jobs: { category: "jobs", entityType: "job" },
+    machines: { category: "machines", entityType: "machine" },
+    caterings: { category: "caterings", entityType: "catering" },
+    accommodations: { category: "accommodations", entityType: "accommodation" },
+    plots: { category: "plots", entityType: "plot" },
+    real_estate: { category: "real_estate", entityType: "plot" },
+    marketplace: { category: "marketplace", entityType: "marketplace" },
+    companies: { category: "companies", entityType: "company" },
+  };
+
+  private static cachedStrategies = new Map<string, BaseAdStrategy>();
+
+  private static getStrategy(category: string): BaseAdStrategy {
+    const cached = this.cachedStrategies.get(category);
+    if (cached) return cached;
+    const mapping = this.CATEGORY_MAP[category];
+    if (!mapping) throw new BadRequestError(`No strategy found for category: ${category}`);
+    const strategy = new BaseAdStrategy(mapping.category, mapping.entityType);
+    this.cachedStrategies.set(category, strategy);
+    return strategy;
+  }
 
   /**
-   * Internal helper to handle request collapsing and L1/L2 caching logic for metadata
+   * Internal helper for metadata caching (direct fetch + CacheService)
    */
-  private static async getCachedMetadata<T>(cacheKey: string, fastPathDoc: string, fetchFn: () => Promise<T>, fallbackValue?: T): Promise<T> {
-    const now = Date.now();
-    
-    // 1. L1 RAM Shield Check (Static/Synchronous)
-    const shield = this.l1ShieldCache.get(cacheKey);
-    if (shield && now < shield.expiry) return shield.data as T;
-
-    // 2. In-flight Promise Collapsing (Prevents Thundering Herd)
-    const inflight = this.inflightPromises.get(cacheKey);
-    if (inflight) return inflight as Promise<T>;
-
-    const fetchTask = (async () => {
-      try {
-        const data = await CacheService.getOrSetSWR(
-          cacheKey,
-          async () => {
-             // 1. Try Firestore Fast-Path (L0) as a cheaper fallback than query
-             try {
-               const { checkQuotaStatus, getMockDocSnapshot } = await import("../config/firebase.ts");
-               
-                let doc;
-                if (checkQuotaStatus()) {
-                   console.warn(`[UnifiedAdsService] Quota exhausted, using local mock for ${fastPathDoc}`);
-                   doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
-                } else {
-                   // EXTREME TIMEOUT: 100ms for Fast-Path FirestoreDoc. 
-                   // If Firestore is slow, we'd rather fail the Fast-Path and fallback than block the BFF.
-                   const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 100));
-                   doc = await Promise.race([
-                     db.doc(fastPathDoc).get(),
-                     timeoutPromise
-                   ]).catch(() => null);
-                }
-
-                if (doc && doc.exists) {
-                  const d = doc.data();
-                  const actualData = d?.stats || d?.partners || d?.urgent || d?.premium || d;
-                  if (actualData) {
-                    if (Array.isArray(actualData) && actualData.length === 0) {
-                      console.log(`[UnifiedAdsService] L0 Fast-Path empty array for ${cacheKey}, skipping`);
-                    } else {
-                      console.log(`[UnifiedAdsService] L0 Fast-Path hit for ${cacheKey}`);
-                      return actualData;
-                    }
-                  }
-                }
-             } catch (e: unknown) {
-               const err = e instanceof Error ? e : new Error(String(e));
-               console.warn(`[UnifiedAdsService] L0 Fast-Path failed for ${cacheKey}:`, err.message);
-             }
-
-             // Stop execution and return fallback immediately if circuit breaker tripped
-             const { checkQuotaStatus } = await import("../config/firebase.ts");
-             if (checkQuotaStatus()) {
-               console.warn(`[UnifiedAdsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
-               return fallbackValue as T;
-             }
-
-             // 2. Fallback to real query (Cold Path)
-             const res = await fetchFn();
-             
-             return res;
-          },
-          30 * 24 * 3600 * 1000, // Near-Infinite 30 Days TTL (Protected with Event-Driven Cache Invalidation)
-          fallbackValue
-        );
-        this.l1ShieldCache.set(cacheKey, { data, expiry: now + this.L1_SHIELD_TTL });
-        return data;
-      } catch (err: unknown) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        console.error(`[UnifiedAdsService] Cache Shield failure for ${cacheKey}:`, error.message);
-        throw error;
-      } finally {
-        this.inflightPromises.delete(cacheKey);
-      }
-    })();
-
-    this.inflightPromises.set(cacheKey, fetchTask);
-    
-    // 3. Global Tier-2 Safety Timeout: 5000ms max wait for the whole tiered lookup
-    const globalTimeout = new Promise<T>((resolve) => {
-      setTimeout(() => resolve(fallbackValue as T), 5000);
-    });
-
-    return Promise.race([fetchTask, globalTimeout]);
+  private static async getCachedMetadata<T>(cacheKey: string, _fastPathDoc: string, fetchFn: () => Promise<T>, fallbackValue?: T): Promise<T> {
+    try {
+      return await CacheService.getOrSetSWR(
+        cacheKey,
+        async () => {
+           const { checkQuotaStatus } = await import("../config/firebase.ts");
+           if (checkQuotaStatus()) {
+             console.warn(`[UnifiedAdsService] Quota active, returning fallback for ${cacheKey}`);
+             return fallbackValue as T;
+           }
+           return await fetchFn();
+        },
+        30 * 24 * 3600 * 1000,
+        fallbackValue
+      );
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error(`[UnifiedAdsService] Cache failure for ${cacheKey}:`, error.message);
+      throw error;
+    }
   }
 
   static async createAd(category: string, rawData: Record<string, any>, uid: string) {
-    const strategy = AdStrategyFactory.getStrategy(category);
+    const strategy = this.getStrategy(category);
     return strategy.createAd(rawData, uid);
   }
 
@@ -199,12 +152,12 @@ export class UnifiedAdsService {
     rawData: Record<string, unknown>,
     uid: string,
   ) {
-    const strategy = AdStrategyFactory.getStrategy(category);
+    const strategy = this.getStrategy(category);
     return strategy.updateAd(id, rawData, uid);
   }
 
   static async deleteAd(category: string, id: string, uid: string) {
-    const strategy = AdStrategyFactory.getStrategy(category);
+    const strategy = this.getStrategy(category);
     return strategy.deleteAd(id, uid);
   }
 
@@ -314,7 +267,7 @@ export class UnifiedAdsService {
     adminId: string,
     reason?: string,
   ) {
-    const strategy = AdStrategyFactory.getStrategy(category);
+    const strategy = this.getStrategy(category);
     return strategy.moderateAd(id, action, adminId, reason);
   }
 

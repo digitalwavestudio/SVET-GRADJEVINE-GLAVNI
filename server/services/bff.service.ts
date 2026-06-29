@@ -279,7 +279,6 @@ const withHomepageQueryTimeout = async <T>(
 };
 
 export const bffSingleFlightMap = new Map<string, Promise<DashboardDataResult>>();
-const homepageSingleFlightMap = new Map<string, Promise<HomepageDataResult>>();
 let lastFastPathCompute = 0; // debounce: ne racunaj cesce od jednom u 5 min
 
 export const bffService = {
@@ -301,12 +300,6 @@ export const bffService = {
         return fastPathData;
       }
     } catch {}
-
-    // 3. SingleFlight Implementation for Homepage
-    if (homepageSingleFlightMap.has(cacheKey)) {
-      logger.debug(`Γ£ê∩╕Å [SingleFlight] Coalescing concurrent homepage request: ${cacheKey}`);
-      return homepageSingleFlightMap.get(cacheKey) as Promise<HomepageDataResult>;
-    }
 
     const fetchTask = (async () => {
       const { CacheService } = await import("./cache.service.ts");
@@ -601,26 +594,21 @@ export const bffService = {
     );
   })();
 
-    homepageSingleFlightMap.set(cacheKey, fetchTask);
-    try {
-      const result = await fetchTask;
-      if (result) {
-        l1HomepageCache.set(cacheKey, {
-          data: result,
-          expiry: Date.now() + L1_HOMEPAGE_TTL,
-        });
-        // Fire background Fast-Path computation so it gets populated with complete data (incl. logos)
-        // Debounce: max jednom u 5 minuta
-        const now = Date.now();
-        if (now - lastFastPathCompute > 300000) {
-          lastFastPathCompute = now;
-          computeAndSaveFastPath(platform).catch(() => {});
-        }
+    const result = await fetchTask;
+    if (result) {
+      l1HomepageCache.set(cacheKey, {
+        data: result,
+        expiry: Date.now() + L1_HOMEPAGE_TTL,
+      });
+      // Fire background Fast-Path computation so it gets populated with complete data (incl. logos)
+      // Debounce: max jednom u 5 minuta
+      const now = Date.now();
+      if (now - lastFastPathCompute > 300000) {
+        lastFastPathCompute = now;
+        computeAndSaveFastPath(platform).catch(() => {});
       }
-      return result;
-    } finally {
-      homepageSingleFlightMap.delete(cacheKey);
     }
+    return result;
   },
 
   async getDashboardMetrics(userId: string): Promise<DashboardQuickMetrics> {

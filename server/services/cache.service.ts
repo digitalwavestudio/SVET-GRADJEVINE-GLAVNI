@@ -1,10 +1,8 @@
 import { MonitoringService } from "./monitoring.service.ts";
 import { getRedis } from "../utils/redis.ts";
-import { RedisLockManager } from "../utils/redis-lock.ts";
 import { DatabaseManager } from "../utils/db-manager.ts";
 import { checkQuotaStatus } from "../config/firebase.ts";
-import { AdaptiveQosService } from "./adaptive-qos.service.ts";
-import { CACHE_PREFIXES, CacheKeys } from "../constants/cache-keys.ts";
+import { CACHE_PREFIXES } from "../constants/cache-keys.ts";
 import zlib from "zlib";
 import { Logger, logger } from "../utils/logger.ts";
 
@@ -34,15 +32,6 @@ export class CacheService {
     }
   }
 
-  // Enterprise Strategy: Compress large HTML/String/Array keys to save Redis Memory
-  private static shouldCompress(key: string): boolean {
-    return key.startsWith(CACHE_PREFIXES.SEO_SCHEMA) ||
-           key.startsWith("fallback_search_") ||
-           key.startsWith("unified_search_") ||
-           key.startsWith(CACHE_PREFIXES.SWR_ENVELOPE);
-  }
-
-  // Enterprise Hot Keys Optimization: Localize super-hot objects in-memory to reduce CPU & network constraints under 50k RPS
   private static isHotKey(key: string): boolean {
     const cleanKey = key.includes(":") ? key.substring(key.indexOf(":") + 1) : key;
     return key.startsWith(CACHE_PREFIXES.AD_DETAIL) ||
@@ -65,74 +54,71 @@ export class CacheService {
     return cl;
   }
 
-  /**
-   * Rešava problem 'Cache Stampede' / thundering herd.
-   * Koristi distribuirani globalni katanac (RedisLockManager) za Cloud Run flotu.
-   */
   static async getOrSet<T>(
     key: string,
     fetchFn: () => Promise<T>,
     ttlMs: number = 300000,
   ): Promise<T> {
-    // 1. Synchronous L1 inFlight check at the VERY ENTRY (SingleFlight coalescing)
     if (this.inFlight.has(key)) {
       return this.inFlight.get(key) as Promise<T>;
     }
 
     const execute = async (): Promise<T> => {
-      // Provera keša L1 & L2
-      let cached = await this.get<T>(key);
+      const cached = await this.get<T>(key);
       if (cached !== null) return cached;
 
-      // ADR 003: Pre-emptive Quota Guard (Ako nema ni bajatog keša, ne pokušavamo upit na bazu)
       if (checkQuotaStatus()) {
-         logger.warn(`[CacheService] 🛡️ Pre-emptive Quota Guard: Baza zaštićena. Nema stale keša za ${key}, obustavljam block-fetch.`);
+         logger.warn(`[CacheService] Pre-emptive Quota Guard: Baza zaštićena. Nema keša za ${key}, obustavljam fetch.`);
          throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
       }
 
-      let lockId: string | null = null;
-      let acquired = false;
+      const val = await fetchFn();
+      await this.set(key, val, ttlMs);
+      return val;
+    };
 
-      if (this.redisClient) {
-        for (let i = 0; i < 10; i++) {
-          try {
-            lockId = await RedisLockManager.acquire(key, ttlMs);
-            if (lockId) {
-              acquired = true;
-              break;
-            }
-          } catch (lockErr: unknown) {
-            logger.warn(`[CacheService] RedisLockManager.acquire failed for key ${key}:`, lockErr instanceof Error ? lockErr.message : String(lockErr));
-            break;
-          }
+    const promise = execute().finally(() => {
+      this.inFlight.delete(key);
+    });
 
-          await RedisLockManager.snooze(50);
-          try {
-            cached = await this.get<T>(key);
-            if (cached !== null) {
-              return cached;
-            }
-          } catch (getErr) {
-            // Ignorišemo grešku i nastavljamo dalje
-          }
+    this.inFlight.set(key, promise);
+    return promise;
+  }
+
+  static async getOrSetSWR<T>(
+    key: string,
+    fetchFn: () => Promise<T>,
+    ttlMs: number = 300000,
+    fallbackValue?: T,
+    timeoutMs: number = 25000
+  ): Promise<T> {
+    if (this.inFlight.has(key)) {
+      return this.inFlight.get(key) as Promise<T>;
+    }
+
+    const execute = async (): Promise<T> => {
+      const cached = await this.get<T>(key);
+      if (cached !== null) return cached;
+
+      if (checkQuotaStatus()) {
+        if (fallbackValue !== undefined) {
+          logger.warn(`[CacheService] Quota active, returning fallback for ${key}`);
+          return fallbackValue;
         }
-      }
-
-      // ADR 003: Provera Throughput-a pre samog izrsavanja
-      const isThroughputSafe = await AdaptiveQosService.recordReadIntent();
-      if (!isThroughputSafe) {
-         logger.warn(`[CacheService] 🛡️ Adaptive QoS: Throughput spike detektovan za ${key}. Baza se stiti (Block-fetch denied).`);
-         throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
+        logger.warn(`[CacheService] Quota active, no fallback for ${key}`);
+        throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
       }
 
       try {
-        const val = await fetchFn();
-        await this.set(key, val, ttlMs);
-        return val;
-      } finally {
-        if (acquired && lockId) {
-          await RedisLockManager.release(key, lockId).catch((e: any) => logger.warn("[CacheService] Redis lock release:", e));
+        const freshData = await this.executeWithTimeout(fetchFn, timeoutMs);
+        await this.set(key, freshData, ttlMs);
+        return freshData;
+      } catch (err) {
+        if (fallbackValue !== undefined) {
+          logger.warn(`[CacheService] Fetch failed for ${key}, returning fallback`);
+          return fallbackValue;
         }
+        throw err;
       }
     };
 
@@ -144,198 +130,6 @@ export class CacheService {
     return promise;
   }
 
-  /**
-   * Rešava problem 'Cache Stampede' / thundering herd koristeći Stale-While-Revalidate (SWR) uz RedisLockManager.
-   * Ako je keš istekao, prvi zahtev počinje revalidaciju u pozadini dok ostalih 19 odmah dobija 'stale'
-   * podatke produžene za 15 sekundi u cilju očuvanja resursa.
-   */
-  static async getOrSetSWR<T>(
-    key: string,
-    fetchFn: () => Promise<T>,
-    ttlMs: number = 300000,
-    fallbackValue?: T,
-    timeoutMs: number = 25000
-  ): Promise<T> {
-    const swrKey = CacheKeys.swr(key);
-    const lockKey = CacheKeys.swrLock(key);
-    const backoffKey = CacheKeys.swrBackoff(key);
-
-    // 1. Synchronous L1 inFlight check at the VERY ENTRY (SingleFlight coalescing)
-    if (this.inFlight.has(swrKey)) {
-      return this.inFlight.get(swrKey) as Promise<T>;
-    }
-
-    interface SWREnvelope<T> {
-      isSWR: boolean;
-      expiresAt: number;
-      staleFallbackUntil: number;
-      data: T;
-    }
-
-    const executeSWR = async (): Promise<T> => {
-      // 1. Provera postojanja SWR koverte u L1 / L2 kešu
-      const envelope = await this.get<SWREnvelope<T>>(swrKey);
-      const now = Date.now();
-
-      if (envelope && envelope.isSWR) {
-        // Keš je u potpunosti svež i validan -> vrati ga odmah
-        if (now <= envelope.expiresAt) {
-          return envelope.data;
-        }
-
-        // Keš je prešao u 'stale' stanje, a prozor za fallback je i dalje otvoren
-        if (now <= envelope.staleFallbackUntil) {
-          // Provera da li smo u backoff periodu zbog prethodnih grešaka revalidacije
-          try {
-            const backoff = await this.get<{ errorCount: number; retryAfter: number }>(backoffKey);
-            if (backoff && now < backoff.retryAfter) {
-              logger.debug(`[CacheService SWR] Background revalidation backoff active for ${key}. Skipping retry for another ${Math.round((backoff.retryAfter - now) / 1000)}s.`);
-              return envelope.data;
-            }
-          } catch (err) {
-            logger.warn(`[CacheService SWR] Failed to check SWR backoff for ${key}:`, err);
-          }
-
-          // Pokušaj preuzimanja distributed lock-a (jedan pobednik) za asinhronu pozadinsku revalidaciju
-          const lockId = await RedisLockManager.acquire(lockKey, 30000).catch(() => null);
-
-          if (lockId) {
-            // Ovaj zahtev je pobednik i preuzima revalidaciju
-            logger.debug(`[CacheService SWR] Acquired background lock for ${key}. Revalidating...`);
-            
-            // ADR 003: Provera Throughput-a
-            AdaptiveQosService.recordReadIntent().then((isThroughputSafe) => {
-               if (!isThroughputSafe) {
-                 logger.warn(`[CacheService SWR] 🛡️ Adaptive QoS: Background revalidation obustavljena zbog spike-a.`);
-                 throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-               }
-               return this.executeWithTimeout(fetchFn, timeoutMs);
-            })
-              .then(async (freshData) => {
-                const newEnvelope: SWREnvelope<T> = {
-                  isSWR: true,
-                  expiresAt: Date.now() + ttlMs,
-                  staleFallbackUntil: Date.now() + ttlMs + 24 * 60 * 60 * 1000, // 24h fallback prozor
-                  data: freshData,
-                };
-                await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
-                // Clear current backoff upon successful revalidation
-                await this.delete(backoffKey).catch((e: any) => logger.warn("[CacheService] SWR delete backoff key:", e));
-                logger.debug(`[CacheService SWR] Successfully refreshed SWR cache for key: ${key}`);
-              })
-              .catch(async (err) => {
-                console.error(`[CacheService SWR] Background revalidation failed for key: ${key}`, err);
-                // Update backoff exponentially
-                try {
-                  const currentBackoff = await this.get<{ errorCount: number; retryAfter: number }>(backoffKey).catch(() => null);
-                  const errorCount = currentBackoff ? currentBackoff.errorCount + 1 : 1;
-                  const delay = Math.min(1000 * Math.pow(2, errorCount - 1), 300000); // 1s, 2s, 4s, 8s, up to 5 min
-                  const retryAfter = Date.now() + delay;
-                  await this.set(backoffKey, { errorCount, retryAfter }, delay + 60000);
-                  logger.debug(`[CacheService SWR] Exponential backoff registered for ${key}. Attempts: ${errorCount}, delay: ${delay / 1000}s.`);
-                } catch (e) {
-                  console.error("[CacheService SWR] Failed to update backoff metadata:", e);
-                }
-              })
-              .finally(async () => {
-                await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[CacheService] SWR lock release after revalidation:", e));
-              });
-
-            // Pobednik takođe odmah dobija stale podatak da ne bi čekao na spori DB odziv (UX <5ms)
-            return envelope.data;
-          } else {
-            // Lock je zauzet, neko drugi već radi revalidaciju. 
-            // Serviramo trenutni 'stale' podatak
-            logger.debug(`[CacheService SWR] Revalidation lock holds. Serving stale data for key: ${key}`);
-            return envelope.data;
-          }
-        }
-      }
-
-      // 2. Hladan start (nema keša ili je fallback prozor prošao) -> radimo sinhroni blokirajući fetch sa lock zaštitom
-      const hasRedis = !!this.redisClient;
-
-      // PRE-EMPTIVE QUOTA CHECK: If we know quota is exhausted, don't even try the fetch
-      if (checkQuotaStatus()) {
-         if (fallbackValue !== undefined) {
-           logger.warn(`[CacheService SWR] 🛡️ Pre-emptive Quota Fallback activated for ${key}`);
-           return fallbackValue;
-         } else {
-           logger.warn(`[CacheService SWR] 🛡️ Pre-emptive Quota Guard: Baza zaštićena. Obustavljam cold-start fetch za ${key}`);
-           throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-         }
-      }
-
-      const lockId = hasRedis ? await RedisLockManager.acquire(lockKey, 30000).catch(() => null) : null;
-      if (hasRedis && !lockId) {
-        // Čekamo u krugovima nadajući se da će druga nit završiti upis sveže koverte
-        // Smanjujemo broj retry-ja i povećavamo delay da smanjimo "noise" u logovima
-        for (let i = 0; i < 5; i++) {
-          await RedisLockManager.snooze(250);
-          const retryEnv = await this.get<SWREnvelope<T>>(swrKey);
-          if (retryEnv && retryEnv.data) {
-            return retryEnv.data;
-          }
-        }
-      }
-
-      try {
-        logger.debug(`[CacheService SWR] Cold-start block-fetch for key: ${key}`);
-        
-        // ADR 003: Provera Throughput-a
-        const isThroughputSafe = await AdaptiveQosService.recordReadIntent();
-        if (!isThroughputSafe) {
-           logger.warn(`[CacheService SWR] 🛡️ Adaptive QoS: Cold-start block-fetch obustavljen zbog spike-a.`);
-           throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-        }
-
-        const freshData = await this.executeWithTimeout(fetchFn, timeoutMs);
-        const newEnvelope: SWREnvelope<T> = {
-          isSWR: true,
-          expiresAt: Date.now() + ttlMs,
-          staleFallbackUntil: Date.now() + ttlMs + 24 * 60 * 60 * 1000,
-          data: freshData,
-        };
-        await this.set(swrKey, newEnvelope, ttlMs + 24 * 60 * 60 * 1000);
-        // Cold-start success should also clear any existing backoff
-                await this.delete(backoffKey).catch((e: any) => logger.warn("[CacheService] Cold-start delete backoff key:", e));
-                return freshData;
-      } catch (err: unknown) {
-        // CRITICAL FALLBACK: If cold start fails, check if we have ANY stale data to return
-        const backup = await this.get<SWREnvelope<T>>(swrKey).catch(() => null);
-        if (backup && backup.data) {
-           logger.warn(`[CacheService SWR] Recovered cold-start failure using stale backup for ${key}`);
-           return backup.data;
-        }
-        
-        if (fallbackValue !== undefined) {
-           logger.warn(`[CacheService SWR] Recovered cold-start failure using provided fallbackValue for ${key}`);
-           return fallbackValue;
-        }
-
-        const errorMsg = err instanceof Error ? err.message : String(err);
-        console.error(`[CacheService SWR] Cold-start fetch failed for ${key} and no fallback available:`, errorMsg);
-        throw err;
-      } finally {
-        if (lockId) {
-          await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[CacheService] Cold-start lock release:", e));
-        }
-      }
-    };
-
-    const promise = executeSWR().finally(() => {
-      this.inFlight.delete(swrKey);
-    });
-
-    this.inFlight.set(swrKey, promise);
-    return promise;
-  }
-
-  /**
-   * Postavlja vrednost u L1 i L2 keš.
-   * L1 keš ima kraći TTL (max 10 sekundi) kako bi stitio Redis od ludnice,
-   * a pritom izbegao stale data problem na Cloud Runtu.
-   */
   static async set<T>(
     key: string,
     value: T,
@@ -343,15 +137,12 @@ export class CacheService {
   ): Promise<void> {
     const routedKey = DatabaseManager.routeCacheKey(key);
     const client = this.redisClient;
-    // If Redis is active, L1 maxes at 10s to prevent stale data. If no Redis, L1 MUST use full TTL to protect DB.
     let l1TtlMs = client ? Math.min(ttlMs, 10000) : ttlMs;
 
-    // Enterprise 50k RPS opt: keep hot keys at least 5000ms locally in L1 to prevent network/CPU card bottlenecks
     if (this.isHotKey(routedKey)) {
       l1TtlMs = Math.max(l1TtlMs, 5000);
     }
 
-    // Uvek setujemo L1 sa praćenjem poseta
     const currentItem = this.localCache.get(routedKey);
     const prevHits = currentItem ? currentItem.hits : 0;
 
@@ -361,7 +152,6 @@ export class CacheService {
       hits: prevHits + 1,
     });
 
-    // Sprečavamo preveliku potrošnju memorije - Smart LFU/LRU Eviction za L1
     if (this.localCache.size > 2000) {
       let candidateKey: string | null = null;
       let minScore = Infinity;
@@ -387,7 +177,6 @@ export class CacheService {
       }
     }
 
-    // Setujemo u L2 (Envelope Pattern za Stale-Cache otpornost - ADR 003)
     if (client) {
       try {
         const envelope = {
@@ -396,22 +185,13 @@ export class CacheService {
           expiry: Date.now() + ttlMs,
         };
         const payloadString = JSON.stringify(envelope);
-        let redisPayload = payloadString;
-        
-        // Optimizacija: Automatska kompresija za bilo koji payload veći od 2KB kako bi sačuvali bandwidth i RAM Redisa
-        if (this.shouldCompress(routedKey) || payloadString.length > 2048) {
-           const compressed = zlib.gzipSync(Buffer.from(payloadString)).toString("base64");
-           redisPayload = "GZ64:" + compressed;
-        }
-
         const staleRetentionMs = 20 * 24 * 60 * 60 * 1000;
         const redisPx = Math.min(ttlMs + staleRetentionMs, 2_147_483_647);
-        await client.set(routedKey, redisPayload, "PX", redisPx);
+        await client.set(routedKey, payloadString, "PX", redisPx);
       } catch (err) {
         console.error("[CacheService] Redis set error:", err);
       }
     }
-
   }
 
   /**

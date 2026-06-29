@@ -201,7 +201,6 @@ async function startServer() {
     const { performanceMiddleware } = await import("./server/middleware/performance.middleware.ts");
     const { zodPayloadLimiterMiddleware } = await import("./server/middleware/zod-payload-limiter.middleware.ts");
     const { idempotencyMiddleware } = await import("./server/middleware/idempotency.middleware.ts");
-    const { circuitBreakerMiddleware } = await import("./server/middleware/circuit-breaker.middleware.ts");
     const { authMiddleware } = await import("./server/middleware/auth.middleware.ts");
     const { xssMiddleware } = await import("./server/middleware/xss.middleware.ts");
     const { globalErrorHandler } = await import("./server/middleware/error.middleware.ts");
@@ -319,9 +318,8 @@ async function startServer() {
 
     app.use(express.json({ limit: "5mb" }));
     app.use(zodPayloadLimiterMiddleware);
-    app.use(idempotencyMiddleware);
 
-    app.use("/api", circuitBreakerMiddleware, authMiddleware, xssMiddleware, apiRouter);
+    app.use("/api", authMiddleware, xssMiddleware, apiRouter);
     app.use("/feed", feedRouter);
     app.use("/", seoRouter);
     app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

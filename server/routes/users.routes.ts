@@ -22,7 +22,6 @@ import {
 } from "@svet-gradjevine/shared";
 import { authLimiter } from "../middleware/rate-limit.middleware.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
-import { idempotency } from "../middleware/idempotency-lock.middleware.ts";
 import { UsersService } from "../services/users.service.ts";
 import { admin, getDb } from "../config/firebase.ts";
 import { AuditService, AuditAction } from "../services/audit.service.ts";
@@ -42,7 +41,6 @@ usersRouter.post(
   "/init",
   requireAuth,
   authLimiter,
-  idempotency({ ttl: 5 }),
   validateRequest(initUserSchema),
   async (req, res, next) => {
     try {
@@ -147,7 +145,7 @@ usersRouter.post(
   },
 );
 
-usersRouter.post("/switch-role", requireAuth, idempotency({ ttl: 5 }), switchRole);
+usersRouter.post("/switch-role", requireAuth, switchRole);
 usersRouter.post("/deactivate", requireAuth, async (req, res, next) => {
   try {
     const uid = req.user?.uid;
@@ -163,12 +161,11 @@ usersRouter.post("/deactivate", requireAuth, async (req, res, next) => {
     next(error);
   }
 });
-usersRouter.post("/force-sync", requireAuth, idempotency({ ttl: 10 }), forceSync);
-usersRouter.put("/profile", requireAuth, idempotency({ ttl: 5 }), validateBody(userProfileSchema), updateProfile);
+usersRouter.post("/force-sync", requireAuth, forceSync);
+usersRouter.put("/profile", requireAuth, validateBody(userProfileSchema), updateProfile);
 usersRouter.post(
   "/profile",
   requireAuth,
-  idempotency({ ttl: 5 }),
   validateRequest(migrateProfileSchema),
   migrateProfile,
 );

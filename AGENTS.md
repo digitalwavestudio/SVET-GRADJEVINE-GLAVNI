@@ -1,5 +1,27 @@
 # Agents Protocol
 
+## ✅ STABLE BUILD (2026-06-29) — OVO JE GLAVNI BUILD
+
+**Commit:** `ec4b15e` — **NE DIRAJ!** Ako se išta sjebe, vrati se na ovaj build.
+
+**Šta radi:**
+- Homepage: 5 najnovijih poslova SA logom (premium, urgent, latest)
+- Homepage: logo se vidi i na premium i na najnovijim oglasima
+- Fast-Path: ~15s prvi read, zatim instant; background task osvežava sa logom
+- `/poslovi`: svi poslovi sa logom, premium na vrhu
+- Lokalno: sporo ali radi (geografija Srbija ↔ Oregon)
+
+**Ključni fajlovi i stanje:**
+| Fajl | Ključna linija | Šta radi |
+|---|---|---|
+| `server/services/bff.service.ts` | 41 | Fast-Path timeout 15000ms |
+| `server/services/bff.service.ts` | 51 | Logo validacija — ako nema logo, ignoriši Fast-Path |
+| `server/services/bff.service.ts` | 283 | Background task debounce 5min |
+| `server/services/bff.service.ts` | 615 | Background task se uvek pokreće (ne samo kad su jobovi prazni) |
+| `server/services/bff.service.ts` | 310 | Sub-query timeout 25000ms |
+
+**Ako se nešto sjebe, vrati se na:** `git checkout ec4b15e`
+
 ## Pravila
 
 1. **Jezik** — uvek pišem na srpskom (latinica)

@@ -5,7 +5,6 @@ import { requireAuth } from "../middleware/auth.middleware.ts";
 import { ApplicationsService } from "../services/applications.service.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { validateApplicationOwnership } from "../middleware/ownership.middleware.ts";
-import { idempotency } from "../middleware/idempotency-lock.middleware.ts";
 import { z } from "zod";
 import { applicationActionSchema } from "@svet-gradjevine/shared";
 
@@ -73,7 +72,6 @@ applicationsRouter.get("/job/:adId", requireAuth, async (req, res, next) => {
 applicationsRouter.post(
   "/",
   requireAuth,
-  idempotency({ ttl: 10 }),
   validateRequest(submitSchema),
   async (req, res, next) => {
     try {
@@ -95,7 +93,6 @@ applicationsRouter.post(
 applicationsRouter.patch(
   "/:id/status",
   requireAuth,
-  idempotency({ ttl: 5 }),
   validateApplicationOwnership,
   validateRequest(applicationActionSchema), async (req, res, next) => {
   try {

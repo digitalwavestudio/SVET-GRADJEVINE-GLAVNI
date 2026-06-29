@@ -127,7 +127,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                   <div className="p-5 md:p-7 flex flex-col w-full h-full relative flex-1 z-10">
                     
                     {/* Top Row: Logo + Header info */}
-                    <div className="flex gap-4 md:gap-7 items-start md:items-center w-full min-w-0">
+                    <div className="flex gap-4 md:gap-7 items-start flex-row-reverse justify-between w-full min-w-0">
                       
                       {/* Logo */}
                       <div className="w-[64px] h-[64px] min-w-[64px] max-w-[64px] md:w-[72px] md:h-[72px] md:min-w-[72px] md:max-w-[72px] bg-white rounded-full p-1.5 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">

@@ -21,7 +21,6 @@ import {
 } from "@svet-gradjevine/shared";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
 import { requestCoalescingMiddleware } from "../middleware/coalesce.middleware.ts";
-import { idempotency } from "../middleware/idempotency-lock.middleware.ts";
 
 export const adsRouter = Router();
 
@@ -319,7 +318,6 @@ adsRouter.get("/:id/optimization-suggestion", authMiddleware, async (req, res, n
 adsRouter.patch(
   "/:id",
   authMiddleware,
-  idempotency({ ttl: 5 }),
   validateAdOwnership,
   // ZOD strict middleware validation added for integrity
   validateBody(updateAdSchema),
@@ -355,7 +353,6 @@ adsRouter.patch(
 adsRouter.post(
   "/create",
   authMiddleware,
-  idempotency({ ttl: 10 }),
   requireVerifiedEmail,
   adCreationLimiter,
   validateBody(createAdSchema),
@@ -403,7 +400,6 @@ adsRouter.delete("/:category/:id", authMiddleware, validateAdOwnership, async (r
 adsRouter.post(
   "/moderate",
   authMiddleware,
-  idempotency({ ttl: 5 }),
   validateRequest(moderateAdSchema),
   async (req, res, next) => {
     try {

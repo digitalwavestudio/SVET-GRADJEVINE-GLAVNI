@@ -7,11 +7,13 @@ import { AppError, BadRequestError } from "../../utils/appError.ts";
 import { eventBus, DomainEvents } from "../../events/event-bus.ts";
 import { Listing, AdStatus } from "../../types/ads.ts";
 
-export abstract class BaseAdStrategy {
-  protected logger = new Logger({ service: this.constructor.name });
+export class BaseAdStrategy {
+  protected logger = new Logger({ service: "BaseAdStrategy" });
 
-  abstract get category(): string;
-  abstract get entityType(): string;
+  constructor(
+    public readonly category: string,
+    public readonly entityType: string,
+  ) {}
 
   protected resolvePackagePrice(pkgId: string): number {
     if (!pkgId || pkgId === "free") return 0;

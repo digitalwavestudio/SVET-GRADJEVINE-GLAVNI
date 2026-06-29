@@ -43,12 +43,21 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
     ? rawComp 
     : fallbackAuthor;
 
+  const titleParts = (job.title || '').split(/\s*—\s*|\s*-\s*/);
+  const sektor = titleParts[0] || '';
+  const grad = titleParts[1] || '';
+  const cleanTitle = grad ? `${sektor} ${grad}` : sektor;
+
+  const firstSpaceIdx = companyNameDisplay.indexOf(' ');
+  const compRow1 = firstSpaceIdx !== -1 ? companyNameDisplay.substring(0, firstSpaceIdx) : companyNameDisplay;
+  const compRow2 = firstSpaceIdx !== -1 ? companyNameDisplay.substring(firstSpaceIdx + 1) : '';
+
   return (
     <>
       {/* Mobile Card Layout */}
       <article 
         itemScope itemType="https://schema.org/JobPosting"
-        className={`md:hidden group relative rounded-[16px] p-5 flex flex-col transition-all duration-300 overflow-hidden ${
+        className={`md:hidden group relative h-[285px] rounded-[16px] p-5 flex flex-col transition-all duration-300 overflow-hidden ${
           job.isPremium 
             ? 'border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)]' 
             : 'border border-white/10 bg-white/[0.02] backdrop-blur-sm shadow-lg'
@@ -76,8 +85,51 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           )}
         </div>
 
+        {/* Title */}
+        <div className="relative z-10 mb-0.5 pr-12 w-full min-w-0">
+          <h3 itemProp="title" className="text-lg font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug w-full min-w-0">
+            <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0 flex flex-col items-start w-full min-w-0">
+              <span className="truncate w-full text-left" style={{ fontSize: '1.1em', lineHeight: '1.2' }}>{sektor}</span>
+              {grad && <span className="truncate w-full text-left font-bold" style={{ fontSize: '0.75em', marginTop: '2px' }}>{grad}</span>}
+            </Link>
+          </h3>
+        </div>
+
+        {/* Company, Category & Premium Badge Row */}
+        <div className="flex items-center justify-between mt-3 mb-2 relative z-10 border-b border-white/5 pb-2">
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-start gap-1">
+              {job.companyId ? (
+                <Link to={`/firma/${job.companyId}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] hover:brightness-110 text-xs font-black uppercase tracking-widest relative z-20 flex flex-col items-start leading-tight">
+                  <span>{compRow1}</span>
+                  {compRow2 && <span>{compRow2}</span>}
+                </Link>
+              ) : (
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest flex flex-col items-start leading-tight">
+                  <span>{compRow1}</span>
+                  {compRow2 && <span>{compRow2}</span>}
+                </span>
+              )}
+              {job.isCompanyVerified && (
+                <span className="material-symbols-outlined text-green-500 text-[12px] font-black mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+              )}
+            </div>
+            {!job.isPremium && (
+              <span className="text-white/40 text-[10px] font-bold uppercase tracking-wider truncate">{job.cat}</span>
+            )}
+          </div>
+
+          {job.isPremium && (
+            <div className="shrink-0 flex items-center">
+              <span className="bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(254,191,13,0.2)]">
+                <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium
+              </span>
+            </div>
+          )}
+        </div>
+
         {/* Header: Tags */}
-        {(job.isUrgent || job.isPremium || isNovo) && (
+        {(job.isUrgent || isNovo) && (
           <div className="flex flex-wrap items-center gap-2 mb-3 relative z-10 pr-12">
             {isNovo && (
               <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-[0.1em] shadow-md flex items-center">
@@ -89,39 +141,8 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                 <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
               </span>
             )}
-            {job.isPremium && (
-              <span className="bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(254,191,13,0.2)]">
-                <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium
-              </span>
-            )}
           </div>
         )}
-
-        {/* Title */}
-        <div className={`relative z-10 mb-0.5 pr-12 ${!(job.isUrgent || job.isPremium || isNovo) ? 'min-h-[40px]' : ''}`}>
-          <h3 itemProp="title" className="text-lg font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug line-clamp-2">
-            <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
-              {job.title}
-            </Link>
-          </h3>
-        </div>
-
-        {/* Company and Category */}
-        <div className="flex flex-col items-start gap-1 mt-3 mb-4 relative z-10 border-b border-white/5 pb-4">
-          <div className="flex items-center gap-1">
-            {job.companyId ? (
-              <Link to={`/firma/${job.companyId}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] hover:brightness-110 text-xs font-black uppercase tracking-widest relative z-20">
-                {companyNameDisplay}
-              </Link>
-            ) : (
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest">{companyNameDisplay}</span>
-            )}
-            {job.isCompanyVerified && (
-              <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-            )}
-          </div>
-          <span className="text-white/40 text-[10px] font-bold uppercase tracking-wider truncate">{job.cat}</span>
-        </div>
 
         {/* Benefits (Middle) */}
         {(() => {
@@ -130,23 +151,23 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
           const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
 
-          if (!hasSmestaj && !hasPrevoz && !hasHrana) return <div className="mb-4"></div>;
+          if (!hasSmestaj && !hasPrevoz && !hasHrana) return <div className="mb-2"></div>;
 
           return (
-            <div className="flex flex-wrap gap-2 mb-5 relative z-10">
+            <div className="flex flex-wrap gap-1 mb-2 relative z-10">
               {hasSmestaj && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                  <span className="material-symbols-outlined text-[12px] text-green-400">home</span> Smeštaj
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                  <span className="material-symbols-outlined text-[10px] text-green-400">home</span> Smeštaj
                 </span>
               )}
               {hasPrevoz && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                  <span className="material-symbols-outlined text-[12px] text-blue-400">commute</span> Prevoz
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                  <span className="material-symbols-outlined text-[10px] text-blue-400">commute</span> Prevoz
                 </span>
               )}
               {hasHrana && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                  <span className="material-symbols-outlined text-[12px] text-yellow-400">restaurant</span> Hrana
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                  <span className="material-symbols-outlined text-[10px] text-yellow-400">restaurant</span> Hrana
                 </span>
               )}
             </div>
@@ -227,22 +248,27 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         {/* Content Section */}
         <div className={`flex-grow w-full relative z-10 ${viewMode === 'grid' ? 'flex flex-col items-center' : ''}`}>
             {/* Title + Badges + Salary row */}
-          <div className={`flex items-center gap-3 mb-1 flex-wrap ${viewMode === 'grid' ? 'justify-center' : ''}`}>
-            <h3 itemProp="title" className={`${viewMode === 'list' ? 'text-xl' : 'text-sm'} font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug`}>
-              <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
-                {job.title}
-              </Link>
-            </h3>
-            {job.isUrgent && (
-              <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1">
-                <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
-              </span>
-            )}
-            {job.isPremium && (
-              <span className="bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(254,191,13,0.2)]">
-                <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium
-              </span>
-            )}
+          <div className={`flex items-start gap-3 mb-1 flex-wrap w-full ${viewMode === 'grid' ? 'justify-center' : ''}`}>
+            <div className="flex flex-col items-start min-w-0 md:max-w-[450px]">
+              <h3 itemProp="title" className={`${viewMode === 'list' ? 'text-xl' : 'text-sm'} font-sans font-black text-white group-hover:text-secondary transition-colors duration-300 uppercase tracking-tight leading-snug w-full min-w-0`}>
+                <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0 flex flex-col items-start w-full min-w-0">
+                  <span className="truncate w-full text-left" style={{ fontSize: '1.1em', lineHeight: '1.2' }}>{sektor}</span>
+                  {grad && <span className="truncate w-full text-left font-bold" style={{ fontSize: '0.75em', marginTop: '2px' }}>{grad}</span>}
+                </Link>
+              </h3>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              {job.isUrgent && (
+                <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
+                </span>
+              )}
+              {job.isPremium && (
+                <span className="bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(254,191,13,0.2)]">
+                  <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium
+                </span>
+              )}
+            </div>
             {viewMode === 'list' && (
               <div className="ml-auto text-right flex flex-col items-end">
                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
@@ -314,7 +340,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
                 <Link 
                   to={buildJobUrl(job)}
                   state={{ job: {
-                    title: job.title,
+                    title: cleanTitle,
                     company: companyNameDisplay,
                     location: job.loc,
                     tacnaLokacija: job.tacnaLokacija,

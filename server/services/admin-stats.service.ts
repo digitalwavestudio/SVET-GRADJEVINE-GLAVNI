@@ -1,5 +1,4 @@
 ﻿import { admin as firebaseAdmin, db } from "../config/firebase.ts";
-import { CacheService } from "./cache.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { LockManager } from "./lock.service.ts";
 
@@ -11,101 +10,6 @@ export class AdminStatsService {
   private static logger = new Logger({ service: "AdminStatsService" });
   private static STATS_DOC_PATH = "metadata/global_stats";
   private static NUM_SHARDS = 10;
-
-  // L1 Hard Cache (Shield) specifically for homepage performance
-  private static l1ShieldCache = new Map<string, { data: unknown; expiry: number }>();
-  private static inflightPromises = new Map<string, Promise<unknown>>();
-  private static readonly L1_SHIELD_TTL = 60 * 1000; // 1 minute protection
-
-  /**
-   * Internal helper to handle request collapsing and L1/L2 caching logic for metadata
-   */
-  private static async getCachedMetadata<T>(cacheKey: string, fastPathDoc: string, fetchFn: () => Promise<T>, fallbackValue?: T): Promise<T> {
-    const now = Date.now();
-    
-    // 1. L1 RAM Shield Check
-    const shield = this.l1ShieldCache.get(cacheKey);
-    if (shield && now < shield.expiry) return shield.data as T;
-
-    // 2. In-flight Promise Collapsing
-    const inflight = this.inflightPromises.get(cacheKey);
-    if (inflight) return inflight as Promise<T>;
-
-    const fetchTask = (async () => {
-      try {
-        const data = await CacheService.getOrSetSWR(
-          cacheKey,
-          async () => {
-             // 1. Try Firestore Fast-Path (L0) as a cheaper fallback than query
-             try {
-               const { checkQuotaStatus, getMockDocSnapshot } = await import("../config/firebase.ts");
-               
-                let doc;
-                if (checkQuotaStatus()) {
-                   console.warn(`[AdminStatsService] Quota exhausted, using local mock for ${fastPathDoc}`);
-                   doc = getMockDocSnapshot(fastPathDoc.split('/').pop() || "", fastPathDoc);
-                } else {
-                   // Increased timeout for Fast-Path FirestoreDoc to prevent expensive recalculations. 
-                   const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500));
-                   doc = await Promise.race([
-                     db.doc(fastPathDoc).get(),
-                     timeoutPromise
-                   ]).catch(() => null);
-                }
-
-               if (doc && doc.exists) {
-                 const d = doc.data();
-                 const actualData = d?.stats || d;
-                 if (actualData) {
-                   console.log(`[AdminStatsService] L0 Fast-Path hit for ${cacheKey}`);
-                   return actualData;
-                 }
-               }
-             } catch (e: any) {
-               console.warn(`[AdminStatsService] L0 Fast-Path failed for ${cacheKey}:`, e instanceof Error ? e.message : String(e));
-             }
-
-             // Stop execution and return fallback immediately if circuit breaker tripped
-             const { checkQuotaStatus } = await import("../config/firebase.ts");
-             if (checkQuotaStatus()) {
-               console.warn(`[AdminStatsService] Quota status is active after fast-path attempt. Skipping cold-path query for ${cacheKey} and returning fallback.`);
-               return fallbackValue as T;
-             }
-
-             // 2. Fallback to real query (Cold Path) 
-             // U skladu sa zadatkom: 1 Firestore ─ìita─ì koji popunjava cache
-             const res = await fetchFn();
-             
-             // Sync to Fast-Path
-             db.doc(fastPathDoc).set({
-               stats: res,
-               updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-             }, { merge: true }).catch(() => {});
-             
-             return res;
-          },
-          3600 * 1000, // 1 hour TTL
-          fallbackValue
-        );
-        this.l1ShieldCache.set(cacheKey, { data, expiry: now + this.L1_SHIELD_TTL });
-        return data;
-      } catch (err: any) {
-        console.error(`[AdminStatsService] Cache failure for ${cacheKey}:`, err instanceof Error ? err.message : String(err));
-        throw err;
-      } finally {
-        this.inflightPromises.delete(cacheKey);
-      }
-    })();
-
-    this.inflightPromises.set(cacheKey, fetchTask);
-
-    // 3. Global Tier-2 Safety Timeout: 150ms max wait for the whole tiered lookup
-    const globalTimeout = new Promise<T>((resolve) => {
-      setTimeout(() => resolve(fallbackValue as T), 150);
-    });
-
-    return Promise.race([fetchTask, globalTimeout]);
-  }
 
   /**
    * Updates global stats atomically using sharded counters.
