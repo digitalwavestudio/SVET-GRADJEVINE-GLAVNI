@@ -150,7 +150,7 @@ d.settings({ignoreUndefinedProperties:true});
 (async()=>{
   const j=await d.collectionGroup('listings').where('type','==','job').where('status','in',['active','approved']).orderBy('createdAt','desc').limit(5).get();
   const safe=(s,f)=>{const r={};f.forEach(x=>{const v=s.data()[x];if(v!==undefined&&v!==null&&(!x.startsWith('_'))&&(typeof v!=='object'||Array.isArray(v)))r[x]=v;const c=s.data().createdAt;if(c?.toDate)r.createdAt=c.toDate().toISOString()});return r};
-  const jobs=j.docs.map(d=>safe(d,['title','isPremium','isUrgent','location','comp','company','companyName','salary','plataMin','plataMax','salaryType','benefits']));
+  const jobs=j.docs.map(d=>safe(d,['title','isPremium','isUrgent','location','comp','company','companyName','salary','plataMin','plataMax','salaryType','benefits','logo']));
   await d.doc('metadata/homepage_fastpath').delete();
   await d.doc('metadata/homepage_fastpath').set({homepage:{success:true,stats:{totalJobs:111,totalMachines:1},premiumJobs:[],urgentJobs:[],latestJobs:jobs,latestMachines:[],latestRealEstate:[],latestAccommodations:[],latestCaterings:[],latestArticles:[]},updatedAt:a.firestore.FieldValue.serverTimestamp()});
   console.log('Fast-Path napisan:',jobs.length,'poslova');
@@ -196,6 +196,13 @@ Background task prepisuje Fast-Path posle svakog zahteva. Ako ti treba da ručno
 2. Ako je prazan → upiši ručno (skripta gore)
 3. Proveri timeout-e u `bff.service.ts` (treba 15000ms i 25000ms)
 4. Ako i dalje ne radi → `git checkout 83949ca` pa ponovo primeni fix-eve
+
+**Simptom: Logo se ne vidi na homepage (samo slova), ali se vidi na /poslovi**
+1. Fast-Path ima stare podatke bez `logo` polja (ručno upisan skriptom koji nije uključivao logo)
+2. Izbriši Fast-Path: `node -e "const a=require('firebase-admin'),{getFirestore:b}=require('firebase-admin/firestore');a.initializeApp({credential:a.credential.cert(require('./firebase-service-account.json'))});b(a.app(),'ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8').doc('metadata/homepage_fastpath').delete().then(()=>console.log('OK')).catch(e=>console.error(e.message))"`
+3. Posle brisanja, sledeći zahtev će ići u real-time fallback i vratiti logo
+4. Background task (debounce 5min) će napisati svež Fast-Path SA logom
+5. Proveri `bff.service.ts` — `readFastPathHomepage()` ima validaciju: ako `latestJobs[0].logo` ne postoji, tretira Fast-Path kao miss
 
 **Simptom: /poslovi prazan, /api/jobs timeout**
 - Firestore upit je spor (1-13s). Sačekaj duže ili proveri mrežu.

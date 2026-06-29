@@ -45,7 +45,12 @@ async function readFastPathHomepage(): Promise<HomepageDataResult | null> {
     ]).catch(() => null);
     if (doc && doc.exists) {
       const data = doc.data();
-      if (data && data.homepage) return data.homepage as HomepageDataResult;
+      if (data && data.homepage) {
+        const h = data.homepage as HomepageDataResult;
+        // Validacija: ako latestJobs nemaju logo, Fast-Path je zastareo
+        if (h.latestJobs?.length && !h.latestJobs[0]?.logo) return null;
+        return h;
+      }
     }
   } catch {}
   return null;
@@ -275,6 +280,7 @@ const withHomepageQueryTimeout = async <T>(
 
 export const bffSingleFlightMap = new Map<string, Promise<DashboardDataResult>>();
 const homepageSingleFlightMap = new Map<string, Promise<HomepageDataResult>>();
+let lastFastPathCompute = 0; // debounce: ne racunaj cesce od jednom u 5 min
 
 export const bffService = {
   async getHomepageData(platform: string): Promise<HomepageDataResult> {
@@ -603,8 +609,11 @@ export const bffService = {
           data: result,
           expiry: Date.now() + L1_HOMEPAGE_TTL,
         });
-        // Fire background Fast-Path computation if jobs missing (other categories may have loaded)
-        if (!result.latestJobs?.length) {
+        // Fire background Fast-Path computation so it gets populated with complete data (incl. logos)
+        // Debounce: max jednom u 5 minuta
+        const now = Date.now();
+        if (now - lastFastPathCompute > 300000) {
+          lastFastPathCompute = now;
           computeAndSaveFastPath(platform).catch(() => {});
         }
       }
