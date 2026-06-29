@@ -14,23 +14,7 @@ Deploy to default database:
 
 **IMPORTANT**: App uses `ai-studio` database (not `(default)`). The `firebase deploy` only targets `(default)`. To deploy indexes to `ai-studio`, use `gcloud firestore indexes composite create` or the REST API directly.
 
-78 indexes defined in `firestore.indexes.json`. 55 deployed to `ai-studio` (via gcloud --async). Remaining 23 (premium/urgent variants) need `gcloud` deployment.
-
-Indexes created in this session (12 new on ai-studio): type+status+categorySlug+createdAt, type+status+categoryId+createdAt, type+status+typeSlug+createdAt, type+status+mainCategories+CONTAINS+createdAt, status+updatedAt, type+status+authorId, and cat+city combo variants (categorySlug+locationSlug, categoryId+locationSlug, typeSlug+locationSlug).
-
-To deploy remaining indexes from `firestore.indexes.json` to ai-studio:
-```powershell
-$json = Get-Content -Raw "firestore.indexes.json" | ConvertFrom-Json
-foreach ($idx in $json.indexes) {
-  $args = @(); $args += "--collection-group=$($idx.collectionGroup)"; $args += "--query-scope=$($idx.queryScope)"
-  foreach ($f in $idx.fields) {
-    if ($f.order) { $args += "--field-config", "field-path=$($f.fieldPath),order=$($f.order)"
-    } else { $args += "--field-config", "field-path=$($f.fieldPath),array-config=$($f.arrayConfig)" }
-  }
-  $args += "--database=ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8"; $args += "--project=gen-lang-client-0548525213"; $args += "--async"
-  & "gcloud" "firestore" "indexes" "composite" "create" @args 2>&1
-}
-```
+78 indexes defined in `firestore.indexes.json`. All 78 are deployed to `ai-studio` (verifed 2026-06-28, all returned ALREADY_EXISTS).
 
 ## SEO / Rate Limiting
 
@@ -130,6 +114,103 @@ Kad je Firestore bio spor (>100ms), Fast-Path timeout od 100ms je istekao i sist
 - `usePremiumJobs` hook i `allJobsPremiumFirst` merge logiku u `JobsPage.tsx`
 - Fast-Path empty array guard u `unified-ads.service.ts`
 - pageSize cap 1000 u `jobs.controller.ts`
+
+## 🖥️ LOCALHOST SETUP (Session 5 — fixirano 2026-06-29)
+
+**⚠️ BITNO: Lokalni dev radi SPORO jer je Firestore baza u `us-west1` (Oregon), a ti si u Srbiji. Svaki upit traje 1-15s.**
+Online (Cloud Run u Oregon-u) je brz (<10ms). Lokalno je sporo ali radi.
+
+### 🔧 Timeout podešavanja
+
+| Fajl | Linija | Originalno | Fix |
+|---|---|---|---|
+| `server/services/bff.service.ts` | readFastPathHomepage (41) | 100ms timeout | **15000ms** — da Fast-Path read stigne |
+| `server/services/bff.service.ts` | CacheService callback (310) | 10000ms sub-query | **25000ms** — da sveži upit stigne |
+| `server/services/bff.service.ts` | search("jobs") limit (85, 377) | 10 | **5** — na naslovnoj 5 poslova |
+
+### 💾 Fast-Path (homepage keš)
+
+Fast-Path dokument je `metadata/homepage_fastpath` u `ai-studio` bazi. Firestore limit je **1MB** — base64 logo polja su ~800KB svako, pa se ne mogu pisati u Fast-Path.
+
+**Kako radi:**
+1. BFF prima zahtev
+2. Čita Fast-Path sa 15s timeout-om (sporo, ali uspe posle prvog čitanja)
+3. Ako Fast-Path ima podatke → vraća instant
+4. Background task (`computeAndSaveFastPath`) pokreće svež upit (bez timeout-a)
+5. Background task upisuje nove podatke u Fast-Path (ali bez logoa — da stane u 1MB)
+
+**Ako Fast-Path nema podataka (0 poslova):**
+```powershell
+# Ručno upiši Fast-Path sa trenutnim poslovima
+node -e "
+const a=require('firebase-admin'),{getFirestore:b}=require('firebase-admin/firestore');
+a.initializeApp({credential:a.credential.cert(require('./firebase-service-account.json'))});
+const d=b(a.app(),'ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8');
+d.settings({ignoreUndefinedProperties:true});
+(async()=>{
+  const j=await d.collectionGroup('listings').where('type','==','job').where('status','in',['active','approved']).orderBy('createdAt','desc').limit(5).get();
+  const safe=(s,f)=>{const r={};f.forEach(x=>{const v=s.data()[x];if(v!==undefined&&v!==null&&(!x.startsWith('_'))&&(typeof v!=='object'||Array.isArray(v)))r[x]=v;const c=s.data().createdAt;if(c?.toDate)r.createdAt=c.toDate().toISOString()});return r};
+  const jobs=j.docs.map(d=>safe(d,['title','isPremium','isUrgent','location','comp','company','companyName','salary','plataMin','plataMax','salaryType','benefits']));
+  await d.doc('metadata/homepage_fastpath').delete();
+  await d.doc('metadata/homepage_fastpath').set({homepage:{success:true,stats:{totalJobs:111,totalMachines:1},premiumJobs:[],urgentJobs:[],latestJobs:jobs,latestMachines:[],latestRealEstate:[],latestAccommodations:[],latestCaterings:[],latestArticles:[]},updatedAt:a.firestore.FieldValue.serverTimestamp()});
+  console.log('Fast-Path napisan:',jobs.length,'poslova');
+})();
+"
+```
+
+### 🚀 Prvi start (hladni start)
+
+1. `npm run dev`
+2. Sačekaj **~15-20 sekundi** da se Firestore upiti izvrše
+3. **Ctrl+Shift+R** (hard refresh) u browseru
+4. Homepage prikazuje 5 najnovijih poslova
+5. `/poslovi` strana prikazuje sve poslove (posle ~5-10s učitavanja)
+6. Sledeći putevi su brži jer Fast-Path radi
+
+### ⚠️ Ne diraj u BFF tokom rada servera
+
+Background task prepisuje Fast-Path posle svakog zahteva. Ako ti treba da ručno upišeš Fast-Path:
+1. Sačekaj da se server pokrene i background task završi (prvi zahtev)
+2. Tek onda piši Fast-Path skriptom gore
+3. Inače će background task odmah prepisati tvoje podatke sa praznima
+
+### 🗑️ Mrtvi fajlovi (obrisani u ovoj sesiji)
+
+**Frontend (11 fajlova):**
+`src/components/seo/EntityContextLinker.tsx`, `src/components/ui/CopyLinkButton.tsx`,
+`src/hooks/useDataFetching.ts`, `src/hooks/useFirestoreListener.ts`, `src/hooks/usePaginatedList.ts`, `src/hooks/useVisibilityAwareSubscription.ts`,
+`src/lib/monitoredFirestore.ts`, `src/lib/searchUtils.ts`, `src/lib/securityObserver.ts`, `src/lib/firestoreUtils.ts`
+`src/lib/performance.ts` → **sveden na stub** (24 linije, passthrough funkcije)
+
+**Server (4 fajla):**
+`server/services/internal-linking.service.ts`, `server/services/matrix-router.service.ts`,
+`server/subscribers/cache.subscriber.ts`, `server/subscribers/sync.subscriber.ts`
+
+**Sentry (1 fajl):**
+`server/utils/sentry-stub.ts` → zamenjen sa `@sentry/node` u `server.ts`
+
+### 🔄 Ako se sjebe
+
+**Simptom: Homepage 0 poslova, /api/bff/homepage timeout**
+1. Proveri Fast-Path: `node -e "require('firebase-admin')..."` vidi gore
+2. Ako je prazan → upiši ručno (skripta gore)
+3. Proveri timeout-e u `bff.service.ts` (treba 15000ms i 25000ms)
+4. Ako i dalje ne radi → `git checkout 83949ca` pa ponovo primeni fix-eve
+
+**Simptom: /poslovi prazan, /api/jobs timeout**
+- Firestore upit je spor (1-13s). Sačekaj duže ili proveri mrežu.
+- Ako je online server brz a lokalan spor → geografija, nije bug.
+
+### 🔐 Service Account
+- Fajl: `firebase-service-account.json` (u .gitignore, ne commit-uje se)
+- `.env`: `FIREBASE_SERVICE_ACCOUNT_KEY="./firebase-service-account.json"`
+- Ako `.env` nema ovu liniju → dodaj je
+
+### 🧪 Lint
+```powershell
+npm run lint
+```
+Samo 2 pre-existing greške u `src/components/AiSearchBar.tsx` — ne diraj.
 
 ## Bundle Size (Uncompressed, initial load ~1.6MB)
 - `vendor-core`: 460KB (React, Router, Query)

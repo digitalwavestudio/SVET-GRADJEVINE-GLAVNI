@@ -1,4 +1,3 @@
-import { OptimizedImage } from '@/src/components/OptimizedImage';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
@@ -181,14 +180,6 @@ export default function RegisterPage() {
         {/* Left Side: Visual Anchor (60%) */}
         <section className="hidden md:block relative w-full md:w-[60%] min-h-[409px] md:min-h-screen overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <OptimizedImage 
-              src="/assets/pattern-bg.png" 
-              fallbackType="company" 
-              alt="Siguran pristup platformi" 
-              className="w-full h-full object-cover opacity-50 grayscale" 
-              containerClassName="w-full h-full"
-            /> 
-              
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
           </div>
           <div className="relative z-10 h-full flex items-center justify-center p-8 md:p-16">

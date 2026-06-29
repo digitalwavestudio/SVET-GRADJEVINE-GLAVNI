@@ -38,7 +38,7 @@ const FAST_PATH_DOC = "metadata/homepage_fastpath";
 
 async function readFastPathHomepage(): Promise<HomepageDataResult | null> {
   try {
-    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 100));
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 15000));
     const doc = await Promise.race([
       db.doc(FAST_PATH_DOC).get(),
       timeoutPromise,
@@ -82,7 +82,7 @@ async function computeAndSaveFastPath(platform: string): Promise<void> {
       UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2),
       UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3),
       UnifiedSearchService.search("caterings", { status: "active", skipCount: true }, 3),
-      UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 10),
+      UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 5),
     ]);
 
     const gStats = (globalStats.status === "fulfilled" ? globalStats.value : {}) as any;
@@ -307,7 +307,7 @@ export const bffService = {
       return await CacheService.getOrSetSWR<HomepageDataResult>(
         cacheKey,
         async (): Promise<HomepageDataResult> => {
-          const bffSubTimeoutMs = 10000;
+          const bffSubTimeoutMs = 25000;
 
           const [
             globalStats,
@@ -374,7 +374,7 @@ export const bffService = {
               UnifiedSearchService.search(
                 "jobs",
                 { status: "active", skipCount: true },
-                10,
+                5,
               ),
               bffSubTimeoutMs,
               { docs: [], lastVisibleId: null, hasMore: false },

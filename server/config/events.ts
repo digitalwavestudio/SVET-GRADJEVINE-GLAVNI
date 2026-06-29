@@ -1,6 +1,4 @@
-import { setupSyncSubscriber } from "../subscribers/sync.subscriber.ts";
 import { setupActivitySubscriber } from "../subscribers/activity.subscriber.ts";
-import { setupCacheSubscriber } from "../subscribers/cache.subscriber.ts";
 import { initPaymentSubscriber } from "../subscribers/payment.subscriber.ts";
 import { setupNotificationSubscriber } from "../subscribers/notification.subscriber.ts";
 import { initializeImageSubscribers } from "../subscribers/image.subscriber.ts";
@@ -15,9 +13,7 @@ import { DashboardService } from "../services/dashboard.service.ts";
 import { DashboardPrewarmService } from "../services/dashboard-prewarm.service.ts";
 
 export function initializeEventSubscribers() {
-  setupSyncSubscriber();
   setupActivitySubscriber();
-  setupCacheSubscriber();
   initPaymentSubscriber();
   setupNotificationSubscriber();
   initializeImageSubscribers();

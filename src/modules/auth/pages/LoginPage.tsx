@@ -1,4 +1,3 @@
-import { OptimizedImage } from '@/src/components/OptimizedImage';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
@@ -112,14 +111,6 @@ export default function LoginPage() {
       {/* LEFT PANEL: Brand Narrative (60%) */}
       <section className="hidden md:flex md:w-3/5 relative items-center px-12 lg:px-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <OptimizedImage 
-            src="/assets/pattern-bg.png" 
-            fallbackType="company" 
-            alt="Siguran pristup platformi" 
-            className="w-full h-full object-cover opacity-50 grayscale" 
-            containerClassName="w-full h-full"
-          /> 
-            
           <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent"></div>
         </div>
         <div className="relative z-10 max-w-2xl">

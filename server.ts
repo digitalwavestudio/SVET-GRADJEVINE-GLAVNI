@@ -211,7 +211,7 @@ async function startServer() {
     
     const helmet = (await import("helmet")).default;
     const compression = (await import("compression")).default;
-    const Sentry = await import("./server/utils/sentry-stub.ts");
+    const Sentry = await import("@sentry/node");
 
     app.use(requestLogger);
     app.set("trust proxy", 1);
