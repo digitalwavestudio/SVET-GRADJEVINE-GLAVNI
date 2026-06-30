@@ -1,6 +1,7 @@
 import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { initGA, trackPageView } from '@/src/lib/analytics';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 import NetworkStatus from '@/src/components/NetworkStatus';
 import CookieConsent from '@/src/components/CookieConsent';
 import BackToTop from '@/src/components/BackToTop';
@@ -16,6 +17,12 @@ const PageLoader = () => (
 );
 
 export function RootLayout() {
+  useRegisterSW({
+    onNeedRefresh() {
+      window.location.reload();
+    },
+  });
+
   const location = useLocation();
   
   useAffiliateTracking();
