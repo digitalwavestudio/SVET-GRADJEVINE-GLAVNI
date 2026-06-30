@@ -158,14 +158,22 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-black text-white group-hover/card:text-secondary transition-colors duration-300 mb-1 uppercase line-clamp-2 md:line-clamp-1 break-words tracking-tight">
-                          {displayTitle}
+                        <h3 className="text-base md:text-2xl font-black text-white group-hover/card:text-secondary transition-colors duration-300 mb-1 uppercase break-words tracking-tight leading-tight">
+                          {(() => {
+                            const t = displayTitle;
+                            const i = t.lastIndexOf(' ');
+                            if (i === -1) return t;
+                            return <>{t.slice(0, i)}<br />{t.slice(i + 1)}</>;
+                          })()}
                         </h3>
 
                         <div className="mb-2">
                           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs md:text-[13px] font-black uppercase tracking-widest relative z-20">
                             {job.comp || 'Svet Građevine'}
                           </span>
+                          {job.isCompanyVerified && (
+                            <span className="material-symbols-outlined text-green-500 text-[12px] font-black ml-1.5 align-middle" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          )}
                         </div>
                         
                         <p className="text-slate-400 text-xs md:text-sm line-clamp-2 md:line-clamp-2 pr-2">

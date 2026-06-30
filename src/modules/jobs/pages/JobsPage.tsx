@@ -98,7 +98,8 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
 
-  const totalJobsCount = allJobsPremiumFirst.length;
+  const totalJobsCount = data?.pages[0]?.total ?? allJobsPremiumFirst.length;
+  const activeJobsCount = data?.pages[0]?.activeJobs ?? allJobsPremiumFirst.length;
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; path?: string }[] = [];
@@ -629,7 +630,7 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
                     Aktivna <br /> <span className="text-secondary">Ponuda</span>
                   </h3>
                   <p className="text-[10px] font-black mt-2 tracking-[0.3em] uppercase">
-                    <span className="text-white/40">UKUPNO PRONAĐENO:</span> <span className="text-secondary">{totalJobsCount} OGLASA</span>
+                    <span className="text-white/40">UKUPNO PRONAĐENO:</span> <span className="text-secondary">{activeJobsCount} OGLASA</span>
                   </p>
                 </div>
               </div>

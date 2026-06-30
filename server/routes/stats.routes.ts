@@ -352,12 +352,33 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
         let today = 0;
         const targetType = typeMap[collectionName];
         if (targetType) {
-          // TODO: Implementirati efikasnije brojanje za "danas" bez count() skeniranja cele baze.
-          // Zbog Firebase baga sa čitanjem "duhova", count() trenutno troši hiljade readova.
-          today = 0; 
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+          try {
+            const todaySnap = await db.collection("listings")
+              .where("type", "==", targetType)
+              .where("status", "in", ["active", "approved"])
+              .where("createdAt", ">=", todayStart)
+              .count()
+              .get();
+            today = todaySnap.data().count;
+          } catch (e) {
+            // count() fallback — ne ruši ceo odgovor
+            today = 0;
+          }
         } else if (collectionName === "companies") {
-          // TODO: Obezbediti efikasno brojanje kompanija za danas
-          today = 0;
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+          try {
+            const todaySnap = await db.collection("users")
+              .where("role", "==", "company")
+              .where("createdAt", ">=", todayStart)
+              .count()
+              .get();
+            today = todaySnap.data().count;
+          } catch (e) {
+            today = 0;
+          }
         }
 
         return { total, today, premium };

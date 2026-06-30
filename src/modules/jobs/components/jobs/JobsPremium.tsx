@@ -146,9 +146,14 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase line-clamp-2 md:line-clamp-1 break-words">
+                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase break-words leading-tight">
                           <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
-                            {job.title?.replace(' — ', ' ') || 'Premium Posao'}
+                            {(() => {
+                              const t = (job.title || 'Premium Posao').replace(' — ', ' ');
+                              const i = t.lastIndexOf(' ');
+                              if (i === -1) return t;
+                              return <>{t.slice(0, i)}<br />{t.slice(i + 1)}</>;
+                            })()}
                           </Link>
                         </h3>
 
@@ -156,6 +161,9 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs md:text-[13px] font-black uppercase tracking-widest relative z-20">
                             {job.comp || 'Svet Građevine'}
                           </span>
+                          {job.isCompanyVerified && (
+                            <span className="material-symbols-outlined text-green-500 text-[12px] font-black ml-1.5 align-middle" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          )}
                         </div>
                         
                         <p className="text-slate-400 text-xs md:text-sm line-clamp-2 md:line-clamp-2 pr-2">

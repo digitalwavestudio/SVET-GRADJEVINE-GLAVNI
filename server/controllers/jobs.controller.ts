@@ -5,6 +5,7 @@ import { env } from "../config/env.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
 import { CacheService } from "../services/cache.service.ts";
+import { AdminStatsService } from "../services/admin-stats.service.ts";
 
 export const getPublicJobs = async (
   req: Request,
@@ -20,13 +21,21 @@ export const getPublicJobs = async (
     console.info("[JOBS_CTRL] getPublicJobs called, calling JobsService.getPublicJobs...");
     const result = await JobsService.getPublicJobs(limit, cursor);
 
+    // Ne blokiramo odgovor na spori AdminStatsService — timeout 3s, pa fallback
+    const globalStats: Record<string, any> = await Promise.race([
+      AdminStatsService.getGlobalStats(),
+      new Promise<null>(resolve => setTimeout(() => resolve(null), 15000)),
+    ]).catch(() => ({})) || {};
+
     let finalResult: {
       docs: any[];
       lastVisible: string | null;
       hasMore: boolean;
       warning?: string;
       isOptimized?: boolean;
-    } = { ...result, hasMore: result.docs.length > pageSize };
+      total?: number;
+      activeJobs?: number;
+    } = { ...result, hasMore: result.docs.length > pageSize, total: globalStats.totalJobs || 0, activeJobs: globalStats.activeJobs ?? globalStats.totalJobs ?? 0 };
 
     if (finalResult.hasMore) {
       finalResult.docs = result.docs.slice(0, pageSize);
@@ -39,6 +48,8 @@ export const getPublicJobs = async (
         ...result,
         docs: result.docs.map((job) => JobTransformer.toMobile(job as unknown as RawJobInput)),
         isOptimized: true,
+        total: globalStats.totalJobs || 0,
+        activeJobs: globalStats.activeJobs ?? globalStats.totalJobs ?? 0,
       };
     }
 

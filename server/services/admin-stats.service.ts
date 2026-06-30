@@ -184,8 +184,9 @@ export class AdminStatsService {
           const lowJobs = (d.totalJobs || 0) < 50;
           const lowCompanies = (d.companiesCount || 0) < 10;
           const lowUsers = (d.totalUsers || 0) < 50;
-          if (lowJobs || lowCompanies || lowUsers) {
-            console.warn(`[AdminStatsService] admin_stats values suspiciously low (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}). Auto-triggering reconciliation.`);
+          const missingActiveJobs = d.activeJobs === undefined;
+          if (lowJobs || lowCompanies || lowUsers || missingActiveJobs) {
+            console.warn(`[AdminStatsService] Triggering reconciliation (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}, missingActiveJobs=${missingActiveJobs}).`);
             this.reconcileGlobalStats().catch(err => {
               console.error("[AdminStatsService] Auto-reconciliation failed:", err);
             });
@@ -254,12 +255,23 @@ export class AdminStatsService {
     try {
       // 1. Precise aggregations using count() (Safest & Cheapest - 1 read per 1k docs)
       const counts: Record<string, number> = {};
-      const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace", "company"];
+      const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace"];
       
       for (const cat of categories) {
-        const snap = await db.collection("listings").where("type", "==", cat).count().get();
+        const snap = await db.collection("listings")
+          .where("type", "==", cat)
+          .count()
+          .get();
         counts[`total_${cat}s`] = snap.data().count;
       }
+
+      // 1b. Aktivni poslovi (za "UKUPNO PRONAĐENO")
+      const activeJobsSnap = await db.collection("listings")
+        .where("type", "==", "job")
+        .where("status", "in", ["active", "approved"])
+        .count()
+        .get();
+      const activeJobs = activeJobsSnap.data().count;
 
       // 2. Revenue & Premium Sampling with strict BATCHING and LIMIT (PROMPT 9)
       // Instead of an uncapped scan, we use limit(100) as requested.
@@ -273,9 +285,16 @@ export class AdminStatsService {
       // 3. Real Users Count
       const usersSnap = await db.collection("users").count().get();
 
+      // 4. Companies Count — firme su u users kolekciji sa role == "company"
+      const companiesSnap = await db.collection("users")
+        .where("role", "==", "company")
+        .count()
+        .get();
+
       const reconciledStats = {
         totalJobs: counts.total_jobs || 0,
-        companiesCount: counts.total_companies || 0,
+        activeJobs,
+        companiesCount: companiesSnap.data().count,
         machinesCount: counts.total_machines || 0,
         accommodationsCount: counts.total_accommodations || 0,
         cateringCount: counts.total_caterings || 0,
