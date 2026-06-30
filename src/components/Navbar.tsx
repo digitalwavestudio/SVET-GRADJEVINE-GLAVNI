@@ -345,8 +345,12 @@ export default function Navbar() {
               <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-secondary/20 to-transparent blur-xl pointer-events-none" />
                 <div className="relative flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 shadow-lg">
-                    <span className="material-symbols-outlined text-white/70">construction</span>
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                    <img
+                      src={logoImage}
+                      alt="Svet Građevine Logo"
+                      className="w-full h-full object-contain p-1"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <span className="block text-sm text-white font-black leading-tight">Dobrodošli na Svet Građevine</span>
