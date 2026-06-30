@@ -111,10 +111,14 @@ export class JobsCoreService {
         hasMore: rawDocs.length > pageSize,
       };
       
-      // Cache the result for 60 minutes (Quota protection)
-      const t0_set = Date.now();
-      await CacheService.set(cacheKey, response, 3600000);
-      console.log(`[TIMING] CacheService.set(): ${Date.now() - t0_set}ms`);
+      // Cache the result for 60 minutes — samo ako ima podataka
+      if (rawDocs.length > 0) {
+        const t0_set = Date.now();
+        await CacheService.set(cacheKey, response, 3600000);
+        console.log(`[TIMING] CacheService.set(): ${Date.now() - t0_set}ms`);
+      } else {
+        console.log(`[JOBS_CORE] Skipping cache for ${cacheKey}: empty result`);
+      }
       console.log(`[TIMING] TOTAL getPublicJobs: ${Date.now() - t0_cache}ms`);
       return response;
     } catch (error: any) {

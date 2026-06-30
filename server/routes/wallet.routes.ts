@@ -4,6 +4,7 @@ import { db, admin } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { AdminSettingsService } from "../services/admin/admin-settings.service.ts";
+import { idempotencyMiddleware } from "../middleware/idempotency.middleware.ts";
 import { z } from "zod";
 
 export const walletRouter = Router();
@@ -48,7 +49,7 @@ const promoteSchema = z.object({
     .default("premium"),
 });
 
-walletRouter.post("/promote", requireAuth, async (req, res, next) => {
+walletRouter.post("/promote", requireAuth, idempotencyMiddleware, async (req, res, next) => {
   try {
     const parsed = promoteSchema.parse(req.body);
     const userId = getReqUser(req).uid;
@@ -210,7 +211,7 @@ const adminFundSchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
-walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
+walletRouter.post("/admin/add-funds", requireAuth, idempotencyMiddleware, async (req, res, next) => {
   try {
     const user = getReqUser(req);
     if (user?.isAdmin !== true) {
@@ -283,7 +284,7 @@ const manualDepositSchema = z.object({
   amount: z.number().int().min(1, "Amount must be greater than 0"),
 });
 
-walletRouter.post("/deposit/manual", requireAuth, async (req, res, next) => {
+walletRouter.post("/deposit/manual", requireAuth, idempotencyMiddleware, async (req, res, next) => {
   try {
     const parsed = manualDepositSchema.parse(req.body);
     const userId = getReqUser(req).uid;
@@ -386,7 +387,7 @@ const approveDepositSchema = z.object({
   action: z.enum(["approve", "reject"]),
 });
 
-walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, next) => {
+walletRouter.post("/admin/approve-deposit/:id", requireAuth, idempotencyMiddleware, async (req, res, next) => {
   let txDataForDLQ: { userId?: string; amount?: number; referenceNumber?: string; description?: string } | null = null;
   try {
     const user = getReqUser(req);

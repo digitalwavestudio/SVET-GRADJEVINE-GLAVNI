@@ -387,10 +387,9 @@ input, textarea {
   nav.fixed.top-0 {
     height: 5rem !important;
   }
-  nav.fixed.top-0 img {
-    width: 130px !important;
-    height: auto !important;
-    max-height: 48px !important;
+  nav.fixed.top-0 > div:first-child > div:first-child img {
+    height: 40px !important;
+    max-width: 100% !important;
   }
   nav.fixed.top-0 .flex.items-center.gap-3.lg\:gap-4 {
     gap: 0.5rem !important;

@@ -35,14 +35,7 @@ import {
   runCleanup,
   runSitemapRebuild,
 } from "../controllers/housekeeping.controller.ts";
-import {
-  ensureInitialized,
-  db,
-  firebaseConfig,
-  admin,
-  checkQuotaStatus,
-} from "../config/firebase.ts";
-import { MonitoringService } from "../services/monitoring.service.ts";
+import { firebaseConfig, ensureInitialized, db, admin } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
 import { requestCoalescingMiddleware } from "../middleware/coalesce.middleware.ts";
@@ -51,8 +44,7 @@ import {
   heavyOperationsLimiter,
   adminTriggerLimiter,
 } from "../middleware/rate-limit.middleware.ts";
-import { telemetryMiddleware } from "../middleware/telemetry.middleware.ts";
-import { idempotencyMiddleware } from "../middleware/idempotency.middleware.ts";
+
 import { requireAdmin, requireAuth, authMiddleware } from "../middleware/auth.middleware.ts";
 import { RateLimiterService } from "../services/rate-limiter.service.ts";
 import { JobApplicationService, applyJobContractSchema } from "../services/job-application.service.ts";
@@ -203,8 +195,7 @@ apiRouter.get("/stream", requireAuth, (req, res) => {
   SSEService.subscribe(req, res, uid);
 });
 
-// Apply Telemetry, auto validation, and standard security middleware
-apiRouter.use(telemetryMiddleware);
+// Apply auto validation and standard security middleware
 apiRouter.use(autoValidateMiddleware);
 apiRouter.use(apiLimiter);
 
@@ -286,56 +277,7 @@ apiRouter.use("/stats/pseo-insights", async (req, res, next) => {
   next();
 });
 
-// Apply idempotency / debouncing globally for all POST/PUT/PATCH/DELETE
-apiRouter.use(idempotencyMiddleware);
 
-let lastSlowQueryLogTime = 0;
-
-// Middleware za brojanje requestova i latenciju + Slow Query Tracking
-apiRouter.use((req, res, next) => {
-  const start = Date.now();
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    MonitoringService.recordResponseTime(duration);
-
-    // Slow Query Tracking (iznad 2000ms)
-    if (duration > 2000) {
-      logger.warn(
-        `[SLOW QUERY WARNING] Request to ${req.originalUrl} took ${duration}ms`,
-        {
-          method: req.method,
-          query: req.query,
-          body: req.method !== "GET" ? req.body : undefined,
-        },
-      );
-
-      const now = Date.now();
-      if (now - lastSlowQueryLogTime > 60000) {
-        lastSlowQueryLogTime = now;
-        try {
-          db.collection("dlq").add({
-            jobType: "slow_query",
-            status: "pending_review",
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            error: "Slow query detected (>2000ms)",
-            payload: {
-              url: req.originalUrl,
-              durationMs: duration,
-              method: req.method,
-            },
-          });
-        } catch (err) {
-          console.error("Failed to log slow query to DLQ:", err);
-        }
-      } else {
-        logger.warn(
-          `[SLOW QUERY DEBOUNCED] Firestore DLQ write skipped to prevent infinite query write loop. Last logged to DB at ${new Date(lastSlowQueryLogTime).toISOString()}`,
-        );
-      }
-    }
-  });
-  next();
-});
 
 // Firebase Health Check
 apiRouter.get(
@@ -344,18 +286,7 @@ apiRouter.get(
   async (_req, res) => {
     try {
       ensureInitialized();
-      
-      // Provera statusa kvote. Ako je aktivna zaštita kvote, vraćamo uspešan i predvidljiv fallback
-      if (checkQuotaStatus()) {
-        logger.warn("[Firebase Health Check] Quota protection active. Returning graceful fallback.");
-        return res.json({
-          status: "fallback",
-          quotaExhausted: true,
-          usersFound: 0,
-          projectId: firebaseConfig.projectId,
-          databaseId: firebaseConfig.firestoreDatabaseId || "(default)",
-        });
-      }
+
 
       const usersSnap = await db.collection("users").limit(1).get().catch((err: any) => {
         logger.warn(`[Firebase Health Check] Quota or database request failed within get(): ${err.message || err}`);

@@ -77,15 +77,15 @@ export default function Navbar() {
 
   return (
     <>
-<nav className={`bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all ${isOpen ? 'opacity-0 pointer-events-none' : ''}`}>
+<nav className={`bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all`}>
       <div className="flex justify-between items-center px-4 sm:px-8 h-full max-w-7xl mx-auto w-full">
 
           <div className="flex items-center gap-2 -ml-5 sm:ml-0">
             <Link to="/" className="flex items-center group">
               <img
-                src={logoUrl || logoImage}
+                src={logoImage}
                 alt="Svet Građevine Logo"
-                className="w-[120px] md:w-[160px] h-auto max-h-[80px] object-contain drop-shadow-md transition-transform group-hover:scale-105"
+                className="h-8 sm:h-10 md:h-14 w-auto object-contain"
               />
             </Link>
           </div>
@@ -323,7 +323,7 @@ export default function Navbar() {
               <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-secondary/20 to-transparent blur-xl pointer-events-none" />
                 <div className="relative flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
                     {profileSrc && !imgError ? (
                       <img
                         src={profileSrc}

@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Database, Activity, Zap, ShieldAlert, CheckCircle2, ChevronRight, BarChart3, Clock, LineChart, DollarSign } from 'lucide-react';
-import { observability } from '@/src/lib/observability';
+import { firestoreTelemetry } from '@/src/lib/firestoreTelemetry';
 import QueryOptimizationAudit from './QueryOptimizationAudit';
 import CostOptimizationAudit from './CostOptimizationAudit';
 
 const FirestoreObservability: React.FC = () => {
-  const [data, setData] = useState(observability.getSystemAudit());
+  const [data, setData] = useState(() => {
+    const stats = firestoreTelemetry.getSnapshot();
+    return buildAudit(stats);
+  });
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'queries' | 'costs'>('overview');
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setData(observability.getSystemAudit());
+      const stats = firestoreTelemetry.getSnapshot();
+      setData(buildAudit(stats));
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -160,6 +164,33 @@ const FirestoreObservability: React.FC = () => {
     </motion.div>
   );
 };
+
+function buildAudit(stats: any) {
+  const isAbusive = stats.reads > 500;
+  const slowCount = stats.slowQueries?.length || 0;
+  const missingIndexCount = stats.missingIndexes?.length || 0;
+  let advice = 'Optimal performance detected.';
+  if (isAbusive) advice = 'Critical: High read volume detected. Check for infinite loops or missing cache.';
+  else if (slowCount > 0) advice = 'Slow queries detected. Consider adding missing indexes or optimizing filters.';
+  else if (missingIndexCount > 0) advice = 'Missing compound indexes. Check the Query Auditor for direct Google Console links.';
+
+  const health = {
+    reads: stats.reads,
+    writes: stats.writes,
+    activeListeners: stats.listeners,
+    cacheHitRate: stats.reads > 0 ? (stats.cacheHits / stats.reads) : 1,
+    isAbusive,
+    slowQueries: slowCount,
+    missingIndexes: missingIndexCount,
+    potentialOptimization: advice
+  };
+
+  return {
+    timestamp: new Date().toISOString(),
+    status: isAbusive ? 'WARNING' : 'HEALTHY',
+    metrics: { fs: health }
+  };
+}
 
 const MetricMini = ({ label, value, color }: any) => (
   <div className="flex flex-col items-end">

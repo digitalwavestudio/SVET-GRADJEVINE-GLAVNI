@@ -15,7 +15,7 @@ import {
   DashboardDataResult
 } from "../types/bff.ts";
 import { AuthUser } from "../types/auth.ts";
-import { db, checkQuotaStatus, admin as firebaseAdmin } from "../config/firebase.ts";
+import { db } from "../config/firebase.ts";
 import { AdminStatsService } from "./admin-stats.service.ts";
 import { UnifiedAdsService } from "./unified-ads.service.ts";
 import { UnifiedSearchService } from "./unified-search.service.ts";
@@ -24,7 +24,7 @@ import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 import { logger, Logger } from "../utils/logger.ts";
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
-const L1_HOMEPAGE_TTL = 30 * 60 * 1000; // 30min in-memory Shield cache
+const L1_HOMEPAGE_TTL = 30_000; // 30s in-memory cache
 
 export function clearL1HomepageCache() {
   l1HomepageCache.clear();
@@ -33,43 +33,31 @@ export function clearL1HomepageCache() {
 const l1DashboardPrewarmCache = new Map<string, { data: any; expiry: number }>();
 const L1_DASHBOARD_PREWARM_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
 
-// Fast-Path: single Firestore doc for whole homepage (instant, no quota)
-const FAST_PATH_DOC = "metadata/homepage_fastpath";
+const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
+  Promise.race([promise, new Promise<T>((r) => setTimeout(() => r(fallback), ms))]);
 
-async function readFastPathHomepage(): Promise<HomepageDataResult | null> {
-  try {
-    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 15000));
-    const doc = await Promise.race([
-      db.doc(FAST_PATH_DOC).get(),
-      timeoutPromise,
-    ]).catch(() => null);
-    if (doc && doc.exists) {
-      const data = doc.data();
-      if (data && data.homepage) {
-        const h = data.homepage as HomepageDataResult;
-        // Validacija: ako latestJobs nemaju logo, Fast-Path je zastareo
-        if (h.latestJobs?.length && !h.latestJobs[0]?.logo) return null;
-        return h;
-      }
+export const bffSingleFlightMap = new Map<string, Promise<DashboardDataResult>>();
+
+export const bffService = {
+  async getHomepageData(platform: string): Promise<HomepageDataResult> {
+    const cacheKey = `homepage_bff_${platform}_v8`;
+
+    const now = Date.now();
+    const l1Cached = l1HomepageCache.get(cacheKey);
+    if (l1Cached && now < l1Cached.expiry) {
+      return l1Cached.data;
     }
-  } catch {}
-  return null;
-}
 
-async function writeFastPathHomepage(data: HomepageDataResult): Promise<void> {
-  try {
-    await db.doc(FAST_PATH_DOC).set({
-      homepage: data,
-      updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
-  } catch (e) {
-    logger.warn(`[BFF] Fast-Path write failed: ${e instanceof Error ? e.message : String(e)}`);
-  }
-}
+    // Redis keš (5 min) — instant posle prvog učitavanja
+    try {
+      const { CacheService } = await import("./cache.service.ts");
+      const redisCached = await CacheService.get<HomepageDataResult>(cacheKey);
+      if (redisCached) {
+        l1HomepageCache.set(cacheKey, { data: redisCached, expiry: Date.now() + L1_HOMEPAGE_TTL });
+        return redisCached;
+      }
+    } catch {}
 
-async function computeAndSaveFastPath(platform: string): Promise<void> {
-  logger.info("[BFF Fast-Path] Starting background computation...");
-  try {
     const [
       globalStats,
       premiumAdsData,
@@ -80,29 +68,52 @@ async function computeAndSaveFastPath(platform: string): Promise<void> {
       cateringsData,
       jobsData,
     ] = await Promise.allSettled([
-      AdminStatsService.getGlobalStats(),
-      UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }),
-      UnifiedAdsService.getPromotedAds({ isUrgent: true, limit: 12 }),
-      UnifiedSearchService.search("machines", { status: "active", skipCount: true }, 2),
-      UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2),
-      UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3),
-      UnifiedSearchService.search("caterings", { status: "active", skipCount: true }, 3),
-      UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 5),
+      withTimeout(AdminStatsService.getGlobalStats(), 120000, {}),
+      withTimeout(UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }), 120000, []),
+      withTimeout(UnifiedAdsService.getPromotedAds({ isUrgent: true, limit: 12 }), 120000, []),
+      withTimeout(UnifiedSearchService.search("machines", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
+      withTimeout(UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
+      withTimeout(UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
+      withTimeout(UnifiedSearchService.search("caterings", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
+      withTimeout(UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 5), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
     ]);
 
-    const gStats = (globalStats.status === "fulfilled" ? globalStats.value : {}) as any;
+    const gStats = (
+      globalStats.status === "fulfilled" ? globalStats.value : {}
+    ) as {
+      totalJobs?: number,
+      machinesCount?: number,
+      accommodationsCount?: number,
+      cateringCount?: number,
+      realEstateCount?: number,
+      companiesCount?: number,
+      totalUsers?: number,
+      premiumPartners?: number,
+      urgentAds?: number
+    };
+
+    const totalJobs = gStats.totalJobs || 0;
+    const totalMachines = gStats.machinesCount || 0;
+    const totalAccommodations = gStats.accommodationsCount || 0;
+    const totalCaterings = gStats.cateringCount || 0;
+
+    const calculatedAdsCount =
+      totalJobs +
+      totalMachines +
+      totalAccommodations +
+      totalCaterings;
 
     const stats: HomepageStats = {
-      totalJobs: gStats.totalJobs || 0,
-      totalMachines: gStats.machinesCount || 0,
-      totalAccommodations: gStats.accommodationsCount || 0,
-      totalCaterings: gStats.cateringCount || 0,
+      totalJobs,
+      totalMachines,
+      totalAccommodations,
+      totalCaterings,
       totalRealEstate: gStats.realEstateCount || 0,
       totalCompanies: gStats.companiesCount || 0,
       totalUsers: gStats.totalUsers || 0,
       premiumJobs: gStats.premiumPartners || 0,
       urgentJobs: gStats.urgentAds || 0,
-      totalAdsCount: (gStats.totalJobs || 0) + (gStats.machinesCount || 0) + (gStats.accommodationsCount || 0) + (gStats.cateringCount || 0),
+      totalAdsCount: calculatedAdsCount,
       dynamicFirmsCount: gStats.companiesCount || 0,
       dynamicWorkersCount: gStats.totalUsers || 0,
       dynamicMachineryCount: gStats.machinesCount || 0,
@@ -229,6 +240,7 @@ async function computeAndSaveFastPath(platform: string): Promise<void> {
         "viewsCount", "cat", "status"
       ])
     );
+    const latestArticles: any[] = [];
 
     const result: HomepageDataResult = {
       success: true,
@@ -240,374 +252,20 @@ async function computeAndSaveFastPath(platform: string): Promise<void> {
       latestAccommodations,
       latestCaterings,
       latestJobs,
-      latestArticles: [],
+      latestArticles,
     };
 
-    await writeFastPathHomepage(result);
-
-    // Invalidate caches so next request reads from Fast-Path
-    const cacheKey = `homepage_bff_${platform}_v7`;
-    l1HomepageCache.delete(cacheKey);
-    const { CacheService } = await import("./cache.service.ts");
-    await CacheService.delete(cacheKey).catch(() => {});
-
-    logger.info("[BFF Fast-Path] Background computation complete.");
-  } catch (e) {
-    logger.error(`[BFF Fast-Path] Failed: ${e instanceof Error ? e.message : String(e)}`);
-  }
-}
-
-const withHomepageQueryTimeout = async <T>(
-  promise: Promise<T> | T,
-  ms: number,
-  fallback: T,
-): Promise<T> => {
-  let timeoutId: NodeJS.Timeout | null = null;
-  const timeoutPromise = new Promise<T>((resolve) => {
-    timeoutId = setTimeout(() => {
-      resolve(fallback);
-    }, ms);
-  });
-  return Promise.race([Promise.resolve(promise), timeoutPromise])
-    .catch((err) => {
-      logger.warn(`[BFF] Query failed or timeout: ${err.message}`);
-      return fallback;
-    })
-    .finally(() => {
-      if (timeoutId) clearTimeout(timeoutId);
-    });
-};
-
-export const bffSingleFlightMap = new Map<string, Promise<DashboardDataResult>>();
-let lastFastPathCompute = 0; // debounce: ne racunaj cesce od jednom u 5 min
-
-export const bffService = {
-  async getHomepageData(platform: string): Promise<HomepageDataResult> {
-    const cacheKey = `homepage_bff_${platform}_v7`;
-
-    // 1. L1 Process Shield (Hard RAM Cache)
-    const now = Date.now();
-    const l1Cached = l1HomepageCache.get(cacheKey);
-    if (l1Cached && now < l1Cached.expiry) {
-      return l1Cached.data;
-    }
-
-    // 2. Fast-Path: single Firestore doc read (instant, same as premium/urgent)
-    try {
-      const fastPathData = await readFastPathHomepage();
-      if (fastPathData) {
-        l1HomepageCache.set(cacheKey, { data: fastPathData, expiry: Date.now() + L1_HOMEPAGE_TTL });
-        return fastPathData;
-      }
-    } catch {}
-
-    const fetchTask = (async () => {
-      const { CacheService } = await import("./cache.service.ts");
-      return await CacheService.getOrSetSWR<HomepageDataResult>(
-        cacheKey,
-        async (): Promise<HomepageDataResult> => {
-          const bffSubTimeoutMs = 25000;
-
-          const [
-            globalStats,
-            premiumAdsData,
-            urgentAdsData,
-            machinesData,
-            realEstateData,
-            accommodationsData,
-            cateringsData,
-            jobsData,
-          ] = await Promise.allSettled([
-            withHomepageQueryTimeout(
-              AdminStatsService.getGlobalStats(),
-              bffSubTimeoutMs,
-              {},
-            ),
-            withHomepageQueryTimeout(
-              UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }),
-              bffSubTimeoutMs,
-              [],
-            ),
-            withHomepageQueryTimeout(
-              UnifiedAdsService.getPromotedAds({ isUrgent: true, limit: 12 }),
-              bffSubTimeoutMs,
-              [],
-            ),
-            withHomepageQueryTimeout(
-              UnifiedSearchService.search(
-                "machines",
-                { status: "active", skipCount: true },
-                2,
-              ),
-              bffSubTimeoutMs,
-              { docs: [], lastVisibleId: null, hasMore: false },
-            ),
-            withHomepageQueryTimeout(
-              UnifiedSearchService.search(
-                "realEstate",
-                { status: "active", skipCount: true },
-                2,
-              ),
-              bffSubTimeoutMs,
-              { docs: [], lastVisibleId: null, hasMore: false },
-            ),
-            withHomepageQueryTimeout(
-              UnifiedSearchService.search(
-                "accommodations",
-                { status: "active", skipCount: true },
-                3,
-              ),
-              bffSubTimeoutMs,
-              { docs: [], lastVisibleId: null, hasMore: false },
-            ),
-            withHomepageQueryTimeout(
-              UnifiedSearchService.search(
-                "caterings",
-                { status: "active", skipCount: true },
-                3,
-              ),
-              bffSubTimeoutMs,
-              { docs: [], lastVisibleId: null, hasMore: false },
-            ),
-            withHomepageQueryTimeout(
-              UnifiedSearchService.search(
-                "jobs",
-                { status: "active", skipCount: true },
-                5,
-              ),
-              bffSubTimeoutMs,
-              { docs: [], lastVisibleId: null, hasMore: false },
-            ),
-          ]);
-
-          const gStats = (
-            globalStats.status === "fulfilled" ? globalStats.value : {}
-          ) as {
-            totalJobs?: number,
-            machinesCount?: number,
-            accommodationsCount?: number,
-            cateringCount?: number,
-            realEstateCount?: number,
-            companiesCount?: number,
-            totalUsers?: number,
-            premiumPartners?: number,
-            urgentAds?: number
-          };
-
-          const totalJobs = gStats.totalJobs || 0;
-          const totalMachines = gStats.machinesCount || 0;
-          const totalAccommodations = gStats.accommodationsCount || 0;
-          const totalCaterings = gStats.cateringCount || 0;
-
-          const calculatedAdsCount =
-            totalJobs +
-            totalMachines +
-            totalAccommodations +
-            totalCaterings;
-
-          const stats: HomepageStats = {
-            totalJobs,
-            totalMachines,
-            totalAccommodations,
-            totalCaterings,
-            totalRealEstate: gStats.realEstateCount || 0,
-            totalCompanies: gStats.companiesCount || 0,
-            totalUsers: gStats.totalUsers || 0,
-            premiumJobs: gStats.premiumPartners || 0,
-            urgentJobs: gStats.urgentAds || 0,
-            totalAdsCount: calculatedAdsCount,
-            dynamicFirmsCount: gStats.companiesCount || 0,
-            dynamicWorkersCount: gStats.totalUsers || 0,
-            dynamicMachineryCount: gStats.machinesCount || 0,
-            dynamicRealEstateCount: gStats.realEstateCount || 0,
-            dynamicViewsCount: 0,
-          };
-
-          let premiumJobsRaw: RawAdData[] =
-            premiumAdsData.status === "fulfilled" && premiumAdsData.value
-              ? (premiumAdsData.value as RawAdData[])
-              : [];
-
-          if (!premiumJobsRaw.length) {
-            try {
-              const snap = await db.collectionGroup("listings")
-                .where("status", "in", ["active", "approved"])
-                .where("isPremium", "==", true)
-                .orderBy("createdAt", "desc")
-                .limit(12)
-                .get();
-              if (!snap.empty) {
-                premiumJobsRaw = snap.docs.map((doc) => {
-                  const d = doc.data();
-                  return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
-                }) as RawAdData[];
-              }
-            } catch {}
-          }
-
-          let urgentJobsRaw: RawAdData[] =
-            urgentAdsData.status === "fulfilled" && urgentAdsData.value
-              ? (urgentAdsData.value as RawAdData[])
-              : [];
-
-          if (!urgentJobsRaw.length) {
-            try {
-              const snap = await db.collectionGroup("listings")
-                .where("status", "in", ["active", "approved"])
-                .where("isUrgent", "==", true)
-                .orderBy("createdAt", "desc")
-                .limit(12)
-                .get();
-              if (!snap.empty) {
-                urgentJobsRaw = snap.docs.map((doc) => {
-                  const d = doc.data();
-                  return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
-                }) as RawAdData[];
-              }
-            } catch {}
-          }
-
-          const urgentJobsMap = (ad: RawAdData): MappedAdData => ({
-            ...(ad as any),
-            id: ad.id,
-            title: ad.title || ad.name || "Oglas",
-            loc:
-              ad.loc ||
-              (ad.location && typeof ad.location === "object" && "address" in ad.location ? (ad.location as { address?: string }).address : undefined) ||
-              (typeof ad.location === "string" ? ad.location : undefined) ||
-              ad.grad ||
-              "Srbija",
-            salary: ad.salary || ad.price || ad.sal || null,
-            comp:
-              ad.comp ||
-              ad.authorSnapshot?.companyName ||
-              ad.authorSnapshot?.displayName ||
-              "Korisnik",
-            logo: ad.logo || ad.images?.[0] || ad.authorSnapshot?.photoURL || "",
-          } as MappedAdData);
-
-          let urgentJobs: MappedAdData[] = urgentJobsRaw.map(urgentJobsMap);
-          let premiumJobs: MappedAdData[] = premiumJobsRaw.map(urgentJobsMap);
-
-          if (platform === "mobile") {
-            premiumJobs = premiumJobs.map((job) =>
-              JobTransformer.toMobile(job as unknown as RawJobInput),
-            ) as unknown as MappedAdData[];
-            urgentJobs = urgentJobs.map((job) =>
-              JobTransformer.toMobile(job as unknown as RawJobInput),
-            ) as unknown as MappedAdData[];
-          } else {
-            premiumJobs = premiumJobs.map((job) =>
-              JobTransformer.toWeb(job),
-            ) as unknown as MappedAdData[];
-            urgentJobs = urgentJobs.map((job) => JobTransformer.toWeb(job)) as unknown as MappedAdData[];
-          }
-
-          const buildMappedDocs = <T>(dataResult: PromiseSettledResult<unknown>): T[] => {
-            if (dataResult.status === "fulfilled" && dataResult.value && typeof dataResult.value === "object" && "docs" in (dataResult.value as object)) {
-              return (dataResult.value as { docs: T[] }).docs;
-            }
-            return [];
-          };
-
-          const snippet = <T extends Record<string, unknown>>(entity: T, fields: (keyof T)[]): Record<string, unknown> => {
-            const s: Record<string, unknown> = {};
-            for (const f of fields) {
-              if (f in entity) s[f as string] = entity[f];
-            }
-            return s;
-          };
-
-          const latestMachines = buildMappedDocs<Record<string, unknown>>(machinesData).map((m) =>
-            snippet(m, ["id", "title", "images", "listingType", "yearOfManufacture", "workingHours", "location", "price"])
-          );
-          const latestRealEstate = buildMappedDocs<Record<string, unknown>>(realEstateData).map((p) =>
-            snippet(p, ["id", "title", "images", "listingType", "isPremium", "location", "area", "price"])
-          );
-          const latestAccommodations = buildMappedDocs<Record<string, unknown>>(accommodationsData).map((a) =>
-            snippet(a, ["id", "title", "images", "location", "capacity", "rooms", "bathrooms", "hasKitchen", "price"])
-          );
-          const latestCaterings = buildMappedDocs<Record<string, unknown>>(cateringsData).map((c) =>
-            snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
-          );
-          const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData).map((j) =>
-            snippet(j, [
-              "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
-              // Lokacija
-              "loc", "location",
-              // Satnica / Plata
-              "sal", "salary", "plataMin", "plataMax", "salaryType",
-              // Kompanija / Logo
-              "comp", "company", "companyName", "companyId", "isCompanyVerified",
-              "logo", "logoPlaceholder", "authorName",
-              // Benefiti
-              "benefits", "benefiti", "rawBenefits",
-              "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
-              // Ostalo
-              "viewsCount", "cat", "status"
-            ])
-          );
-          const latestArticles: any[] = [];
-
-          return {
-            success: true,
-            stats,
-            premiumJobs,
-            urgentJobs,
-            latestMachines,
-            latestRealEstate,
-            latestAccommodations,
-            latestCaterings,
-            latestJobs,
-            latestArticles,
-          };
-        },
-        1800000,
-        {
-          success: true,
-          stats: {
-            totalJobs: 0,
-            totalMachines: 0,
-            totalAccommodations: 0,
-            totalCaterings: 0,
-            totalRealEstate: 0,
-            totalCompanies: 0,
-            totalUsers: 0,
-            premiumJobs: 0,
-            urgentJobs: 0,
-            totalAdsCount: 0,
-            dynamicFirmsCount: 0,
-            dynamicWorkersCount: 0,
-            dynamicMachineryCount: 0,
-            dynamicRealEstateCount: 0,
-            dynamicViewsCount: 0,
-          },
-        premiumJobs: [],
-        urgentJobs: [],
-        latestMachines: [],
-        latestRealEstate: [],
-        latestAccommodations: [],
-        latestCaterings: [],
-        latestJobs: [],
-        latestArticles: [],
-      },
-    );
-  })();
-
-    const result = await fetchTask;
-    if (result) {
+    if (result.latestJobs && result.latestJobs.length > 0) {
       l1HomepageCache.set(cacheKey, {
         data: result,
         expiry: Date.now() + L1_HOMEPAGE_TTL,
       });
-      // Fire background Fast-Path computation so it gets populated with complete data (incl. logos)
-      // Debounce: max jednom u 5 minuta
-      const now = Date.now();
-      if (now - lastFastPathCompute > 300000) {
-        lastFastPathCompute = now;
-        computeAndSaveFastPath(platform).catch(() => {});
-      }
+      try {
+        const { CacheService } = await import("./cache.service.ts");
+        await CacheService.set(cacheKey, result, 300000).catch(() => {});
+      } catch {}
     }
+
     return result;
   },
 
@@ -618,10 +276,6 @@ export const bffService = {
     return await CacheService.getOrSetSWR<DashboardQuickMetrics>(
       cacheKey,
       async (): Promise<DashboardQuickMetrics> => {
-        if (checkQuotaStatus()) {
-          throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-        }
-
         const { internalUserLoader } = await import("../utils/dataloader.ts");
         const fetchLogicPromise = Promise.all([
           internalUserLoader.load(userId)
@@ -718,26 +372,6 @@ export const bffService = {
     const cacheKey = `bff_cache_tiered:${userId}:${role}`;
     const flightKey = `${userId}:${role}`;
 
-    const { checkQuotaStatus } = await import("../config/firebase.ts");
-    if (checkQuotaStatus()) {
-      return {
-        success: true,
-        _degraded: true,
-        stats: {
-          activeAds: 0,
-          pendingAds: 0,
-          totalViews: 0,
-          applicationsCount: 0,
-          recentAds: [],
-          recentApplications: [],
-          totalAdsCount: 0,
-          totalUsers: 0
-        },
-        recentActivities: [],
-        myAds: [],
-        trends: []
-      };
-    }
 
     if (bffSingleFlightMap.has(flightKey)) {
       return bffSingleFlightMap.get(flightKey) as Promise<DashboardDataResult>;
@@ -763,8 +397,6 @@ export const bffService = {
       );
 
       const fetchLogic = async (): Promise<DashboardDataResult> => {
-        if (checkQuotaStatus()) throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-
         try {
           const matchedProfile = walletUserData?.user
             ? { uid: userId, location: walletUserData.user.location || "Beograd", profession: walletUserData.user.profession || "Sve" }
@@ -835,8 +467,6 @@ export const bffService = {
 
           return baseData as DashboardDataResult;
         } catch (dbErr: unknown) {
-          const { triggerQuotaProtection } = await import("../config/firebase.ts");
-          triggerQuotaProtection(dbErr as Error);
           throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
         }
       };

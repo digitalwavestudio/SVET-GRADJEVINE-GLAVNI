@@ -9,13 +9,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChartSkeleton } from '@/src/modules/dashboard/components/dashboard/AnalyticsSkeleton';
 import { queryKeys } from "@/src/lib/queryKeysFactory";
 
-export interface CircuitBreakerStats {
-  name: string;
-  state: string;
-  failureCount: number;
-  lastErrorAt: string | null;
-}
-
 export interface RouteMetric {
   route: string;
   total: number;
@@ -51,7 +44,6 @@ export interface DiagnosticsData {
       evicted_keys: number;
     };
   };
-  circuitBreakers: CircuitBreakerStats[];
   routeMetrics: RouteMetric[];
   cachePartitionStats: Record<string, { hits: number; misses: number; ratio: string }>;
 }
@@ -118,19 +110,6 @@ export function ObservabilityTab() {
     enabled: true,
   });
 
-  const resetCbMutation = useMutation({
-    mutationFn: async (name: string) => {
-      const token = await (await getLazyAuth()).currentUser?.getIdToken();
-      return fetch(`/api/admin/monitoring/circuit-breakers/${name}/reset`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'diagnostics'] });
-    }
-  });
-
   const retryMutation = useMutation({
     mutationFn: async ({ id, source }: { id: string, source: string }) => {
       const token = await (await getLazyAuth()).currentUser?.getIdToken();
@@ -150,7 +129,6 @@ export function ObservabilityTab() {
 
   const loading = diagLoading || dlqLoading;
   const stats = diagnostics?.stats;
-  const circuitBreakers = diagnostics?.circuitBreakers || [];
   const routeMetrics = diagnostics?.routeMetrics || [];
   const cachePartitionStats = diagnostics?.cachePartitionStats || {};
 
@@ -235,40 +213,7 @@ export function ObservabilityTab() {
                ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Circuit Breakers */}
-              <div className="bg-[#0A0F14] border border-white/5 rounded-[12px] overflow-hidden flex flex-col">
-                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                  <h4 className="text-[11px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm text-amber-500">bolt</span>
-                    Circuit Breakers Status
-                  </h4>
-                  <div className="text-[10px] font-bold text-white/20 uppercase">Auto-Reset: Enabled</div>
-                </div>
-                <div className="p-6 space-y-4">
-                  {circuitBreakers.length > 0 ? circuitBreakers.map((cb, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-lg group">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-3 h-3 rounded-full ${cb.state === 'CLOSED' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : cb.state === 'OPEN' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]' : 'bg-yellow-500 animate-pulse'}`}></div>
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-tight">{cb.name}</div>
-                          <div className="text-[9px] font-bold text-white/30 uppercase">Failures: {cb.failureCount} | State: {cb.state}</div>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => resetCbMutation.mutate(cb.name)}
-                        className="opacity-0 group-hover:opacity-100 transition-all text-white/20 hover:text-white"
-                        title="Force Reset"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">restart_alt</span>
-                      </button>
-                    </div>
-                  )) : (
-                    <div className="py-10 text-center text-white/20 font-black uppercase text-[10px] tracking-widest border border-dashed border-white/5 rounded-lg">No active breakers registered</div>
-                  )}
-                </div>
-              </div>
-
+            <div className="grid grid-cols-1 gap-8">
               {/* Bot Activity / Crawler Load */}
               <div className="bg-[#0A0F14] border border-white/5 rounded-[12px] p-6 flex flex-col">
                 <h4 className="text-[11px] font-black uppercase tracking-widest text-white/50 mb-6 flex items-center gap-2">

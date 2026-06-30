@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getLazyAuth } from '@/src/lib/firebase';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/src/lib/queryKeysFactory';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, 
   ResponsiveContainer, CartesianGrid, Legend 
@@ -13,35 +12,12 @@ import {
   TrendingUp, Activity, Database
 } from 'lucide-react';
 
-interface CircuitBreakerStats {
-  name: string;
-  state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
-  failureCount: number;
-  lastErrorAt: string | null;
-}
-
 export function ResilienceTab() {
   const queryClient = useQueryClient();
   const [selectedBreaker, setSelectedBreaker] = useState<string>('');
   const [cachePrefix, setCachePrefix] = useState<string>('');
   const [successMsg, setSuccessMsg] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
-
-  const { data: breakers = [], isLoading, refetch, isFetching } = useQuery<CircuitBreakerStats[]>({
-    queryKey: queryKeys.admin.circuitBreakers,
-    queryFn: async () => {
-      const token = await (await getLazyAuth()).currentUser?.getIdToken();
-      const res = await fetch('/api/admin/circuit-breakers', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Neuspešno učitavanje osigurača');
-      return res.json();
-    },
-    refetchInterval: false,
-    refetchIntervalInBackground: false,
-    staleTime: 30 * 60 * 1000,
-    enabled: true,
-  });
 
   const resetMutation = useMutation({
     mutationFn: async (payload: { name?: string; invalidateCache?: boolean; cachePrefix?: string }) => {
@@ -63,7 +39,6 @@ export function ResilienceTab() {
     onSuccess: (data) => {
       setSuccessMsg(data.message || 'Operacija uspešno sprovedena.');
       setErrorMsg('');
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.circuitBreakers });
       setTimeout(() => setSuccessMsg(''), 5000);
     },
     onError: (err: any) => {
@@ -72,10 +47,6 @@ export function ResilienceTab() {
       setTimeout(() => setErrorMsg(''), 5000);
     }
   });
-
-  const handleResetBreaker = (name: string) => {
-    resetMutation.mutate({ name });
-  };
 
   const handleClearCache = (prefix?: string) => {
     if (prefix) {
@@ -109,32 +80,6 @@ export function ResilienceTab() {
     { name: 'Firme i Korisnici', requests: 1500, cached: 900 },
   ];
 
-  const getStatusColor = (state: string) => {
-    switch (state) {
-      case 'CLOSED':
-        return 'text-green-500 border-green-500/10 bg-green-500/5';
-      case 'OPEN':
-        return 'text-red-500 border-red-500/10 bg-red-500/5 animate-pulse';
-      case 'HALF_OPEN':
-        return 'text-amber-500 border-amber-500/10 bg-amber-500/5';
-      default:
-        return 'text-white/40 border-white/5 bg-white/5';
-    }
-  };
-
-  const getBadgeColor = (state: string) => {
-    switch (state) {
-      case 'CLOSED':
-        return 'bg-green-500 !text-black';
-      case 'OPEN':
-        return 'bg-red-500 text-white animate-pulse';
-      case 'HALF_OPEN':
-        return 'bg-amber-500 !text-black';
-      default:
-        return 'bg-white/10 text-white/50';
-    }
-  };
-
   return (
     <motion.div 
       initial={{ opacity: 0, y: 15 }}
@@ -151,17 +96,9 @@ export function ResilienceTab() {
             REZILIJENCIJA & TOKENSKA ZAŠTITA
           </h3>
           <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">
-            Upravljanje kaskadnim osiguračima (Circuit Breakers) i invalidacija distribuisanog keša
+            Upravljanje keš memorijom i performansama
           </p>
         </div>
-        <button 
-          onClick={() => refetch()}
-          disabled={isLoading || isFetching}
-          className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all self-start md:self-auto flex items-center gap-2 border border-white/10 disabled:opacity-50"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-          {isLoading ? 'Učitavanje...' : 'OSVEŽI MATRICU'}
-        </button>
       </div>
 
       {/* Notifications */}
@@ -189,60 +126,6 @@ export function ResilienceTab() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Circuit Breakers grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {isLoading ? (
-          <div className="col-span-3 text-center py-10 uppercase font-bold text-white/20 tracking-wider">
-            Učitavanje osigurača...
-          </div>
-        ) : breakers.length > 0 ? (
-          breakers.map((breaker) => (
-            <div 
-              key={breaker.name}
-              className={`border rounded-[10px] p-6 flex flex-col justify-between transition-all ${getStatusColor(breaker.state)}`}
-            >
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className="text-sm font-black uppercase tracking-widest text-white">{breaker.name}</h4>
-                    <p className="text-[9px] font-bold text-white/40 uppercase mt-0.5">Sistemska grupa</p>
-                  </div>
-                  <span className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded ${getBadgeColor(breaker.state)}`}>
-                    {breaker.state}
-                  </span>
-                </div>
-
-                <div className="space-y-2 mb-6">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/45">Faktor greške:</span>
-                    <span className="font-mono font-bold text-white">{breaker.failureCount} / 5</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/45">Zadnji prekid:</span>
-                    <span className="font-mono text-white/80">
-                      {breaker.lastErrorAt ? new Date(breaker.lastErrorAt).toLocaleTimeString('sr-RS') : 'Nema prekida'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => handleResetBreaker(breaker.name)}
-                disabled={resetMutation.isPending}
-                className="w-full py-2.5 bg-white/5 hover:bg-white/10 active:bg-white/20 text-[10px] font-black uppercase tracking-widest rounded border border-white/5 flex items-center justify-center gap-1.5 transition-all text-white hover:text-secondary hover:border-secondary/20"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                Resetuj Osigurač
-              </button>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-3 p-8 border border-white/5 rounded-[10px] text-center bg-white/[0.01]">
-            <p className="text-xs uppercase font-black tracking-wider text-white/30">Nema registrovanih osigurača u sistemu.</p>
-          </div>
-        )}
-      </div>
 
       {/* Main Charts area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -5,7 +5,6 @@ import { subscribeToOfflineStatus, subscribeToQuotaStatus } from '@/src/lib/erro
 import { partnerService } from '@/src/services/partnerService';
 import { User, UserRole } from '@/src/modules/core/types/user';
 import { apiClient } from '@/src/lib/apiClient';
-import { traceAsync } from '@/src/lib/performance';
 import { queryClient } from '@/src/lib/queryClient';
 import { favoritesKeys } from '@/src/modules/dashboard/hooks/useFavorites';
 
@@ -423,7 +422,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
     return () => { mounted = false; };
   }, [subscribeToUser]);
   const loginWithGoogle = useCallback(async (defaultRole?: string) => {
-    return traceAsync('auth_login_google', async () => {
+    return (async () => {
       const mod = await import('firebase/auth');
       const authInst = await getLazyAuth();
       const provider = getLazyGoogleProvider();
@@ -459,12 +458,12 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
           throw err;
         }
       }
-    });
+    })();
   }, []);
 
 
   const loginWithEmail = useCallback(async (email: string, pass: string) => {
-    return traceAsync('auth_login_email', async () => {
+    return (async () => {
       try {
         const mod = await import('firebase/auth');
         const authInst = await getLazyAuth();
@@ -483,11 +482,11 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         }).catch(() => console.warn('[Auth] Telemetry login failure post failed'));
         throw err;
       }
-    });
+    })();
   }, []);
 
   const registerWithEmail = useCallback(async (email: string, pass: string, firstName: string, lastName: string, role: UserRole) => {
-    return traceAsync('auth_register_email', async () => {
+    return (async () => {
       const mod = await import('firebase/auth');
       const authInst = await getLazyAuth();
       const result = await mod.createUserWithEmailAndPassword(authInst, email, pass);
@@ -510,7 +509,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
       };
       
       await apiClient.post('/users/init', newUser);
-    });
+    })();
   }, []);
 
   const logout = useCallback(async () => {

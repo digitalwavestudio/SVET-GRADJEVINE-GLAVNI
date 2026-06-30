@@ -40,12 +40,13 @@ export function AiSearchBar({ vertical, onResult, onError }: AiSearchBarProps) {
 
       const targetVertical = VERTICAL_ROUTES[vertical];
 
+      const sq = parsed.searchQuery || '';
       if (onResult) {
-        onResult({ searchQuery: parsed.searchQuery, location: locMatch || parsed.location });
+        onResult({ searchQuery: sq, location: locMatch || parsed.location });
       } else if (locMatch) {
-        navigate(`${targetVertical}?q=${encodeURIComponent(parsed.searchQuery)}&loc=${locMatch}`);
+        navigate(`${targetVertical}?q=${encodeURIComponent(sq)}&loc=${locMatch}`);
       } else {
-        navigate(`${targetVertical}?q=${encodeURIComponent(parsed.searchQuery)}`);
+        navigate(`${targetVertical}?q=${encodeURIComponent(sq)}`);
       }
     } catch (err) {
       onError?.(err);

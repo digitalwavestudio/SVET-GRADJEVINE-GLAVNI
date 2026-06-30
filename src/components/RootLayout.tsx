@@ -5,13 +5,11 @@ import NetworkStatus from '@/src/components/NetworkStatus';
 import CookieConsent from '@/src/components/CookieConsent';
 import BackToTop from '@/src/components/BackToTop';
 import { VerificationBanner } from '@/src/components/VerificationBanner';
-import { measurePageLoad } from '@/src/lib/performance';
 import { useAffiliateTracking } from '@/src/hooks/useAffiliateTracking';
 import { usePresence } from '@/src/hooks/usePresence';
 import { useRealtimeSync } from '@/src/hooks/useRealtimeSync';
 import QuotaBanner from '@/src/components/QuotaBanner';
 import ProgressBar from '@/src/components/ui/ProgressBar';
-import { usePerformanceNavigation } from '@/src/lib/performance';
 
 const PageLoader = () => (
   <div className="bg-surface min-h-screen"></div>
@@ -23,11 +21,7 @@ export function RootLayout() {
   useAffiliateTracking();
   usePresence();
   useRealtimeSync();
-  usePerformanceNavigation();
-
-  useEffect(() => {
-    measurePageLoad();
-    const gaId = (typeof window !== 'undefined' && (window as any).__APP_ENV__?.VITE_GA_MEASUREMENT_ID) || import.meta.env.VITE_GA_MEASUREMENT_ID;
+  useEffect(() => {    const gaId = (typeof window !== 'undefined' && (window as any).__APP_ENV__?.VITE_GA_MEASUREMENT_ID) || import.meta.env.VITE_GA_MEASUREMENT_ID;
     initGA(gaId);
   }, []);
 

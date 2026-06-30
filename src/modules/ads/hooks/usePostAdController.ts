@@ -7,7 +7,6 @@ import { useToast } from '@/src/context/ToastContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { moderationService } from '@/src/services/moderationService';
 import { apiClient } from '@/src/lib/apiClient';
-import { traceAsync } from '@/src/lib/performance';
 
 import { getValidationSchema, getAutoTitle } from '@/src/modules/ads/utils/adUtils';
 import { applyPayloadTransform } from '@/src/modules/ads/hooks/usePostAdControllerPayload';
@@ -381,7 +380,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
   const onFormSubmit = async (data: AdFormData) => {
     if (!user) return;
 
-    return traceAsync('ad_submission_total', async () => {
+    return (async () => {
       if (!user?.emailVerified && user?.role !== 'admin') {
         showError("Vaš email nije verifikovan. Molimo verifikujte email pre postavljanja oglasa.");
         return;
@@ -483,7 +482,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         }
         setIsSubmitting(false);
       }
-    });
+    })();
   };
 
   const nextStep = async () => {

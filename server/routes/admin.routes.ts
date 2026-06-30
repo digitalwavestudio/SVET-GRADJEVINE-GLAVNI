@@ -42,11 +42,10 @@ export const adminRouter = express.Router();
 adminRouter.use(performanceBenchmark);
 
 adminRouter.get("/monitoring", async (req, res) => {
-  const { checkQuotaStatus } = await import("../config/firebase.ts");
   const { breaker } = await import("./bff.routes.ts");
 
   const currentState = await breaker.getState();
-  if (currentState === "OPEN" || checkQuotaStatus()) {
+  if (currentState === "OPEN") {
     logger.warn("[CircuitBreaker] Admin /monitoring serving sandbox admin data due to OPEN state or active Quota protection.");
     return res.json({
       status: "warning",

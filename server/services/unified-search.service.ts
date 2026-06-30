@@ -1,12 +1,8 @@
 import { Logger } from "../utils/logger.ts";
-import { CacheService } from "./cache.service.ts";
-import crypto from "crypto";
-import { TraceContext } from "../utils/trace.ts";
-import { AppError } from "../utils/appError.ts";
-
-import { UnifiedSearchUtils } from "./unified-search/unified-search-utils.service.ts";
-import { UnifiedSearchAlgolia } from "./unified-search/unified-search-algolia.service.ts";
-import { UnifiedSearchFirestore } from "./unified-search/unified-search-firestore.service.ts";
+import { db } from "../config/firebase.ts";
+import { resolveGeoFallback } from "../utils/geocode.ts";
+import { ImageTransformer } from "../utils/image.transformer.ts";
+import { QueryDocumentSnapshot } from "firebase-admin/firestore";
 
 export interface UnifiedSearchDoc {
   id: string;
@@ -29,6 +25,8 @@ export interface UnifiedSearchFilters {
   skills?: string[];
   isVerified?: boolean;
   isUrgent?: boolean;
+  isPremium?: boolean;
+  isPremiumPartner?: boolean;
   minPrice?: number;
   maxPrice?: number;
   showAllStatuses?: boolean;
@@ -46,16 +44,8 @@ export interface UnifiedSearchResult {
 export class UnifiedSearchService {
   private static logger = new Logger({ service: "UnifiedSearchService" });
 
-  // L1 Hard Cache (Shield) for homepage snippet queries
-  private static l1ShieldCache = new Map<string, { data: UnifiedSearchResult; expiry: number }>();
-  private static readonly L1_SHIELD_TTL = 5 * 60 * 1000; // 5 min protection
-
   static clearL1ShieldCache(): void {
-    this.l1ShieldCache.clear();
-  }
-
-  static analyzeQueryComplexity(filters: UnifiedSearchFilters): "SIMPLE" | "COMPLEX" {
-    return UnifiedSearchUtils.analyzeQueryComplexity(filters);
+    // No-op: L1 shield removed in cleanup
   }
 
   static async search(
@@ -64,189 +54,120 @@ export class UnifiedSearchService {
     pageSize: number = 20,
     lastVisibleId?: string,
   ): Promise<UnifiedSearchResult> {
-    const filtersAny: UnifiedSearchFilters = filters;
-    // Enterprise Strategy: Avoid cache explosion & fragmentation by canonicalizing the key
-    const canonicalFilters = Object.keys(filters).sort().reduce((acc: Record<string, unknown>, key) => {
-      const val = filtersAny[key];
-      if (val !== undefined && val !== null && val !== "") {
-        if (Array.isArray(val)) {
-          acc[key] = [...val].sort();
-        } else if (typeof val === "object") {
-           acc[key] = JSON.stringify(val); // Simplistic deep canonicalization
-        } else {
-          acc[key] = val;
-        }
+    let entityType = category;
+    if (category && category !== "all" && category !== "marketplace") {
+      if (category === "machines") entityType = "machine";
+      else if (category === "accommodations") entityType = "accommodation";
+      else if (category === "caterings") entityType = "catering";
+      else if (category === "plots") entityType = "plot";
+      else if (category === "companies") entityType = "company";
+      else if (category === "masters") entityType = "master";
+      else if (category === "realEstate") entityType = "realEstate";
+      else if (category === "jobs" || category === "job") entityType = "job";
+      else if (category === "magazine" || category === "articles") entityType = "article";
+    }
+
+    let q: FirebaseFirestore.Query;
+
+    const isProfileSearch = category === "masters" || category === "companies" || entityType === "master" || entityType === "company";
+
+    if (isProfileSearch) {
+      q = db.collection("users");
+      const targetRole = category === "masters" || entityType === "master" ? "majstor" : "company";
+      q = q.where("role", "==", targetRole);
+    } else {
+      q = db.collectionGroup("listings");
+      if (entityType && entityType !== "all") q = q.where("type", "==", entityType);
+    }
+
+    if (!filters.showAllStatuses) q = q.where("status", "in", ["active", "approved"]);
+
+    const targetedLoc = filters.locationSlug || filters.location;
+    if (targetedLoc && targetedLoc !== "SVE") {
+      const resGeo = resolveGeoFallback(targetedLoc as string);
+      if (resGeo && resGeo.district && resGeo.district !== "srbija" && resGeo.district !== targetedLoc) {
+        q = q.where("locationSlug", "in", Array.from(new Set([targetedLoc, resGeo.district])));
+      } else {
+        q = q.where("locationSlug", "==", targetedLoc);
       }
-      return acc;
-    }, {});
-    
-    const cacheString = JSON.stringify({ filters: canonicalFilters, pageSize, lastVisibleId: lastVisibleId || null });
-    // Use sha256 to keep key short and avoid Redis max key size issues
-    const hash = crypto.createHash("sha256").update(cacheString).digest("hex");
-    const cacheKey = `unified_search_v2_${category}_${hash}`;
-
-    // 0. L1 Process Shield (Hard RAM Cache) for homepage queries
-    const now = Date.now();
-    const shield = this.l1ShieldCache.get(cacheKey);
-    if (shield && now < shield.expiry) {
-      return shield.data;
     }
 
-    // SERVER OPTIMIZATION: Cache Stampede Protection (PROMPT 8 continuation)
-    // Wrap entire search execution in getOrSetSWR to leverage Redis distributed locks
-    // and stop thundering herds from DDoS-ing Algolia or Firestore.
-    const result = await CacheService.getOrSetSWR<UnifiedSearchResult>(
-      cacheKey,
-      async () => {
-        const queryComplexity = this.analyzeQueryComplexity(filtersAny);
-        this.logger.info(
-          `[FilterProfiler] Query marked as: ${queryComplexity}`,
-        );
+    if (filters.authorId) q = q.where("authorId", "==", filters.authorId);
+    if (filters.userId) q = q.where("authorId", "==", filters.userId);
+    if (filters.companyId) q = q.where("companyId", "==", filters.companyId);
+    if (filters.isPremiumPartner) q = q.where("isPremiumPartner", "==", true);
+    if (filters.isVerified) q = q.where("isVerified", "==", true);
+    if (filters.isPremium) q = q.where("isPremium", "==", true);
+    if (filters.isUrgent) q = q.where("isUrgent", "==", true);
+    if (filters.mainCategory) q = q.where("mainCategories", "array-contains", filters.mainCategory);
+    if (filters.employeeCount) q = q.where("employeeCount", "==", filters.employeeCount);
+    if (filters.type && entityType === "accommodation") q = q.where("typeSlug", "==", filters.type);
+    if (filters.accommodationType) q = q.where("accommodationType", "==", filters.accommodationType);
+    if (filters.beds || filters.minBeds) q = q.where("beds", ">=", Number(filters.beds || filters.minBeds));
+    if (filters.roomType) q = q.where("roomType", "==", filters.roomType);
+    if (filters.parkingAvailable) q = q.where("parkingAvailable", "==", true);
+    if (filters.machineType) q = q.where("machineType", "==", filters.machineType);
+    if (filters.condition) q = q.where("condition", "==", filters.condition);
+    if (filters.adType) q = q.where("adType", "==", filters.adType);
+    if (filters.categoryId) q = q.where("categoryId", "==", filters.categoryId);
+    if (filters.fuelType) q = q.where("fuelType", "==", filters.fuelType);
+    if (filters.minWeightKg) q = q.where("weightKg", ">=", Number(filters.minWeightKg));
+    if (filters.maxWeightKg) q = q.where("weightKg", "<=", Number(filters.maxWeightKg));
+    if (filters.minArea) q = q.where("area", ">=", Number(filters.minArea));
+    if (filters.maxArea) q = q.where("area", "<=", Number(filters.maxArea));
+    if (filters.purpose) q = q.where("purpose", "==", filters.purpose);
+    if (filters.accessRoad) q = q.where("accessRoad", "==", true);
+    if (filters.highwayAccess) q = q.where("highwayAccess", "==", true);
+    if (filters.railAccess) q = q.where("railAccess", "==", true);
+    if (filters.profession) q = q.where("professionSlug", "==", filters.profession);
+    if (filters.minPrice != null) q = q.where("price", ">=", Number(filters.minPrice));
+    if (filters.maxPrice != null) q = q.where("price", "<=", Number(filters.maxPrice));
+    if (filters.cateringType) q = q.where("cateringType", "==", filters.cateringType);
+    if (filters.kitchenType) q = q.where("kitchenType", "==", filters.kitchenType);
+    if (filters.invoiceAvailable) q = q.where("invoiceAvailable", "==", true);
+    if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
+    if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
-        let entityType = category;
-        if (category && category !== "all" && category !== "marketplace") {
-          if (category === "machines") entityType = "machine";
-          else if (category === "accommodations") entityType = "accommodation";
-          else if (category === "caterings") entityType = "catering";
-          else if (category === "plots") entityType = "plot";
-          else if (category === "companies") entityType = "company";
-          else if (category === "masters") entityType = "master";
-          else if (category === "realEstate") entityType = "realEstate";
-          else if (category === "jobs" || category === "job") entityType = "job";
-          else if (category === "magazine" || category === "articles") entityType = "article";
-        }
+    q = q.orderBy("createdAt", "desc");
+    q = q.limit(pageSize + 1);
 
-        // --- PAGINATION SECURITY: Deep Offset Block ---
-        const MAX_PAGES = 20; // Amazon/Google pattern (10-15 pages max)
-        let firestoreCursorId = lastVisibleId;
-        let currentPage = 1;
-        let skipAlgolia = false;
-
-        if (
-          lastVisibleId &&
-          typeof lastVisibleId === "string" &&
-          lastVisibleId.startsWith("cursor_")
-        ) {
-          // cursor_ token = came from Firestore executeFirestoreSearch.
-          // Algolia can't use this — skip to Firestore.
-          try {
-            const decodedStr = Buffer.from(
-              lastVisibleId.replace("cursor_", ""),
-              "base64",
-            ).toString("utf-8");
-            const parsedToken = JSON.parse(decodedStr);
-            firestoreCursorId = parsedToken.id;
-            currentPage = parsedToken.p;
-            skipAlgolia = true;
-          } catch (e) {
-            this.logger.warn(`Invalid cursor token attempt: ${lastVisibleId}`);
-            return {
-              docs: [],
-              lastVisibleId: null,
-              hasMore: false,
-              warning: "Nevažeći paginacioni token.",
-            };
-          }
-        } else if (lastVisibleId && !isNaN(Number(lastVisibleId))) {
-          // Numeric cursor = Algolia page number → use Algolia
-          currentPage = Number(lastVisibleId);
-          firestoreCursorId = lastVisibleId;
-        } else if (lastVisibleId) {
-          // Plain doc ID = came from GET /api/jobs (getPublicJobs).
-          // Algolia can't use this — skip to Firestore.
-          skipAlgolia = true;
-        }
-
-        // Deep Pagination Block for crawlers / search bots to protect Firestore quotas under 50k RPS
-        const isBot = TraceContext.get("isBot") === "true";
-        if (isBot && currentPage >= 12) {
-          this.logger.warn(`[SEO Tracker] Deep pagination blocked for bot. Page: ${currentPage}, Category: ${category}`);
-          throw new AppError("Duboko listanje rezultata je onemogućeno za pretraživače kraulere. Koristite konkretne filtere.", 404);
-        }
-
-        if (currentPage >= MAX_PAGES) {
-          this.logger.warn(
-            `Max pagination depth reached (${currentPage}) for ${category}. Blocking deep read.`,
-          );
-          return {
-            docs: [],
-            lastVisibleId: null,
-            hasMore: false,
-            totalHits: 0,
-            warning:
-              "Dosegli ste limit listanja. Za specifičnije rezultate, molimo koristite konkretne filtere i pretragu gore.",
-          };
-        }
-        // ----------------------------------------------
-
-        // cursor_ token ili plain doc ID → došlo iz Firestore-a, Algolia ne razume → skip
-        if (!skipAlgolia) {
-          const algoliaResult = await UnifiedSearchAlgolia.executeAlgoliaSearch(
-            category,
-            entityType,
-            filtersAny,
-            pageSize,
-            currentPage,
-            this.logger,
-            lastVisibleId
-          );
-
-          if (algoliaResult && algoliaResult.docs && algoliaResult.docs.length > 0) {
-            return algoliaResult;
-          }
-        }
-
-        // COMPLEX non-search queries (geo, radius) → fallback cache ili prazno
-        if (queryComplexity === "COMPLEX" && !filtersAny.search) {
-          try {
-            const fallbackKey = `fallback_search_${category}`;
-            const fallbackData = await CacheService.get<UnifiedSearchResult>(fallbackKey);
-            if (fallbackData) return fallbackData;
-          } catch (err) { console.error("[Search] Algolia fallback cache error:", err); }
-          return { docs: [], lastVisibleId: null, hasMore: false };
-        }
-
-        if (filtersAny.search) {
-          this.logger.warn(`[Search] Algolia failed or timed out. Falling back to in-memory Firestore search for: "${filtersAny.search}"`);
-          return await UnifiedSearchFirestore.executeFirestoreInMemorySearch(
-            category,
-            entityType,
-            filtersAny,
-            pageSize,
-            currentPage,
-            this.logger
-          );
-        }
-
-        return await UnifiedSearchFirestore.executeFirestoreSearch(
-          category,
-          entityType,
-          filtersAny,
-          pageSize,
-          currentPage,
-          firestoreCursorId,
-          lastVisibleId,
-          this.logger
-        );
-      },
-      !filtersAny.search ||
-        ["bager", "kamion", "posao", "smeštaj"].some((wk) =>
-          filtersAny.search?.toLowerCase().includes(wk),
-        )
-        ? 3600000
-        : 900000,
-      {
-        docs: [],
-        lastVisibleId: null,
-        hasMore: false,
-        warning:
-          "Sistem je trenutno pod opterećenjem. Koristimo rezervni režim rada.",
-      },
-    );
-
-    if (result && (!result.docs || result.docs.length > 0)) {
-       this.l1ShieldCache.set(cacheKey, { data: result, expiry: Date.now() + this.L1_SHIELD_TTL });
+    if (lastVisibleId) {
+      const lastDoc = await db.collection(isProfileSearch ? "users" : "listings").doc(lastVisibleId).get();
+      if (lastDoc.exists) q = q.startAfter(lastDoc);
     }
-    return result;
+
+    try {
+      const snap = await q.get();
+      const hasMore = snap.docs.length > pageSize;
+      const actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
+
+      let docs: UnifiedSearchDoc[] = actualDocs.map((doc: QueryDocumentSnapshot) => {
+        const data = { id: doc.id, ...doc.data() };
+        return ImageTransformer.transformDocumentImages(data) as UnifiedSearchDoc;
+      });
+
+      if (filters.isPremium) docs = docs.filter((d: any) => d.isPremium === true);
+      if (filters.isUrgent) docs = docs.filter((d: any) => d.isUrgent === true);
+
+      docs = docs.sort((a, b) => {
+        const aP = (a as any).isPremium ? 1 : 0;
+        const bP = (b as any).isPremium ? 1 : 0;
+        if (bP !== aP) return bP - aP;
+        const aT = (a as any).createdAt?.toMillis?.() || (a as any).createdAt || 0;
+        const bT = (b as any).createdAt?.toMillis?.() || (b as any).createdAt || 0;
+        return bT - aT;
+      });
+
+      const lastVisible = hasMore && actualDocs.length > 0 ? actualDocs[actualDocs.length - 1].id : null;
+
+      return { docs, lastVisibleId: lastVisible, hasMore, totalHits: docs.length };
+    } catch (error: unknown) {
+      const err = error as Error & { details?: string; code?: number };
+      if (err?.message?.includes("Quota limit exceeded") || err?.details?.includes("Quota limit exceeded") || err?.code === 8) {
+        this.logger.warn(`Firestore QUOTA EXCEEDED for ${category}.`);
+        return { docs: [], lastVisibleId: null, hasMore: false, warning: "Privremeno smo dostigli limit baze podataka." };
+      }
+      throw error;
+    }
   }
 }

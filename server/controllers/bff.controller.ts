@@ -1,4 +1,5 @@
 import { Request as ExpressRequest, Response, NextFunction } from "express";
+import { env } from "../config/env.ts";
 import { bffService } from "../services/bff.service.ts";
 
 export const getHomepageBff = async (
@@ -6,10 +7,11 @@ export const getHomepageBff = async (
   res: Response,
   next: NextFunction,
 ) => {
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=300, stale-while-revalidate=600",
-  );
+  if (env.NODE_ENV === "production") {
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+  } else {
+    res.setHeader("Cache-Control", "no-store, max-age=0");
+  }
   res.setHeader("X-Cache-Tier", "Tier-2-Public-SWR");
   try {
     const platform = (req.headers["x-client-platform"] as string) || "web";

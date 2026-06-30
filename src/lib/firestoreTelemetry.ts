@@ -1,5 +1,6 @@
-import { trackAction } from './performance';
 import { exportService } from './exportService';
+
+const trackAction = (_name: string, _attributes?: Record<string, string>) => {};
 
 interface QueryProfile {
   id: string;

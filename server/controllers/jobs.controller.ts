@@ -62,24 +62,24 @@ export const searchJobs = async (
 
     const pageSize = Math.min(Math.max(Number(validated?.pageSize) || 24, 1), 50);
 
-    // CACHING LOGIC FOR HOMEPAGE PREVIEWS (Plan 2 Optimization)
-    const isPremiumHomepage =
+    // Keširanje za premium/urgent poslove — i na naslovnoj (pageSize=6) i na /poslovi (pageSize=12)
+    const cacheablePremium =
       validated?.filters?.isPremium === true &&
       validated?.filters?.status === "active" &&
-      pageSize === 6 &&
+      (pageSize === 6 || pageSize === 12) &&
       !validated?.searchQuery;
-    const isUrgentHomepage =
+    const cacheableUrgent =
       validated?.filters?.isUrgent === true &&
       validated?.filters?.status === "active" &&
-      pageSize === 6 &&
+      (pageSize === 6 || pageSize === 12) &&
       !validated?.searchQuery;
 
     let cacheKey = null;
 
-    if (isPremiumHomepage)
-      cacheKey = `homepage_premium_jobs_${platform || "web"}`;
-    if (isUrgentHomepage)
-      cacheKey = `homepage_urgent_jobs_${platform || "web"}`;
+    if (cacheablePremium)
+      cacheKey = `premium_jobs_${pageSize}_${platform || "web"}`;
+    if (cacheableUrgent)
+      cacheKey = `urgent_jobs_${pageSize}_${platform || "web"}`;
 
     if (cacheKey) {
       const cached = await CacheService.get(cacheKey);

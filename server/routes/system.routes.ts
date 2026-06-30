@@ -6,6 +6,18 @@ import { z } from "zod";
 
 export const systemRouter = Router();
 
+systemRouter.get("/bust-cache", async (_req, res) => {
+  try {
+    const { clearL1HomepageCache } = await import("../services/bff.service.ts");
+    clearL1HomepageCache();
+    const { CacheService } = await import("../services/cache.service.ts");
+    await CacheService.clear().catch(() => {});
+    res.json({ success: true, message: "Cache obrisan" });
+  } catch (err) {
+    res.status(500).json({ error: "Greška pri brisanju keša" });
+  }
+});
+
 // Javni endpoint za čitanje konfiguracije (treba nam na frontendu)
 systemRouter.get("/config", async (req, res) => {
   try {

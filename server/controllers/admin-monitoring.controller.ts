@@ -116,7 +116,6 @@ export class AdminMonitoringController {
         cachePartitionStats: cachePartitionStats as any,
         circuitBreakers: cbRegistry,
         timestamp: new Date().toISOString(),
-        firestoreAudit: MonitoringService.getFirestoreAuditStats(),
       };
 
       if (redis) {

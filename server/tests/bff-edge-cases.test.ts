@@ -39,19 +39,6 @@ describe("BFF Edge Cases & Error Resilience", () => {
     expect(typeof result).toBe("object");
   });
 
-  it("Returns degraded response on quota exhaustion for dashboard", async () => {
-    const { checkQuotaStatus } = await import("../config/firebase.ts");
-    vi.mocked(checkQuotaStatus).mockReturnValueOnce(true);
-
-    const result = await bffService.getDashboardData(
-      "edge_quota_user", "poslodavac", false,
-      { uid: "edge_quota_user", role: "poslodavac" } as never,
-    );
-
-    expect(result).toBeDefined();
-    expect((result as unknown as Record<string, unknown>)._degraded).toBe(true);
-  });
-
   it("Survives null user input with graceful fallback", async () => {
     const result = await bffService.getDashboardData(
       "unknown_user", "poslodavac", false,

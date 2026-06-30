@@ -358,7 +358,6 @@ export class OutboxWorker {
    */
   public static async processSingleMessage(msg: any) {
     await TraceContext.run(msg.traceId, async () => {
-      await MonitoringService.tracePhase("sync_outbox", async () => {
         const iLogger = Logger.withContext(msg.correlationId);
 
         // Client sliding-window rate limiter (15 outbox tasks/second per node)
@@ -516,7 +515,6 @@ export class OutboxWorker {
             throw error; // Bacamo error da bi BullMQ odradio backoff i retry
           }
         }
-      }, { type: msg.type, id: msg.id });
     });
   }
 

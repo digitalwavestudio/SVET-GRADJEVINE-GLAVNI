@@ -5,6 +5,7 @@ import { requireAuth } from "../middleware/auth.middleware.ts";
 import { generateProformaInvoice } from "../utils/invoiceGenerator.ts";
 import { emailService } from "../services/emailService.ts";
 import { CacheService } from "../services/cache.service.ts";
+import { idempotencyMiddleware } from "../middleware/idempotency.middleware.ts";
 
 export const checkoutRouter = Router();
 
@@ -51,6 +52,7 @@ checkoutRouter.get("/:id", requireAuth, async (req, res, next) => {
 checkoutRouter.post(
   "/generate-proforma",
   requireAuth,
+  idempotencyMiddleware,
   async (req, res, next) => {
     try {
       const uid = getReqUser(req).uid;
@@ -128,7 +130,7 @@ checkoutRouter.post(
 );
 
 // Update checkout status
-checkoutRouter.patch("/:id", requireAuth, async (req, res, next) => {
+checkoutRouter.patch("/:id", requireAuth, idempotencyMiddleware, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

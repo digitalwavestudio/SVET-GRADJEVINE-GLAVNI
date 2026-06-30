@@ -197,10 +197,6 @@ async function startServer() {
     const { rateLimitShield } = await import("./server/middleware/rate-limit-shield.middleware.ts");
     const { redirectMiddleware } = await import("./server/middleware/redirect.middleware.ts");
     const { canonicalHostMiddleware, botPrerenderMiddleware } = await import("./server/middleware/seo.middleware.ts");
-    const { traceMiddleware } = await import("./server/middleware/trace.middleware.ts");
-    const { performanceMiddleware } = await import("./server/middleware/performance.middleware.ts");
-    const { zodPayloadLimiterMiddleware } = await import("./server/middleware/zod-payload-limiter.middleware.ts");
-    const { idempotencyMiddleware } = await import("./server/middleware/idempotency.middleware.ts");
     const { authMiddleware } = await import("./server/middleware/auth.middleware.ts");
     const { xssMiddleware } = await import("./server/middleware/xss.middleware.ts");
     const { globalErrorHandler } = await import("./server/middleware/error.middleware.ts");
@@ -298,12 +294,6 @@ async function startServer() {
         referrerPolicy: { policy: "strict-origin-when-cross-origin" },
       }),
     );
-    app.use(traceMiddleware);
-    app.use(performanceMiddleware);
-    app.use(redirectMiddleware);
-    app.use(canonicalHostMiddleware);
-    app.use(botPrerenderMiddleware);
-
     app.use((req, res, next) => {
       const url = req.url || "";
       if (url.includes("/api/messages/upload") || url.includes("/api/verification/upload")) {
@@ -317,10 +307,12 @@ async function startServer() {
     });
 
     app.use(express.json({ limit: "5mb" }));
-    app.use(zodPayloadLimiterMiddleware);
 
     app.use("/api", authMiddleware, xssMiddleware, apiRouter);
     app.use("/feed", feedRouter);
+    app.use(redirectMiddleware);
+    app.use(canonicalHostMiddleware);
+    app.use(botPrerenderMiddleware);
     app.use("/", seoRouter);
     app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 

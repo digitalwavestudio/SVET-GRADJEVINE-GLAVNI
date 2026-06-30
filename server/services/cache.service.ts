@@ -1,7 +1,4 @@
-import { MonitoringService } from "./monitoring.service.ts";
-import { getRedis } from "../utils/redis.ts";
 import { DatabaseManager } from "../utils/db-manager.ts";
-import { checkQuotaStatus } from "../config/firebase.ts";
 import { CACHE_PREFIXES } from "../constants/cache-keys.ts";
 import zlib from "zlib";
 import { Logger, logger } from "../utils/logger.ts";
@@ -13,7 +10,20 @@ import { Logger, logger } from "../utils/logger.ts";
 export class CacheService {
   private static localCache = new Map<string, { value: unknown; expiry: number; hits: number }>();
   private static inFlight = new Map<string, Promise<unknown>>();
+  private static sweeperInitialized = false;
 
+  static init(): void {
+    if (this.sweeperInitialized) return;
+    this.sweeperInitialized = true;
+    setInterval(() => {
+      const now = Date.now();
+      for (const [key, item] of this.localCache) {
+        if (now > item.expiry) {
+          this.localCache.delete(key);
+        }
+      }
+    }, 60000);
+  }
 
   private static async executeWithTimeout<R>(fn: () => Promise<R>, timeoutMs: number = 25000): Promise<R> {
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -67,11 +77,6 @@ export class CacheService {
       const cached = await this.get<T>(key);
       if (cached !== null) return cached;
 
-      if (checkQuotaStatus()) {
-         logger.warn(`[CacheService] Pre-emptive Quota Guard: Baza zaštićena. Nema keša za ${key}, obustavljam fetch.`);
-         throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-      }
-
       const val = await fetchFn();
       await this.set(key, val, ttlMs);
       return val;
@@ -99,15 +104,6 @@ export class CacheService {
     const execute = async (): Promise<T> => {
       const cached = await this.get<T>(key);
       if (cached !== null) return cached;
-
-      if (checkQuotaStatus()) {
-        if (fallbackValue !== undefined) {
-          logger.warn(`[CacheService] Quota active, returning fallback for ${key}`);
-          return fallbackValue;
-        }
-        logger.warn(`[CacheService] Quota active, no fallback for ${key}`);
-        throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
-      }
 
       try {
         const freshData = await this.executeWithTimeout(fetchFn, timeoutMs);
@@ -199,15 +195,12 @@ export class CacheService {
    */
   static async get<T>(key: string, ignoreTTL: boolean = false): Promise<T | null> {
     const routedKey = DatabaseManager.routeCacheKey(key);
-    const tracker = MonitoringService.startSegment("cache_lookup", { key: routedKey });
     try {
       // 1. Provera L1 (Local RAM)
       const item = this.localCache.get(routedKey);
       if (item && (ignoreTTL || Date.now() <= item.expiry)) {
         item.hits = (item.hits || 0) + 1;
         const prefix = routedKey.split(":")[0];
-        MonitoringService.recordCacheHit("L1", prefix);
-        tracker.end({ hit: true, cache_layer: "L1" });
         return item.value as T;
       } else if (item) {
         // Istekao L1
@@ -233,25 +226,14 @@ export class CacheService {
               const logicalExpired = Date.now() > parsed.expiry;
               
               if (logicalExpired && !ignoreTTL) {
-                // Ako je istekao, a NE štitimo bazu, ignorišemo keš (force refresh)
-                if (!checkQuotaStatus()) {
-                  this.localCache.delete(routedKey); // Očisti mogući stari rep
-                  tracker.end({ hit: false, reason: "logical_expiry" });
-                  return null;
-                } else {
-                  logger.warn(`[CacheService] 🛡️ QoS Quota Guard: Serviram STALE-CACHE (istekle podatke) za ključ ${routedKey}`);
-                }
+                this.localCache.delete(routedKey);
+                return null;
               }
               // Raspakuj u originalni oblik ukoliko je prošao evaluaciju ili je još svež
               parsed = parsed.data;
             }
 
-            const prefix = routedKey.split(":")[0];
-            MonitoringService.recordCacheHit("L2", prefix);
-            
-            // Hydrate L1 from L2 for short burst protection
-            // Podizemo burst saobracaja na duzi nivo za local L1 kada smo u aktivnoj Quota zastiti ili za hotkeys
-            let hydratedTtl = checkQuotaStatus() ? 60000 : 10000;
+            let hydratedTtl = 10000;
             if (this.isHotKey(routedKey)) {
               hydratedTtl = Math.max(hydratedTtl, 5000);
             }
@@ -260,7 +242,6 @@ export class CacheService {
               expiry: Date.now() + hydratedTtl,
               hits: (item?.hits || 0) + 1,
             });
-            tracker.end({ hit: true, cache_layer: "L2" });
             return parsed as T;
           }
         } catch (err: unknown) {
@@ -276,18 +257,13 @@ export class CacheService {
               expiry: Date.now() + recoveryTtl,
               hits: item.hits + 1,
             });
-            tracker.end({ hit: true, cache_layer: "L1_failover_stale" });
             return item.value as T;
           }
         }
       }
 
-      const prefix = routedKey.split(":")[0];
-      MonitoringService.recordCacheMiss(prefix);
-      tracker.end({ hit: false });
       return null;
     } catch (err) {
-      tracker.end({ error: (err as Error).message });
       throw err;
     }
   }
@@ -307,8 +283,6 @@ export class CacheService {
       const item = this.localCache.get(routedKey);
       if (item && (ignoreTTL || Date.now() <= item.expiry)) {
         item.hits = (item.hits || 0) + 1;
-        const prefix = routedKey.split(":")[0];
-        MonitoringService.recordCacheHit("L1", prefix);
         results.set(key, item.value as T);
       } else {
         if (item) this.localCache.delete(routedKey);
@@ -345,20 +319,13 @@ export class CacheService {
               if (parsed && typeof parsed === "object" && parsed.__isEnvelope) {
                 const logicalExpired = Date.now() > parsed.expiry;
                 if (logicalExpired && !ignoreTTL) {
-                  if (!checkQuotaStatus()) {
-                    results.set(originalKey, null);
-                    continue;
-                  } else {
-                    logger.warn(`[CacheService] 🛡️ QoS Quota Guard MGET: Serviram STALE-CACHE za ${routedKey}`);
-                  }
+                  results.set(originalKey, null);
+                  continue;
                 }
                 parsed = parsed.data;
               }
 
-              const prefix = routedKey.split(":")[0];
-              MonitoringService.recordCacheHit("L2", prefix);
-
-              let hydratedTtl = checkQuotaStatus() ? 60000 : 10000;
+              let hydratedTtl = 10000;
               if (this.isHotKey(routedKey)) {
                 hydratedTtl = Math.max(hydratedTtl, 5000);
               }
@@ -375,8 +342,6 @@ export class CacheService {
               results.set(originalKey, null);
             }
           } else {
-            const prefix = routedKey.split(":")[0];
-            MonitoringService.recordCacheMiss(prefix);
             results.set(originalKey, null);
           }
         }
@@ -657,3 +622,5 @@ export class CacheService {
     }
   }
 }
+
+CacheService.init();

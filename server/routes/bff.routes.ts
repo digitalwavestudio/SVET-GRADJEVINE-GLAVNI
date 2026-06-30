@@ -210,10 +210,8 @@ bffRouter.get(
           console.error("[CircuitBreaker] Intercepted database/BFF error:", error.message || err);
           await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure in customNext failed:", err));
 
-          // If the breaker tripped or if quota is exceeded, serve Sandbox fallback immediately
           const currentState = await breaker.getState();
-          const { checkQuotaStatus } = await import("../config/firebase.ts");
-          if (currentState === "OPEN" || checkQuotaStatus()) {
+          if (currentState === "OPEN") {
             logger.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active. Rendering cache fallback.");
             const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
             if (!res.headersSent) {
@@ -252,9 +250,8 @@ bffRouter.get(
       await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure at catch block failed:", err));
 
       const currentState = await breaker.getState();
-      const { checkQuotaStatus } = await import("../config/firebase.ts");
-      if (currentState === "OPEN" || checkQuotaStatus()) {
-        logger.warn("[CircuitBreaker] Circuit is OPEN or Quota protection is active on catch. Rendering cache fallback.");
+      if (currentState === "OPEN") {
+        logger.warn("[CircuitBreaker] Circuit is OPEN. Rendering cache fallback.");
         const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
         return res.json({
            ...(typeof staleData === "object" ? staleData : {}),
@@ -321,29 +318,5 @@ bffRouter.get(
 bffRouter.get(
   "/homepage", 
   validateBffInputs, 
-  async (req: Request, res: Response, next: NextFunction) => {
-    const state = await breaker.getState();
-    const { checkQuotaStatus } = await import("../config/firebase.ts");
-
-    const platform = req.headers["x-client-platform"] || "web";
-    const cacheKey = `homepage_bff_${platform}_v4`;
-
-    // Serve sandbox if circuit is open or quota protection is manually triggered
-    if (state === "OPEN" || checkQuotaStatus()) {
-        logger.warn(`[CircuitBreaker] Serving homepage STALE cache for ${req.ip}`);
-        const staleData = (await CacheService.get(cacheKey, true)) || {};
-        return res.json({
-           ...(typeof staleData === "object" ? staleData : {}),
-           success: true,
-           _metaWarning: "Sistem je trenutno ekstremno opterećen usled povišenog saobraćaja, prikazujemo poslednju sačuvanu verziju podataka."
-        });
-    }
-
-    try {
-        await getHomepageBff(req, res, next);
-    } catch (err: unknown) {
-        await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure in homepage failed:", err));
-        next(err);
-    }
-  }
+  getHomepageBff
 );

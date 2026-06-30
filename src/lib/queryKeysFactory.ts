@@ -92,7 +92,7 @@ export const queryKeys = {
     pendingDeposits: ['adminPendingDeposits'] as const,
     dlq: ['admin', 'dlq'] as const,
     monitoring: ['admin', 'monitoring'] as const,
-    circuitBreakers: ['admin', 'circuit-breakers'] as const,
+
     abuseReports: ['admin', 'abuse-reports'] as const,
     support: ['admin', 'support'] as const,
     verificationRequests: ['admin', 'verification-requests'] as const,

@@ -2,6 +2,45 @@ import Redis from "ioredis";
 import { env } from "../config/env.ts";
 import { logger } from "../utils/logger.ts";
 
+function isNetworkError(err: Error & { code?: string | number }): boolean {
+  const msg = err.message.toLowerCase();
+  return (
+    msg.includes("stream") ||
+    msg.includes("writeable") ||
+    msg.includes("offlinequeue") ||
+    msg.includes("closed") ||
+    msg.includes("connection") ||
+    msg.includes("refused") ||
+    msg.includes("timeout") ||
+    msg.includes("econnrefused") ||
+    msg.includes("epipe") ||
+    msg.includes("econnreset") ||
+    msg.includes("etimedout") ||
+    msg.includes("enotfound") ||
+    msg.includes("max number of clients") ||
+    msg.includes("quota") ||
+    msg.includes("limit") ||
+    msg.includes("bandwidth") ||
+    msg.includes("usage") ||
+    msg.includes("overlimit") ||
+    err.code === "EPIPE" ||
+    err.code === "ECONNRESET" ||
+    err.code === "ECONNREFUSED" ||
+    err.code === "ETIMEDOUT" ||
+    err.code === "ENOTFOUND"
+  );
+}
+
+function createRetryStrategy(isDev: boolean, maxDelay: number = 10000): (times: number) => number | null {
+  return (times: number) => {
+    if (isDev) return null;
+    const base = 200;
+    const expDelay = base * Math.pow(2, Math.min(times - 1, 6));
+    const jitter = Math.random() * 200;
+    return Math.min(expDelay + jitter, maxDelay);
+  };
+}
+
 // Lokalni in-memory fallback kada Redis padne
 class MockPipeline {
   private fallback: InMemoryFallback;
@@ -20,8 +59,8 @@ class MockPipeline {
     this.fallback.set(key, value, ...args).catch(err => console.error("[Cache] invalidation error:", err));
     return this;
   }
-  get(key: string) {
-    return this;
+  async get(key: string) {
+    return this.fallback.get(key);
   }
   del(...keys: string[]) {
     this.fallback.del(...keys).catch(err => console.error("[Cache] invalidation error:", err));
@@ -41,8 +80,19 @@ class MockPipeline {
 }
 
 class InMemoryFallback {
+  private static readonly MAX_KEYS = 10000;
   private map = new Map<string, string | Set<string>>();
   private timeouts = new Map<string, NodeJS.Timeout>();
+
+  private maybeEvict(): void {
+    if (this.map.size < InMemoryFallback.MAX_KEYS) return;
+    const oldest = this.map.keys().next().value;
+    if (oldest) {
+      this.map.delete(oldest);
+      const t = this.timeouts.get(oldest);
+      if (t) { clearTimeout(t); this.timeouts.delete(oldest); }
+    }
+  }
 
   async set(key: string, value: string, ...args: (string | number)[]) {
     let nx = false;
@@ -79,6 +129,7 @@ class InMemoryFallback {
       return null;
     }
 
+    this.maybeEvict();
     this.map.set(key, value);
 
     if (ttlMs !== null) {
@@ -257,7 +308,9 @@ class InMemoryFallback {
     const results: (string | null)[] = [];
     for (const key of keys) {
       const val = this.map.get(key);
-      results.push(typeof val === "string" ? val : null);
+      if (typeof val === "string") results.push(val);
+      else if (val instanceof Set) results.push(null); // sets not readable via mget
+      else results.push(null);
     }
     return results;
   }
@@ -339,15 +392,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
         keepAlive: 5000, // TCP Keep-alive to prevent EPIPE/idle drops
         retryStrategy: (times) => {
           setDownState(true);
-          if (env.NODE_ENV !== "production") {
-            return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
-          }
-          const base = 200;
-          const maxDelay = 10000;
-          const expDelay = base * Math.pow(2, Math.min(times - 1, 6));
-          const jitter = Math.random() * 200;
-          const delay = Math.min(expDelay + jitter, maxDelay);
-          return delay;
+          return createRetryStrategy(env.NODE_ENV !== "production")(times);
         },
       })
     : urlOrClient;
@@ -365,33 +410,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
     });
 
     client.on("error", (err: Error & { code?: string | number }) => {
-      const errMsg = err.message.toLowerCase();
-      const isNetworkError =
-        errMsg.includes("stream") ||
-        errMsg.includes("writeable") ||
-        errMsg.includes("offlinequeue") ||
-        errMsg.includes("closed") ||
-        errMsg.includes("connection") ||
-        errMsg.includes("refused") ||
-        errMsg.includes("timeout") ||
-        errMsg.includes("econnrefused") ||
-        errMsg.includes("epipe") ||
-        errMsg.includes("econnreset") ||
-        errMsg.includes("etimedout") ||
-        errMsg.includes("enotfound") ||
-        errMsg.includes("max number of clients") ||
-        errMsg.includes("quota") ||
-        errMsg.includes("limit") ||
-        errMsg.includes("bandwidth") ||
-        errMsg.includes("usage") ||
-        errMsg.includes("overlimit") ||
-        err.code === "EPIPE" ||
-        err.code === "ECONNRESET" ||
-        err.code === "ECONNREFUSED" ||
-        err.code === "ETIMEDOUT" ||
-        err.code === "ENOTFOUND";
-
-      if (isNetworkError) {
+      if (isNetworkError(err)) {
         if (!getDownState()) {
           setDownState(true);
           logger.warn(`🛡️ [Redis Failover] Konekcija odbijena/pukla (${err.message}). Aktiviran lokalni fallback.`);
@@ -516,35 +535,11 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
             }
           } catch (err: unknown) {
             const error = err as Error & { code?: string | number };
-            const errMsg = error.message.toLowerCase();
-            const isNetworkError =
-              errMsg.includes("stream") ||
-              errMsg.includes("writeable") ||
-              errMsg.includes("offlinequeue") ||
-              errMsg.includes("closed") ||
-              errMsg.includes("connection") ||
-              errMsg.includes("refused") ||
-              errMsg.includes("timeout") ||
-              errMsg.includes("epipe") ||
-              errMsg.includes("econnreset") ||
-              errMsg.includes("max number of clients") ||
-              errMsg.includes("quota") ||
-              errMsg.includes("limit") ||
-              errMsg.includes("bandwidth") ||
-              errMsg.includes("usage") ||
-              errMsg.includes("overlimit") ||
-              error.code === "EPIPE" ||
-              error.code === "ECONNRESET" ||
-              error.code === "ECONNREFUSED" ||
-              error.code === "ETIMEDOUT" ||
-              error.code === "ENOTFOUND";
-
-            if (isNetworkError) {
+            if (isNetworkError(error)) {
               if (!getDownState()) {
                 setDownState(true);
-                // Only log once and make it less scary
                 const silentErrors = ["stream isn't writeable", "offlinequeue", "epipe", "econnreset", "connection is closed"];
-                if (!silentErrors.some(e => errMsg.includes(e))) {
+                if (!silentErrors.some(e => error.message.toLowerCase().includes(e))) {
                   logger.warn("🛡️ [Redis] Lokalni in-memory mod aktiviran.", error.message);
                 }
               }
@@ -591,15 +586,7 @@ export function getRawRedis(): Redis | null {
       keepAlive: 5000,
       retryStrategy: (times) => {
         isRedisDown = true;
-        if (env.NODE_ENV !== "production") {
-          return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
-        }
-        const base = 200;
-        const maxDelay = 10000;
-        const expDelay = base * Math.pow(2, Math.min(times - 1, 6));
-        const jitter = Math.random() * 200;
-        const delay = Math.min(expDelay + jitter, maxDelay);
-        return delay;
+        return createRetryStrategy(env.NODE_ENV !== "production")(times);
       },
     });
 
@@ -611,33 +598,7 @@ export function getRawRedis(): Redis | null {
     });
 
     client.on("error", (err: Error & { code?: string | number }) => {
-      const errMsg = err.message.toLowerCase();
-      const isNetworkError =
-        errMsg.includes("stream") ||
-        errMsg.includes("writeable") ||
-        errMsg.includes("offlinequeue") ||
-        errMsg.includes("closed") ||
-        errMsg.includes("connection") ||
-        errMsg.includes("refused") ||
-        errMsg.includes("timeout") ||
-        errMsg.includes("econnrefused") ||
-        errMsg.includes("epipe") ||
-        errMsg.includes("econnreset") ||
-        errMsg.includes("etimedout") ||
-        errMsg.includes("enotfound") ||
-        errMsg.includes("max number of clients") ||
-        errMsg.includes("quota") ||
-        errMsg.includes("limit") ||
-        errMsg.includes("bandwidth") ||
-        errMsg.includes("usage") ||
-        errMsg.includes("overlimit") ||
-        err.code === "EPIPE" ||
-        err.code === "ECONNRESET" ||
-        err.code === "ECONNREFUSED" ||
-        err.code === "ETIMEDOUT" ||
-        err.code === "ENOTFOUND";
-
-      if (isNetworkError) {
+      if (isNetworkError(err)) {
         isRedisDown = true;
       } else {
         console.error("Redis Raw Client Error:", err.message);
@@ -707,16 +668,6 @@ export function getRegionalRedis(region: string): ResilientRedis {
   return getRedis();
 }
 
-const lastWarned = new Map<string, number>();
-function throttleWarn(key: string, msg: string, intervalMs: number = 60000) {
-  const now = Date.now();
-  const lastTime = lastWarned.get(key) || 0;
-  if (now - lastTime > intervalMs) {
-    lastWarned.set(key, now);
-    logger.warn(msg);
-  }
-}
-
 export function getSubRedis(): ResilientRedis {
   const url = getRedisUrl();
   if (!subRedis) {
@@ -726,16 +677,7 @@ export function getSubRedis(): ResilientRedis {
         maxRetriesPerRequest: null,
         connectTimeout: 5000,
         enableOfflineQueue: true,
-        retryStrategy: (times) => {
-          if (env.NODE_ENV !== "production") {
-            return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
-          }
-          const base = 200;
-          const maxDelay = 15000;
-          const expDelay = base * Math.pow(2, Math.min(times - 1, 6));
-          const jitter = Math.random() * 200;
-          return Math.min(expDelay + jitter, maxDelay);
-        }
+        retryStrategy: createRetryStrategy(env.NODE_ENV !== "production", 15000),
       });
   
       // Wrap the subscriber in a resilient proxy too, so it doesn't crash on connection spikes
@@ -761,16 +703,7 @@ export function getStreamRedis(): ResilientRedis {
         maxRetriesPerRequest: null,
         connectTimeout: 5000,
         enableOfflineQueue: true,
-        retryStrategy: (times) => {
-          if (env.NODE_ENV !== "production") {
-            return null; // Zaustavi reconnect loop u razvoju radi stabilnosti procesora
-          }
-          const base = 200;
-          const maxDelay = 15000;
-          const expDelay = base * Math.pow(2, Math.min(times - 1, 6));
-          const jitter = Math.random() * 200;
-          return Math.min(expDelay + jitter, maxDelay);
-        }
+        retryStrategy: createRetryStrategy(env.NODE_ENV !== "production", 15000),
       });
   
       // Wrap the stream reader in a resilient proxy

@@ -46,22 +46,16 @@ export class UnifiedAdsService {
    */
   private static async getCachedMetadata<T>(cacheKey: string, _fastPathDoc: string, fetchFn: () => Promise<T>, fallbackValue?: T): Promise<T> {
     try {
-      return await CacheService.getOrSetSWR(
-        cacheKey,
-        async () => {
-           const { checkQuotaStatus } = await import("../config/firebase.ts");
-           if (checkQuotaStatus()) {
-             console.warn(`[UnifiedAdsService] Quota active, returning fallback for ${cacheKey}`);
-             return fallbackValue as T;
-           }
-           return await fetchFn();
-        },
-        30 * 24 * 3600 * 1000,
-        fallbackValue
-      );
+      const data = await fetchFn();
+      if (Array.isArray(data) && data.length === 0) {
+        return data;
+      }
+      await CacheService.set(cacheKey, data, 300000).catch(() => {});
+      return data;
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
       console.error(`[UnifiedAdsService] Cache failure for ${cacheKey}:`, error.message);
+      if (fallbackValue !== undefined) return fallbackValue;
       throw error;
     }
   }

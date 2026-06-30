@@ -50,7 +50,7 @@ export const authMiddleware = async (
   }
   try {
     ensureInitialized();
-    const authUser = await MonitoringService.tracePhase("auth_verification", async () => {
+    const authUser = await (async () => {
       let decodedToken;
       try {
         const rawDecoded = await JwksService.verifyIdTokenLocal(idToken);
@@ -152,7 +152,7 @@ export const authMiddleware = async (
       } as AuthUser;
 
       return authUser;
-    }, { ip });
+    })();
 
     req.user = authUser;
     next();

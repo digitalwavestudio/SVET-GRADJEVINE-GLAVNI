@@ -13,12 +13,6 @@ function getRouter() {
   return router;
 }
 
-const GlobalFallback = () => (
-  <div className="flex items-center justify-center min-h-screen bg-[#0B0F19]">
-    <div className="w-12 h-12 border-4 border-secondary/20 border-t-secondary rounded-full animate-spin"></div>
-  </div>
-);
-
 import { Toaster } from 'react-hot-toast';
 import { AuthLoader } from '@/src/components/AuthLoader';
 
@@ -36,7 +30,7 @@ function App() {
         }}
       />
       <AuthLoader>
-        <RouterProvider router={getRouter()} fallbackElement={<GlobalFallback />} />
+        <RouterProvider router={getRouter()} />
       </AuthLoader>
     </AppProviders>
   );
