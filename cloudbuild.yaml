@@ -27,6 +27,8 @@ steps:
       - 'APP_REGION=us-west1'
       - '--min-instances'
       - '1'
+      - '--max-instances'
+      - '2'
 
 images:
   - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
