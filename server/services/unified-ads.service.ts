@@ -46,6 +46,15 @@ export class UnifiedAdsService {
    */
   private static async getCachedMetadata<T>(cacheKey: string, _fastPathDoc: string, fetchFn: () => Promise<T>, fallbackValue?: T): Promise<T> {
     try {
+      const cached = await CacheService.get<T>(cacheKey).catch(() => null);
+      if (cached) {
+        if (Array.isArray(cached) && cached.length === 0) {
+          // Prazan niz ignorišemo i idemo na pravi upit
+        } else {
+          return cached;
+        }
+      }
+
       const data = await fetchFn();
       if (Array.isArray(data) && data.length === 0) {
         return data;

@@ -5,6 +5,7 @@ import { browseIndicesObjects, deleteAdFromIndex } from "./algolia.service.ts";
 import { env } from "../config/env.ts";
 import { CacheService } from "./cache.service.ts";
 import { CACHE_PREFIXES } from "../constants/cache-keys.ts";
+import { AdminStatsService } from "./admin/admin-stats.service.ts";
 
 export class ReconciliationService {
   private static readonly LOCK_KEY = "data_reconciliation";
@@ -246,7 +247,7 @@ export class ReconciliationService {
       .limit(1)
       .get();
        
-    Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance: ${walletSnap.data().count}`);
+    Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance exist: ${walletSnap.docs.length > 0}`);
 
     const oneHourAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 1 * 60 * 60 * 1000));
     const recentTransactionsSnap = await db.collection("transactions")

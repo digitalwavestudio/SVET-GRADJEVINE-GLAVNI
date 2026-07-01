@@ -15,10 +15,11 @@ export class JobsCoreService {
     // This prevents N cache keys for N pages = N Firestore reads
     const cacheKey = `public_jobs_v2_${limit}`;  // ← No cursor in key!
     const t0_cache = Date.now();
+    let cached: any = null;
     
     // Return cached FIRST page for all requests, let client handle pagination with cursor
     if (!cursor) {
-      const cached = await CacheService.get(cacheKey);
+      cached = await CacheService.get(cacheKey);
       console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
       if (cached) {
         const samplePremium = (cached as any).docs?.slice(0, 5).filter((d: any) => d.isPremium).length;

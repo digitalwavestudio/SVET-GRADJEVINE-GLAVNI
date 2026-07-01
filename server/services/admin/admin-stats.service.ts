@@ -1,4 +1,4 @@
-﻿import { admin as firebaseAdmin, db } from "../../config/firebase.ts";
+import { admin as firebaseAdmin, db } from "../../config/firebase.ts";
 import { Logger } from "../../utils/logger.ts";
 import { LockManager } from "../lock.service.ts";
 
@@ -199,7 +199,12 @@ export class AdminStatsService {
           const lowJobs = (d.totalJobs || 0) < 50;
           const lowCompanies = (d.companiesCount || 0) < 10;
           const lowUsers = (d.totalUsers || 0) < 50;
-          if (lowJobs || lowCompanies || lowUsers) {
+
+          const lastReconciledStr = d.lastReconciled;
+          const oneHourAgo = Date.now() - 60 * 60 * 1000;
+          const shouldReconcile = !lastReconciledStr || new Date(lastReconciledStr).getTime() < oneHourAgo;
+
+          if ((lowJobs || lowCompanies || lowUsers) && shouldReconcile) {
             console.warn(`[AdminStatsService] Triggering reconciliation (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}).`);
             this.reconcileGlobalStats().catch(err => {
               console.error("[AdminStatsService] Auto-reconciliation failed:", err);
