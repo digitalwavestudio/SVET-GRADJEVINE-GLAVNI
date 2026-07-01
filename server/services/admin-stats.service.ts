@@ -70,6 +70,11 @@ export class AdminStatsService {
       updates.pendingAds = firebaseAdmin.firestore.FieldValue.increment(change);
     }
 
+    // Aktivni poslovi — samo za kategoriju jobs, samo za aktivne statuse
+    if (category === "jobs" && (status === "active" || status === "approved")) {
+      updates.activeJobs = firebaseAdmin.firestore.FieldValue.increment(change);
+    }
+
     // Premium tracking & Revenue Estimation
     if (isPremium) {
       // If it's a category update, track as premiumAds
@@ -181,12 +186,21 @@ export class AdminStatsService {
       if (doc.exists) {
         const d = doc.data();
         if (d) {
+          // Čitamo activeJobs iz šardova u realnom vremenu (increment/decrement na svaki oglas)
+          try {
+            const shardsSnap = await db.collection("metadata/global_stats/shards").get();
+            let activeJobs = 0;
+            shardsSnap.forEach(s => { activeJobs += s.data().activeJobs || 0; });
+            d.activeJobs = activeJobs;
+          } catch (e) {
+            // Fallback — koristi admin_stats vrednost
+          }
+
           const lowJobs = (d.totalJobs || 0) < 50;
           const lowCompanies = (d.companiesCount || 0) < 10;
           const lowUsers = (d.totalUsers || 0) < 50;
-          const missingActiveJobs = d.activeJobs === undefined;
-          if (lowJobs || lowCompanies || lowUsers || missingActiveJobs) {
-            console.warn(`[AdminStatsService] Triggering reconciliation (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}, missingActiveJobs=${missingActiveJobs}).`);
+          if (lowJobs || lowCompanies || lowUsers) {
+            console.warn(`[AdminStatsService] Triggering reconciliation (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}).`);
             this.reconcileGlobalStats().catch(err => {
               console.error("[AdminStatsService] Auto-reconciliation failed:", err);
             });
