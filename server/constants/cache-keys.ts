@@ -4,7 +4,7 @@ export const CACHE_PREFIXES = {
   AD_LISTING_PAGE: "ads:listing:",
   AD_SEARCH: "ads:search:",
   PUBLIC_ADS: "public_ads_",
-  SEARCH_ADS: "search_ads_",
+  SEARCH_ADS: "search_ads_v2_",
   MY_ADS: "myAds_",
   PUBLIC_PROFILE_ADS: "publicProfileAds_",
   PROMOTED: "promoted_",

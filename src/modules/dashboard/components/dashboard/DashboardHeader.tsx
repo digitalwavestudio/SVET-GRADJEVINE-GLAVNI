@@ -46,10 +46,13 @@ export default React.memo(function DashboardHeader({
   }) || {};
   const isOffline = !navigator.onLine;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isCoverUploading, setIsCoverUploading] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const logoSrc = user?.businessProfile?.logo || user?.photoURL;
+  const coverSrc = user?.businessProfile?.coverImage || null;
   const isShield = logoSrc === 'shield' || logoSrc === 'stit' || imgError;
 
   const { greeting, briefing } = React.useMemo(
@@ -88,6 +91,27 @@ export default React.memo(function DashboardHeader({
       console.error(err);
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setIsCoverUploading(true);
+    try {
+      const url = await uploadImage(file, "profiles/avatars", "cover");
+      const updateData: any = {};
+      if (user.role === "poslodavac") {
+        updateData.businessProfile = {
+          ...user.businessProfile,
+          coverImage: url,
+        };
+        await updateUser(updateData);
+      }
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setIsCoverUploading(false);
     }
   };
 
@@ -170,7 +194,50 @@ export default React.memo(function DashboardHeader({
             </button>
           )}
         </div>
-        <div>
+
+        {user?.role === 'poslodavac' && (
+          <div className="relative group">
+            <input
+              aria-label="Upload Cover"
+              type="file"
+              ref={coverInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleCoverChange}
+            />
+            <div
+              onClick={() => coverInputRef.current?.click()}
+              className="w-32 h-28 md:w-48 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-[#0A0F14] border border-white/10 flex items-center justify-center shadow-2xl group/cover"
+            >
+              {coverSrc ? (
+                 <img
+                    width="800"
+                    height="400"
+                    decoding="async"
+                    src={coverSrc}
+                    className="w-full h-full object-cover"
+                    alt="Cover pozadina"
+                    referrerPolicy="no-referrer"
+                 />
+              ) : (
+                 <span className="material-symbols-outlined text-slate-400 text-5xl group-hover/cover:scale-110 transition-transform">wallpaper</span>
+              )}
+              
+              <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px] opacity-0 group-hover/cover:opacity-100 transition-all duration-200 flex flex-col items-center justify-center gap-1.5">
+                <span className="material-symbols-outlined text-white text-2xl">add_photo_alternate</span>
+                <span className="text-[9px] font-black text-white uppercase tracking-widest leading-none text-center px-2">PROMENI<br/>POZADINU</span>
+              </div>
+
+              {isCoverUploading && (
+                <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center">
+                  <span className="text-white/40 text-xs font-bold uppercase tracking-widest animate-pulse">Ucitavanje...</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-4 mb-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter uppercase text-white w-full leading-tight">
               {greeting}, <br className="sm:hidden" />

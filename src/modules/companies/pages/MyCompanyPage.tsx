@@ -1,32 +1,22 @@
 import { motion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { DashboardLayout } from '@/src/modules/core';
-import {
-  COMPANY_EMPLOYEE_RANGES,
-  COMPANY_MAIN_CATEGORIES,
-  COMPANY_SUB_CATEGORIES
-} from '@/src/constants/companyTaxonomy';
 import { LOCATIONS } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
 import { useCompaniesList, useCompanyAdMutations } from '@/src/modules/companies/hooks/useCompanies';
 import { Company as CompanyAd } from '@/src/modules/companies/types/models';
 import { uploadImageDirectly } from '@/src/lib/imageCompressor';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 const companySchema = z.object({
   name: z.string().min(1, 'Naziv firme je obavezan'),
   pib: z.string().min(1, 'PIB je obavezan'),
-  address: z.string().optional(),
-  locationSlug: z.string().min(1, 'Lokacija je obavezna'),
+  locationSlug: z.string().optional(),
   phone: z.string().optional(),
   description: z.string().optional(),
-  mainCategories: z.array(z.string()).default([]),
-  subCategories: z.array(z.string()).default([]),
-  coverageType: z.enum(['local', 'regional', 'national', 'international']).default('local'),
-  coverageValue: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
   website: z.string().optional().refine(val => {
@@ -35,13 +25,7 @@ const companySchema = z.object({
   }, { message: 'Unesite ispravan URL format za web sajt.' }),
   logo: z.string().optional(),
   coverImage: z.string().optional(),
-  employeeCount: z.string().default('1-5'),
   companyPortfolioImages: z.array(z.string()).default([]),
-  references: z.string().optional(),
-  licenses: z.string().optional(),
-  certifications: z.string().optional(),
-  equipmentSummary: z.string().optional(),
-  teamSpecialties: z.string().optional(),
 });
 
 type CompanyFormValues = z.infer<typeof companySchema>;
@@ -56,14 +40,11 @@ export default function MyCompanyPage() {
 
   const [saving, setSaving] = useState(false);
   const [companyData, setCompanyData] = useState<CompanyAd | null>(null);
-  const [activeStep, setActiveStep] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
     handleSubmit,
-    control,
     setValue,
     watch,
     reset,
@@ -73,36 +54,22 @@ export default function MyCompanyPage() {
     defaultValues: {
       name: '',
       pib: '',
-      address: '',
-      locationSlug: 'be-beograd',
+      locationSlug: '',
       phone: '',
       description: '',
-      mainCategories: [],
-      subCategories: [],
-      coverageType: 'local',
-      coverageValue: '',
       instagram: '',
       facebook: '',
       website: '',
       logo: '',
       coverImage: '',
-      employeeCount: '1-5',
       companyPortfolioImages: [],
-      references: '',
-      licenses: '',
-      certifications: '',
-      equipmentSummary: '',
-      teamSpecialties: ''
     },
     mode: 'onSubmit'
   });
 
-  const mainCategories = watch('mainCategories');
-  const subCategories = watch('subCategories');
-  const coverageType = watch('coverageType');
   const logoUrl = watch('logo');
-  const coverImageUrl = watch('coverImage');
-  const portfolioImages = watch('companyPortfolioImages');
+  const coverUrl = watch('coverImage');
+  const portfolioImages = watch('companyPortfolioImages') || [];
 
   const hasInitializedRef = useRef(false);
 
@@ -115,26 +82,15 @@ export default function MyCompanyPage() {
         reset({
           name: existing.name || '',
           pib: existing.pib || '',
-          address: existing.address || '',
-          locationSlug: existing.locationSlug || 'be-beograd',
+          locationSlug: existing.locationSlug || '',
           phone: existing.phone || '',
           description: existing.description || '',
-          mainCategories: existing.mainCategories || [],
-          subCategories: existing.subCategories || [],
-          coverageType: (existing.coverageType as any) || 'local',
-          coverageValue: existing.coverageValue || '',
           instagram: existing.instagram || '',
           facebook: existing.facebook || '',
           website: existing.website || '',
           logo: existing.logo || '',
           coverImage: existing.coverImage || '',
-          employeeCount: existing.employeeCount || '1-5',
           companyPortfolioImages: existing.portfolioImages || [],
-          references: existing.references?.join(', ') || '',
-          licenses: existing.licenses?.join(', ') || '',
-          certifications: existing.certifications?.join(', ') || '',
-          equipmentSummary: existing.equipmentSummary || '',
-          teamSpecialties: existing.teamSpecialties?.join(', ') || ''
         });
       } else {
         hasInitializedRef.current = true;
@@ -147,36 +103,11 @@ export default function MyCompanyPage() {
     }
   }, [user, companies, loading, reset]);
 
-  const toggleMainCategory = (catId: string) => {
-    const isSelected = mainCategories.includes(catId);
-    const newCats = isSelected 
-      ? mainCategories.filter((c: string) => c !== catId)
-      : [...mainCategories, catId];
-    
-    // Clean up subcategories if main is removed
-    let newSubCats = subCategories;
-    if (isSelected) {
-      const remainingSubs = COMPANY_SUB_CATEGORIES[catId] || [];
-      newSubCats = subCategories.filter((s: string) => !remainingSubs.includes(s));
-    }
-
-    setValue('mainCategories', newCats, { shouldValidate: true, shouldDirty: true });
-    setValue('subCategories', newSubCats, { shouldValidate: true, shouldDirty: true });
-  };
-
-  const toggleSubCategory = (subName: string) => {
-    const newSubCats = subCategories.includes(subName)
-      ? subCategories.filter((s: string) => s !== subName)
-      : [...subCategories, subName];
-    setValue('subCategories', newSubCats, { shouldValidate: true, shouldDirty: true });
-  };
-
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSaving(true);
       try {
-        // 7. Direktni Client-Side Upload i Kompresija 
         const url = await uploadImageDirectly(file);
         setValue('logo', url, { shouldDirty: true });
       } catch (error: any) {
@@ -187,12 +118,13 @@ export default function MyCompanyPage() {
     }
   };
 
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSaving(true);
       try {
-        // 7. Direktni Client-Side Upload i Kompresija 
         const url = await uploadImageDirectly(file);
         setValue('coverImage', url, { shouldDirty: true });
       } catch (error: any) {
@@ -224,24 +156,55 @@ export default function MyCompanyPage() {
     setValue('companyPortfolioImages', newImages, { shouldDirty: true });
   };
 
+  const handleAIGenerate = async () => {
+    const name = watch('name');
+    const location = watch('locationSlug');
+    if (!name) {
+      alert("Molimo unesite Naziv Firme pre generisanja opisa.");
+      return;
+    }
+    
+    // Simulacija AI endpointa dok ga ne napravimo pravog:
+    const locationObj = LOCATIONS.find(l => l.slug === location);
+    const locName = locationObj ? locationObj.name : location;
+    const simDescription = `Mi smo ${name}, profesionalni tim stručnjaka lociran u mestu ${locName}. Posvećeni smo pružanju vrhunskih usluga i garantujemo kvalitet u svakom segmentu našeg poslovanja. Naše dugogodišnje iskustvo i brojni zadovoljni klijenti svedoče o našoj pouzdanosti i stručnosti.`;
+    
+    setValue('description', simDescription, { shouldDirty: true });
+  };
+
   const onSubmit = async (data: any) => {
     if (!user) return;
     
     setSaving(true);
     try {
-      const payload: Omit<CompanyAd, 'id' | 'createdAt'> = {
+      const payload: any = {
         ...data,
+        type: 'company',
         authorId: user.id,
         status: 'active',
         isPremium: true,
-        // Map Phase 2 strings back to arrays
+        companyName: data.name,
+        companyPIB: data.pib || '',
+        companyDescription: data.description || '',
+        companyAddress: data.location || '',
         portfolioImages: data.companyPortfolioImages,
-        references: data.references ? data.references.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
-        licenses: data.licenses ? data.licenses.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
-        certifications: data.certifications ? data.certifications.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
-        teamSpecialties: data.teamSpecialties ? data.teamSpecialties.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
-        equipmentSummary: data.equipmentSummary
-      } as any;
+        images: data.companyPortfolioImages || [],
+        
+        // Postavljamo podrazumevane (prazne) vrednosti za zaostala legacy polja
+        address: { street: '', city: '', country: '' },
+        workingHours: '',
+        mainCategories: [],
+        subCategories: [],
+        coverageType: 'local',
+        coverageValue: '',
+        coverImage: data.coverImage || '',
+        employeeCount: '1-5',
+        references: [],
+        licenses: [],
+        certifications: [],
+        teamSpecialties: [],
+        equipmentSummary: ''
+      };
 
       if (companyData && companyData.id) {
         await updateCompanyAd({ id: companyData.id, data: payload as any });
@@ -255,15 +218,21 @@ export default function MyCompanyPage() {
         phone: data.phone,
         businessProfile: {
           ...user.businessProfile,
+          companyName: data.name,
           logo: data.logo,
+          coverImage: data.coverImage,
           pib: data.pib
         } as any
       });
 
       alert("Podaci su sačuvani i profil firme je ažuriran.");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Greška pri čuvanju podataka.");
+      let errMsg = error?.response?.data?.error || error?.message || "Nepoznata greška";
+      if (error?.response?.data?.details) {
+         errMsg += "\nDetalji: " + JSON.stringify(error.response.data.details);
+      }
+      alert("Greška pri čuvanju podataka: " + errMsg);
     } finally {
       setSaving(false);
     }
@@ -273,39 +242,55 @@ export default function MyCompanyPage() {
 
   return (
     <DashboardLayout>
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-12 pb-20">
-        <div className="flex items-center justify-between">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto space-y-12 pb-20">
+        <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">PROFIL FIRME</h1>
-            <p className="text-white/40 text-xs font-bold uppercase tracking-widest">UPRAVLJAJTE JAVNIM PODACIMA VAŠE KOMPANIJE</p>
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest">POPUNITE PROFIL I DODAĆEMO VAS U ADRESAR</p>
           </div>
-          <button 
-            type="submit"
-            disabled={saving}
-            className="bg-secondary !text-black font-black px-10 py-4 rounded-[10px] hover:bg-yellow-400 transition-all text-xs tracking-widest uppercase disabled:opacity-50"
-          >
-            {saving ? 'ČUVANJE...' : 'SAČUVAJ IZMENE'}
-          </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-white/5 gap-8 overflow-x-auto no-scrollbar">
-          {['Osnovno', 'Usluge', 'Pokrivenost', 'Vizuelno', 'Portfolio & B2B'].map((stepName, idx) => (
-            <button
-              type="button"
-              key={stepName}
-              onClick={() => setActiveStep(idx + 1)}
-              className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative whitespace-nowrap ${activeStep === idx + 1 ? 'text-secondary' : 'text-white/40 hover:text-white'}`}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
+          {/* Pozadina profila */}
+          <div className="w-full space-y-4">
+            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Pozadina Profila</h4>
+            <div 
+              onClick={() => coverInputRef.current?.click()}
+              className="w-full h-48 bg-white/5 shadow-2xl rounded-[10px] border border-white/5 flex items-center justify-center overflow-hidden cursor-pointer group relative"
             >
-              {stepName}
-              {activeStep === idx + 1 && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-secondary"></div>}
-            </button>
-          ))}
-        </div>
+              {coverUrl ? (
+                <img src={coverUrl} alt="Cover" className="w-full h-full object-cover" />
+              ) : (
+                <span className="material-symbols-outlined text-white/10 text-6xl">wallpaper</span>
+              )}
+              <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                <span className="material-symbols-outlined text-white">publish</span>
+              </div>
+            </div>
+            <input type="file" ref={coverInputRef} onChange={handleCoverUpload} className="hidden" accept="image/*" />
+          </div>
 
-        {activeStep === 1 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Logo i Osnovno */}
+          <div className="flex flex-col md:flex-row gap-10 items-start">
+            <div className="w-full md:w-1/3 space-y-4">
+              <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Logo Firme</h4>
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="aspect-square bg-white shadow-2xl rounded-[10px] border-4 border-white/5 flex items-center justify-center overflow-hidden cursor-pointer group relative"
+              >
+                {logoUrl ? (
+                  <img width="800" height="600" decoding="async" src={logoUrl} alt="Logo" className="w-full h-full object-contain" loading="lazy" />
+                ) : (
+                  <span className="material-symbols-outlined text-black/10 text-6xl">add_business</span>
+                )}
+                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                  <span className="material-symbols-outlined text-white">publish</span>
+                </div>
+              </div>
+              <input aria-label="Unos polja" type="file" ref={fileInputRef} onChange={handleLogoUpload} className="hidden" accept="image/*" />
+            </div>
+
+            <div className="w-full md:w-2/3 space-y-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Naziv Firme *</label>
                 <input 
@@ -314,6 +299,7 @@ export default function MyCompanyPage() {
                 />
                 {errors.name && <p className="text-red-500 text-xs">{errors.name.message as string}</p>}
               </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">PIB (Javno vidljiv) *</label>
                 <input 
@@ -322,268 +308,111 @@ export default function MyCompanyPage() {
                 />
                 {errors.pib && <p className="text-red-500 text-xs">{errors.pib.message as string}</p>}
               </div>
+
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Lokacija Sedišta *</label>
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Lokacija Sedišta</label>
                 <select 
                   {...register('locationSlug')}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all appearance-none"
+                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 1rem center", backgroundSize: "1.2rem" }}
                 >
-                   {LOCATIONS.map(loc => <option key={loc.slug} value={loc.slug}>{loc.name}</option>)}
+                   <option value="" className="bg-[#0B1219] text-white">SVE LOKACIJE (OPCIONO)</option>
+                   {LOCATIONS.map(loc => <option key={loc.slug} value={loc.slug} className="bg-[#0B1219] text-white">{loc.name}</option>)}
                 </select>
                 {errors.locationSlug && <p className="text-red-500 text-xs">{errors.locationSlug.message as string}</p>}
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Tačna Adresa</label>
-                <input 
-                  {...register('address')}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Broj Zaposlenih</label>
-                <select 
-                  {...register('employeeCount')}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"
-                >
-                   {COMPANY_EMPLOYEE_RANGES.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Kontakt Telefon</label>
-                <input 
-                  {...register('phone')}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"
-                />
-              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Opis Firme i Istorijat</label>
-              <textarea 
-                {...register('description')}
-                rows={6}
-                className="w-full bg-white/5 border border-white/10 rounded-[10px] p-6 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all resize-none"
-              ></textarea>
-            </div>
-          </motion.div>
-        )}
+          </div>
 
-        {activeStep === 2 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
-            <div>
-              <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-6">GLAVNE DELATNOSTI (Odaberite jednu ili više)</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {COMPANY_MAIN_CATEGORIES.map(cat => (
-                  <button
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-white/5">
+             <div className="space-y-2">
+               <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Email Adresa</label>
+               <input 
+                 value={user?.email || ''}
+                 disabled
+                 className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white/50 outline-none cursor-not-allowed"
+               />
+             </div>
+             <div className="space-y-2">
+               <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Kontakt Telefon</label>
+               <input 
+                 {...register('phone')}
+                 className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"
+               />
+             </div>
+          </div>
+
+          <div className="space-y-6 pt-6 border-t border-white/5">
+            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Društvene Mreže i Sajt</h4>
+            <div className="flex flex-col gap-6">
+               {[
+                 { name: 'website', icon: 'language', label: 'Web Sajt' },
+                 { name: 'facebook', icon: 'facebook', label: 'Facebook' },
+                 { name: 'instagram', icon: 'photo_camera', label: 'Instagram' }
+               ].map(item => (
+                 <div key={item.name} className="flex flex-col gap-2 relative">
+                   <span className="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-lg text-white/20 z-10 pointer-events-none">{item.icon}</span>
+                   <input 
+                     {...register(item.name as any)}
+                     placeholder={item.label}
+                     className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 pl-14 text-xs font-bold text-white outline-none focus:border-secondary transition-all placeholder:text-white/20" 
+                   />
+                   {errors[item.name as keyof CompanyFormValues] && <p className="text-red-500 text-xs">{errors[item.name as keyof CompanyFormValues]?.message as string}</p>}
+                 </div>
+               ))}
+            </div>
+          </div>
+
+          <div className="space-y-2 pt-6 border-t border-white/5 relative">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Opis Firme</label>
+              <button 
+                type="button" 
+                onClick={handleAIGenerate}
+                className="flex items-center gap-2 text-secondary hover:text-white bg-secondary/10 hover:bg-secondary/20 transition-all px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest"
+              >
+                <span>✨</span> Generiši Opis sa AI
+              </button>
+            </div>
+            <textarea 
+              {...register('description')}
+              rows={8}
+              placeholder="Unesite kratak opis firme..."
+              className="w-full bg-white/5 border border-white/10 rounded-[10px] p-6 text-xs font-bold text-white outline-none focus:border-secondary transition-all resize-none"
+            ></textarea>
+          </div>
+
+          <div className="space-y-6 pt-6 border-t border-white/5">
+            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Portfolio Slike</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+              {portfolioImages.map((url: string, idx: number) => (
+                <div key={idx} className="aspect-square relative rounded-[10px] overflow-hidden group">
+                  <OptimizedImage src={url} fallbackType="company" alt="Slika" className="w-full h-full object-cover" />
+                  <button 
                     type="button"
-                    key={cat.id}
-                    onClick={() => toggleMainCategory(cat.id)}
-                    className={`p-4 rounded-[10px] border-2 transition-all flex flex-col items-center gap-3 ${mainCategories?.includes(cat.id) ? 'border-secondary bg-secondary/10' : 'border-white/5 bg-white/5 hover:border-white/20'}`}
+                    onClick={() => removePortfolioImage(idx)}
+                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all"
                   >
-                    <span className="material-symbols-outlined text-2xl">{cat.icon}</span>
-                    <span className="text-[9px] font-black uppercase text-center leading-tight">{cat.name}</span>
+                    <span className="material-symbols-outlined text-xs">close</span>
                   </button>
-                ))}
-              </div>
-            </div>
-
-            {mainCategories?.length > 0 && (
-              <div>
-                <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-6">SPECIFIČNE USLUGE</h3>
-                <div className="flex flex-wrap gap-2">
-                   {mainCategories.flatMap((catId: string) => COMPANY_SUB_CATEGORIES[catId] || []).map((sub: string) => (
-                     <button
-                       type="button"
-                       key={sub}
-                       onClick={() => toggleSubCategory(sub)}
-                       className={`px-4 py-2 rounded-[10px] text-[9px] font-black uppercase tracking-widest border transition-all ${subCategories?.includes(sub) ? 'bg-secondary !text-black border-secondary' : 'bg-white/5 text-white/40 border-white/10 hover:border-white/30'}`}
-                     >
-                       {sub}
-                     </button>
-                   ))}
                 </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {activeStep === 3 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Područje rada *</label>
-                {[
-                  { id: 'local', name: 'Lokalno (grad/opština)' },
-                  { id: 'regional', name: 'Regionalno (ceo region)' },
-                  { id: 'national', name: 'Cela Srbija' },
-                  { id: 'international', name: 'Inostranstvo' }
-                ].map(opt => (
-                  <button
-                    type="button"
-                    key={opt.id}
-                    onClick={() => setValue('coverageType', opt.id as any, { shouldValidate: true, shouldDirty: true })}
-                    className={`w-full p-5 rounded-[10px] border-2 text-left transition-all flex items-center justify-between ${coverageType === opt.id ? 'border-secondary bg-secondary/10' : 'border-white/5 bg-white/5'}`}
-                  >
-                    <span className={`text-xs font-bold uppercase tracking-wider ${coverageType === opt.id ? 'text-secondary' : 'text-white'}`}>{opt.name}</span>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${coverageType === opt.id ? 'border-secondary' : 'border-white/20'}`}>
-                      {coverageType === opt.id && <div className="w-2.5 h-2.5 bg-secondary rounded-full"></div>}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="space-y-4">
-                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Detalji lokacija</label>
-                <textarea 
-                  {...register('coverageValue')}
-                  rows={8}
-                  placeholder="Navedite gradove ili regije..."
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-6 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all resize-none"
-                ></textarea>
-              </div>
+              ))}
+              <label className="aspect-square rounded-[10px] border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 hover:border-secondary transition-all cursor-pointer">
+                <span className="material-symbols-outlined text-white/20">add_a_photo</span>
+                <input aria-label="Unos slika" type="file" multiple className="hidden" onChange={handlePortfolioUpload} accept="image/*" />
+              </label>
             </div>
-          </motion.div>
-        )}
-
-        {activeStep === 4 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {/* Logo Upload */}
-              <div className="space-y-6">
-                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Logo Firme</h4>
-                <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square bg-white shadow-2xl rounded-[10px] border-4 border-white/5 flex items-center justify-center overflow-hidden cursor-pointer group relative"
-                >
-                  {logoUrl ? (
-                    <img width="800" height="600" decoding="async" src={logoUrl} alt="Logo" className="w-full h-full object-contain" loading="lazy" />
-                  ) : (
-                    <span className="material-symbols-outlined text-black/10 text-6xl">add_business</span>
-                  )}
-                  <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white">publish</span>
-                  </div>
-                </div>
-                <input aria-label="Unos polja" type="file" ref={fileInputRef} onChange={handleLogoUpload} className="hidden" accept="image/*" />
-              </div>
-
-              {/* Cover Image Upload */}
-              <div className="space-y-6">
-                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Naslovna Slika (Cover)</h4>
-                <div 
-                  onClick={() => coverInputRef.current?.click()}
-                  className="aspect-square bg-white/5 rounded-[10px] border-4 border-dashed border-white/5 flex items-center justify-center overflow-hidden cursor-pointer group relative"
-                >
-                  {coverImageUrl ? (
-                    <img width="800" height="600" decoding="async" src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" loading="lazy" />
-                  ) : (
-                    <span className="material-symbols-outlined text-white/10 text-6xl">image</span>
-                  )}
-                  <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white">publish</span>
-                  </div>
-                </div>
-                <input aria-label="Unos polja" type="file" ref={coverInputRef} onChange={handleCoverUpload} className="hidden" accept="image/*" />
-              </div>
-            </div>
-
-            <div className="space-y-6 pt-10 border-t border-white/5">
-              <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Društvene Mreže i Sajt</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 {[
-                   { name: 'website', icon: 'language', label: 'Web Sajt' },
-                   { name: 'facebook', icon: 'facebook', label: 'Facebook' },
-                   { name: 'instagram', icon: 'photo_camera', label: 'Instagram' }
-                 ].map(item => (
-                   <div key={item.name} className="flex flex-col gap-2">
-                     <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-[10px] px-6 py-4 focus-within:border-secondary/50 transition-all">
-                       <span className="material-symbols-outlined text-lg text-white/20">{item.icon}</span>
-                       <input 
-                         {...register(item.name as any)}
-                         placeholder={item.label}
-                         className="bg-transparent border-none outline-none text-[11px] font-bold text-white w-full placeholder:text-white/10" 
-                       />
-                     </div>
-                     {errors[item.name as keyof CompanyFormValues] && <p className="text-red-500 text-xs">{errors[item.name as keyof CompanyFormValues]?.message as string}</p>}
-                   </div>
-                 ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {activeStep === 5 && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Reference (Razdvojite zarezom)</label>
-                <textarea 
-                  {...register('references')}
-                  rows={4}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all resize-none"
-                  placeholder="Npr. Projekt X, Izgradnja Y..."
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Licence i Sertifikati (Svojstva)</label>
-                <textarea 
-                  {...register('licenses')}
-                  rows={4}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all resize-none"
-                  placeholder="Licenca 1, Licenca 2..."
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Sertifikati (ISO, CE...)</label>
-                <textarea 
-                  {...register('certifications')}
-                  rows={4}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all resize-none"
-                  placeholder="ISO 9001, CE znak..."
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Specijalnosti tima</label>
-                <input 
-                  {...register('teamSpecialties')}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"
-                  placeholder="Zavarivanje, Armiranje..."
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Pregled Mehanizacije</label>
-                <textarea 
-                  {...register('equipmentSummary')}
-                  rows={4}
-                  className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all resize-none"
-                  placeholder="Bageri 5t, Kamioni..."
-                />
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Portfolio Galerija</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-                {portfolioImages?.map((url: string, idx: number) => (
-                  <div key={idx} className="aspect-square relative rounded-[10px] overflow-hidden group">
-                    <OptimizedImage src={url} fallbackType="company" alt="Slika" className="w-full h-full object-cover" />
-                    <button 
-                      type="button"
-                      onClick={() => removePortfolioImage(idx)}
-                      className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      <span className="material-symbols-outlined text-xs">close</span>
-                    </button>
-                  </div>
-                ))}
-                <label className="aspect-square rounded-[10px] border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 hover:border-secondary transition-all cursor-pointer">
-                  <span className="material-symbols-outlined text-white/20">add_a_photo</span>
-                  <input aria-label="Unos polja" type="file" multiple className="hidden" onChange={handlePortfolioUpload} accept="image/*" />
-                </label>
-              </div>
-            </div>
-          </motion.div>
-        )}
+          </div>
+          
+          <button 
+            type="submit"
+            disabled={saving}
+            className="w-full bg-secondary !text-black font-black px-10 py-5 rounded-[10px] hover:bg-yellow-400 transition-all text-sm tracking-widest uppercase disabled:opacity-50 mt-10"
+          >
+            {saving ? 'ČUVANJE...' : 'SAČUVAJ IZMENE'}
+          </button>
+        </motion.div>
       </form>
     </DashboardLayout>
   );
 }
-

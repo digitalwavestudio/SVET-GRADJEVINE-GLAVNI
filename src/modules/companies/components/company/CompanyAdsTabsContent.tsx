@@ -1,5 +1,5 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { MACHINE_CATEGORIES } from '@/src/constants/machineTaxonomy';
@@ -31,6 +31,9 @@ export function CompanyAdsTabsContent({
   activePlots,
   isLoadingCurrentTab
 }: CompanyAdsTabsContentProps) {
+  const [visibleJobsCount, setVisibleJobsCount] = useState(5);
+  const displayedJobs = activeJobs.slice(0, visibleJobsCount);
+  const hasMoreJobs = activeJobs.length > visibleJobsCount;
   return (
     <AnimatePresence mode="wait">
       {activeTab === 'jobs' && (
@@ -42,7 +45,7 @@ export function CompanyAdsTabsContent({
           className="space-y-6"
         >
           <div className="flex items-center justify-between mb-8">
-             <h2 className="text-3xl font-black uppercase tracking-tighter text-white font-headline">Aktivni Poslovi</h2>
+             <h2 className="text-3xl font-black uppercase tracking-tighter text-white font-headline">Svi oglasi ovog poslodavca</h2>
              <div className="h-px flex-1 bg-white/5 mx-8 hidden md:block"></div>
           </div>
           {isLoadingCurrentTab ? (
@@ -54,7 +57,7 @@ export function CompanyAdsTabsContent({
             </div>
           ) : (
             <div className="space-y-6">
-              {activeJobs.map((job) => (
+              {displayedJobs.map((job) => (
                  <Link 
                   key={job.id}
                   to={getJobLink(job.id)}
@@ -81,6 +84,16 @@ export function CompanyAdsTabsContent({
                   </div>
                 </Link>
               ))}
+              {hasMoreJobs && (
+                <div className="pt-4 text-center">
+                  <button
+                    onClick={() => setVisibleJobsCount(prev => prev + 5)}
+                    className="bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest px-8 py-4 rounded-[10px] text-[10px] transition-all border border-white/10"
+                  >
+                    Učitaj još
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </motion.div>

@@ -12,11 +12,31 @@ export interface Company extends SharedCompany {
   isPremiumProfile?: boolean;
 }
 
+const normalizeCompany = (c: any): Company => {
+  if (!c) return c;
+  return {
+    ...c,
+    name: c.comp || c.name || 'Nedefinisana Firma',
+    description: c.companyDescription || c.description || '',
+    portfolioImages: c.companyPortfolioImages || c.portfolioImages || [],
+    pib: c.companyPIB || c.pib || '',
+    address: typeof c.address === 'object' ? c.address : (c.companyAddress || c.address || ''),
+    logo: c.logo || (c.images && c.images.length > 0 ? c.images[0] : ''),
+    isVerified: c.status === 'active' || c.isVerified,
+    phone: c.phone || '',
+    website: c.website || c.companyWeb || '',
+    facebook: c.facebook || c.companyFB || '',
+    instagram: c.instagram || c.companyIG || '',
+    workingHours: c.workingHours || c.companyWorkingHours || '',
+  } as Company;
+};
+
 export const companiesService = {
   async getById(id: string): Promise<Company | null> {
     return withRetry(async () => {
       try {
-        return await apiClient.get<Company>(`/ads/${id}`);
+        const res = await apiClient.get<any>(`/ads/${id}`);
+        return normalizeCompany(res);
       } catch (e) {
         return null;
       }
@@ -34,9 +54,14 @@ export const companiesService = {
       : (typeof lastDoc === 'string' ? lastDoc : undefined);
 
     return withRetry(async () => {
-      const data = await algoliaSearch('companies', filters || {}, validPageSize, lastVisibleId || undefined);
+      const data = await apiClient.post<any>('/ads/search', {
+        category: 'companies',
+        filters: filters || {},
+        pageSize: validPageSize,
+        lastVisibleId: lastVisibleId || undefined
+      });
       return {
-        items: (data.docs || []) as unknown as Company[],
+        items: (data.docs || []).map((doc: any) => normalizeCompany(doc)) as Company[],
         lastVisible: data.lastVisibleId || null,
         hasMore: data.hasMore || false
       };
@@ -54,7 +79,7 @@ export const companiesService = {
 
   async update(id: string, updates: Partial<Company>) {
     return withRetry(async () => {
-      await apiClient.patch(`/ads/${id}`, updates);
+      await apiClient.patch(`/ads/${id}`, { category: 'companies', data: updates });
     });
   },
 

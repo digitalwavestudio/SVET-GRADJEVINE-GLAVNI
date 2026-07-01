@@ -363,15 +363,16 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
               .get();
             today = todaySnap.data().count;
           } catch (e) {
-            // count() fallback — ne ruši ceo odgovor
+            // count() fallback
             today = 0;
           }
         } else if (collectionName === "companies") {
           const todayStart = new Date();
           todayStart.setHours(0, 0, 0, 0);
           try {
-            const todaySnap = await db.collection("users")
-              .where("role", "==", "company")
+            const todaySnap = await db.collection("listings")
+              .where("type", "==", "company")
+              .where("status", "==", "active")
               .where("createdAt", ">=", todayStart)
               .count()
               .get();

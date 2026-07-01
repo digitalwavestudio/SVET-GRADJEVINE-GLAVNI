@@ -18,13 +18,13 @@ export function CompanyNavigationTabs({ activeTab, setActiveTab, counts }: Compa
   return (
     <div className="flex flex-nowrap md:flex-wrap gap-2 mb-8 bg-white/5 p-2 rounded-[10px] border border-white/5 overflow-x-auto overflow-y-hidden no-scrollbar">
       {[
+        { id: 'info', label: 'O Firmi', count: null, icon: 'info' },
         { id: 'jobs', label: 'Poslovi', count: counts.jobs, icon: 'work' },
         { id: 'machines', label: 'Mašine', count: counts.machines, icon: 'construction' },
         { id: 'accommodations', label: 'Smeštaj', count: counts.accommodations, icon: 'home' },
         { id: 'catering', label: 'Hrana', count: counts.catering, icon: 'restaurant' },
         { id: 'realestate', label: 'Placevi', count: counts.realestate, icon: 'landscape' },
-        { id: 'info', label: 'O Firmi', count: null, icon: 'info' },
-      ].map(tab => (
+      ].filter(tab => tab.count === null || tab.count > 0).map(tab => (
         <button
           key={tab.id}
           onClick={() => setActiveTab(tab.id as ProfileTab)}

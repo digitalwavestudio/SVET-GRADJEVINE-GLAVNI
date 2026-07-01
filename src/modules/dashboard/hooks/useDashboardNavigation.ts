@@ -118,7 +118,7 @@ export function useDashboardNavigation() {
         return [
           { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'NADZORNI CENTAR', path: '/moj-profil/gradiliste', icon: 'monitoring' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
+          { label: 'BIZNIS PROFIL', path: '/moj-profil/firma', icon: 'domain' },
           { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
           { label: 'PRIJAVE', path: '/moj-profil/prijave', icon: 'assignment' },
           { label: 'UPITI', path: '/moj-profil/upiti', icon: 'mark_email_unread' },

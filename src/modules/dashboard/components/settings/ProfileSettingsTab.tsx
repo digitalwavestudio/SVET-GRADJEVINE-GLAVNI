@@ -7,8 +7,10 @@ interface ProfileSettingsTabProps {
   errors: Record<string, string>;
   user: any;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
+  coverInputRef?: React.RefObject<HTMLInputElement | null>;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleCoverChange?: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
 
 export function ProfileSettingsTab({
@@ -16,8 +18,10 @@ export function ProfileSettingsTab({
   errors,
   user,
   fileInputRef,
+  coverInputRef,
   handleInputChange,
   handleFileChange,
+  handleCoverChange,
 }: ProfileSettingsTabProps) {
   return (
     <motion.div 
@@ -25,6 +29,25 @@ export function ProfileSettingsTab({
       animate={{ opacity: 1, x: 0 }}
       className="space-y-10"
     >
+      {user?.role === 'poslodavac' && (
+        <div className="pb-10 border-b border-white/5 space-y-4">
+          <h3 className="text-2xl font-black text-white uppercase tracking-tight">POZADINA PROFILA FIRME</h3>
+          <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-relaxed">
+            OVA SLIKA ĆE SE PRIKAZIVATI KAO POZADINA VAŠEG BIZNIS PROFILA. <span className="text-secondary opacity-60">(LIMIT: 100KB)</span>
+          </p>
+          <div className="relative group w-full h-48 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center overflow-hidden cursor-pointer hover:border-secondary transition-all" onClick={() => coverInputRef?.current?.click()}>
+            {formData.coverImage ? (
+              <OptimizedImage src={formData.coverImage} fallbackType="default" alt="Cover slika" className="w-full h-full object-cover" containerClassName="w-full h-full" />
+            ) : (
+              <span className="material-symbols-outlined text-white/20 text-6xl">wallpaper</span>
+            )}
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+              <span className="material-symbols-outlined text-white text-3xl">publish</span>
+            </div>
+            <input type="file" ref={coverInputRef} onChange={handleCoverChange} className="hidden" accept="image/*" />
+          </div>
+        </div>
+      )}
       <div className="flex flex-col md:flex-row gap-8 items-start pb-10 border-b border-white/5">
         <div className="relative group">
           <div className="w-40 h-40 rounded-[10px] bg-white flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-secondary transition-all p-2 shadow-2xl">
@@ -89,17 +112,44 @@ export function ProfileSettingsTab({
         </div>
 
         {user?.role === 'poslodavac' && (
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">NAZIV FIRME</label>
-            <input 
-              name="company"
-              value={formData.company}
-              onChange={handleInputChange}
-              placeholder="npr. ENERGOPROJEKT D.O.O."
-              className={`w-full bg-white/[0.03] border ${errors.company ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none`}
-            />
-            {errors.company && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.company}</p>}
-          </div>
+          <>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">NAZIV FIRME</label>
+              <input 
+                name="company"
+                value={formData.company || ''}
+                onChange={handleInputChange}
+                placeholder="npr. ENERGOPROJEKT D.O.O."
+                className={`w-full bg-white/[0.03] border ${errors.company ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none`}
+              />
+              {errors.company && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.company}</p>}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">PIB FIRME</label>
+                <input 
+                  name="pib"
+                  value={formData.pib || ''}
+                  onChange={handleInputChange}
+                  placeholder="npr. 102345678"
+                  className={`w-full bg-white/[0.03] border ${errors.pib ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none`}
+                />
+                {errors.pib && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.pib}</p>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">WEBSAJT FIRME</label>
+                <input 
+                  name="website"
+                  value={formData.website || ''}
+                  onChange={handleInputChange}
+                  placeholder="npr. https://vasafirma.rs"
+                  className={`w-full bg-white/[0.03] border ${errors.website ? 'border-red-500' : 'border-white/5'} rounded-[10px] py-5 px-6 text-sm font-bold tracking-widest uppercase focus:border-secondary transition-all outline-none`}
+                />
+                {errors.website && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors.website}</p>}
+              </div>
+            </div>
+          </>
         )}
         
         {user?.role !== 'standard' && user?.role !== 'poslodavac' && (
@@ -118,8 +168,26 @@ export function ProfileSettingsTab({
 
         {user?.role !== 'standard' && (
           <>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-widest ml-1">KRATAK OPIS / O NAMA</label>
+            <div className="space-y-2 relative">
+              <div className="flex items-center justify-between ml-1">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-widest">KRATAK OPIS / O NAMA</label>
+                {(user?.role === 'poslodavac' || user?.role === 'company' || user?.role === 'business') && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const comp = formData.company || formData.name || 'naša kompanija';
+                      const generated = `Dobrodošli na profil firme ${comp}. Mi smo profesionalni tim specijalizovan za visokokvalitetne radove i usluge u građevinarstvu. Sa dugogodišnjim iskustvom i posvećenošću detaljima, garantujemo pouzdanost i stručnost na svakom projektu. Naš cilj je da vaše vizije pretvorimo u stvarnost, poštujući rokove i najviše standarde kvaliteta u industriji. Kontaktirajte nas za saradnju i uverite se u našu profesionalnost!`;
+                      const fakeEvent = { target: { name: 'description', value: generated } } as any;
+                      handleInputChange(fakeEvent);
+                    }}
+                    className="text-[10px] font-black text-secondary uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
+                    Generiši AI Opis
+                  </button>
+                )}
+              </div>
               <textarea 
                 name="description"
                 value={formData.description}

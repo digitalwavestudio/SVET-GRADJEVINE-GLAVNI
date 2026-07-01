@@ -3,8 +3,9 @@ import { phoneRegex } from '@/src/modules/core';
 
 export const userBusinessProfileSchema = z.object({
   companyName: z.string().min(2, 'Naziv kompanije je obavezan').max(200),
-  logo: z.string().max(2083).or(z.literal('')).optional(),
-  website: z.string().url().or(z.literal('')).optional(),
+  logo: z.string().or(z.literal('')).optional(),
+  pib: z.string().max(20).optional(),
+  website: z.string().max(2083).or(z.literal('')).optional(),
   industry: z.string().optional(),
   about: z.string().max(5000).optional(),
   address: z.object({
@@ -22,7 +23,8 @@ export const userProfileSchema = z.object({
   description: z.string().max(10000).optional(),
   facebook: z.string().max(500).or(z.literal('')).optional(),
   instagram: z.string().max(500).or(z.literal('')).optional(),
-  photoURL: z.string().max(2083).or(z.literal('')).optional(),
+  photoURL: z.string().or(z.literal('')).optional(),
+  portfolioImages: z.array(z.string()).optional(),
   profession: z.string().max(200).optional(),
   company: z.string().max(200).optional(),
   city: z.string().max(100).optional(),
@@ -32,8 +34,7 @@ export const userProfileSchema = z.object({
   availability: z.string().optional(),
   businessProfile: userBusinessProfileSchema.partial().optional(),
   isVerified: z.boolean().optional(),
-  verifiedAt: z.any().optional(), // Firebase timestamp or ISO string
-  pib: z.string().optional()
+  verifiedAt: z.any().optional() // Firebase timestamp or ISO string
 }).passthrough(); // allow extra fields without failing
 
 export type UserBusinessProfileValues = z.infer<typeof userBusinessProfileSchema>;

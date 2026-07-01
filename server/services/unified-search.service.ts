@@ -73,14 +73,15 @@ export class UnifiedSearchService {
 
     let q: FirebaseFirestore.Query;
 
-    const isProfileSearch = category === "masters" || category === "companies" || entityType === "master" || entityType === "company";
+    // Oglasi firmi i majstora su sada u listings bazi! (migracija na jedinstveni sistem)
+    const isProfileSearch = false; // Privremeno (ili trajno) ukidamo legacy pretragu po users kolekciji za sve
 
     if (isProfileSearch) {
       q = db.collection("users");
       const targetRole = category === "masters" || entityType === "master" ? "majstor" : "company";
       q = q.where("role", "==", targetRole);
     } else {
-      q = db.collection("listings");  // ← Use collection() instead of collectionGroup()
+      q = db.collection("listings");
       if (entityType && entityType !== "all") q = q.where("type", "==", entityType);
     }
 
@@ -142,6 +143,7 @@ export class UnifiedSearchService {
 
     try {
       const snap = await q.get();
+      console.log('UNIFIED SEARCH GOT SNAP.DOCS.LENGTH = ', snap.docs.length, ' FOR CATEGORY', category);
       const hasMore = snap.docs.length > pageSize;
       const actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
 

@@ -409,7 +409,7 @@ export const validateRequest = (schema: ZodSchema) => {
         const details = formatZodErrorSerbian(error);
         
         res.status(400).json({
-          error: "Payload validacija nije uspela",
+          error: "Validacija nije uspela: " + details.map(d => d.field + "=" + d.message).join(", "),
           details
         });
 
@@ -485,7 +485,7 @@ export const validateBody = (schema: ZodSchema) => {
         const details = formatZodErrorSerbian(error);
         
         res.status(400).json({
-          error: "Payload validacija nije uspela",
+          error: "Validacija nije uspela: " + details.map(d => d.field + "=" + d.message).join(", "),
           details
         });
 
@@ -700,7 +700,7 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
       const details = formatZodErrorSerbian(error);
       
       res.status(400).json({
-        error: "Payload validacija nije uspela",
+        error: "Validacija nije uspela: " + details.map(d => d.field + "=" + d.message).join(", "),
         details
       });
 

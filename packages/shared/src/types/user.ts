@@ -97,6 +97,8 @@ export interface User {
   description?: string;
   facebook?: string;
   instagram?: string;
+  pib?: string;
+  website?: string;
   hasCV?: boolean;
   freeAdsCount: number;
   isPremiumProfile: boolean;
@@ -147,7 +149,6 @@ export interface User {
   isAdmin?: boolean;
   lastSeen?: { _seconds: number; _nanoseconds: number } | string | number | Date | null;
   mb?: string;
-  pib?: string;
   licences?: string[];
   events?: { date: string; status: 'free' | 'busy' | 'maintenance' }[];
   stats?: {

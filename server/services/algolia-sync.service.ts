@@ -124,7 +124,7 @@ export class AlgoliaSync {
     let category = "";
     if (userData.role === "master" || userData.role === "professional" || userData.role === "majstor")
       category = "masters";
-    else if (userData.role === "company" || userData.role === "business")
+    else if (userData.role === "company" || userData.role === "business" || userData.role === "poslodavac")
       category = "companies";
 
     if (!category) return;

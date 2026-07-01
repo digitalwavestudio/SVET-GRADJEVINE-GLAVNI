@@ -138,7 +138,7 @@ export const searchAds = async (
     const { CacheService } = await import("../services/cache.service.ts");
 
     const filtersStr = JSON.stringify(filters);
-    const cacheKey = `search_ads_${category || "all"}_${filtersStr}_${limit}_${lastVisibleId || "none"}`;
+    const cacheKey = `search_ads_v4_${category || "all"}_${filtersStr}_${limit}_${lastVisibleId || "none"}`;
 
     // Agresivno SWR keširanje na bazi query-parametr-hash-a
     // Povećavamo TTL na 60 minuta (3600000 ms) za anonimne pretrage
@@ -152,7 +152,7 @@ export const searchAds = async (
           limit,
           lastVisibleId,
         );
-        return publicAdsResponseSchema.parse(searchRes);
+        return searchRes;
       },
       3600000, // 60 min cache
       { docs: [], lastVisibleId: null, hasMore: false }

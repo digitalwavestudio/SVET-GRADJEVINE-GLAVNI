@@ -41,17 +41,16 @@ export default function CompanyProfilePage() {
   const { data: company, isLoading: companyLoading } = useCompanyDetails(id);
   
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<ProfileTab>('info');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const { updateCompanyAd } = useCompanyAdMutations();
 
   const { data: authorCounts } = useAuthorCounts(company?.authorId, id);
 
-  const { data: jobsData, isLoading: jobsLoading } = useJobs({ companyId: id }, { enabled: activeTab === 'jobs' && !!id });
-  const { data: machinesData, isLoading: machinesLoading } = useMachinesList({ authorId: company?.authorId }, { enabled: activeTab === 'machines' && !!company?.authorId });
-  const { data: accData, isLoading: accLoading } = useAccommodationsList({ authorId: company?.authorId }, { enabled: activeTab === 'accommodations' && !!company?.authorId });
-  const { data: catData, isLoading: catLoading } = useCateringList({ authorId: company?.authorId }, { enabled: activeTab === 'catering' && !!company?.authorId });
-  const { data: plotsData, isLoading: plotsLoading } = useRealEstateList({ authorId: company?.authorId }, { enabled: activeTab === 'realestate' && !!company?.authorId });
+  const { data: jobsData, isLoading: jobsLoading } = useJobs({ authorId: company?.authorId }, { enabled: !!company?.authorId });
+  const { data: machinesData, isLoading: machinesLoading } = useMachinesList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
+  const { data: accData, isLoading: accLoading } = useAccommodationsList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
+  const { data: catData, isLoading: catLoading } = useCateringList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
+  const { data: plotsData, isLoading: plotsLoading } = useRealEstateList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
 
   const activeJobs = jobsData?.pages.flatMap(p => p?.items || []) || [];
   const activeMachines = machinesData?.pages.flatMap(p => p?.items || []) || [];
@@ -59,12 +58,7 @@ export default function CompanyProfilePage() {
   const activeCaterings = catData?.pages.flatMap(p => p?.items || []) || [];
   const activePlots = plotsData?.pages.flatMap(p => p?.items || []) || [];
 
-  const isLoadingCurrentTab = 
-    (activeTab === 'jobs' && jobsLoading) ||
-    (activeTab === 'machines' && machinesLoading) ||
-    (activeTab === 'accommodations' && accLoading) ||
-    (activeTab === 'catering' && catLoading) ||
-    (activeTab === 'realestate' && plotsLoading) || false;
+  const isLoadingCurrentTab = jobsLoading || machinesLoading || accLoading || catLoading || plotsLoading || false;
 
   const { isTrackedInSession } = useTrackView(company?.id, 'companies', company?.id);
 
@@ -110,8 +104,16 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="bg-[#0F1923] text-white font-body selection:bg-secondary selection:!text-black min-h-screen">
+      <SeoHead 
+        title={`${company.name} | Profil Firme | Svet Građevine`}
+        description={company.description?.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) || "Detaljan profil firme na platformi Svet Građevine."}
+        image={company.coverImage || company.logo}
+        type="website"
+        jsonLd={[orgSchema, breadcrumbSchema]}
+      />
+      
       {isAdmin && company && (
-        <div className="fixed bottom-0 left-0 right-0 z-[100] bg-slate-900 border-t border-white/10 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div className="bg-slate-900 border-b border-white/10 p-3 relative z-50">
           <div className="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-white">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
@@ -144,13 +146,6 @@ export default function CompanyProfilePage() {
           </div>
         </div>
       )}
-      <SeoHead 
-        title={`${company.name} | Profil Firme | Svet Građevine`}
-        description={company.description?.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) || "Detaljan profil firme na platformi Svet Građevine."}
-        image={company.coverImage || company.logo}
-        type="website"
-        jsonLd={[orgSchema, breadcrumbSchema]}
-      />
       <main className="max-w-[1920px] mx-auto min-h-screen">
         <CompanyHeroSection company={company} isTrackedInSession={isTrackedInSession} />
 
@@ -160,30 +155,66 @@ export default function CompanyProfilePage() {
             
             {/* MAIN CONTENT COLUMN (8 cols) */}
             <article className="lg:col-span-8 space-y-12" aria-labelledby="company-title">
-              <CompanyNavigationTabs 
-                activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
-                counts={{
-                  jobs: authorCounts?.jobs || 0,
-                  machines: authorCounts?.machines || 0,
-                  accommodations: authorCounts?.accommodations || 0,
-                  catering: authorCounts?.catering || 0,
-                  realestate: authorCounts?.realestate || 0
-                }}
-              />
+              <CompanyInfoTab company={company} />
 
-              {activeTab === 'info' ? (
-                <CompanyInfoTab company={company} />
-              ) : (
-                <CompanyAdsTabsContent 
-                  activeTab={activeTab}
-                  activeJobs={activeJobs}
-                  activeMachines={activeMachines}
-                  activeAccommodations={activeAccommodations}
-                  activeCaterings={activeCaterings}
-                  activePlots={activePlots}
-                  isLoadingCurrentTab={isLoadingCurrentTab}
-                />
+              {(activeJobs.length > 0 || jobsLoading) && (
+                 <CompanyAdsTabsContent 
+                   activeTab="jobs"
+                   activeJobs={activeJobs}
+                   activeMachines={activeMachines}
+                   activeAccommodations={activeAccommodations}
+                   activeCaterings={activeCaterings}
+                   activePlots={activePlots}
+                   isLoadingCurrentTab={jobsLoading}
+                 />
+              )}
+
+              {(activeMachines.length > 0 || machinesLoading) && (
+                 <CompanyAdsTabsContent 
+                   activeTab="machines"
+                   activeJobs={activeJobs}
+                   activeMachines={activeMachines}
+                   activeAccommodations={activeAccommodations}
+                   activeCaterings={activeCaterings}
+                   activePlots={activePlots}
+                   isLoadingCurrentTab={machinesLoading}
+                 />
+              )}
+
+              {(activeAccommodations.length > 0 || accLoading) && (
+                 <CompanyAdsTabsContent 
+                   activeTab="accommodations"
+                   activeJobs={activeJobs}
+                   activeMachines={activeMachines}
+                   activeAccommodations={activeAccommodations}
+                   activeCaterings={activeCaterings}
+                   activePlots={activePlots}
+                   isLoadingCurrentTab={accLoading}
+                 />
+              )}
+
+              {(activeCaterings.length > 0 || catLoading) && (
+                 <CompanyAdsTabsContent 
+                   activeTab="catering"
+                   activeJobs={activeJobs}
+                   activeMachines={activeMachines}
+                   activeAccommodations={activeAccommodations}
+                   activeCaterings={activeCaterings}
+                   activePlots={activePlots}
+                   isLoadingCurrentTab={catLoading}
+                 />
+              )}
+
+              {(activePlots.length > 0 || plotsLoading) && (
+                 <CompanyAdsTabsContent 
+                   activeTab="realestate"
+                   activeJobs={activeJobs}
+                   activeMachines={activeMachines}
+                   activeAccommodations={activeAccommodations}
+                   activeCaterings={activeCaterings}
+                   activePlots={activePlots}
+                   isLoadingCurrentTab={plotsLoading}
+                 />
               )}
             </article>
 

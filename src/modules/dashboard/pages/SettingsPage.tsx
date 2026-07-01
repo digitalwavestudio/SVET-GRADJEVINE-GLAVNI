@@ -21,6 +21,7 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState<'profile' | 'cv' | 'applications'>('profile');
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const coverInputRef = React.useRef<HTMLInputElement>(null);
 
   const tabs = [
     { id: 'profile', label: 'JAVNI PROFIL', icon: 'visibility' },
@@ -36,6 +37,7 @@ export default function SettingsPage() {
     phone: '',
     company: '',
     photoURL: '',
+    coverImage: '',
     profession: '',
     description: '',
     facebook: '',
@@ -63,6 +65,7 @@ export default function SettingsPage() {
         photoURL: user.role === 'poslodavac' 
           ? (user.businessProfile?.logo || '') 
           : (user.photoURL || ''),
+        coverImage: user.role === 'poslodavac' ? (user.businessProfile?.coverImage || '') : '',
         phone: String((user as unknown as { phone?: string })?.phone || '') || ''
       }));
     }
@@ -91,17 +94,23 @@ export default function SettingsPage() {
       } catch (error: unknown) {
         let msg = 'Greška pri uploadu';
         if (error instanceof Error) msg = error.message;
-        if (error && typeof error === 'object') {
-           const errObj = error as Record<string, unknown>;
-           if (errObj.response && typeof errObj.response === 'object') {
-              const res = errObj.response as Record<string, unknown>;
-              if (res.data && typeof res.data === 'object') {
-                 const d = res.data as Record<string, unknown>;
-                 if (typeof d.error === 'string') msg = d.error;
-              }
-           }
-        }
         toast.error(msg);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsSaving(true);
+      try {
+        const url = await uploadImage(file, 'profiles/covers', 'cover');
+        setFormData(prev => ({ ...prev, coverImage: url }));
+        toast.success("Pozadinska slika je uspešno postavljena");
+      } catch (error: unknown) {
+        toast.error('Greška pri uploadu pozadinske slike');
       } finally {
         setIsSaving(false);
       }
@@ -115,6 +124,7 @@ export default function SettingsPage() {
       businessProfile: user?.role === 'poslodavac' ? {
         ...user?.businessProfile,
         logo: data.photoURL || user?.businessProfile?.logo,
+        coverImage: user?.businessProfile?.coverImage,
         companyName: data.company || user?.businessProfile?.companyName
       } : user?.businessProfile
     };
@@ -170,7 +180,9 @@ export default function SettingsPage() {
         // Za firme, photoURL u formi se koristi kao logo
         updateData.businessProfile = {
           ...user.businessProfile,
-          logo: formData.photoURL
+          logo: formData.photoURL,
+          coverImage: formData.coverImage,
+          companyName: formData.company,
         };
       } else if (user.role === 'majstor') {
         updateData.profession = formData.profession;
@@ -258,7 +270,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-4xl font-black tracking-tighter uppercase mb-1">MOJ PROFIL</h1>
+          <h1 className="text-4xl font-black tracking-tighter uppercase mb-1">{user?.role === 'poslodavac' ? 'BIZNIS PROFIL' : 'MOJ PROFIL'}</h1>
           <p className="text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">UPRAVLJAJTE VAŠIM PODACIMA I BIOGRAFIJOM</p>
         </motion.div>
 
@@ -297,8 +309,10 @@ export default function SettingsPage() {
                   errors={errors}
                   user={user}
                   fileInputRef={fileInputRef}
+                  coverInputRef={coverInputRef}
                   handleInputChange={handleInputChange}
                   handleFileChange={handleFileChange}
+                  handleCoverChange={handleCoverChange}
                 />
               )}
 
