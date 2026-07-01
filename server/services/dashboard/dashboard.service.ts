@@ -244,7 +244,7 @@ export class DashboardService {
       try {
         const activeListingsSnap = await db.collection("listings")
           .where("authorId", "==", uid)
-          .where("status", "in", ["active", "approved"])
+          .where("status", "==", "active")
           .count()
           .get();
         const activeCount = activeListingsSnap.data().count;

@@ -93,7 +93,7 @@ statsRouter.get("/pseo-insights", async (req, res, next) => {
       async () => {
         let queryRef: import("firebase-admin/firestore").Query = db
           .collection(collection as string)
-          .where("status", "in", ["active", "approved"]);
+          .where("status", "==", "active");
 
         if (grad) {
           queryRef = queryRef.where("locationSlug", "==", grad);
@@ -234,7 +234,7 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
     }
 
     const queryListings = (type: string) =>
-      db.collection("listings").where("type", "==", type).where("status", "in", ["approved", "active"]);
+      db.collection("listings").where("type", "==", type).where("status", "==", "active");
 
     const promises = [
       queryListings("job")
@@ -357,7 +357,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
           try {
             const todaySnap = await db.collection("listings")
               .where("type", "==", targetType)
-              .where("status", "in", ["active", "approved"])
+              .where("status", "==", "active")
               .where("createdAt", ">=", todayStart)
               .count()
               .get();

@@ -282,7 +282,7 @@ export class AdminStatsService {
       // 1b. Aktivni poslovi (za "UKUPNO PRONAĐENO")
       const activeJobsSnap = await db.collection("listings")
         .where("type", "==", "job")
-        .where("status", "in", ["active", "approved"])
+        .where("status", "==", "active")
         .count()
         .get();
       const activeJobs = activeJobsSnap.data().count;

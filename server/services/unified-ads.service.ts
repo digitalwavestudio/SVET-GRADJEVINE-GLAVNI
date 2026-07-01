@@ -180,7 +180,7 @@ export class UnifiedAdsService {
         const snap = await db
           .collection("listings")
           .where("type", "==", "company")
-          .where("status", "in", ["active", "approved"])
+          .where("status", "==", "active")
           .where("isPremium", "==", true)
           .orderBy("createdAt", "desc")
           .limit(20)
@@ -221,7 +221,7 @@ export class UnifiedAdsService {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
           let query = db
             .collection("listings")
-            .where("status", "in", ["active", "approved"]);
+            .where("status", "==", "active");
 
           if (options.isUrgent) query = query.where("isUrgent", "==", true);
           if (options.isPremium) query = query.where("isPremium", "==", true);
@@ -325,9 +325,9 @@ export class UnifiedAdsService {
       else if (category === "realEstate") entityType = "realEstate";
       else if (category === "jobs") entityType = "job";
 
-      q = q.where("type", "==", entityType).where("status", "in", ["active", "approved"]);
+      q = q.where("type", "==", entityType).where("status", "==", "active");
     } else {
-      q = q.where("status", "in", ["active", "approved"]);
+      q = q.where("status", "==", "active");
     }
 
     q = q.orderBy("createdAt", "desc");

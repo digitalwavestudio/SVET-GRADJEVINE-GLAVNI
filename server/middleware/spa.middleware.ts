@@ -260,7 +260,7 @@ async function backgroundPreRenderListingHub(
 
   try {
     let query: FirebaseFirestore.Query = resolveFirestoreQuery(collectionName)
-      .where("status", "in", ["active", "approved"])
+      .where("status", "==", "active")
       .orderBy("createdAt", "desc");
 
     const categoryField = COLLECTION_CATEGORY_FIELD[collectionName];
@@ -748,6 +748,7 @@ async function backgroundPreRenderHomepage(
 
   try {
     const snapshot = await db.collectionGroup("listings")
+      .where("status", "==", "active")
       .orderBy("createdAt", "desc")
       .limit(6)
       .get();

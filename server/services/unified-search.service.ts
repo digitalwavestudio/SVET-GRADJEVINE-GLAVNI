@@ -3,6 +3,7 @@ import { db } from "../config/firebase.ts";
 import { resolveGeoFallback } from "../utils/geocode.ts";
 import { ImageTransformer } from "../utils/image.transformer.ts";
 import { QueryDocumentSnapshot } from "firebase-admin/firestore";
+import { CacheService } from "./cache.service.ts";
 
 export interface UnifiedSearchDoc {
   id: string;
@@ -54,6 +55,9 @@ export class UnifiedSearchService {
     pageSize: number = 20,
     lastVisibleId?: string,
   ): Promise<UnifiedSearchResult> {
+    const cacheKey = `search:${category}:${pageSize}:${lastVisibleId || "init"}:${JSON.stringify(filters)}`;
+    const cached = await CacheService.get<UnifiedSearchResult>(cacheKey);
+    if (cached) return cached;
     let entityType = category;
     if (category && category !== "all" && category !== "marketplace") {
       if (category === "machines") entityType = "machine";
@@ -80,7 +84,7 @@ export class UnifiedSearchService {
       if (entityType && entityType !== "all") q = q.where("type", "==", entityType);
     }
 
-    if (!filters.showAllStatuses) q = q.where("status", "in", ["active", "approved"]);
+    if (!filters.showAllStatuses) q = q.where("status", "==", "active");
 
     const targetedLoc = filters.locationSlug || filters.location;
     if (targetedLoc && targetedLoc !== "SVE") {
@@ -160,7 +164,9 @@ export class UnifiedSearchService {
 
       const lastVisible = hasMore && actualDocs.length > 0 ? actualDocs[actualDocs.length - 1].id : null;
 
-      return { docs, lastVisibleId: lastVisible, hasMore, totalHits: docs.length };
+      const result: UnifiedSearchResult = { docs, lastVisibleId: lastVisible, hasMore, totalHits: docs.length };
+      await CacheService.set(cacheKey, result, 30000).catch(() => {});
+      return result;
     } catch (error: unknown) {
       const err = error as Error & { details?: string; code?: number };
       if (err?.message?.includes("Quota limit exceeded") || err?.details?.includes("Quota limit exceeded") || err?.code === 8) {

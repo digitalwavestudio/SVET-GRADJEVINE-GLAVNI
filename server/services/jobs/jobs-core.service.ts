@@ -32,7 +32,7 @@ export class JobsCoreService {
       let q = rawDb
         .collectionGroup("listings")
         .where("type", "==", "job")
-        .where("status", "in", ["active", "approved"])
+        .where("status", "==", "active")
         .orderBy("createdAt", "desc");
         
       if (cursor) {

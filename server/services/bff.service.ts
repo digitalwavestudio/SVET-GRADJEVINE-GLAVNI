@@ -124,7 +124,7 @@ export const bffService = {
     if (!premiumJobsRaw.length) {
       try {
         const snap = await db.collectionGroup("listings")
-          .where("status", "in", ["active", "approved"])
+          .where("status", "==", "active")
           .where("isPremium", "==", true)
           .orderBy("createdAt", "desc")
           .limit(12)
@@ -146,7 +146,7 @@ export const bffService = {
     if (!urgentJobsRaw.length) {
       try {
         const snap = await db.collectionGroup("listings")
-          .where("status", "in", ["active", "approved"])
+          .where("status", "==", "active")
           .where("isUrgent", "==", true)
           .orderBy("createdAt", "desc")
           .limit(12)

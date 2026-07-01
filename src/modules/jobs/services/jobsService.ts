@@ -81,7 +81,7 @@ export const jobsService = {
   // --- FETCHING ---
   async fetchByCompany(companyId: string): Promise<JobResponse[]> {
     return withRetry(async () => {
-      const data = await apiClient.post<JobSearchApiResponse>('/jobs/search', { filters: { companyId }, pageSize: 100 });
+      const data = await apiClient.post<JobSearchApiResponse>('/jobs/search', { filters: { companyId }, pageSize: 25 });
       return validateList(jobExtendedSchema, data?.docs || []);
     });
   },
@@ -103,11 +103,11 @@ export const jobsService = {
         if (f[key] !== undefined) cleanFilters[key] = f[key];
       }
       const data = isEmptyFilter && !filters?.searchQuery
-        ? await apiClient.get<JobSearchApiResponse>('/jobs?pageSize=100')
+        ? await apiClient.get<JobSearchApiResponse>('/jobs?pageSize=25')
         : await apiClient.post<JobSearchApiResponse>('/jobs/search', { 
             searchQuery: (filters?.searchQuery as string | undefined) || "", 
             filters: cleanFilters, 
-            pageSize: 50
+            pageSize: 25
           });
 
       return {
