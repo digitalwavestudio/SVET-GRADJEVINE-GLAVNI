@@ -11,7 +11,7 @@ export const MobileBottomNav: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Hide on auth pages
-  const isAuthPage = location.pathname === '/prijava' || location.pathname === '/registracija';
+  const isAuthPage = location.pathname === '/prijava';
   if (isAuthPage) return null;
 
   const dashboardPath = user ? '/kontrolna-tabla' : '/prijava';

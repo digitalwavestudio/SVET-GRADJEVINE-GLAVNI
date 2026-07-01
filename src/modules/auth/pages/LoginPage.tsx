@@ -247,7 +247,7 @@ export default function LoginPage() {
           {/* Footer */}
           <p className="mt-10 text-center text-on-surface-variant text-sm font-medium">
             Nemate nalog? 
-            <Link to="/registracija" className="text-primary hover:underline font-bold transition-colors ml-1">Registrujte se besplatno</Link>
+            <Link to="/prijava" className="text-primary hover:underline font-bold transition-colors ml-1">Registrujte se besplatno</Link>
           </p>
         </div>
 

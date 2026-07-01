@@ -51,7 +51,7 @@ export function RootLayout() {
     <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary">
       <ProgressBar />
       <QuotaBanner />
-      {location.pathname !== '/prijava' && location.pathname !== '/registracija' && <VerificationBanner />}
+      {location.pathname !== '/prijava' && <VerificationBanner />}
       <NetworkStatus />
       <CookieConsent />
       <ScrollRestoration />

@@ -143,7 +143,7 @@ export default function CtaSection() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Link 
-                  to="/registracija"
+                  to="/prijava"
                   className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:shadow-[0_10px_40px_rgba(59,130,246,0.5)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] overflow-hidden w-full sm:w-auto"
                 >
                   <div className="absolute inset-0 rounded-[12px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full ease-out"></div>

@@ -137,8 +137,8 @@ export default function RegisterPage() {
         console.error('Error sending verification', e);
       }
       
-      addToast('Uspešna registracija! Potvrdite email pre prijave.', 'success');
-      navigate('/prijava');
+      addToast('Uspešna registracija! Proverite email za potvrdu naloga.', 'success');
+      navigate('/kontrolna-tabla');
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
