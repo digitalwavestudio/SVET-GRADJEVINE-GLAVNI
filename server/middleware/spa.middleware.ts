@@ -158,31 +158,15 @@ function ensureCanonical(html: string, reqPath: string): string {
   return html.replace("</head>", `<link rel="canonical" href="${canonicalUrl}" />\n</head>`);
 }
 
-// Strip existing <title> and <meta name="description"> before injecting SSR helmet output
-function stripHeadMeta(html: string): string {
-  return html
-    .replace(/<title>.*?<\/title>/i, "")
-    .replace(/<meta\s+name=["']description["'][^>]*\/?>/gi, "");
-}
-
-// Remove all but the last meta description tag (fixes duplicates from SSR Helmet + server fallback)
-function dedupeMetaDescriptions(html: string): string {
-  const matches = [...html.matchAll(/<meta\s+name=["']description["'][^>]*\/?>/gi)];
-  if (matches.length <= 1) return html;
-  for (let i = 0; i < matches.length - 1; i++) {
-    html = html.replace(matches[i][0], "");
+// Combined dedup of SSR helmet output: ensures only one <title> and one meta description remain
+function dedupeHeadTags(html: string): string {
+  const titleMatches = [...html.matchAll(/<title>.*?<\/title>/gi)];
+  for (let i = 0; i < titleMatches.length - 1; i++) {
+    html = html.replace(titleMatches[i][0], "");
   }
-  return html;
-}
-
-function dedupeAll(html: string): string {
-  return dedupeTitles(dedupeMetaDescriptions(html));
-}
-function dedupeTitles(html: string): string {
-  const matches = [...html.matchAll(/<title>.*?<\/title>/gi)];
-  if (matches.length <= 1) return html;
-  for (let i = 0; i < matches.length - 1; i++) {
-    html = html.replace(matches[i][0], "");
+  const descMatches = [...html.matchAll(/<meta\s+name=["']description["'][^>]*\/?>/gi)];
+  for (let i = 0; i < descMatches.length - 1; i++) {
+    html = html.replace(descMatches[i][0], "");
   }
   return html;
 }
@@ -1042,14 +1026,9 @@ export const createSpaMiddleware = () => {
 
       if (staticMetas[req.path]) {
         const meta = staticMetas[req.path];
-        html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
-        html = html.replace(
-          /<title>.*?<\/title>/,
-          `<title>${meta.title}</title>`,
-        );
         html = html.replace(
           "</head>",
-          `<meta name="description" content="${meta.desc}" /><link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" /></head>`,
+          `<title>${meta.title}</title>\n<meta name="description" content="${meta.desc}" />\n<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
         );
         html = injectEmptyRootLinks(html, req.path);
         return res.send(html);
@@ -1065,12 +1044,12 @@ export const createSpaMiddleware = () => {
         if (ssrResult) {
           const { html, dehydratedState, helmetHtml } = ssrResult;
           const helmetContent = helmetHtml || `<title>Svet Građevine - Portal za građevinske oglase</title>\n<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />`;
-          let finalHtml = stripHeadMeta(indexHtml);
+          let finalHtml = indexHtml;
           const ssrDataScript = isBot ? '' : `<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState: sanitizeDehydratedState(dehydratedState) })}</script>`;
           finalHtml = finalHtml
             .replace('</head>', `${helmetContent}${ssrDataScript}</head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-          finalHtml = dedupeAll(ensureCanonical(finalHtml, req.path));
+          finalHtml = dedupeHeadTags(ensureCanonical(finalHtml, req.path));
           res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
           const redisCache = getRedis();
           if (redisCache) {
@@ -1081,10 +1060,10 @@ export const createSpaMiddleware = () => {
 
         // Fallback: string-based pre-render
         const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
-        if (rendered) return res.send(dedupeAll(rendered));
+        if (rendered) return res.send(dedupeHeadTags(rendered));
 
         // Clean shell fallback (no pre-rendered content)
-        const cleanHtml = injectEmptyRootLinks(stripHeadMeta(indexHtml)
+        const cleanHtml = injectEmptyRootLinks(indexHtml
           .replace("</head>", `<title>Svet Građevine - Portal za građevinske oglase</title>
 <meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
@@ -1098,7 +1077,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
 <meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
 </head>`), req.path);
-        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeAll(cleanHtml));
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(cleanHtml));
       }
 
       if (matchedRoute) {
@@ -1140,7 +1119,7 @@ export const createSpaMiddleware = () => {
               const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
               const { html, dehydratedState, helmetHtml } = ssrResult;
               const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
-              let finalHtml = stripHeadMeta(indexHtml);
+              let finalHtml = indexHtml;
               const ssrDataScript = isBot ? '' : `<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState: sanitizeDehydratedState(dehydratedState) })}</script>`;
               finalHtml = finalHtml
                 .replace('</head>', `${helmetContent}${ssrDataScript}</head>`)
@@ -1323,15 +1302,12 @@ ${breadcrumbHtml}
 
           const detailLastmod = new Date().toISOString().split("T")[0];
 
-          let skeletonHtml = stripHeadMeta(html);
-          skeletonHtml = skeletonHtml.replace(
-            /<title>.*?<\/title>/,
-            `<title>${title}</title>`,
-          );
+          let skeletonHtml = html;
 
           skeletonHtml = skeletonHtml.replace(
             "</head>",
             `
+<title>${title}</title>
 <meta name="description" content="${desc}" />
 <meta name="lastmod" content="${detailLastmod}" />
 <link rel="canonical" href="${canonicalUrl}" />

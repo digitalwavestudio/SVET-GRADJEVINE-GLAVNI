@@ -246,7 +246,7 @@ export function useAuthNode() {
                          isPremiumProfile: false,
                          photoURL: firebaseUser.photoURL || '',
                          viewsCount: 0,
-                         freeAdsCount: 3
+                         freeAdsCount: 1500
                       })
                    });
                    if (!initRes.ok) {
@@ -363,7 +363,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         isPremiumProfile: false,
         photoURL: firebaseUser.photoURL || '',
         viewsCount: 0,
-        freeAdsCount: 3
+        freeAdsCount: 1500
       })
     });
     if (initRes.ok) {
@@ -503,7 +503,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
 
       const newUser = {
         firstName, lastName, name: `${firstName} ${lastName}`, email,
-        role, photoURL: '', status: 'active', freeAdsCount: 3,
+        role, photoURL: '', status: 'active', freeAdsCount: 1500,
         isPremiumProfile: false, viewsCount: 0, emailVerified: false,
         uid: firebaseUser.uid
       };

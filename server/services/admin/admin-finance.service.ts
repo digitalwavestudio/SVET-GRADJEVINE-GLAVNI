@@ -3,7 +3,6 @@ import { AuditService, AuditAction } from "../audit.service.ts";
 import { CacheService } from "../cache.service.ts";
 import { CacheKeys } from "../../constants/cache-keys.ts";
 import { employerStatsMemoryCache } from "../dashboard/dashboard-lru.ts";
-import { FinancialLedgerService, TransactionType } from "../ledger.service.ts";
 
 export class AdminFinanceService {
   static async updateUserWallet(
@@ -20,16 +19,19 @@ export class AdminFinanceService {
       delta = amount - (userSnap.data()?.walletBalance || 0);
     }
 
-    await FinancialLedgerService.updateBalance(
-      userId,
-      delta,
-      "ADJUSTMENT",
-      reason || "Administratorska korekcija balansa",
-      undefined,
-      { adminId }
-    );
+    await db.runTransaction(async (transaction) => {
+      const walletRef = db.collection("wallets").doc(userId);
+      const userRef = db.collection("users").doc(userId);
 
-    // Note: users.walletBalance is synced atomically inside FinancialLedgerService.applyBalanceInTransaction
+      transaction.set(walletRef, {
+        balance: firebaseAdmin.firestore.FieldValue.increment(delta),
+        lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+
+      transaction.update(userRef, {
+        walletBalance: firebaseAdmin.firestore.FieldValue.increment(delta),
+      });
+    });
 
     return { success: true };
   }

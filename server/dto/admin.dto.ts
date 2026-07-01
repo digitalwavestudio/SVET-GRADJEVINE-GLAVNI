@@ -19,12 +19,6 @@ export const retryDlqItemSchema = z.object({
   source: z.enum(["outbox", "dlq"])
 });
 
-export const resetCircuitBreakerOrCacheSchema = z.object({
-  name: z.string().optional(),
-  invalidateCache: z.boolean().optional(),
-  cachePrefix: z.string().optional()
-});
-
 export const resolveReportSchema = z.object({
   status: z.enum(["resolved", "dismissed"]),
   note: z.string().optional().default("")
@@ -32,10 +26,6 @@ export const resolveReportSchema = z.object({
 
 export const adminMonitoringQuerySchema = z.object({
   bypassCache: z.enum(["true", "false"]).optional()
-});
-
-export const resetCircuitBreakerParamsSchema = z.object({
-  name: z.string().min(1, "Ime je obavezno")
 });
 
 export const basePaginationQuerySchema = z.object({

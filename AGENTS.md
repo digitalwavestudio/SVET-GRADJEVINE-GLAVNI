@@ -1,8 +1,8 @@
 # Agents Protocol
 
-## ✅ STABLE BUILD (2026-06-29) — OVO JE GLAVNI BUILD
+## ✅ STABLE BUILD (2026-06-30) — OVO JE GLAVNI BUILD
 
-**Commit:** `ec4b15e` — **NE DIRAJ!** Ako se išta sjebe, vrati se na ovaj build.
+**Commit:** `d89d5fe` — **NE DIRAJ!** Ako se išta sjebe, vrati se na ovaj build.
 
 **Šta radi:**
 - Homepage: 5 najnovijih poslova SA logom (premium, urgent, latest)

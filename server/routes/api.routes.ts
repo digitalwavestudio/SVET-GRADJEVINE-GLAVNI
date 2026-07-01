@@ -38,7 +38,6 @@ import {
 import { firebaseConfig, ensureInitialized, db, admin } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
-import { requestCoalescingMiddleware } from "../middleware/coalesce.middleware.ts";
 import {
   apiLimiter,
   heavyOperationsLimiter,
@@ -326,7 +325,6 @@ apiRouter.get(
 import { AdminService } from "../services/admin.service.ts";
 apiRouter.get(
   "/branding",
-  requestCoalescingMiddleware(),
   cacheMiddleware(120000, "branding"),
   async (_req, res, next) => {
     try {
@@ -354,7 +352,6 @@ apiRouter.use(
 
 apiRouter.get(
   "/settings/platform",
-  requestCoalescingMiddleware(),
   cacheMiddleware(120000, "settings_platform"),
   async (_req, res, next) => {
     try {
@@ -387,7 +384,7 @@ apiRouter.use("/masters", firestoreLimiter, heavyOperationsLimiter, mastersRoute
 apiRouter.use("/media", heavyOperationsLimiter, mediaRouter);
 apiRouter.post("/search/masters", firestoreLimiter, heavyOperationsLimiter, searchMasters);
 apiRouter.post("/search/companies", firestoreLimiter, heavyOperationsLimiter, searchCompanies);
-apiRouter.use("/stats", requestCoalescingMiddleware(), statsRouter);
+apiRouter.use("/stats", statsRouter);
 apiRouter.use("/dashboard", dashboardRouter);
 apiRouter.use("/bff", bffRouter);
 apiRouter.use("/ads", firestoreLimiter, heavyOperationsLimiter, adsRouter);

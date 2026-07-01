@@ -155,15 +155,14 @@ describe("Dashboard Cache Sanity & Integration Flow", () => {
     expect(lru.get("b")).toBe(2);
     expect(lru.get("c")).toBe(3);
 
-    // 2. Check TTL simulation
-    const lruWithTtl = new SimpleLRUCache<string, string>(5);
+    // 2. Check TTL simulation (value set 16 minutes ago with 15 min TTL)
+    const lruWithTtl = new SimpleLRUCache<string, string>(5, 15 * 60 * 1000);
     lruWithTtl.set("test_ttl", "working");
+    lruWithTtl.set("test_expired", "gone");
+    (lruWithTtl as any).cache.get("test_expired").timestamp = Date.now() - 16 * 60 * 1000;
+
     expect(lruWithTtl.get("test_ttl")).toBe("working");
-
-    // Simulate being written 16 minutes ago (TTL is 15 minutes) to trigger expired state
-    lruWithTtl.setTimestampForTest("test_ttl", Date.now() - 16 * 60 * 1000);
-
-    expect(lruWithTtl.get("test_ttl")).toBeUndefined(); // Should be evicted due to TTL expiration
+    expect(lruWithTtl.get("test_expired")).toBeUndefined();
   });
 
   it("Phase 6: SingleFlight Map checks that concurrent/duplicate requests are correctly tracked", async () => {

@@ -1,5 +1,4 @@
 import { ChatBufferService } from "./chat-buffer.service.ts";
-import { MessagePresenceBuffer } from "./messagePresenceBuffer.ts";
 import { db, admin } from "../config/firebase.ts";
 import { SSEService } from "./sse.service.ts";
 
@@ -28,14 +27,7 @@ export class ChatService {
     // 2. Prosledi poruku u optimizovani ChatBufferService
     const msgId = await ChatBufferService.enqueueMessage(chatId, senderId, content, type, offerData, partnerId);
 
-    // 3. Baferujemo izmene na konverzacijama sa flushing-om od 1 minuta kroz MessagePresenceBuffer
-    await MessagePresenceBuffer.bufferConversationUpdate(chatId, {
-      lastMessage: type === "offer" ? "🧩 Ponuda poslata" : content,
-      lastSenderId: senderId,
-      partnerId
-    });
-
-    // 4. Stream message in real-time over SSE bypassing Firestore reads
+    // 3. Stream message in real-time over SSE bypassing Firestore reads
     const chatMsgPayload = {
       id: msgId,
       chatId,

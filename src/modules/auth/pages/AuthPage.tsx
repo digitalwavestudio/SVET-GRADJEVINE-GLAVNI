@@ -48,7 +48,7 @@ export default function AuthPage() {
         if (isAdmin && from === '/moj-profil') {
           navigate('/admin', { replace: true });
         } else {
-          navigate(from, { replace: true });
+          navigate(from, { state: tab === 'register' ? { welcome: true } : undefined, replace: true });
         }
       } else if (tab === 'login') {
         setError('Vaš email nije potvrđen. Molimo proverite inbox.');
@@ -138,7 +138,7 @@ export default function AuthPage() {
       const userDoc = {
         firstName: '', lastName: '', name: defaultName, role: 'standard',
         isVerified: false, displayName: defaultName, email: user.email, uid: user.uid,
-        status: 'active', isPremiumProfile: false, photoURL: '', viewsCount: 0, freeAdsCount: 3
+        status: 'active', isPremiumProfile: false, photoURL: '', viewsCount: 0, freeAdsCount: 1500
       };
 
       const token = await user.getIdToken();
@@ -161,7 +161,7 @@ export default function AuthPage() {
       try { await _sendEmailVerification(user); } catch { /* ignore */ }
 
       addToast('Uspešna registracija! Proverite email za potvrdu naloga.', 'success');
-      navigate('/kontrolna-tabla');
+      navigate('/kontrolna-tabla', { state: { welcome: true } });
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') setError('Ova email adresa je već u upotrebi.');
       else if (err.code === 'auth/invalid-email') setError('Neispravan format email adrese.');

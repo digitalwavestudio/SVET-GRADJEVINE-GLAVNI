@@ -118,7 +118,6 @@ async function startServer() {
     // Background Init (Non-blocking)
     (async () => {
       try {
-        const { DatabaseManager } = await import("./server/utils/db-manager.ts");
         const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
         const { initializeEventSubscribers } = await import("./server/config/events.ts");
         const { BigQueryService } = await import("./server/services/bigquery.service.ts");
@@ -128,7 +127,6 @@ async function startServer() {
         if (ensureInitialized) {
           ensureInitialized();
         }
-        DatabaseManager.init();
         DynamicConfigService.init().catch(e => console.error("[CONFIG] Dynamic config skipped", e));
         initializeEventSubscribers();
         BigQueryService.initializeSchema().catch(e => console.error("BigQuery init failed", e));
@@ -159,18 +157,15 @@ async function startServer() {
           const { SyncManager } = await import("./server/services/sync.service.ts");
           const { OutboxWorker } = await import("./server/services/outbox.worker.ts");
           const { GoogleIndexingWorker } = await import("./server/services/google-indexing.worker.ts");
-          const { DLQRecoveryWorker } = await import("./server/services/dlq.worker.ts");
-
+          
           setTimeout(async () => {
             try {
               if (RegionService.isLeaderRegion() || env.SANDBOX_WORKERS_ENABLED === "true") {
                 await SyncManager.init();
                 await OutboxWorker.start();
                 await GoogleIndexingWorker.init();
-                DLQRecoveryWorker.start();
                 
-                const { AlgoliaRedisBatcher } = await import("./server/services/algolia-redis-batcher.service");
-                await AlgoliaRedisBatcher.init();
+
                 const { ChatBufferService } = await import("./server/services/chat-buffer.service");
                 await ChatBufferService.init();
                 const { ImageWorker } = await import("./server/services/image.worker");
@@ -359,27 +354,23 @@ async function startServer() {
       const { shutdownRedis } = await import("./server/utils/redis.ts");
       const { OutboxWorker } = await import("./server/services/outbox.worker.ts");
       const { GoogleIndexingWorker } = await import("./server/services/google-indexing.worker.ts");
-      const { DLQRecoveryWorker } = await import("./server/services/dlq.worker.ts");
-      const { SyncManager } = await import("./server/services/sync.service.ts");
-      const { MetricsService } = await import("./server/services/metrics.service.ts");
-      const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
-      const { DLQMonitoringService } = await import("./server/services/dlq-monitoring.service.ts");
-      const { SystemCron } = await import("./server/utils/system-cron.ts");
-      const { ImageWorker } = await import("./server/services/image.worker.ts");
-      const { ChatBufferService } = await import("./server/services/chat-buffer.service.ts");
-      const { AlgoliaRedisBatcher } = await import("./server/services/algolia-redis-batcher.service.ts");
-      const { shutdownSitemapWorker } = await import("./server/services/sitemap.worker.ts");
-      
-      try {
-        if (mode === "worker" || mode === "full") {
-          await OutboxWorker.gracefulShutdown();
-          await GoogleIndexingWorker.gracefulShutdown();
-          DLQRecoveryWorker.stop();
+          const { SyncManager } = await import("./server/services/sync.service.ts");
+          const { MetricsService } = await import("./server/services/metrics.service.ts");
+          const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
+          const { DLQMonitoringService } = await import("./server/services/dlq-monitoring.service.ts");
+          const { SystemCron } = await import("./server/utils/system-cron.ts");
+          const { ImageWorker } = await import("./server/services/image.worker.ts");
+          const { ChatBufferService } = await import("./server/services/chat-buffer.service.ts");
+          const { shutdownSitemapWorker } = await import("./server/services/sitemap.worker.ts");
+          
+          try {
+            if (mode === "worker" || mode === "full") {
+              await OutboxWorker.gracefulShutdown();
+              await GoogleIndexingWorker.gracefulShutdown();
           await SyncManager.gracefulShutdown();
           await SystemCron.gracefulShutdown();
           await ImageWorker.gracefulShutdown();
           await ChatBufferService.gracefulShutdown();
-          await AlgoliaRedisBatcher.gracefulShutdown();
           await shutdownSitemapWorker();
         }
         await MetricsService.gracefulShutdown();

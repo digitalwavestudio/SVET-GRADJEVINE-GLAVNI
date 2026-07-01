@@ -213,30 +213,6 @@ export const chatMessagingLimiter = rateLimit({
 });
 
 /**
- * Dashboard Polling Rate Limiter
- * Max 15 requests per 10 seconds per UID or IP to prevent polling DDoS.
- */
-export const dashboardPollingLimiter = rateLimit({
-  windowMs: 10 * 1000, // 10 seconds
-  max: 15,
-  standardHeaders: true,
-  legacyHeaders: false,
-  store: getStore("dashboard_polling"),
-  validate: false,
-  keyGenerator: (req: Request, _res: Response) => {
-    if (req.user && req.user.uid) {
-      return req.user.uid;
-    }
-    return req.ip || "unknown_ip";
-  },
-  message: {
-    status: 429,
-    message: "Background refresh rate exceeded. Please slow down.",
-  },
-  handler,
-});
-
-/**
  * Enterprise Dashboard Limiter for BFF router
  * Allows maximum 5 requests per 1 minute per User ID or IP address
  */

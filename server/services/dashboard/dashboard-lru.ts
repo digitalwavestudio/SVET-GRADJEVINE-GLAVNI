@@ -7,35 +7,13 @@ export let tokenCounter = 1;
 
 export class SimpleLRUCache<K, V> {
   private cache = new Map<K, { value: V; timestamp: number }>();
-  private gcInterval: NodeJS.Timeout;
 
-  constructor(private maxLimit: number = 200, private ttl: number = 15 * 60 * 1000) {
-    this.gcInterval = setInterval(() => {
-      const now = Date.now();
-      for (const [key, entry] of this.cache.entries()) {
-        if (now - entry.timestamp > this.ttl) {
-          this.cache.delete(key);
-        }
-      }
-    }, Math.max(5 * 60 * 1000, Math.floor(this.ttl / 2)));
-
-    if (this.gcInterval && typeof this.gcInterval.unref === "function") {
-      this.gcInterval.unref();
-    }
-  }
-
-  setTimestampForTest(key: K, timestamp: number): void {
-    const entry = this.cache.get(key);
-    if (entry) {
-      entry.timestamp = timestamp;
-    }
-  }
+  constructor(private maxLimit: number = 200, private ttl: number = 15 * 60 * 1000) {}
 
   get(key: K): V | undefined {
-    if (!this.cache.has(key)) return undefined;
-    const entry = this.cache.get(key)!;
-    const now = Date.now();
-    if (now - entry.timestamp > this.ttl) {
+    const entry = this.cache.get(key);
+    if (!entry) return undefined;
+    if (Date.now() - entry.timestamp > this.ttl) {
       this.cache.delete(key);
       return undefined;
     }
@@ -45,29 +23,18 @@ export class SimpleLRUCache<K, V> {
   }
 
   set(key: K, value: V): void {
-    const entry = { value, timestamp: Date.now() };
     if (this.cache.has(key)) {
       this.cache.delete(key);
     } else if (this.cache.size >= this.maxLimit) {
       const oldestKey = this.cache.keys().next().value;
-      if (oldestKey !== undefined) {
-        this.cache.delete(oldestKey);
-      }
+      if (oldestKey !== undefined) this.cache.delete(oldestKey);
     }
-    this.cache.set(key, entry);
+    this.cache.set(key, { value, timestamp: Date.now() });
   }
 
-  delete(key: K): void {
-    this.cache.delete(key);
-  }
+  delete(key: K): void { this.cache.delete(key); }
 
-  clear(): void {
-    this.cache.clear();
-  }
-
-  destroy(): void {
-    clearInterval(this.gcInterval);
-  }
+  clear(): void { this.cache.clear(); }
 }
 
 export const jobTokensLRU = new SimpleLRUCache<string, { title: Uint32Array; requirements: Uint32Array; city: Uint32Array; location: Uint32Array }>(500);

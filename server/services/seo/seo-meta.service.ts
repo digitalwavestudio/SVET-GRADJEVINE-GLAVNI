@@ -47,9 +47,9 @@ export class SEOMetaService {
     resolvedPath: string,
     cacheKey: string
   ): Promise<Record<string, unknown> | null> {
-    const { RedisLockManager } = await import("../../utils/redis-lock.ts");
+    const { LockManager } = await import("../lock.service.ts");
     const lockKey = `lock:seo_meta:${cacheKey}`;
-    const lockId = await RedisLockManager.acquire(lockKey, 30000);
+    const lockId = await LockManager.acquire(lockKey, 30000);
     if (!lockId) {
        // Another request is already fetching; poll for cache
        const waitStart = Date.now();
@@ -171,7 +171,7 @@ export class SEOMetaService {
       console.error("[SEO] Failed metadata fetch:", err);
       return null;
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch(() => {});
+      await LockManager.release(lockKey, lockId).catch(() => {});
     }
   }
 

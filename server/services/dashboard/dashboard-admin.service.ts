@@ -15,9 +15,6 @@ export class DashboardAdminService {
 
           s.housekeeping = await this.getHousekeepingStatus();
           
-          const { PredictiveAnalyticsService } = await import("../predictive.service.ts");
-          s.systemInternals = await PredictiveAnalyticsService.getSystemInternalStatus();
-          
           return s;
         },
         3600000 // 1h cache

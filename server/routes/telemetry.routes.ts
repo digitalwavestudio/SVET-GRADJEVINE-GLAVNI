@@ -2,11 +2,9 @@ import { Router } from 'express';
 import { BigQueryService } from '../services/bigquery.service';
 import { AuditService, AuditAction } from '../services/audit.service';
 import { Logger } from '../utils/logger';
-import { trace } from '@opentelemetry/api';
 
 const router = Router();
 const logger = new Logger({ service: "TelemetryRouter" });
-const tracer = trace.getTracer('telemetry-proxy');
 
 /**
  * @api {post} /api/telemetry/otel/traces OTLP Trace Proxy

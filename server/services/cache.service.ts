@@ -1,4 +1,4 @@
-import { DatabaseManager } from "../utils/db-manager.ts";
+import { getRedis } from "../utils/redis.ts";
 import { CACHE_PREFIXES } from "../constants/cache-keys.ts";
 import zlib from "zlib";
 import { Logger, logger } from "../utils/logger.ts";
@@ -54,7 +54,7 @@ export class CacheService {
   }
 
   private static get redisClient() {
-    const cl = DatabaseManager.getRegionalRedisConnection();
+    const cl = getRedis();
     if (!cl) return null;
     if (typeof cl.status === 'string') {
       // Proxy with "end" status still routes to InMemoryFallback — locking works within process
@@ -131,18 +131,17 @@ export class CacheService {
     value: T,
     ttlMs: number = 300000,
   ): Promise<void> {
-    const routedKey = DatabaseManager.routeCacheKey(key);
     const client = this.redisClient;
     let l1TtlMs = client ? Math.min(ttlMs, 10000) : ttlMs;
 
-    if (this.isHotKey(routedKey)) {
+    if (this.isHotKey(key)) {
       l1TtlMs = Math.max(l1TtlMs, 5000);
     }
 
-    const currentItem = this.localCache.get(routedKey);
+    const currentItem = this.localCache.get(key);
     const prevHits = currentItem ? currentItem.hits : 0;
 
-    this.localCache.set(routedKey, {
+    this.localCache.set(key, {
       value,
       expiry: Date.now() + l1TtlMs,
       hits: prevHits + 1,
@@ -183,7 +182,7 @@ export class CacheService {
         const payloadString = JSON.stringify(envelope);
         const staleRetentionMs = 20 * 24 * 60 * 60 * 1000;
         const redisPx = Math.min(ttlMs + staleRetentionMs, 2_147_483_647);
-        await client.set(routedKey, payloadString, "PX", redisPx);
+        await client.set(key, payloadString, "PX", redisPx);
       } catch (err) {
         console.error("[CacheService] Redis set error:", err);
       }
@@ -194,24 +193,22 @@ export class CacheService {
    * Dobavlja vrednost iz keša. L1 -> L2 fallback.
    */
   static async get<T>(key: string, ignoreTTL: boolean = false): Promise<T | null> {
-    const routedKey = DatabaseManager.routeCacheKey(key);
     try {
       // 1. Provera L1 (Local RAM)
-      const item = this.localCache.get(routedKey);
+      const item = this.localCache.get(key);
       if (item && (ignoreTTL || Date.now() <= item.expiry)) {
         item.hits = (item.hits || 0) + 1;
-        const prefix = routedKey.split(":")[0];
         return item.value as T;
       } else if (item) {
         // Istekao L1
-        this.localCache.delete(routedKey);
+        this.localCache.delete(key);
       }
 
       // 2. Provera L2 (Redis) - ADR 003 Stale-Cache Adaptive QoS
       const client = this.redisClient;
       if (client) {
         try {
-          const val = await client.get(routedKey);
+          const val = await client.get(key);
           if (val) {
             let payloadStr = val;
             if (val.startsWith("GZ64:")) {
@@ -226,7 +223,7 @@ export class CacheService {
               const logicalExpired = Date.now() > parsed.expiry;
               
               if (logicalExpired && !ignoreTTL) {
-                this.localCache.delete(routedKey);
+                this.localCache.delete(key);
                 return null;
               }
               // Raspakuj u originalni oblik ukoliko je prošao evaluaciju ili je još svež
@@ -234,10 +231,10 @@ export class CacheService {
             }
 
             let hydratedTtl = 10000;
-            if (this.isHotKey(routedKey)) {
+            if (this.isHotKey(key)) {
               hydratedTtl = Math.max(hydratedTtl, 5000);
             }
-            this.localCache.set(routedKey, {
+            this.localCache.set(key, {
               value: parsed,
               expiry: Date.now() + hydratedTtl,
               hits: (item?.hits || 0) + 1,
@@ -249,10 +246,10 @@ export class CacheService {
           console.error("[CacheService] Redis get error, attempting local stale recovery:", errorMsg);
           // Rescue using Stale Local L1: If we have the expired item in local memory, return it gracefully rather than crashing or hitting DB
           if (item) {
-            logger.warn(`[CacheService] 🛡️ Failover Recovery: Serviram istekli lokalni L1 za ključ ${routedKey} usled mrežnih/Redis problema.`);
+            logger.warn(`[CacheService] 🛡️ Failover Recovery: Serviram istekli lokalni L1 za ključ ${key} usled mrežnih/Redis problema.`);
             // Privremeno ga re-setujemo na par sekundi u L1 da sledeći burstovi ne zaguše sistem
-            const recoveryTtl = this.isHotKey(routedKey) ? 5000 : 2000;
-            this.localCache.set(routedKey, {
+            const recoveryTtl = this.isHotKey(key) ? 5000 : 2000;
+            this.localCache.set(key, {
               value: item.value,
               expiry: Date.now() + recoveryTtl,
               hits: item.hits + 1,
@@ -275,22 +272,21 @@ export class CacheService {
     const results = new Map<string, T | null>();
     if (keys.length === 0) return results;
 
-    const missingKeysWithRouted: { original: string; routed: string }[] = [];
+    const missingKeys: string[] = [];
     
     // 1. Provera lokalnog L1 keša
     for (const key of keys) {
-      const routedKey = DatabaseManager.routeCacheKey(key);
-      const item = this.localCache.get(routedKey);
+      const item = this.localCache.get(key);
       if (item && (ignoreTTL || Date.now() <= item.expiry)) {
         item.hits = (item.hits || 0) + 1;
         results.set(key, item.value as T);
       } else {
-        if (item) this.localCache.delete(routedKey);
-        missingKeysWithRouted.push({ original: key, routed: routedKey });
+        if (item) this.localCache.delete(key);
+        missingKeys.push(key);
       }
     }
 
-    if (missingKeysWithRouted.length === 0) {
+    if (missingKeys.length === 0) {
       return results;
     }
 
@@ -298,12 +294,10 @@ export class CacheService {
     const client = this.redisClient;
     if (client) {
       try {
-        const routedKeysToFetch = missingKeysWithRouted.map(k => k.routed);
-        const values = await client.mget(...routedKeysToFetch);
+        const values = await client.mget(...missingKeys);
 
-        for (let i = 0; i < missingKeysWithRouted.length; i++) {
-          const originalKey = missingKeysWithRouted[i].original;
-          const routedKey = missingKeysWithRouted[i].routed;
+        for (let i = 0; i < missingKeys.length; i++) {
+          const originalKey = missingKeys[i];
           const val = values[i];
 
           if (val) {
@@ -326,11 +320,11 @@ export class CacheService {
               }
 
               let hydratedTtl = 10000;
-              if (this.isHotKey(routedKey)) {
+              if (this.isHotKey(originalKey)) {
                 hydratedTtl = Math.max(hydratedTtl, 5000);
               }
               
-              this.localCache.set(routedKey, {
+              this.localCache.set(originalKey, {
                 value: parsed,
                 expiry: Date.now() + hydratedTtl,
                 hits: 1,
@@ -338,7 +332,7 @@ export class CacheService {
 
               results.set(originalKey, parsed as T);
             } catch (err) {
-              console.error(`[CacheService] MGET parsing/compression error for ${routedKey}:`, err);
+              console.error(`[CacheService] MGET parsing/compression error for ${originalKey}:`, err);
               results.set(originalKey, null);
             }
           } else {
@@ -347,14 +341,14 @@ export class CacheService {
         }
       } catch (err) {
         console.error("[CacheService] Redis MGET error:", err);
-        for (const item of missingKeysWithRouted) {
-          const singleVal = await this.get<T>(item.original, ignoreTTL).catch(() => null);
-          results.set(item.original, singleVal);
+        for (const key of missingKeys) {
+          const singleVal = await this.get<T>(key, ignoreTTL).catch(() => null);
+          results.set(key, singleVal);
         }
       }
     } else {
-      for (const item of missingKeysWithRouted) {
-        results.set(item.original, null);
+      for (const key of missingKeys) {
+        results.set(key, null);
       }
     }
 
@@ -383,6 +377,7 @@ export class CacheService {
     const runStreamReader = async () => {
       try {
         const { getStreamRedis } = await import("../utils/redis.ts");
+
         const sub = getStreamRedis();
         if (!sub) {
           logger.warn("[CacheService] Redis stream klijent nije konfigurisan. Invalidation Stream je isključen (graceful fallback).");
@@ -458,19 +453,15 @@ export class CacheService {
    * Briše ključ isključivo iz in-memory L1 keša ovog kontejnera (sprečava petlje)
    */
   static deleteLocalOnly(key: string): void {
-    const routedKey = DatabaseManager.routeCacheKey(key);
-    this.localCache.delete(routedKey);
+    this.localCache.delete(key);
   }
 
   /**
    * Briše ključeve sa specifičnim prefiksom isključivo iz in-memory L1 keša ovog kontejnera
    */
   static deleteLocalByPrefixOnly(prefix: string): void {
-    const geoRegion = DatabaseManager.getRequestRegion();
-    const regionalPrefix = geoRegion && geoRegion !== "beograd" ? `${geoRegion}:${prefix}` : prefix;
-
     for (const key of this.localCache.keys()) {
-      if (key.startsWith(prefix) || key.startsWith(regionalPrefix)) {
+      if (key.startsWith(prefix)) {
         this.localCache.delete(key);
       }
     }
@@ -487,13 +478,12 @@ export class CacheService {
    * Briše određeni ključ iz L1 i L2, i asinhrono invalidira sve kontejnere preko Redis Streama.
    */
   static async delete(key: string): Promise<void> {
-    const routedKey = DatabaseManager.routeCacheKey(key);
-    this.localCache.delete(routedKey);
+    this.localCache.delete(key);
 
     const client = this.redisClient;
     if (client) {
       try {
-        await client.del(routedKey);
+        await client.del(key);
         // Radimo XADD u Stream sa MAXLEN 1000 za prevenciju rasta memorije u Redisu
         await client.xadd(this.STREAM_NAME, "MAXLEN", "~", "1000", "*", "action", "delete", "key", key);
       } catch (err) {
@@ -510,8 +500,6 @@ export class CacheService {
   static async invalidateByPrefixes(prefixes: string[]): Promise<void> {
     if (prefixes.length === 0) return;
 
-    const geoRegion = DatabaseManager.getRequestRegion();
-
     // Očisti lokalni L1 za sve prefikse
     for (const prefix of prefixes) {
       this.deleteLocalByPrefixOnly(prefix);
@@ -525,19 +513,12 @@ export class CacheService {
         const seen = new Set<string>();
 
         for (const prefix of prefixes) {
-          const regionalPrefix = geoRegion && geoRegion !== "beograd" ? `${geoRegion}:${prefix}` : prefix;
-          const prefList = [prefix];
-          if (regionalPrefix !== prefix) {
-            prefList.push(regionalPrefix);
-          }
-
-          for (const pref of prefList) {
-            let cursor = "0";
+          let cursor = "0";
             do {
               const [newCursor, keys] = await client.scan(
                 cursor,
                 "MATCH",
-                `${pref}*`,
+                `${prefix}*`,
                 "COUNT",
                 200,
               );
@@ -549,7 +530,6 @@ export class CacheService {
                 }
               }
             } while (cursor !== "0");
-          }
         }
 
         if (seen.size > 0) {
@@ -565,9 +545,6 @@ export class CacheService {
    * Briše sve ključeve koji počinju sa prefiksom iz oba keša.
    */
   static async invalidateByPrefix(prefix: string): Promise<void> {
-    const geoRegion = DatabaseManager.getRequestRegion();
-    const regionalPrefix = geoRegion && geoRegion !== "beograd" ? `${geoRegion}:${prefix}` : prefix;
-
     // Očisti lokalni L1
     this.deleteLocalByPrefixOnly(prefix);
 
@@ -576,17 +553,11 @@ export class CacheService {
     if (client) {
       try {
         let cursor = "0";
-        const prefixes = [prefix];
-        if (regionalPrefix !== prefix) {
-          prefixes.push(regionalPrefix);
-        }
-        
-        for (const pref of prefixes) {
           do {
             const [newCursor, keys] = await client.scan(
               cursor,
               "MATCH",
-              `${pref}*`,
+              `${prefix}*`,
               "COUNT",
               100,
             );
@@ -595,7 +566,6 @@ export class CacheService {
               await client.del(...keys);
             }
           } while (cursor !== "0");
-        }
 
         // Emitujemo asinhroni invalidacioni događaj u Redis Stream
         await client.xadd(this.STREAM_NAME, "MAXLEN", "~", "1000", "*", "action", "invalidate_prefix", "prefix", prefix);

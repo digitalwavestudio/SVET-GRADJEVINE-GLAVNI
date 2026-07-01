@@ -148,9 +148,9 @@ export class SEODbService {
     url: string,
     cacheKey: string,
   ): Promise<Record<string, unknown> | null> {
-    const { RedisLockManager } = await import("../../utils/redis-lock.ts");
+    const { LockManager } = await import("../lock.service.ts");
     const lockKey = `lock:seo_hub:${cacheKey}`;
-    const lockId = await RedisLockManager.acquire(lockKey, 30000);
+    const lockId = await LockManager.acquire(lockKey, 30000);
     if (!lockId) {
       const waitStart = Date.now();
       while (Date.now() - waitStart < 5000) {
@@ -197,7 +197,7 @@ export class SEODbService {
       console.error("[SEO] Failed hub metadata fetch:", err);
       return null;
     } finally {
-      await RedisLockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[SEODb] lock release error:", e?.message));
+      await LockManager.release(lockKey, lockId).catch((e: any) => logger.warn("[SEODb] lock release error:", e?.message));
     }
   }
 

@@ -2,7 +2,6 @@ import { Router } from "express";
 import { getReqUser } from "../utils/request.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { db, admin } from "../config/firebase.ts";
-import { DatabaseManager } from "../utils/db-manager.ts";
 import { validateRequest } from "../middleware/validate.ts";
 import { partnerSchema } from "@svet-gradjevine/shared";
 import { z } from "zod";
@@ -91,7 +90,8 @@ partnersRouter.post("/init/:id", requireAuth, validateRequest(partnerInitSchema)
     }
 
     const cleanSlug = slug.toLowerCase();
-    const redis = DatabaseManager.getRegionalRedisConnection();
+    const { getRedis } = await import("../utils/redis.ts");
+    const redis = getRedis();
     if (redis) {
       const addedCount = await redis.sadd("unique_partner_slugs", cleanSlug);
       if (addedCount === 0) {

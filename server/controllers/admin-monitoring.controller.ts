@@ -3,9 +3,8 @@ import { db } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { getRedis } from "../utils/redis.ts";
 import { MonitoringService } from "../services/monitoring.service.ts";
-import { CircuitBreaker } from "../utils/circuit-breaker.ts";
 import { breaker as dashboardBreaker } from "../routes/bff.routes.ts";
-import { adminMonitoringQuerySchema, idParamSchema, resetCircuitBreakerParamsSchema } from "../dto/admin.dto.ts";
+import { adminMonitoringQuerySchema, idParamSchema } from "../dto/admin.dto.ts";
 
 export interface BotStatEntry {
   total: number;
@@ -54,18 +53,10 @@ export interface RouteMetric {
   statusBreakdown: Record<string, number>;
 }
 
-export interface CircuitBreakerStats {
-  name: string;
-  state: string;
-  failureCount: number;
-  lastErrorAt: string | null;
-}
-
 export interface DiagnosticsResponse {
   stats: MonitorStats;
   routeMetrics: RouteMetric[];
   cachePartitionStats: Record<string, { hits: number; misses: number; ratio: string }>;
-  circuitBreakers: CircuitBreakerStats[];
   timestamp: string;
   firestoreAudit?: {
     top20Endpoints: Array<{ endpoint: string; totalReads: number; executions: number; avgReads: number; percentage: number }>;
@@ -108,13 +99,10 @@ export class AdminMonitoringController {
       const routeMetrics = await MonitoringService.getRouteMetrics() as unknown as RouteMetric[];
       const cachePartitionStats = await MonitoringService.getCachePartitionStats();
       
-      const cbRegistry = CircuitBreaker.getRegistryStats() as unknown as CircuitBreakerStats[];
-      
       const response: DiagnosticsResponse = {
         stats,
         routeMetrics,
         cachePartitionStats: cachePartitionStats as any,
-        circuitBreakers: cbRegistry,
         timestamp: new Date().toISOString(),
       };
 
@@ -131,21 +119,6 @@ export class AdminMonitoringController {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error("Failed to fetch diagnostics", { error: err.message });
       res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-
-  static async resetCircuitBreaker(req: Request, res: Response) {
-    try {
-      const { name } = resetCircuitBreakerParamsSchema.parse(req.params);
-      const success = CircuitBreaker.resetByName(name);
-      if (success) {
-        res.json({ success: true, message: `Circuit breaker '${name}' reset.` });
-      } else {
-        res.status(404).json({ error: "Circuit breaker not found" });
-      }
-    } catch (error: unknown) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      res.status(500).json({ error: err.message });
     }
   }
 
@@ -168,10 +141,9 @@ export class AdminMonitoringController {
       // 2. Provera mrežnih konekcija i odziva
       logs.push("\n📡 [2/4] DIJAGNOSTIKA KONEKCIJA KROZ DOKER:");
       
-      const { DatabaseManager } = await import("../utils/db-manager.ts");
       try {
         const dbStart = Date.now();
-        await DatabaseManager.init();
+        await db.collection("admin_stats").doc("global").get();
         logs.push(`   ✅ Firestore Baza podataka: POVEZANA (${Date.now() - dbStart}ms)`);
       } catch (err: any) {
         logs.push(`   ❌ Greška pri povezivanju sa bazom podataka: ${err.message}`);

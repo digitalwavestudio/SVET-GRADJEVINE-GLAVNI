@@ -6,7 +6,6 @@ import {
   syncAdsToIndex,
 } from "../algolia.service.ts";
 import { MonitoringService } from "../monitoring.service.ts";
-import { syncCircuit } from "../../utils/circuit-breaker.ts";
 import { Logger } from "../../utils/logger.ts";
 import { TraceContext } from "../../utils/trace.ts";
 import { Job as BullJob } from "bullmq";
@@ -29,33 +28,25 @@ export class SyncProcessor {
         });
 
         if (type === SyncTaskType.ALGOLIA_JOB_SYNC) {
-          await syncCircuit.execute(() =>
-            syncJobToIndex(targetId, data as Record<string, unknown>),
-          );
+          await syncJobToIndex(targetId, data as Record<string, unknown>);
           await this.enqueueGooglePing(SyncUtils.getAdUrl("jobs", targetId), "URL_UPDATED");
         } else if (type === SyncTaskType.ALGOLIA_JOB_DELETE) {
-          await syncCircuit.execute(() => deleteAdFromIndex("jobs", targetId));
+          await deleteAdFromIndex("jobs", targetId);
           await this.enqueueGooglePing(SyncUtils.getAdUrl("jobs", targetId), "URL_DELETED");
         } else if (type === SyncTaskType.ALGOLIA_AD_SYNC) {
           const { category, ...adData } = data as Record<string, unknown>;
-          await syncCircuit.execute(() =>
-            syncAdToIndex(category as string, targetId, adData),
-          );
+          await syncAdToIndex(category as string, targetId, adData);
           await this.enqueueGooglePing(SyncUtils.getAdUrl(category as string, targetId), "URL_UPDATED");
         } else if (type === SyncTaskType.ALGOLIA_AD_DELETE) {
           const { category } = data as Record<string, unknown>;
-          await syncCircuit.execute(() =>
-            deleteAdFromIndex(category as string, targetId),
-          );
+          await deleteAdFromIndex(category as string, targetId);
           await this.enqueueGooglePing(SyncUtils.getAdUrl(category as string, targetId), "URL_DELETED");
         } else if (type === SyncTaskType.ALGOLIA_PROFILE_SYNC) {
           const { userData } = data as Record<string, unknown>;
           await SyncAlgolia.syncProfile(targetId as string, userData as Record<string, any>, cid);
         } else if (type === SyncTaskType.ALGOLIA_PROFILE_DELETE) {
           const { category } = data as Record<string, unknown>;
-          await syncCircuit.execute(() =>
-            deleteAdFromIndex(category as string, targetId as string),
-          );
+          await deleteAdFromIndex(category as string, targetId as string);
           await this.enqueueGooglePing(SyncUtils.getAdUrl(category as string, targetId as string), "URL_DELETED");
         } else if (type === SyncTaskType.USER_RELATIONAL_SYNC) {
           await this.processUserRelationalSync(targetId as string);

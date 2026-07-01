@@ -8,7 +8,7 @@ import { db, admin } from "../config/firebase.ts";
 import { logDestructiveAction } from "../utils/destructive-audit.ts";
 import { NotificationService, NotificationType } from "../services/notification.service.ts";
 import { getRedis } from "../utils/redis.ts";
-import { resetCircuitBreakerOrCacheSchema, clearDashboardCacheSchema, sendBroadcastSchema, basePaginationQuerySchema, idParamSchema, retryDlqItemSchema, resolveReportSchema, verifyUserSchema, updateUserSchema, updateUserWalletSchema, suspendUserSchema } from "../dto/admin.dto.ts";
+import { clearDashboardCacheSchema, sendBroadcastSchema, basePaginationQuerySchema, idParamSchema, retryDlqItemSchema, resolveReportSchema, verifyUserSchema, updateUserSchema, updateUserWalletSchema, suspendUserSchema } from "../dto/admin.dto.ts";
 import { logger } from "../utils/logger.ts";
 
 // Initialize registrations - REMOVED: Initialized in server.ts at startup
@@ -105,12 +105,6 @@ export const reindexAll = async (
 };
 
 import { setupAlgoliaIndexSettings } from "../services/algolia.service.ts";
-import { CircuitBreaker } from "../utils/circuit-breaker.ts";
-
-export const getCircuitBreakers = (req: Request, res: Response) => {
-  if (!req.user?.isAdmin) return res.status(403).json({ error: "Forbidden" });
-  res.json(CircuitBreaker.getRegistryStats());
-};
 
 export const resetCircuitBreakerOrCache = async (
   req: Request,
@@ -120,17 +114,9 @@ export const resetCircuitBreakerOrCache = async (
   if (!req.user?.isAdmin) return res.status(403).json({ error: "Forbidden" });
 
   try {
-    const { name, invalidateCache, cachePrefix } = resetCircuitBreakerOrCacheSchema.parse(req.body);
+    const { invalidateCache, cachePrefix } = req.body as { invalidateCache?: boolean; cachePrefix?: string };
 
     let message = "";
-    if (name) {
-      const resetOk = CircuitBreaker.resetByName(name);
-      if (resetOk) {
-        message += `Circuit breaker "${name}" je uspešno resetovan. `;
-      } else {
-        message += `Circuit breaker "${name}" nije pronađen. `;
-      }
-    }
 
     if (invalidateCache) {
       const { CacheService } = await import("../services/cache.service.ts");

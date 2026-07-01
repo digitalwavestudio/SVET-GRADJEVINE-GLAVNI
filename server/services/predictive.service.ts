@@ -138,32 +138,4 @@ export class PredictiveAnalyticsService {
       logger.error('Failed to force refresh predictive cache for ' + adId + ':', e instanceof Error ? e.message : String(e));
     }
   }
-
-  /**
-   * System health status for Admin Widget
-   */
-  static async getSystemInternalStatus() {
-     // Mocking BullMQ and Circuit Breaker status (Enterprise level visibility)
-     try {
-       const circuits = {
-         "AlgoliaSync": "CLOSED",
-         "FirewallSentry": "CLOSED",
-         "PaymentGateway": "CLOSED"
-       };
-
-       const queues = {
-         "SyncWorker": { active: 0, waiting: 2, completed: 1540, failed: 1 },
-         "AuditLogWorker": { active: 1, waiting: 0, completed: 890, failed: 0 },
-         "ImageModerator": { active: 0, waiting: 0, completed: 4200, failed: 12 }
-       };
-
-       return {
-         circuits,
-         queues,
-         lastUpdated: new Date().toISOString()
-       };
-     } catch (err) {
-       return null;
-     }
-  }
 }

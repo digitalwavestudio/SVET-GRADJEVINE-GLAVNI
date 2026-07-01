@@ -201,31 +201,6 @@ export const rateLimitShield = async (
       });
     }
 
-    // 2. Global rate limit (Configurable via Admin Dashboard) using SHA-256 hashed IP
-    const limitBase = DynamicConfigService.get("globalRateLimit", 1000);
-    const botLimitBase = 20000; // Generous limit for known crawlers (AhrefsBot, GPTBot, etc.)
-
-    const isStaticAsset = req.path.startsWith("/assets/") || req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|map|txt|xml)$/i);
-
-    if (!isStaticAsset && !req.path.startsWith("/api/admin")) {
-      const activeLimit = isWhitelistedBot ? botLimitBase : limitBase;
-      const isAllowed = await RateLimiterService.isAllowed(
-        `global:${hashedIp}`,
-        activeLimit,
-        60,
-      ); // Default 1000 req per minute global
-      if (!isAllowed) {
-        await AuditService.log({
-          action: AuditAction.SECURITY_THREAT,
-          severity: 'medium',
-          ip: ipStr,
-          userAgent: ua,
-          path: req.path,
-          details: { limit_base: limitBase, type: 'rate_limit' }
-        });
-        return res.status(429).json({ error: "Rate limit exceeded" });
-      }
-    }
   } catch (err) {
     console.error(
       "[RateLimitShield] Error in middleware, skipping for safety:",

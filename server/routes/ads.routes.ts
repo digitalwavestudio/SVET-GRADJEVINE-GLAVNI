@@ -20,7 +20,6 @@ import {
   moderateAdSchema,
 } from "@svet-gradjevine/shared";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
-import { requestCoalescingMiddleware } from "../middleware/coalesce.middleware.ts";
 
 export const adsRouter = Router();
 
@@ -229,7 +228,6 @@ adsRouter.post("/search", searchAds);
 // Get premium partners for trust section (limited, cached)
 adsRouter.get(
   "/premium-partners",
-  requestCoalescingMiddleware(),
   cacheMiddleware(300000, "premium_partners"),
   async (req, res, next) => {
     try {

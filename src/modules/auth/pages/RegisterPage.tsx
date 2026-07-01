@@ -105,7 +105,7 @@ export default function RegisterPage() {
         isPremiumProfile: false,
         photoURL: '',
         viewsCount: 0,
-        freeAdsCount: 3
+        freeAdsCount: 1500
       };
 
       const token = await user.getIdToken();

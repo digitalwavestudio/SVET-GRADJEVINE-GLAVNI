@@ -3,7 +3,7 @@ import type { DecodedIdToken } from "firebase-admin/auth";
 import { CacheService } from "../services/cache.service.ts";
 import { MonitoringService } from "../services/monitoring.service.ts";
 import { AppScope, AuthorizationService } from "../services/authorization.service.ts";
-import { JwksService } from "../services/jwks.service.ts";
+
 import type { AuthUser } from "../types/auth.ts";
 import type { Request, Response, NextFunction } from "express";
 import { logger } from "../utils/logger.ts";
@@ -51,32 +51,11 @@ export const authMiddleware = async (
   try {
     ensureInitialized();
     const authUser = await (async () => {
-      let decodedToken;
-      try {
-        const rawDecoded = await JwksService.verifyIdTokenLocal(idToken);
-        // Normalize Firebase specific claims to standard AuthUser interface
-        decodedToken = {
-          ...rawDecoded,
-          uid: rawDecoded.uid || rawDecoded.user_id || rawDecoded.sub
-        } as DecodedIdToken;
-      } catch (localVerifyErr: unknown) {
-        const error = localVerifyErr instanceof Error ? localVerifyErr : new Error(String(localVerifyErr));
-        logger.warn(`[AUTH] Local JWKS verification failed, trying fallback to Admin SDK: ${error.message}`);
-        // Fallback to official admin SDK verifyIdToken if local check fails for unexpected reasons (e.g. key refreshing latency)
-        let timeoutId: NodeJS.Timeout | null = null;
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          timeoutId = setTimeout(() => reject(new Error("Admin SDK verification timeout (3000ms limit achieved)")), 3000);
-        });
-
-        decodedToken = await Promise.race([
-          admin.auth().verifyIdToken(idToken, true),
-          timeoutPromise
-        ]);
-
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-      }
+      const rawDecoded = await admin.auth().verifyIdToken(idToken);
+      const decodedToken = {
+        ...rawDecoded,
+        uid: rawDecoded.uid || rawDecoded.user_id || rawDecoded.sub
+      } as DecodedIdToken;
 
       // Clear login attempts on successful token verification
       const attemptsKey = `login_attempts:${ip}`;

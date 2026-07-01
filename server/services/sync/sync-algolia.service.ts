@@ -7,14 +7,13 @@ import {
 } from "../algolia.service.ts";
 import { MonitoringService } from "../monitoring.service.ts";
 import { Job } from "@svet-gradjevine/shared";
-import { syncCircuit } from "../../utils/circuit-breaker.ts";
 import { Logger } from "../../utils/logger.ts";
 import { TraceContext } from "../../utils/trace.ts";
 import { QueueService, JobType, JobPriority } from "../queue.service.ts";
 import { SyncTaskType } from "../sync.service.ts";
 import { GoogleIndexingService } from "../google-indexing.service.ts";
 import { SyncUtils } from "./sync-utils.service.ts";
-import { AlgoliaRedisBatcher } from "../algolia-redis-batcher.service.ts";
+
 
 export interface UserProfileData {
   role?: string;
@@ -86,10 +85,7 @@ export class SyncAlgolia {
       }
     }
 
-    iLogger.info(`Buffering sync to Redis Stream for ${category} ${id}`);
-    
-    // Domain 3: Outbox Congestion fix - 50k RPS Adaptive Bulk Batching via Redis Streams
-    await AlgoliaRedisBatcher.bufferSync(category, id, data);
+    await syncAdsToIndex(category, [{ id, data }]);
   }
 
   static async deleteAd(category: string, id: string, correlationId?: string) {
@@ -97,7 +93,7 @@ export class SyncAlgolia {
     const iLogger = Logger.withContext(cid);
 
     try {
-      await syncCircuit.execute(() => deleteAdFromIndex(category, id));
+      await deleteAdFromIndex(category, id);
     } catch (error) {
       await QueueService.addJob(
         JobType.SYNC_COLLECTION,
@@ -161,9 +157,7 @@ export class SyncAlgolia {
             : Date.now(),
       };
 
-      await syncCircuit.execute(() =>
-        syncAdToIndex(category, userId, algoliaData),
-      );
+      await syncAdToIndex(category, userId, algoliaData);
       MonitoringService.recordSyncSuccess();
     } catch (error: unknown) {
       iLogger.warn(`Profile sync failed for ${userId}, queuing`, {

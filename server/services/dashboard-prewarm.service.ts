@@ -5,7 +5,7 @@ import { MetricsService } from "./metrics.service.ts";
 import { CacheService } from "./cache.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
-import { RedisLockManager } from "../utils/redis-lock.ts";
+import { LockManager } from "./lock.service.ts";
 
 const logger = new Logger({ service: "DashboardPrewarmService" });
 
@@ -274,7 +274,7 @@ export class DashboardPrewarmService {
         SystemCron.register("dashboard_prewarm_cron", { pattern: "0 0 * * *" }, async () => {
           logger.info("[Prewarm Cron] Checking concurrency using Redis distributed lock...");
           // Pokusaj preuzimanja locka na 3 sata kako se zadatak ne bi ponovio na drugim instancama
-          const lockId = await RedisLockManager.acquire("dashboard_prewarm_lock", 3 * 60 * 60 * 1000);
+          const lockId = await LockManager.acquire("dashboard_prewarm_lock", 3 * 60 * 60 * 1000);
           if (!lockId) {
             logger.info("[Prewarm Cron] Failed to acquire distributed lock, another instance is already running this task.");
             return;
@@ -284,7 +284,7 @@ export class DashboardPrewarmService {
             await DashboardPrewarmService.prewarmGlobalFastPaths();
             await DashboardPrewarmService.prewarmPremiumUsers();
           } finally {
-            await RedisLockManager.release("dashboard_prewarm_lock", lockId).catch((e: any) => logger.warn("[DashboardPrewarmService] Release prewarm lock:", e));
+            await LockManager.release("dashboard_prewarm_lock", lockId).catch((e: any) => logger.warn("[DashboardPrewarmService] Release prewarm lock:", e));
           }
         }).catch(err => logger.error("[Prewarm Cron] Failed to register repeatable job", err));
       })

@@ -17,7 +17,6 @@ import {
   getSupportTickets,
   getAbuseReports,
   setupAlgolia,
-  getCircuitBreakers,
   resetCircuitBreakerOrCache,
   moderateListing,
   editListing,
@@ -170,7 +169,6 @@ adminRouter.get("/support-tickets", adminTriggerLimiter, requireScope(AppScope.U
 adminRouter.get("/abuse-reports", adminTriggerLimiter, requireScope(AppScope.USER_MODERATE), getAbuseReports);
 adminRouter.post("/verify-user", validateRequest(verifyUserSchema), requireScope(AppScope.USER_MODERATE), verifyUser);
 adminRouter.patch("/users/:id", adminTriggerLimiter, requireScope(AppScope.USER_EDIT), updateUser);
-adminRouter.get("/circuit-breakers", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), getCircuitBreakers);
 adminRouter.post("/circuit-breakers/reset", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), resetCircuitBreakerOrCache);
 adminRouter.post("/sync-claims", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), syncClaims);
 adminRouter.post("/migrations/run", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), runMigrations);
@@ -214,7 +212,6 @@ import {
 } from "../controllers/admin.controller.ts";
 adminRouter.get("/monitoring/diagnostics", AdminMonitoringController.getDiagnostics);
 adminRouter.post("/monitoring/run-diagnostics", AdminMonitoringController.runDiagnosticsScript);
-adminRouter.post("/monitoring/circuit-breakers/:name/reset", AdminMonitoringController.resetCircuitBreaker);
 adminRouter.get("/dlq", adminTriggerLimiter, getDlqItems);
 adminRouter.post("/dlq/retry", adminTriggerLimiter, retryDlqBulk);
 adminRouter.post("/dlq/:id/retry", adminTriggerLimiter, retryDlqItem);

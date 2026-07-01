@@ -351,8 +351,6 @@ let redis: ResilientRedis | null = null;
 let rawRedis: Redis | null = null;
 let subRedis: ResilientRedis | null = null;
 let streamRedis: ResilientRedis | null = null;
-const regionalClients = new Map<string, ResilientRedis>();
-
 interface ResilientClientOptions {
   isMain?: boolean;
   [key: string]: unknown;
@@ -638,36 +636,6 @@ export function getRedis(): ResilientRedis {
   return redis!;
 }
 
-/**
- * Vraća Redis klijent za specifičan region.
- * Korisno za prekograničnu sinhronizaciju ili failover metadata.
- */
-const MAX_REGIONAL_CLIENTS = 5;
-
-export function getRegionalRedis(region: string): ResilientRedis {
-  if (regionalClients.has(region)) return regionalClients.get(region)!;
-
-  // Cleanup old clients if limit reached
-  if (regionalClients.size >= MAX_REGIONAL_CLIENTS) {
-    // If we hit the limit, just fallback to main redis to avoid new socket opening
-    return getRedis();
-  }
-
-  const regionUrls = env.REDIS_REGION_URLS
-    ? env.REDIS_REGION_URLS.split(",")
-    : [];
-  const pair = regionUrls.find((p) => p.startsWith(`${region}:`));
-
-  if (pair) {
-    const colonIdx = pair.indexOf(":");
-    const url = pair.substring(colonIdx + 1);
-    const client = createResilientClient(url, { maxRetriesPerRequest: 1, isMain: false });
-    regionalClients.set(region, client);
-    return client;
-  }
-  return getRedis();
-}
-
 export function getSubRedis(): ResilientRedis {
   const url = getRedisUrl();
   if (!subRedis) {
@@ -744,10 +712,5 @@ export async function shutdownRedis() {
   redis = null;
   await cleanupClient(rawRedis);
   rawRedis = null;
-  
-  for (const client of regionalClients.values()) {
-    await cleanupClient(client);
-  }
-  regionalClients.clear();
 }
 

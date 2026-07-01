@@ -568,8 +568,8 @@ walletRouter.delete("/transactions", requireAuth, async (req, res, next) => {
 walletRouter.get("/balance", requireAuth, async (req, res, next) => {
   try {
     const userId = getReqUser(req).uid;
-    const { FinancialLedgerService } = await import("../services/ledger.service.ts");
-    const balance = await FinancialLedgerService.getBalance(userId);
+    const walletSnap = await db.collection("wallets").doc(userId).get();
+    const balance = walletSnap.exists ? (walletSnap.data()?.balance || 0) : 0;
     res.json({ balance });
   } catch (error) {
     console.error("Fetch Balance Error:", error);
