@@ -16,12 +16,12 @@ import {
 } from "../types/bff.ts";
 import { AuthUser } from "../types/auth.ts";
 import { db } from "../config/firebase.ts";
-import { AdminStatsService } from "./admin-stats.service.ts";
+import { AdminStatsService } from "./admin/admin-stats.service.ts";
 import { UnifiedAdsService } from "./unified-ads.service.ts";
 import { UnifiedSearchService } from "./unified-search.service.ts";
-import { DashboardService } from "./dashboard.service.ts";
+import { DashboardService } from "./dashboard/dashboard.service.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
-import { logger, Logger } from "../utils/logger.ts";
+
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
 const L1_HOMEPAGE_TTL = 30_000; // 30s in-memory cache
@@ -30,13 +30,8 @@ export function clearL1HomepageCache() {
   l1HomepageCache.clear();
 }
 
-const l1DashboardPrewarmCache = new Map<string, { data: any; expiry: number }>();
-const L1_DASHBOARD_PREWARM_TTL = 5 * 60 * 1000; // 5min in-memory Shield cache
-
 const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> =>
   Promise.race([promise, new Promise<T>((r) => setTimeout(() => r(fallback), ms))]);
-
-export const bffSingleFlightMap = new Map<string, Promise<DashboardDataResult>>();
 
 export const bffService = {
   async getHomepageData(platform: string): Promise<HomepageDataResult> {
@@ -370,125 +365,62 @@ export const bffService = {
     cacheControlHeader?: string
   ): Promise<DashboardDataResult> {
     const cacheKey = `bff_cache_tiered:${userId}:${role}`;
-    const flightKey = `${userId}:${role}`;
+    const { CacheService } = await import("./cache.service.ts");
+    const walletUserCacheKey = `bff_wallet_user:${userId}`;
+    const walletUserData = await CacheService.getOrSet<{ wallet: any; user: any }>(
+      walletUserCacheKey,
+      async () => {
+        const { internalUserLoader } = await import("../utils/dataloader.ts");
+        const [walletDoc, userDoc] = await Promise.all([
+          db.collection("wallets").doc(userId).get(),
+          internalUserLoader.load(userId),
+        ]);
+        return {
+          wallet: walletDoc.exists ? walletDoc.data() : null,
+          user: userDoc || null,
+        };
+      },
+      5 * 60 * 1000
+    );
 
+    const fetchLogic = async (): Promise<DashboardDataResult> => {
+      try {
+        const matchedProfile = walletUserData?.user
+          ? { uid: userId, location: walletUserData.user.location || "Beograd", profession: walletUserData.user.profession || "Sve" }
+          : reqUser;
 
-    if (bffSingleFlightMap.has(flightKey)) {
-      return bffSingleFlightMap.get(flightKey) as Promise<DashboardDataResult>;
-    }
+        const baseData = await DashboardService.aggregateDashboardData(
+          userId,
+          role,
+          isAdmin,
+          matchedProfile,
+        );
 
-    const logicPromise = (async () => {
-      const { CacheService } = await import("./cache.service.ts");
-      const walletUserCacheKey = `bff_wallet_user:${userId}`;
-      const walletUserData = await CacheService.getOrSet<{ wallet: any; user: any }>(
-        walletUserCacheKey,
-        async () => {
-          const { internalUserLoader } = await import("../utils/dataloader.ts");
-          const [walletDoc, userDoc] = await Promise.all([
-            db.collection("wallets").doc(userId).get(),
-            internalUserLoader.load(userId),
-          ]);
-          return {
-            wallet: walletDoc.exists ? walletDoc.data() : null,
-            user: userDoc || null,
-          };
-        },
-        5 * 60 * 1000 // 5 minuta TTL
-      );
-
-      const fetchLogic = async (): Promise<DashboardDataResult> => {
-        try {
-          const matchedProfile = walletUserData?.user
-            ? { uid: userId, location: walletUserData.user.location || "Beograd", profession: walletUserData.user.profession || "Sve" }
-            : reqUser;
-
-          const { getRedis } = await import("../utils/redis.ts");
-          const redis = getRedis();
-          const prewarmKey = `dashboard_stats_prewarm:${userId}:${role}`;
-          let baseData: any = null;
-
-          // 1. Check L1 Memory Cache first
-          const now = Date.now();
-          const l1PrewarmCached = l1DashboardPrewarmCache.get(prewarmKey);
-          if (l1PrewarmCached && now < l1PrewarmCached.expiry) {
-            baseData = l1PrewarmCached.data;
-            logger.debug(`[BFF L1 Prewarm] Served pre-calculated stats from L1 RAM cache: ${prewarmKey}`);
+        if (baseData && typeof baseData === "object" && "stats" in baseData && baseData.stats) {
+          const statsObj = baseData.stats as Record<string, unknown>;
+          delete statsObj.unreadActivities;
+          delete statsObj.walletBalance;
+          if (walletUserData?.wallet) {
+            statsObj.walletBalance = walletUserData.wallet.balance || 0;
           }
-
-          if (!baseData && redis) {
-            try {
-              const cachedStr = await redis.get(prewarmKey);
-              if (cachedStr) {
-                baseData = JSON.parse(cachedStr);
-                logger.debug(`[BFF Prewarm] Served pre-calculated dashboard stats from ${prewarmKey}`);
-                
-                // Write into L1 cache for extremely fast subsequent reads
-                l1DashboardPrewarmCache.set(prewarmKey, {
-                  data: baseData,
-                  expiry: Date.now() + L1_DASHBOARD_PREWARM_TTL,
-                });
-              }
-            } catch (err) {
-              logger.warn("[BFF Prewarm] Failed to read prewarm stats from Redis:", err);
-            }
-          }
-
-          if (!baseData) {
-            baseData = await DashboardService.aggregateDashboardData(
-              userId,
-              role,
-              isAdmin,
-              matchedProfile,
-            );
-
-            if (redis) {
-              try {
-                await redis.set(prewarmKey, JSON.stringify(baseData), "EX", 10 * 60); // 10 minutes TTL
-              } catch (err) {
-                logger.warn("[BFF Prewarm] Failed to write prewarm stats to Redis:", err);
-              }
-            }
-
-            // Write into L1 cache
-            l1DashboardPrewarmCache.set(prewarmKey, {
-              data: baseData,
-              expiry: Date.now() + L1_DASHBOARD_PREWARM_TTL,
-            });
-          }
-
-          if (baseData && typeof baseData === "object" && "stats" in baseData && baseData.stats) {
-            const statsObj = baseData.stats as Record<string, unknown>;
-            delete statsObj.unreadActivities;
-            delete statsObj.walletBalance;
-            if (walletUserData?.wallet) {
-              statsObj.walletBalance = walletUserData.wallet.balance || 0;
-            }
-          }
-
-          return baseData as DashboardDataResult;
-        } catch (dbErr: unknown) {
-          throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
         }
-      };
 
-      if (cacheControlHeader === "no-cache") {
-        const newData = await fetchLogic();
-        await CacheService.set(cacheKey, newData, 300000);
-        return newData;
+        return baseData as DashboardDataResult;
+      } catch (dbErr: unknown) {
+        throw new Error("QUOTA_EXHAUSTED_NO_STALE_CACHE");
       }
+    };
 
-      return await CacheService.getOrSetSWR<DashboardDataResult>(
-        cacheKey,
-        fetchLogic,
-        300000
-      );
-    })();
-
-    bffSingleFlightMap.set(flightKey, logicPromise);
-    try {
-      return await logicPromise;
-    } finally {
-      bffSingleFlightMap.delete(flightKey);
+    if (cacheControlHeader === "no-cache") {
+      const newData = await fetchLogic();
+      await CacheService.set(cacheKey, newData, 300000);
+      return newData;
     }
+
+    return await CacheService.getOrSetSWR<DashboardDataResult>(
+      cacheKey,
+      fetchLogic,
+      300000
+    );
   }
 };

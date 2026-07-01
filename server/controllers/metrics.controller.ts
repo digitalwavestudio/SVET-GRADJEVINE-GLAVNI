@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { MetricsService } from "../services/metrics.service.ts";
+import { ProductAnalyticsService } from "../services/product-analytics.service.ts";
+import { SystemMetricsService } from "../services/system-metrics.service.ts";
 import { MonitoringService } from "../services/monitoring.service.ts";
 
-// Initialize the background processing directly using the service
-MetricsService.init();
+ProductAnalyticsService.init();
+SystemMetricsService.init();
 
 export const getPrometheusMetrics = async (
   req: Request,
@@ -88,7 +89,7 @@ export const bulkRecordEvents = async (
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
 
     // Obradi batch u pozadini, bez blokiranja (ili sa minimalnim await)
-    const result = await MetricsService.bulkRecordEvents(events, ipStr);
+    const result = await ProductAnalyticsService.bulkRecordEvents(events, ipStr);
 
     return res.json({ success: true, processed: result.processed });
   } catch (err) {
@@ -112,7 +113,7 @@ export const recordEvent = async (
       req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown";
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
 
-    const result = await MetricsService.recordEvent(
+    const result = await ProductAnalyticsService.recordEvent(
       type,
       collectionName,
       targetId,
@@ -137,7 +138,7 @@ export const getUserAnalytics = async (
 
     if (!userId) return res.status(400).json({ error: "User ID required" });
 
-    const result = await MetricsService.getUserAnalytics(
+    const result = await ProductAnalyticsService.getUserAnalytics(
       userId,
       Number(days) || 30,
     );

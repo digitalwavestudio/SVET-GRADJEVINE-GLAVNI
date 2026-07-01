@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { DashboardService } from "../services/dashboard.service.ts";
+import { DashboardService } from "../services/dashboard/dashboard.service.ts";
 
 export const getStats = async (
   req: Request,

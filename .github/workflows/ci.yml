@@ -20,7 +20,3 @@ jobs:
       - run: npm run lint
       - run: npm run test:contract
       - run: npm test
-      - name: Install Playwright Browsers (optional)
-        run: npx playwright install --with-deps || true
-      - name: E2E Tests (placeholder)
-        run: npm run test:e2e || echo "E2E tests not yet configured"

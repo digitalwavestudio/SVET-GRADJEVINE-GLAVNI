@@ -322,13 +322,13 @@ apiRouter.get(
 );
 
 // Branding is public
-import { AdminService } from "../services/admin.service.ts";
+import { AdminSettingsService } from "../services/admin/admin-settings.service.ts";
 apiRouter.get(
   "/branding",
   cacheMiddleware(120000, "branding"),
   async (_req, res, next) => {
     try {
-      const result = await AdminService.getSettings("branding");
+      const result = await AdminSettingsService.getSettings("branding");
       res.json(result);
     } catch (err) {
       next(err);

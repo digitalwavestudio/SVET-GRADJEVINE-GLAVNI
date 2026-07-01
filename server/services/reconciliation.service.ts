@@ -3,7 +3,6 @@ import { Logger } from "../utils/logger.ts";
 import { LockManager } from "./lock.service.ts";
 import { browseIndicesObjects, deleteAdFromIndex } from "./algolia.service.ts";
 import { env } from "../config/env.ts";
-import { RegionService } from "./region.service.ts";
 import { CacheService } from "./cache.service.ts";
 import { CACHE_PREFIXES } from "../constants/cache-keys.ts";
 
@@ -16,11 +15,6 @@ export class ReconciliationService {
    * Main entry point for the reconciliation task
    */
   static async run() {
-    // Safety check: Only run in leader region
-    if (!RegionService.isLeaderRegion()) {
-      return;
-    }
-
     const lockId = await LockManager.acquire(this.LOCK_KEY, this.LOCK_TTL);
     if (!lockId) {
       Logger.withContext().info("[Reconciliation] Task already running or locked on another instance.");
@@ -31,7 +25,7 @@ export class ReconciliationService {
       await db.collection("metadata").doc("sync_status").set({
         status: "reconciling",
         startedAt: admin.firestore.FieldValue.serverTimestamp(),
-        region: RegionService.getRegion()
+        region: env.APP_REGION
       }, { merge: true });
 
       Logger.withContext().info("[Reconciliation] >>> Starting leader-only reconciliation cycle...");
@@ -91,11 +85,6 @@ export class ReconciliationService {
    * Updates metadata/admin_stats document, performing count aggregations once daily at 4:00 AM
    */
   static async updateAdminStats() {
-    if (!RegionService.isLeaderRegion()) {
-      Logger.withContext().info("[Reconciliation] Skipping admin stats — not leader region.");
-      return;
-    }
-
     const lockKey = "lock:reconciliation_admin_stats";
     const lockId = await LockManager.acquire(lockKey, 10 * 60 * 1000);
     if (!lockId) {

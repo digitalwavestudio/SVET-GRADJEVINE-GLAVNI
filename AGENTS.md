@@ -196,17 +196,20 @@ Background task prepisuje Fast-Path posle svakog zahteva. Ako ti treba da ručno
 2. Tek onda piši Fast-Path skriptom gore
 3. Inače će background task odmah prepisati tvoje podatke sa praznima
 
-### 🗑️ Mrtvi fajlovi (obrisani u ovoj sesiji)
+### 🗑️ Mrtvi fajlovi (obrisani u OBE sesije, 5 + 6)
 
-**Frontend (11 fajlova):**
+**Frontend (11 fajlova — Session 5):**
 `src/components/seo/EntityContextLinker.tsx`, `src/components/ui/CopyLinkButton.tsx`,
 `src/hooks/useDataFetching.ts`, `src/hooks/useFirestoreListener.ts`, `src/hooks/usePaginatedList.ts`, `src/hooks/useVisibilityAwareSubscription.ts`,
 `src/lib/monitoredFirestore.ts`, `src/lib/searchUtils.ts`, `src/lib/securityObserver.ts`, `src/lib/firestoreUtils.ts`
 `src/lib/performance.ts` → **sveden na stub** (24 linije, passthrough funkcije)
 
-**Server (4 fajla):**
+**Server — Session 5 (4 fajla):**
 `server/services/internal-linking.service.ts`, `server/services/matrix-router.service.ts`,
 `server/subscribers/cache.subscriber.ts`, `server/subscribers/sync.subscriber.ts`
+
+**Server — Session 6 (1 fajl):**
+`server/services/admin.service.ts` — **proxy potpuno obrisan**, sva 22 delegirana poziva zamenjena direktnim sub-service pozivima
 
 **Sentry (1 fajl):**
 `server/utils/sentry-stub.ts` → zamenjen sa `@sentry/node` u `server.ts`
@@ -240,6 +243,64 @@ Background task prepisuje Fast-Path posle svakog zahteva. Ako ti treba da ručno
 npm run lint
 ```
 Samo 2 pre-existing greške u `src/components/AiSearchBar.tsx` — ne diraj.
+
+## 🏗️ Session 6 — Admin fajlovi reorganizovani + splitovani (2026-06-30)
+
+### PROBLEM A1 — Admin servisi reorganizovani
+
+**Šta je urađeno:**
+- `admin-system.service.ts`, `admin-stats.service.ts`, `admin-moderation.service.ts` → preseljeni u `server/services/admin/`
+- Ispravljeni interni importovi (relativne putanje)
+- `admin.service.ts` (85L proxy, 22 delegirajuća metoda) — **obrisan**
+- Svi importovi ažurirani
+
+### PROBLEM A2 — "God controller" splitovan na 4
+
+**Problem:** `admin.controller.ts` imao 537 linija u jednom fajlu, dok servisni sloj ispod već ima lepu podelu po domenu.
+
+**Rešenje:** Splitovan na 4 kontrolera po domenu:
+
+| Novi fajl | Handleri | Servisi koje poziva |
+|---|---|---|
+| `server/controllers/admin-users.controller.ts` | verifyUser, updateUser, syncClaims, getUsers, suspendUser, shutdownUserAccount | AdminUsersService, AdminCleanupService |
+| `server/controllers/admin-ads.controller.ts` | getModerationQueue, editListing, moderateListing, getReportTranscript, resolveReport | AdminAdsService, AdminModerationService |
+| `server/controllers/admin-finance.controller.ts` | getCheckouts, updateUserWallet, confirmCheckoutPayment | AdminFinanceService |
+| `server/controllers/admin-settings.controller.ts` | runMigrations, reindexAll, updateSettings, getSettings, clearDashboardCache, sendBroadcast, getBroadcasts, getSupportTickets, getAbuseReports, getAuditLogs, runAuditLogsCleanup, resetCircuitBreakerOrCache, setupAlgolia | AdminSettingsService, AdminSystemService, AdminLogsService, CacheService, HousekeepingService |
+
+**Promenjeni fajlovi:**
+- `server/controllers/admin.controller.ts` — **obrisan**
+- `server/controllers/admin-users.controller.ts` — **NOV** (64L)
+- `server/controllers/admin-ads.controller.ts` — **NOV** (88L)
+- `server/controllers/admin-finance.controller.ts` — **NOV** (46L)
+- `server/controllers/admin-settings.controller.ts` — **NOV** (151L)
+- `server/routes/admin.routes.ts` — importi iz 4 nova kontrolera umesto jednog
+
+### PROBLEM A3 — AdminStatsService NE duplira postojeće servise
+
+**Zaključak:** Nema preklapanja. Analizirana su 3 sistema:
+1. **ProductAnalyticsService** — broji *interakcije* (pregledi, klikovi, upiti)
+2. **SystemMetricsService** — broji *bot saobraćaj*
+3. **AdminStatsService** — broji *inventar* (koliko oglasa/korisnika postoji, koliko je aktivnih/premium/urgent, procenjeni revenue)
+
+Potpuno različiti domeni. `AdminStatsService.getGlobalStats()` čita iz `metadata/admin_stats` dokumenta koji piše `reconcileGlobalStats()` (povremeni count() upiti). `reconcileGlobalStats()` koristi Firestore `count()` agregacije koje niko drugi ne radi. **Nema refaktorisanja.**
+
+### Ključne promene (A1 + A2)
+| Fajl | Promena |
+|---|---|
+| `server/services/admin.service.ts` | **Obrisan** — proxy klasa sa 22 delegirajuća poziva |
+| `server/services/admin-system.service.ts` | Preseljen u `admin/admin-system.service.ts` |
+| `server/services/admin-stats.service.ts` | Preseljen u `admin/admin-stats.service.ts` |
+| `server/services/admin-moderation.service.ts` | Preseljen u `admin/admin-moderation.service.ts` |
+| `server/controllers/admin.controller.ts` | **Obrisan** — splitovan na 4 kontrolera |
+| `server/controllers/admin-*.controller.ts` | **NOVI** — 4 kontrolera umesto jednog |
+| `server/routes/admin.routes.ts` | Importi iz 4 nova kontrolera |
+| `server/services/users.service.ts` | 2 `AdminService.syncClaims()` → `AdminUsersService.syncClaims()` |
+| `server/routes/api.routes.ts` | `AdminService.getSettings()` → `AdminSettingsService.getSettings()` |
+| `server/routes/messages.routes.ts` | `AdminService.getSettings()` → `AdminSettingsService.getSettings()` |
+
+### Ne diraj
+- `server/services/admin/` folder — sadrži svih 8 admin servisa
+- `server/controllers/admin-*.controller.ts` — 4 kontrolera po domenu
 
 ## Bundle Size (Uncompressed, initial load ~1.6MB)
 - `vendor-core`: 460KB (React, Router, Query)

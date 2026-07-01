@@ -1,12 +1,12 @@
-import { env } from "../config/env.ts";
-import { db } from "../config/firebase.ts";
-import { TraceContext } from "../utils/trace.ts";
-import { CacheService } from "./cache.service.ts";
-import { getRedis, getSubRedis, isClusterOffline } from "../utils/redis.ts";
-import { MetricsService } from "./metrics.service.ts";
-import { CacheKeys } from "../constants/cache-keys.ts";
+import { env } from "../../config/env.ts";
+import { db } from "../../config/firebase.ts";
+import { TraceContext } from "../../utils/trace.ts";
+import { CacheService } from "../cache.service.ts";
+import { getRedis, getSubRedis, isClusterOffline } from "../../utils/redis.ts";
+import { ProductAnalyticsService } from "../product-analytics.service.ts";
+import { CacheKeys } from "../../constants/cache-keys.ts";
 import * as admin from "firebase-admin";
-import { logger } from "../utils/logger.ts";
+import { logger } from "../../utils/logger.ts";
 
 // Extracted modules
 import { 
@@ -15,22 +15,22 @@ import {
   employerStatsMemoryCache,
   smartMatchesMemoryCache,
   employerTrendsMemoryCache
-} from "./dashboard/dashboard-lru.ts";
+} from "./dashboard-lru.ts";
 
-import { getErrorMessage } from "../utils/error-handler.ts";
+import { getErrorMessage } from "../../utils/error-handler.ts";
 
-import { DashboardAdminService } from "./dashboard/dashboard-admin.service.ts";
-import { DashboardEmployerService } from "./dashboard/employer-dashboard.service.ts";
-import { DashboardSmartMatchService, UserMatchProfile } from "./dashboard/dashboard-matches.service.ts";
-import { ApplicationItemDTO } from "../dto/dashboard.dto.ts";
+import { DashboardAdminService } from "./dashboard-admin.service.ts";
+import { DashboardEmployerService } from "./employer-dashboard.service.ts";
+import { DashboardSmartMatchService, UserMatchProfile } from "./dashboard-matches.service.ts";
+import { ApplicationItemDTO } from "../../dto/dashboard.dto.ts";
 
 // Proxy re-export for backward compatibility
 export { SimpleLRUCache };
 
 const REDIS_EVICTION_CHANNEL = "dashboard_cache_eviction";
 
-import { AuthUser } from "../types/auth.ts";
-import { EmployerStats } from "../types/bff.ts";
+import { AuthUser } from "../../types/auth.ts";
+import { EmployerStats } from "../../types/bff.ts";
 
 export class DashboardService {
   private static subRegistered = false;
@@ -94,7 +94,7 @@ export class DashboardService {
           return { role };
         }
       })(),
-      MetricsService.getUserAnalytics(userId, 30),
+      ProductAnalyticsService.getUserAnalytics(userId, 30),
     ]);
 
     if (statsResult.status === "rejected") {
@@ -267,7 +267,7 @@ export class DashboardService {
             id: doc.id,
             collType: data.type,
             ...data,
-          } as import("../dto/dashboard.dto.ts").DashboardAdItemDTO;
+          } as import("../../dto/dashboard.dto.ts").DashboardAdItemDTO;
         });
 
         cachedStats.totalAds = activeCount;

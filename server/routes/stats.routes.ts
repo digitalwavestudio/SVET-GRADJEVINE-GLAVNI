@@ -2,7 +2,7 @@ import { Router } from "express";
 import { getReqUser } from "../utils/request.ts";
 import { admin, db } from "../config/firebase.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
-import { AdminStatsService } from "../services/admin-stats.service.ts";
+import { AdminStatsService } from "../services/admin/admin-stats.service.ts";
 import { logger } from "../utils/logger.ts";
 
 export const statsRouter = Router();

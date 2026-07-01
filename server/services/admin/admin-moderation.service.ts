@@ -1,6 +1,6 @@
-import { db, admin } from "../config/firebase.ts";
+import { db, admin } from "../../config/firebase.ts";
 
-import { transcriptResponseSchema } from "../dto/admin.dto.ts";
+import { transcriptResponseSchema } from "../../dto/admin.dto.ts";
 
 export class AdminModerationService {
   static async getReportTranscript(id: string) {

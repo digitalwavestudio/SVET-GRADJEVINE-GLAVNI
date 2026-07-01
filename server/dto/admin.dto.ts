@@ -15,10 +15,6 @@ export const sendBroadcastSchema = z.object({
   body: z.string().min(10, "Prekratko")
 });
 
-export const retryDlqItemSchema = z.object({
-  source: z.enum(["outbox", "dlq"])
-});
-
 export const resolveReportSchema = z.object({
   status: z.enum(["resolved", "dismissed"]),
   note: z.string().optional().default("")

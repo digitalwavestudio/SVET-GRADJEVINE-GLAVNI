@@ -2,7 +2,15 @@ import { admin, db, ensureInitialized } from "../config/firebase.ts";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { CacheService } from "../services/cache.service.ts";
 import { MonitoringService } from "../services/monitoring.service.ts";
-import { AppScope, AuthorizationService } from "../services/authorization.service.ts";
+const getDefaultPermissions = (role: string): string[] => {
+  switch (role) {
+    case "admin": return ["*"];
+    case "employer": return ["ads:read", "ads:create", "ads:edit"];
+    case "candidate": return ["ads:read", "user:edit"];
+    case "majstor": return ["ads:read", "ads:create", "user:edit"];
+    default: return ["ads:read"];
+  }
+};
 
 import type { AuthUser } from "../types/auth.ts";
 import type { Request, Response, NextFunction } from "express";
@@ -94,7 +102,7 @@ export const authMiddleware = async (
               resolvedPermissions = ["*"];
             } else {
               resolvedRole = (userData?.role as string) || "standard";
-              resolvedPermissions = (userData?.permissions as string[]) || AuthorizationService.getDefaultPermissions(resolvedRole);
+              resolvedPermissions = (userData?.permissions as string[]) || getDefaultPermissions(resolvedRole);
             }
 
             // SECURITY: TTL 5 minuta (ne 1 sat) — demote/ban se prima maksimalno 5 min
@@ -109,14 +117,14 @@ export const authMiddleware = async (
           }).catch((e) => console.error("[AUTH] setCustomUserClaims failed in background:", e));
         } catch (e) {
           resolvedRole = "standard";
-          resolvedPermissions = AuthorizationService.getDefaultPermissions("standard");
+          resolvedPermissions = getDefaultPermissions("standard");
         }
       }
 
       // Ako JWT ima role ali nema permissions (stari token pre dodavanja permissions claim-a),
       // popunjavamo iz default-a i upisujemo u custom claims za sledeći put
       if (resolvedRole && !resolvedPermissions) {
-        resolvedPermissions = AuthorizationService.getDefaultPermissions(resolvedRole);
+        resolvedPermissions = getDefaultPermissions(resolvedRole);
         admin.auth().setCustomUserClaims(decodedToken.uid, {
           role: resolvedRole,
           permissions: resolvedPermissions,
@@ -198,44 +206,5 @@ export const requireAdmin = (
     return res.status(403).json({ error: "Forbidden: Admin access only" });
   }
   next();
-};
-
-export const requirePermission = (permission: string) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    res.setHeader("Cache-Control", "no-store, no-cache, private");
-    if (!req.user) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    if (req.user.isAdmin || req.user.permissions?.includes("*")) {
-      return next();
-    }
-    if (!req.user.permissions || !req.user.permissions.includes(permission)) {
-      return res.status(403).json({ error: `Forbidden: Requires permission ${permission}` });
-    }
-    next();
-  };
-};
-
-export const requireScope = (scope: AppScope | string) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    res.setHeader("Cache-Control", "no-store, no-cache, private");
-    if (!req.user) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    
-    // Admin always has all scopes
-    if (req.user.isAdmin || req.user.permissions?.includes(AppScope.MASTER_ALL)) {
-      return next();
-    }
-
-    if (!req.user.permissions || !req.user.permissions.includes(scope)) {
-      logger.warn(`[AUTH] Access denied. User ${req.user.uid} missing scope: ${scope}`);
-      return res.status(403).json({ 
-        error: `Forbidden: Missing required scope: ${scope}`,
-        requiredScope: scope 
-      });
-    }
-    next();
-  };
 };
 

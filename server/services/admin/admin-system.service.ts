@@ -1,7 +1,7 @@
-import { db, admin } from "../config/firebase.ts";
-import { NotificationService, NotificationType } from "./notification.service.ts";
+import { db, admin } from "../../config/firebase.ts";
+import { NotificationService, NotificationType } from "../notification.service.ts";
 import { User } from "@svet-gradjevine/shared";
-import { logger } from "../utils/logger.ts";
+import { logger } from "../../utils/logger.ts";
 
 export class AdminSystemService {
   static async sendBroadcast(audience: string, title: string, body: string) {
@@ -75,8 +75,8 @@ export class AdminSystemService {
   }
 
   static async clearDashboardCache(uid: string) {
-    const { DashboardService } = await import("./dashboard.service.ts");
-    const { CacheService } = await import("./cache.service.ts");
+    const { DashboardService } = await import("../dashboard/dashboard.service.ts");
+    const { CacheService } = await import("../cache.service.ts");
 
     await DashboardService.clearEmployerStatsCache(uid);
     await CacheService.delete(`bff_cache:${uid}`).catch((e: any) => logger.warn("[AdminSystemService] Cache delete bff cache:", e));

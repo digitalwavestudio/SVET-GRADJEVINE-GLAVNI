@@ -1,6 +1,6 @@
 import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { DomainEvents } from "../events/event-bus.ts";
-import { AdminStatsService } from "./admin-stats.service.ts";
+import { AdminStatsService } from "./admin/admin-stats.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError, NotFoundError } from "../utils/appError.ts";
 import { RateLimiterService } from "./rate-limiter.service.ts";

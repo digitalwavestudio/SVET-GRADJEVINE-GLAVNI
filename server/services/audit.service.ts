@@ -82,7 +82,6 @@ export class AuditService {
     const ipHash = crypto.createHash('sha256').update(rawIp).digest('hex');
     const ua = log.userAgent || 'unknown';
     
-    // Automation classification logic from legacy SecurityAuditService
     const automationSigs = ['curl', 'python', 'playwright', 'puppeteer', 'selenium', 'postman', 'axios', 'headless', 'bot', 'crawler'];
     const isAutomated = automationSigs.some(sig => ua.toLowerCase().includes(sig));
 
@@ -138,5 +137,33 @@ export class AuditService {
     details?: Record<string, unknown>,
   ) {
     return this.logAdminAction(adminId, action, targetType, targetId, details);
+  }
+
+  static async logDestructive(
+    req: import("express").Request & { user?: { uid: string, email?: string, role?: string } },
+    resourceId: string,
+    actionType: string,
+    additionalDetails: Record<string, unknown> = {}
+  ) {
+    try {
+      const ip = req.headers["x-forwarded-for"] || req.ip || req?.socket?.remoteAddress || "unknown";
+      const ipStr = Array.isArray(ip) ? ip[0] : ip;
+      const userObj = req.user as Record<string, unknown> | undefined;
+      const uid = req.user?.uid || userObj?.id || userObj?.uid || "unknown";
+      const timestamp = new Date().toISOString();
+
+      const logPayload = {
+        ip: ipStr,
+        timestamp,
+        uid,
+        resourceId,
+        action: actionType,
+        details: additionalDetails,
+      };
+
+      console.info("[AUDIT]", JSON.stringify(logPayload));
+    } catch (err) {
+      console.error("[AUDIT] Error during logDestructive execution:", err);
+    }
   }
 }

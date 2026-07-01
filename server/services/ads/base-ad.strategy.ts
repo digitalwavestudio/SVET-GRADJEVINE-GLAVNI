@@ -1,6 +1,6 @@
 import { admin as firebaseAdmin, db } from "../../config/firebase.ts";
 import { CacheInvalidationService } from "../cache-invalidation.service.ts";
-import { AdminStatsService } from "../admin-stats.service.ts";
+import { AdminStatsService } from "../admin/admin-stats.service.ts";
 import { AuditService, AuditAction } from "../audit.service.ts";
 import { Logger } from "../../utils/logger.ts";
 import { AppError, BadRequestError } from "../../utils/appError.ts";

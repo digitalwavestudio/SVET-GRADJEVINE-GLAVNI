@@ -6,8 +6,7 @@ import { Logger, logger } from "../utils/logger.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { defaultConnection } from "../utils/queue.ts";
 import { JobType } from "./queue.service.ts";
-import { DLQService } from "./dlq.service.ts";
-
+ 
 export class OutboxWorker {
   private static worker: Worker;
   private static MAX_ATTEMPTS = 5;
@@ -33,11 +32,6 @@ export class OutboxWorker {
       },
     );
 
-    this.worker.on("failed", async (job, err) => {
-      if (job && job.name === JobType.OUTBOX_PROCESS && job.attemptsMade >= (job.opts.attempts || 1)) {
-        await DLQService.handleFinalFailure(job, err);
-      }
-    });
   }
 
   public static async processSingleMessage(msg: any) {

@@ -1,6 +1,6 @@
 import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
 import { AuditService, AuditAction } from "../audit.service.ts";
-import { SyncManager } from "../sync.service.ts";
+import { AlgoliaSync } from "../algolia-sync.service.ts";
 import { CacheService } from "../cache.service.ts";
 import { CacheInvalidationService } from "../cache-invalidation.service.ts";
 import { AdminUsersService } from "./admin-users.service.ts";
@@ -25,7 +25,7 @@ export class AdminAdsService {
       lastEditedByAdmin: adminId,
     });
 
-    await SyncManager.syncAd(collection, id, updates, oldData);
+    await AlgoliaSync.syncAd(collection, id, updates, oldData);
 
     // Invalidate cache for ad detail and related listings
     const category = (oldData.type as string) || (collection === "listings" ? "jobs" : collection);
@@ -88,9 +88,9 @@ export class AdminAdsService {
 
     // Sync to Algolia if approved
     if (status === "approved") {
-      await SyncManager.syncAd(category, id, { ...data, ...updates }, data);
+      await AlgoliaSync.syncAd(category, id, { ...data, ...updates }, data);
     } else {
-      await SyncManager.deleteAd(category, id);
+      await AlgoliaSync.deleteAd(category, id);
     }
 
     // Invalidate cache

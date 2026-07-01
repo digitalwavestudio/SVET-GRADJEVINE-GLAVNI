@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { HousekeepingService } from "../services/housekeeping.service.ts";
 import { sitemapWorkerService } from "../services/sitemap.worker.ts";
 import { env } from "../config/env.ts";
-import { AppScope, AuthorizationService } from "../services/authorization.service.ts";
+
 
 export const runCleanup = async (
   req: Request,
@@ -12,7 +12,7 @@ export const runCleanup = async (
   try {
     // Allow if valid CRON_KEY (Cloud Scheduler) OR if authenticated admin
     const hasCronKey = env.CRON_KEY && req.headers['x-cron-key'] === env.CRON_KEY;
-    const isAdmin = AuthorizationService.hasScope(req.user, AppScope.SYSTEM_ADMIN);
+    const isAdmin = req.user?.isAdmin === true;
     if (!hasCronKey && !isAdmin) {
       return res.status(403).json({ error: "Unauthorized" });
     }

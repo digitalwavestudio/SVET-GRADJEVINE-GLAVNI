@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Database, Activity, Zap, ShieldAlert, CheckCircle2, ChevronRight, BarChart3, Clock, LineChart, DollarSign } from 'lucide-react';
+import { Database, Activity, Zap, ShieldAlert, CheckCircle2, ChevronRight, BarChart3, Clock, LineChart } from 'lucide-react';
 import { firestoreTelemetry } from '@/src/lib/firestoreTelemetry';
 import QueryOptimizationAudit from './QueryOptimizationAudit';
-import CostOptimizationAudit from './CostOptimizationAudit';
 
 const FirestoreObservability: React.FC = () => {
   const [data, setData] = useState(() => {
@@ -11,7 +10,7 @@ const FirestoreObservability: React.FC = () => {
     return buildAudit(stats);
   });
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'queries' | 'costs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'queries'>('overview');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -88,15 +87,7 @@ const FirestoreObservability: React.FC = () => {
                 <Clock className="w-3 h-3" />
                 Query Auditor
               </button>
-              <button 
-                onClick={() => setActiveTab('costs')}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
-                  activeTab === 'costs' ? 'text-indigo-400 border-indigo-400' : 'text-zinc-500 border-transparent'
-                }`}
-              >
-                <DollarSign className="w-3 h-3" />
-                FinOps
-              </button>
+
             </div>
 
             <div className="p-6">
@@ -156,7 +147,6 @@ const FirestoreObservability: React.FC = () => {
                 </div>
               )}
               {activeTab === 'queries' && <QueryOptimizationAudit />}
-              {activeTab === 'costs' && <CostOptimizationAudit />}
             </div>
           </motion.div>
         )}

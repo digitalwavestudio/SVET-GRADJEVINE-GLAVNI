@@ -1,6 +1,6 @@
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
 import { Logger } from "../utils/logger.ts";
-import { MetricsService } from "../services/metrics.service.ts";
+import { ProductAnalyticsService } from "../services/product-analytics.service.ts";
 
 export function setupStatsSubscriber() {
   const logger = new Logger({ service: "StatsSubscriber" });
@@ -11,7 +11,7 @@ export function setupStatsSubscriber() {
     async (payload) => {
       try {
         const { employerId } = payload;
-        await MetricsService.recordEvent("inquiry", "user_stats", employerId, employerId);
+        await ProductAnalyticsService.recordEvent("inquiry", "user_stats", employerId, employerId);
       } catch (e) {
         logger.error(`Failed to increment stats for payload`, e);
       }
@@ -24,7 +24,7 @@ export function setupStatsSubscriber() {
     async (payload) => {
        try {
         const { authorId } = payload;
-        await MetricsService.recordEvent("view", "user_stats", authorId, authorId);
+        await ProductAnalyticsService.recordEvent("view", "user_stats", authorId, authorId);
       } catch (e) {
         logger.error(`Failed to increment view stats for payload`, e);
       }

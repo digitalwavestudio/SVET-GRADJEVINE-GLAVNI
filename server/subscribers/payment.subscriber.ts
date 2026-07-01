@@ -71,22 +71,12 @@ export const initPaymentSubscriber = () => {
         logger.info(`[PaymentSubscriber] Successfully updated pre-aggregated user_stats document for ${payload.userId}`);
 
         // Evict L1 (Memory) and L2 (Redis) cache for the user across all cluster instances
-        const { DashboardService } = await import("../services/dashboard.service.ts");
+        const { DashboardService } = await import("../services/dashboard/dashboard.service.ts");
         await DashboardService.clearEmployerStatsCache(payload.userId).catch((err: unknown) => {
           const error = err as Error;
           logger.error(`[PaymentSubscriber] Failed to evict dashboard cache for user: ${payload.userId}`, { error: error.message });
         });
 
-        // Pre-warm the cache immediately after payment to ensure <50ms response on next login
-        try {
-          const { DashboardPrewarmService } = await import("../services/dashboard-prewarm.service.ts");
-          // Determine role if possible, fallback to standard employer for most payments
-          const role = payload.role || "poslodavac";
-          await DashboardPrewarmService.prewarmUser(payload.userId, role);
-        } catch (prewarmErr: unknown) {
-          const error = prewarmErr as Error;
-          logger.error(`[PaymentSubscriber] Prewarm failed for user: ${payload.userId}`, { error: error.message });
-        }
       } catch (statsErr: unknown) {
         const error = statsErr as Error;
         logger.error(`[PaymentSubscriber] Failed to update pre-aggregated user_stats document`, {

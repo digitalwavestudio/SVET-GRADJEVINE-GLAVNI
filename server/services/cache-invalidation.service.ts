@@ -48,7 +48,7 @@ export class CacheInvalidationService {
 
     // Also clear employer stats for this user in background
     try {
-      const { DashboardService } = await import("../services/dashboard.service.ts");
+      const { DashboardService } = await import("../services/dashboard/dashboard.service.ts");
       DashboardService.clearEmployerStatsCache(uid).catch(() => {});
     } catch {
       // ignore dynamic import error

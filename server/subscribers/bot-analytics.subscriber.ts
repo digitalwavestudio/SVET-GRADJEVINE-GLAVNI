@@ -3,7 +3,7 @@ import { db } from "../config/firebase.ts";
 import { LoggerService } from "../services/logger.service.ts";
 import { getRedis } from "../utils/redis.ts";
 import { AlertingService } from "../services/alerting.service.ts";
-import { MetricsService } from "../services/metrics.service.ts";
+import { SystemMetricsService } from "../services/system-metrics.service.ts";
 
 export function setupBotAnalyticsSubscriber() {
   eventBus.on(
@@ -11,7 +11,7 @@ export function setupBotAnalyticsSubscriber() {
     async (payload) => {
       const { botType, botName, path, ip, status, durationMs } = payload;
       try {
-        await MetricsService.recordBotTelemetry(botType, botName, path, status, durationMs);
+        await SystemMetricsService.recordBotTelemetry(botType, botName, path, status, durationMs);
         
         // Track 404 & Dead-End Telemetry logger
         if (status === 404 || status === 410) {

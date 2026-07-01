@@ -2,7 +2,7 @@ import { Router } from "express";
 import { UnifiedAdsService } from "../services/unified-ads.service.ts";
 import { authMiddleware, requireAuth, requireVerifiedEmail } from "../middleware/auth.middleware.ts";
 import { validateAdOwnership } from "../middleware/ownership.middleware.ts";
-import { logDestructiveAction } from "../utils/destructive-audit.ts";
+import { AuditService } from "../services/audit.service.ts";
 import { adCreationLimiter } from "../middleware/rate-limit.middleware.ts";
 import {
   getPublicAds,
@@ -214,7 +214,7 @@ adsRouter.delete("/favorites/:id", requireAuth, async (req, res, next) => {
     await CacheService.set(cacheKey, favorites, 60 * 60 * 1000);
     
     // Log favorite-removal as an asynchronous audit trace
-    logDestructiveAction(req, adId, "FAVORITE_REMOVAL", { type: "user_favorites" });
+    AuditService.logDestructive(req, adId, "FAVORITE_REMOVAL", { type: "user_favorites" });
 
     res.json({ success: true });
   } catch (error) {
@@ -386,7 +386,7 @@ adsRouter.delete("/:category/:id", authMiddleware, validateAdOwnership, async (r
     const result = await UnifiedAdsService.deleteAd(category, id, uid);
 
     // Log ad-deletion as an asynchronous audit trace
-    logDestructiveAction(req, id, "AD_DELETION", { category });
+    AuditService.logDestructive(req, id, "AD_DELETION", { category });
 
     res.json(result);
   } catch (error) {

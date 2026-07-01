@@ -4,37 +4,25 @@ import { MonitoringService } from "../services/monitoring.service.ts";
 import { performanceBenchmark } from "../middleware/benchmark.middleware.ts";
 import { logger } from "../utils/logger.ts";
 import {
-  verifyUser,
-  syncClaims,
-  runMigrations,
-  updateUser,
-  reindexAll,
-  updateSettings,
-  getSettings,
-  getModerationQueue,
-  getUsers,
-  getCheckouts,
-  getSupportTickets,
-  getAbuseReports,
-  setupAlgolia,
-  resetCircuitBreakerOrCache,
-  moderateListing,
-  editListing,
-  updateUserWallet,
-  suspendUser,
-  getAuditLogs,
-  confirmCheckoutPayment,
-  clearDashboardCache,
-  sendBroadcast,
-  getBroadcasts,
-  runAuditLogsCleanup,
-  shutdownUserAccount,
-} from "../controllers/admin.controller.ts";
+  verifyUser, syncClaims, updateUser,
+  getUsers, suspendUser, shutdownUserAccount,
+} from "../controllers/admin-users.controller.ts";
+import {
+  getModerationQueue, editListing, moderateListing,
+} from "../controllers/admin-ads.controller.ts";
+import {
+  getCheckouts, updateUserWallet, confirmCheckoutPayment,
+} from "../controllers/admin-finance.controller.ts";
+import {
+  runMigrations, reindexAll, updateSettings, getSettings,
+  clearDashboardCache, sendBroadcast, getBroadcasts,
+  getSupportTickets, getAbuseReports, getAuditLogs,
+  runAuditLogsCleanup, resetCircuitBreakerOrCache, setupAlgolia,
+} from "../controllers/admin-settings.controller.ts";
 import { validateRequest, validateSettings } from "../middleware/validate.ts";
 import { verifyUserSchema } from "@svet-gradjevine/shared";
 import { adminTriggerLimiter } from "../middleware/rate-limit.middleware.ts";
-import { requireScope } from "../middleware/auth.middleware.ts";
-import { AppScope } from "../services/authorization.service.ts";
+
 
 export const adminRouter = express.Router();
 
@@ -80,7 +68,7 @@ adminRouter.get("/monitoring", async (req, res) => {
 import { AlertingService } from "../services/alerting.service.ts";
 import { getRedis } from "../utils/redis.ts";
 
-adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), async (req, res) => {
+adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, async (req, res) => {
   try {
     const redis = getRedis();
     if (!redis) {
@@ -161,60 +149,51 @@ adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, requireScope(AppS
   }
 });
 
-adminRouter.get("/moderation-queue", adminTriggerLimiter, requireScope(AppScope.ADS_MODERATE), getModerationQueue);
-adminRouter.get("/settings/:type", requireScope(AppScope.SYSTEM_ADMIN), getSettings);
-adminRouter.get("/users", adminTriggerLimiter, requireScope(AppScope.USER_READ), getUsers);
-adminRouter.get("/checkouts", adminTriggerLimiter, requireScope(AppScope.FINANCE_READ), getCheckouts);
-adminRouter.get("/support-tickets", adminTriggerLimiter, requireScope(AppScope.USER_MODERATE), getSupportTickets);
-adminRouter.get("/abuse-reports", adminTriggerLimiter, requireScope(AppScope.USER_MODERATE), getAbuseReports);
-adminRouter.post("/verify-user", validateRequest(verifyUserSchema), requireScope(AppScope.USER_MODERATE), verifyUser);
-adminRouter.patch("/users/:id", adminTriggerLimiter, requireScope(AppScope.USER_EDIT), updateUser);
-adminRouter.post("/circuit-breakers/reset", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), resetCircuitBreakerOrCache);
-adminRouter.post("/sync-claims", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), syncClaims);
-adminRouter.post("/migrations/run", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), runMigrations);
-adminRouter.post("/sync/reindex", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), reindexAll);
-adminRouter.post("/sync/algolia-setup", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), setupAlgolia);
-adminRouter.patch("/settings/:type", adminTriggerLimiter, validateSettings, requireScope(AppScope.SYSTEM_ADMIN), updateSettings);
-adminRouter.post("/cache/clear-dashboard", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), clearDashboardCache);
-adminRouter.post("/housekeeping/cleanup-audit-logs", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), runAuditLogsCleanup);
-adminRouter.post("/broadcast", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), sendBroadcast);
-adminRouter.get("/broadcasts", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), getBroadcasts);
+adminRouter.get("/moderation-queue", adminTriggerLimiter, getModerationQueue);
+adminRouter.get("/settings/:type", getSettings);
+adminRouter.get("/users", adminTriggerLimiter, getUsers);
+adminRouter.get("/checkouts", adminTriggerLimiter, getCheckouts);
+adminRouter.get("/support-tickets", adminTriggerLimiter, getSupportTickets);
+adminRouter.get("/abuse-reports", adminTriggerLimiter, getAbuseReports);
+adminRouter.post("/verify-user", validateRequest(verifyUserSchema), verifyUser);
+adminRouter.patch("/users/:id", adminTriggerLimiter, updateUser);
+adminRouter.post("/circuit-breakers/reset", adminTriggerLimiter, resetCircuitBreakerOrCache);
+adminRouter.post("/sync-claims", adminTriggerLimiter, syncClaims);
+adminRouter.post("/migrations/run", adminTriggerLimiter, runMigrations);
+adminRouter.post("/sync/reindex", adminTriggerLimiter, reindexAll);
+adminRouter.post("/sync/algolia-setup", adminTriggerLimiter, setupAlgolia);
+adminRouter.patch("/settings/:type", adminTriggerLimiter, validateSettings, updateSettings);
+adminRouter.post("/cache/clear-dashboard", adminTriggerLimiter, clearDashboardCache);
+adminRouter.post("/housekeeping/cleanup-audit-logs", adminTriggerLimiter, runAuditLogsCleanup);
+adminRouter.post("/broadcast", adminTriggerLimiter, sendBroadcast);
+adminRouter.get("/broadcasts", adminTriggerLimiter, getBroadcasts);
 
-adminRouter.get("/audit-logs", adminTriggerLimiter, requireScope(AppScope.SYSTEM_ADMIN), getAuditLogs);
+adminRouter.get("/audit-logs", adminTriggerLimiter, getAuditLogs);
 adminRouter.post(
   "/moderate/:collection/:id",
   adminTriggerLimiter,
-  requireScope(AppScope.ADS_MODERATE),
   moderateListing,
 );
 adminRouter.patch(
   "/moderate/:collection/:id",
   adminTriggerLimiter,
-  requireScope(AppScope.ADS_EDIT),
   editListing,
 );
-adminRouter.post("/users/:id/balance", adminTriggerLimiter, requireScope(AppScope.FINANCE_ADJUST), updateUserWallet);
-adminRouter.post("/users/:id/suspend", adminTriggerLimiter, requireScope(AppScope.USER_SUSPEND), suspendUser);
-adminRouter.post("/users/:id/shutdown", adminTriggerLimiter, requireScope(AppScope.USER_DELETE), shutdownUserAccount);
+adminRouter.post("/users/:id/balance", adminTriggerLimiter, updateUserWallet);
+adminRouter.post("/users/:id/suspend", adminTriggerLimiter, suspendUser);
+adminRouter.post("/users/:id/shutdown", adminTriggerLimiter, shutdownUserAccount);
 adminRouter.post(
   "/checkouts/:id/confirm",
   adminTriggerLimiter,
-  requireScope(AppScope.FINANCE_ADJUST),
   confirmCheckoutPayment,
 );
 
 import {
-  getDlqItems,
-  retryDlqItem,
   getReportTranscript,
   resolveReport,
-  retryDlqBulk,
-} from "../controllers/admin.controller.ts";
+} from "../controllers/admin-ads.controller.ts";
 adminRouter.get("/monitoring/diagnostics", AdminMonitoringController.getDiagnostics);
 adminRouter.post("/monitoring/run-diagnostics", AdminMonitoringController.runDiagnosticsScript);
-adminRouter.get("/dlq", adminTriggerLimiter, getDlqItems);
-adminRouter.post("/dlq/retry", adminTriggerLimiter, retryDlqBulk);
-adminRouter.post("/dlq/:id/retry", adminTriggerLimiter, retryDlqItem);
 
 adminRouter.get(
   "/abuse-reports/:id/transcript",

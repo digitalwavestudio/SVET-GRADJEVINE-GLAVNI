@@ -9,8 +9,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Worker, Job } from "bullmq";
 import { defaultConnection } from "../utils/queue.ts";
 import { QueueService, JobType } from "./queue.service.ts";
-import { RegionService } from "./region.service.ts";
-
 const logger = new Logger({ module: "ChatBufferService" });
 
 /**
@@ -60,8 +58,7 @@ export class ChatBufferService {
         }
       );
 
-      if (RegionService.isLeaderRegion()) {
-        await QueueService.addJob(
+      await QueueService.addJob(
           JobType.CHAT_BUFFER_CRON,
           {},
           {
@@ -69,7 +66,6 @@ export class ChatBufferService {
             repeat: { every: this.INTERVAL_MS },
           }
         );
-      }
     }
   }
 

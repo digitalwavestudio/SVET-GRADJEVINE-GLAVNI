@@ -45,9 +45,8 @@ vi.mock("../config/firebase.ts", () => {
 });
 
 import { CacheService } from "../services/cache.service.ts";
-import { DashboardService, SimpleLRUCache } from "../services/dashboard.service.ts";
+import { DashboardService, SimpleLRUCache } from "../services/dashboard/dashboard.service.ts";
 import { breaker } from "../routes/bff.routes.ts";
-import { bffSingleFlightMap } from "../services/bff.service.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 
 describe("Dashboard Cache Sanity & Integration Flow", () => {
@@ -165,21 +164,5 @@ describe("Dashboard Cache Sanity & Integration Flow", () => {
     expect(lruWithTtl.get("test_expired")).toBeUndefined();
   });
 
-  it("Phase 6: SingleFlight Map checks that concurrent/duplicate requests are correctly tracked", async () => {
-    const flightKey = "test_user_flight";
-    expect(bffSingleFlightMap.has(flightKey)).toBe(false);
 
-    // Create a mock active request Promise
-    const resolveValue = { success: true, data: "flight_result" };
-    const flightPromise = Promise.resolve(resolveValue);
-
-    bffSingleFlightMap.set(flightKey, flightPromise);
-    expect(bffSingleFlightMap.has(flightKey)).toBe(true);
-
-    const resolved = await bffSingleFlightMap.get(flightKey);
-    expect(resolved).toEqual(resolveValue);
-
-    bffSingleFlightMap.delete(flightKey);
-    expect(bffSingleFlightMap.has(flightKey)).toBe(false);
-  });
 });

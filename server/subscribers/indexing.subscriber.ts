@@ -1,5 +1,5 @@
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
-import { IndexingService } from "../services/indexing.service.ts";
+import { GoogleIndexingService } from "../services/google-indexing.service.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 
 const typeToRoute: Record<string, string> = {
@@ -23,7 +23,7 @@ const notifyIndexers = async (
     const meta = await SEOMetaService.getAdMetaData(routePrefix, id);
     if (!meta || !meta.url) return;
 
-    await IndexingService.pushToIndex(String(meta.url), action);
+    await GoogleIndexingService.submitUrl(String(meta.url), action);
   } catch (error) {
     console.error(
       `[IndexingSubscriber] Error triggering indexing for ${category}:${id}`,

@@ -10,7 +10,7 @@ export class DashboardAdminService {
       const stats = await CacheService.getOrSet(
         cacheKey,
         async () => {
-          const { AdminStatsService } = await import("../admin-stats.service.ts");
+          const { AdminStatsService } = await import("../admin/admin-stats.service.ts");
           const s = await AdminStatsService.getGlobalStats();
 
           s.housekeeping = await this.getHousekeepingStatus();

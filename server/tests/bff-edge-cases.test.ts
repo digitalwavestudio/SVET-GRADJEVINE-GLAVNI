@@ -23,14 +23,13 @@ vi.mock("../config/firebase.ts", () => {
 vi.mock("@sentry/node", () => ({ captureException: vi.fn(), captureMessage: vi.fn(), withScope: vi.fn() }));
 
 import { CacheService } from "../services/cache.service.ts";
-import { bffService, bffSingleFlightMap } from "../services/bff.service.ts";
+import { bffService } from "../services/bff.service.ts";
 
 describe("BFF Edge Cases & Error Resilience", () => {
   beforeEach(() => {
     firestoreFetchCount = 0;
     CacheService["localCache"].clear();
     CacheService["inFlight"].clear();
-    bffSingleFlightMap.clear();
   });
 
   it("Handles empty platform gracefully (defaults to web)", async () => {

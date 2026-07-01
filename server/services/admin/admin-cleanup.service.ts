@@ -2,7 +2,7 @@ import { db, admin as firebaseAdmin } from "../../config/firebase.ts";
 import { AuditService, AuditAction } from "../audit.service.ts";
 import { DomainEvents } from "../../events/event-bus.ts";
 import { CacheService } from "../cache.service.ts";
-import { AdminStatsService } from "../admin-stats.service.ts";
+import { AdminStatsService } from "./admin-stats.service.ts";
 import { Logger } from "../../utils/logger.ts";
 import { AppError } from "../../utils/appError.ts";
 

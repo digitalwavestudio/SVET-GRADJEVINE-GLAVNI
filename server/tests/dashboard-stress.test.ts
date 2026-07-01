@@ -66,15 +66,12 @@ vi.mock("@sentry/node", () => ({
 
 import { CacheService } from "../services/cache.service.ts";
 import { getDashboardBff } from "../controllers/bff.controller.ts";
-import { bffSingleFlightMap } from "../services/bff.service.ts";
 import { Request, Response } from "express";
 
 describe("BFF High-Load Stress & Concurrency Benchmark", () => {
   it("Simulates 150 concurrent client sessions calling BFF routes to verify extreme caching efficiency", async () => {
     // Reset global spy counters prior to executing benchmark run
     firestoreFetchCount = 0;
-    bffSingleFlightMap.clear();
-
     const TOTAL_REQUESTS = 150;
     const durHistory: number[] = [];
     const responsePayloads: unknown[] = [];

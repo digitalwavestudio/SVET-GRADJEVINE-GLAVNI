@@ -9,8 +9,7 @@ import { setupSitemapQueueListeners } from "../services/sitemap.worker.ts";
 import { setupStatsSubscriber } from "../subscribers/stats.subscriber.ts";
 import { setupMediaSubscriber } from "../subscribers/media.subscriber.ts";
 import { setupRfqSubscriber } from "../subscribers/rfq.subscriber.ts";
-import { DashboardService } from "../services/dashboard.service.ts";
-import { DashboardPrewarmService } from "../services/dashboard-prewarm.service.ts";
+import { DashboardService } from "../services/dashboard/dashboard.service.ts";
 
 export function initializeEventSubscribers() {
   setupActivitySubscriber();
@@ -27,9 +26,6 @@ export function initializeEventSubscribers() {
   
   // Register dashboard cache eviction pub/sub
   DashboardService.registerPubSubEviction();
-
-  // Start background cache pre-warming for premium users
-  DashboardPrewarmService.startScheduler();
   
   console.info("[Events] All systemic subscribers initialized.");
 }

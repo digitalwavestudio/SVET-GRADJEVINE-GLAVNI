@@ -7,7 +7,7 @@ import { AppError, BadRequestError, NotFoundError } from "../../utils/appError.t
 import { sanitizeInput } from "../../../src/lib/sanitize.ts";
 import { DomainEvents } from "../../events/event-bus.ts";
 import { TraceContext } from "../../utils/trace.ts";
-import { AdminStatsService } from "../admin-stats.service.ts";
+import { AdminStatsService } from "../admin/admin-stats.service.ts";
 
 export class JobsCoreService {
   static async getPublicJobs(limit: number = 100, cursor?: string) {

@@ -6,10 +6,10 @@ import {
   processVerificationRequest,
   uploadVerificationDocuments,
 } from "../controllers/verification.controller.ts";
-import { authMiddleware, requireAuth, requireScope } from "../middleware/auth.middleware.ts";
+import { authMiddleware, requireAuth, requireAdmin } from "../middleware/auth.middleware.ts";
 import { BadRequestError } from "../utils/appError.ts";
 import { validateRequest, submitVerificationSchema, processVerificationSchema } from "../middleware/validate.ts";
-import { AppScope } from "../services/authorization.service.ts";
+
 
 import { RequestHandler } from "express";
 
@@ -51,14 +51,14 @@ verificationRouter.get(
   "/requests",
   authMiddleware,
   requireAuth,
-  requireScope(AppScope.USER_MODERATE),
+  requireAdmin,
   getVerificationRequests as unknown as RequestHandler,
 );
 verificationRouter.post(
   "/requests/:id/process",
   authMiddleware,
   requireAuth,
-  requireScope(AppScope.USER_MODERATE),
+  requireAdmin,
   validateRequest(processVerificationSchema),
   processVerificationRequest as unknown as RequestHandler,
 );

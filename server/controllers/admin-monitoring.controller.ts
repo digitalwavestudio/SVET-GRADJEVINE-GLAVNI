@@ -29,7 +29,6 @@ export interface MonitorStats {
   instanceUptimeSeconds: number;
   outbox: {
     pending: number;
-    dlq: number;
   };
   syncSuccess: number;
   syncFail: number;
@@ -178,108 +177,6 @@ export class AdminMonitoringController {
       logs.push("=========================================================\n");
 
       res.json({ success: true, logs });
-    } catch (error: unknown) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      res.status(500).json({ error: errorMsg });
-    }
-  }
-
-  static async getDLQ(req: Request, res: Response) {
-    try {
-      const parsedQuery = adminMonitoringQuerySchema.parse(req.query);
-      const bypassCache = parsedQuery.bypassCache === "true";
-      const cacheKey = "admin:monitoring:dlq:v1";
-      const redis = getRedis();
-
-      if (redis && !bypassCache) {
-        try {
-          const cached = await redis.get(cacheKey);
-          if (cached) {
-            return res.json(JSON.parse(cached));
-          }
-        } catch (err: unknown) {
-          const errorMsg = err instanceof Error ? err.message : String(err);
-          this.logger.warn("Greška pri čitanju keša za DLQ", errorMsg);
-        }
-      }
-
-      const snap = await db
-        .collection("outbox")
-        .where("status", "==", "dlq")
-        .limit(50)
-        .get();
-      const messages = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
-      if (redis) {
-        try {
-          await redis.setex(cacheKey, 180, JSON.stringify(messages)); // 3 minuta cache
-        } catch (err: unknown) {
-          // safe
-        }
-      }
-
-      res.json(messages);
-    } catch (error: unknown) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error("Failed to fetch DLQ", { error: errorMsg });
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-
-  static async retryMessage(req: Request, res: Response) {
-    try {
-      const { id } = idParamSchema.parse(req.params);
-      const snap = await db.collection("outbox").doc(id).get();
-      const msg = snap.exists ? { id: snap.id, ...snap.data() } : null;
-      if (!msg) {
-        return res.status(404).json({ error: "Message not found" });
-      }
-
-      await db
-        .collection("outbox")
-        .doc(id)
-        .update({
-          status: "pending",
-          attempts: 0,
-          lastError: `Manually retried via Admin at ${new Date().toISOString()}`,
-        });
-
-      const redis = getRedis();
-      if (redis) {
-        await Promise.all([
-          redis.del("admin:monitoring:dlq:v1"),
-          redis.del("admin:monitoring:diagnostics:v1"),
-          redis.del("admin:monitoring:stats:v1")
-        ]).catch((e: any) => AdminMonitoringController.logger.warn("[AdminMonitoringController] Redis cache invalidation after retry:", e));
-      }
-
-      this.logger.info(`Message ${id} queued for retry`);
-      res.json({ success: true, message: "Re-queued for processing" });
-    } catch (error: unknown) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Retry failed`, {
-        error: errorMsg,
-      });
-      res.status(500).json({ error: errorMsg });
-    }
-  }
-
-  static async deleteFromDLQ(req: Request, res: Response) {
-    try {
-      const { id } = idParamSchema.parse(req.params);
-      // Opciono: Arhiviranje umesto brisanja
-      await db.collection("outbox").doc(id).update({ status: "failed" }); // Mark as final failed
-
-      const redis = getRedis();
-      if (redis) {
-        await Promise.all([
-          redis.del("admin:monitoring:dlq:v1"),
-          redis.del("admin:monitoring:diagnostics:v1"),
-          redis.del("admin:monitoring:stats:v1")
-        ]).catch((e: any) => AdminMonitoringController.logger.warn("[AdminMonitoringController] Redis cache invalidation after delete:", e));
-      }
-
-      res.json({ success: true });
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       res.status(500).json({ error: errorMsg });

@@ -8,7 +8,6 @@ import {
   switchRole,
   registerFcmToken,
 } from "../controllers/users.controller.ts";
-import { logDestructiveAction } from "../utils/destructive-audit.ts";
 import { AdminSettingsService } from "../services/admin/admin-settings.service.ts";
 import { validateRequest, validateBody } from "../middleware/validate.ts";
 import { logger } from "../utils/logger.ts";
@@ -155,7 +154,7 @@ usersRouter.post("/deactivate", requireAuth, async (req, res, next) => {
     await UsersService.updateProfile(uid, { status: "deleted" }, true);
     const CacheService = (await import("../services/cache.service.ts")).CacheService;
     await CacheService.delete(`auth:claims:${uid}`);
-    logDestructiveAction(req, uid, "PROFILE_DEACTIVATION", { type: "user_self_deactivation" });
+    AuditService.logDestructive(req, uid, "PROFILE_DEACTIVATION", { type: "user_self_deactivation" });
     res.json({ success: true });
   } catch (error) {
     next(error);
@@ -397,7 +396,7 @@ usersRouter.post(
         
         // Log profile deactivation / deletion as a destructive audit trace
         if (action === "delete") {
-          logDestructiveAction(req, uid, "PROFILE_DEACTIVATION", { type: "profile_status_deleted" });
+          AuditService.logDestructive(req, uid, "PROFILE_DEACTIVATION", { type: "profile_status_deleted" });
         }
       }
 

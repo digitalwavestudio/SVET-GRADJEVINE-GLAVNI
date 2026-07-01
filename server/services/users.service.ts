@@ -1,12 +1,11 @@
 import { CacheService } from "./cache.service.ts";
 import { db, admin as firebaseAdmin } from "../config/firebase.ts";
 import { FieldPath } from "firebase-admin/firestore";
-import { DomainEventPublisher } from "../utils/DomainEventPublisher.ts";
 import { AppError, NotFoundError, BadRequestError } from "../utils/appError.ts";
 import { DomainEvents, eventBus } from "../events/event-bus.ts";
 import { userProfileSchema } from "@svet-gradjevine/shared";
 import { User, UserRole } from "@svet-gradjevine/shared";
-import { AdminService } from "./admin.service.ts";
+import { AdminUsersService } from "./admin/admin-users.service.ts";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { logger } from "../utils/logger.ts";
 
@@ -360,7 +359,17 @@ export class UsersService {
       });
 
       // 3. Outbox sync to inform search layer that availability changed
-      DomainEventPublisher.publish(batch, "USER_AVAILABILITY_SYNC", { userId: uid }, uid);
+      const availabilityRef = db.collection("outbox").doc();
+      batch.set(availabilityRef, {
+        type: "USER_AVAILABILITY_SYNC",
+        payload: { userId: uid },
+        status: "pending",
+        attempts: 0,
+        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        correlationId: uid,
+        version: 1,
+        shardNum: Math.floor(Math.random() * 10),
+      });
       
       // Clean up the main document field if it exists (Backfill/Migration)
       batch.update(db.collection("users").doc(uid), {
@@ -376,7 +385,17 @@ export class UsersService {
     );
 
     if (isProfileRelevant) {
-      DomainEventPublisher.publish(batch, "FAN_OUT_PROFILE_UPDATE", { userId: uid }, uid);
+      const profileRef = db.collection("outbox").doc();
+      batch.set(profileRef, {
+        type: "FAN_OUT_PROFILE_UPDATE",
+        payload: { userId: uid },
+        status: "pending",
+        attempts: 0,
+        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        correlationId: uid,
+        version: 1,
+        shardNum: Math.floor(Math.random() * 10),
+      });
     }
 
     await batch.commit();
@@ -399,7 +418,7 @@ export class UsersService {
       publicUpdates.isVerified !== undefined ||
       publicUpdates.status
     ) {
-      await AdminService.syncClaims(uid);
+      await AdminUsersService.syncClaims(uid);
     }
 
     return {
@@ -422,7 +441,17 @@ export class UsersService {
       const batch = db.batch();
       batch.update(db.collection("users").doc(uid), updateData);
 
-      DomainEventPublisher.publish(batch, "FAN_OUT_PROFILE_UPDATE", { userId: uid }, uid);
+      const profileRef = db.collection("outbox").doc();
+      batch.set(profileRef, {
+        type: "FAN_OUT_PROFILE_UPDATE",
+        payload: { userId: uid },
+        status: "pending",
+        attempts: 0,
+        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        correlationId: uid,
+        version: 1,
+        shardNum: Math.floor(Math.random() * 10),
+      });
 
       await batch.commit();
 
@@ -489,14 +518,24 @@ export class UsersService {
       { merge: true },
     );
 
-    DomainEventPublisher.publish(batch, "FAN_OUT_PROFILE_UPDATE", { userId: uid }, uid);
+    const pkgRef = db.collection("outbox").doc();
+    batch.set(pkgRef, {
+      type: "FAN_OUT_PROFILE_UPDATE",
+      payload: { userId: uid },
+      status: "pending",
+      attempts: 0,
+      createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+      correlationId: uid,
+      version: 1,
+      shardNum: Math.floor(Math.random() * 10),
+    });
 
     await batch.commit();
 
     const { CacheService } = await import("./cache.service.ts");
     await CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000);
 
-    await AdminService.syncClaims(uid);
+    await AdminUsersService.syncClaims(uid);
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
     await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on role change:", e?.message));

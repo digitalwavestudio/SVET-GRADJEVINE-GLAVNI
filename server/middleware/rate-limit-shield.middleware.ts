@@ -7,18 +7,7 @@ import { AuditService, AuditAction } from "../services/audit.service.ts";
 import { env } from "../config/env.ts";
 import crypto from "crypto";
 import { logger } from "../utils/logger.ts";
-
-const BAD_BOTS = [
-  "semrushbot",
-  "mj12bot",
-  "dotbot",
-  "blexbot",
-  "barkrowler",
-  "rogerbot",
-  "megaindex",
-  "seznambot",
-  "python-requests",
-];
+import { isBadBot, isWhitelistedSearchBot, isWhitelistedAiBot, isBotUserAgent } from "@svet-gradjevine/shared";
 
 /**
  * Aggressive Global Shield for Bot/DDOS protection.
@@ -53,9 +42,9 @@ export const rateLimitShield = async (
 
     const ua = (req.headers["user-agent"] || "").toLowerCase();
 
-    const isWhitelistedSearchBot = ["googlebot", "bingbot", "algolia", "ahrefs"].some((bot) => ua.includes(bot));
-    const isWhitelistedAiBot = ["gptbot", "claudebot", "perplexitybot", "applebot-ai", "oai-searchbot"].some((bot) => ua.includes(bot));
-    const isWhitelistedBot = isWhitelistedSearchBot || isWhitelistedAiBot;
+    const isWhitelistedSearch = isWhitelistedSearchBot(ua);
+    const isWhitelistedAi = isWhitelistedAiBot(ua);
+    const isWhitelistedBot = isWhitelistedSearch || isWhitelistedAi;
 
     // expensivePaths: Sitemaps, Search, P-SEO listing combos, and Feeds
     const isPseoPath = ["/poslovi/", "/masine/", "/gradjevinske-masine/", "/smestaj/", "/ketering/", "/placevi/", "/alat-i-oprema/", "/firme/"].some(p => req.path.startsWith(p));
@@ -69,7 +58,7 @@ export const rateLimitShield = async (
 
     // 0.1 Bot Shield Enhancement (PROMPT 8)
     if (isExpensivePath) {
-      if (!isWhitelistedBot && /bot|crawler|spider|robot|crawling/i.test(ua)) {
+      if (!isWhitelistedBot && isBotUserAgent(ua)) {
         // Aggressive crawler detected that is NOT whitelisted
         await AuditService.log({
           action: AuditAction.SECURITY_THREAT,
@@ -86,7 +75,7 @@ export const rateLimitShield = async (
       }
 
       // AI Bots are allowed but we apply a stricter rate limit for expensive paths to prevent "scraping bursts"
-      if (isWhitelistedAiBot) {
+      if (isWhitelistedAi) {
         const aiBotLimitKey = `shield:ai_bot:${hashedIp}`;
         const isAllowed = await RateLimiterService.isAllowed(aiBotLimitKey, 100, 60); // Max 100 expensive hits per minute for AI bots (was 10 - too restrictive for crawlers)
         if (!isAllowed) {
@@ -109,14 +98,14 @@ export const rateLimitShield = async (
     }
 
     // 0.2 Bot-Trap: Block useless SEO/scraping bots early
-    if (BAD_BOTS.some((bot) => ua.includes(bot))) {
+    if (isBadBot(ua)) {
       await AuditService.log({
         action: AuditAction.SECURITY_THREAT,
         severity: 'low',
         ip: ipStr,
         userAgent: ua,
         path: req.path,
-        details: { bot_name: BAD_BOTS.find(b => ua.includes(b)), type: 'bot_behavior' }
+        details: { type: 'bot_behavior' }
       });
       return res.status(403).send("Access denied. Crawler not allowed.");
     }
@@ -126,8 +115,8 @@ export const rateLimitShield = async (
     if (isWhitelistedBot && isExpensivePath) {
       const pseoBotLimitKey = `shield:pseo_bot:${hashedIp}`;
       // Search engine bots (Google, Bing, Ahrefs) need higher limits for deep crawls
-      const limit = isWhitelistedSearchBot ? 200 : 10;
-      const windowSec = isWhitelistedSearchBot ? 1 : 1;
+      const limit = isWhitelistedSearch ? 200 : 10;
+      const windowSec = isWhitelistedSearch ? 1 : 1;
       const isAllowed = await RateLimiterService.isAllowed(pseoBotLimitKey, limit, windowSec);
       if (!isAllowed) {
         res.setHeader("Retry-After", "10");

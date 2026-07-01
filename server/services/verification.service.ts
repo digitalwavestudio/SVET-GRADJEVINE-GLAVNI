@@ -3,7 +3,6 @@ import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError } from "../utils/appError.ts";
 import { AuditService, AuditAction } from "./audit.service.ts";
 import { DomainEvents } from "../events/event-bus.ts";
-import { DomainEventPublisher } from "../utils/DomainEventPublisher.ts";
 import { handleFirestoreError } from "../utils/error-handler.ts";
 
 export interface VerificationRequest {
@@ -161,12 +160,19 @@ export class VerificationService {
           });
 
           // Add verification badge to all active listings via Faza 4.3 Fan-Out
-          outboxResult = DomainEventPublisher.publish(
-            transaction,
-            "FAN_OUT_PROFILE_UPDATE",
-            { userId: requestData.userId },
-            requestData.userId
-          );
+          const outboxRef = db.collection("outbox").doc();
+          const outboxPayloadObj = {
+            type: "FAN_OUT_PROFILE_UPDATE",
+            payload: { userId: requestData.userId },
+            status: "pending",
+            attempts: 0,
+            createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+            correlationId: requestData.userId,
+            version: 1,
+            shardNum: Math.floor(Math.random() * 10),
+          };
+          transaction.set(outboxRef, outboxPayloadObj);
+          outboxResult = { outboxDocId: outboxRef.id, outboxPayload: outboxPayloadObj };
         }
 
         if (!ticketsSnap.empty) {

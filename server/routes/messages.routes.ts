@@ -130,8 +130,8 @@ messagesRouter.post(
       // 2. Asynchronously retrieve and test the file size limit before writing to Cloud Storage
       const maxLimit = await (async () => {
         try {
-          const { AdminService } = await import("../services/admin.service.ts");
-          const settings = await AdminService.getSettings("system") as { maxUploadSize?: number };
+          const { AdminSettingsService } = await import("../services/admin/admin-settings.service.ts");
+          const settings = await AdminSettingsService.getSettings("system") as { maxUploadSize?: number };
           return settings?.maxUploadSize || 5 * 1024 * 1024;
         } catch {
           return 5 * 1024 * 1024; // fallback to 5MB

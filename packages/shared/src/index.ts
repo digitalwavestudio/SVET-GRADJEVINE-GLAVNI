@@ -3,3 +3,4 @@ export * from './utils/seo.ts';
 export * from './utils/url.ts';
 export * from './schemas.ts';
 export * from './utils/zodLocalization.ts';
+export * from './utils/bot-patterns.ts';

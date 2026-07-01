@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { db } from "../config/firebase.ts";
 import { FieldValue } from "firebase-admin/firestore";
-import { logDestructiveAction } from "../utils/destructive-audit.ts";
+import { AuditService } from "../services/audit.service.ts";
 import { calendarEventSchema, saveDiarySchema } from "@svet-gradjevine/shared";
 import type { AuthenticatedRequest } from "../types/auth.ts";
 
@@ -75,7 +75,7 @@ export const deleteEvent = async (
     }
 
     // Log destructive event deletion to DB _logs
-    logDestructiveAction(req, id, "EVENT_DELETION", { type: "calendar_event" });
+    AuditService.logDestructive(req, id, "EVENT_DELETION", { type: "calendar_event" });
 
     res.json({ id, status: "deleted" });
   } catch (error) {

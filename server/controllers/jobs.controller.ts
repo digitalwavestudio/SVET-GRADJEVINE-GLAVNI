@@ -3,9 +3,9 @@ import { JobsService } from "../services/jobs.service.ts";
 import { UnifiedAdsService } from "../services/unified-ads.service.ts";
 import { env } from "../config/env.ts";
 import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
-import { logDestructiveAction } from "../utils/destructive-audit.ts";
+import { AuditService } from "../services/audit.service.ts";
 import { CacheService } from "../services/cache.service.ts";
-import { AdminStatsService } from "../services/admin-stats.service.ts";
+import { AdminStatsService } from "../services/admin/admin-stats.service.ts";
 
 export const getPublicJobs = async (
   req: Request,
@@ -236,7 +236,7 @@ export const deleteJob = async (
     const result = await JobsService.deleteJob(id, uid);
 
     // Internally log destructive job deletion asynchronously
-    logDestructiveAction(req, id, "JOB_DELETION", { type: "job" });
+    AuditService.logDestructive(req, id, "JOB_DELETION", { type: "job" });
 
     res.json(result);
   } catch (err) {

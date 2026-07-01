@@ -3,7 +3,7 @@ import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { CacheService } from "./cache.service.ts";
 
 type RawAdData = Record<string, unknown>;
-import { AdminStatsService } from "./admin-stats.service.ts";
+import { AdminStatsService } from "./admin/admin-stats.service.ts";
 import { AuditService, AuditAction } from "./audit.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError } from "../utils/appError.ts";
@@ -134,7 +134,7 @@ export class UnifiedAdsService {
     await PredictiveAnalyticsService.forceRefresh(id).catch(() => {});
 
     // Invalidate employer dashboard stats cache to resolve "Ghost" ads immediately
-    const { DashboardService } = await import("./dashboard.service.ts");
+    const { DashboardService } = await import("./dashboard/dashboard.service.ts");
     await DashboardService.clearEmployerStatsCache(adData.authorId).catch(() => {});
 
     return { success: true };

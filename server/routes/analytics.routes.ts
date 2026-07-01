@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getReqUser } from "../utils/request.ts";
-import { AnalyticsService } from "../services/analytics.service.ts";
+import { ProductAnalyticsService } from "../services/product-analytics.service.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { logger } from "../utils/logger.ts";
 
@@ -27,7 +27,7 @@ analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
   res.on("close", () => clearTimeout(breakerTimeout));
 
   try {
-    const stats = await AnalyticsService.getUserTotalTrends(
+    const stats = await ProductAnalyticsService.getUserTotalTrends(
       userId,
       days ? parseInt(days as string) : 7,
     );
@@ -60,7 +60,7 @@ analyticsRouter.get("/ad/:adId", requireAuth, async (req, res) => {
   res.on("close", () => clearTimeout(breakerTimeout));
 
   try {
-    const stats = await AnalyticsService.getAdViewTrend(adId);
+    const stats = await ProductAnalyticsService.getAdViewTrend(adId);
     if (!res.headersSent) {
       res.json(stats);
     }

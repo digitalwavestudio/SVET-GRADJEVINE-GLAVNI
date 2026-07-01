@@ -1,6 +1,6 @@
-﻿import { admin as firebaseAdmin, db } from "../config/firebase.ts";
-import { Logger } from "../utils/logger.ts";
-import { LockManager } from "./lock.service.ts";
+﻿import { admin as firebaseAdmin, db } from "../../config/firebase.ts";
+import { Logger } from "../../utils/logger.ts";
+import { LockManager } from "../lock.service.ts";
 
 /**
  * AdminStatsService handles proactive aggregation of platform metrics on the server side.
@@ -166,7 +166,7 @@ export class AdminStatsService {
   }
 
   static async getGlobalStats() {
-    const { getRedis } = await import("../utils/redis.ts");
+    const { getRedis } = await import("../../utils/redis.ts");
     const redis = getRedis();
     if (redis) {
       try {

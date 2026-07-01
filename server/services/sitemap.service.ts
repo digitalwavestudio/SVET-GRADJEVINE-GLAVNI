@@ -1,7 +1,7 @@
 import { env } from "../config/env.ts";
 import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
-import { AdminStatsService } from "./admin-stats.service.ts";
+import { AdminStatsService } from "./admin/admin-stats.service.ts";
 import { CacheService } from "./cache.service.ts";
 
 export class SitemapService {
