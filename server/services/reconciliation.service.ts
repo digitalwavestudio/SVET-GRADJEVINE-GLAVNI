@@ -118,10 +118,7 @@ export class ReconciliationService {
       }
       const pendingCountSnap = { data: () => ({ count: systemOutboxPending }) };
       const failedCountSnap = { data: () => ({ count: systemOutboxDlq }) };
-      const systemOutboxPending = pendingCountSnap.data().count;
-      const systemOutboxDlq = failedCountSnap.data().count;
       
-      const redis = (await import("../utils/redis.ts")).getRedis();
       if (redis) {
         await redis.set(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":pending", systemOutboxPending.toString()).catch(err => console.error("[Cache] invalidation error:", err));
         await redis.set(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":failed", systemOutboxDlq.toString()).catch(err => console.error("[Cache] invalidation error:", err));

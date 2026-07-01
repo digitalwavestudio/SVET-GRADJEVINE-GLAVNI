@@ -76,7 +76,6 @@ export class UnifiedAdsService {
 
       let docs: any[] = snap.docs
         .map((doc) => {
-        .map((doc) => {
           const data = doc.data();
           const type = data.type || '';
           let typeLabel = 'Oglas';
