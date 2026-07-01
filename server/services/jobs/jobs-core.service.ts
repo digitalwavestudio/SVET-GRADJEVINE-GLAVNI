@@ -11,14 +11,20 @@ import { AdminStatsService } from "../admin/admin-stats.service.ts";
 
 export class JobsCoreService {
   static async getPublicJobs(limit: number = 100, cursor?: string) {
-    const cacheKey = cursor ? `public_jobs_${limit}_${cursor}` : `public_jobs_v2_${limit}`;
+    // OPTIMIZATION: Cache only first page (no cursor), reuse for all pages via client-side revalidation
+    // This prevents N cache keys for N pages = N Firestore reads
+    const cacheKey = `public_jobs_v2_${limit}`;  // ← No cursor in key!
     const t0_cache = Date.now();
-    const cached = await CacheService.get(cacheKey);
-    console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
-    if (cached) {
-      const samplePremium = (cached as any).docs?.slice(0, 5).filter((d: any) => d.isPremium).length;
-      console.log(`[PREMIUM_DEBUG] Cached data: ${(cached as any).docs?.length || 0} docs, premium in first 5: ${samplePremium}`);
-      return cached;
+    
+    // Return cached FIRST page for all requests, let client handle pagination with cursor
+    if (!cursor) {
+      const cached = await CacheService.get(cacheKey);
+      console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
+      if (cached) {
+        const samplePremium = (cached as any).docs?.slice(0, 5).filter((d: any) => d.isPremium).length;
+        console.log(`[PREMIUM_DEBUG] Cached data: ${(cached as any).docs?.length || 0} docs, premium in first 5: ${samplePremium}`);
+        return cached;
+      }
     }
 
     try {
@@ -27,10 +33,10 @@ export class JobsCoreService {
       const rawDb = getDb();
       console.log(`[TIMING] getDb(): ${Date.now() - t0_db}ms`);
 
-      // Fetch from Firestore
+      // Fetch from Firestore - use top-level collection, not collectionGroup
       const t0_query = Date.now();
       let q = rawDb
-        .collectionGroup("listings")
+        .collection("listings")  // ← Use collection() instead of collectionGroup()
         .where("type", "==", "job")
         .where("status", "==", "active")
         .orderBy("createdAt", "desc");
@@ -111,12 +117,12 @@ export class JobsCoreService {
         hasMore: rawDocs.length > pageSize,
       };
       
-      // Cache the result for 60 minutes — samo ako ima podataka
-      if (rawDocs.length > 0) {
+      // OPTIMIZATION: Cache only first page (no cursor), extends TTL on every view
+      if (rawDocs.length > 0 && !cursor) {
         const t0_set = Date.now();
-        await CacheService.set(cacheKey, response, 3600000);
+        await CacheService.set(cacheKey, response, 3600000);  // 60 min TTL
         console.log(`[TIMING] CacheService.set(): ${Date.now() - t0_set}ms`);
-      } else {
+      } else if (!cursor) {
         console.log(`[JOBS_CORE] Skipping cache for ${cacheKey}: empty result`);
       }
       console.log(`[TIMING] TOTAL getPublicJobs: ${Date.now() - t0_cache}ms`);

@@ -45,7 +45,7 @@ export class DashboardEmployerService {
 
           try {
             const { userStatsLoader } = await import("../../utils/dataloader.ts");
-            const [statsDoc, adsResult, appsResult, trendsResult, adsCountResult] = await Promise.allSettled([
+            const [statsDoc, adsResult, appsResult, trendsResult] = await Promise.allSettled([
               // 1. User Stats (Optimized via DataLoader)
               userStatsLoader.load(uid),
               // 2. Latest Listings (without composite index)
@@ -60,11 +60,6 @@ export class DashboardEmployerService {
                 .get(),
               // 4. Employer Trends
               this.getEmployerTrends(uid),
-              // 5. Dynamic count fallback (without composite index)
-              db.collection("listings")
-                .where("authorId", "==", uid)
-                .count()
-                .get()
             ]);
 
             // Handle user_stats (Surgical Loader Pattern)
@@ -83,10 +78,8 @@ export class DashboardEmployerService {
               isFirestoreHealthy = false;
             }
 
-            // Fallback for totalAds if user_stats doesn't have it or is out of sync
-            if (adsCountResult.status === "fulfilled") {
-              totalAds = Math.max(totalAds, adsCountResult.value.data().count);
-            }
+            // Fallback for totalAds uses cached value from user_stats
+            // No separate count() call needed - user_stats is authoritative
 
             if (adsResult.status === "fulfilled") {
               const adsDocs = adsResult.value.docs;

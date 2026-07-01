@@ -147,12 +147,7 @@ async function startServer() {
         await AdminSettingsService.prewarm().catch(e => console.error("AdminSettings Pre-warm failed", e));
 
         // 1. Worker Initialization (for WORKER or FULL mode)
-        // Only the first instance (leader) runs background workers.
-        // Redis lock prevents duplicate workers when multiple instances scale up.
-        const { LockManager } = await import("./server/services/lock.service.ts");
-        const leaderLock = await LockManager.acquire("background:worker-leader", 120000);
-
-        if ((mode === "worker" || mode === "full") && leaderLock) {
+        if (mode === "worker" || mode === "full") {
           const { AlgoliaSync } = await import("./server/services/algolia-sync.service.ts");
           const { OutboxWorker } = await import("./server/services/outbox.worker.ts");
           const { GoogleIndexingService } = await import("./server/services/google-indexing.service.ts");
@@ -173,8 +168,6 @@ async function startServer() {
               console.error("[Server] Worker Init Error:", err);
             }
           }, 15000);
-        } else if (mode === "worker" || mode === "full") {
-          console.log("[Server] Another instance is the background worker leader, skipping workers.");
         }
       } catch (e) {
         console.error("Delayed background init failed", e);

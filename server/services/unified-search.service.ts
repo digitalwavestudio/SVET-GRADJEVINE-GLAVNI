@@ -80,7 +80,7 @@ export class UnifiedSearchService {
       const targetRole = category === "masters" || entityType === "master" ? "majstor" : "company";
       q = q.where("role", "==", targetRole);
     } else {
-      q = db.collectionGroup("listings");
+      q = db.collection("listings");  // ← Use collection() instead of collectionGroup()
       if (entityType && entityType !== "all") q = q.where("type", "==", entityType);
     }
 

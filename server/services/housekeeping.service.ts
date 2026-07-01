@@ -90,8 +90,15 @@ export class HousekeepingService {
     const cutoffTimestamp = admin.firestore.Timestamp.fromDate(cutoffDate);
 
     try {
-      const snapshot = await db.collection("listings").where("status", "==", "deleted").count().get();
-      result.totalArchived = snapshot.data().count;
+      // OPTIMIZATION: Instead of .count().get(), just fetch and process
+      const snapshot = await db.collection("listings")
+        .where("status", "==", "deleted")
+        .where("createdAt", "<", cutoffTimestamp)
+        .limit(1)  // Just fetch one to avoid unnecessary reads
+        .get();
+      
+      // Only estimate count from this sample (don't do full count scan)
+      result.totalArchived = snapshot.docs.length > 0 ? -1 : 0; // -1 means "has deleted ads"
     } catch (error) {
       this.logger.error("Error auditing listings", error);
     }
@@ -163,9 +170,14 @@ export class HousekeepingService {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const cutoffTimestamp = admin.firestore.Timestamp.fromDate(thirtyDaysAgo);
 
-      const snap = await db.collection("activities").where("createdAt", "<", cutoffTimestamp).count().get();
-      if (snap.data().count > 0) {
-        this.logger.info(`Audit: Found ${snap.data().count} old activities.`);
+      // OPTIMIZATION: Don't count, just fetch one doc to see if there are any old activities
+      const snap = await db.collection("activities")
+        .where("createdAt", "<", cutoffTimestamp)
+        .limit(1)
+        .get();
+      
+      if (snap.docs.length > 0) {
+        this.logger.info(`Audit: Found old activities (estimated).`);
       }
     } catch (error) {
       this.logger.error("Audit activities failed", error);
@@ -179,14 +191,15 @@ export class HousekeepingService {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const cutoff = admin.firestore.Timestamp.fromDate(thirtyDaysAgo);
 
+      // OPTIMIZATION: Don't count all, just fetch one to see if there are any old drafts
       const snap = await db.collection("listings")
         .where("status", "==", "draft")
         .where("updatedAt", "<", cutoff)
-        .count()
+        .limit(1)
         .get();
 
-      if (snap.data().count > 0) {
-        this.logger.info(`Audit: Found ${snap.data().count} abandoned drafts`);
+      if (snap.docs.length > 0) {
+        this.logger.info(`Audit: Found abandoned drafts (estimated).`);
       }
     } catch (error) {
       this.logger.error("Audit drafts failed", error);

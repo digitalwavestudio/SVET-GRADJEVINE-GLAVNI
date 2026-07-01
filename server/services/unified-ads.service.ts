@@ -67,17 +67,15 @@ export class UnifiedAdsService {
 
   static async getMyAds(uid: string, limitNum: number) {
     try {
+      // Limit query at Firestore level for efficiency, not client-side
       const snap = await db.collection("listings")
         .where("authorId", "==", uid)
+        .orderBy("createdAt", "desc")
+        .limit(limitNum)
         .get();
 
       let docs: any[] = snap.docs
-        .sort((a, b) => {
-          const aTime = (a.data() as any).createdAt?.toMillis?.() || (a.data() as any).createdAt?._seconds * 1000 || 0;
-          const bTime = (b.data() as any).createdAt?.toMillis?.() || (b.data() as any).createdAt?._seconds * 1000 || 0;
-          return bTime - aTime;
-        })
-        .slice(0, limitNum)
+        .map((doc) => {
         .map((doc) => {
           const data = doc.data();
           const type = data.type || '';

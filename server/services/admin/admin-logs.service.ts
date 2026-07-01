@@ -52,6 +52,8 @@ export class AdminLogsService {
     return CacheService.getOrSet<Record<string, number>>(
       "admin:ticket_stats",
       async () => {
+        // .count().get() is acceptable here because result is cached for 5 minutes
+        // and this is only used in admin panel, not on critical path
         const totalSnap = await db.collection("supportTickets").count().get();
         const closedSnap = await db.collection("supportTickets")
           .where("status", "==", "closed")
@@ -68,9 +70,13 @@ export class AdminLogsService {
   }
 
   static async getAbuseReports(limitCount = 20, lastDocId?: string) {
-    const cacheKey = `admin_abuse_reports_${limitCount}_${lastDocId || "initial"}`;
-    const cached = await CacheService.get<{ items: Record<string, unknown>[]; lastVisibleId: string | null; hasMore: boolean }>(cacheKey);
-    if (cached) return cached;
+    // Cache only first page (no cursor in key) to maximize hit rate
+    const cacheKey = lastDocId ? null : `admin_abuse_reports_${limitCount}`;
+    
+    if (cacheKey) {
+      const cached = await CacheService.get<{ items: Record<string, unknown>[]; lastVisibleId: string | null; hasMore: boolean }>(cacheKey);
+      if (cached) return cached;
+    }
 
     let q: FirebaseFirestore.Query = db
       .collection("reports")
@@ -90,7 +96,9 @@ export class AdminLogsService {
       hasMore: result.length === limitCount
     };
 
-    await CacheService.set(cacheKey, payload, 10 * 60000); // 10 min cache
+    if (cacheKey) {
+      await CacheService.set(cacheKey, payload, 10 * 60000); // 10 min cache
+    }
     return payload;
   }
 }

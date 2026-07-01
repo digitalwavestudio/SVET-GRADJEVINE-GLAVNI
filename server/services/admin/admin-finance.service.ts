@@ -37,9 +37,13 @@ export class AdminFinanceService {
   }
 
   static async getCheckouts(limit = 20, lastDocId?: string, searchQ?: string) {
-    const cacheKey = `admin_checkouts_${limit}_${lastDocId || "initial"}_${searchQ || "none"}`;
-    const cached = await CacheService.get<{ items: Record<string, unknown>[]; lastVisibleId: string | null; hasMore: boolean }>(cacheKey);
-    if (cached) return cached;
+    // Cache only first page (no cursor in key) to maximize hit rate
+    const cacheKey = lastDocId ? null : `admin_checkouts_${limit}_${searchQ || "none"}`;
+    
+    if (cacheKey) {
+      const cached = await CacheService.get<{ items: Record<string, unknown>[]; lastVisibleId: string | null; hasMore: boolean }>(cacheKey);
+      if (cached) return cached;
+    }
 
     let q: FirebaseFirestore.Query = db.collection("checkouts");
 
@@ -65,7 +69,9 @@ export class AdminFinanceService {
       hasMore: result.length === limit
     };
 
-    await CacheService.set(cacheKey, payload, 5 * 60000); // 5 min cache
+    if (cacheKey) {
+      await CacheService.set(cacheKey, payload, 5 * 60000); // 5 min cache
+    }
     return payload;
   }
 

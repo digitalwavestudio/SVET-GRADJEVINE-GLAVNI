@@ -21,10 +21,10 @@ export const getPublicJobs = async (
     console.info("[JOBS_CTRL] getPublicJobs called, calling JobsService.getPublicJobs...");
     const result = await JobsService.getPublicJobs(limit, cursor);
 
-    // Ne blokiramo odgovor na spori AdminStatsService — timeout 3s, pa fallback
+    // Non-blocking timeout (3s) for AdminStatsService fallback
     const globalStats: Record<string, any> = await Promise.race([
       AdminStatsService.getGlobalStats(),
-      new Promise<null>(resolve => setTimeout(() => resolve(null), 15000)),
+      new Promise<null>(resolve => setTimeout(() => resolve(null), 3000)),
     ]).catch(() => ({})) || {};
 
     let finalResult: {

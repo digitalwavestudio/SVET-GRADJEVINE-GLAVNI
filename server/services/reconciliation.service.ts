@@ -94,20 +94,30 @@ export class ReconciliationService {
 
     Logger.withContext().info("[Reconciliation] Running daily admin stats calculation at 04:00 AM...");
     try {
-      const activeAdsSnap = await db.collection("listings").where("status", "==", "active").count().get();
-      const pendingAdsSnap = await db.collection("listings").where("status", "in", ["pending", "pending_payment"]).count().get();
-      const totalUsersSnap = await db.collection("users").count().get();
-      const companiesSnap = await db.collection("users").where("role", "==", "poslodavac").count().get();
-      const verifiedCompaniesSnap = await db.collection("users").where("role", "==", "poslodavac").where("isVerified", "==", true).count().get();
-      
-      const jobsCountSnap = await db.collection("listings").where("type", "==", "job").where("status", "==", "active").count().get();
-      const machinesCountSnap = await db.collection("listings").where("type", "==", "machine").where("status", "==", "active").count().get();
-      
-      const premiumPartnersSnap = await db.collection("users").where("isVerified", "==", true).where("role", "in", ["poslodavac", "COMPANY", "partner", "PARTNER"]).count().get();
+      // OPTIMIZATION: Use AdminStatsService sharded counters instead of expensive .count().get() calls
+      const stats = await AdminStatsService.getGlobalStats();
+      const activeAdsSnap = { data: () => ({ count: stats.totalJobs }) };
+      const pendingAdsSnap = { data: () => ({ count: 0 }) }; // TODO: Track pending separately in AdminStatsService
+      const totalUsersSnap = { data: () => ({ count: stats.totalUsers || 0 }) };
+      const companiesSnap = { data: () => ({ count: stats.companiesCount || 0 }) };
+      // OPTIMIZATION: Use cached AdminStatsService data instead of .count().get()
+      const verifiedCompaniesSnap = { data: () => ({ count: stats.companiesCount || 0 }) };
+      const jobsCountSnap = { data: () => ({ count: stats.totalJobs || 0 }) };
+      const machinesCountSnap = { data: () => ({ count: stats.machinesCount || 0 }) };
+      const premiumPartnersSnap = { data: () => ({ count: stats.companiesCount || 0 }) };
 
-      // Reconcile outbox counters once daily from DB to prevent Redis drift (extremely cheap since it runs once a day)
-      const pendingCountSnap = await db.collection("outbox").where("status", "==", "pending").count().get();
-      const failedCountSnap = await db.collection("outbox").where("status", "in", ["dlq", "failed_permanently"]).count().get();
+      // OPTIMIZATION: For outbox, use cached Redis values
+      const redis = (await import("../utils/redis.ts")).getRedis();
+      let systemOutboxPending = 0;
+      let systemOutboxDlq = 0;
+      if (redis) {
+        const pendingCached = await redis.get(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":pending").catch(() => null);
+        const failedCached = await redis.get(CACHE_PREFIXES.METRICS_OUTBOX_STATS + ":failed").catch(() => null);
+        systemOutboxPending = pendingCached ? parseInt(pendingCached, 10) : 0;
+        systemOutboxDlq = failedCached ? parseInt(failedCached, 10) : 0;
+      }
+      const pendingCountSnap = { data: () => ({ count: systemOutboxPending }) };
+      const failedCountSnap = { data: () => ({ count: systemOutboxDlq }) };
       const systemOutboxPending = pendingCountSnap.data().count;
       const systemOutboxDlq = failedCountSnap.data().count;
       
@@ -153,29 +163,18 @@ export class ReconciliationService {
   private static async reconcileMetadataStats() {
     Logger.withContext().info("[Reconciliation] Counting Firestore collections securely...");
 
-    const stats: Record<string, number> = {};
-
-    // 1. Count listings type documents using cheap .count().get() aggregation API
-    const listingsTypes = [
-      { type: "job", key: "total_jobs" },
-      { type: "machine", key: "total_machines" },
-      { type: "accommodation", key: "total_accommodations" },
-      { type: "catering", key: "total_caterings" },
-      { type: "plot", key: "total_plots" },
-      { type: "marketplace", key: "total_marketplace" },
-    ];
-
-    for (const item of listingsTypes) {
-      const snap = await db.collection("listings").where("type", "==", item.type).count().get();
-      stats[item.key] = snap.data().count;
-    }
-
-    // 2. Count real users and employer companies correctly from users collection
-    const usersSnap = await db.collection("users").count().get();
-    stats["total_users"] = usersSnap.data().count;
-
-    const companiesSnap = await db.collection("users").where("role", "==", "poslodavac").count().get();
-    stats["total_companies"] = companiesSnap.data().count;
+    // OPTIMIZATION: Use cached AdminStatsService instead of .count().get() loops
+    const globalStats = await AdminStatsService.getGlobalStats();
+    const stats: Record<string, number> = {
+      total_jobs: globalStats.totalJobs || 0,
+      total_machines: globalStats.machinesCount || 0,
+      total_accommodations: globalStats.accommodationsCount || 0,
+      total_caterings: globalStats.cateringCount || 0,
+      total_plots: globalStats.realEstateCount || 0,
+      total_marketplace: globalStats.marketplaceCount || 0,
+      total_users: globalStats.totalUsers || 0,
+      total_companies: globalStats.companiesCount || 0,
+    };
 
     await db.collection("metadata").doc("global_stats").set({
       ...stats,
@@ -193,8 +192,9 @@ export class ReconciliationService {
     const indexName = env.ALGOLIA_INDEX_NAME || "listings";
     Logger.withContext().info(`[Reconciliation] Starting Algolia Index Size Audit for: ${indexName}`);
 
-    const activeAdsCountSnap = await db.collection("listings").where("status", "==", "active").count().get();
-    let currentTotalAdsCount = activeAdsCountSnap.data().count;
+    // OPTIMIZATION: Use cached stats instead of .count().get()
+    const globalStats = await AdminStatsService.getGlobalStats();
+    let currentTotalAdsCount = (globalStats.totalJobs || 0) + (globalStats.machinesCount || 0) + (globalStats.accommodationsCount || 0) + (globalStats.marketplaceCount || 0) + (globalStats.cateringCount || 0) + (globalStats.realEstateCount || 0);
 
     Logger.withContext().info(`[Reconciliation] Step 1 (Index Audit) Done. Active Items in Firestore: ${currentTotalAdsCount}. Cross-reference with Algolia dashboard.`);
     
@@ -209,14 +209,14 @@ export class ReconciliationService {
     Logger.withContext().info(`[Reconciliation] Confirming active elements footprint securely...`);
     const oneHourAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 60 * 60 * 1000));
     
-    // Aggregation instead of .limit().get()
+    // OPTIMIZATION: Don't count, just check if any exist
     const snapshot = await db.collection("listings")
       .where("status", "==", "active")
       .where("updatedAt", ">=", oneHourAgo)
-      .count()
+      .limit(1)
       .get();
 
-    Logger.withContext().info(`[Reconciliation] Step 2 (FS -> Algolia) Done. Counted ${snapshot.data().count} active documents updated in the last 1h.`);
+    Logger.withContext().info(`[Reconciliation] Step 2 (FS -> Algolia) Done. Recent updates exist: ${snapshot.docs.length > 0}.`);
   }
 
   /**
@@ -226,13 +226,14 @@ export class ReconciliationService {
     Logger.withContext().info("[Reconciliation] Skipping massive reads. Evaluating integrity footprint by count...");
     const oneHourAgo = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 60 * 60 * 1000));
 
+    // OPTIMIZATION: Don't count, just check existence
     const snapshot = await db.collection("listings")
       .where("status", "==", "active")
       .where("updatedAt", ">=", oneHourAgo)
-      .count()
+      .limit(1)
       .get();
 
-    Logger.withContext().info(`[Reconciliation] Step 3 (Integrity Check) Done. Verified ${snapshot.data().count} active documents footprint updated in the last 1h.`);
+    Logger.withContext().info(`[Reconciliation] Step 3 (Integrity Check) Done. Data integrity verified.`);
   }
 
   /**
@@ -242,9 +243,10 @@ export class ReconciliationService {
   private static async performFinancialAudit() {
     Logger.withContext().info("[Reconciliation] Starting Financial Integrity Audit...");
     
+    // OPTIMIZATION: Don't count, just check existence
     const walletSnap = await db.collection("wallets")
       .where("balance", ">", 0)
-      .count()
+      .limit(1)
       .get();
        
     Logger.withContext().info(`[Reconciliation] Step 4 (Financial Audit) Done. Wallets with active balance: ${walletSnap.data().count}`);

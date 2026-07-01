@@ -62,7 +62,8 @@ export const getMyAds = async (
 
     const { limitCount = 20, cursor, searchQ } = req.query;
     const limitNum = Math.min(Number(limitCount) || 20, 50);
-    const cacheKey = `myAds_${user.uid}_${limitNum}_${cursor || 'initial'}_${searchQ || 'none'}`;
+    // Cache key without cursor to maximize hit rate - pagination is handled server-side
+    const cacheKey = `myAds_${user.uid}_${limitNum}`;
     const { CacheService } = await import("../services/cache.service.ts");
 
     let resultPayload: any | null;
@@ -78,12 +79,7 @@ export const getMyAds = async (
         const { myAdsResponseSchema } = await import("../dto/ads.dto.ts");
         const resPayload = await UnifiedAdsService.getMyAds(user.uid, limitNum);
 
-        // Dijagnostika: ako je prazno, proveri da li uopste postoje dokumenti za ovog usera
-        if (resPayload.docs.length === 0) {
-          const rawDb = getDb();
-          const countSnap = await rawDb.collection("listings").where("authorId", "==", user.uid).count().get().catch(() => null);
-          console.info(`[ADS] getMyAds DIAG: uid=${user.uid}, limit=${limitNum}, totalDocsForUser=${countSnap?.data()?.count || 'ERROR'}, sampleAuthorId=null`);
-        }
+        // Empty results handled gracefully without extra Firestore query
 
         const parseResult = myAdsResponseSchema.safeParse(resPayload);
         if (!parseResult.success) {

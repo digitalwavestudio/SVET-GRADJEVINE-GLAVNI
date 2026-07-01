@@ -1,5 +1,5 @@
 steps:
-  # 1. Build Docker image
+  # 1. Build Docker image (same as main)
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '--no-cache', '-t', 'gcr.io/$PROJECT_ID/svet-gra-evine:latest', '.']
     
@@ -7,28 +7,34 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/svet-gra-evine:latest']
     
-  # 3. Deploy to Cloud Run (API only - workers will be handled by separate worker service)
+  # 3. Deploy to Cloud Run (WORKER ONLY - dedicated instance)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'svet-gra-evine'
+      - 'svet-gra-evine-worker'
       - '--image'
       - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
       - '--region'
       - 'us-west1'
       - '--platform'
       - 'managed'
-      - '--allow-unauthenticated'
+      - '--no-allow-unauthenticated'
       - '--port'
       - '8080'
       - '--update-env-vars'
-      - 'APP_REGION=us-west1,APP_MODE=api'
+      - 'APP_REGION=us-west1,APP_MODE=worker'
       - '--min-instances'
       - '1'
       - '--max-instances'
-      - '10'
+      - '1'
+      - '--timeout'
+      - '3600'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
 
 images:
   - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
