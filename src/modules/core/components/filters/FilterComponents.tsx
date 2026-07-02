@@ -269,25 +269,32 @@ export const FilterCheckbox = ({ label, checked, onChange }: { label: string, ch
   </label>
 );
 
-export const MarketStatsWidget = ({ stats }: { stats: { total: number; trend?: string; category: string } }) => (
-  <div className="bg-slate-950 p-6 rounded-[10px] border border-white/[0.08] relative overflow-hidden group">
-    <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/5 blur-2xl -mr-12 -mt-12 group-hover:bg-secondary/10 transition-all"></div>
-    <div className="relative z-10">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">MARKET STATS</span>
-      </div>
-      <div className="space-y-1">
-        <div className="text-3xl font-black text-white font-mono tracking-tighter leading-none italic">{stats.total}</div>
-        <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{stats.category} oglašeno</div>
-      </div>
-      {stats.trend && (
-        <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[14px] text-green-500 font-black">trending_up</span>
-          <span className="text-[8px] font-black text-green-500/80 uppercase tracking-widest">{stats.trend} u zadnjih 24h</span>
-        </div>
-      )}
-    </div>
+export const MarketStatsWidget = (_props: { stats: { total: number; trend?: string; category: string } }) => null;
+
+export const ViewToggle = ({ viewMode, setViewMode }: { viewMode: 'list' | 'grid'; setViewMode: (mode: 'list' | 'grid') => void }) => (
+  <div className="flex bg-white/[0.04] border border-white/[0.06] rounded-xl p-0.5 gap-0.5">
+    <button
+      onClick={() => setViewMode('list')}
+      className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+        viewMode === 'list'
+          ? 'bg-white/10 text-secondary shadow-sm shadow-white/5'
+          : 'text-white/30 hover:text-white/60 hover:bg-white/[0.02]'
+      }`}
+      title="Prikaz kao lista"
+    >
+      <span className="material-symbols-outlined text-lg">view_list</span>
+    </button>
+    <button
+      onClick={() => setViewMode('grid')}
+      className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
+        viewMode === 'grid'
+          ? 'bg-white/10 text-secondary shadow-sm shadow-white/5'
+          : 'text-white/30 hover:text-white/60 hover:bg-white/[0.02]'
+      }`}
+      title="Mrežni prikaz"
+    >
+      <span className="material-symbols-outlined text-lg">grid_view</span>
+    </button>
   </div>
 );
 

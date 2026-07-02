@@ -13,7 +13,7 @@ import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import ThemeToggle from '@/src/components/ThemeToggle';
 import { APP_CONFIG } from '@/src/constants/config';
 import { KITCHEN_TYPES, LOCATIONS } from '@/src/constants/taxonomy';
-import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterSelect, FilterInput, FilterCTA, MarketStatsWidget, SortingBar } from '@/src/modules/core/components/filters/FilterComponents';
+import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterSelect, FilterInput, FilterCTA, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
 import { useCateringList } from '@/src/modules/catering/hooks/useCatering';
 import { useDebounce } from '@/src/hooks/useDebounce';
@@ -351,20 +351,7 @@ export default function CateringPage() {
               </div>
             </div>
               <div className="flex items-center gap-6">
-                <div className="flex bg-[#13212e]/60 backdrop-blur-md border border-white/5 rounded-lg p-1 gap-1">
-                  <button 
-                    onClick={() => setViewMode('grid')}
-                    className={`w-9 h-9 flex items-center justify-center rounded-md transition-all duration-300 ${viewMode === 'grid' ? 'bg-secondary text-black shadow-lg shadow-secondary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-                  >
-                    <span className="material-symbols-outlined text-[20px]">grid_view</span>
-                  </button>
-                  <button 
-                    onClick={() => setViewMode('list')}
-                    className={`w-9 h-9 flex items-center justify-center rounded-md transition-all duration-300 ${viewMode === 'list' ? 'bg-secondary text-black shadow-lg shadow-secondary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-                  >
-                    <span className="material-symbols-outlined text-[20px]">view_list</span>
-                  </button>
-                </div>
+                <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
               </div>
             </div>
 

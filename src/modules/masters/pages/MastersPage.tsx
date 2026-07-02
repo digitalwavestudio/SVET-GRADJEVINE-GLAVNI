@@ -12,7 +12,7 @@ import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
 import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { APP_CONFIG } from '@/src/constants/config';
-import { FilterSidebar, FilterClearButton, FilterSection, FilterSelect, FilterCTA, MarketStatsWidget, SortingBar } from '@/src/modules/core/components/filters/FilterComponents';
+import { FilterSidebar, FilterClearButton, FilterSection, FilterSelect, FilterCTA, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
 import { Button } from '@/src/components/ui/Button';
 import { LOCATIONS, PROFESSIONS, SECTORS } from '@/src/constants/taxonomy';
@@ -390,22 +390,7 @@ export default function MastersPage() {
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <div className="flex bg-[#13212e]/60 backdrop-blur-md border border-white/5 rounded-lg p-1 gap-1">
-                <button 
-                  onClick={() => setViewMode('grid')}
-                  className={`w-9 h-9 flex items-center justify-center rounded-md transition-all duration-300 ${viewMode === 'grid' ? 'bg-secondary text-black shadow-lg shadow-secondary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-                  title="Mrežni prikaz"
-                >
-                  <span className="material-symbols-outlined text-[20px]">grid_view</span>
-                </button>
-                <button 
-                  onClick={() => setViewMode('list')}
-                  className={`w-9 h-9 flex items-center justify-center rounded-md transition-all duration-300 ${viewMode === 'list' ? 'bg-secondary text-black shadow-lg shadow-secondary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-                  title="Lista"
-                >
-                  <span className="material-symbols-outlined text-[20px]">view_list</span>
-                </button>
-              </div>
+              <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
             </div>
           </div>
 

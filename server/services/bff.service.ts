@@ -24,7 +24,7 @@ import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
-const L1_HOMEPAGE_TTL = 300_000; // 5min in-memory cache
+const L1_HOMEPAGE_TTL = 900_000; // 15min in-memory cache
 
 let lastFastPathWrite = 0;
 const FAST_PATH_DEBOUNCE = 300_000; // 5min debounce

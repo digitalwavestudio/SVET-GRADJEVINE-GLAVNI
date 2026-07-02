@@ -1035,35 +1035,36 @@ export const createSpaMiddleware = () => {
         return res.send(html);
       }
 
-      // Homepage: React SSR (fallback to clean shell)
+      // Homepage: React SSR for bots only (cached in Redis for 2h)
       if (req.path === "/") {
         const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
-        const scheme = req.get('x-forwarded-proto') || 'http';
-        const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
-        const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
-        const ssrResult = await reactSsrPage(ssrUrl);
-        if (ssrResult) {
-          const { html, dehydratedState, helmetHtml } = ssrResult;
-          const helmetContent = helmetHtml || `<title>Svet Građevine - Portal za građevinske oglase</title>\n<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />`;
-          let finalHtml = indexHtml;
-          const ssrDataScript = isBot ? '' : `<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState: sanitizeDehydratedState(dehydratedState) })}</script>`;
-          finalHtml = finalHtml
-            .replace('</head>', `${helmetContent}${ssrDataScript}</head>`)
-            .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-          finalHtml = dedupeHeadTags(ensureCanonical(finalHtml, req.path));
-          res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-          const redisCache = getRedis();
-          if (redisCache) {
-            redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
+        if (isBot) {
+          const scheme = req.get('x-forwarded-proto') || 'http';
+          const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+          const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+          const ssrResult = await reactSsrPage(ssrUrl);
+          if (ssrResult) {
+            const { html, dehydratedState, helmetHtml } = ssrResult;
+            const helmetContent = helmetHtml || `<title>Svet Građevine - Portal za građevinske oglase</title>\n<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />`;
+            let finalHtml = indexHtml;
+            finalHtml = finalHtml
+              .replace('</head>', `${helmetContent}</head>`)
+              .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+            finalHtml = dedupeHeadTags(ensureCanonical(finalHtml, req.path));
+            res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+            const redisCache = getRedis();
+            if (redisCache) {
+              redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
+            }
+            return res.send(finalHtml);
           }
-          return res.send(finalHtml);
+
+          // Fallback: string-based pre-render for bots
+          const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
+          if (rendered) return res.send(dedupeHeadTags(rendered));
         }
 
-        // Fallback: string-based pre-render
-        const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
-        if (rendered) return res.send(dedupeHeadTags(rendered));
-
-        // Clean shell fallback (no pre-rendered content)
+        // Clean shell for humans (no SSR — let React hydrate on client)
         const cleanHtml = injectEmptyRootLinks(indexHtml
           .replace("</head>", `<title>Svet Građevine - Portal za građevinske oglase</title>
 <meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
@@ -1111,30 +1112,29 @@ export const createSpaMiddleware = () => {
 
         if (isListingPage) {
           if (collectionName) {
-            // Try React SSR for all visitors (not just bots)
-            const scheme = req.get('x-forwarded-proto') || 'http';
-            const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
-            const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
-            const ssrResult = await reactSsrPage(ssrUrl);
-            if (ssrResult) {
-              const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
-              const { html, dehydratedState, helmetHtml } = ssrResult;
-              const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
-              let finalHtml = indexHtml;
-              const ssrDataScript = isBot ? '' : `<script>window.__SSR_DATA__=${JSON.stringify({ dehydratedState: sanitizeDehydratedState(dehydratedState) })}</script>`;
-              finalHtml = finalHtml
-                .replace('</head>', `${helmetContent}${ssrDataScript}</head>`)
-                .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-              finalHtml = ensureCanonical(finalHtml, req.path);
-              res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-              const redisCache = getRedis();
-              if (redisCache) {
-                redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
-              }
-              return res.send(finalHtml);
-            }
-
             if (isBot) {
+              // React SSR for bots only
+              const scheme = req.get('x-forwarded-proto') || 'http';
+              const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+              const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+              const ssrResult = await reactSsrPage(ssrUrl);
+              if (ssrResult) {
+                const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+                const { html, helmetHtml } = ssrResult;
+                const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
+                let finalHtml = indexHtml;
+                finalHtml = finalHtml
+                  .replace('</head>', `${helmetContent}</head>`)
+                  .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+                finalHtml = ensureCanonical(finalHtml, req.path);
+                res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+                const redisCache = getRedis();
+                if (redisCache) {
+                  redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
+                }
+                return res.send(finalHtml);
+              }
+
               // Bot fallback: string-based pre-render
               const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
 

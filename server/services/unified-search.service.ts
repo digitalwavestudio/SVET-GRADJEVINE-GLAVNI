@@ -180,7 +180,7 @@ export class UnifiedSearchService {
       const lastVisible = hasMore && actualDocs.length > 0 ? actualDocs[actualDocs.length - 1].id : null;
 
       const result: UnifiedSearchResult = { docs, lastVisibleId: lastVisible, hasMore, totalHits: docs.length };
-      await CacheService.set(cacheKey, result, 30000).catch(() => {});
+      await CacheService.set(cacheKey, result, 300000).catch(() => {});
       return result;
     } catch (error: unknown) {
       const err = error as Error & { details?: string; code?: number };
