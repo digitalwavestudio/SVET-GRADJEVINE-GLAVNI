@@ -196,20 +196,9 @@ export class AdminStatsService {
             // Fallback — koristi admin_stats vrednost
           }
 
-          const lowJobs = (d.totalJobs || 0) < 50;
-          const lowCompanies = (d.companiesCount || 0) < 10;
-          const lowUsers = (d.totalUsers || 0) < 50;
-
-          const lastReconciledStr = d.lastReconciled;
-          const oneHourAgo = Date.now() - 60 * 60 * 1000;
-          const shouldReconcile = !lastReconciledStr || new Date(lastReconciledStr).getTime() < oneHourAgo;
-
-          if ((lowJobs || lowCompanies || lowUsers) && shouldReconcile) {
-            console.warn(`[AdminStatsService] Triggering reconciliation (jobs=${d.totalJobs}, companies=${d.companiesCount}, users=${d.totalUsers}).`);
-            this.reconcileGlobalStats().catch(err => {
-              console.error("[AdminStatsService] Auto-reconciliation failed:", err);
-            });
-          }
+          // Reconciliation se pokreće isključivo pozadinski (SystemCron),
+          // nikad iz zahtevnog puta da ne bi trošio Firestore reads.
+          // Brojači se osvežavaju na admin_stats dokument na svaki sat.
           if (redis) {
             await redis.set("admin_global_metrics:cache", JSON.stringify(d), "EX", 3600);
           }
