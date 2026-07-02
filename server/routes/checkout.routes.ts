@@ -130,7 +130,7 @@ checkoutRouter.post(
 );
 
 // Update checkout status
-checkoutRouter.patch("/:id", requireAuth, idempotencyMiddleware, async (req, res, next) => {
+checkoutRouter.patch("/:id", requireAuth, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
