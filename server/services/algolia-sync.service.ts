@@ -9,7 +9,6 @@ import {
   deleteAdFromIndex,
   syncAdsToIndex,
 } from "./algolia.service.ts";
-import { MonitoringService } from "./monitoring.service.ts";
 import { TraceContext } from "../utils/trace.ts";
 import { QueueService, JobType, JobPriority } from "./queue.service.ts";
 import { Job } from "@svet-gradjevine/shared";
@@ -147,7 +146,6 @@ export class AlgoliaSync {
       };
 
       await syncAdToIndex(category, userId, algoliaData);
-      MonitoringService.recordSyncSuccess();
     } catch (error: unknown) {
       iLogger.warn(`Profile sync failed for ${userId}, queuing`, {
         error: error instanceof Error ? error.message : String(error),
@@ -208,13 +206,11 @@ export class AlgoliaSync {
           await this.processFullReindex(data as Record<string, unknown>);
         }
 
-        MonitoringService.recordSyncSuccess();
         iLogger.info(`Completed sync task ${targetId}`);
       } catch (err: unknown) {
         iLogger.error(`Sync task failed`, {
           error: err instanceof Error ? err.message : String(err),
         });
-        MonitoringService.recordSyncFail();
         throw err;
       }
     });

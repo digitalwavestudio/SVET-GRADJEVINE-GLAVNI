@@ -1,7 +1,7 @@
 import { getDb, getBucket } from "../config/firebase-init.ts";
 import type admin from "firebase-admin";
 import type { QuerySnapshot, DocumentSnapshot } from "firebase-admin/firestore";
-import { trackFirestoreOp } from "../middleware/logging.middleware.ts";
+
 
 export interface FirestoreQuotaError extends Error {
   code?: number;
@@ -167,7 +167,7 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
                 return cached;
               }
 
-              trackFirestoreOp('read');
+              
 
               try {
                 const resultPromise = value.apply(target, unwrappedArgs) as Promise<unknown>;
@@ -202,9 +202,9 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
           }
 
           if (prop === 'get') {
-            trackFirestoreOp('read');
+            
           } else if (['set', 'update', 'delete', 'add'].includes(prop as string)) {
-            trackFirestoreOp('write');
+            
             if (isDocumentRef && targetPath) {
               import("../utils/redis.ts").then(({ getRedis }) => {
                 const redis = getRedis();
@@ -284,7 +284,7 @@ function wrapBatch(batch: admin.firestore.WriteBatch | Record<string, unknown>):
             } catch (err) { console.error("[Firestore] Batch commit error:", err); }
           }
           if (prop === 'commit') {
-            trackFirestoreOp('write', writeCount);
+            
           }
 
           let result: unknown;
@@ -329,9 +329,9 @@ function wrapTransaction(transaction: admin.firestore.Transaction | Record<strin
           const unwrappedArgs = args.map(unwrapArg);
 
           if (prop === 'get') {
-            trackFirestoreOp('read');
+            
           } else if (['set', 'update', 'delete'].includes(prop as string)) {
-            trackFirestoreOp('write');
+            
             try {
               const docRef = args[0] as any;
               const docPath = docRef?.path;

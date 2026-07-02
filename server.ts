@@ -95,13 +95,7 @@ async function startServer() {
     if (env.NODE_ENV !== "production") console.log("[Server] Starting Phase 1 initialization");
     let ensureInitialized: any;
     try {
-      const { initTracing } = await import("./server/utils/tracing.ts");
-      if (env.NODE_ENV !== "production") console.log("[Server] Tracing imported");
-      try { initTracing(); } catch (e) { console.warn("[Tracing] Failed, continuing."); }
-  
-      const { MonitoringService } = await import("./server/services/monitoring.service.ts");
-      console.log("[Server] MonitoringService imported");
-      MonitoringService.init();
+
       
       if (env.NODE_ENV !== "production") console.log("[Server] Phase 1 initialization almost complete");
       const firebaseModule = await import("./server/config/firebase.ts");
@@ -324,7 +318,6 @@ async function startServer() {
     // Shutdown Handler
     const shutdown = async (signal: string) => {
       console.log(`[Server] Received ${signal}. Starting shutdown.`);
-      const { LoggerService } = await import("./server/services/logger.service.ts");
       const { LockManager } = await import("./server/services/lock.service");
       const { shutdownRedis } = await import("./server/utils/redis.ts");
       const { OutboxWorker } = await import("./server/services/outbox.worker.ts");

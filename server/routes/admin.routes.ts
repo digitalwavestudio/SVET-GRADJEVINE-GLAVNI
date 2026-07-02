@@ -1,5 +1,4 @@
 import express from "express";
-import { AdminMonitoringController } from "../controllers/admin-monitoring.controller.ts";
 import { logger } from "../utils/logger.ts";
 import {
   verifyUser, syncClaims, updateUser,
@@ -41,14 +40,8 @@ adminRouter.get("/monitoring", async (req, res) => {
   }
 
   try {
-    const bypass = req.query.bypassCache === "true";
-    const stats = await MonitoringService.getStats(bypass);
-    if (stats && (stats as { status?: string }).status !== "error") {
-      breaker.recordSuccess().catch(err => console.error("[CircuitBreaker] recordSuccess failed:", err));
-    } else {
-      breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure failed:", err));
-    }
-    res.json(stats);
+    breaker.recordSuccess().catch(err => console.error("[CircuitBreaker] recordSuccess failed:", err));
+    res.json({ status: "ok", message: "Monitoring nije aktivan (stubbovan)" });
   } catch (err) {
     console.error("[CircuitBreaker] Admin /monitoring failed", err);
     await breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure failed:", err));
@@ -181,9 +174,6 @@ import {
   getReportTranscript,
   resolveReport,
 } from "../controllers/admin-ads.controller.ts";
-adminRouter.get("/monitoring/diagnostics", AdminMonitoringController.getDiagnostics);
-adminRouter.post("/monitoring/run-diagnostics", AdminMonitoringController.runDiagnosticsScript);
-
 adminRouter.get(
   "/abuse-reports/:id/transcript",
   adminTriggerLimiter,

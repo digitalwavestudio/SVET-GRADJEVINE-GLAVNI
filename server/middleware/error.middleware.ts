@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { env } from "../config/env.ts";
 import { AppError } from "../utils/appError.ts";
-import { LoggerService } from "../services/logger.service.ts";
+import { logger } from "../utils/logger.ts";
 
 export const globalErrorHandler = (
   err: unknown,
@@ -25,7 +25,7 @@ export const globalErrorHandler = (
       `${req.method} ${req.originalUrl} - ${errMsg || "Internal Server Error"}`,
       err instanceof Error ? err : new Error(errMsg),
     );
-    LoggerService.error(`[Unhandled Error] ${errMsg}`, {
+    logger.error(`[Unhandled Error] ${errMsg}`, {
       error: err,
       requestId,
       url: req.originalUrl,
@@ -33,14 +33,13 @@ export const globalErrorHandler = (
     
     const errObj = err as Record<string, unknown> | null | undefined;
   } else if (err instanceof AppError && err.statusCode !== 429 && !isValidation) {
-    // Only log operational errors that are not Rate Limits
-    LoggerService.warn(`[Operational Error] ${err.message}`, {
+    logger.warn(`[Operational Error] ${err.message}`, {
       statusCode: err.statusCode,
       requestId,
       url: req.originalUrl,
     });
   } else if (err instanceof ZodError) {
-    LoggerService.warn(
+    logger.warn(
       `[Validation Error] on ${req.method} ${req.originalUrl}`,
       { issues: err.issues, requestId },
     );

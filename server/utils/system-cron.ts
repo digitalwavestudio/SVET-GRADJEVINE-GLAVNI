@@ -1,7 +1,7 @@
 import { Queue, Worker, Job } from "bullmq";
 import { getRawRedis } from "./redis.ts";
 import { defaultConnection } from "./queue.ts";
-import { LoggerService } from "../services/logger.service.ts";
+import { logger } from "./logger.ts";
 import { env } from "../config/env.ts";
 
 let cronQueue: Queue | null = null;
@@ -12,14 +12,14 @@ const tasks = new Map<string, () => Promise<void> | void>();
 export const SystemCron = {
   async init() {
     if (!defaultConnection) {
-      LoggerService.warn("[SystemCron] Redis connection configuration missing, cron skipping.");
+      logger.warn("[SystemCron] Redis connection configuration missing, cron skipping.");
       return;
     }
 
     // Inicijalizujemo BullMQ Queue za Cron
     const sharedClient = getRawRedis();
     if (!sharedClient) {
-      LoggerService.warn("[SystemCron] Redis connection failed, cron skipping.");
+      logger.warn("[SystemCron] Redis connection failed, cron skipping.");
       return;
     }
 
@@ -31,10 +31,10 @@ export const SystemCron = {
       async (job: Job) => {
         const task = tasks.get(job.name);
         if (task) {
-          LoggerService.info(`[SystemCron] Executing job: ${job.name}`);
+          logger.info(`[SystemCron] Executing job: ${job.name}`);
           await task();
         } else {
-          LoggerService.warn(`[SystemCron] Unknown job executed: ${job.name}`);
+          logger.warn(`[SystemCron] Unknown job executed: ${job.name}`);
         }
       },
       { connection: defaultConnection!, 
@@ -45,10 +45,10 @@ export const SystemCron = {
     );
 
     cronWorker.on("failed", (job, err) => {
-      LoggerService.error(`[SystemCron] Job ${job?.name} failed`, err);
+      logger.error(`[SystemCron] Job ${job?.name} failed`, err);
     });
 
-    LoggerService.info("[SystemCron] Initialized BullMQ Cron Engine");
+    logger.info("[SystemCron] Initialized BullMQ Cron Engine");
   },
 
   /**
@@ -59,7 +59,7 @@ export const SystemCron = {
    */
   async register(name: string, repeatOptions: { pattern?: string; every?: number }, task: () => any) {
     if (env.NODE_ENV !== "production" && !env.RUN_CRONS) {
-      LoggerService.info(`[SystemCron] Skipping registration of ${name} in non-production mode.`);
+      logger.info(`[SystemCron] Skipping registration of ${name} in non-production mode.`);
       return;
     }
     tasks.set(name, task);
@@ -72,10 +72,10 @@ export const SystemCron = {
         removeOnComplete: true,
         removeOnFail: 3, // cuvamo zadnja 3 u slucaju fail-a za debug
       });
-      LoggerService.info(`[SystemCron] Registered repeatable job: ${name} with options: ${JSON.stringify(repeatOptions)}`);
+      logger.info(`[SystemCron] Registered repeatable job: ${name} with options: ${JSON.stringify(repeatOptions)}`);
     } else {
        // Ako SystemCron nije initovan (npr dev mod bez redisa), zadatak se ne izvršava ili bacamo grešku.
-       LoggerService.warn(`[SystemCron] Cannot register ${name}, Queue not initialized.`);
+       logger.warn(`[SystemCron] Cannot register ${name}, Queue not initialized.`);
     }
   },
 

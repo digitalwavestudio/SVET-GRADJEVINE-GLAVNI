@@ -1,13 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import rateLimit, { Options } from "express-rate-limit";
 import { RedisStore } from "rate-limit-redis";
-import { MonitoringService } from "../services/monitoring.service.ts";
 import { getRedis } from "../utils/redis.ts";
 
 const handler = (req: Request, res: Response, next: NextFunction, options: Options) => {
-  MonitoringService.recordError(
-    `Rate limit exceeded: ${(options.message as { message: string })?.message || options.message}`,
-  );
   res.status(options.statusCode || 429).json(options.message);
 };
 
@@ -180,10 +176,6 @@ export const adCreationLimiter = rateLimit({
     message: "Dostigli ste limit za kreiranje novih oglasa (10 na sat). Molimo pokušajte ponovo kasnije. Za veći limit, unapredite nalog.",
   },
   handler: (req: Request, res: Response, next: NextFunction, options: Options) => {
-    const uid = req.user?.uid || req.ip;
-    MonitoringService.recordError(
-      `Draft Injection Limit exceeded for UID/IP: ${uid} - ${(options.message as { message: string })?.message || options.message}`,
-    );
     res.status(options.statusCode || 429).json(options.message);
   },
 });

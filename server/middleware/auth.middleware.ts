@@ -1,7 +1,6 @@
 import { admin, db, ensureInitialized } from "../config/firebase.ts";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { CacheService } from "../services/cache.service.ts";
-import { MonitoringService } from "../services/monitoring.service.ts";
 const getDefaultPermissions = (role: string): string[] => {
   switch (role) {
     case "admin": return ["*"];

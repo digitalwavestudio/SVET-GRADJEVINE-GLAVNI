@@ -36,11 +36,6 @@ vi.mock("./queue.service.ts", () => ({
 vi.mock("./algolia.service.ts", () => ({
   syncJobToIndex: vi.fn().mockResolvedValue({}),
 }));
-
-vi.mock("./monitoring.service.ts", () => ({
-  MonitoringService: { recordSyncSuccess: vi.fn(), recordSyncFail: vi.fn(), recordError: vi.fn() },
-}));
-
 describe("AlgoliaSync", () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
