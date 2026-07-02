@@ -96,7 +96,7 @@ export const jobsService = {
       const filterKeys = Object.keys(filters || {}).filter(k => !metaKeys.includes(k));
       const isEmptyFilter = !filters || filterKeys.length === 0;
 
-      const allowedFilterKeys = ['status', 'searchQuery', 'locationSlug', 'professionSlug', 'sector', 'engagement', 'experience', 'minSalary', 'maxSalary', 'isPremium', 'isUrgent', 'isPremiumPartner', 'isVerified', 'showAllStatuses', 'companyId'];
+      const allowedFilterKeys = ['status', 'searchQuery', 'locationSlug', 'professionSlug', 'sector', 'engagement', 'experience', 'minSalary', 'maxSalary', 'isPremium', 'isUrgent', 'isPremiumPartner', 'isVerified', 'showAllStatuses', 'companyId', 'authorId'];
       const f = filters || {} as Record<string, unknown>;
       const cleanFilters: Record<string, unknown> = {};
       for (const key of allowedFilterKeys) {

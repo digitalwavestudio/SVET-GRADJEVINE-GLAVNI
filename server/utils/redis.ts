@@ -559,6 +559,9 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
 
 function getRedisUrl(): string | null {
   if (env.REDIS_URL) {
+    if (env.REDIS_URL.startsWith("rediss://")) {
+      return "redis://" + env.REDIS_URL.slice(9);
+    }
     return env.REDIS_URL;
   }
   if (env.REDIS_HOST) {
