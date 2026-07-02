@@ -1,16 +1,50 @@
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { Link } from 'react-router-dom'
-import { Search, Wrench, HardHat, Building2, ArrowDown } from 'lucide-react'
+import { Search, ArrowDown, Zap, Wrench, Building2, Shield, Settings, Package, HardHat } from 'lucide-react'
+import { OptimizedImage } from '@/src/components/OptimizedImage'
 
 const categories = [
-  { id: 'elektricni-alat', name: 'Električni alat', icon: '⚡' },
-  { id: 'rucni-alat', name: 'Ručni alat', icon: '🔧' },
-  { id: 'oprema-skele-oplate', name: 'Skele i oplate', icon: '🏗️' },
-  { id: 'htz-oprema', name: 'HTZ oprema', icon: '🛡️' },
-  { id: 'rezervni-delovi', name: 'Rezervni delovi', icon: '⚙️' },
-  { id: 'ostalo', name: 'Ostalo', icon: '📦' },
+  { id: 'elektricni-alat', name: 'Električni alat', icon: Zap },
+  { id: 'rucni-alat', name: 'Ručni alat', icon: Wrench },
+  { id: 'oprema-skele-oplate', name: 'Skele i oplate', icon: Building2 },
+  { id: 'htz-oprema', name: 'HTZ oprema', icon: Shield },
+  { id: 'rezervni-delovi', name: 'Rezervni delovi', icon: Settings },
+  { id: 'ostalo', name: 'Ostalo', icon: Package },
 ]
+
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=1920&q=80'
+
+function Particle({ index }: { index: number }) {
+  const size = useMemo(() => Math.random() * 6 + 2, [])
+  const x = useMemo(() => Math.random() * 100, [])
+  const duration = useMemo(() => Math.random() * 8 + 6, [])
+  const delay = useMemo(() => Math.random() * 5, [])
+  const isGold = useMemo(() => Math.random() > 0.5, [])
+
+  return (
+    <motion.div
+      className={`absolute rounded-full ${isGold ? 'bg-secondary/30' : 'bg-white/10'}`}
+      style={{
+        width: size,
+        height: size,
+        left: `${x}%`,
+        bottom: '-10px',
+      }}
+      animate={{
+        y: [0, -(Math.random() * 400 + 200)],
+        x: [0, (Math.random() - 0.5) * 100],
+        opacity: [0, 0.8, 0],
+      }}
+      transition={{
+        duration,
+        delay,
+        repeat: Infinity,
+        ease: 'linear',
+      }}
+    />
+  )
+}
 
 export function ToolsParallaxHero() {
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -19,144 +53,174 @@ export function ToolsParallaxHero() {
     offset: ['start start', 'end start'],
   })
 
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '40%'])
-  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0])
-  const contentY = useTransform(scrollYProgress, [0, 0.4], ['0%', '-20%'])
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.6], [0.6, 0.8])
-  const scrollArrowOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0])
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '45%'])
+  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.2])
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
+  const contentY = useTransform(scrollYProgress, [0, 0.3], ['0%', '-30%'])
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5], [0.55, 0.85])
+  const scrollArrowOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0])
+
+  const particles = useMemo(
+    () => Array.from({ length: 20 }, (_, i) => <Particle key={i} index={i} />),
+    [],
+  )
 
   return (
-    <section ref={sectionRef} className="relative min-h-[620px] md:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-surface">
-      {/* Parallax pozadina */}
+    <section ref={sectionRef} className="relative min-h-[700px] md:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-surface">
+      {/* Parallax pozadina sa REALNOM SLIKOM gradilišta */}
       <motion.div
         style={{ y: backgroundY, scale: backgroundScale }}
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 will-change-transform"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-surface via-surface/95 to-surface/90" />
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 20% 50%, rgba(254,191,13,0.12) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(0,97,165,0.1) 0%, transparent 50%),
-              radial-gradient(circle at 50% 80%, rgba(231,118,0,0.08) 0%, transparent 50%)
-            `,
-          }}
+        <OptimizedImage
+          src={HERO_IMAGE}
+          alt="Građevinski radovi"
+          className="w-full h-full object-cover"
+          containerClassName="w-full h-full"
+          fallbackType="machine"
         />
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(254,191,13,0.03) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(254,191,13,0.03) 1px, transparent 1px)
-            `,
-            backgroundSize: '60px 60px',
-          }}
-        />
-        {/* Industrial ornament - decorative circles */}
-        <div className="absolute top-20 right-[10%] w-72 h-72 rounded-full border border-secondary/5" />
-        <div className="absolute top-40 right-[15%] w-48 h-48 rounded-full border border-secondary/8" />
-        <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full border border-primary/5" />
+        {/* Tamni overlay sa gradijentom */}
+        <div className="absolute inset-0 bg-gradient-to-r from-surface/95 via-surface/80 to-surface/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30" />
       </motion.div>
+
+      {/* Floating čestice */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        {particles}
+      </div>
+
+      {/* Industrial grid linije preko slike */}
+      <div
+        className="absolute inset-0 z-[1] opacity-[0.08] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(254,191,13,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(254,191,13,0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '80px 80px',
+        }}
+      />
 
       {/* Overlay koji tamni na skrol */}
       <motion.div
         style={{ opacity: overlayOpacity }}
-        className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-surface/20 to-surface"
+        className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-transparent to-surface pointer-events-none"
       />
 
       {/* Glavni sadržaj */}
       <motion.div
         style={{ opacity: contentOpacity, y: contentY }}
-        className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center text-center pt-32 md:pt-40 pb-16"
+        className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center text-center pt-36 md:pt-48 pb-20"
       >
-        {/* Badge */}
+        {/* Badge sa animacijom enter-a */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-6"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-8"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-bold tracking-[0.2em] uppercase">
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-black tracking-[0.25em] uppercase shadow-[0_0_30px_rgba(254,191,13,0.15)]">
             <HardHat className="w-4 h-4" />
             Alat i oprema
           </div>
         </motion.div>
 
-        {/* Naslov */}
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] text-white leading-[0.85] tracking-[-0.05em] uppercase max-w-5xl"
-        >
-          Alati za
-          <br />
-          <span className="text-secondary">tvoj posao</span>
-        </motion.h1>
+        {/* Naslov sa clip reveal efektom */}
+        <div className="overflow-hidden">
+          <motion.h1
+            initial={{ opacity: 0, y: 80 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="font-headline text-6xl md:text-8xl lg:text-9xl font-[1000] text-white leading-[0.85] tracking-[-0.06em] uppercase max-w-6xl"
+          >
+            Alati za
+            <br />
+            <span className="text-secondary drop-shadow-[0_0_40px_rgba(254,191,13,0.3)]">
+              tvoj posao
+            </span>
+          </motion.h1>
+        </div>
 
         {/* Podnaslov */}
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 text-lg md:text-xl text-slate-300 max-w-2xl font-medium"
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-8 text-lg md:text-xl text-slate-300 max-w-2xl font-medium leading-relaxed"
         >
-          Iznajmi ili iznajmi građevinski alat i opremu. Od ručnog alata do teških mašina — sve na jednom mestu.
+          Iznajmi ili izdaj građevinski alat i opremu. Od ručnog alata do teških mašina — sve na jednom mestu.
         </motion.p>
 
         {/* Glassmorphism Search Bar */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 w-full max-w-2xl"
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-12 w-full max-w-2xl"
         >
           <Link
             to="/alat-i-oprema"
-            className="group flex items-center gap-4 w-full px-6 py-4 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 hover:border-secondary/30 hover:bg-white/[0.06] transition-all duration-500"
+            className="group relative flex items-center gap-4 w-full px-7 py-5 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/[0.08] hover:border-secondary/30 transition-all duration-500 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)]"
           >
             <Search className="w-6 h-6 text-slate-400 group-hover:text-secondary transition-colors duration-300 shrink-0" />
-            <span className="flex-1 text-left text-slate-400 group-hover:text-slate-200 transition-colors duration-300">
+            <span className="flex-1 text-left text-lg text-slate-400 group-hover:text-slate-200 transition-colors duration-300">
               Pretraži alat i opremu...
             </span>
-            <kbd className="hidden md:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 text-xs text-slate-500 border border-white/5">
-              <span className="text-[10px]">⌘</span>K
-            </kbd>
+            <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-xs text-slate-500 border border-white/5">
+              <kbd className="font-mono font-bold">⌘</kbd>
+              <kbd className="font-mono font-bold">K</kbd>
+            </span>
           </Link>
         </motion.div>
 
-        {/* Kategorije — horizontalni red */}
+        {/* Kategorije — horizontalni red sa staggerom */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 flex flex-wrap justify-center gap-3"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.08, delayChildren: 0.65 } },
+          }}
+          className="mt-12 flex flex-wrap justify-center gap-3"
         >
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/alat-i-oprema/${cat.id}`}
-              className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] hover:border-secondary/20 hover:bg-secondary/5 transition-all duration-300"
-            >
-              <span className="text-base">{cat.icon}</span>
-              <span className="text-sm text-slate-300 group-hover:text-secondary transition-colors duration-300">
-                {cat.name}
-              </span>
-            </Link>
-          ))}
+          {categories.map((cat) => {
+            const Icon = cat.icon
+            return (
+              <motion.div
+                key={cat.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20, scale: 0.9 },
+                  visible: { opacity: 1, y: 0, scale: 1 },
+                }}
+              >
+                <Link
+                  to={`/alat-i-oprema/${cat.id}`}
+                  className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] hover:border-secondary/30 hover:bg-secondary/10 transition-all duration-300"
+                >
+                  <Icon className="w-4 h-4 text-slate-400 group-hover:text-secondary transition-colors duration-300" />
+                  <span className="text-sm text-slate-300 group-hover:text-secondary font-medium transition-colors duration-300">
+                    {cat.name}
+                  </span>
+                </Link>
+              </motion.div>
+            )
+          })}
         </motion.div>
 
         {/* Scroll indikator */}
         <motion.div
           style={{ opacity: scrollArrowOpacity }}
-          className="mt-16 flex flex-col items-center gap-2"
+          className="mt-20 flex flex-col items-center gap-3"
         >
-          <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-slate-500">
+          <span className="text-[9px] font-bold tracking-[0.35em] uppercase text-slate-500">
             Skroluj
           </span>
-          <ArrowDown className="w-4 h-4 text-slate-500 animate-bounce" />
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <ArrowDown className="w-4 h-4 text-slate-500" />
+          </motion.div>
         </motion.div>
       </motion.div>
     </section>
