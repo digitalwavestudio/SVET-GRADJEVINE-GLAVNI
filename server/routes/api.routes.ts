@@ -23,7 +23,6 @@ import { applicationsRouter } from "./applications.routes.ts";
 import { reportsRouter } from "./reports.routes.ts";
 import { verificationRouter } from "./verification.routes.ts";
 import { favoritesRouter } from "./favorites.routes.ts";
-import { analyticsRouter } from "./analytics.routes.ts";
 import { systemRouter } from "./system.routes.ts";
 import { mediaRouter } from "./media.routes.ts";
 import { rfqRouter } from "./rfq.routes.ts";
@@ -394,8 +393,6 @@ apiRouter.use("/applications", applicationsRouter);
 apiRouter.use("/reports", reportsRouter);
 apiRouter.use("/verification", verificationRouter);
 apiRouter.use("/favorites", favoritesRouter);
-apiRouter.use("/analytics", analyticsRouter);
-
 apiRouter.use("/system", systemRouter);
 
 // Frontend error logging (used by entry-client.tsx window.onerror handler)

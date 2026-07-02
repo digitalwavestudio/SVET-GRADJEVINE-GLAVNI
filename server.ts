@@ -120,14 +120,12 @@ async function startServer() {
       try {
         const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
         const { initializeEventSubscribers } = await import("./server/config/events.ts");
-        const { SystemMetricsService } = await import("./server/services/system-metrics.service.ts");
 
         if (ensureInitialized) {
           ensureInitialized();
         }
         DynamicConfigService.init().catch(e => console.error("[CONFIG] Dynamic config skipped", e));
         initializeEventSubscribers();
-        SystemMetricsService.init();
 
         const { initMigrations } = await import("./server/migrations/index.ts");
         const { runPendingMigrations } = await import("./server/services/migration.service.ts");
@@ -331,7 +329,6 @@ async function startServer() {
       const { shutdownRedis } = await import("./server/utils/redis.ts");
       const { OutboxWorker } = await import("./server/services/outbox.worker.ts");
           const { AlgoliaSync } = await import("./server/services/algolia-sync.service.ts");
-          const { SystemMetricsService } = await import("./server/services/system-metrics.service.ts");
           const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
           const { SystemCron } = await import("./server/utils/system-cron.ts");
           const { ChatBufferService } = await import("./server/services/chat-buffer.service.ts");
@@ -343,7 +340,6 @@ async function startServer() {
               await SystemCron.gracefulShutdown();
               await ChatBufferService.gracefulShutdown();
             }
-            await SystemMetricsService.shutdown();
             await DynamicConfigService.gracefulShutdown();
             if (server) server.close();
             await LockManager.gracefulCleanup();

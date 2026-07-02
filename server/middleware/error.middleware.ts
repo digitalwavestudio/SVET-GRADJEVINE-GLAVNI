@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { env } from "../config/env.ts";
 import { AppError } from "../utils/appError.ts";
-import { MonitoringService } from "../services/monitoring.service.ts";
 import { LoggerService } from "../services/logger.service.ts";
 
 export const globalErrorHandler = (
@@ -32,20 +31,7 @@ export const globalErrorHandler = (
       url: req.originalUrl,
     });
     
-    // Provera da li je Firestore Quota Limit (RESOURCE_EXHAUSTED)
     const errObj = err as Record<string, unknown> | null | undefined;
-    const errCode = errObj?.code;
-    const errMessage = errObj?.message;
-    if (errObj && (errCode === 8 || errCode === 'RESOURCE_EXHAUSTED' || (typeof errMessage === 'string' && errMessage.includes('Quota exceeded')))) {
-      import('../services/critical-alert.service.ts').then(({ CriticalAlertService }) => {
-        CriticalAlertService.notifyQuotaExceeded({
-          message: String(errMessage || ""),
-          code: String(errCode || ""),
-          url: req.originalUrl,
-          method: req.method,
-        }).catch(e => LoggerService.warn("[CriticalAlert] Failed to notify quota exceeded:", e));
-      }).catch(e => console.error("[CRITICAL-ALERT] Failed to load service during error", e));
-    }
   } else if (err instanceof AppError && err.statusCode !== 429 && !isValidation) {
     // Only log operational errors that are not Rate Limits
     LoggerService.warn(`[Operational Error] ${err.message}`, {

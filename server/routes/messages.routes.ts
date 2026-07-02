@@ -436,12 +436,6 @@ messagesRouter.get(
       
       const chatData = chatSnap.data();
       if (!chatData?.participants?.includes(uid) && !user.isAdmin) {
-        import('../services/critical-alert.service.ts').then(({ CriticalAlertService }) => {
-          CriticalAlertService.triggerResourceAlert("Potential IDOR Attack Detected (Messages Fetch)", {
-            uid,
-            chatId: id
-          });
-          }).catch(err => console.error("[Messages] CriticalAlertService.triggerResourceAlert failed:", err));
         return res.status(403).json({ error: "Access denied to this chat" });
       }
 
@@ -531,12 +525,6 @@ messagesRouter.get(
       
       const chatData = chatSnap.data();
       if (!chatData?.participants?.includes(uid) && !user.isAdmin) {
-        import('../services/critical-alert.service.ts').then(({ CriticalAlertService }) => {
-          CriticalAlertService.triggerResourceAlert("Potential IDOR Attack Detected (Media Fetch)", {
-            uid,
-            chatId: id
-          });
-        }).catch(err => console.error("[Messages] CriticalAlertService.triggerResourceAlert failed:", err));
         return res.status(403).json({ error: "Access denied to this chat media" });
       }
 
