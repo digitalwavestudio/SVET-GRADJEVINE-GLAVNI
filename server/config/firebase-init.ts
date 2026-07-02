@@ -128,6 +128,7 @@ export function ensureInitialized() {
 }
 
 let _db: admin.firestore.Firestore | null = null;
+
 export function getDb() {
   ensureInitialized();
   if (!_db) {

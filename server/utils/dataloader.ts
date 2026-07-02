@@ -56,20 +56,25 @@ export interface UserStatsDTO {
 // Global Read-Budget Trackers (In-Memory per Node Process)
 let globalReadCount = 0;
 let windowStartTime = Date.now();
-// Povećano sa 500 na 2000 — 500 je bilo previše restriktivno za homepage sa 10+ upita
-// Konfigurabilno preko env var-a za fleksibilnost
 const READ_BUDGET_LIMIT = parseInt(process.env.FIRESTORE_READ_BUDGET || "2000", 10);
-const WINDOW_MS = 60000; // 1 minute window
+const WINDOW_MS = 60000;
 
-/**
- * Enterprise Quota Sentinel
- * Returns false if the request exceeds the allowed process-level budget.
- */
+let readLogCount = 0;
+
 function checkReadBudget(requestedCount: number): boolean {
   const now = Date.now();
   if (now - windowStartTime > WINDOW_MS) {
     globalReadCount = 0;
     windowStartTime = now;
+    readLogCount = 0;
+  }
+
+  readLogCount += requestedCount;
+  if (readLogCount <= 50 || readLogCount % 200 === 0) {
+    const err = new Error();
+    const stack = err.stack?.split("\n") || [];
+    const caller = stack.find(l => !l.includes("dataloader.ts") && !l.includes("Error") && !l.includes("checkReadBudget"))?.trim() || "unknown";
+    console.log(`[DLREAD #${readLogCount}] ${caller}`);
   }
   
   if (globalReadCount + requestedCount > READ_BUDGET_LIMIT) {

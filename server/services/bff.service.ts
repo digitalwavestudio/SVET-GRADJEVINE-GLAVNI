@@ -98,6 +98,7 @@ export const bffService = {
 
     // ── Fast-Path: instant čitanje iz Firestore dokumenta (0 queries za homepage) ──
     try {
+      console.log("[BFF_READ] Fast-Path read: metadata/homepage_fastpath");
       const fpSnap = await db.doc("metadata/homepage_fastpath").get();
       if (fpSnap.exists) {
         const fpData = fpSnap.data()?.homepage as HomepageDataResult | undefined;
