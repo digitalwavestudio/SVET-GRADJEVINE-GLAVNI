@@ -1,10 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ProductAnalyticsService } from "../services/product-analytics.service.ts";
-import { SystemMetricsService } from "../services/system-metrics.service.ts";
 import { MonitoringService } from "../services/monitoring.service.ts";
-
-ProductAnalyticsService.init();
-SystemMetricsService.init();
 
 export const getPrometheusMetrics = async (
   req: Request,

@@ -1,7 +1,5 @@
 import { db, admin } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
-import { BigQueryService } from "./bigquery.service.ts";
-import crypto from 'crypto';
 
 export enum AuditAction {
   USER_VERIFIED = "USER_VERIFIED",
@@ -64,44 +62,10 @@ export class AuditService {
         this.logger.error("Firestore audit write failed", err)
       );
 
-      // 2. High-Severity Security Export (BigQuery)
-      if (log.severity === 'high' || log.severity === 'critical' || log.action === AuditAction.SECURITY_THREAT) {
-        await this.exportToBigQuery(entry).catch(err => 
-          this.logger.error("BigQuery audit export failed", err)
-        );
-      }
-
       this.logger.info(`Audit Registered: ${entry.action}`);
     } catch (error) {
       this.logger.error("Failed to process unified audit log", error);
     }
-  }
-
-  private static async exportToBigQuery(log: AuditLog) {
-    const rawIp = log.ip || "0.0.0.0";
-    const ipHash = crypto.createHash('sha256').update(rawIp).digest('hex');
-    const ua = log.userAgent || 'unknown';
-    
-    const automationSigs = ['curl', 'python', 'playwright', 'puppeteer', 'selenium', 'postman', 'axios', 'headless', 'bot', 'crawler'];
-    const isAutomated = automationSigs.some(sig => ua.toLowerCase().includes(sig));
-
-    const bqRow = {
-      timestamp: new Date().toISOString(),
-      threat_type: log.action === AuditAction.SECURITY_THREAT ? (log.details?.type || 'unauthorized_access') : 'audit_high_severity',
-      severity: log.severity || 'medium',
-      user_id: log.userId || log.adminId || 'anonymous',
-      ip_hash: ipHash,
-      user_agent: ua,
-      path: log.path || 'unknown',
-      metadata: {
-        ...log.details,
-        client_fingerprint: crypto.createHash('sha256').update(`${ua}-${ipHash}`).digest('hex'),
-        is_automated: isAutomated,
-        detection_engine: "enterprise_unified_audit_v1"
-      }
-    };
-
-    return BigQueryService.export('threat_analytics', [bqRow]);
   }
 
   static async logAdminAction(

@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import compression from "compression";
-import { performanceBenchmark } from "../middleware/benchmark.middleware.ts";
+
+
 import {
   getDashboardBff,
   getHomepageBff,
@@ -72,7 +73,7 @@ export function validateBffInputs(req: Request, res: Response, next: NextFunctio
   }
 }
 
-bffRouter.use(performanceBenchmark);
+
 
 // State-machine based Circuit Breaker pattern implementation to protect Firestore database performance
 class BffDashboardCircuitBreaker {

@@ -3,7 +3,6 @@ import { db } from "../../config/firebase.ts";
 import { TraceContext } from "../../utils/trace.ts";
 import { CacheService } from "../cache.service.ts";
 import { getRedis, getSubRedis, isClusterOffline } from "../../utils/redis.ts";
-import { ProductAnalyticsService } from "../product-analytics.service.ts";
 import { CacheKeys } from "../../constants/cache-keys.ts";
 import * as admin from "firebase-admin";
 import { logger } from "../../utils/logger.ts";
@@ -94,7 +93,7 @@ export class DashboardService {
           return { role };
         }
       })(),
-      ProductAnalyticsService.getUserAnalytics(userId, 30),
+      Promise.resolve({ totalViews: 0, totalClicks: 0, totalInquiries: 0 }),
     ]);
 
     if (statsResult.status === "rejected") {

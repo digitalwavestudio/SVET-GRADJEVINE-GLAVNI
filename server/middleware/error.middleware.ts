@@ -22,7 +22,7 @@ export const globalErrorHandler = (
 
   if (!isOperational && !isValidation) {
     // Sentry + Logger for critical unhandled errors
-    MonitoringService.recordError(
+    console.error(
       `${req.method} ${req.originalUrl} - ${errMsg || "Internal Server Error"}`,
       err instanceof Error ? err : new Error(errMsg),
     );

@@ -1,7 +1,5 @@
 import express from "express";
 import { AdminMonitoringController } from "../controllers/admin-monitoring.controller.ts";
-import { MonitoringService } from "../services/monitoring.service.ts";
-import { performanceBenchmark } from "../middleware/benchmark.middleware.ts";
 import { logger } from "../utils/logger.ts";
 import {
   verifyUser, syncClaims, updateUser,
@@ -26,7 +24,6 @@ import { adminTriggerLimiter } from "../middleware/rate-limit.middleware.ts";
 
 export const adminRouter = express.Router();
 
-adminRouter.use(performanceBenchmark);
 
 adminRouter.get("/monitoring", async (req, res) => {
   const { breaker } = await import("./bff.routes.ts");
@@ -65,7 +62,6 @@ adminRouter.get("/monitoring", async (req, res) => {
   }
 });
 
-import { AlertingService } from "../services/alerting.service.ts";
 import { getRedis } from "../utils/redis.ts";
 
 adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, async (req, res) => {
@@ -93,13 +89,7 @@ adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, async (req, res) 
     const edgeMisses = parseInt(edgeMissesStr || "0", 10);
     const totalRequests = edgeHits + edgeMisses;
     const hitRatio = totalRequests > 0 ? (edgeHits / totalRequests) * 100 : 0;
-    
-    // Check Discord alerting condition
-    if (totalRequests > 1000 && hitRatio < 90) {
-      await AlertingService.sendCacheHitDropAlert(hitRatio.toFixed(2) + "%");
-    }
 
-    // AI scraper share
     let aiScraperCount = 0;
     let totalBotCount = 0;
     if (botHits) {
@@ -126,8 +116,7 @@ adminRouter.get("/seo/crawler-telemetry", adminTriggerLimiter, async (req, res) 
         }
       }
     }
-    
-    // avgLatencyMs approx assuming totalBotCount ~ totalDurationSamples for bots
+
     const avgLatencyMs = totalBotCount > 0 ? totalDurationMs / totalBotCount : 0;
 
     res.json({

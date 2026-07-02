@@ -2,7 +2,6 @@ import { admin as firebaseAdmin, db } from "../config/firebase.ts";
 import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError } from "../utils/appError.ts";
 import { AdminStatsService } from "./admin/admin-stats.service.ts";
-import { ProductAnalyticsService } from "./product-analytics.service.ts";
 import { Listing } from "../types/ads.ts";
 
 export class UnifiedFavoritesService {
@@ -40,17 +39,6 @@ export class UnifiedFavoritesService {
 
       return !isRemoving;
     });
-
-    // Delegate aggregation to MetricsService (Redis Throttle & Delay)
-    // Fire and forget to avoid slowing down request
-    ProductAnalyticsService.recordFavoriteToggle(adId, userId, isSaved ? 1 : -1).catch(
-      (err) => {
-        UnifiedFavoritesService.logger.error(
-          "Failed to record favorite metric",
-          err,
-        );
-      },
-    );
 
     return { isSaved };
   }

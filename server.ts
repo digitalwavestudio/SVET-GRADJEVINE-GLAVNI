@@ -120,8 +120,6 @@ async function startServer() {
       try {
         const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
         const { initializeEventSubscribers } = await import("./server/config/events.ts");
-        const { BigQueryService } = await import("./server/services/bigquery.service.ts");
-        const { ProductAnalyticsService } = await import("./server/services/product-analytics.service.ts");
         const { SystemMetricsService } = await import("./server/services/system-metrics.service.ts");
 
         if (ensureInitialized) {
@@ -129,8 +127,6 @@ async function startServer() {
         }
         DynamicConfigService.init().catch(e => console.error("[CONFIG] Dynamic config skipped", e));
         initializeEventSubscribers();
-        BigQueryService.initializeSchema().catch(e => console.error("BigQuery init failed", e));
-        ProductAnalyticsService.init();
         SystemMetricsService.init();
 
         const { initMigrations } = await import("./server/migrations/index.ts");
@@ -150,18 +146,14 @@ async function startServer() {
         if (mode === "worker" || mode === "full") {
           const { AlgoliaSync } = await import("./server/services/algolia-sync.service.ts");
           const { OutboxWorker } = await import("./server/services/outbox.worker.ts");
-          const { GoogleIndexingService } = await import("./server/services/google-indexing.service.ts");
           
           setTimeout(async () => {
             try {
               await AlgoliaSync.init();
               await OutboxWorker.start();
-              await GoogleIndexingService.processQueue();
 
               const { ChatBufferService } = await import("./server/services/chat-buffer.service");
               await ChatBufferService.init();
-              const { ImageWorker } = await import("./server/services/image.worker");
-              await ImageWorker.init();
               const { SystemCron } = await import("./server/utils/system-cron.ts");
               await SystemCron.init();
             } catch (err) {
@@ -177,7 +169,6 @@ async function startServer() {
     // 2. Middleware & Routing foundation
     const { requestLogger } = await import("./server/middleware/logging.middleware");
     const { rateLimitShield } = await import("./server/middleware/rate-limit-shield.middleware.ts");
-    const { redirectMiddleware } = await import("./server/middleware/redirect.middleware.ts");
     const { canonicalHostMiddleware, botPrerenderMiddleware } = await import("./server/middleware/seo.middleware.ts");
     const { authMiddleware } = await import("./server/middleware/auth.middleware.ts");
     const { xssMiddleware } = await import("./server/middleware/xss.middleware.ts");
@@ -292,7 +283,6 @@ async function startServer() {
 
     app.use("/api", authMiddleware, xssMiddleware, apiRouter);
     app.use("/feed", feedRouter);
-    app.use(redirectMiddleware);
     app.use(canonicalHostMiddleware);
     app.use(botPrerenderMiddleware);
     app.use("/", seoRouter);
@@ -340,32 +330,24 @@ async function startServer() {
       const { LockManager } = await import("./server/services/lock.service");
       const { shutdownRedis } = await import("./server/utils/redis.ts");
       const { OutboxWorker } = await import("./server/services/outbox.worker.ts");
-      const { GoogleIndexingService } = await import("./server/services/google-indexing.service.ts");
           const { AlgoliaSync } = await import("./server/services/algolia-sync.service.ts");
-          const { ProductAnalyticsService } = await import("./server/services/product-analytics.service.ts");
           const { SystemMetricsService } = await import("./server/services/system-metrics.service.ts");
           const { DynamicConfigService } = await import("./server/services/dynamic-config.service.ts");
           const { SystemCron } = await import("./server/utils/system-cron.ts");
-          const { ImageWorker } = await import("./server/services/image.worker.ts");
           const { ChatBufferService } = await import("./server/services/chat-buffer.service.ts");
-          const { shutdownSitemapWorker } = await import("./server/services/sitemap.worker.ts");
           
           try {
             if (mode === "worker" || mode === "full") {
               await OutboxWorker.gracefulShutdown();
-              await GoogleIndexingService.shutdownQueue();
-          await AlgoliaSync.gracefulShutdown();
-          await SystemCron.gracefulShutdown();
-          await ImageWorker.gracefulShutdown();
-          await ChatBufferService.gracefulShutdown();
-          await shutdownSitemapWorker();
-        }
-        await ProductAnalyticsService.shutdown();
-        await SystemMetricsService.shutdown();
-        await DynamicConfigService.gracefulShutdown();
-        if (server) server.close();
-        await LockManager.gracefulCleanup();
-        await shutdownRedis();
+              await AlgoliaSync.gracefulShutdown();
+              await SystemCron.gracefulShutdown();
+              await ChatBufferService.gracefulShutdown();
+            }
+            await SystemMetricsService.shutdown();
+            await DynamicConfigService.gracefulShutdown();
+            if (server) server.close();
+            await LockManager.gracefulCleanup();
+            await shutdownRedis();
         process.exit(0);
       } catch (err) {
         console.error("[Shutdown] Error:", err);

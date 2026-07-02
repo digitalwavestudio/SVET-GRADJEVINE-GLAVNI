@@ -8,8 +8,7 @@ import { SEODbService } from "../services/seo/seo-db.service.ts";
 import { SEOSchemaService } from "../services/seo/seo-schema.service.ts";
 import { SEORenderEngine } from "../services/seo/seo-render-engine.ts";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
-import { LockManager } from "../services/lock.service.ts";
-import { logger } from "../utils/logger.ts";
+
 
 export const seoRouter = Router();
 
@@ -238,75 +237,12 @@ seoRouter.get("/og-image", (req, res) => {
   res.send(svg);
 });
 
-async function withDistributedLock<T>(
-  resourceId: string,
-  cacheKey: string,
-  CacheService: typeof import("../services/cache.service.ts").CacheService,
-  generateFn: () => Promise<T>
-): Promise<T | null> {
-  const lockId = await LockManager.acquire(resourceId, 120000); // 2 minutes lock
-  if (lockId) {
-    try {
-      const result = await generateFn();
-      if (result) {
-        await CacheService.set(cacheKey, result, 86400000); // 24 hours
-      }
-      return result;
-    } finally {
-      await LockManager.release(resourceId, lockId);
-    }
-  } else {
-    // Wait and poll cache up to 60 seconds
-    let retries = 30;
-    while (retries > 0) {
-      await new Promise((res) => setTimeout(res, 2000));
-      const cached = await (CacheService as { get: (k: string) => Promise<unknown> }).get(cacheKey);
-      if (cached) return cached as T;
-      retries--;
-    }
-    logger.warn(`[SEO] Lock timeout waiting for generation of ${resourceId}`);
-    return null; // or fallback
-  }
-}
-
 // DinamiÄki sitemap (Index)
 seoRouter.get("/sitemap.xml", async (_req, res) => {
   try {
-    const { CacheService } = await import("../services/cache.service.ts");
-    const cacheKey = "seo:sitemap_index";
-
-    let sitemap = await CacheService.get<string>(cacheKey);
-
-    if (sitemap && typeof sitemap === "string") {
-      res.header("Content-Type", "application/xml");
-      res.setHeader("Cache-Control", "public, max-age=86400");
-      return res.send(sitemap);
-    }
-
-    const { sitemapWorkerService } =
-      await import("../services/sitemap.worker.ts");
-    sitemap = (await sitemapWorkerService.getStoredSitemap(
-      "sitemap-index.xml",
-    )) as string | null;
-
-    if (!sitemap) {
-      const { SitemapService } = await import("../services/sitemap.service.ts");
-      sitemap = (await withDistributedLock("lock:sitemap:index", cacheKey, CacheService, async () => {
-        return await SitemapService.generateIndex();
-      })) as string | null;
-    }
-
-    if (sitemap) {
-      await CacheService.set(cacheKey, sitemap, 24 * 60 * 60 * 1000); // 24 hours
-    }
-
-    if (!sitemap) {
-      sitemap = generateFallbackSitemap();
-    }
-
     res.header("Content-Type", "application/xml");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    res.send(sitemap);
+    res.send(generateFallbackSitemap());
   } catch (error) {
     console.error("Sitemap error:", error);
     res.header("Content-Type", "application/xml");
@@ -318,76 +254,12 @@ seoRouter.get("/sitemap.xml", async (_req, res) => {
 seoRouter.get("/sitemap-:type.xml", async (req, res) => {
   try {
     const { type } = req.params;
-
-    // 1. First check our own string cache
-    const { CacheService } = await import("../services/cache.service.ts");
-    const cacheKey = `seo:sitemap_chunk_${type}`;
-    const cachedXml = await CacheService.get<string>(cacheKey);
-
-    if (cachedXml && typeof cachedXml === "string") {
-      res.header("Content-Type", "application/xml");
-      res.setHeader("Cache-Control", "public, max-age=86400");
-      return res.send(cachedXml);
-    }
-
-    // 2. Try to get from cloud storage (bucket)
-    const { sitemapWorkerService } =
-      await import("../services/sitemap.worker.ts");
-    let xml = (await sitemapWorkerService.getStoredSitemap(
-      `sitemap-${type}.xml`,
-    )) as string | null | undefined;
-
-    if (xml) {
-      await CacheService.set(cacheKey, xml, 24 * 60 * 60 * 1000); // 24 hours
-      res.header("Content-Type", "application/xml");
-      res.setHeader("Cache-Control", "public, max-age=86400");
-      return res.send(xml);
-    }
-
-    // 3. Fallback: generate dynamically ONLY FOR LIGHTWEIGHT SEGMENTS to prevent infinite read loops
-    const { SitemapService } = await import("../services/sitemap.service.ts");
-    
-    // Parse segment type for pagination (e.g. jobs-1)
-    const [coll, pageStr] = type.split("-");
-    const page = parseInt(pageStr) || 1;
-
-    xml = (await withDistributedLock(`lock:sitemap:${type}`, cacheKey, CacheService, async () => {
-      if (coll === "static") {
-        return await SitemapService.generateStaticSitemap();
-      } else if (coll === "pseo") {
-        return await SitemapService.generatePseoSitemap();
-      } else if (coll === "magazine") {
-        const result = await SitemapService.generateMagazineSitemap(page);
-        return result?.xml || null;
-      } else if (coll === "companies") {
-        const result = await SitemapService.generateCompaniesSitemap(page);
-        return result?.xml || null;
-      } else if (coll === "masters") {
-        const result = await SitemapService.generateMastersSitemap(page);
-        return result?.xml || null;
-      } else if (["jobs", "machines", "accommodations", "caterings", "plots", "marketplace"].includes(coll)) {
-        const result = await SitemapService.generateCollectionSitemap(coll, page);
-        return result?.xml || null;
-      } else {
-        logger.warn(`[SEO] Blocked dynamic generation of unrecognized segment: ${type}.`);
-        return null; 
-      }
-    })) as string | null | undefined;
-    
-    if (xml === null && !["static", "pseo", "magazine"].includes(type)) {
-      return res.status(404).send("Sitemap segment not ready. Worker is building it offline.");
-    }
-
-    if (xml) {
-      await CacheService.set(cacheKey, xml, 24 * 60 * 60 * 1000); // 24h as per request
-    }
-
     res.header("Content-Type", "application/xml");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    return res.send(xml || "");
+    res.send(generateFallbackSitemap());
   } catch (error) {
     console.error("Sitemap chunk error:", error);
-    res.status(500).send("Error generating sitemap chunk");
+    res.status(500).send("Error generating sitemap");
   }
 });
 

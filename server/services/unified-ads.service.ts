@@ -136,8 +136,6 @@ export class UnifiedAdsService {
     await CacheService.invalidateByPrefix(`publicProfileAds_${adData.authorId}`);
     await CacheService.invalidateByPrefix("public_ads_");
     await CacheService.invalidateByPrefix("search_ads_"); 
-    const { PredictiveAnalyticsService } = await import("./predictive.service.ts");
-    await PredictiveAnalyticsService.forceRefresh(id).catch(() => {});
 
     // Invalidate employer dashboard stats cache to resolve "Ghost" ads immediately
     const { DashboardService } = await import("./dashboard/dashboard.service.ts");

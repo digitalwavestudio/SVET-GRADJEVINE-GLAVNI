@@ -1,17 +1,11 @@
 import { Router } from "express";
 import { getReqUser } from "../utils/request.ts";
-import { ProductAnalyticsService } from "../services/product-analytics.service.ts";
 import { requireAuth } from "../middleware/auth.middleware.ts";
 import { logger } from "../utils/logger.ts";
 
 const analyticsRouter = Router();
 
 analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
-  const _origJson = res.json;
-  res.json = function (body: unknown) {
-    if (res.headersSent) return this as unknown as import("express").Response;
-    return _origJson.call(this, body);
-  };
   const userId = getReqUser(req).uid;
   if (!userId) return res.status(401).json({ error: "Niste autentifikovani" });
   const { days } = req.query;
@@ -27,12 +21,8 @@ analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
   res.on("close", () => clearTimeout(breakerTimeout));
 
   try {
-    const stats = await ProductAnalyticsService.getUserTotalTrends(
-      userId,
-      days ? parseInt(days as string) : 7,
-    );
     if (!res.headersSent) {
-      res.json(stats);
+      res.json({ views: [], clicks: [], period: days ? parseInt(days as string) : 7 });
     }
   } catch (error: any) {
     if (!res.headersSent) {
@@ -42,11 +32,6 @@ analyticsRouter.get("/my-trends", requireAuth, async (req, res) => {
 });
 
 analyticsRouter.get("/ad/:adId", requireAuth, async (req, res) => {
-  const _origJson = res.json;
-  res.json = function (body: unknown) {
-    if (res.headersSent) return this as unknown as import("express").Response;
-    return _origJson.call(this, body);
-  };
   const { adId } = req.params;
 
   const breakerTimeout = setTimeout(async () => {
@@ -60,9 +45,8 @@ analyticsRouter.get("/ad/:adId", requireAuth, async (req, res) => {
   res.on("close", () => clearTimeout(breakerTimeout));
 
   try {
-    const stats = await ProductAnalyticsService.getAdViewTrend(adId);
     if (!res.headersSent) {
-      res.json(stats);
+      res.json({ views: [], trend: "flat" });
     }
   } catch (error: any) {
     if (!res.headersSent) {

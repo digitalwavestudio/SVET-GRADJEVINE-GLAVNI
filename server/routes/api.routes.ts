@@ -9,13 +9,11 @@ import { authRouter } from "./auth.routes.ts";
 import { usersRouter } from "./users.routes.ts";
 import { jobsRouter } from "./jobs.routes.ts";
 import { metricsRouter } from "./metrics.routes.ts";
-import { mastersRouter } from "./masters.routes.ts";
 import dashboardRouter from "./dashboard.routes.ts";
 import { bffRouter } from "./bff.routes.ts";
 import { adsRouter } from "./ads.routes.ts";
 import { messagesRouter } from "./messages.routes.ts";
 import { calendarRouter } from "./calendar.routes.ts";
-import { constructionRouter } from "./construction.routes.ts";
 import { partnersRouter } from "./partners.routes.ts";
 import { checkoutRouter } from "./checkout.routes.ts";
 import { walletRouter } from "./wallet.routes.ts";
@@ -29,11 +27,10 @@ import { analyticsRouter } from "./analytics.routes.ts";
 import { systemRouter } from "./system.routes.ts";
 import { mediaRouter } from "./media.routes.ts";
 import { rfqRouter } from "./rfq.routes.ts";
-import telemetryRouter from "./telemetry.routes.ts";
+
 
 import {
   runCleanup,
-  runSitemapRebuild,
 } from "../controllers/housekeeping.controller.ts";
 import { firebaseConfig, ensureInitialized, db, admin } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
@@ -77,7 +74,6 @@ const firestoreLimiter = rateLimit({
 
 import { statsRouter } from "./stats.routes.ts";
 
-import { aiRouter } from "./ai.routes.ts";
 import { autoValidateMiddleware, validateRequest } from "../middleware/validate.ts";
 
 
@@ -370,19 +366,19 @@ apiRouter.get(
   },
 );
 
-import { searchMasters } from "../controllers/masters.controller.ts";
+
 import { searchCompanies } from "../controllers/companies.controller.ts";
 
 apiRouter.use("/admin", requireAdmin, adminRouter);
-apiRouter.use("/ai", heavyOperationsLimiter, aiRouter);
+
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/user", usersRouter); // For backwards compatibility
 apiRouter.use("/jobs", firestoreLimiter, heavyOperationsLimiter, jobsRouter);
 apiRouter.use("/metrics", metricsRouter);
-apiRouter.use("/masters", firestoreLimiter, heavyOperationsLimiter, mastersRouter);
+
 apiRouter.use("/media", heavyOperationsLimiter, mediaRouter);
-apiRouter.post("/search/masters", firestoreLimiter, heavyOperationsLimiter, searchMasters);
+
 apiRouter.post("/search/companies", firestoreLimiter, heavyOperationsLimiter, searchCompanies);
 apiRouter.use("/stats", statsRouter);
 apiRouter.use("/dashboard", dashboardRouter);
@@ -399,7 +395,7 @@ apiRouter.use("/reports", reportsRouter);
 apiRouter.use("/verification", verificationRouter);
 apiRouter.use("/favorites", favoritesRouter);
 apiRouter.use("/analytics", analyticsRouter);
-apiRouter.use("/telemetry", telemetryRouter);
+
 apiRouter.use("/system", systemRouter);
 
 // Frontend error logging (used by entry-client.tsx window.onerror handler)
@@ -435,9 +431,8 @@ apiRouter.post("/logs", async (req, res) => {
 });
 
 apiRouter.use("/messages", messagesRouter);
-apiRouter.use("/construction", firestoreLimiter, constructionRouter);
+
 apiRouter.use("/calendar", calendarRouter);
 
 // System Maintenance
 apiRouter.post("/housekeeping/cleanup", adminTriggerLimiter, runCleanup);
-apiRouter.post("/housekeeping/sitemap", adminTriggerLimiter, runSitemapRebuild);

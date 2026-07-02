@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { HousekeepingService } from "../services/housekeeping.service.ts";
-import { sitemapWorkerService } from "../services/sitemap.worker.ts";
 import { env } from "../config/env.ts";
 
 
@@ -10,7 +9,6 @@ export const runCleanup = async (
   next: NextFunction,
 ) => {
   try {
-    // Allow if valid CRON_KEY (Cloud Scheduler) OR if authenticated admin
     const hasCronKey = env.CRON_KEY && req.headers['x-cron-key'] === env.CRON_KEY;
     const isAdmin = req.user?.isAdmin === true;
     if (!hasCronKey && !isAdmin) {
@@ -28,32 +26,6 @@ export const runCleanup = async (
       archive: archiveResult,
       reconcile: reconcileResult,
       algolia: { disabled: true },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const runSitemapRebuild = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    // Ovo može biti okinuto preko Cloud Scheduler-a svaka 4 sata.
-    // Okidamo redom sve globalne sitemape da izbegnemo paralelni overload.
-    const { category } = req.body;
-
-    // Ukoliko je payload kategorija, regenerisi nju. Ako ne, regenerisi sve.
-    await sitemapWorkerService.triggerRegeneration({
-      trigger: "CRON_SCHEDULED_REBUILD",
-      category: category,
-    });
-
-    res.json({
-      success: true,
-      message: "Sitemap regeneration job queued successfully",
-      category: category || "ALL",
     });
   } catch (error) {
     next(error);

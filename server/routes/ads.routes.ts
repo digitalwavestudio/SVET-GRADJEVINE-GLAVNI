@@ -241,76 +241,8 @@ adsRouter.get(
 
 // Batch ads
 adsRouter.post("/batch", getAdsBatch);
-
 // Get single ad
 adsRouter.get("/:id", getAdById);
-
-// Get sync status
-adsRouter.get("/:id/sync-status", authMiddleware, async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { category } = req.query;
-    const { ReconciliationService } = await import("../services/reconciliation.service.ts");
-    const status = await ReconciliationService.getSyncStatus(id, category as string);
-    res.json(status);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// Get ad optimization suggestions (Lazy computed to avoid N+1 Gemini API abuse)
-adsRouter.get("/:id/optimization-suggestion", authMiddleware, async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const user = req.user;
-    if (!user) {
-      return res.status(401).json({ error: "Niste prijavljeni." });
-    }
-
-    // Protect with RateLimiter to prevent DDoS/Quota abuse
-    const { RateLimiterService } = await import("../services/rate-limiter.service.ts");
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown";
-    const ipStr = Array.isArray(ip) ? ip[0] : ip;
-    const allowed = await RateLimiterService.isAllowed(`opt_suggestion:${user.uid || ipStr}`, 5, 60); // 5 calls per minute
-    if (!allowed) {
-      return res.status(429).json({ error: "Previše zahteva za AI optimizaciju. Sačekajte trenutak." });
-    }
-
-    // Fetch the ad details securely
-    const { UnifiedAdsService } = await import("../services/unified-ads.service.ts");
-    const ad = await UnifiedAdsService.getAdById("", id);
-    if (!ad) {
-      return res.status(404).json({ error: "Oglas nije pronađen." });
-    }
-
-    // Ensure user owns the ad or is admin for security (Ad Contract Alignment)
-    if (ad.authorId !== user.uid && !user.isAdmin) {
-      return res.status(403).json({ error: "Nemate dozvolu za analizu ovog oglasa." });
-    }
-
-    // Compute status mathematically first
-    const { PredictiveAnalyticsService } = await import("../services/predictive.service.ts");
-    const health = await PredictiveAnalyticsService.calculateAdHealth(ad);
-
-    if (health.status === "healthy") {
-      return res.json({
-        id,
-        status: "healthy",
-        suggestion: "Vaš oglas ima optimalne performanse i ne zahteva dodatne preporuke. Odličan rad!"
-      });
-    }
-
-    // Lazy load the suggestion
-    const suggestion = await PredictiveAnalyticsService.getAiOptimizationSuggestion(ad, health.status);
-    res.json({
-      id,
-      status: health.status,
-      suggestion
-    });
-  } catch (err) {
-    next(err);
-  }
-});
 
 // Update single ad
 adsRouter.patch(
