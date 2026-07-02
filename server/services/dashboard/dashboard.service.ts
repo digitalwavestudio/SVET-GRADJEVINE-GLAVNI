@@ -18,9 +18,7 @@ import {
 
 import { getErrorMessage } from "../../utils/error-handler.ts";
 
-import { DashboardAdminService } from "./dashboard-admin.service.ts";
-import { DashboardEmployerService } from "./employer-dashboard.service.ts";
-import { DashboardSmartMatchService, UserMatchProfile } from "./dashboard-matches.service.ts";
+import { UserMatchProfile } from "./dashboard-matches.service.ts";
 import { ApplicationItemDTO } from "../../dto/dashboard.dto.ts";
 
 // Proxy re-export for backward compatibility
@@ -317,29 +315,4 @@ export class DashboardService {
     this.getEmployerStats(uid).catch((e: any) => logger.warn("[DashboardService] Refresh employer stats:", e));
   }
 
-  // --- Proxied Methods ---
-
-  static async getAdminStats() {
-    return DashboardAdminService.getAdminStats();
-  }
-
-  static async getChartData() {
-    return DashboardAdminService.getChartData();
-  }
-
-  static async getHousekeepingStatus() {
-    return DashboardAdminService.getHousekeepingStatus();
-  }
-
-  static async getEmployerStats(uid: string) {
-    return DashboardEmployerService.getEmployerStats(uid);
-  }
-
-  static async getEmployerTrends(uid: string) {
-    return DashboardEmployerService.getEmployerTrends(uid);
-  }
-
-  static async getSmartMatches(user: UserMatchProfile) {
-    return DashboardSmartMatchService.getSmartMatches(user);
-  }
 }

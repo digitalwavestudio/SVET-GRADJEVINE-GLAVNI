@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { DashboardService } from "../services/dashboard/dashboard.service.ts";
+import { DashboardAdminService } from "../services/dashboard/dashboard-admin.service.ts";
+import { DashboardEmployerService } from "../services/dashboard/employer-dashboard.service.ts";
+import { DashboardSmartMatchService } from "../services/dashboard/dashboard-matches.service.ts";
 
 export const getStats = async (
   req: Request,
@@ -14,18 +16,18 @@ export const getStats = async (
       req.user.isAdmin;
 
     if (isAdmin) {
-      const stats = await DashboardService.getAdminStats();
-      const chartData = await DashboardService.getChartData();
+      const stats = await DashboardAdminService.getAdminStats();
+      const chartData = await DashboardAdminService.getChartData();
       return res.json({ ...stats, chartData });
     }
 
     if (req.user.role === "poslodavac" || req.user.role === "COMPANY") {
-      const stats = await DashboardService.getEmployerStats(req.user.uid);
+      const stats = await DashboardEmployerService.getEmployerStats(req.user.uid);
       return res.json(stats);
     }
 
     if (req.user.role === "majstor" || req.user.role === "MASTER") {
-      const stats = await DashboardService.getSmartMatches(req.user);
+      const stats = await DashboardSmartMatchService.getSmartMatches(req.user);
       return res.json({ smartMatches: stats });
     }
 
