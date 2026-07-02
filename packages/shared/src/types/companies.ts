@@ -17,7 +17,6 @@ export interface Company extends BaseEntity {
   website?: string;
   logo?: string;
   coverImage?: string;
-  employeeCount?: string;
   authorId: string;
   isVerified?: boolean;
   isPremium?: boolean;

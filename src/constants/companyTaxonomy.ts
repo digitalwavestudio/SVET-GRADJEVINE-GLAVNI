@@ -57,10 +57,4 @@ export const COMPANY_SUB_CATEGORIES: Record<string, string[]> = {
   ]
 };
 
-export const COMPANY_EMPLOYEE_RANGES = [
-  { id: '1-5', name: '1 - 5 zaposlenih' },
-  { id: '6-15', name: '6 - 15 zaposlenih' },
-  { id: '16-50', name: '16 - 50 zaposlenih' },
-  { id: '51-200', name: '51 - 200 zaposlenih' },
-  { id: '201+', name: 'Preko 200 zaposlenih' }
-];
+

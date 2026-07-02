@@ -24,7 +24,50 @@ import { JobTransformer, RawJobInput } from "../bff/job.transformer.ts";
 
 
 const l1HomepageCache = new Map<string, { data: HomepageDataResult; expiry: number }>();
-const L1_HOMEPAGE_TTL = 30_000; // 30s in-memory cache
+const L1_HOMEPAGE_TTL = 300_000; // 5min in-memory cache
+
+let lastFastPathWrite = 0;
+const FAST_PATH_DEBOUNCE = 300_000; // 5min debounce
+
+async function computeAndSaveFastPath(result: HomepageDataResult) {
+  const now = Date.now();
+  if (now - lastFastPathWrite < FAST_PATH_DEBOUNCE) return;
+  lastFastPathWrite = now;
+
+  try {
+    const {
+      premiumJobs,
+      urgentJobs,
+      latestJobs,
+      latestMachines,
+      latestRealEstate,
+      latestAccommodations,
+      latestCaterings,
+      latestArticles,
+      stats,
+    } = result;
+
+    const safeData = {
+      homepage: {
+        success: true,
+        stats,
+        premiumJobs: premiumJobs || [],
+        urgentJobs: urgentJobs || [],
+        latestJobs: latestJobs || [],
+        latestMachines: latestMachines || [],
+        latestRealEstate: latestRealEstate || [],
+        latestAccommodations: latestAccommodations || [],
+        latestCaterings: latestCaterings || [],
+        latestArticles: latestArticles || [],
+      },
+      updatedAt: new Date().toISOString(),
+    };
+
+    await db.doc("metadata/homepage_fastpath").set(safeData, { merge: true });
+  } catch (err) {
+    console.warn("[BFF] Fast-Path write failed (non-blocking):", (err as Error).message);
+  }
+}
 
 export function clearL1HomepageCache() {
   l1HomepageCache.clear();
@@ -48,10 +91,32 @@ export const bffService = {
       const { CacheService } = await import("./cache.service.ts");
       const redisCached = await CacheService.get<HomepageDataResult>(cacheKey);
       if (redisCached) {
-        l1HomepageCache.set(cacheKey, { data: redisCached, expiry: Date.now() + L1_HOMEPAGE_TTL });
+          l1HomepageCache.set(cacheKey, { data: redisCached, expiry: Date.now() + L1_HOMEPAGE_TTL });
         return redisCached;
       }
     } catch {}
+
+    // ── Fast-Path: instant čitanje iz Firestore dokumenta (0 queries za homepage) ──
+    try {
+      const fpSnap = await db.doc("metadata/homepage_fastpath").get();
+      if (fpSnap.exists) {
+        const fpData = fpSnap.data()?.homepage as HomepageDataResult | undefined;
+        if (fpData?.latestJobs?.length) {
+          // Fast-Path ima validne podatke — vraćamo odmah
+          l1HomepageCache.set(cacheKey, { data: fpData, expiry: Date.now() + L1_HOMEPAGE_TTL });
+          // Redis keš za sledeći put
+          try {
+            const { CacheService } = await import("./cache.service.ts");
+            await CacheService.set(cacheKey, fpData, 300000).catch(() => {});
+          } catch {}
+          return fpData;
+        }
+      }
+    } catch (fpErr) {
+      // Fast-Path nije dostupan — nastavi sa punim upitom
+      console.warn("[BFF] Fast-Path read failed, falling back to full query:", (fpErr as Error).message);
+    }
+    // ── Kraj Fast-Path-a ──
 
     const [
       globalStats,
@@ -260,6 +325,8 @@ export const bffService = {
         await CacheService.set(cacheKey, result, 300000).catch(() => {});
       } catch {}
     }
+
+    computeAndSaveFastPath(result);
 
     return result;
   },

@@ -588,11 +588,9 @@ export function getRawRedis(): Redis | null {
       },
     });
 
-    client.on("connect", async () => {
+    client.on("connect", () => {
       isRedisDown = false;
-      try {
-        await client.config("SET", "maxmemory-policy", "allkeys-lru");
-      } catch (err: unknown) { /* intentionally empty */ }
+      client.config("SET", "maxmemory-policy", "noeviction").catch(() => {});
     });
 
     client.on("error", (err: Error & { code?: string | number }) => {

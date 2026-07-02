@@ -249,7 +249,7 @@ export class AlgoliaSync {
       "kategorija", "potkategorija", "skills", "profession", "professionSlug", "beds", "roomType",
       "parkingAvailable", "invoiceAvailable", "cuisine", "machineType", "condition", "adType",
       "categoryId", "fuelType", "weightKg", "area", "purpose", "brand", "model", "city",
-      "mainCategories", "employeeCount", "isVerified", "isPremiumPartner", "cateringType",
+      "mainCategories", "isVerified", "isPremiumPartner", "cateringType",
       "kitchenType", "dailyCapacityMeals", "minOrder", "accessRoad", "highwayAccess", "railAccess",
       "freeZone", "accommodationType", "tacnaLokacija", "areaM2", "viewsCount", "geopoint", "_geoloc",
     ];

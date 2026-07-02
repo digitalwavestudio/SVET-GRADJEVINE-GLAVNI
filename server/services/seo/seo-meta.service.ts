@@ -205,7 +205,7 @@ export class SEOMetaService {
       case "jobs":
         return `Ovaj poslovni oglas (ID: ${id}) objavljen ${date} nudi poziciju za "${title}" u mestu ${loc} za kompenzaciju: ${price}. ${contact} Kompanija: ${data.companyName || "nepoznata"}.`;
       case "companies":
-        return `Ovo je kompanija "${title}" (ID: ${id}) na lokaciji ${loc}. Adresa: ${data.address || "nije navedena"}. PIB: ${data.pib || "nije naveden"}. Zapošljava: ${data.employeeCount || "N/A"} radnika.`;
+        return `Ovo je kompanija "${title}" (ID: ${id}) na lokaciji ${loc}. Adresa: ${data.address || "nije navedena"}. PIB: ${data.pib || "nije naveden"}.`;
       case "plots":
         return `Ovaj oglas (ID: ${id}) objavljen ${date} nudi na prodaju građevinski plac "${title}" na lokaciji ${loc} po ceni od ${price}. ${contact}`;
       case "machines":
@@ -330,7 +330,6 @@ export class SEOMetaService {
       details = `
         <p itemprop="location"><strong>Lokacija:</strong> ${data.city || data.locationSlug || "Srbija"}</p>
         <p itemprop="address"><strong>Adresa:</strong> ${data.address || "N/A"}</p>
-        <p itemprop="numberOfEmployees"><strong>Broj Zaposlenih:</strong> ${data.employeeCount || "N/A"}</p>
         <p itemprop="taxID"><strong>PIB:</strong> ${data.pib || "N/A"}</p>
       `;
     } else if (

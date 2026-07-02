@@ -180,7 +180,6 @@ export const applyPayloadTransform = (selectedCategory: string | null, sData: Re
       companySubCats: sData.companySubCats || [],
       companyCoverage: sData.companyCoverage,
       companyCoverageValue: sData.companyCoverageValue,
-      companyEmployees: sData.companyEmployees || '1-10',
       companyPortfolioImages: sData.companyPortfolioImages || [],
       logo: sData.companyLogo,
       website: sData.companyWeb,

@@ -5,6 +5,23 @@ import { CacheService } from "../services/cache.service.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 import { logger } from "../utils/logger.ts";
 
+// Per-collection Firestore read tracking
+const collectionReads = new Map<string, number>();
+let metricsReported = false;
+
+function trackRead(collection: string, count: number) {
+  collectionReads.set(collection, (collectionReads.get(collection) || 0) + count);
+  if (!metricsReported) {
+    metricsReported = true;
+    setInterval(() => {
+      if (collectionReads.size === 0) return;
+      const snapshot = Object.fromEntries(collectionReads);
+      logger.info("[ReadMetrics] Firestore reads per collection (last 60s)", snapshot);
+      collectionReads.clear();
+    }, 60000);
+  }
+}
+
 export interface UserDTO {
   id?: string;
   uid?: string;
@@ -39,7 +56,9 @@ export interface UserStatsDTO {
 // Global Read-Budget Trackers (In-Memory per Node Process)
 let globalReadCount = 0;
 let windowStartTime = Date.now();
-const READ_BUDGET_LIMIT = 500; 
+// Povećano sa 500 na 2000 — 500 je bilo previše restriktivno za homepage sa 10+ upita
+// Konfigurabilno preko env var-a za fleksibilnost
+const READ_BUDGET_LIMIT = parseInt(process.env.FIRESTORE_READ_BUDGET || "2000", 10);
 const WINDOW_MS = 60000; // 1 minute window
 
 /**
@@ -89,6 +108,7 @@ export function createFirestoreLoader(collectionPath: string) {
                 .collection(collectionPath)
                 .where(FieldPath.documentId(), "in", chunk)
                 .get();
+              trackRead(collectionPath, chunk.length);
               return snap.docs;
             } catch (err) {
               logger.error(`[Dataloader] Generic Firestore query failed for ${collectionPath} chunk:`, err);
@@ -109,7 +129,7 @@ export function createFirestoreLoader(collectionPath: string) {
       }
     },
     {
-      batchScheduleFn: (callback) => setTimeout(callback, 30),
+      batchScheduleFn: (callback) => setTimeout(callback, 100),
     },
   );
 }
@@ -151,6 +171,7 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
                 .collection("users")
                 .where(FieldPath.documentId(), "in", chunk)
                 .get();
+              trackRead("users", chunk.length);
               snap.docs.forEach((doc) => {
                 const rawUser = { id: doc.id, ...doc.data() } as Record<string, unknown>;
                 const {
@@ -189,7 +210,7 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
     return keys.map((key) => fetchedUsers.get(key) || null);
   },
   {
-    batchScheduleFn: (callback) => setTimeout(callback, 30),
+    batchScheduleFn: (callback) => setTimeout(callback, 100),
   },
 );
 
@@ -229,6 +250,7 @@ export const internalUserLoader = new DataLoader<string, UserDTO | null>(
                 .collection("users")
                 .where(FieldPath.documentId(), "in", chunk)
                 .get();
+              trackRead("users", chunk.length);
               snap.docs.forEach((doc) => {
                 const data = { id: doc.id, uid: doc.id, ...doc.data() } as UserDTO;
                 fetchedUsers.set(doc.id, data);
@@ -246,7 +268,7 @@ export const internalUserLoader = new DataLoader<string, UserDTO | null>(
     return keys.map((key) => fetchedUsers.get(key) || null);
   },
   {
-    batchScheduleFn: (callback) => setTimeout(callback, 30),
+    batchScheduleFn: (callback) => setTimeout(callback, 100),
   },
 );
 
@@ -306,6 +328,7 @@ export const listingsLoader = new DataLoader<string, ListingDTO | null>(
                 .collection("listings")
                 .where(FieldPath.documentId(), "in", chunk)
                 .get();
+              trackRead("listings", chunk.length);
               snap.docs.forEach((doc) => {
                 const data = { id: doc.id, ...doc.data() } as ListingDTO;
                 fetchedListings.set(doc.id, data);
@@ -323,7 +346,7 @@ export const listingsLoader = new DataLoader<string, ListingDTO | null>(
     return keys.map((key) => fetchedListings.get(key) || null);
   },
   {
-    batchScheduleFn: (callback) => setTimeout(callback, 50),
+    batchScheduleFn: (callback) => setTimeout(callback, 100),
     cache: false,
   },
 );
@@ -364,6 +387,7 @@ export const userStatsLoader = new DataLoader<string, UserStatsDTO | null>(
                 .collection("user_stats")
                 .where(FieldPath.documentId(), "in", chunk)
                 .get();
+              trackRead("user_stats", chunk.length);
               snap.docs.forEach((doc) => {
                 const data = { id: doc.id, ...doc.data() } as UserStatsDTO;
                 fetchedStats.set(doc.id, data);
@@ -381,6 +405,6 @@ export const userStatsLoader = new DataLoader<string, UserStatsDTO | null>(
     return keys.map((key) => fetchedStats.get(key) || null);
   },
   {
-    batchScheduleFn: (callback) => setTimeout(callback, 30),
+    batchScheduleFn: (callback) => setTimeout(callback, 100),
   },
 );

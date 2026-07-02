@@ -8,6 +8,9 @@ import { LockManager } from "../lock.service.ts";
  */
 export class AdminStatsService {
   private static logger = new Logger({ service: "AdminStatsService" });
+
+  // L1 In-Memory cache za globalne statistike (30s TTL)
+  private static l1StatsCache: { data: Record<string, any>; expiry: number } | null = null;
   private static STATS_DOC_PATH = "metadata/global_stats";
   private static NUM_SHARDS = 10;
 
@@ -166,6 +169,11 @@ export class AdminStatsService {
   }
 
   static async getGlobalStats() {
+    // L1 In-Memory cache — instant, 0 reads
+    if (this.l1StatsCache && Date.now() < this.l1StatsCache.expiry) {
+      return this.l1StatsCache.data;
+    }
+
     const { getRedis } = await import("../../utils/redis.ts");
     const redis = getRedis();
     if (redis) {
@@ -202,6 +210,8 @@ export class AdminStatsService {
           if (redis) {
             await redis.set("admin_global_metrics:cache", JSON.stringify(d), "EX", 3600);
           }
+          // L1 in-memory cache: 30s — sprečava ponovno čitanje iz Firestore-a
+          this.l1StatsCache = { data: d, expiry: Date.now() + 30000 };
           console.log("[AdminStatsService] Served global stats from admin_stats document shield.");
           return d;
         }
@@ -238,6 +248,8 @@ export class AdminStatsService {
     // Cold Path Removal: Prohibiting sharded collection scans in runtime to protect Quota.
     // Stats must be reconciled by background services, never by user request.
     console.warn("[AdminStatsService] Cold-path sharded scan requested but prohibited. Returning fallback metrics.");
+    // L1 in-memory cache za fallback — 30s
+    this.l1StatsCache = { data: fallbackStats, expiry: Date.now() + 30000 };
     return fallbackStats;
   }
 

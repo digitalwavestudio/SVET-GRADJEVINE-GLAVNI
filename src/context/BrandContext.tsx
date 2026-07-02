@@ -29,8 +29,8 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         return null;
       }
     },
-    staleTime: 60 * 60 * 1000, // 1 hour
-    gcTime: 24 * 60 * 60 * 1000, // Keep in memory for 24h
+    staleTime: 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
   });
 
   const setLogoUrl = (url: string | null) => {

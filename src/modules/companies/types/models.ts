@@ -6,18 +6,13 @@ export interface Company extends BaseEntity {
   address: string;
   locationSlug: string;
   phone: string;
-  workingHours: string;
   description: string;
-  mainCategories: string[];
-  subCategories: string[];
-  coverageType: string;
-  coverageValue: string;
+  email?: string;
   instagram?: string;
   facebook?: string;
   website?: string;
   logo?: string;
   coverImage?: string;
-  employeeCount?: string;
   authorId: string;
   isVerified?: boolean;
   isPremium?: boolean;
@@ -25,12 +20,5 @@ export interface Company extends BaseEntity {
   isUrgent?: boolean;
   viewsCount?: number;
   images: string[];
-  
-  // Phase 2 Fields
   portfolioImages?: string[];
-  references?: string[];
-  licenses?: string[];
-  certifications?: string[];
-  equipmentSummary?: string;
-  teamSpecialties?: string[];
 }

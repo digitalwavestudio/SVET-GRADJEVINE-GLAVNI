@@ -14,7 +14,7 @@ import Spinner from '@/src/components/ui/Spinner';
 import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import DynamicSEO from '@/src/components/DynamicSEO';
-import { COMPANY_EMPLOYEE_RANGES, COMPANY_MAIN_CATEGORIES } from '@/src/constants/companyTaxonomy';
+import { COMPANY_MAIN_CATEGORIES } from '@/src/constants/companyTaxonomy';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterRadio, FilterSelect, FilterCTA, MarketStatsWidget, SortingBar } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
 import { APP_CONFIG } from '@/src/constants/config';
@@ -50,7 +50,6 @@ function CompaniesPage() {
       location: grad && grad !== 'all' ? grad : null,
       radius: searchParams.get('radius') ? Number(searchParams.get('radius')) : undefined,
       mainCategory: searchParams.get('cat') || null,
-      employeeCount: searchParams.get('size') || null,
       isPremiumPartner: searchParams.get('premium') === 'true' || undefined,
       isVerified: searchParams.get('verified') === 'true' || undefined
     };
@@ -71,7 +70,6 @@ function CompaniesPage() {
   const debouncedSearchQuery = useDebounce(searchQuery, 400);
   const [selectedMainCat, setSelectedMainCat] = useState<string | null>(searchParams.get('cat'));
   const [selectedLocation, setSelectedLocation] = useState<string>(grad || 'all');
-  const [selectedSize, setSelectedSize] = useState<string | null>(searchParams.get('size'));
   const [filterRadius, setFilterRadius] = useState(searchParams.get('radius') || '50');
   const [verifiedOnly, setVerifiedOnly] = useState(searchParams.get('verified') === 'true');
   const debouncedRadius = useDebounce(filterRadius, 500);
@@ -103,7 +101,6 @@ function CompaniesPage() {
     const desiredLoc = selectedLocation || 'all';
     const newParams = new URLSearchParams();
     if (selectedMainCat) newParams.set('cat', selectedMainCat);
-    if (selectedSize) newParams.set('size', selectedSize);
     if (filterRadius && filterRadius !== '50') newParams.set('radius', filterRadius);
     if (activeFilters.isPremiumPartner) newParams.set('premium', 'true');
     if (verifiedOnly) newParams.set('verified', 'true');
@@ -121,7 +118,7 @@ function CompaniesPage() {
         setSearchParams(newParams, { preventScrollReset: true });
       }
     }
-  }, [selectedLocation, selectedMainCat, selectedSize, filterRadius, activeFilters.isPremiumPartner, searchParams, navigate, setSearchParams]);
+  }, [selectedLocation, selectedMainCat, filterRadius, activeFilters.isPremiumPartner, searchParams, navigate, setSearchParams]);
 
   // Auto apply filters - strictly guarded to prevent loops
   useEffect(() => {
@@ -129,7 +126,6 @@ function CompaniesPage() {
 
     const currentLoc = grad || 'all';
     const currentCat = searchParams.get('cat') || '';
-    const currentSize = searchParams.get('size') || '';
     const currentRadius = searchParams.get('radius') || '50';
     const currentPremium = searchParams.get('premium') === 'true';
     const currentVerified = searchParams.get('verified') === 'true';
@@ -141,7 +137,6 @@ function CompaniesPage() {
       selectedLocation !== currentLoc ||
       selectedMainCat !== (currentCat || null) ||
       debouncedRadius !== currentRadius ||
-      selectedSize !== (currentSize || null) ||
       isPremiumActive !== currentPremium ||
       verifiedOnly !== currentVerified;
 
@@ -153,7 +148,6 @@ function CompaniesPage() {
   }, [
     selectedMainCat, 
     selectedLocation, 
-    selectedSize, 
     debouncedRadius, 
     activeFilters.isPremiumPartner, 
     verifiedOnly,
@@ -168,13 +162,11 @@ function CompaniesPage() {
 
     const loc = grad || 'all';
     const cat = searchParams.get('cat') || null;
-    const size = searchParams.get('size') || null;
     const rad = searchParams.get('radius') || '50';
     const ver = searchParams.get('verified') === 'true';
 
     if (loc !== selectedLocation) setSelectedLocation(loc);
     if (cat !== selectedMainCat) setSelectedMainCat(cat);
-    if (size !== selectedSize) setSelectedSize(size);
     if (rad !== filterRadius) setFilterRadius(rad);
     if (ver !== verifiedOnly) setVerifiedOnly(ver);
   }, [searchParams, grad]);
@@ -262,13 +254,12 @@ function CompaniesPage() {
             </FilterSection>
 
             {/* Clear All Button */}
-            {(selectedMainCat || (selectedLocation && selectedLocation !== 'all') || selectedSize || filterRadius !== '50' || verifiedOnly) && (
+            {(selectedMainCat || (selectedLocation && selectedLocation !== 'all') || filterRadius !== '50' || verifiedOnly) && (
               <FilterClearButton 
                 onClick={() => {
                   setSelectedMainCat(null);
                   setSelectedLocation('all');
                   setFilterRadius('50');
-                  setSelectedSize(null);
                   setVerifiedOnly(false);
                   setSearchParams(new URLSearchParams(), { preventScrollReset: true });
                 }}
@@ -314,16 +305,7 @@ function CompaniesPage() {
               </div>
             </FilterSection>
 
-            {/* Company Size */}
-            <FilterSection title="Broj Zaposlenih">
-              <FilterSelect
-                value={selectedSize || ''}
-                onChange={(e) => setSelectedSize(e.target.value || null)}
-              >
-                <option value="" className="bg-[#111a22]">Svi kapaciteti</option>
-                {COMPANY_EMPLOYEE_RANGES.map(range => <option key={range.id} value={range.id} className="bg-[#111a22]">{range.name}</option>)}
-              </FilterSelect>
-            </FilterSection>
+
 
             
 
@@ -444,26 +426,6 @@ function CompaniesPage() {
                           </div>
 
                           <p className="text-white/60 text-xs mb-6 line-clamp-2 leading-relaxed font-medium">{company.description}</p>
-
-                          {/* Professional Specs Grid */}
-                          <div className="grid grid-cols-2 gap-3 mb-6 mt-auto">
-                             <div className="bg-white/[0.02] p-3.5 rounded-lg border border-white/5 transition-colors group-hover:bg-white/[0.04]">
-                               <span className="block text-[8px] font-black uppercase tracking-widest text-white/30 mb-2 flex items-center gap-1.5">
-                                 <span className="material-symbols-outlined text-[10px]">public</span> Pokrivenost
-                               </span>
-                               <span className="block text-xs font-bold text-white">
-                                 {company.coverageType === 'national' ? 'Cela Srbija' : 'Regionalno'}
-                               </span>
-                             </div>
-                             <div className="bg-white/[0.02] p-3.5 rounded-lg border border-white/5 transition-colors group-hover:bg-white/[0.04]">
-                               <span className="block text-[8px] font-black uppercase tracking-widest text-white/30 mb-2 flex items-center gap-1.5">
-                                 <span className="material-symbols-outlined text-[10px]">group</span> Resursi
-                               </span>
-                               <span className="block text-xs font-bold text-white">
-                                 {COMPANY_EMPLOYEE_RANGES.find(r => r.id === company.employeeCount)?.name || 'N/A'}
-                               </span>
-                             </div>
-                          </div>
 
                           {/* Action Module */}
                           <div className="pt-5 border-t border-white/5 flex items-center justify-between">

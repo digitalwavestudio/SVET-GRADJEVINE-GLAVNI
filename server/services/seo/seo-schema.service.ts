@@ -58,7 +58,6 @@ export interface SEOEntityData {
   role?: string;
   email?: string;
   contact?: string;
-  employeeCount?: string | number;
   industry?: string;
   status?: string;
   viewsCount?: number;

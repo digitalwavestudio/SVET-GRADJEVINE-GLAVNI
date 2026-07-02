@@ -27,7 +27,10 @@ const normalizeCompany = (c: any): Company => {
     website: c.website || c.companyWeb || '',
     facebook: c.facebook || c.companyFB || '',
     instagram: c.instagram || c.companyIG || '',
-    workingHours: c.workingHours || c.companyWorkingHours || '',
+    locationSlug: c.locationSlug || c.location || '',
+    email: c.email || '',
+    coverImage: c.coverImage || '',
+    isPremiumPartner: c.isPremiumPartner === true,
   } as Company;
 };
 

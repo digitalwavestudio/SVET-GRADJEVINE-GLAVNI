@@ -104,7 +104,6 @@ export interface FormDataState {
   companyName: string;
   companyPIB: string;
   companyAddress: string;
-  companyEmployees: string;
   companyFoundedYear: string;
   companyDescription: string;
   companyWorkingHours: string;

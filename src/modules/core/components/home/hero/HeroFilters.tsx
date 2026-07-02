@@ -18,10 +18,7 @@ import {
   MARKETPLACE_CATEGORIES,
 } from "@/src/constants/taxonomy";
 import { MACHINE_CATEGORIES } from "@/src/constants/machineTaxonomy";
-import {
-  COMPANY_MAIN_CATEGORIES,
-  COMPANY_EMPLOYEE_RANGES,
-} from "@/src/constants/companyTaxonomy";
+import { COMPANY_MAIN_CATEGORIES } from "@/src/constants/companyTaxonomy";
 import { HeroTabType } from "@/src/modules/core/hooks/useHeroSearch";
 
 interface HeroFiltersProps {
@@ -147,17 +144,6 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
                   placeholder="Svi sektori poslovanja"
                   icon={<Building2 size={20} />}
                   label="Sektor Firme"
-                />
-                <CustomSelect
-                  value={selectedSize}
-                  onChange={setSelectedSize}
-                  options={COMPANY_EMPLOYEE_RANGES.map((s: any) => ({
-                    value: s.id,
-                    label: s.name,
-                  }))}
-                  placeholder="Sve veličine"
-                  icon={<Users size={20} />}
-                  label="Veličina Firme"
                 />
                 <CustomSelect
                   value={selectedLocation}

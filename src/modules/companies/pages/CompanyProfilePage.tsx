@@ -1,14 +1,10 @@
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { RelatedSEO } from '@/src/components/RelatedSEO';
+import { motion } from 'motion/react';
 import SeoHead from '@/src/components/SeoHead';
-import ThemeToggle from '@/src/components/ThemeToggle';
-import { COMPANY_EMPLOYEE_RANGES } from '@/src/constants/companyTaxonomy';
-import { MACHINE_CATEGORIES } from '@/src/constants/machineTaxonomy';
-import { KITCHEN_TYPES, LOCATIONS } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
 import { useTrackView } from '@/src/hooks/useTrackView';
+import { OptimizedImage } from '@/src/components/OptimizedImage';
 
 import { useCompanyDetails, useCompanyAdMutations } from '@/src/modules/companies/hooks/useCompanies';
 import { useJobs } from '@/src/modules/jobs';
@@ -16,25 +12,15 @@ import { useMachinesList } from '@/src/modules/machines';
 import { useAccommodationsList } from '@/src/modules/accommodations';
 import { useCateringList } from '@/src/modules/catering';
 import { useRealEstateList } from '@/src/modules/real_estate';
-import { useAuthorCounts } from '@/src/hooks/useCollectionStats';
-
-type ProfileTab = 'info' | 'jobs' | 'machines' | 'accommodations' | 'catering' | 'realestate';
 
 import { generateLocalBusinessSchema, generateBreadcrumbSchema } from '@/src/lib/seoSchema';
 import { APP_CONFIG } from '@/src/constants/config';
-import {
-  getAccommodationLink,
-  getCateringLink,
-  getJobLink,
-  getMachineLink,
-  getPlotLink,
-  getUserLink
-} from '@/src/lib/routeFilters';
+import { LOCATIONS } from '@/src/constants/taxonomy';
 import { CompanyHeroSection } from '@/src/modules/companies/components/company/CompanyHeroSection';
 import { CompanyInfoTab } from '@/src/modules/companies/components/company/CompanyInfoTab';
 import { CompanyAdsTabsContent } from '@/src/modules/companies/components/company/CompanyAdsTabsContent';
 import { CompanySidebar } from '@/src/modules/companies/components/company/CompanySidebar';
-import { CompanyNavigationTabs } from '@/src/modules/companies/components/company/CompanyNavigationTabs';
+
 
 export default function CompanyProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -43,8 +29,6 @@ export default function CompanyProfilePage() {
   const { user } = useAuth();
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const { updateCompanyAd } = useCompanyAdMutations();
-
-  const { data: authorCounts } = useAuthorCounts(company?.authorId, id);
 
   const { data: jobsData, isLoading: jobsLoading } = useJobs({ authorId: company?.authorId }, { enabled: !!company?.authorId });
   const { data: machinesData, isLoading: machinesLoading } = useMachinesList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
@@ -113,7 +97,7 @@ export default function CompanyProfilePage() {
       />
       
       {isAdmin && company && (
-        <div className="bg-slate-900 border-b border-white/10 p-3 relative z-50">
+        <div className="bg-slate-900 border-b border-white/10 p-3 relative z-50 mt-24">
           <div className="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-white">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
@@ -147,81 +131,144 @@ export default function CompanyProfilePage() {
         </div>
       )}
       <main className="max-w-[1920px] mx-auto min-h-screen">
-        <CompanyHeroSection company={company} isTrackedInSession={isTrackedInSession} />
+        <CompanyHeroSection company={company} />
+
+        {/* Logo overlap - pola u heroju */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+          <div className="-mt-36 md:-mt-24 mb-4 md:mb-6">
+            <div className="relative w-fit">
+              <div className="w-24 h-24 md:w-52 md:h-52 bg-white p-2 md:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-[#0a111a] flex items-center justify-center overflow-hidden group">
+                {company.logo ? (
+                  <img width="800" height="600" decoding="async" src={company.logo} alt="Logo" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                ) : (
+                  <span className="text-3xl md:text-7xl font-black text-gray-200">{company.name?.charAt(0) || 'C'}</span>
+                )}
+              </div>
+              {company.isPremiumPartner && (
+                <div className="absolute -top-2 -right-2 md:-top-4 md:-right-4 w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-secondary to-yellow-500 rounded-full border-4 border-[#0a111a] flex items-center justify-center shadow-[0_0_20px_rgba(254,191,13,0.4)]" title="Premium Partner">
+                  <span className="material-symbols-outlined !text-black font-black text-sm md:text-lg">stars</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+            <div className="mb-4 md:mb-6">
+            <h1 id="company-title" className="text-3xl md:text-6xl lg:text-7xl font-black font-headline tracking-tight uppercase leading-none text-white">
+              {company.name}
+            </h1>
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+              {company.isVerified ? (
+                <span className="px-4 py-1.5 bg-gradient-to-r from-green-500/15 to-emerald-500/10 border border-green-500/25 text-green-400 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.15)]">
+                  <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                  Verifikovan Partner
+                </span>
+              ) : (
+                <span className="px-4 py-1.5 bg-white/5 border border-white/10 text-white/60 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[14px]">pending</span>
+                  Profil u obradi
+                </span>
+              )}
+              <span className="px-4 py-1.5 bg-white/5 border border-white/10 text-white/60 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-2">
+                <span className="material-symbols-outlined text-[14px]">location_on</span>
+                {LOCATIONS.find(l => l.slug === company.locationSlug)?.name || 'Srbija'}, Srbija
+              </span>
+            </div>
+            {company.website && (
+              <a href={company.website.startsWith('http') ? company.website : `https://${company.website}`}
+                 target="_blank" rel="noreferrer"
+                 className="block mt-3 text-blue-400 hover:text-blue-300 text-base md:text-lg font-bold transition-colors">
+                {company.website.replace(/^https?:\/\//, '')}
+              </a>
+            )}
+            {company.email && (
+              <a href={`mailto:${company.email}`} className="block mt-1 text-white/70 hover:text-white text-sm md:text-base font-medium transition-colors">
+                {company.email}
+              </a>
+            )}
+            <div className="flex flex-wrap items-center gap-4 mt-2">
+              {company.facebook && (
+                <a href={company.facebook} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-bold transition-colors">
+                  <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>globe</span>
+                  Facebook
+                </a>
+              )}
+              {company.instagram && (
+                <a href={company.instagram} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-pink-400 hover:text-pink-300 text-sm font-bold transition-colors">
+                  <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>globe</span>
+                  Instagram
+                </a>
+              )}
+            </div>
+            <div className="flex items-center gap-3 mt-4 text-white/40 text-[10px] font-bold uppercase tracking-[0.15em]">
+              <span className="material-symbols-outlined text-[#38bdf8] text-base">visibility</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Pregleda: <span className="text-white">{(company.viewsCount || 0) + (isTrackedInSession ? 1 : 0)}</span></span>
+            </div>
+          </div>
+        </div>
 
         {/* PAGE CONTENT */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 lg:py-16">
-          <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-12 lg:gap-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-2 lg:py-8">
+          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16">
             
             {/* MAIN CONTENT COLUMN (8 cols) */}
             <article className="lg:col-span-8 space-y-12" aria-labelledby="company-title">
               <CompanyInfoTab company={company} />
-
-              {(activeJobs.length > 0 || jobsLoading) && (
-                 <CompanyAdsTabsContent 
-                   activeTab="jobs"
-                   activeJobs={activeJobs}
-                   activeMachines={activeMachines}
-                   activeAccommodations={activeAccommodations}
-                   activeCaterings={activeCaterings}
-                   activePlots={activePlots}
-                   isLoadingCurrentTab={jobsLoading}
-                 />
-              )}
-
-              {(activeMachines.length > 0 || machinesLoading) && (
-                 <CompanyAdsTabsContent 
-                   activeTab="machines"
-                   activeJobs={activeJobs}
-                   activeMachines={activeMachines}
-                   activeAccommodations={activeAccommodations}
-                   activeCaterings={activeCaterings}
-                   activePlots={activePlots}
-                   isLoadingCurrentTab={machinesLoading}
-                 />
-              )}
-
-              {(activeAccommodations.length > 0 || accLoading) && (
-                 <CompanyAdsTabsContent 
-                   activeTab="accommodations"
-                   activeJobs={activeJobs}
-                   activeMachines={activeMachines}
-                   activeAccommodations={activeAccommodations}
-                   activeCaterings={activeCaterings}
-                   activePlots={activePlots}
-                   isLoadingCurrentTab={accLoading}
-                 />
-              )}
-
-              {(activeCaterings.length > 0 || catLoading) && (
-                 <CompanyAdsTabsContent 
-                   activeTab="catering"
-                   activeJobs={activeJobs}
-                   activeMachines={activeMachines}
-                   activeAccommodations={activeAccommodations}
-                   activeCaterings={activeCaterings}
-                   activePlots={activePlots}
-                   isLoadingCurrentTab={catLoading}
-                 />
-              )}
-
-              {(activePlots.length > 0 || plotsLoading) && (
-                 <CompanyAdsTabsContent 
-                   activeTab="realestate"
-                   activeJobs={activeJobs}
-                   activeMachines={activeMachines}
-                   activeAccommodations={activeAccommodations}
-                   activeCaterings={activeCaterings}
-                   activePlots={activePlots}
-                   isLoadingCurrentTab={plotsLoading}
-                 />
-              )}
             </article>
 
             {/* SIDEBAR COLUMN (4 cols) */}
             <aside className="lg:col-span-4" aria-label="Company Details Sidebar">
               <CompanySidebar company={company} />
             </aside>
+          </div>
+
+          {/* Portfolio - full width */}
+          {(() => {
+            const pfImages = (company as any).portfolioImages || (company as any).companyPortfolioImages || [];
+            return (
+              <section className="mt-10 md:mt-16 space-y-6 md:space-y-8">
+                <div className="flex items-center justify-between">
+                   <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-secondary to-yellow-600 font-headline">Portfolio</h2>
+                   <div className="h-px flex-1 bg-white/5 mx-8 hidden md:block"></div>
+                </div>
+                {pfImages.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    {pfImages.map((img: string, idx: number) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        className="group relative aspect-square rounded-[10px] overflow-hidden border border-white/10 shadow-2xl"
+                      >
+                        <OptimizedImage
+                          src={img}
+                          fallbackType="company"
+                          alt={`Portfolio slika ${idx + 1}`}
+                          className="w-full h-full object-cover relative z-10 transition-transform duration-700 group-hover:scale-110"
+                          containerClassName="w-full h-full"
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-surface-container-lowest p-8 md:p-12 rounded-[10px] border border-white/5 text-center w-full flex flex-col items-center justify-center min-h-[200px] md:min-h-[350px]">
+                    <span className="material-symbols-outlined text-white/10 text-4xl md:text-6xl mb-3 md:mb-4" style={{ fontVariationSettings: '"FILL" 1' }}>photo_library</span>
+                    <h3 className="font-black text-lg md:text-2xl text-white/50 mb-2 uppercase tracking-tighter">Firma nije postavila slike svojih radova.</h3>
+                  </div>
+                )}
+              </section>
+            );
+          })()}
+
+          {/* Svi oglasi - full width */}
+          <div className="mt-10 md:mt-16">
+            <CompanyAdsTabsContent
+              activeJobs={activeJobs}
+              activeMachines={activeMachines}
+              activeAccommodations={activeAccommodations}
+              activeCaterings={activeCaterings}
+              activePlots={activePlots}
+              isLoading={isLoadingCurrentTab}
+            />
           </div>
         </div>
       </main>

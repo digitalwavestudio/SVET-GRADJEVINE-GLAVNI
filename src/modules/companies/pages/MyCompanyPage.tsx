@@ -1,12 +1,14 @@
 import { motion } from 'motion/react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DashboardLayout } from '@/src/modules/core';
 import { LOCATIONS } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
-import { useCompaniesList, useCompanyAdMutations } from '@/src/modules/companies/hooks/useCompanies';
+import { useCompanyDetails, useCompaniesList, useCompanyAdMutations } from '@/src/modules/companies/hooks/useCompanies';
 import { Company as CompanyAd } from '@/src/modules/companies/types/models';
 import { uploadImageDirectly } from '@/src/lib/imageCompressor';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
+import { db } from '@/src/lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -33,8 +35,18 @@ type CompanyFormValues = z.infer<typeof companySchema>;
 export default function MyCompanyPage() {
   const { user, updateUser } = useAuth();
   
-  const { data: companiesData, isLoading: loading } = useCompaniesList({ authorId: user?.id } as any);
-  const companies = companiesData?.pages.flatMap(page => page?.items || []) || [];
+  const storedCompanyId = (user?.businessProfile as any)?.companyId;
+
+  const { data: companyById, isLoading: loadingById } = useCompanyDetails(storedCompanyId);
+  const { data: companiesData, isLoading: loadingSearch } = useCompaniesList(
+    !storedCompanyId && user?.id ? { authorId: user?.id } as any : null,
+    (storedCompanyId || !user?.id) ? { enabled: false } as any : undefined
+  );
+
+  const isLoading = storedCompanyId ? loadingById : loadingSearch;
+  const companies = storedCompanyId
+    ? (companyById ? [companyById] : [])
+    : (companiesData?.pages.flatMap(page => page?.items || []) || []);
   
   const { addCompanyAd, updateCompanyAd } = useCompanyAdMutations();
 
@@ -73,35 +85,64 @@ export default function MyCompanyPage() {
 
   const hasInitializedRef = useRef(false);
 
+  const prefillForm = useCallback((company: any) => {
+    hasInitializedRef.current = true;
+    setCompanyData(company);
+    reset({
+      name: company.name || '',
+      pib: company.pib || '',
+      locationSlug: company.locationSlug || '',
+      phone: company.phone || '',
+      description: company.description || '',
+      instagram: company.instagram || '',
+      facebook: company.facebook || '',
+      website: company.website || '',
+      logo: company.logo || '',
+      coverImage: company.coverImage || '',
+      companyPortfolioImages: company.portfolioImages || [],
+    });
+  }, [reset]);
+
   useEffect(() => {
-    if (user && !loading && !hasInitializedRef.current) {
+    if (user && !isLoading && !hasInitializedRef.current) {
       const existing = companies.find((c: any) => c.authorId === user.id);
       if (existing) {
-        hasInitializedRef.current = true;
-        setCompanyData(existing);
-        reset({
-          name: existing.name || '',
-          pib: existing.pib || '',
-          locationSlug: existing.locationSlug || '',
-          phone: existing.phone || '',
-          description: existing.description || '',
-          instagram: existing.instagram || '',
-          facebook: existing.facebook || '',
-          website: existing.website || '',
-          logo: existing.logo || '',
-          coverImage: existing.coverImage || '',
-          companyPortfolioImages: existing.portfolioImages || [],
-        });
-      } else {
+        prefillForm(existing);
+        return;
+      }
+      if (storedCompanyId) {
         hasInitializedRef.current = true;
         reset((prev: any) => ({
           ...prev,
           name: user.company || '',
           phone: user.phone || ''
         }));
+        return;
       }
+      (async () => {
+        try {
+          const q = query(
+            collection(db, 'listings'),
+            where('type', '==', 'company'),
+            where('status', '==', 'active'),
+            where('authorId', '==', user.id)
+          );
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            const doc = snap.docs[0];
+            prefillForm({ id: doc.id, ...doc.data() } as any);
+            return;
+          }
+        } catch (e) {}
+        hasInitializedRef.current = true;
+        reset((prev: any) => ({
+          ...prev,
+          name: user.company || '',
+          phone: user.phone || ''
+        }));
+      })();
     }
-  }, [user, companies, loading, reset]);
+  }, [user, companies, isLoading, reset, storedCompanyId, prefillForm]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -181,47 +222,42 @@ export default function MyCompanyPage() {
         ...data,
         type: 'company',
         authorId: user.id,
+        email: user.email || '',
         status: 'active',
-        isPremium: true,
         companyName: data.name,
         companyPIB: data.pib || '',
         companyDescription: data.description || '',
-        companyAddress: data.location || '',
+        companyAddress: data.locationSlug || '',
         portfolioImages: data.companyPortfolioImages,
         images: data.companyPortfolioImages || [],
         
-        // Postavljamo podrazumevane (prazne) vrednosti za zaostala legacy polja
         address: { street: '', city: '', country: '' },
-        workingHours: '',
-        mainCategories: [],
-        subCategories: [],
-        coverageType: 'local',
-        coverageValue: '',
-        coverImage: data.coverImage || '',
-        employeeCount: '1-5',
-        references: [],
-        licenses: [],
-        certifications: [],
-        teamSpecialties: [],
-        equipmentSummary: ''
+        coverImage: data.coverImage || ''
       };
+
+      let newCompanyId = companyData?.id || null;
 
       if (companyData && companyData.id) {
         await updateCompanyAd({ id: companyData.id, data: payload as any });
       } else {
-        await addCompanyAd(payload);
+        newCompanyId = await addCompanyAd(payload);
+        setCompanyData({ id: newCompanyId } as any);
       }
 
-      // Sync to Auth Profile
+      // Sync to Auth Profile (ukljucujuci companyId za direktan lookup)
       await updateUser({
         company: data.name,
         phone: data.phone,
         businessProfile: {
           ...user.businessProfile,
+          companyId: newCompanyId,
           companyName: data.name,
           logo: data.logo,
           coverImage: data.coverImage,
-          pib: data.pib
+          pib: data.pib,
+          instagram: data.instagram,
+          facebook: data.facebook,
+          website: data.website,
         } as any
       });
 
@@ -238,7 +274,7 @@ export default function MyCompanyPage() {
     }
   };
 
-  if (loading) return null;
+  if (isLoading) return null;
 
   return (
     <DashboardLayout>
