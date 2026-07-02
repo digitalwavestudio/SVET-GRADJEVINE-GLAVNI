@@ -1,6 +1,5 @@
 import { Logger } from "../utils/logger.ts";
 import { db } from "../config/firebase.ts";
-import { resolveGeoFallback } from "../utils/geocode.ts";
 import { ImageTransformer } from "../utils/image.transformer.ts";
 import { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import { CacheService } from "./cache.service.ts";
@@ -89,12 +88,7 @@ export class UnifiedSearchService {
 
     const targetedLoc = filters.locationSlug || filters.location;
     if (targetedLoc && targetedLoc !== "SVE") {
-      const resGeo = resolveGeoFallback(targetedLoc as string);
-      if (resGeo && resGeo.district && resGeo.district !== "srbija" && resGeo.district !== targetedLoc) {
-        q = q.where("locationSlug", "in", Array.from(new Set([targetedLoc, resGeo.district])));
-      } else {
-        q = q.where("locationSlug", "==", targetedLoc);
-      }
+      q = q.where("locationSlug", "==", targetedLoc);
     }
 
     if (filters.authorId) q = q.where("authorId", "==", filters.authorId);
@@ -143,7 +137,6 @@ export class UnifiedSearchService {
 
     try {
       const snap = await q.get();
-      console.log('UNIFIED SEARCH GOT SNAP.DOCS.LENGTH = ', snap.docs.length, ' FOR CATEGORY', category);
       const hasMore = snap.docs.length > pageSize;
       const actualDocs = hasMore ? snap.docs.slice(0, pageSize) : snap.docs;
 
