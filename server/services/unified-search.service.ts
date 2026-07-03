@@ -146,16 +146,16 @@ export class UnifiedSearchService {
     if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
     if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
-    // Get total count using Firestore aggregation (fast — no data download, uses existing composite index)
+    // Get total count — same as reconcileGlobalStats (all listings of given type, any status)
     let totalHits: number | undefined;
     try {
       let countQ = db.collection("listings") as FirebaseFirestore.Query;
       if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
-      if (!filters.showAllStatuses) countQ = countQ.where("status", "==", "active");
-      countQ = countQ.orderBy("createdAt", "desc");
       const countSnap = await countQ.count().get();
       totalHits = countSnap.data().count;
-    } catch { totalHits = undefined; }
+    } catch (e) {
+      console.error(`[UnifiedSearch] count() failed:`, e);
+    }
 
     q = q.orderBy("createdAt", "desc");
     q = q.limit(pageSize);  // N+1 fix: čitamo tačno pageSize, ne pageSize+1
