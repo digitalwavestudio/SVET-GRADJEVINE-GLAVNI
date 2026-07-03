@@ -2,6 +2,7 @@ import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { Building2 } from 'lucide-react';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { useMemo } from 'react';
+import { motion } from 'motion/react';
 import { Link, useParams } from 'react-router-dom';
 import { ListingSkeleton } from '@/src/components/ListingSkeleton';
 import NoResults from '@/src/components/ui/NoResults';
@@ -79,70 +80,78 @@ function CompaniesPage() {
 
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
         {loading && companies.length === 0 ? (
-          <ListingSkeleton count={6} viewMode="grid" />
+          <ListingSkeleton count={8} viewMode="grid" />
         ) : companies.length === 0 ? (
           <NoResults message="Nije pronađena nijedna firma." icon="business_center" />
         ) : (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {companies.map((company: any) => (
-                <div key={company.id} className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded-xl overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1">
-                  <div className="relative h-44 w-full overflow-hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {companies.map((company: any, idx: number) => (
+                <motion.div
+                  key={company.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded-xl overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1"
+                >
+                  <div className="relative h-32 w-full overflow-hidden">
                     {company.coverImage ? (
                       <OptimizedImage src={company.coverImage} alt={company.name} className="w-full h-full object-cover transition-transform duration-700 scale-105 group-hover:scale-110" containerClassName="w-full h-full" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-tr from-[#0F1720] to-[#182330]"></div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#050B10] via-[#050B10]/40 to-transparent opacity-90"></div>
-                    <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                    <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
                       {company.isVerified && (
-                        <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 backdrop-blur-md px-2.5 py-1 rounded-md shadow-lg">
-                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
-                          <span className="text-[9px] font-black tracking-widest uppercase text-green-400">Verifikovan</span>
+                        <div className="flex items-center gap-1 bg-green-500/10 border border-green-500/20 backdrop-blur-md px-2 py-0.5 rounded-md shadow-lg">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.8)]"></span>
+                          <span className="text-[8px] font-black tracking-widest uppercase text-green-400">Verifikovan</span>
                         </div>
                       )}
                       {(company as any).isPremiumPartner && (
-                        <div className="flex items-center gap-1 bg-gradient-to-r from-secondary to-yellow-400 !text-black px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.3)] transform transition-transform group-hover:scale-105">
-                          <span className="material-symbols-outlined text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
+                        <div className="flex items-center gap-1 bg-gradient-to-r from-secondary to-yellow-400 !text-black px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.3)] transform transition-transform group-hover:scale-105">
+                          <span className="material-symbols-outlined text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
                           PREMIUM
                         </div>
                       )}
                     </div>
                   </div>
-                  <div className="relative px-6 pb-6 flex-grow flex flex-col -mt-10 z-10">
-                    <div className="flex items-end gap-4 mb-5">
-                      <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center p-2.5 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 shrink-0 relative overflow-hidden">
+                  <div className="relative px-4 pb-4 flex-grow flex flex-col -mt-8 z-10">
+                    <div className="flex items-end gap-3 mb-3">
+                      <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 shrink-0 relative overflow-hidden">
                         {company.logo ? (
                           <OptimizedImage src={company.logo} alt="Logo" className="w-full h-full object-contain" containerClassName="w-full h-full" />
                         ) : (
-                          <span className="!text-black font-black text-3xl opacity-20">{company.name.charAt(0)}</span>
+                          <span className="!text-black font-black text-xl opacity-20">{company.name.charAt(0)}</span>
                         )}
                       </div>
-                      <div className="flex-1 pb-2">
+                      <div className="flex-1 pb-1 min-w-0">
                         <Link onMouseEnter={() => prefetch('company', company.id)} to={`/firma/${company.id}`} className="block group/link">
-                          <h3 className="text-xl font-black font-headline text-white uppercase tracking-tight group-hover/link:text-secondary transition-colors line-clamp-1">{company.name}</h3>
+                          <h3 className="text-sm font-black font-headline text-white uppercase tracking-tight group-hover/link:text-secondary transition-colors truncate">{company.name}</h3>
                         </Link>
-                        <div className="flex items-center gap-1.5 text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] mt-2">
-                          <span className="material-symbols-outlined text-[12px]">location_on</span>
+                        <div className="flex items-center gap-1 text-[8px] font-bold text-white/40 uppercase tracking-[0.15em] mt-1">
+                          <span className="material-symbols-outlined text-[10px]">location_on</span>
                           {LOCATIONS.find(l => l.slug === company.locationSlug)?.name || 'Srbija'}
                         </div>
                       </div>
                     </div>
-                    <p className="text-white/60 text-xs mb-6 line-clamp-2 leading-relaxed font-medium">{company.description}</p>
-                    <div className="pt-5 border-t border-white/5 flex items-center justify-between">
-                      <div className="flex flex-wrap gap-1.5">
+                    <p className="text-white/50 text-[11px] mb-3 line-clamp-2 leading-relaxed font-medium flex-grow">{company.description}</p>
+                    <div className="pt-3 border-t border-white/5 flex flex-col gap-2">
+                      <div className="flex flex-wrap gap-1">
                         {Array.isArray(company.mainCategories) && company.mainCategories.slice(0, 2).map((catId: string) => (
-                          <span key={catId} className="bg-secondary/10 border border-secondary/20 text-secondary px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-[0.15em]">
+                          <span key={catId} className="bg-secondary/10 border border-secondary/20 text-secondary px-2 py-0.5 rounded text-[7px] font-black uppercase tracking-[0.12em]">
                             {COMPANY_MAIN_CATEGORIES.find(c => c.id === catId)?.name || 'INŽENJERING'}
                           </span>
                         ))}
                       </div>
-                      <Link onMouseEnter={() => prefetch('company', company.id)} to={`/firma/${company.id}`} className="text-white bg-white/5 hover:bg-secondary hover:text-black transition-colors px-4 py-2 rounded-md font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
-                        PROFIL <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                      <Link onMouseEnter={() => prefetch('company', company.id)} to={`/firma/${company.id}`} className="w-full bg-gradient-to-r from-secondary/20 to-secondary/10 hover:from-secondary hover:to-yellow-400 text-secondary hover:!text-black border border-secondary/20 hover:border-secondary transition-all px-4 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 group/btn">
+                        <span>Pogledaj profil</span>
+                        <span className="material-symbols-outlined text-[12px] transition-transform duration-300 group-hover/btn:translate-x-1">arrow_forward</span>
                       </Link>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
             <div className="flex flex-col justify-center mt-12 gap-4 items-center">
