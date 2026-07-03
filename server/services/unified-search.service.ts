@@ -74,7 +74,7 @@ export class UnifiedSearchService {
     const cleanFilters = Object.fromEntries(
       Object.entries(stableFilters).filter(([_, v]) => v != null && v !== undefined)
     );
-    const cacheKey = `search_v2:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
+    const cacheKey = `search_v3:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
     const cached = await CacheService.get<UnifiedSearchResult>(cacheKey);
     if (cached) return cached;
     let entityType = category;
