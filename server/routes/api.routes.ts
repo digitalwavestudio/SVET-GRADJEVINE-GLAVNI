@@ -367,6 +367,7 @@ apiRouter.get(
 
 
 import { searchCompanies } from "../controllers/companies.controller.ts";
+import { searchAds } from "../controllers/ads.controller.ts";
 
 apiRouter.use("/admin", requireAdmin, adminRouter);
 
@@ -379,6 +380,15 @@ apiRouter.use("/metrics", metricsRouter);
 apiRouter.use("/media", heavyOperationsLimiter, mediaRouter);
 
 apiRouter.post("/search/companies", firestoreLimiter, heavyOperationsLimiter, searchCompanies);
+apiRouter.post("/masters/search", firestoreLimiter, heavyOperationsLimiter, (req, res, next) => {
+  req.body.category = "masters";
+  req.body.filters = req.body.filters || {};
+  return searchAds(req, res, next);
+});
+apiRouter.get("/masters", firestoreLimiter, heavyOperationsLimiter, (req, res, next) => {
+  req.body = { category: "masters", filters: {}, pageSize: 24 };
+  return searchAds(req, res, next);
+});
 apiRouter.use("/stats", statsRouter);
 apiRouter.use("/dashboard", dashboardRouter);
 apiRouter.use("/bff", bffRouter);
