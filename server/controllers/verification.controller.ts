@@ -28,16 +28,14 @@ export const uploadVerificationDocuments = async (
       try {
         const bucket = admin.storage().bucket();
         const blob = bucket.file(fileName);
-        const token = uuidv4();
 
         await blob.save(file.buffer, {
           metadata: {
             contentType: file.mimetype,
-            metadata: { firebaseStorageDownloadTokens: token },
           },
         });
 
-        return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
+        return `https://storage.googleapis.com/${bucket.name}/${encodeURIComponent(fileName)}`;
       } catch (storageError: unknown) {
         console.error("[GCS_UPLOAD_FAIL]", storageError instanceof Error ? storageError.message : String(storageError));
         if (process.env.NODE_ENV === "production" || process.env.K_SERVICE) {

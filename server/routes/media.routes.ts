@@ -224,17 +224,15 @@ mediaRouter.post(
       try {
         const bucket = admin.storage().bucket();
         const blob = bucket.file(fileName);
-        const token = uuidv4();
 
         await blob.save(processedBuffer, {
           metadata: {
             contentType,
             cacheControl: "public, max-age=31536000",
-            metadata: { firebaseStorageDownloadTokens: token },
           },
         });
 
-        publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
+        publicUrl = `https://storage.googleapis.com/${bucket.name}/${encodeURIComponent(fileName)}`;
       } catch (storageError: any) {
         console.error("[GCS_UPLOAD_FAIL]", storageError?.message || storageError);
         if (process.env.NODE_ENV === "production" || process.env.K_SERVICE) {
