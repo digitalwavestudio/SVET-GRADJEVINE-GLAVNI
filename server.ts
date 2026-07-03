@@ -215,9 +215,10 @@ async function startServer() {
         "'self'",
         "data:",
         "blob:",
-        "https:", // Firebase Storage / user uploads / avatar providers
+        "https:",
         "https://www.svetgradjevine.com",
         "https://lh3.googleusercontent.com",
+        "https://firebasestorage.googleapis.com",
       ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: [
