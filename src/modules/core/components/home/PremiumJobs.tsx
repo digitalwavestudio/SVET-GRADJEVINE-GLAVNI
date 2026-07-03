@@ -138,11 +138,6 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                             {job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}
                           </div>
                         )}
-                        {job.isCompanyVerified && (
-                          <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center border border-white shadow-[0_0_10px_rgba(34,197,94,0.5)] z-20">
-                            <span className="material-symbols-outlined text-white text-[8px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                          </div>
-                        )}
                       </div>
                       
                       {/* Title & Desc */}

@@ -609,12 +609,7 @@ export default function ConstructionMachinesPage() {
                                 {machine.companyName?.charAt(0) || 'M'}
                               </div>
                             )}
-                            {machine.isCompanyVerified && (
-                              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center border border-[#111a22] shadow-md">
-                                <span className="material-symbols-outlined text-white text-[6px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                              </div>
-                            )}
-                           </div>
+                            </div>
                            <div className="flex flex-col">
                              <div className="flex items-center gap-1">
                                <span className="text-[7px] font-black text-white/40 uppercase tracking-widest leading-none">{machine.companyName || 'SAMOSTALNI OGLAŠIVAČ'}</span>

@@ -428,11 +428,6 @@ export default function MastersPage() {
                           containerClassName="w-16 h-16 rounded-sm overflow-hidden border border-white/10 bg-[#050f19] shadow-2xl" 
                         />
                           
-                        {candidate.verified && (
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-[#111a22] shadow-[0_0_10px_rgba(34,197,94,0.5)]">
-                            <span className="material-symbols-outlined text-white text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                          </div>
-                        )}
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <span className={`px-2 py-0.5 rounded-sm text-[8px] font-black uppercase tracking-widest ${
