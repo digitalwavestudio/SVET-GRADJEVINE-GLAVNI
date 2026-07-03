@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AlgoliaSync, SyncTaskType } from "./algolia-sync.service.ts";
 import { syncJobToIndex } from "./algolia.service.ts";
 import { QueueService, JobType } from "./queue.service.ts";

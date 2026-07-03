@@ -60,10 +60,12 @@ export interface BusinessProfile {
   isVerified?: boolean;
   isPremium?: boolean;
   logo?: string;
+  coverImage?: string;
   companyName?: string;
   website?: string;
   industry?: string;
   about?: string;
+  phone?: string;
   address?: {
     street?: string;
     city?: string;

@@ -29,7 +29,7 @@ export default function ContactPage() {
 
       if (!response.ok) throw new Error('Failed to send');
 
-      trackEvent('Kontakt', 'Submit', 'Forma');
+      trackEvent();
       addToast('Poruka uspešno poslata! Naš tim će Vas kontaktirati.', 'success');
       setFormData({ name: '', email: '', subject: 'Opšti upit', message: '' });
       setIsSuccess(true);

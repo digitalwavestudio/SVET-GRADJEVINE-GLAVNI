@@ -191,14 +191,27 @@ export function useAuthNode() {
                   role: (currentPreviewRole || meData.role || claims.role || 'standard') as UserRole,
                   isAdmin: isMeAdmin || !!claims.admin,
                 } as User;
-               if (isMountedFn.current) {
-                 setUser((prev) => {
-                   const newStr = JSON.stringify(combinedData);
-                   const prevStr = prev ? JSON.stringify(prev) : null;
-                   // Essential: deep check to prevent re-render loop if data hasn't changed
-                   return newStr === prevStr ? prev : combinedData;
-                 });
-                safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(combinedData)));
+                if (isMountedFn.current) {
+                  const cachedUser = (() => {
+                    try {
+                      const raw = safeStorage.getItem(CACHE_KEY);
+                      return raw ? JSON.parse(raw) : null;
+                    } catch { return null; }
+                  })();
+                  const mergedData = { ...combinedData };
+                  if (cachedUser?.businessProfile) {
+                    if (typeof mergedData.businessProfile === 'object' && mergedData.businessProfile !== null) {
+                      mergedData.businessProfile = { ...cachedUser.businessProfile, ...mergedData.businessProfile };
+                    } else {
+                      mergedData.businessProfile = cachedUser.businessProfile;
+                    }
+                  }
+                  setUser((prev) => {
+                    const newStr = JSON.stringify(mergedData);
+                    const prevStr = prev ? JSON.stringify(prev) : null;
+                    return newStr === prevStr ? prev : mergedData;
+                  });
+                 safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(mergedData)));
                   safeStorage.setItem('svet_gradjevine_last_sync', now.toString());
                  setLoading(false); setIsInitializing(false);
                }
@@ -604,6 +617,12 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
     
     // Optimizovano: odma apdejtuj UI optimistički i keširaj lokalno
     const updatedUser = { ...currentUser, ...finalData };
+    if (finalData.businessProfile && currentUser?.businessProfile) {
+      updatedUser.businessProfile = {
+        ...currentUser.businessProfile,
+        ...finalData.businessProfile,
+      };
+    }
     setUser(updatedUser);
     safeStorage.setItem(CACHE_KEY, JSON.stringify(stripSensitiveFields(updatedUser)));
 

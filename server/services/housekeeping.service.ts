@@ -82,6 +82,41 @@ export class HousekeepingService {
 
   // ── Cleanup methods ────────────────────────────────────────────
 
+  static async archiveDeletedAds() {
+    this.logger.info("Starting Housekeeping: Archive Deleted Ads (soft-deleted >30d)");
+    const result = { totalArchived: 0, totalErrors: 0 };
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 30);
+    const cutoffTimestamp = admin.firestore.Timestamp.fromDate(cutoffDate);
+
+    try {
+      const snap = await db.collection("listings")
+        .where("status", "==", "deleted")
+        .where("updatedAt", "<", cutoffTimestamp)
+        .get();
+
+      if (snap.docs.length === 0) {
+        this.logger.info("No deleted ads to archive.");
+        await this.accumulateStatus("archiveDeletedAds", result);
+        return result;
+      }
+
+      const batch = db.batch();
+      snap.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+        result.totalArchived++;
+      });
+      await batch.commit();
+      this.logger.info(`Archived ${result.totalArchived} deleted ads.`);
+    } catch (error) {
+      result.totalErrors++;
+      this.logger.error("Error archiving deleted ads", error);
+    }
+
+    await this.accumulateStatus("archiveDeletedAds", result);
+    return result;
+  }
+
   static async cleanupDeletedAds() {
     this.logger.info("Starting Housekeeping: Audit Archive Deleted Ads");
     const result = { totalArchived: 0, processedCollections: ["listings"] };

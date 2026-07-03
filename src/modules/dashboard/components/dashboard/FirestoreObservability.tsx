@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Database, Activity, Zap, ShieldAlert, CheckCircle2, ChevronRight, BarChart3, Clock, LineChart } from 'lucide-react';
-import { firestoreTelemetry } from '@/src/lib/firestoreTelemetry';
 import QueryOptimizationAudit from './QueryOptimizationAudit';
 
 const FirestoreObservability: React.FC = () => {
-  const [data, setData] = useState(() => {
-    const stats = firestoreTelemetry.getSnapshot();
-    return buildAudit(stats);
-  });
+  const [data, setData] = useState(() => buildAudit({}));
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'queries'>('overview');
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const stats = firestoreTelemetry.getSnapshot();
-      setData(buildAudit(stats));
+      setData(buildAudit({}));
     }, 5000);
     return () => clearInterval(interval);
   }, []);

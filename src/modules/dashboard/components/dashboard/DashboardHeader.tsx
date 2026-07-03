@@ -99,7 +99,7 @@ export default React.memo(function DashboardHeader({
     if (!file || !user) return;
     setIsCoverUploading(true);
     try {
-      const url = await uploadImage(file, "profiles/avatars", "cover");
+      const url = await uploadImage(file, "profiles/avatars", "avatar");
       const updateData: any = {};
       if (user.role === "poslodavac") {
         updateData.businessProfile = {

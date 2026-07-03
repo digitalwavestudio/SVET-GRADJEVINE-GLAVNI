@@ -42,7 +42,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
             key={index}
             to={buildJobUrl(job)}
             className={`snap-center sm:snap-start shrink-0 group relative rounded-2xl overflow-hidden border transition-all duration-300 w-full sm:w-[350px] ${job.isPremium ? 'border-yellow-500/50 bg-yellow-500/[0.03] shadow-[0_0_40px_rgba(234,179,8,0.05)] hover:bg-yellow-500/[0.05]' : 'bg-[#0B0F19] border-white/10 hover:border-white/20'}`}
-            onClick={() => trackEvent('job', 'similar_job_click', job.id)}
+            onClick={() => trackEvent()}
           >
             <div className="p-3 sm:p-5 flex flex-col h-full">
               {/* Header: Company & Time */}

@@ -7,7 +7,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { buildJobUrl } from '@/src/lib/seo';
 import { useFavoritesList, favoritesKeys } from '@/src/modules/dashboard/hooks/useFavorites';
 import { apiClient } from '@/src/lib/apiClient';
-import { offlineSyncManager } from '@/src/lib/offlineSyncManager';
+
 
 export default function FavoritesPage() {
   const { user } = useAuth();
@@ -26,8 +26,7 @@ export default function FavoritesPage() {
   const toggleFavoriteMutation = useMutation({
     mutationFn: async ({ id, type }: { id: string; type: string }) => {
       if (!navigator.onLine) {
-        offlineSyncManager.addToOutbox('toggleFavorite', { id, type });
-        return { offline: true };
+        throw new Error("Cannot toggle favorite while offline");
       }
       if (abortControllersRef.current.has(id)) {
         abortControllersRef.current.get(id)?.abort();
@@ -100,8 +99,7 @@ export default function FavoritesPage() {
   const clearAllFavoritesMutation = useMutation({
     mutationFn: async () => {
       if (!navigator.onLine) {
-        offlineSyncManager.addToOutbox('clearAllFavorites', {});
-        return { offline: true };
+        throw new Error("Cannot clear favorites while offline");
       }
       await apiClient.post('/favorites/clear-all');
     },

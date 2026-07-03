@@ -6,10 +6,8 @@ import { marketplaceLoader } from '@/src/lib/loaders';
 const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
 const MarketplaceItemDetailsPage = lazy(() => import('./pages/MarketplaceItemDetailsPage'));
 const MarketplaceModule = lazy(() => import('./index.tsx'));
-const ToolsHubPage = lazy(() => import('./pages/ToolsHubPage'));
 
 export const getMarketplaceRouter = () => [
-  <Route key="alati" path="/alati" element={<ToolsHubPage />} />,
   <Route key="alat-i-oprema-kategorija-grad" path="/alat-i-oprema/:kategorija/:grad" element={<MarketplaceModule />} loader={marketplaceLoader} />,
   <Route key="alat-i-oprema-kategorija" path="/alat-i-oprema/:kategorija" element={<MarketplaceModule />} loader={marketplaceLoader} />,
   <Route key="alat-i-oprema-grad" path="/alat-i-oprema/lokacija/:grad" element={<MarketplaceModule />} loader={marketplaceLoader} />,

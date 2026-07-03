@@ -99,8 +99,8 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
 
-  const totalJobsCount = data?.pages[0]?.total ?? allJobsPremiumFirst.length;
-  const activeJobsCount = data?.pages[0]?.activeJobs ?? allJobsPremiumFirst.length;
+  const totalJobsCount = data?.pages[0]?.totalHits ?? allJobsPremiumFirst.length;
+  const activeJobsCount = data?.pages[0]?.totalHits ?? allJobsPremiumFirst.length;
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; path?: string }[] = [];

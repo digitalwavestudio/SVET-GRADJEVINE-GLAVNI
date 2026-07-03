@@ -1,4 +1,5 @@
 import { CacheService } from "./cache.service.ts";
+import { CacheKeys } from "../constants/cache-keys.ts";
 import { db, admin as firebaseAdmin } from "../config/firebase.ts";
 import { FieldPath } from "firebase-admin/firestore";
 import { AppError, NotFoundError, BadRequestError } from "../utils/appError.ts";
@@ -8,6 +9,7 @@ import { User, UserRole } from "@svet-gradjevine/shared";
 import { AdminUsersService } from "./admin/admin-users.service.ts";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { logger } from "../utils/logger.ts";
+import { userProfileLoader } from "../utils/dataloader.ts";
 
 const l1UserCache = new Map<string, { data: User; expiry: number }>();
 const L1_USER_TTL = 30 * 1000; // 30s RAM cache for current user data
@@ -311,13 +313,26 @@ export class UsersService {
     }
 
     const userSnap = await db.collection("users").doc(uid).get();
+    const existingData = userSnap.data() || {};
 
     const batch = db.batch();
 
-    if (Object.keys(publicUpdates).length > 0) {
-      batch.set(db.collection("users").doc(uid), publicUpdates, {
-        merge: true,
-      });
+    // For nested objects (e.g. businessProfile), deep-merge with existing Firestore data
+    // so we don't lose sibling fields. Plain batch.set({merge:true}) only does shallow merge.
+    const finalPublic: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(publicUpdates)) {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        finalPublic[key] = {
+          ...(existingData[key] as Record<string, unknown> || {}),
+          ...(value as Record<string, unknown>),
+        };
+      } else {
+        finalPublic[key] = value;
+      }
+    }
+
+    if (Object.keys(finalPublic).length > 0) {
+      batch.update(db.collection("users").doc(uid), finalPublic as Record<string, firebaseAdmin.firestore.FieldValue | string | number | boolean | null | undefined>);
     }
 
     if (Object.keys(privateUpdates).length > 0) {
@@ -404,6 +419,40 @@ export class UsersService {
       await CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000);
       eventBus.emit(DomainEvents.USER_UPDATED, { userId: uid });
     }
+
+    // Sync logo/cover to user's listing documents so company detail page shows them
+    const businessProfileUpdates = rawPayload.businessProfile as Record<string, unknown> | undefined;
+    if (businessProfileUpdates && (businessProfileUpdates.logo || businessProfileUpdates.coverImage)) {
+      const listingSync: Record<string, string> = {};
+      if (businessProfileUpdates.logo) listingSync.logo = businessProfileUpdates.logo as string;
+      if (businessProfileUpdates.coverImage) listingSync.coverImage = businessProfileUpdates.coverImage as string;
+
+      try {
+        const listingSnap = await db.collection("listings")
+          .where("authorId", "==", uid)
+          .where("status", "in", ["active", "approved"])
+          .limit(20)
+          .get();
+        if (!listingSnap.empty) {
+          const syncBatch = db.batch();
+          listingSnap.docs.forEach(doc => {
+            syncBatch.update(doc.ref, listingSync);
+          });
+          await syncBatch.commit();
+          logger.info(`[Users] Synced logo/cover to ${listingSnap.docs.length} listing(s) for user ${uid}`);
+          // Invalidate ad detail caches so fresh data with logo is served
+          listingSnap.docs.forEach(doc => {
+            CacheService.delete(CacheKeys.adDetail(doc.id)).catch(() => {});
+          });
+        }
+      } catch (err) {
+        logger.warn(`[Users] Failed to sync logo/cover to listings for ${uid}:`, err);
+      }
+      // Invalidate search cache so logo appears immediately on /firme and /poslovi
+      CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+    }
+    // Clear DataLoader cache so search enrichment picks up fresh businessProfile
+    userProfileLoader.clear(uid);
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
     await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session:", e?.message));
@@ -457,8 +506,10 @@ export class UsersService {
 
       const { CacheService } = await import("./cache.service.ts");
       await CacheService.set("outbox_tasks_has_pending", true, 60 * 60 * 1000);
-      await CacheService.delete(`user_me_${uid}:pub`);
-      await CacheService.delete(`user_me_${uid}:priv`);
+    l1UserCache.delete(`user_me_${uid}:pub`);
+    l1UserCache.delete(`user_me_${uid}:priv`);
+    await CacheService.delete(`user_me_${uid}:pub`);
+    await CacheService.delete(`user_me_${uid}:priv`);
       await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on update:", e?.message));
       await CacheService.delete(`public_profile_${uid}`);
     }

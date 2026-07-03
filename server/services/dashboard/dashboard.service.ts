@@ -18,7 +18,9 @@ import {
 
 import { getErrorMessage } from "../../utils/error-handler.ts";
 
-import { UserMatchProfile } from "./dashboard-matches.service.ts";
+import { UserMatchProfile, DashboardSmartMatchService } from "./dashboard-matches.service.ts";
+import { DashboardAdminService } from "./dashboard-admin.service.ts";
+import { DashboardEmployerService } from "./employer-dashboard.service.ts";
 import { ApplicationItemDTO } from "../../dto/dashboard.dto.ts";
 
 // Proxy re-export for backward compatibility
@@ -48,15 +50,15 @@ export class DashboardService {
     const [statsResult, analyticsResult] = await Promise.allSettled([
       (async () => {
         if (isAdmin) {
-          const s = await DashboardService.getAdminStats();
-          const chartData = await DashboardService.getChartData();
+          const s = await DashboardAdminService.getAdminStats();
+          const chartData = await DashboardAdminService.getChartData();
           return { ...s, chartData };
         }
         if (role === "poslodavac" || role === "COMPANY") {
-          return await DashboardService.getEmployerStats(userId);
+          return await DashboardEmployerService.getEmployerStats(userId);
         }
         if (role === "majstor" || role === "MASTER") {
-          const smartMatches = await DashboardService.getSmartMatches(reqUser || { uid: userId, location: "Beograd", profession: "Sve" });
+          const smartMatches = await DashboardSmartMatchService.getSmartMatches(reqUser || { uid: userId, location: "Beograd", profession: "Sve" });
           let recentApplications: ApplicationItemDTO[] = [];
           try {
             const appsSnap = await db
@@ -312,7 +314,7 @@ export class DashboardService {
       await CacheService.delete(CacheKeys.employerTrends(uid)).catch(err => console.error("[Cache] invalidation error:", err));
     }
 
-    this.getEmployerStats(uid).catch((e: any) => logger.warn("[DashboardService] Refresh employer stats:", e));
+    DashboardEmployerService.getEmployerStats(uid).catch((e: any) => logger.warn("[DashboardService] Refresh employer stats:", e));
   }
 
 }

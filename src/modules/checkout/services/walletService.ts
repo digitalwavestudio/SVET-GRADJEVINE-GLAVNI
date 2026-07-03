@@ -48,7 +48,6 @@ export const walletService = {
             );
           }
         }),
-      { actionName: "promoteEntity", context: { data } },
     );
   },
 
@@ -95,7 +94,6 @@ export const walletService = {
           throw new Error(err.message || "Došlo je do greške pri brisanju transakcija");
         }
       }),
-      { actionName: "deleteAllTransactions" },
     );
   },
 
@@ -180,7 +178,6 @@ export const walletService = {
             );
           }
         }),
-      { actionName: "adminAddFunds", context: { targetUserId, amount, description } },
     );
   },
 };

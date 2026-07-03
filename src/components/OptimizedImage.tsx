@@ -75,7 +75,7 @@ export function OptimizedImage({
     setError(true);
   };
 
-  const hasValidSrc = Boolean(src && src !== '' && !src.includes('picsum.photos') && !src.includes('images.unsplash.com'));
+  const hasValidSrc = Boolean(src && src !== '' && !src.includes('picsum.photos'));
 
   if (isProcessing) {
     return (

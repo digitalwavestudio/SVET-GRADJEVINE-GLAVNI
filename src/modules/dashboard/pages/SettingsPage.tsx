@@ -106,7 +106,7 @@ export default function SettingsPage() {
     if (file) {
       setIsSaving(true);
       try {
-        const url = await uploadImage(file, 'profiles/covers', 'cover');
+        const url = await uploadImage(file, 'profiles/covers', 'avatar');
         setFormData(prev => ({ ...prev, coverImage: url }));
         toast.success("Pozadinska slika je uspešno postavljena");
       } catch (error: unknown) {

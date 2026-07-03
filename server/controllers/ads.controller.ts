@@ -158,6 +158,27 @@ export const searchAds = async (
       { docs: [], lastVisibleId: null, hasMore: false }
     );
 
+    // Enrich results with author businessProfile data (logo, coverImage)
+    // Author's user doc is source of truth — always override listing doc's potentially stale data
+    if (result?.docs?.length > 0) {
+      const { userProfileLoader } = await import("../utils/dataloader.ts");
+      const uniqueIds = [...new Set((result.docs as any[]).filter((d: any) => d.authorId).map((d: any) => d.authorId))];
+      if (uniqueIds.length > 0) {
+        const authors = await userProfileLoader.loadMany(uniqueIds as string[]).catch(() => [] as any[]);
+        const authorMap = new Map<string, any>();
+        (authors as any[]).forEach((a: any) => {
+          if (a?.uid || a?.id) authorMap.set(a.uid || a.id, a);
+        });
+        (result.docs as any[]).forEach((d: any) => {
+          const author = authorMap.get(d.authorId);
+          if (author) {
+            if (author.businessProfile?.logo) d.logo = author.businessProfile.logo;
+            if (author.businessProfile?.coverImage) d.coverImage = author.businessProfile.coverImage;
+          }
+        });
+      }
+    }
+
     res.json(result);
   } catch (err) {
     next(err);
@@ -241,6 +262,14 @@ export const getAdById = async (
               companyName: author.companyName || "",
               verified: author.verified || false
             };
+            const dd = docData as any;
+            const au = author as any;
+            if (!dd.logo && au.businessProfile?.logo) {
+              dd.logo = au.businessProfile.logo;
+            }
+            if (!dd.coverImage && au.businessProfile?.coverImage) {
+              dd.coverImage = au.businessProfile.coverImage;
+            }
           }
         }
 

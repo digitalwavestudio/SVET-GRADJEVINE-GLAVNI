@@ -267,39 +267,10 @@ export function useDashboardStats<TData = BffDashboardResponse>(select?: (data: 
         }
       }
 
-      let queueLocked = false;
-      try {
-        const { offlineSyncManager } = await import("@/src/lib/offlineSyncManager");
-        if (offlineSyncManager && typeof offlineSyncManager.flushOutbox === "function") {
-          const outboxItems = offlineSyncManager.getOutbox();
-          if (outboxItems.length > 0) {
-            queueLocked = true;
-            console.info(`[Offline Sync Manager] Found ${outboxItems.length} offline outbox entries. Initiating silent background flush with Queue Lock...`);
-            await offlineSyncManager.flushOutbox();
-
-            const remaining = offlineSyncManager.getOutbox();
-            if (remaining.length === 0) {
-              queueLocked = false;
-              console.info("[Offline Sync Manager] Outbox queue cleared. Queue Lock released.");
-            } else {
-              console.warn(`[Offline Sync Manager] Outbox queue still has ${remaining.length} items. Queue Lock maintained.`);
-            }
-          }
-        }
-      } catch (err) {
-        console.warn("[Offline Sync Manager] Auto-synchronization of outbox skipped or failed:", err);
-      }
-
-      if (!queueLocked) {
-        try {
-          console.info("[Offline Sync Manager] Reconnection database reconciliation: refetching latest metrics...");
-          queryClient.invalidateQueries({ queryKey: dashboardKeys.bff(role, uid), refetchType: "all" });
-        } catch (err) {
-          console.error("[Offline Sync Manager] Background query refresh failed:", err);
-        }
-      } else {
-        console.warn("[Offline Sync Manager] Global BFF refetch aborted due to active Queue Lock.");
-      }
+      console.info("[Offline Sync Manager] Reconnection database reconciliation: refetching latest metrics...");
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.bff(role, uid), refetchType: "all" }).catch((err) => {
+        console.error("[Offline Sync Manager] Background query refresh failed:", err);
+      });
     };
 
     window.addEventListener("online", handleOnline);

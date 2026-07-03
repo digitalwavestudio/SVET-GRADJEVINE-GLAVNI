@@ -40,11 +40,11 @@ export function RootLayout() {
   usePresence();
   useRealtimeSync();
   useEffect(() => {    const gaId = (typeof window !== 'undefined' && (window as any).__APP_ENV__?.VITE_GA_MEASUREMENT_ID) || import.meta.env.VITE_GA_MEASUREMENT_ID;
-    initGA(gaId);
+    initGA();
   }, []);
 
   useEffect(() => {
-    trackPageView(location.pathname + location.search);
+    trackPageView();
   }, [location]);
 
   return (

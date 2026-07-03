@@ -23,8 +23,6 @@ export interface JobsListResponse {
   lastVisible: string | null;
   hasMore: boolean;
   totalHits?: number;
-  total?: number;
-  activeJobs?: number;
 }
 
 export interface UserApplicationsResponse {
@@ -115,8 +113,6 @@ export const jobsService = {
         lastVisible: data?.lastVisible || null,
         hasMore: data?.hasMore || false,
         totalHits: data?.totalHits as number | undefined,
-        total: data?.total as number | undefined,
-        activeJobs: data?.activeJobs as number | undefined,
       };
     });
   },

@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Search, AlertTriangle, ExternalLink, Zap, Clock, Database } from 'lucide-react';
-import { firestoreTelemetry } from '@/src/lib/firestoreTelemetry';
+interface SlowQuery { collection: string; operation: string; id: string; timestamp: number; duration: number; resultSize: number; }
 
 const QueryOptimizationAudit: React.FC = () => {
-  const stats = firestoreTelemetry.getSnapshot();
+  const stats: { slowQueries: SlowQuery[]; missingIndexes: string[] } = { slowQueries: [], missingIndexes: [] };
   const slowQueries = stats.slowQueries || [];
   const missingIndexes = stats.missingIndexes || [];
 
@@ -22,7 +22,7 @@ const QueryOptimizationAudit: React.FC = () => {
             <h3 className="font-bold uppercase tracking-wider text-sm">Critical: Missing Compound Indexes</h3>
           </div>
           <div className="space-y-2">
-            {missingIndexes.map((link, i) => (
+            {missingIndexes.map((link: string, i: number) => (
               <a 
                 key={i}
                 href={link}
@@ -56,7 +56,7 @@ const QueryOptimizationAudit: React.FC = () => {
               No slow queries detected in the current session.
             </div>
           ) : (
-            slowQueries.slice().reverse().map((q, i) => (
+            slowQueries.slice().reverse().map((q: SlowQuery, i: number) => (
               <div key={i} className="p-4 flex items-center justify-between hover:bg-white/[0.02]">
                 <div className="flex items-center gap-4">
                   <div className="p-2 bg-zinc-800 rounded">
@@ -97,7 +97,7 @@ const QueryOptimizationAudit: React.FC = () => {
           icon={<Search className="w-4 h-4" />}
           title="Full Scan Risk"
           description="Queries fetching more than 100 docs without a limit detected. High cost & latency."
-          status={slowQueries.some(q => q.resultSize > 100) ? 'Warning' : 'Good'}
+          status={slowQueries.some((q: SlowQuery) => q.resultSize > 100) ? 'Warning' : 'Good'}
         />
         <InsightCard 
           icon={<Zap className="w-4 h-4" />}

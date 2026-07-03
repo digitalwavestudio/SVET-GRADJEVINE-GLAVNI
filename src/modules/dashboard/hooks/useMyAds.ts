@@ -10,7 +10,6 @@ import { apiClient } from "@/src/lib/apiClient";
 import { mutationGuard } from "@/src/lib/mutationGuard";
 import { toast } from "react-hot-toast";
 import { queryKeys as factoryQueryKeys, dashboardKeys } from "@/src/lib/queryKeysFactory";
-import { offlineSyncManager } from "@/src/lib/offlineSyncManager";
 import { useAuth } from "@/src/context/AuthContext";
 
 export const myAdsKeys = {
@@ -195,23 +194,13 @@ export function useMyAdsMutations(userId: string | undefined) {
   };
 
   const updateAdStatus = async (id: string, status: string) => {
-    return mutationGuard(() => apiClient.patch(`/ads/${id}`, { status }), {
-      actionName: `updateAdStatus_${status}`,
-      context: { id, userId },
-    });
+    return mutationGuard(() => apiClient.patch(`/ads/${id}`, { status }));
   };
 
   const deleteMutation = useMutation({
     mutationFn: async ({ id, type }: { id: string; type?: string }) => {
-      if (!navigator.onLine) {
-        offlineSyncManager.addToOutbox("deleteAd", { id });
-        return { offline: true };
-      }
       const category = typeToCategory[type || ''] || 'marketplace';
-      return mutationGuard(() => apiClient.delete(`/ads/${category}/${id}`), {
-        actionName: 'deleteAd',
-        context: { id, userId },
-      });
+      return mutationGuard(() => apiClient.delete(`/ads/${category}/${id}`));
     },
     onMutate: async ({ id }) => {
       if (!userId) return;

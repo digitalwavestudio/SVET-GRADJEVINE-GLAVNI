@@ -21,6 +21,7 @@ try {
   createAdSchema.parse(payload);
   console.log("SUCCESS");
 } catch(e) {
+  const err = e as { errors: unknown };
   console.log("VALIDATION ERROR:");
-  console.dir(e.errors, {depth: null});
+  console.dir(err.errors, {depth: null});
 }

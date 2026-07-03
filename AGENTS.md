@@ -22,6 +22,50 @@
 
 **Ako se nešto sjebe, vrati se na:** `git checkout ec4b15e`
 
+## 🖼️ Session 7 — Business Logo/Cover Image Fix (2026-07-03)
+
+**Problem:** 
+1. Navbar show "UP" instead of user's business logo
+2. Cover image not showing on company detail page
+3. Logo/cover not synced from profile to listing documents
+
+### Root Causes & Fixes
+
+| Problem | Root Cause | Fix | Fajl |
+|---|---|---|---|
+| "UP" umesto logoa | Firestore `batch.set` sa `merge: true` **ne spaja duboko** — `businessProfile` map se zamenjuje celi, ne merge-uju se polja | Zamenjeno sa `batch.update` i dot notacijom (`"businessProfile.logo": url`) | `server/services/users.service.ts:317-332` |
+| Cover image se ne vidi | `normalizeCompany` čita `c.coverImage` i `c.logo` sa top-levela, ali podaci su u `c.businessProfile.*` | Dodati fallbackovi na `businessProfile?.logo`, `businessProfile?.coverImage`, itd. | `src/modules/companies/services/companiesService.ts:24-32` |
+| Promena na profilu ne ažurira listing | Niko ne sluša `FAN_OUT_PROFILE_UPDATE` outbox event | Direktan batch update listinga u `updateProfile` — upiše logo/coverImage na sve `listings` gde je `authorId == uid` | `server/services/users.service.ts` |
+| `coverImage` ne postoji u BusinessProfile tipu | Tip nije imao `coverImage` i `phone` polja | Dodato u `BusinessProfile` interface | `packages/shared/src/types/user.ts:62-63` |
+| `"cover"` nije validan CompressionMode | `uploadImage(file, path, "cover")` — `"cover"` ne postoji u tipu | Zamenjeno sa `"avatar"` | `DashboardHeader.tsx:102`, `SettingsPage.tsx:109` |
+
+### Ključna lekcija
+**Firestore `set` + `{ merge: true }` radi samo top-level merge.** Za ugnježđene map-e (npr. `businessProfile.logo`), polja se zamenjuju. Moraš koristiti `update` sa `"businessProfile.logo"` dot path-om da sačuvaš ostala polja.
+
+## 🧹 Session 8 — TS Error Cleanup (2026-07-03)
+
+Sve TS greške su rešene nakon cleanupa iz Sessions 5-6 (kad su obrisani `admin.service.ts`, `offlineSyncManager`, `trackEvent` stub-ovi, itd.).
+
+**Ukupno rešeno:** 39 TS grešaka u 14 fajlova.
+
+| Fajl | Greška | Fix |
+|---|---|---|
+| `server/services/dashboard/dashboard.service.ts` | `AdminService` import | Delegirano na `DashboardAdminService`/`DashboardEmployerService`/`DashboardSmartMatchService` |
+| `server/controllers/housekeeping.controller.ts` | `archiveDeletedAds()` ne postoji | Dodata metoda u `HousekeepingService` — briše listinge `status == "deleted"` starije od 30 dana |
+| `src/components/RootLayout.tsx` | `initGA(gaId)`, `trackPageView(path)` — 0 argumenata | Uklonjeni argumenti |
+| `src/modules/checkout/services/walletService.ts` | `withRetry(fn, { actionName })` — 2 args umesto 1 | Uklonjen drugi argument |
+| `src/modules/core/pages/ContactPage.tsx` | `trackEvent(3 args)` | Uklonjeni argumenti |
+| `src/modules/jobs/components/jobs/SimilarJobsSlider.tsx` | `trackEvent(3 args)` | Uklonjeni argumenti |
+| `src/modules/dashboard/hooks/useDashboardBff.ts` | `offlineSyncManager.flushOutbox/getOutbox` | Zamenjeno sa `queryClient.invalidateQueries` |
+| `src/modules/dashboard/hooks/useMyAds.ts` | `offlineSyncManager.addToOutbox`, `mutationGuard(2 args)` | Uklonjen outbox blok, drugi argument iz `mutationGuard` |
+| `src/modules/dashboard/pages/FavoritesPage.tsx` | `offlineSyncManager.addToOutbox` | Uklonjeni pozivi |
+| `src/modules/jobs/services/jobsService.ts` | `total`, `activeJobs` ne postoje u `JobSearchApiResponse` | Uklonjena polja (API vraća samo `docs`, `totalHits`, `hasMore`) |
+| `src/modules/jobs/pages/JobsPage.tsx` | `total`, `activeJobs` | Zamenjeno sa `totalHits` |
+| `src/modules/dashboard/components/dashboard/FirestoreObservability.tsx` | `getSnapshot` ne postoji | Uklonjen import i pozivi |
+| `src/modules/dashboard/components/dashboard/QueryOptimizationAudit.tsx` | `getSnapshot` + implicit `any` | Import uklonjen, dodati eksplicitni tipovi |
+| `server/services/algolia-sync.service.test.ts` | `beforeEach` not found | Dodat u vitest import |
+| `server/test-zod.ts` | `e` is unknown | Cast-an kao `{ errors: unknown }` |
+
 ## Pravila
 
 1. **Jezik** — uvek pišem na srpskom (latinica)
