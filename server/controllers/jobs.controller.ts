@@ -132,6 +132,26 @@ export const searchJobs = async (
       };
     }
 
+    // Enrich with author businessProfile data (logo, coverImage)
+    if (finalResult?.docs?.length > 0) {
+      const { userProfileLoader } = await import("../utils/dataloader.ts");
+      const uniqueIds = [...new Set((finalResult.docs as any[]).filter((d: any) => d.authorId).map((d: any) => d.authorId))];
+      if (uniqueIds.length > 0) {
+        const authors = await userProfileLoader.loadMany(uniqueIds as string[]).catch(() => [] as any[]);
+        const authorMap = new Map<string, any>();
+        (authors as any[]).forEach((a: any) => {
+          if (a?.uid || a?.id) authorMap.set(a.uid || a.id, a);
+        });
+        (finalResult.docs as any[]).forEach((d: any) => {
+          const author = authorMap.get(d.authorId);
+          if (author) {
+            if (author.businessProfile?.logo) d.logo = author.businessProfile.logo;
+            if (author.businessProfile?.coverImage) d.coverImage = author.businessProfile.coverImage;
+          }
+        });
+      }
+    }
+
     if (cacheKey) {
       await CacheService.set(cacheKey, finalResult, 15 * 60 * 1000);
     }
