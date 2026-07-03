@@ -73,13 +73,13 @@ export default function Navbar() {
   `;
 
   const renderDisabledTooltip = (isMobile = false) => (
-    <div className={`absolute ${isMobile ? 'top-full mt-2' : 'top-full mt-2'} left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50`}>
-      <div className={`bg-[#0c1219]/95 backdrop-blur-md border border-white/10 ${isMobile ? 'p-3' : 'p-4'} rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap`}>
-        <div className={`flex items-center ${isMobile ? 'gap-2 mb-1' : 'gap-3 mb-2'}`}>
-          <img src={logoImage} alt="Svet Građevine Logo" className={`${isMobile ? 'h-4' : 'h-6'} w-auto object-contain drop-shadow-md`} />
-          <span className={`text-secondary font-black ${isMobile ? 'text-[10px]' : 'text-[12px]'} uppercase tracking-widest`}>Uskoro</span>
+    <div className={`absolute ${isMobile ? 'top-full mt-2' : 'top-full mt-2'} left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-focus/tooltip:scale-100 group-active/tooltip:scale-100 z-50`}>
+      <div className={`bg-[#0c1219]/95 backdrop-blur-md border border-white/10 ${isMobile ? 'p-4' : 'p-4 md:p-5'} rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap min-w-[200px] flex flex-col items-center`}>
+        <div className={`flex items-center ${isMobile ? 'gap-3 mb-2' : 'gap-3 mb-2'}`}>
+          <img src={logoImage} alt="Svet Građevine Logo" className={`${isMobile ? 'h-5' : 'h-5 md:h-6'} w-auto object-contain drop-shadow-md`} />
+          <span className={`text-secondary font-black ${isMobile ? 'text-[12px]' : 'text-[12px] md:text-[14px]'} uppercase tracking-widest`}>USKORO!</span>
         </div>
-        <p className={`text-white/90 ${isMobile ? 'text-[11px]' : 'text-[13px]'} font-medium tracking-wide`}>Ova sekcija stiže uskoro!</p>
+        <p className={`text-white/90 ${isMobile ? 'text-[12px]' : 'text-[12px] md:text-[14px]'} font-medium tracking-wide`}>Ova sekcija stiže uskoro!</p>
       </div>
     </div>
   );
@@ -132,7 +132,7 @@ export default function Navbar() {
                   Ketering
                 </span>
               </Link>
-              <Link to="/alat-i-oprema" className={navLinkClass("/alat-i-oprema", true)} onClick={(e) => e.preventDefault()}>
+              <Link to="/alat-i-oprema" className={navLinkClass("/alat-i-oprema", true)} onClick={(e) => e.preventDefault()} tabIndex={0}>
                 <span className={hoverGradient}>
                   Alat i oprema
                 </span>
@@ -142,6 +142,7 @@ export default function Navbar() {
                 to="/gradjevinske-masine"
                 className={navLinkClass("/gradjevinske-masine", true)}
                 onClick={(e) => e.preventDefault()}
+                tabIndex={0}
               >
                 <span
                   className={hoverGradient}
@@ -150,7 +151,7 @@ export default function Navbar() {
                 </span>
                 {renderDisabledTooltip(false)}
               </Link>
-              <Link to="/placevi" className={navLinkClass("/placevi", true)} onClick={(e) => e.preventDefault()}>
+              <Link to="/placevi" className={navLinkClass("/placevi", true)} onClick={(e) => e.preventDefault()} tabIndex={0}>
                 <span className={hoverGradient}>
                   Placevi
                 </span>
@@ -394,6 +395,7 @@ export default function Navbar() {
                     <Link
                       key={link.path}
                       to={link.path}
+                      tabIndex={link.disabled ? 0 : undefined}
                       onClick={(e) => {
                         if (link.disabled) {
                           e.preventDefault();
@@ -401,7 +403,6 @@ export default function Navbar() {
                         }
                         setIsOpen(false);
                       }}
-                      role="menuitem"
                       className={`group/item relative flex items-center gap-3 py-3 px-4 min-h-12 rounded-xl text-sm font-bold transition-all duration-200 justify-start ${link.disabled ? 'group/tooltip cursor-not-allowed opacity-70' : ''} ${
                         active && !link.disabled
                           ? "bg-secondary/10 text-white"

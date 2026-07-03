@@ -1,9 +1,12 @@
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
+import { useBrandLogo } from '@/src/context/BrandContext';
+import logoImage from '@/src/assets/images/logo.webp';
 
 export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
   const { switchRole } = useAuth();
+  const { logoUrl } = useBrandLogo();
   const navigate = useNavigate();
 
   const handleSelectRole = async (targetRole: string) => {
@@ -55,18 +58,6 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       benefits: ['Direktan kontakt sa firmama', 'Isticanje lokacije i kapaciteta', 'Popunjenost tokom cele godine']
     },
     {
-      slug: 'masine',
-      title: 'MAŠINE I OPREMA',
-      subtitle: 'NAJAM ILI PRODAJA MEHANIZACIJE',
-      description: 'Iznajmite ili prodajte bagere, dizalice, skele, oplate i prateću građevinsku opremu. Budite prvi izbor izvođačima radova u potrazi za opremom.',
-      icon: 'construction',
-      color: 'text-orange-400 border-orange-500/20 hover:border-orange-400 hover:shadow-orange-500/10',
-      bgGlow: 'bg-orange-500/10',
-      tagColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-      btnBg: 'bg-orange-400 !text-black hover:bg-orange-300',
-      benefits: ['Pregledan katalog mašina', 'Cenovnik najma po danu/satu', 'Direktni upiti od izvođača']
-    },
-    {
       slug: 'ketering',
       title: 'KETERING & ISHRANA RADNIKA',
       subtitle: 'DOSTAVA HRANE NA GRADILIŠTA',
@@ -79,6 +70,19 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       benefits: ['Kreiranje dnevnih menija', 'Dugoročni ugovori sa firmama', 'Povećanje obima porudžbina']
     },
     {
+      slug: 'masine',
+      title: 'MAŠINE I OPREMA',
+      subtitle: 'NAJAM ILI PRODAJA MEHANIZACIJE',
+      description: 'Iznajmite ili prodajte bagere, dizalice, skele, oplate i prateću građevinsku opremu. Budite prvi izbor izvođačima radova u potrazi za opremom.',
+      icon: 'construction',
+      color: 'text-orange-400 border-orange-500/20 hover:border-orange-400 hover:shadow-orange-500/10',
+      bgGlow: 'bg-orange-500/10',
+      tagColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+      btnBg: 'bg-orange-400 !text-black hover:bg-orange-300',
+      benefits: ['Pregledan katalog mašina', 'Cenovnik najma po danu/satu', 'Direktni upiti od izvođača'],
+      isComingSoon: true
+    },
+    {
       slug: 'placevi',
       title: 'PLACEVI I ZONE',
       subtitle: 'INDUSTRIJSKO ZEMLJIŠTE I PROSTORI',
@@ -88,7 +92,8 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       bgGlow: 'bg-emerald-500/10',
       tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
-      benefits: ['Detaljne specifikacije zemljišta', 'Lokacijski prikaz i plan zone', 'Direktan kontakt sa investitorima']
+      benefits: ['Detaljne specifikacije zemljišta', 'Lokacijski prikaz i plan zone', 'Direktan kontakt sa investitorima'],
+      isComingSoon: true
     },
     {
       slug: 'partner',
@@ -134,14 +139,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
             {/* Background Glow */}
             <div className={`absolute top-0 right-0 w-36 h-36 ${role.bgGlow} opacity-20 blur-[50px] -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700`}></div>
 
-            {/* Tooltip za Coming Soon ulogu na hover */}
-            {role.isComingSoon && (
-              <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <div className="bg-amber-500 !text-black font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-md shadow-lg border border-amber-400">
-                  STIŽE USKORO
-                </div>
-              </div>
-            )}
+            {/* Tooltip za Coming Soon ulogu na hover (staro uklonjeno, ovo je glassmorphism ispod) */}
 
             <div className="relative z-10 flex-1 flex flex-col justify-between space-y-10">
               
@@ -178,21 +176,23 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
 
               {/* Action Button */}
               {role.isComingSoon ? (
-                <div className="relative w-full group/btn">
+                <div className="relative w-full group/btn" tabIndex={0}>
                   <button
                     disabled
-                    className="w-full py-4 md:py-5 bg-white/5 text-white/20 border border-white/5 font-black text-xs md:text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-4 md:py-5 bg-white/5 text-white/20 border border-white/5 font-black text-xs md:text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2 pointer-events-none"
                   >
                     USKORO
                     <span className="material-symbols-outlined text-lg">hourglass_empty</span>
                   </button>
-                  {/* Hover popup stilizovan kao na footeru svetlog moda */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-amber-500 border border-amber-400 !text-black rounded-lg shadow-2xl opacity-0 invisible group-hover/btn:opacity-100 group-hover/btn:visible transition-all duration-300 z-50 text-center pointer-events-none">
-                    <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-1">OBAVEŠTENJE</div>
-                    <p className="text-[10px] font-black uppercase tracking-wider leading-tight">
-                      Partner / Affiliate opcija stiže uskoro na platformu!
-                    </p>
-                    <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-500 border-r border-b border-amber-400 rotate-45"></div>
+                  {/* Glassmorphism popup */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 pointer-events-none opacity-0 group-hover/btn:opacity-100 group-focus/btn:opacity-100 transition-all duration-300 scale-90 group-hover/btn:scale-100 group-focus/btn:scale-100 z-50">
+                    <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap flex flex-col items-center min-w-[200px]">
+                      <div className="flex items-center gap-3 mb-2">
+                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md" />
+                        <span className="text-secondary font-black text-[12px] md:text-[14px] uppercase tracking-widest">USKORO!</span>
+                      </div>
+                      <p className="text-white/90 text-[12px] md:text-[14px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
+                    </div>
                   </div>
                 </div>
               ) : (

@@ -9,6 +9,7 @@ interface CategoryOption {
   title: string;
   subtitle: string;
   icon: string;
+  disabled?: boolean;
 }
 
 interface CategorySelectorProps {
@@ -28,7 +29,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleCategoryClick = (id: string) => {
+  const handleCategoryClick = (id: string, disabled?: boolean) => {
+    if (disabled) return;
     onSelect(id);
   };
 
@@ -67,18 +69,31 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 * idx }}
-                onClick={() => handleCategoryClick(opt.id)}
-                className={`p-10 rounded-[10px] border-2 text-left cursor-pointer transition-all duration-500 group relative overflow-hidden ${selectedCategory === opt.id ? "border-secondary bg-secondary/5" : "border-white/5 bg-white/[0.02] hover:border-secondary/50 hover:bg-secondary/5"}`}
+                onClick={() => handleCategoryClick(opt.id, opt.disabled)}
+                tabIndex={opt.disabled ? 0 : undefined}
+                className={`p-10 rounded-[10px] border-2 text-left transition-all duration-500 group/tooltip relative overflow-hidden ${opt.disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'} ${selectedCategory === opt.id && !opt.disabled ? "border-secondary bg-secondary/5" : "border-white/5 bg-white/[0.02] " + (!opt.disabled ? "hover:border-secondary/50 hover:bg-secondary/5" : "")}`}
               >
-                <div className={`w-16 h-16 rounded-[10px] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform border ${selectedCategory === opt.id ? "bg-secondary border-secondary" : "bg-surface-container-high border-white/10"}`}>
-                  <span className={`material-symbols-outlined text-3xl ${selectedCategory === opt.id ? "!text-black" : "text-secondary"}`}>{opt.icon}</span>
+                <div className={`w-16 h-16 rounded-[10px] flex items-center justify-center mb-8 ${!opt.disabled && "group-hover:scale-110"} transition-transform border ${selectedCategory === opt.id && !opt.disabled ? "bg-secondary border-secondary" : "bg-surface-container-high border-white/10"}`}>
+                  <span className={`material-symbols-outlined text-3xl ${selectedCategory === opt.id && !opt.disabled ? "!text-black" : "text-secondary"}`}>{opt.icon}</span>
                 </div>
-                <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 font-headline transition-colors ${selectedCategory === opt.id ? "text-secondary" : "text-white"}`}>{opt.title}</h3>
+                <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 font-headline transition-colors ${selectedCategory === opt.id && !opt.disabled ? "text-secondary" : "text-white"}`}>{opt.title}</h3>
                 <p className="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">{opt.subtitle}</p>
 
-                <div className={`absolute top-6 right-6 transition-all duration-300 ${selectedCategory === opt.id ? "opacity-100 scale-100" : "opacity-0 scale-50"}`}>
+                <div className={`absolute top-6 right-6 transition-all duration-300 ${selectedCategory === opt.id && !opt.disabled ? "opacity-100 scale-100" : "opacity-0 scale-50"}`}>
                   <span className="material-symbols-outlined text-secondary text-3xl">check_circle</span>
                 </div>
+
+                {opt.disabled && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-focus/tooltip:scale-100 z-50">
+                    <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap flex flex-col items-center min-w-[200px]">
+                      <div className="flex items-center gap-3 mb-2">
+                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md" />
+                        <span className="text-secondary font-black text-[12px] md:text-[14px] uppercase tracking-widest">USKORO!</span>
+                      </div>
+                      <p className="text-white/90 text-[12px] md:text-[14px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

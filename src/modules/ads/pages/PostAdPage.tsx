@@ -133,9 +133,9 @@ export default function PostAdPage() {
       { id: "job", title: "Postavljam oglas za posao", subtitle: "ZA FIRME I POSLODAVCE", icon: "work" },
       { id: "accommodation", title: "Reklamiram smeštaj za radnike", subtitle: "ZA VLASNIKE SMEŠTAJA", icon: "home_work" },
       { id: "catering", title: "Oglašavam svoje ketering usluge", subtitle: "ZA KETERING SLUŽBE", icon: "restaurant" },
-      { id: "machines", title: "Prodajem ili izdajem mašinu", subtitle: "ZA VLASNIKE MAŠINA", icon: "precision_manufacturing" },
-      { id: "plot", title: "Prodajem ili izdajem plac", subtitle: "ZA VLASNIKE PLACA", icon: "landscape" },
-      { id: "marketplace", title: "Alat i oprema (Polovno)", subtitle: "POLOVAN ALAT I OPREMA", icon: "build" },
+      { id: "machines", title: "Prodajem ili izdajem mašinu", subtitle: "ZA VLASNIKE MAŠINA", icon: "precision_manufacturing", disabled: true },
+      { id: "plot", title: "Prodajem ili izdajem plac", subtitle: "ZA VLASNIKE PLACA", icon: "landscape", disabled: true },
+      { id: "marketplace", title: "Alat i oprema (Polovno)", subtitle: "POLOVAN ALAT I OPREMA", icon: "build", disabled: true },
     ];
 
     return (

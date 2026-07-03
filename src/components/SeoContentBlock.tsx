@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { ShieldCheck, MessageSquare, TrendingUp, HelpCircle, BarChart3 } from 'lucide-react';
 import { APP_CONFIG } from '@/src/constants/config';
 import { MACHINE_CATEGORIES } from '@/src/constants/machineTaxonomy';

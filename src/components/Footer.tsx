@@ -95,18 +95,18 @@ export default function Footer() {
               <li><Link to="/kontakt" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
               <li><Link to="/korisni-linkovi" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
               <li>
-                <div className="text-secondary hover:text-yellow-400 font-bold transition-colors text-[16px] flex items-center gap-1 hover:translate-x-1 duration-300 relative group/partner cursor-default">
+                <div className="text-secondary hover:text-yellow-400 font-bold transition-colors text-[16px] flex items-center gap-1 hover:translate-x-1 duration-300 relative group/partner cursor-pointer" tabIndex={0}>
                   Partner
                   <span className="lg:hidden text-[9px] text-secondary font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
                   
                   {/* Tooltip Popup */}
-                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 z-50 transform-gpu">
-                    <div className="bg-[#0c1219]/90 backdrop-blur-md border border-white/10 p-4 rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 group-focus/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 group-focus/partner:scale-100 z-50 transform-gpu">
+                    <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap min-w-[200px] flex flex-col items-center">
                       <div className="flex items-center gap-3 mb-2">
-                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-6 w-auto object-contain drop-shadow-md" />
-                        <span className="text-secondary font-black text-[12px] uppercase tracking-widest">Uskoro</span>
+                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md" />
+                        <span className="text-secondary font-black text-[12px] md:text-[14px] uppercase tracking-widest">USKORO!</span>
                       </div>
-                      <p className="text-white/90 text-[13px] font-medium tracking-wide">Affiliate program stiže uskoro!</p>
+                      <p className="text-white/90 text-[12px] md:text-[14px] font-medium tracking-wide">Affiliate program stiže uskoro!</p>
                     </div>
                   </div>
                 </div>
