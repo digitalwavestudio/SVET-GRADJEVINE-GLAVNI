@@ -223,11 +223,6 @@ mediaRouter.post(
 
       try {
         const bucket = admin.storage().bucket();
-        const [exists] = await bucket.exists();
-        if (!exists) {
-          throw new Error("Target Cloud Storage bucket does not exist.");
-        }
-
         const blob = bucket.file(fileName);
         const token = uuidv4();
 
