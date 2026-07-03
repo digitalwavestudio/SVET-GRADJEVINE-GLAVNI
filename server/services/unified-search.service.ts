@@ -146,12 +146,12 @@ export class UnifiedSearchService {
     if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
     if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
-    // Get total count using the same index as main query (type+status+createdAt)
+    // Get total count (reads all matching IDs, no limit — uses existing composite index)
     let totalHits: number | undefined;
     try {
       let countQ = db.collection("listings") as FirebaseFirestore.Query;
       if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
-      countQ = countQ.where("status", "==", "active");
+      if (!filters.showAllStatuses) countQ = countQ.where("status", "==", "active");
       countQ = countQ.orderBy("createdAt", "desc");
       const countSnap = await countQ.get();
       totalHits = countSnap.size;
