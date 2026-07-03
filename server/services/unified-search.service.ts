@@ -146,15 +146,15 @@ export class UnifiedSearchService {
     if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
     if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
-    // Get real total count before pagination
+    // Get total count (reads only doc IDs, not full data)
     let totalHits: number | undefined;
     try {
-      // Clone query without orderBy/limit for count
-      const countSnap = await (q as any).count().get();
-      totalHits = countSnap.data().count;
-    } catch {
-      totalHits = undefined;
-    }
+      let countQ = db.collection("listings") as FirebaseFirestore.Query;
+      if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
+      countQ = countQ.where("status", "==", "active");
+      const countSnap = await countQ.select().get();
+      totalHits = countSnap.size;
+    } catch { totalHits = undefined; }
 
     q = q.orderBy("createdAt", "desc");
     q = q.limit(pageSize);  // N+1 fix: čitamo tačno pageSize, ne pageSize+1
