@@ -93,9 +93,9 @@ function CompaniesPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-30px" }}
                   transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1"
+                  className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded-md overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1"
                 >
-                  <div className="relative h-28 w-full overflow-hidden">
+                  <div className="relative h-32 w-full overflow-hidden">
                     {company.coverImage ? (
                       <OptimizedImage src={company.coverImage} alt={company.name} className="w-full h-full object-cover transition-transform duration-700 scale-105 group-hover:scale-110" containerClassName="w-full h-full" />
                     ) : (
@@ -104,13 +104,13 @@ function CompaniesPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#050B10] via-[#050B10]/40 to-transparent opacity-90"></div>
                     <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
                       {company.isVerified && (
-                        <div className="flex items-center gap-1 bg-green-500/10 border border-green-500/20 backdrop-blur-md px-2 py-0.5 rounded shadow-lg">
+                        <div className="flex items-center gap-1 bg-green-500/10 border border-green-500/20 backdrop-blur-md px-2 py-0.5 rounded-md shadow-lg">
                           <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.8)]"></span>
                           <span className="text-[8px] font-black tracking-widest uppercase text-green-400">Verifikovan</span>
                         </div>
                       )}
                       {(company as any).isPremiumPartner && (
-                        <div className="flex items-center gap-1 bg-gradient-to-r from-secondary to-yellow-400 !text-black px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.3)] transform transition-transform group-hover:scale-105">
+                        <div className="flex items-center gap-1 bg-gradient-to-r from-secondary to-yellow-400 !text-black px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.3)] transform transition-transform group-hover:scale-105">
                           <span className="material-symbols-outlined text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
                           PREMIUM
                         </div>
@@ -118,8 +118,8 @@ function CompaniesPage() {
                     </div>
                   </div>
                   <div className="relative px-4 pb-4 flex-grow flex flex-col z-10">
-                    <div className="flex items-center gap-4 mb-3 mt-2">
-                      <div className="w-16 h-16 bg-white rounded flex items-center justify-center p-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 shrink-0 relative overflow-hidden">
+                    <div className="flex items-center gap-4 mb-3 mt-3">
+                      <div className="w-16 h-16 bg-white rounded-md flex items-center justify-center p-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 shrink-0 relative overflow-hidden">
                         {company.logo ? (
                           <OptimizedImage src={company.logo} alt="Logo" className="w-full h-full object-contain" containerClassName="w-full h-full" />
                         ) : (
@@ -130,18 +130,44 @@ function CompaniesPage() {
                         <Link onMouseEnter={() => prefetch('company', company.id)} to={`/firma/${company.id}`} className="block group/link">
                           <h3 className="text-base font-black font-headline text-white uppercase tracking-tight group-hover/link:text-secondary transition-colors truncate">{company.name}</h3>
                         </Link>
+                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                          {company.isVerified && (
+                            <span className="text-[9px] font-bold text-green-400 uppercase tracking-wider flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                              Verifikovan Partner
+                            </span>
+                          )}
+                          <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[10px]">location_on</span>
+                            {LOCATIONS.find((l: any) => l.slug === company.locationSlug)?.name || 'Srbija'}
+                          </span>
+                        </div>
                       </div>
+                    </div>
+                    <div className="flex flex-wrap gap-3 mb-3 text-[10px]">
+                      {company.phone && (
+                        <span className="flex items-center gap-1 text-white/40 font-medium">
+                          <span className="material-symbols-outlined text-[11px]">phone</span>
+                          {company.phone}
+                        </span>
+                      )}
+                      {company.website && (
+                        <span className="flex items-center gap-1 text-white/40 font-medium truncate max-w-[180px]">
+                          <span className="material-symbols-outlined text-[11px]">language</span>
+                          {company.website.replace(/^https?:\/\//, '')}
+                        </span>
+                      )}
                     </div>
                     <p className="text-white/50 text-[11px] mb-3 line-clamp-2 leading-relaxed font-medium flex-grow">{company.description}</p>
                     <div className="pt-3 border-t border-white/5 flex flex-col gap-2">
                       <div className="flex flex-wrap gap-1">
                         {Array.isArray(company.mainCategories) && company.mainCategories.slice(0, 2).map((catId: string) => (
-                          <span key={catId} className="bg-secondary/10 border border-secondary/20 text-secondary px-2 py-0.5 rounded text-[7px] font-black uppercase tracking-[0.12em]">
+                          <span key={catId} className="bg-secondary/10 border border-secondary/20 text-secondary px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-[0.12em]">
                             {COMPANY_MAIN_CATEGORIES.find(c => c.id === catId)?.name || 'INŽENJERING'}
                           </span>
                         ))}
                       </div>
-                      <Link onMouseEnter={() => prefetch('company', company.id)} to={`/firma/${company.id}`} className="w-full bg-gradient-to-r from-secondary/20 to-secondary/10 hover:from-secondary hover:to-yellow-400 text-secondary hover:!text-black border border-secondary/20 hover:border-secondary transition-all px-4 py-2.5 rounded font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 group/btn">
+                      <Link onMouseEnter={() => prefetch('company', company.id)} to={`/firma/${company.id}`} className="w-full bg-gradient-to-r from-secondary/20 to-secondary/10 hover:from-secondary hover:to-yellow-400 text-secondary hover:!text-black border border-secondary/20 hover:border-secondary transition-all px-4 py-2.5 rounded-md font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 group/btn">
                         <span>Pogledaj profil</span>
                         <span className="material-symbols-outlined text-[12px] transition-transform duration-300 group-hover/btn:translate-x-1">arrow_forward</span>
                       </Link>
@@ -153,7 +179,7 @@ function CompaniesPage() {
             <div className="flex flex-col justify-center mt-12 gap-4 items-center">
               {isDeepPagingLimitReached && (
                 <div className="w-full">
-                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-[10px] text-center max-w-lg mx-auto">
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-md text-center max-w-lg mx-auto">
                     <p className="text-xs text-red-400 font-bold">
                       Dosegli ste limit listanja.
                     </p>
@@ -161,7 +187,7 @@ function CompaniesPage() {
                 </div>
               )}
               {hasMore && (
-                <button onClick={() => loadMore()} disabled={loading} className="bg-secondary flex items-center gap-2 !text-black font-black px-8 py-4 rounded-[10px] text-xs uppercase tracking-widest hover:bg-yellow-400 transition-all disabled:opacity-50">
+                <button onClick={() => loadMore()} disabled={loading} className="bg-secondary flex items-center gap-2 !text-black font-black px-8 py-4 rounded-md text-xs uppercase tracking-widest hover:bg-yellow-400 transition-all disabled:opacity-50">
                   {loading && <Spinner className="w-4 h-4" />}
                   {loading ? 'UČITAVANJE...' : 'Učitaj još'}
                 </button>
