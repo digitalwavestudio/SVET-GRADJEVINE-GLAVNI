@@ -80,12 +80,12 @@ function CompaniesPage() {
 
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
         {loading && companies.length === 0 ? (
-          <ListingSkeleton count={8} viewMode="grid" />
+          <ListingSkeleton count={6} viewMode="grid" />
         ) : companies.length === 0 ? (
           <NoResults message="Nije pronađena nijedna firma." icon="business_center" />
         ) : (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {companies.map((company: any, idx: number) => (
                 <motion.div
                   key={company.id}
@@ -93,7 +93,7 @@ function CompaniesPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-30px" }}
                   transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded-lg overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1"
+                  className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1"
                 >
                   <div className="relative h-28 w-full overflow-hidden">
                     {company.coverImage ? (
@@ -119,7 +119,7 @@ function CompaniesPage() {
                   </div>
                   <div className="relative px-4 pb-4 flex-grow flex flex-col z-10">
                     <div className="flex items-center gap-4 mb-3 mt-2">
-                      <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 shrink-0 relative overflow-hidden">
+                      <div className="w-16 h-16 bg-white rounded flex items-center justify-center p-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 shrink-0 relative overflow-hidden">
                         {company.logo ? (
                           <OptimizedImage src={company.logo} alt="Logo" className="w-full h-full object-contain" containerClassName="w-full h-full" />
                         ) : (
