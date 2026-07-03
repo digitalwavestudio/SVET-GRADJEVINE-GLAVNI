@@ -241,9 +241,12 @@ mediaRouter.post(
 
         publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
+        if (process.env.NODE_ENV === "production") {
+          throw storageError;
+        }
+        
         console.info(`[MEDIA STORAGE INFO] Direct local media stream active.`);
         
-        // Dynamic file-system fallback (for local development or sandboxed dynamic workspaces)
         const uploadsDir = path.join(process.cwd(), "uploads", cleanFolder, user.uid);
         
         if (!fs.existsSync(uploadsDir)) {
@@ -253,7 +256,6 @@ mediaRouter.post(
         const localFilePath = path.join(uploadsDir, fileId);
         fs.writeFileSync(localFilePath, processedBuffer);
         
-        // Serve locally via express.static mount
         publicUrl = `/uploads/${cleanFolder}/${user.uid}/${fileId}`;
       }
 

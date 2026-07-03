@@ -40,7 +40,21 @@ export function useRealtimeSync() {
     const initSSE = async () => {
       try {
         const authInst = await getLazyAuth();
-        const token = await authInst.currentUser?.getIdToken();
+
+        // Sačekaj da Firebase Auth bude spreman (currentUser je null dok onIdTokenChanged ne odradi)
+        let fbUser = authInst.currentUser;
+        if (!fbUser) {
+          const { onAuthStateChanged } = await import('firebase/auth');
+          fbUser = await new Promise<any>((resolve) => {
+            const unsub = onAuthStateChanged(authInst, (u) => {
+              unsub();
+              resolve(u);
+            });
+          });
+        }
+        if (!fbUser) return;
+
+        const token = await fbUser.getIdToken();
         if (!active) return;
 
         let url = '/api/stream';

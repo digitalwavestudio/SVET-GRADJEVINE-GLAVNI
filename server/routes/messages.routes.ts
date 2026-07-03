@@ -203,6 +203,10 @@ messagesRouter.post(
 
         url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
+        if (process.env.NODE_ENV === "production") {
+          throw storageError;
+        }
+        
         console.info(`[CHAT STORAGE INFO] Direct local media stream active.`);
         
         const uploadsDir = path.join(process.cwd(), "uploads", "chats", chatId);

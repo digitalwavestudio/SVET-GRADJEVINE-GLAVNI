@@ -47,13 +47,14 @@ export const canonicalHostMiddleware = (
   next: NextFunction,
 ) => {
   const host = req.get("x-forwarded-host") || req.get("host") || "";
-  const isProdEnv = env.NODE_ENV === "production" && !host.includes("run.app");
 
   if (
-    isProdEnv &&
+    !host.includes("localhost") &&
+    !host.includes("127.0.0.1") &&
+    !host.includes("run.app") &&
     host !== `www.${APP_CONFIG.DOMAIN}`
   ) {
-    if (DEV) console.info(
+    console.info(
       `[SEO] Redirecting non-canonical host ${host} to ${APP_CONFIG.BASE_URL}`,
     );
     return res.redirect(301, APP_CONFIG.BASE_URL + req.originalUrl);

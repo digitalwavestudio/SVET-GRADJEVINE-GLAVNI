@@ -177,6 +177,9 @@ async function startServer() {
     app.set("trust proxy", 1);
     app.use(compression());
 
+    // Najraniji mogući www redirect — pre svih middleware-a i ruta
+    app.use(canonicalHostMiddleware);
+
     const { createProxyMiddleware } = await import("http-proxy-middleware");
     app.use(
       "/__/auth",
@@ -275,7 +278,6 @@ async function startServer() {
 
     app.use("/api", authMiddleware, xssMiddleware, apiRouter);
     app.use("/feed", feedRouter);
-    app.use(canonicalHostMiddleware);
     app.use(botPrerenderMiddleware);
     app.use("/", seoRouter);
     app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
