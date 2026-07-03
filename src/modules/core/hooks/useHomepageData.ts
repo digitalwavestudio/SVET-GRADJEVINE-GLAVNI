@@ -3,25 +3,29 @@ import { apiClient } from "@/src/lib/apiClient";
 
 async function enrichLogo(jobs: any[]): Promise<any[]> {
   if (!jobs?.length) return jobs;
-  const missingLogo = jobs.filter((j: any) => !j.logo);
+  const missingLogo = jobs.filter((j: any) => !j.logo && j.authorId);
   if (!missingLogo.length) return jobs;
 
+  const authorIds = [...new Set(missingLogo.map((j: any) => j.authorId))];
   try {
-      const searchRes = await apiClient.post<any>("/jobs/search", {
-      pageSize: 5,
-      filters: { status: "active" },
-    });
-    const searchJobs: any[] = searchRes?.docs || [];
-    if (!searchJobs.length) return jobs;
-
+    const profiles = await Promise.all(
+      authorIds.map((uid: string) =>
+        apiClient.get<any>(`/users/${uid}/public`).catch(() => null)
+      )
+    );
     const logoMap = new Map<string, string>();
-    searchJobs.forEach((sj: any) => {
-      if (sj.logo && sj.id) logoMap.set(sj.id, sj.logo);
+    profiles.forEach((p: any) => {
+      if (p?.businessProfile?.logo && p?.uid) {
+        logoMap.set(p.uid, p.businessProfile.logo);
+      } else if (p?.id && p?.businessProfile?.logo) {
+        logoMap.set(p.id, p.businessProfile.logo);
+      }
     });
+    if (!logoMap.size) return jobs;
 
     return jobs.map((j: any) => {
-      if (!j.logo && logoMap.has(j.id)) {
-        return { ...j, logo: logoMap.get(j.id) };
+      if (!j.logo && logoMap.has(j.authorId)) {
+        return { ...j, logo: logoMap.get(j.authorId) };
       }
       return j;
     });
