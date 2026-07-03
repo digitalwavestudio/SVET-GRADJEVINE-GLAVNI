@@ -24,7 +24,7 @@ steps:
       - '--port'
       - '8080'
       - '--update-env-vars'
-      - 'APP_REGION=us-west1,APP_MODE=api,REDIS_URL=${_REDIS_URL}'
+      - 'NODE_ENV=production,APP_REGION=us-west1,APP_MODE=api,REDIS_URL=${_REDIS_URL}'
       - '--min-instances'
       - '1'
       - '--max-instances'

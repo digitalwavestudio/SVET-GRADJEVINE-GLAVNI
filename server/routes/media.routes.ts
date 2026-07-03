@@ -236,7 +236,8 @@ mediaRouter.post(
 
         publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
-        if (process.env.NODE_ENV === "production") {
+        console.error("[GCS_UPLOAD_FAIL]", storageError?.message || storageError);
+        if (process.env.NODE_ENV === "production" || process.env.K_SERVICE) {
           throw storageError;
         }
         console.info(`[MEDIA STORAGE INFO] Direct local media stream active.`);
