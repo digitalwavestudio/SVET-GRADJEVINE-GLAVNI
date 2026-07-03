@@ -13,6 +13,7 @@ import { LOCATIONS } from '@/src/constants/taxonomy';
 import { useCompaniesList } from '@/src/modules/companies/hooks/useCompanies';
 import withSEOAndFilters from '@/src/hoc/withSEOAndFilters';
 import { usePrefetch } from '@/src/hooks/usePrefetch';
+import { AiSearchBar } from '@/src/components/AiSearchBar';
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { generateCompanyListSchema } from '@/src/lib/seoSchema';
 import { APP_CONFIG } from '@/src/constants/config';
@@ -70,7 +71,11 @@ function CompaniesPage() {
           { label: "Novi partneri", value: `+${companyStats?.today?.toLocaleString() || "10"}`, icon: "add_business" },
           { label: "Premium", value: premiumCount?.toLocaleString() || "45", icon: "category" }
         ]}
-      />
+      >
+        <div className="mt-8 flex flex-col gap-4 max-w-4xl w-full">
+          <AiSearchBar vertical="companies" />
+        </div>
+      </StandardPageHero>
 
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
         {loading && companies.length === 0 ? (
