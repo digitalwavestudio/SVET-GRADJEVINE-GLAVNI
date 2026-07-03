@@ -57,7 +57,7 @@ export function StandardPageHero({
       </div>
 
       <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">
-        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-36 md:pt-[240px] pb-20 md:pb-0">
+        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-[129px] md:pt-[225px] pb-20 md:pb-0">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
@@ -94,7 +94,7 @@ export function StandardPageHero({
             <div className="md:h-full">
               {subtitle && (
                 <div className="relative md:pl-8 h-full border-l-0 md:border-l-2 border-secondary/30 flex items-center mt-6 md:mt-0">
-                  <p className="text-base sm:text-xl md:text-2xl text-slate-200 max-w-3xl font-medium leading-relaxed">
+                  <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-3xl font-medium leading-relaxed">
                     {subtitle}
                   </p>
                 </div>

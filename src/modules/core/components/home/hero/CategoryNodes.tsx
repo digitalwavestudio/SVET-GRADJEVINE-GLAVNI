@@ -9,6 +9,7 @@ import {
   Tractor, 
   Map 
 } from "lucide-react";
+import logoImage from "@/src/assets/images/logo.webp";
 import { HeroTabType } from "@/src/modules/core/hooks/useHeroSearch";
 
 export const HERO_TABS = [
@@ -42,10 +43,27 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
           return (
             <div
               key={tab.id}
-              className="flex flex-col items-center text-center shrink-0 w-[6.5rem] cursor-pointer snap-start"
+              className={`group/tooltip relative flex flex-col items-center text-center shrink-0 w-[6.5rem] snap-start ${['alat-i-oprema', 'masine', 'placevi'].includes(tab.id) ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
               style={{ animation: `nodeFadeIn 0.4s ease-out ${idx * 0.04}s both` }}
-              onClick={() => onTabChange(tab.id as HeroTabType)}
+              onClick={(e) => {
+                if (['alat-i-oprema', 'masine', 'placevi'].includes(tab.id)) {
+                  e.preventDefault();
+                  return;
+                }
+                onTabChange(tab.id as HeroTabType);
+              }}
             >
+              {['alat-i-oprema', 'masine', 'placevi'].includes(tab.id) && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50 md:hidden">
+                  <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-3 rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                    <div className="flex items-center gap-2 mb-1">
+                      <img src={logoImage} alt="Svet Građevine Logo" className="h-4 w-auto object-contain drop-shadow-md" />
+                      <span className="text-secondary font-black text-[10px] uppercase tracking-widest">Uskoro</span>
+                    </div>
+                    <p className="text-white/90 text-[11px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
+                  </div>
+                </div>
+              )}
               {/* Outer Golden/Glowing Orb Wrapper */}
               <div className="relative active:scale-95 transition-transform duration-150">
                 <div
@@ -89,10 +107,27 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
           return (
             <div
               key={tab.id}
-              className="group relative cursor-pointer"
+              className={`group group/tooltip relative ${['alat-i-oprema', 'masine', 'placevi'].includes(tab.id) ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
               style={{ animation: `nodeSlideIn 0.5s ease-out ${0.3 + idx * 0.05}s both` }}
-              onClick={() => onTabChange(tab.id as HeroTabType)}
+              onClick={(e) => {
+                if (['alat-i-oprema', 'masine', 'placevi'].includes(tab.id)) {
+                  e.preventDefault();
+                  return;
+                }
+                onTabChange(tab.id as HeroTabType);
+              }}
             >
+              {['alat-i-oprema', 'masine', 'placevi'].includes(tab.id) && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 z-50 hidden md:block">
+                  <div className="bg-[#0c1219]/90 backdrop-blur-md border border-white/10 p-4 rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                    <div className="flex items-center gap-3 mb-2">
+                      <img src={logoImage} alt="Svet Građevine Logo" className="h-6 w-auto object-contain drop-shadow-md" />
+                      <span className="text-secondary font-black text-[12px] uppercase tracking-widest">Uskoro</span>
+                    </div>
+                    <p className="text-white/90 text-[13px] font-medium tracking-wide">Ova sekcija stiže uskoro, još uvek je u izradi!</p>
+                  </div>
+                </div>
+              )}
               {/* Background Sequence Number */}
               <div className="absolute -left-8 -top-8 text-[80px] font-black text-white/[0.02] pointer-events-none group-hover:text-secondary/[0.05] transition-colors duration-1000 italic select-none hidden sm:block">
                 0{idx + 1}

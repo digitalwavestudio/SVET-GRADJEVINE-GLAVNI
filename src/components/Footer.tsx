@@ -11,20 +11,17 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer role="contentinfo" className="bg-[#0a1016] w-full pt-10 md:pt-24 pb-24 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
-      {/* Background glow for luxury feel */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[1px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent"></div>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>
-
+    <footer role="contentinfo" className="bg-[#070b14] w-full pt-10 md:pt-24 pb-24 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
+      {/* Background glow removed as per request */}
       <div className="max-w-[1920px] mx-auto w-full relative z-10">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8 lg:gap-8 mb-8 lg:mb-16">
           {/* Brand Column */}
-          <div className="col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left">
-            <Link to="/" className="flex items-center gap-3 group mb-4 lg:mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg" aria-label="Svet Građevine home">
+          <div className="col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left lg:-mt-6">
+            <Link to="/" className="flex items-center gap-3 group mb-4 lg:mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg md:-ml-8" aria-label="Svet Građevine home">
               <img width="800" height="600" decoding="async" src={logoUrl || logoImage} alt="Svet Građevine Logo" loading="lazy" className="w-[160px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
             </Link>
-            <p className="hidden sm:block text-slate-400 text-sm leading-relaxed mb-6 lg:mb-8 max-w-sm">
-              Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-slate-200">najbolje građevinske poslove</strong>, pouzdane <strong className="font-bold text-slate-200">majstore i radnike</strong>, iznajmite mehanizaciju ili pronađite adekvatan smeštaj i placeve.
+            <p className="hidden sm:block text-white/70 text-base leading-relaxed tracking-wide -mt-2 lg:-mt-4 mb-6 lg:mb-8 max-w-sm">
+              Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-white">najbolje građevinske poslove</strong>, pouzdane <strong className="font-bold text-white">majstore i radnike</strong>, iznajmite mehanizaciju ili pronađite adekvatan smeštaj i placeve.
             </p>
             <div className="flex items-center justify-center sm:justify-start gap-4">
               <a href={APP_CONFIG.SOCIAL.FACEBOOK} target="_blank" rel="noopener noreferrer" aria-label="Posetite našu Facebook grupu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
@@ -41,75 +38,95 @@ export default function Footer() {
 
           {/* Categories Columns */}
           <div className="col-span-2 lg:col-span-4 mt-2 sm:mt-0">
-            <h4 className="text-secondary font-black text-[10px] sm:text-xs tracking-widest uppercase mb-4 flex items-center justify-center sm:justify-start gap-2">
+            <h4 className="text-secondary font-extrabold text-[11px] sm:text-[13px] tracking-widest uppercase mb-4 flex items-center justify-center sm:justify-start gap-2">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Kategorije
             </h4>
-            <ul className="grid grid-cols-2 gap-y-2 gap-x-2 sm:gap-x-4">
+            <ul className="grid grid-cols-2 gap-y-3 gap-x-2 sm:gap-x-4 lg:gap-y-4 lg:gap-x-8">
               {[
                 { path: 'poslovi', label: 'Poslovi' },
                 { path: 'majstori', label: 'Majstori' },
                 { path: 'firme', label: 'Firme' },
                 { path: 'smestaj', label: 'Smeštaj' },
                 { path: 'ketering', label: 'Ketering' },
-                { path: 'alat-i-oprema', label: 'Alat i oprema' },
-                { path: 'gradjevinske-masine', label: 'Mašine' },
-                { path: 'placevi', label: 'Placevi' },
+                { path: 'alat-i-oprema', label: 'Alat i oprema', disabled: true },
+                { path: 'gradjevinske-masine', label: 'Mašine', disabled: true },
+                { path: 'placevi', label: 'Placevi', disabled: true },
                 { path: 'cene-i-statistika', label: 'Statistika' },
                 { path: 'kalkulator', label: 'AI Kalkulator' }
-              ].map((item) => (
-                <li key={item.path} className="flex items-center justify-center sm:justify-start text-center sm:text-left">
-                  <Link to={`/${item.path}`} className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium cursor-pointer touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label={item.label}>
+              ].map((item) => {
+                const isDisabled = item.disabled;
+                return (
+                <li key={item.path} className="flex items-center justify-center sm:justify-start text-center sm:text-left relative group/tooltip">
+                  <Link 
+                    to={`/${item.path}`} 
+                    onClick={(e) => {
+                      if (isDisabled) {
+                        e.preventDefault();
+                      }
+                    }}
+                    className={`inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline ${isDisabled ? 'text-white/20 cursor-not-allowed hover:text-white/30' : 'text-white/40 hover:text-secondary hover:translate-x-1 cursor-pointer'}`} 
+                    aria-label={item.label}
+                  >
                     {item.label}
                   </Link>
+                  {isDisabled && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50">
+                      <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-3 rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                        <div className="flex items-center gap-2 mb-1">
+                          <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-4 w-auto object-contain drop-shadow-md" />
+                          <span className="text-secondary font-black text-[10px] uppercase tracking-widest">Uskoro</span>
+                        </div>
+                        <p className="text-white/90 text-[11px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
+                      </div>
+                    </div>
+                  )}
                 </li>
-              ))}
+              )})}
             </ul>
           </div>
 
           {/* Company Column */}
           <div className="col-span-1 lg:col-span-2 flex flex-col items-center sm:items-start text-center sm:text-left">
-            <h4 className="text-secondary font-black text-[10px] sm:text-xs tracking-widest uppercase mb-4 flex items-center gap-2">
+            <h4 className="text-secondary font-extrabold text-[11px] sm:text-[13px] tracking-widest uppercase mb-4 flex items-center gap-2">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Kompanija
             </h4>
-            <ul className="space-y-2 flex flex-col items-center sm:items-start">
-              <li><Link to="/o-nama" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="O nama">O nama</Link></li>
-              <li><Link to="/kontakt" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
-              <li><Link to="/korisni-linkovi" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
+            <ul className="space-y-3 flex flex-col items-center sm:items-start">
+              <li><Link to="/o-nama" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="O nama">O nama</Link></li>
+              <li><Link to="/kontakt" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Kontakt">Kontakt</Link></li>
+              <li><Link to="/korisni-linkovi" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Korisni linkovi">Korisni linkovi</Link></li>
               <li>
-                <div className="text-[#b35b10]/50 text-[16px] leading-[20px] font-black tracking-widest flex flex-wrap items-center justify-center sm:justify-start gap-1 uppercase relative group/partner cursor-default">
+                <div className="text-secondary hover:text-yellow-400 font-bold transition-colors text-[16px] flex items-center gap-1 hover:translate-x-1 duration-300 relative group/partner cursor-default">
                   Partner
-                  <span className="lg:hidden text-[9px] text-[#b35b10] font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
+                  <span className="lg:hidden text-[9px] text-secondary font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
                   
                   {/* Tooltip Popup */}
                   <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 z-50 transform-gpu">
-                    <div className="bg-[#0F1923] border border-secondary/50 p-3 rounded-md shadow-[0_10px_30px_rgba(0,0,0,0.5)] whitespace-nowrap">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="material-symbols-outlined text-secondary text-sm">construction</span>
-                        <span className="text-secondary font-black text-[10px] uppercase tracking-widest">Uskoro</span>
+                    <div className="bg-[#0c1219]/90 backdrop-blur-md border border-white/10 p-4 rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                      <div className="flex items-center gap-3 mb-2">
+                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-6 w-auto object-contain drop-shadow-md" />
+                        <span className="text-secondary font-black text-[12px] uppercase tracking-widest">Uskoro</span>
                       </div>
-                      <p className="text-white text-[11px] font-medium">Affiliate program stiže uskoro!</p>
-                      {/* Arrow */}
-                      <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-[#0F1923]"></div>
+                      <p className="text-white/90 text-[13px] font-medium tracking-wide">Affiliate program stiže uskoro!</p>
                     </div>
                   </div>
                 </div>
               </li>
-              <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-[15px] flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Predaj oglas"><span className="material-symbols-outlined text-[18px]">add_circle</span> Predaj oglas</Link></li>
+              <li><Link to="/postavi-oglas" className="text-secondary hover:text-yellow-400 font-bold transition-colors text-[16px] flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Predaj oglas"><span className="material-symbols-outlined text-[18px]">add_circle</span> Predaj oglas</Link></li>
               {user && (user.role === 'admin' || user.isAdmin) && (
-                <li><Link to="/admin" className="text-red-400 hover:text-red-300 font-black transition-colors text-[15px] flex items-center gap-1 mt-2 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Admin Hub"><span className="material-symbols-outlined text-[18px]">terminal</span> Admin Hub</Link></li>
+                <li><Link to="/admin" className="text-red-500 hover:text-red-400 font-bold transition-colors text-[16px] flex items-center gap-1 hover:translate-x-1 duration-300 touch-target focus:outline-none focus-visible:underline" aria-label="Admin Hub"><span className="material-symbols-outlined text-[18px]">terminal</span> Admin Hub</Link></li>
               )}
             </ul>
           </div>
 
           {/* Legal Info Column */}
           <div className="col-span-1 lg:col-span-2 flex flex-col items-center sm:items-start text-center sm:text-left">
-            <h4 className="text-secondary font-black text-[10px] sm:text-xs tracking-widest uppercase mb-4 flex items-center gap-2">
+            <h4 className="text-secondary font-extrabold text-[11px] sm:text-[13px] tracking-widest uppercase mb-4 flex items-center gap-2">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Pravne Info
             </h4>
-            <ul className="space-y-2 flex flex-col items-center sm:items-start">
-              <li><Link to="/privatnost" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Privatnost">Privatnost</Link></li>
-              <li><Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Uslovi korišćenja">Uslovi korišćenja</Link></li>
-              <li><Link to="/pravila-oglasavanja" className="text-slate-400 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[15px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Pravila oglašavanja">Pravila oglašavanja</Link></li>
+            <ul className="space-y-3 flex flex-col items-center sm:items-start">
+              <li><Link to="/privatnost" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Privatnost">Privatnost</Link></li>
+              <li><Link to="/uslovi-koriscenja" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Uslovi korišćenja">Uslovi korišćenja</Link></li>
+              <li><Link to="/pravila-oglasavanja" className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-[16px] font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline" aria-label="Pravila oglašavanja">Pravila oglašavanja</Link></li>
             </ul>
           </div>
         </div>
@@ -120,10 +137,29 @@ export default function Footer() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">
             <ThemeToggle className="mt-0" />
+            
+            {/* Trust Badges */}
+            <div className="group flex items-center gap-3 px-4 py-2.5 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(34,197,94,0.15)] transition-all duration-300 ml-0 lg:ml-4 cursor-default relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <span className="material-symbols-outlined text-[20px] text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">security</span>
+              <span className="text-white/80 group-hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10">Sigurna Platforma</span>
+            </div>
+            
+            <div className="group flex items-center gap-3 px-4 py-2.5 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-default relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <span className="material-symbols-outlined text-[20px] text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">verified</span>
+              <span className="text-white/80 group-hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10">Verifikovani Korisnici</span>
+            </div>
+
+            <div className="group flex items-center gap-3 px-4 py-2.5 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(168,85,247,0.15)] transition-all duration-300 cursor-default relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <span className="material-symbols-outlined text-[20px] text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">lock</span>
+              <span className="text-white/80 group-hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10">Sigurno Plaćanje</span>
+            </div>
           </div>
           
-          <div className="text-on-surface-variant text-xs font-medium uppercase tracking-widest text-center">
-            © {new Date().getFullYear()} Svet Građevine. Sva prava zadržana.
+          <div className="text-blue-400 text-xs font-bold uppercase tracking-widest text-center mt-6 lg:mt-0">
+            © {new Date().getFullYear()} SVET GRAĐEVINE. SVA PRAVA ZADRŽANA.
           </div>
         </div>
       </div>

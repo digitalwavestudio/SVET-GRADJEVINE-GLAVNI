@@ -10,6 +10,7 @@ import { useHeroSearch, HeroTabType } from "@/src/modules/core/hooks/useHeroSear
 import { CategoryNodes } from "@/src/modules/core/components/home/hero/CategoryNodes";
 import { HeroFilters } from "@/src/modules/core/components/home/hero/HeroFilters";
 import { Button } from "@/src/components/ui/Button";
+import { AiSearchBar } from "@/src/components/AiSearchBar";
 
 const placeholderMap: Record<string, string> = {
   poslovi: "Traži posao...",
@@ -35,9 +36,21 @@ export default function HeroSection() {
     handleCategorySearch,
   } = useHeroSearch();
 
+  const tabToVertical: Record<string, 'jobs' | 'machines' | 'accommodations' | 'catering' | 'real-estate' | 'masters' | 'companies'> = {
+    poslovi: 'jobs',
+    masine: 'machines',
+    smestaj: 'accommodations',
+    ketering: 'catering',
+    placevi: 'real-estate',
+    majstori: 'masters',
+    firme: 'companies',
+    'alat-i-oprema': 'machines',
+  };
+  const currentVertical = tabToVertical[activeTab as string] || 'jobs';
+
   return (
     <>
-      <section className="relative z-50 min-h-screen flex items-center pt-14 md:pt-24 pb-8 md:pb-16 bg-surface-container-lowest">
+      <section className="relative z-50 min-h-screen flex flex-col justify-start pt-36 md:pt-[240px] pb-8 md:pb-16 bg-surface-container-lowest">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div
             className="absolute inset-0 z-0 hero-bottom-fade"
@@ -56,9 +69,9 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full mt-[50px] md:mt-[110px]">
           <div
-            className="max-w-[1300px] w-full relative mt-16 md:mt-32"
+            className="max-w-[1300px] w-full relative"
             style={{ animation: "heroContentIn 0.8s ease-out 0.2s both" }}
           >
 
@@ -68,54 +81,17 @@ export default function HeroSection() {
                 <span className="text-secondary">NA JEDNOM MESTU</span>
               </div>
             </h1>
-            <p className="text-base sm:text-xl md:text-2xl text-slate-200 max-w-4xl mb-12 font-medium leading-relaxed relative">
+            <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-4xl mb-12 font-medium leading-relaxed relative">
               Poslovi, mašine, placevi, ketering, smeštaj, baza majstora i
               kompanije - jedinstven sistem za brze povezivanje i efikasnije
               poslovanje.
             </p>
 
             {/* Cyber-HUD Universal Search & Category Nodes */}
-            <div className="relative z-20 w-full mt-10 md:mt-40">
+            <div className="relative z-20 w-full mt-[10px] md:mt-[110px]">
               {/* Main HUD Search Module - Now Above Categories */}
-              <div className="relative mb-8 md:mb-36 group/searchwrapper">
-
-
-                <form
-                  onSubmit={handleSearch}
-                  className="flex flex-col md:flex-row items-center gap-4 w-full"
-                >
-                  {/* Unified Search Unit: Input + Search Button */}
-                  <div className="flex-1 w-full relative bg-transparent rounded-[10px] border border-white/10 p-1.5 md:p-3 group/search transition-all duration-700 hover:border-white/20 focus-within:border-white/30 shadow-enterprise overflow-hidden flex items-center">
-                    <div className="pl-2 md:pl-6 text-white/40 group-focus-within/search:text-white transition-colors duration-500">
-                      <Search size={20} className="md:w-6 md:h-6" />
-                    </div>
-                    <div className="flex-1 mx-2 md:mx-6">
-                      <input
-                        type="text"
-                        value={globalQuery}
-                        onChange={(e) => setGlobalQuery(e.target.value)}
-                        placeholder={placeholderMap[activeTab as string] || "Traži..."}
-                        autoComplete="off"
-                        spellCheck="false"
-                        className="w-full !bg-transparent !border-none !backdrop-blur-none focus:ring-0 focus:shadow-none text-white placeholder-white/70 focus:placeholder-white text-xs sm:text-base md:text-xl font-medium tracking-wide py-2 md:py-6 px-2 md:px-4 outline-none transition-all text-ellipsis"
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="h-10 sm:h-14 md:h-16 bg-secondary !text-black px-4 sm:px-6 md:px-8 rounded-[8px] font-black uppercase tracking-wider text-xs sm:text-sm md:text-base transition-all duration-500 hover:bg-[#ffad3a] active:scale-95 flex items-center justify-center gap-2 group/btn shrink-0 mr-1 md:mr-4 border-none"
-                    >
-                      <span className="hidden sm:inline">Pretraži</span>
-                      <ArrowRight
-                        size={20}
-                        className="group-hover/btn:translate-x-1 group-active/btn:translate-x-2 transition-transform duration-300"
-                      />
-                    </Button>
-
-                    {/* HUD Decor Line */}
-                    <div className="absolute bottom-3 left-20 right-48 h-px bg-gradient-to-r from-transparent via-secondary/20 to-transparent pointer-events-none"></div>
-                  </div>
-                </form>
+              <div className="relative mb-12 md:mb-[204px] group/searchwrapper max-w-[970px]">
+                <AiSearchBar vertical={currentVertical} />
               </div>
 
               {/* Category Floating Nodes Grid */}

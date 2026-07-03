@@ -1,5 +1,6 @@
 import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { initGA, trackPageView } from '@/src/lib/analytics';
 import NetworkStatus from '@/src/components/NetworkStatus';
 import CookieConsent from '@/src/components/CookieConsent';
@@ -48,18 +49,37 @@ export function RootLayout() {
   }, [location]);
 
   return (
-    <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary">
-      <ProgressBar />
-      <QuotaBanner />
-      {location.pathname !== '/prijava' && <VerificationBanner />}
-      <NetworkStatus />
-      <CookieConsent />
-      <ScrollRestoration />
-      <BackToTop />
-      
-      <Suspense fallback={<PageLoader />}>
-        <Outlet />
-      </Suspense>
+    <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary relative">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <motion.div
+          className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px]"
+          animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-32 w-[450px] h-[450px] bg-blue-500/3 rounded-full blur-[120px]"
+          animate={{ x: [0, -50, 0], y: [0, 40, 0] }}
+          transition={{ duration: 35, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-white/[0.02] rounded-full blur-[100px]"
+          animate={{ x: [0, 20, -20, 0], y: [0, -20, 10, 0] }}
+          transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+      <div className="relative z-10">
+        <ProgressBar />
+        <QuotaBanner />
+        {location.pathname !== '/prijava' && <VerificationBanner />}
+        <NetworkStatus />
+        <CookieConsent />
+        <ScrollRestoration />
+        <BackToTop />
+
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
+      </div>
     </div>
   );
 }
