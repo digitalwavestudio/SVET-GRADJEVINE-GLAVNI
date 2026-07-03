@@ -236,35 +236,17 @@ mediaRouter.post(
 
         publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: any) {
-        // Pokušaj kreiranje GCS bucketa ako ne postoji
-        try {
-          const bucket = admin.storage().bucket();
-          console.info(`[MEDIA STORAGE INFO] Attempting to create GCS bucket: ${bucket.name}`);
-          await bucket.create({ location: "us-west1" });
-          // Retry upload
-          const retryBlob = bucket.file(fileName);
-          const retryToken = uuidv4();
-          await retryBlob.save(processedBuffer, {
-            metadata: {
-              contentType,
-              cacheControl: "public, max-age=31536000",
-              metadata: { firebaseStorageDownloadTokens: retryToken },
-            },
-          });
-          publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${retryToken}`;
-        } catch (bucketCreateError: any) {
-          if (process.env.NODE_ENV === "production") {
-            throw storageError;
-          }
-          console.info(`[MEDIA STORAGE INFO] Direct local media stream active.`);
-          const uploadsDir = path.join(process.cwd(), "uploads", cleanFolder, user.uid);
-          if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-          }
-          const localFilePath = path.join(uploadsDir, fileId);
-          fs.writeFileSync(localFilePath, processedBuffer);
-          publicUrl = `/uploads/${cleanFolder}/${user.uid}/${fileId}`;
+        if (process.env.NODE_ENV === "production") {
+          throw storageError;
         }
+        console.info(`[MEDIA STORAGE INFO] Direct local media stream active.`);
+        const uploadsDir = path.join(process.cwd(), "uploads", cleanFolder, user.uid);
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const localFilePath = path.join(uploadsDir, fileId);
+        fs.writeFileSync(localFilePath, processedBuffer);
+        publicUrl = `/uploads/${cleanFolder}/${user.uid}/${fileId}`;
       }
 
       res.json({

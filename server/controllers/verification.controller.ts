@@ -39,34 +39,18 @@ export const uploadVerificationDocuments = async (
 
         return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${token}`;
       } catch (storageError: unknown) {
-        // Pokušaj kreiranje GCS bucketa ako ne postoji
-        try {
-          const bucket = admin.storage().bucket();
-          console.info(`[VERIFICATION STORAGE INFO] Attempting to create GCS bucket: ${bucket.name}`);
-          await bucket.create({ location: "us-west1" });
-          const retryBlob = bucket.file(fileName);
-          const retryToken = uuidv4();
-          await retryBlob.save(file.buffer, {
-            metadata: {
-              contentType: file.mimetype,
-              metadata: { firebaseStorageDownloadTokens: retryToken },
-            },
-          });
-          return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${retryToken}`;
-        } catch (bucketCreateError: unknown) {
-          if (process.env.NODE_ENV === "production") {
-            throw storageError;
-          }
-          const error = storageError as Error;
-          console.info(`[VERIFICATION STORAGE INFO] Direct local media stream active: ${error.message}`);
-          const uploadsDir = path.join(process.cwd(), "uploads", "verifications", uid);
-          if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-          }
-          const localFilePath = path.join(uploadsDir, path.basename(fileName));
-          fs.writeFileSync(localFilePath, file.buffer);
-          return `/uploads/verifications/${uid}/${path.basename(fileName)}`;
+        if (process.env.NODE_ENV === "production") {
+          throw storageError;
         }
+        const error = storageError as Error;
+        console.info(`[VERIFICATION STORAGE INFO] Direct local media stream active: ${error.message}`);
+        const uploadsDir = path.join(process.cwd(), "uploads", "verifications", uid);
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const localFilePath = path.join(uploadsDir, path.basename(fileName));
+        fs.writeFileSync(localFilePath, file.buffer);
+        return `/uploads/verifications/${uid}/${path.basename(fileName)}`;
       }
     });
 
