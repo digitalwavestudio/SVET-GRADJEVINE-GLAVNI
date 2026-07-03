@@ -181,6 +181,14 @@ Kad je Firestore bio spor (>100ms), Fast-Path timeout od 100ms je istekao i sist
 - Fast-Path empty array guard u `unified-ads.service.ts`
 - pageSize cap 1000 u `jobs.controller.ts`
 
+## 🛑 PREMIUM PONUDA HOME — NE DODAVATI `type=="job"` U `getPromotedAds`
+
+**Razlog:** `getPromotedAds({ isPremium: true })` u `unified-ads.service.ts` i BFF fallback u `bff.service.ts` NE SMEJU da imaju `where("type", "==", "job")` filter.
+
+Premium Ponuda na naslovnoj strani prikazuje premium oglase iz **SVIH vertikala** (poslovi, mašine, nekretnine, smeštaj, ugostiteljstvo). `type=="job"` filter bi isključio ostale kategorije.
+
+Ako premium upit ne radi (vraća prazno), problem je **nedostajući Firestore indeks** za `ai-studio` bazu, a ne `type` filter. Potrebno je deploy-ovati indekse na `ai-studio` preko `gcloud firestore indexes composite create`.
+
 ## 🖥️ LOCALHOST SETUP (Session 5 — fixirano 2026-06-29)
 
 **⚠️ BITNO: Lokalni dev radi SPORO jer je Firestore baza u `us-west1` (Oregon), a ti si u Srbiji. Svaki upit traje 1-15s.**
