@@ -17,7 +17,7 @@ import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { generateCompanyListSchema } from '@/src/lib/seoSchema';
 import { APP_CONFIG } from '@/src/constants/config';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
-import { useCount } from '@/src/hooks/useCollectionStats';
+import { useCount, useCollectionStats, useFilteredCount } from '@/src/hooks/useCollectionStats';
 
 function CompaniesPage() {
   const prefetch = usePrefetch();
@@ -26,6 +26,8 @@ function CompaniesPage() {
   const resolved = resolveRouteFilters('firme', params);
   const grad = resolved.locationSlug;
   const { data: companyCount } = useCount('companies');
+  const { data: premiumCount } = useFilteredCount('companies', [{ field: 'isPremiumPartner', op: '==', value: true }]);
+  const { data: companyStats } = useCollectionStats('companies');
 
   const activeFilters = useMemo(() => ({
     location: grad && grad !== 'all' ? grad : undefined,
@@ -65,6 +67,8 @@ function CompaniesPage() {
         subtitle="Baza verifikovanih firmi, inženjerskih biroa i specijalizovanih izvođača radova u Srbiji."
         stats={[
           { label: "Verifikovanih firmi", value: companyCount?.toLocaleString() || "840", icon: "verified" },
+          { label: "Novi partneri", value: `+${companyStats?.today?.toLocaleString() || "10"}`, icon: "add_business" },
+          { label: "Premium", value: premiumCount?.toLocaleString() || "45", icon: "category" }
         ]}
       />
 
