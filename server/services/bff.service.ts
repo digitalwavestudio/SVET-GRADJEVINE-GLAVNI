@@ -102,7 +102,7 @@ export const bffService = {
       const fpSnap = await db.doc("metadata/homepage_fastpath").get();
       if (fpSnap.exists) {
         const fpData = fpSnap.data()?.homepage as HomepageDataResult | undefined;
-        if (fpData?.latestJobs?.length) {
+        if (fpData?.latestJobs?.length && fpData?.premiumJobs?.length) {
           // Fast-Path ima validne podatke — vraćamo odmah
           l1HomepageCache.set(cacheKey, { data: fpData, expiry: Date.now() + L1_HOMEPAGE_TTL });
           // Redis keš za sledeći put
