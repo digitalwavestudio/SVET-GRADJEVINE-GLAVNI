@@ -146,6 +146,16 @@ export class UnifiedSearchService {
     if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
     if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
+    // Get real total count before pagination
+    let totalHits: number | undefined;
+    try {
+      // Clone query without orderBy/limit for count
+      const countSnap = await (q as any).count().get();
+      totalHits = countSnap.data().count;
+    } catch {
+      totalHits = undefined;
+    }
+
     q = q.orderBy("createdAt", "desc");
     q = q.limit(pageSize);  // N+1 fix: čitamo tačno pageSize, ne pageSize+1
 
@@ -179,7 +189,7 @@ export class UnifiedSearchService {
 
       const lastVisible = hasMore && actualDocs.length > 0 ? actualDocs[actualDocs.length - 1].id : null;
 
-      const result: UnifiedSearchResult = { docs, lastVisibleId: lastVisible, hasMore, totalHits: docs.length };
+      const result: UnifiedSearchResult = { docs, lastVisibleId: lastVisible, hasMore, totalHits: totalHits ?? docs.length };
       await CacheService.set(cacheKey, result, 300000).catch(() => {});
       return result;
     } catch (error: unknown) {

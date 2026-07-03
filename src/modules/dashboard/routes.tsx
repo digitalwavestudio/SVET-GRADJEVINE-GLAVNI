@@ -54,6 +54,7 @@ const MyAccommodationCapacitiesPage = lazy(() => import(/* webpackPrefetch: true
 const MyCateringOrdersPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-orders" */ './pages/MyCateringOrdersPage'));
 const MyCateringDeliveryPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-delivery" */ './pages/MyCateringDeliveryPage'));
 const MyMachinesReservationsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-reservations" */ './pages/MyMachinesReservationsPage'));
+const MyCompanyPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-company" */ '../companies/pages/MyCompanyPage'));
 
 
 export const getDashboardRouter = () => [
@@ -71,6 +72,7 @@ export const getDashboardRouter = () => [
   <Route key="dostava" path="/moj-profil/dostava" element={<ProtectedRoute><MyCateringDeliveryPage /></ProtectedRoute>} />,
   <Route key="rezervacije" path="/moj-profil/rezervacije" element={<ProtectedRoute><MyMachinesReservationsPage /></ProtectedRoute>} />,
   <Route key="gradiliste" path="/moj-profil/gradiliste" element={<ProtectedRoute><ConstructionSitePage /></ProtectedRoute>} />,
+  <Route key="firma" path="/moj-profil/firma" element={<ProtectedRoute><MyCompanyPage /></ProtectedRoute>} />,
   <Route key="poruke" path="/poruke" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />,
   <Route key="podesavanja" path="/podesavanja" element={<ProtectedRoute><AccountSettingsPage /></ProtectedRoute>} />,
   <Route key="novcanik" path="/novcanik" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />,
