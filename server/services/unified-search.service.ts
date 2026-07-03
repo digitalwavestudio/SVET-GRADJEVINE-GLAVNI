@@ -74,7 +74,7 @@ export class UnifiedSearchService {
     const cleanFilters = Object.fromEntries(
       Object.entries(stableFilters).filter(([_, v]) => v != null && v !== undefined)
     );
-    const cacheKey = `search_v3:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
+    const cacheKey = `search_v4:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
     const cached = await CacheService.get<UnifiedSearchResult>(cacheKey);
     if (cached) return cached;
     let entityType = category;
@@ -146,15 +146,17 @@ export class UnifiedSearchService {
     if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
     if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
-    // Get total count — same as reconcileGlobalStats (all listings of given type, any status)
+    // Get total count — koristi postojeći indeks (type, createdAt desc)
     let totalHits: number | undefined;
     try {
-      let countQ = db.collection("listings") as FirebaseFirestore.Query;
+      let countQ: FirebaseFirestore.Query = db.collection("listings");
       if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
+      // count() zahteva isti indeks kao i regularni query; koristimo (type, createdAt desc) koji postoji
+      countQ = countQ.orderBy("createdAt", "desc");
       const countSnap = await countQ.count().get();
       totalHits = countSnap.data().count;
     } catch (e) {
-      console.error(`[UnifiedSearch] count() failed:`, e);
+      console.error(`[UnifiedSearch] count query failed:`, e);
     }
 
     q = q.orderBy("createdAt", "desc");

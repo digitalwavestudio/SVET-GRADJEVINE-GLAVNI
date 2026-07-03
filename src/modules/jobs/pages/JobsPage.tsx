@@ -99,8 +99,8 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
 
-  const totalJobsCount = data?.pages[0]?.totalHits ?? allJobsPremiumFirst.length;
-  const activeJobsCount = data?.pages[0]?.totalHits ?? allJobsPremiumFirst.length;
+  const totalJobsCount = jobStats?.total ?? data?.pages[0]?.totalHits ?? allJobsPremiumFirst.length;
+  const activeJobsCount = jobStats?.total ?? data?.pages[0]?.totalHits ?? allJobsPremiumFirst.length;
 
   const breadcrumbItems = useMemo(() => {
     const items: { label: string; path?: string }[] = [];
@@ -520,7 +520,7 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
         titleAccent="Građevina"
         subtitle="Najveća baza poslova u građevinskom sektoru. Pronađi stalni zaposlenje ili angažman na projektu za svoj tim."
         stats={[
-          { label: "AKTIVNI OGLASI", value: totalJobsCount.toLocaleString(), icon: "work" },
+              { label: "AKTIVNI OGLASI", value: (jobStats?.total ?? totalJobsCount).toLocaleString(), icon: "work" },
           { label: "KOMPANIJE", value: companyCount != null ? companyCount.toLocaleString() : "400", icon: "business" },
           { label: "NOVI DANAS", value: jobStats?.today != null ? jobStats.today.toLocaleString() : "12", icon: "new_releases" }
         ]}
