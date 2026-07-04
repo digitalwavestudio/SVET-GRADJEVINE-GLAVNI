@@ -9,8 +9,8 @@ export class SEODbService {
     const category = params.category as string;
     const city = params.city as string;
     const categoryOrCity = params.categoryOrCity as string;
-    let title = "Građevinski Portal";
-    let description = "Najveći portal za građevinarstvo na Balkanu.";
+let title = "Svet Građevine";
+let description = "Oglasi u građevinskoj industriji";
     let url = "https://svetgradjevine.com";
 
     const cities = [
@@ -108,7 +108,7 @@ export class SEODbService {
       return {
         title,
         description,
-        image: "https://svetgradjevine.com/og-default.jpg",
+        image: "https://www.svetgradjevine.com/og-image.png",
         url,
         initialState: null,
         structuredData: {
@@ -124,7 +124,7 @@ export class SEODbService {
       return {
         title,
         description,
-        image: "https://svetgradjevine.com/og-default.jpg",
+        image: "https://www.svetgradjevine.com/og-image.png",
         url,
         initialState: null,
         structuredData: {
@@ -177,7 +177,7 @@ export class SEODbService {
       const meta = {
         title,
         description,
-        image: "https://svetgradjevine.com/og-default.jpg",
+        image: "https://www.svetgradjevine.com/og-image.png",
         url,
         initialState,
         structuredData: {

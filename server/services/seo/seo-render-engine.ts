@@ -245,7 +245,7 @@ export class SEORenderEngine {
       const derivedTitle = `${titleWord} | Svet Građevine`;
       const derivedDesc = `Pogledajte detalje za ${titleWord} na portalu Svet Građevine - najvećem građevinskom portalu na Balkanu.`;
       const derivedUrl = `${canonicalBase}${reqPath}`;
-      const defaultImage = "https://svetgradjevine.com/og-default.jpg";
+      const defaultImage = "https://www.svetgradjevine.com/og-image.png";
 
       return `
         <title>${derivedTitle}</title>
@@ -286,8 +286,8 @@ export class SEORenderEngine {
         derivedTitle = `${hubLabels[pathPart]} | Svet Građevine`;
         derivedDesc = `${hubLabels[pathPart]} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Pregledajte sve oglase i pronađite najbolje ponude.`;
       } else {
-        derivedTitle = `Svet Građevine | Građevinski Portal`;
-        derivedDesc = `Najveći građevinski portal na Balkanu za poslove, majstore, mašine i nekretnine.`;
+        derivedTitle = `Svet Građevine`;
+        derivedDesc = `Oglasi u građevinskoj industriji`;
       }
 
       const derivedUrl = `${canonicalBase}${reqPath}`;

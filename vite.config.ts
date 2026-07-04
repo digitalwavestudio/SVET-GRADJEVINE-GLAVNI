@@ -156,7 +156,7 @@ export default defineConfig(({mode}) => {
         manifest: {
           name: 'Svet Građevine',
           short_name: 'Građevina',
-          description: 'Najveća mreža za građevinsku industriju u Srbiji',
+          description: 'Oglasi u građevinskoj industriji',
           theme_color: '#121212',
           background_color: '#0A0F14',
           display: 'standalone',

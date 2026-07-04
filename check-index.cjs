@@ -3,7 +3,7 @@ const { execSync } = require('child_process');
 
 try {
   console.log("Fetching deployed indexes...");
-  const output = execSync("gcloud firestore indexes composite list --project=gen-lang-client-0548525213 --database=ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8 --format=json", { encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10 });
+  const output = execSync("gcloud firestore indexes composite list --project=svet-gradjevine-eu --database=(default) --format=json", { encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10 });
   const data = JSON.parse(output);
   const found = data.filter(idx => 
     idx.queryScope === 'COLLECTION_GROUP' && 

@@ -488,12 +488,12 @@ ${paginationLinks}
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${desc}" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${reqPath}" />
-<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${title}" />
 <meta name="twitter:description" content="${desc}" />
-<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 <style>img{aspect-ratio:auto;max-width:100%;height:auto}</style>
 <script type="application/ld+json">${JSON.stringify(bc)}</script>
 ${jsonLdScript}
@@ -775,7 +775,7 @@ async function backgroundPreRenderHomepage(
     const platformDesc = "Svet Građevine je vodeći građevinski portal na Balkanu koji povezuje izvođače, poslodavce, majstore i klijente širom Srbije, Hrvatske, Bosne i Hercegovine, Crne Gore i regiona.";
     const botHtml = `
       <main>
-        <h1>Svet Građevine - Portal za građevinske oglase</h1>
+        <h1>Svet Građevine</h1>
         <p>Najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više.</p>
         <p>${platformDesc}</p>
         <p>Bez obzira da li tražite iskusnog zidara za renoviranje, rukovaoca bagerom za veliki projekat, ili želite da iznajmite građevinske mašine — na pravom ste mestu. Naša platforma nudi hiljade oglasa iz kategorija: posao u građevini, građevinske mašine, smeštaj za radnike, ketering, građevinsko zemljište, alat i oprema, i više.</p>
@@ -787,9 +787,9 @@ async function backgroundPreRenderHomepage(
 
     let html = cachedIndexHtml;
     html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
-    html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine - Portal za građevinske oglase</title>`);
+    html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine</title>`);
     html = html.replace("</head>", `
-<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+<meta name="description" content="Oglasi u građevinskoj industriji" />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 </head>`);
     html = html.replace('<div id="root"></div>', `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botHtml}</div>`);
@@ -1045,7 +1045,7 @@ export const createSpaMiddleware = () => {
           const ssrResult = await reactSsrPage(ssrUrl);
           if (ssrResult) {
             const { html, dehydratedState, helmetHtml } = ssrResult;
-            const helmetContent = helmetHtml || `<title>Svet Građevine - Portal za građevinske oglase</title>\n<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />`;
+            const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Oglasi u građevinskoj industriji" />`;
             let finalHtml = indexHtml;
             finalHtml = finalHtml
               .replace('</head>', `${helmetContent}</head>`)
@@ -1066,18 +1066,18 @@ export const createSpaMiddleware = () => {
 
         // Clean shell for humans (no SSR — let React hydrate on client)
         const cleanHtml = injectEmptyRootLinks(indexHtml
-          .replace("</head>", `<title>Svet Građevine - Portal za građevinske oglase</title>
-<meta name="description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
+          .replace("</head>", `<title>Svet Građevine</title>
+<meta name="description" content="Oglasi u građevinskoj industriji" />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
-<meta property="og:title" content="Svet Građevine - Portal za građevinske oglase" />
-<meta property="og:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
-<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:title" content="Svet Građevine" />
+<meta property="og:description" content="Oglasi u građevinskoj industriji" />
+<meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}/" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Svet Građevine - Portal za građevinske oglase" />
-<meta name="twitter:description" content="Svet Građevine - najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više." />
-<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta name="twitter:title" content="Svet Građevine" />
+<meta name="twitter:description" content="Oglasi u građevinskoj industriji" />
+<meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`), req.path);
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(cleanHtml));
       }
@@ -1169,12 +1169,12 @@ export const createSpaMiddleware = () => {
 <meta property="og:title" content="${fullTitle}" />
 <meta property="og:description" content="${baseDesc}" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${canonicalPath}" />
-<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${fullTitle}" />
 <meta name="twitter:description" content="${baseDesc}" />
-<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`);
               return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(cleanHtml, req.path));
             }
@@ -1237,7 +1237,7 @@ export const createSpaMiddleware = () => {
           skeletonHtml = skeletonHtml.replace(/<meta name="description"[^>]*\/?>/i, "");
           const fullTitle = `${label} | Svet Građevine`;
           skeletonHtml = skeletonHtml.replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`);
-          const defaultImage = "https://svetgradjevine.com/og-default.jpg";
+          const defaultImage = "https://www.svetgradjevine.com/og-image.png";
           skeletonHtml = skeletonHtml.replace(
             "</head>",
             `
@@ -1299,7 +1299,7 @@ ${breadcrumbHtml}
           const title = `${readableTitle} | Svet Građevine`;
           const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet Građevine. Najveći građevinski portal i berza na Balkanu.`;
           const canonicalUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
-          const defaultImage = "https://svetgradjevine.com/og-default.jpg";
+          const defaultImage = "https://www.svetgradjevine.com/og-image.png";
 
           const detailLastmod = new Date().toISOString().split("T")[0];
 
@@ -1359,13 +1359,13 @@ ${breadcrumbHtml}
 <link rel="canonical" href="${canonicalUrl}" />
 <meta property="og:title" content="${pageTitle}" />
 <meta property="og:description" content="${pageDesc}" />
-<meta property="og:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta property="og:url" content="${canonicalUrl}" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${pageTitle}" />
 <meta name="twitter:description" content="${pageDesc}" />
-<meta name="twitter:image" content="https://svetgradjevine.com/og-default.jpg" />
+<meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta name="robots" content="index, follow" />
 </head>`,
         );

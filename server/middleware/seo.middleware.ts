@@ -52,6 +52,7 @@ export const canonicalHostMiddleware = (
     !host.includes("localhost") &&
     !host.includes("127.0.0.1") &&
     !host.includes("run.app") &&
+    !host.includes("web.app") &&
     host !== `www.${APP_CONFIG.DOMAIN}`
   ) {
     console.info(

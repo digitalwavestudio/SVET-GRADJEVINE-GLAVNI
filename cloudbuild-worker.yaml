@@ -17,14 +17,14 @@ steps:
       - '--image'
       - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'
       - '--region'
-      - 'us-west1'
+      - 'europe-west3'
       - '--platform'
       - 'managed'
       - '--no-allow-unauthenticated'
       - '--port'
       - '8080'
       - '--update-env-vars'
-      - 'APP_REGION=us-west1,APP_MODE=worker,REDIS_URL=${_REDIS_URL}'
+      - 'APP_REGION=europe-west3,APP_MODE=worker,REDIS_URL=${_REDIS_URL}'
       - '--min-instances'
       - '1'
       - '--max-instances'
@@ -35,6 +35,11 @@ steps:
       - '1Gi'
       - '--cpu'
       - '1'
+      - '--vpc-connector'
+      - 'sg-connector-eu'
+      - '--vpc-egress'
+      - 'all-traffic'
+
 
 images:
   - 'gcr.io/$PROJECT_ID/svet-gra-evine:latest'

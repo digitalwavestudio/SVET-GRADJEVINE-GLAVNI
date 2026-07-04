@@ -135,7 +135,7 @@ export class SEOMetaService {
         data?.images?.[0] ||
         data?.photoURL ||
         data?.logo ||
-        "${APP_CONFIG.BASE_URL}/og-default.jpg";
+        `${APP_CONFIG.BASE_URL}/og-image.png`;
 
       const url = `${APP_CONFIG.BASE_URL}${resolvedPath}`;
 

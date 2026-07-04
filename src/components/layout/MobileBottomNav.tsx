@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
+import { apiClient } from '@/src/lib/apiClient';
 
 export const MobileBottomNav: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [showNoResult, setShowNoResult] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Hide on auth pages
@@ -17,12 +19,24 @@ export const MobileBottomNav: React.FC = () => {
   const dashboardPath = user ? '/kontrolna-tabla' : '/prijava';
   const messagesPath = user ? '/poruke' : '/prijava';
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = async () => {
     const q = searchQuery.trim();
     if (!q) return;
-    setIsSearchOpen(false);
-    setSearchQuery('');
-    navigate(`/pretraga?q=${encodeURIComponent(q)}`);
+    setIsSearching(true);
+    try {
+      const res = await apiClient.post<{ url: string | null }>('/ai/search-intent', { query: q });
+      if (res?.url) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        window.location.href = res.url;
+      } else {
+        setShowNoResult(true);
+      }
+    } catch {
+      setShowNoResult(true);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   useEffect(() => {
@@ -219,11 +233,17 @@ export const MobileBottomNav: React.FC = () => {
               
               <button
                 type="submit"
-                disabled={!searchQuery.trim()}
+                disabled={isSearching || !searchQuery.trim()}
                 className="w-full mt-6 py-4 bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] text-[#0d151c] rounded-[14px] font-headline font-black text-lg uppercase tracking-widest shadow-[0_10px_20px_rgba(254,191,13,0.2)] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:from-[#ffad3a] hover:to-[#ffa424] transition-all active:scale-[0.98] border border-white/20"
               >
-                PRETRAŽI
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>arrow_forward</span>
+                {isSearching ? (
+                  <span className="material-symbols-outlined text-[20px] animate-spin">sync</span>
+                ) : (
+                  <>
+                    PRETRAŽI
+                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>arrow_forward</span>
+                  </>
+                )}
               </button>
             </form>
             
@@ -247,6 +267,23 @@ export const MobileBottomNav: React.FC = () => {
                 ))}
               </div>
             </div>
+
+            {/* AI No Result Modal */}
+            {showNoResult && (
+              <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setShowNoResult(false)}>
+                <div className="bg-[#13212e] border border-white/10 rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+                  <span className="material-symbols-outlined text-5xl text-secondary mb-4 block">search_off</span>
+                  <h3 className="text-white text-xl font-bold mb-2">Nema rezultata</h3>
+                  <p className="text-slate-300 mb-6">Nismo pronašli odgovarajuću stranicu za tvoju pretragu. Probaj drugačije da opišeš šta tražiš.</p>
+                  <button
+                    onClick={() => setShowNoResult(false)}
+                    className="px-8 py-3 bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] text-[#0d151c] rounded-[12px] font-bold uppercase tracking-wider"
+                  >
+                    U redu
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
     </div>
     </>

@@ -74,7 +74,7 @@ export class UnifiedSearchService {
     const cleanFilters = Object.fromEntries(
       Object.entries(stableFilters).filter(([_, v]) => v != null && v !== undefined)
     );
-    const cacheKey = `search_v4:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
+    const cacheKey = `search_v5:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
     const cached = await CacheService.get<UnifiedSearchResult>(cacheKey);
     if (cached) return cached;
     let entityType = category;
@@ -137,7 +137,9 @@ export class UnifiedSearchService {
     if (filters.accessRoad) q = q.where("accessRoad", "==", true);
     if (filters.highwayAccess) q = q.where("highwayAccess", "==", true);
     if (filters.railAccess) q = q.where("railAccess", "==", true);
-    if (filters.profession) q = q.where("professionSlug", "==", filters.profession);
+    const targetProfession = filters.profession || filters.professionSlug;
+    const needsLargeBatch = !!targetProfession;
+    // professionSlug se filtrira client-side (linija 188) — nema Firestore indeksa za sve varijante
     if (filters.minPrice != null) q = q.where("price", ">=", Number(filters.minPrice));
     if (filters.maxPrice != null) q = q.where("price", "<=", Number(filters.maxPrice));
     if (filters.cateringType) q = q.where("cateringType", "==", filters.cateringType);
@@ -160,7 +162,8 @@ export class UnifiedSearchService {
     }
 
     q = q.orderBy("createdAt", "desc");
-    q = q.limit(pageSize);  // N+1 fix: čitamo tačno pageSize, ne pageSize+1
+    const queryLimit = needsLargeBatch ? Math.max(pageSize, 1000) : pageSize;
+    q = q.limit(queryLimit);  // N+1 fix: čitamo tačno pageSize, ne pageSize+1
 
     if (lastVisibleId) {
       const lastDoc = await db.collection(isProfileSearch ? "users" : "listings").doc(lastVisibleId).get();
@@ -181,6 +184,8 @@ export class UnifiedSearchService {
       if (filters.isPremium) docs = docs.filter((d: any) => d.isPremium === true);
       if (filters.isUrgent) docs = docs.filter((d: any) => d.isUrgent === true);
 
+      if (targetProfession) docs = docs.filter((d: any) => d.professionSlug === targetProfession);
+
       docs = docs.sort((a, b) => {
         const aP = (a as any).isPremium ? 1 : 0;
         const bP = (b as any).isPremium ? 1 : 0;
@@ -190,9 +195,13 @@ export class UnifiedSearchService {
         return bT - aT;
       });
 
-      const lastVisible = hasMore && actualDocs.length > 0 ? actualDocs[actualDocs.length - 1].id : null;
+      const filteredCount = docs.length;
+      const hasMoreFinal = needsLargeBatch ? filteredCount > pageSize : hasMore;
+      if (needsLargeBatch) docs = docs.slice(0, pageSize);
 
-      const result: UnifiedSearchResult = { docs, lastVisibleId: lastVisible, hasMore, totalHits: totalHits ?? docs.length };
+      const lastVisible = hasMoreFinal && actualDocs.length > 0 ? actualDocs[actualDocs.length - 1].id : null;
+
+      const result: UnifiedSearchResult = { docs, lastVisibleId: lastVisible, hasMore: hasMoreFinal, totalHits: totalHits ?? filteredCount };
       await CacheService.set(cacheKey, result, 300000).catch(() => {});
       return result;
     } catch (error: unknown) {

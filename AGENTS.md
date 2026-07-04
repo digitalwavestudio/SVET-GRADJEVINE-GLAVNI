@@ -9,7 +9,7 @@
 - Homepage: logo se vidi i na premium i na najnovijim oglasima
 - Fast-Path: ~15s prvi read, zatim instant; background task osvežava sa logom
 - `/poslovi`: svi poslovi sa logom, premium na vrhu
-- Lokalno: sporo ali radi (geografija Srbija ↔ Oregon)
+- Lokalno: brzo (baza u Frankfurtu, geografija Srbija ↔ Nemačka)
 
 **Ključni fajlovi i stanje:**
 | Fajl | Ključna linija | Šta radi |
@@ -76,11 +76,12 @@ Sve TS greške su rešene nakon cleanupa iz Sessions 5-6 (kad su obrisani `admin
 ## Firestore Indexes
 
 Deploy to default database:
+  firebase use svet-gradjevine-eu
   firebase deploy --only firestore:indexes
 
-**IMPORTANT**: App uses `ai-studio` database (not `(default)`). The `firebase deploy` only targets `(default)`. To deploy indexes to `ai-studio`, use `gcloud firestore indexes composite create` or the REST API directly.
+**IMPORTANT**: App uses `(default)` database in Frankfurt (`europe-west3`). The `firebase deploy --only firestore:indexes` targets `(default)` database. 
 
-78 indexes defined in `firestore.indexes.json`. All 78 are deployed to `ai-studio` (verifed 2026-06-28, all returned ALREADY_EXISTS).
+78 indexes defined in `firestore.indexes.json`. All 78 need to be deployed to `(default)` in Frankfurt after migration.
 
 ## SEO / Rate Limiting
 
@@ -111,10 +112,12 @@ Posle: HTML dolazi sa pre-rendered content-om → FCP dramatično bolji.
 
 - **Memory**: 1GB (512MB nije dovoljno — OOM SIGABRT kad Redis padne)
 - **Concurrency**: 40 (sa 80 je pritisak prevelik po instanci)
-- **VPC Connector**: `svet-gradevine-connector` (us-west1, range 10.8.0.0/28)
-- **Cloud NAT**: `svet-gradevine-nat` sa statičkom IP `8.235.34.194`
+- **VPC Connector**: `sg-connector-eu` (europe-west3, range 10.8.0.0/28)
+- **Cloud NAT**: `svet-gradevine-nat` sa statičkom IP `35.246.202.207`
 - **Cloud Router**: `svet-gradevine-router`
 - **Redis host**: `spotted-loaf-funny-63490.db.redis.io:14446` — zaštićen lozinkom, firewall mora da pusti Cloud Run egress (static IP gore)
+- **API Server**: `https://svet-gra-evine-xogde3x2pa-ey.a.run.app` (Frankfurt)
+- **Worker**: `https://svet-gra-evine-worker-866586416544.europe-west3.run.app` (Frankfurt)
 
 Ako deploy ruši **503 / SIGABRT**, prvo proveri Redis konekciju. Ako Redis ne radi, app radi u in-memory modu i troši više RAM-a.
 
@@ -187,12 +190,11 @@ Kad je Firestore bio spor (>100ms), Fast-Path timeout od 100ms je istekao i sist
 
 Premium Ponuda na naslovnoj strani prikazuje premium oglase iz **SVIH vertikala** (poslovi, mašine, nekretnine, smeštaj, ugostiteljstvo). `type=="job"` filter bi isključio ostale kategorije.
 
-Ako premium upit ne radi (vraća prazno), problem je **nedostajući Firestore indeks** za `ai-studio` bazu, a ne `type` filter. Potrebno je deploy-ovati indekse na `ai-studio` preko `gcloud firestore indexes composite create`.
+Ako premium upit ne radi (vraća prazno), problem je **nedostajući Firestore indeks** za `(default)` bazu u Frankfurtu, a ne `type` filter. Potrebno je deploy-ovati indekse preko `firebase deploy --only firestore:indexes`.
 
 ## 🖥️ LOCALHOST SETUP (Session 5 — fixirano 2026-06-29)
 
-**⚠️ BITNO: Lokalni dev radi SPORO jer je Firestore baza u `us-west1` (Oregon), a ti si u Srbiji. Svaki upit traje 1-15s.**
-Online (Cloud Run u Oregon-u) je brz (<10ms). Lokalno je sporo ali radi.
+**⚠️ BITNO: Lokalni dev radi brzo jer je Firestore baza sada u Frankfurtu (`europe-west3`). Više nema 1-15s kašnjenja kao ranije kad je baza bila u Oregon-u.**
 
 ### 🔧 Timeout podešavanja
 
@@ -204,7 +206,7 @@ Online (Cloud Run u Oregon-u) je brz (<10ms). Lokalno je sporo ali radi.
 
 ### 💾 Fast-Path (homepage keš)
 
-Fast-Path dokument je `metadata/homepage_fastpath` u `ai-studio` bazi. Firestore limit je **1MB** — base64 logo polja su ~800KB svako, pa se ne mogu pisati u Fast-Path.
+Fast-Path dokument je `metadata/homepage_fastpath` u `(default)` bazi. Firestore limit je **1MB** — base64 logo polja su ~800KB svako, pa se ne mogu pisati u Fast-Path.
 
 **Kako radi:**
 1. BFF prima zahtev
@@ -219,7 +221,7 @@ Fast-Path dokument je `metadata/homepage_fastpath` u `ai-studio` bazi. Firestore
 node -e "
 const a=require('firebase-admin'),{getFirestore:b}=require('firebase-admin/firestore');
 a.initializeApp({credential:a.credential.cert(require('./firebase-service-account.json'))});
-const d=b(a.app(),'ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8');
+const d=b(a.app());
 d.settings({ignoreUndefinedProperties:true});
 (async()=>{
   const j=await d.collectionGroup('listings').where('type','==','job').where('status','in',['active','approved']).orderBy('createdAt','desc').limit(5).get();
@@ -276,14 +278,14 @@ Background task prepisuje Fast-Path posle svakog zahteva. Ako ti treba da ručno
 
 **Simptom: Logo se ne vidi na homepage (samo slova), ali se vidi na /poslovi**
 1. Fast-Path ima stare podatke bez `logo` polja (ručno upisan skriptom koji nije uključivao logo)
-2. Izbriši Fast-Path: `node -e "const a=require('firebase-admin'),{getFirestore:b}=require('firebase-admin/firestore');a.initializeApp({credential:a.credential.cert(require('./firebase-service-account.json'))});b(a.app(),'ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8').doc('metadata/homepage_fastpath').delete().then(()=>console.log('OK')).catch(e=>console.error(e.message))"`
+2. Izbriši Fast-Path: `node -e "const a=require('firebase-admin'),{getFirestore:b}=require('firebase-admin/firestore');a.initializeApp({credential:a.credential.cert(require('./firebase-service-account.json'))});b(a.app()).doc('metadata/homepage_fastpath').delete().then(()=>console.log('OK')).catch(e=>console.error(e.message))"`
 3. Posle brisanja, sledeći zahtev će ići u real-time fallback i vratiti logo
 4. Background task (debounce 5min) će napisati svež Fast-Path SA logom
 5. Proveri `bff.service.ts` — `readFastPathHomepage()` ima validaciju: ako `latestJobs[0].logo` ne postoji, tretira Fast-Path kao miss
 
 **Simptom: /poslovi prazan, /api/jobs timeout**
-- Firestore upit je spor (1-13s). Sačekaj duže ili proveri mrežu.
-- Ako je online server brz a lokalan spor → geografija, nije bug.
+- Firestore upit je bio spor (1-13s kad je baza bila u Oregon-u). Sada je brz u Frankfurtu.
+- Ako i dalje timeoutira, proveri da li je `app.use(...)` u `server.ts` registrovao rute pravilno.
 
 ### 🔐 Service Account
 - Fajl: `firebase-service-account.json` (u .gitignore, ne commit-uje se)

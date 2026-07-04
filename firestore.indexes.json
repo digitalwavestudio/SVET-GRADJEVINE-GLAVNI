@@ -1807,6 +1807,206 @@
       "collectionGroup": "users",
       "fieldPath": "textContent",
       "indexes": []
+    },
+    {
+      "collectionGroup": "articles",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "messages",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "applications",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "cache_store_v2",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "_logs",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "audit_logs",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "dlq",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "activities",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "outbox",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "metrics",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "transactions",
+      "fieldPath": "content",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "image",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "image",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "metadata",
+      "fieldPath": "logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "metadata",
+      "fieldPath": "coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "metadata",
+      "fieldPath": "image",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "cache_store_v2",
+      "fieldPath": "logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "cache_store_v2",
+      "fieldPath": "coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "cache_store_v2",
+      "fieldPath": "image",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "dlq",
+      "fieldPath": "logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "dlq",
+      "fieldPath": "coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "dlq",
+      "fieldPath": "image",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "outbox",
+      "fieldPath": "logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "outbox",
+      "fieldPath": "coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "outbox",
+      "fieldPath": "image",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "businessProfile",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "businessProfile.logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "users",
+      "fieldPath": "businessProfile.coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "businessProfile",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "businessProfile.logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "businessProfile.coverImage",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "comp",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "comp.logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "metadata",
+      "fieldPath": "homepage",
+      "indexes": []
     }
   ]
 }

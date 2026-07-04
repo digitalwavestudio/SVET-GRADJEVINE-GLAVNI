@@ -9,7 +9,7 @@ if (fs.existsSync('./firebase-service-account.json')) {
   process.exit(1);
 }
 
-const db = getFirestore(a.app(), 'ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8'); // iz AGENTS.md
+const db = getFirestore(a.app());
 
 (async () => {
   const snap = await db.collection('listings')

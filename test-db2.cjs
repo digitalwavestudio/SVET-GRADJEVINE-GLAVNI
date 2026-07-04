@@ -4,7 +4,7 @@ const fs = require('fs');
 
 if (fs.existsSync('./firebase-service-account.json')) {
   a.initializeApp({ credential: a.credential.cert(require('./firebase-service-account.json')) });
-  const db = getFirestore(a.app(), "ai-studio-13fdc921-7aeb-4652-b1fc-d679d9e4d0d8");
+  const db = getFirestore(a.app());
   
   db.collection('listings').where('type', '==', 'company').get().then(snap => {
     console.log(`Found ${snap.size} companies`);

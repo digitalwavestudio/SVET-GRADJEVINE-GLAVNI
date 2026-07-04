@@ -15,10 +15,13 @@ export async function parseSearchQuery(query: string): Promise<AiSearchResult> {
     const client = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
     const prompt = `Upit: "${query}"
 
-Kojoj stranici sajta pripada? Stranice: /poslovi (poslovi), /masine, /placevi, /smestaj, /ketering, /alat-i-oprema, /majstori, /firme, /cene.
-Ako je posao → /poslovi/{zanat}/{grad} (npr. /poslovi/tesar/beograd).
-Ako nije posao, npr. "bager" → /stranica?q=pretraga (npr. /masine?q=bager).
-Ne znam → null.
+Kojoj stranici sajta pripada? Stranice: /poslovi, /masine, /placevi, /smestaj, /ketering, /alat-i-oprema, /majstori, /firme, /cene.
+Pravila za URL:
+- Samo zanat → /poslovi/{zanat}  (npr. /poslovi/tesar)
+- Zanat + grad → /poslovi/{zanat}/{grad}  (npr. /poslovi/tesar/beograd)
+- Samo grad → /poslovi/{grad}
+- Za ostalo → /stranica?q=pretraga  (npr. /masine?q=bager)
+Ne znaš → null.
 
 Vrati SAMO {"url":"..."} ili {"url":null}. NISTA DRUGO.`;
 
@@ -40,8 +43,8 @@ Vrati SAMO {"url":"..."} ili {"url":null}. NISTA DRUGO.`;
       url: parsed.url || null,
       keywords: query ? [query] : [],
     };
-  } catch (e) {
-    console.error("[AiSearch] Gemini failed:", e?.message || e);
+  } catch (e: unknown) {
+    console.error("[AiSearch] Gemini failed:", e instanceof Error ? e.message : e);
     return { url: null, keywords: [query] };
   }
 }

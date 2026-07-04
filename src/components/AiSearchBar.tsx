@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/src/components/ui/Button';
 import { apiClient } from '@/src/lib/apiClient';
 
@@ -11,7 +10,6 @@ export function AiSearchBar(props: AiSearchBarProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [showNoResult, setShowNoResult] = useState(false);
-  const navigate = useNavigate();
 
   const handleSearch = useCallback(async () => {
     if (!query.trim()) return;
@@ -19,7 +17,7 @@ export function AiSearchBar(props: AiSearchBarProps) {
     try {
       const res = await apiClient.post<{ url: string | null }>('/ai/search-intent', { query });
       if (res?.url) {
-        navigate(res.url);
+        window.location.href = res.url;
       } else {
         setShowNoResult(true);
       }
@@ -28,7 +26,7 @@ export function AiSearchBar(props: AiSearchBarProps) {
     } finally {
       setIsSearching(false);
     }
-  }, [query, navigate]);
+  }, [query]);
 
   return (
     <>

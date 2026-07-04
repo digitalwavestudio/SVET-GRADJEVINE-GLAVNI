@@ -2,5 +2,29 @@
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "run": {
+          "serviceId": "svet-gra-evine",
+          "region": "europe-west3"
+        }
+      },
+      {
+        "source": "/**",
+        "run": {
+          "serviceId": "svet-gra-evine",
+          "region": "europe-west3"
+        }
+      }
+    ]
   }
 }
