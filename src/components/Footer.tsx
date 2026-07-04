@@ -70,15 +70,25 @@ export default function Footer() {
                     {item.label}
                   </Link>
                   {isDisabled && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50">
-                      <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-3 rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.4)] whitespace-nowrap">
-                        <div className="flex items-center gap-2 mb-1">
-                          <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-4 w-auto object-contain drop-shadow-md" />
-                          <span className="text-secondary font-black text-[10px] uppercase tracking-widest">Uskoro</span>
+                    <>
+                      {/* Mobile Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-95 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50 w-max md:hidden">
+                        <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 py-1.5 px-3 rounded-[8px] shadow-lg flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-secondary text-[14px]">hourglass_empty</span>
+                          <span className="text-white/90 text-[11px] font-bold tracking-wide">Stiže uskoro!</span>
                         </div>
-                        <p className="text-white/90 text-[11px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
                       </div>
-                    </div>
+                      {/* Desktop Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50 w-max hidden md:block">
+                        <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap md:min-w-[260px] flex flex-col items-start text-left">
+                          <div className="flex items-center gap-2.5 mb-2">
+                            <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md flex-shrink-0" />
+                            <span className="text-secondary font-black text-[11px] md:text-[12px] uppercase tracking-widest">USKORO!</span>
+                          </div>
+                          <p className="text-white/90 text-[12px] md:text-[13px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </li>
               )})}
@@ -100,11 +110,11 @@ export default function Footer() {
                   <span className="lg:hidden text-[9px] text-secondary font-black ml-1 uppercase tracking-wider">(Uskoro)</span>
                   
                   {/* Tooltip Popup */}
-                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 group-focus/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 group-focus/partner:scale-100 z-50 transform-gpu">
-                    <div className="bg-[#0c1219]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap min-w-[200px] flex flex-col items-center">
-                      <div className="flex items-center gap-3 mb-2">
-                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md" />
-                        <span className="text-secondary font-black text-[12px] md:text-[14px] uppercase tracking-widest">USKORO!</span>
+                  <div className="hidden lg:block absolute bottom-full left-0 mb-3 pointer-events-none opacity-0 group-hover/partner:opacity-100 group-focus/partner:opacity-100 transition-all duration-300 scale-90 group-hover/partner:scale-100 group-focus/partner:scale-100 z-50 transform-gpu w-max">
+                    <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap md:min-w-[260px] flex flex-col items-start text-left">
+                      <div className="flex items-center gap-2.5 mb-2">
+                        <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md flex-shrink-0" />
+                        <span className="text-secondary font-black text-[11px] md:text-[12px] uppercase tracking-widest">USKORO!</span>
                       </div>
                       <p className="text-white/90 text-[12px] md:text-[14px] font-medium tracking-wide">Affiliate program stiže uskoro!</p>
                     </div>

@@ -1,61 +1,49 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { parseSearchQuery } from '@/src/services/aiService';
-import { LOCATIONS } from '@/src/constants/taxonomy';
 import { Button } from '@/src/components/ui/Button';
+import { apiClient } from '@/src/lib/apiClient';
 
-interface AiSearchBarProps {
-  vertical: 'jobs' | 'machines' | 'accommodations' | 'catering' | 'real-estate' | 'masters' | 'companies';
-  onResult?: (parsed: { searchQuery: string; location?: string }) => void;
-  onError?: (error: unknown) => void;
+export interface AiSearchBarProps {
+  vertical?: string;
 }
 
-const VERTICAL_ROUTES: Record<string, string> = {
-  jobs: '/poslovi',
-  machines: '/masine',
-  accommodations: '/smestaj',
-  catering: '/ketering',
-  'real-estate': '/nekretnine',
-  masters: '/majstori',
-  companies: '/firme',
-};
-
-export function AiSearchBar({ vertical, onResult, onError }: AiSearchBarProps) {
+export function AiSearchBar(props: AiSearchBarProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [showNoResult, setShowNoResult] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = useCallback(async () => {
     if (!query.trim()) return;
     setIsSearching(true);
     try {
-      const parsed = await parseSearchQuery(query);
-      if (!parsed) return;
-      const locMatch = parsed.location
-        ? LOCATIONS.find(l =>
-            l.name.toLowerCase().includes(parsed.location!.toLowerCase()) ||
-            l.slug === parsed.location!.toLowerCase()
-          )?.slug
-        : undefined;
-
-      const targetVertical = VERTICAL_ROUTES[vertical];
-
-      const sq = parsed.searchQuery || '';
-      if (onResult) {
-        onResult({ searchQuery: sq, location: locMatch || parsed.location });
-      } else if (locMatch) {
-        navigate(`${targetVertical}?q=${encodeURIComponent(sq)}&loc=${locMatch}`);
+      const res = await apiClient.post<{ url: string | null }>('/ai/search-intent', { query });
+      if (res?.url) {
+        navigate(res.url);
       } else {
-        navigate(`${targetVertical}?q=${encodeURIComponent(sq)}`);
+        setShowNoResult(true);
       }
-    } catch (err) {
-      onError?.(err);
+    } catch {
+      setShowNoResult(true);
     } finally {
       setIsSearching(false);
     }
-  }, [query, vertical, onResult, onError, navigate]);
+  }, [query, navigate]);
 
   return (
+    <>
+    {showNoResult && (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowNoResult(false)}>
+        <div className="bg-[#13212e] border border-white/10 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+          <span className="material-symbols-outlined text-5xl text-secondary mb-4 block">search_off</span>
+          <h3 className="text-white text-xl font-bold mb-2">Nema rezultata</h3>
+          <p className="text-slate-300 mb-6">Nismo pronašli odgovarajuću stranicu za tvoju pretragu. Probaj drugačije da opišeš šta tražiš.</p>
+          <Button variant="primary" onClick={() => setShowNoResult(false)}>
+            U redu
+          </Button>
+        </div>
+      </div>
+    )}
     <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full">
       <div className="w-full md:flex-1 h-[64px] md:h-[84px] bg-[#13212e]/60 backdrop-blur-3xl border border-white/10 rounded-[12px] flex items-center pl-4 md:pl-8 pr-2 shadow-2xl transition-all hover:bg-[#192735]/80 group">
         <span className="material-symbols-outlined text-secondary text-2xl md:text-3xl font-black group-focus-within:rotate-12 transition-transform">auto_awesome</span>
@@ -90,5 +78,6 @@ export function AiSearchBar({ vertical, onResult, onError }: AiSearchBarProps) {
         {isSearching ? 'PRETRAŽUJEM' : 'AI PRETRAGA'}
       </Button>
     </div>
+    </>
   );
 }

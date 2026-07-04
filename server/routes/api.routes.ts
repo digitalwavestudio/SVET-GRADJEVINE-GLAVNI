@@ -26,6 +26,7 @@ import { favoritesRouter } from "./favorites.routes.ts";
 import { systemRouter } from "./system.routes.ts";
 import { mediaRouter } from "./media.routes.ts";
 import { rfqRouter } from "./rfq.routes.ts";
+import aiRouter from "./ai.routes.ts";
 
 
 import {
@@ -440,6 +441,8 @@ apiRouter.post("/logs", async (req, res) => {
 apiRouter.use("/messages", messagesRouter);
 
 apiRouter.use("/calendar", calendarRouter);
+
+apiRouter.use("/ai", aiRouter);
 
 // System Maintenance
 apiRouter.post("/housekeeping/cleanup", adminTriggerLimiter, runCleanup);
