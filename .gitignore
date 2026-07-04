@@ -8,6 +8,12 @@ coverage/
 .env.*.local
 !.env.example
 *.txt
+*.err
+.firebase/
+*_test.json
+test_body.json
+server_local.log
+server_run.log
 fix_*.ts
 # Secrets & service-account files (any extension / location)
 firebase-service-account.json
