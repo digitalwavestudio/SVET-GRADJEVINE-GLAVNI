@@ -306,7 +306,7 @@ export default function AiSearchPage() {
                   <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-1 leading-tight">
                     Pronađeno {data.count} oglasa
                   </h1>
-                  <p className="text-white/40 text-sm mb-4">za {query}</p>
+                  <p className="text-white/40 text-base mb-4">za <span className="text-[#febf0d] font-bold">{query}</span></p>
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
@@ -337,46 +337,45 @@ export default function AiSearchPage() {
               {/* Desno: AI Understanding Card (Raširen pomoću lg:col-span-5) */}
               {data.parsedIntent && (
                 <div className="lg:col-span-5 bg-[#121c27]/45 border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-inner min-h-[190px]">
-                  {/* Zlatni svetleći prstenovi i mozak sa mockup-a */}
-                  <div className="absolute -right-10 -top-10 w-44 h-44 pointer-events-none z-0">
-                    {/* Spoljni prsten */}
-                    <div className="absolute inset-0 rounded-full border border-secondary/20 bg-secondary/[0.02] blur-[1px] scale-90 animate-pulse"></div>
-                    {/* Unutrašnji prsten */}
-                    <div className="absolute inset-4 rounded-full border border-secondary/35 bg-secondary/[0.04] blur-[2px] scale-95 shadow-[inset_0_0_15px_rgba(254,191,13,0.15)]"></div>
-                    {/* Sam mozak */}
-                    <BrainIllustration className="absolute inset-6 w-32 h-32 opacity-95 text-secondary drop-shadow-[0_0_30px_rgba(254,191,13,0.7)]" />
-                  </div>
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
                       <span className="material-symbols-outlined text-white/20 hover:text-white text-base cursor-pointer">close</span>
                     </div>
                     <div className="flex items-baseline gap-2 mb-4">
-                      <span className="text-4xl font-extrabold text-secondary">{data.confidence}%</span>
+                      <span className="text-6xl font-extrabold text-secondary">{data.confidence}%</span>
                       <span className="text-xs text-white/40 font-bold">pouzdanost</span>
                     </div>
                   </div>
                   {/* Kvačice zamenjene sa teal check ikonama kao na mockup-u */}
-                  <div className="space-y-2 relative z-10 text-white/95">
-                    <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
-                      <span className="text-white/60">Vertikala:</span>
-                      <span className="text-white font-semibold">{data.parsedIntent.vertikala}</span>
+                  <div className="space-y-3 relative z-10 text-white/95 text-base">
+                    <div className="flex items-start gap-2.5">
+                      <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-white/60 mr-1.5">Vertikala:</span>
+                        <span className="text-white font-semibold break-words">{data.parsedIntent.vertikala}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
-                      <span className="text-white/60">Zanimanje:</span>
-                      <span className="text-white font-semibold">{data.parsedIntent.zanimanje}</span>
+                    <div className="flex items-start gap-2.5">
+                      <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-white/60 mr-1.5">Zanimanje:</span>
+                        <span className="text-white font-semibold break-words">{data.parsedIntent.zanimanje}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
-                      <span className="text-white/60">Lokacija:</span>
-                      <span className="text-white font-semibold">{data.parsedIntent.lokacija}</span>
+                    <div className="flex items-start gap-2.5">
+                      <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-white/60 mr-1.5">Lokacija:</span>
+                        <span className="text-white font-semibold break-words">{data.parsedIntent.lokacija}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
-                      <span className="text-white/60">Tip posla:</span>
-                      <span className="text-white font-semibold">{data.parsedIntent.tipPosla}</span>
+                    <div className="flex items-start gap-2.5">
+                      <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-white/60 mr-1.5">Tip posla:</span>
+                        <span className="text-white font-semibold break-words">{data.parsedIntent.tipPosla}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -384,7 +383,7 @@ export default function AiSearchPage() {
             </div>
 
             {/* Horizontalni Divider - smanjene margine i podignut gore, skraćen da ide samo do ivice boksa sa mozgom */}
-            <div className="border-t border-white/10 mt-[-20px] mb-4 w-full lg:w-[58%]"></div>
+            <div className="border-t border-white/10 mt-[-50px] mb-4 w-full lg:w-[58%]"></div>
 
             {/* Donji deo: AI Odgovor */}
             {structuredAnswer && (
@@ -397,7 +396,7 @@ export default function AiSearchPage() {
                 </div>
                 
                 <div className="relative z-10">
-                  <p className="text-white/90 leading-relaxed mb-4 text-sm md:text-base" 
+                  <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
                      dangerouslySetInnerHTML={{ __html: structuredAnswer.summary.replace(/\*\*(.*?)\*\*/g, '<strong class="text-secondary font-bold">$1</strong>') }} 
                   />
                   
@@ -407,7 +406,7 @@ export default function AiSearchPage() {
                         <div key={i} className="flex items-start gap-4">
                           {/* Zamena emojija sa prelepim okruglim Material ikonama */}
                           {getBulletIcon(bullet.emoji)}
-                          <p className="text-white/80 text-sm leading-relaxed pt-1"
+                          <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
                              dangerouslySetInnerHTML={{ __html: bullet.text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-secondary font-bold">$1</strong>') }} 
                           />
                         </div>
@@ -416,22 +415,22 @@ export default function AiSearchPage() {
                   )}
                   
                   {structuredAnswer.closing && (
-                    <p className="text-white/60 text-sm mt-4 pt-4 border-t border-white/5">
+                    <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5">
                       {structuredAnswer.closing}
                     </p>
                   )}
 
-                  {/* Tri male pilule na dnu odgovora */}
-                  <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-white/5">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-xs font-bold">
-                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+                  {/* Redizajnirane velike pilule sa smanjenim uglovima i većim fontom */}
+                  <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-white/5">
+                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm md:text-base font-bold shadow-md">
+                      <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                       AI pouzdanost: {data.confidence}%
                     </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold">
-                      <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping"></span>
+                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl text-sm md:text-base font-bold shadow-md">
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
                       Vreme pretrage: 2.4s
                     </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-xs font-bold">
+                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl text-sm md:text-base font-bold shadow-md">
                       Izvori podataka: {filteredListings.length + 7}
                     </span>
                   </div>
@@ -441,52 +440,52 @@ export default function AiSearchPage() {
           </div>
 
           {/* Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
             {/* ZANIMANJE */}
-            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
               </div>
-              <div className="min-w-0">
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">ZANIMANJE</span>
-                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{data.parsedIntent?.zanimanje || query || '-'}</p>
-                <p className="text-white/40 text-xs font-headline">Glavna pretraga</p>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">ZANIMANJE</span>
+                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{data.parsedIntent?.zanimanje || query || '-'}</p>
+                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">Glavna pretraga</p>
               </div>
             </div>
 
             {/* LOKACIJE */}
-            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
               </div>
-              <div className="min-w-0">
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">LOKACIJE</span>
-                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
-                <p className="text-white/40 text-xs font-headline">{filterData.locations.length} lokacija</p>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">LOKACIJE</span>
+                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
+                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">{filterData.locations.length} lokacija</p>
               </div>
             </div>
 
             {/* SATNICE */}
-            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
               </div>
-              <div className="min-w-0">
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">SATNICE</span>
-                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{filterData.salaryMin} – {filterData.salaryMax} €/h</p>
-                <p className="text-white/40 text-xs font-headline font-headline">Prosečna satnica</p>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">SATNICE</span>
+                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{filterData.salaryMin} – {filterData.salaryMax} €/h</p>
+                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">Prosečna satnica</p>
               </div>
             </div>
 
             {/* UKUPNO OGLASA */}
-            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
               </div>
-              <div className="min-w-0">
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">UKUPNO OGLASA</span>
-                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{data.count}</p>
-                <p className="text-white/40 text-xs font-headline">Aktivnih oglasa</p>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">UKUPNO OGLASA</span>
+                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{data.count}</p>
+                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">Aktivnih oglasa</p>
               </div>
             </div>
           </div>
@@ -494,7 +493,7 @@ export default function AiSearchPage() {
           {/* Info Text */}
           <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 mb-8 flex items-start gap-3">
             <span className="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">info</span>
-            <p className="text-white/60 text-sm leading-relaxed">
+            <p className="text-white/60 text-base leading-relaxed">
               Najviše oglasa u <strong className="text-white">{data.parsedIntent?.lokacija || 'svim lokacijama'}</strong>. 
               Prosečna satnica varira od <strong className="text-white">{filterData.salaryMin} do {filterData.salaryMax} €/h</strong> u zavisnosti od lokacije, iskustva i vrste posla.
             </p>
@@ -506,7 +505,7 @@ export default function AiSearchPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                className={`inline-flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
                   activeTab === tab.id
                     ? 'bg-secondary !text-black shadow-lg shadow-secondary/20'
                     : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10'
@@ -725,37 +724,43 @@ export default function AiSearchPage() {
           </div>
 
           {/* CTA Section */}
-          <div className="mt-12 bg-gradient-to-r from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          <div className="mt-12 bg-gradient-to-r from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4 min-w-0 w-full">
+            <div className="flex items-center gap-4 min-w-0 flex-1 w-full">
               <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-secondary text-xl">rocket_launch</span>
               </div>
-              <div>
-                <h3 className="text-white font-black text-lg">Niste pronašli ono što tražite?</h3>
-                <p className="text-white/50 text-sm">Postavite oglas i dozvolite firmama da vam se jave.</p>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-white font-black text-lg break-words">Niste pronašli ono što tražite?</h3>
+                <p className="text-white/50 text-sm break-words">Promenite kriterijume pretrage i budite što detaljniji u opisu.</p>
               </div>
             </div>
             <button
-              onClick={() => navigate('/postavi-oglas')}
-              className="shrink-0 inline-flex items-center gap-2 bg-secondary text-black font-black px-6 py-3 rounded-xl hover:bg-yellow-500 transition-all text-xs uppercase tracking-widest"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => {
+                  const inputEl = document.querySelector('input[type="text"]') as HTMLInputElement;
+                  if (inputEl) inputEl.focus();
+                }, 500);
+              }}
+              className="shrink-0 inline-flex items-center justify-center gap-2 bg-secondary text-black font-black px-6 py-3 rounded-xl hover:bg-yellow-500 transition-all text-xs uppercase tracking-widest w-full md:w-auto"
             >
-              POSTAVI OGLAS
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              PRETRAŽI PONOVO
+              <span className="material-symbols-outlined text-sm">arrow_upward</span>
             </button>
           </div>
 
-          {/* Trust Signals */}
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Trust Signals (Povećane za 3 stupnja) */}
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: 'verified', title: 'Provereni poslodavci', desc: 'Svi poslodavci su verifikovani' },
               { icon: 'paid', title: 'Sigurna isplata', desc: 'Redovna i sigurna isplata zarade' },
               { icon: 'support_agent', title: 'Podrška 24/7', desc: 'Uvek tu za sva vaša pitanja' },
               { icon: 'speed', title: 'Brza pretraga', desc: 'AI pretraga štedi vaše vreme' },
             ].map((item, i) => (
-              <div key={i} className="text-center p-4">
-                <span className="material-symbols-outlined text-secondary text-2xl mb-2">{item.icon}</span>
-                <h4 className="text-white font-bold text-xs mb-1">{item.title}</h4>
-                <p className="text-white/40 text-[10px]">{item.desc}</p>
+              <div key={i} className="text-center p-4 flex flex-col items-center justify-center">
+                <span className="material-symbols-outlined text-secondary text-5xl mb-3 shrink-0">{item.icon}</span>
+                <h4 className="text-white font-bold text-base mb-1.5">{item.title}</h4>
+                <p className="text-white/40 text-xs md:text-sm text-center">{item.desc}</p>
               </div>
             ))}
           </div>
