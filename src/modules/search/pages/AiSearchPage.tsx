@@ -291,11 +291,11 @@ export default function AiSearchPage() {
           {/* Ujedinjeni AI Kontejner sa Mockup-a */}
           <div className="bg-[#0c1520]/80 border border-white/10 rounded-[28px] p-6 md:p-8 mb-8 shadow-xl shadow-black/40">
             {/* Gornji red: Header + Understanding Card (Grid layout da se desni boks raširi) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-4">
               {/* Levo: Header informacije */}
-              <div className="lg:col-span-7 flex flex-col justify-between min-h-[190px]">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
+              <div className="lg:col-span-7 flex flex-col justify-start">
+                <div className="mb-4">
+                  <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
                       <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
                     </div>
@@ -303,30 +303,30 @@ export default function AiSearchPage() {
                       <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
                     </div>
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-black text-white mb-1">
+                  <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-1 leading-tight">
                     Pronađeno {data.count} oglasa
                   </h1>
-                  <p className="text-white/40 text-sm mb-6">za {query}</p>
+                  <p className="text-white/40 text-sm mb-4">za {query}</p>
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={handleCopySummary}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
                   >
                     <span className="material-symbols-outlined text-sm">content_copy</span>
                     Kopiraj sažetak
                   </button>
                   <button
                     onClick={handleShare}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
                   >
                     <span className="material-symbols-outlined text-sm">share</span>
                     Podeli
                   </button>
                   <button
                     onClick={handleNewSearch}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
                   >
                     <span className="material-symbols-outlined text-sm">search</span>
                     Nova pretraga
@@ -348,48 +348,48 @@ export default function AiSearchPage() {
                   </div>
                   <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
+                      <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
                       <span className="material-symbols-outlined text-white/20 hover:text-white text-base cursor-pointer">close</span>
                     </div>
-                    <div className="flex items-baseline gap-2 mb-5">
-                      <span className="text-4xl font-black text-secondary">{data.confidence}%</span>
+                    <div className="flex items-baseline gap-2 mb-4">
+                      <span className="text-4xl font-extrabold text-secondary">{data.confidence}%</span>
                       <span className="text-xs text-white/40 font-bold">pouzdanost</span>
                     </div>
                   </div>
                   {/* Kvačice zamenjene sa teal check ikonama kao na mockup-u */}
-                  <div className="space-y-2.5 relative z-10">
+                  <div className="space-y-2 relative z-10 text-white/95">
                     <div className="flex items-center gap-2.5 text-sm">
                       <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Vertikala:</span>
-                      <span className="text-white font-bold">{data.parsedIntent.vertikala}</span>
+                      <span className="text-white font-semibold">{data.parsedIntent.vertikala}</span>
                     </div>
                     <div className="flex items-center gap-2.5 text-sm">
                       <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Zanimanje:</span>
-                      <span className="text-white font-bold">{data.parsedIntent.zanimanje}</span>
+                      <span className="text-white font-semibold">{data.parsedIntent.zanimanje}</span>
                     </div>
                     <div className="flex items-center gap-2.5 text-sm">
                       <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Lokacija:</span>
-                      <span className="text-white font-bold">{data.parsedIntent.lokacija}</span>
+                      <span className="text-white font-semibold">{data.parsedIntent.lokacija}</span>
                     </div>
                     <div className="flex items-center gap-2.5 text-sm">
                       <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Tip posla:</span>
-                      <span className="text-white font-bold">{data.parsedIntent.tipPosla}</span>
+                      <span className="text-white font-semibold">{data.parsedIntent.tipPosla}</span>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Horizontalni Divider */}
-            <div className="border-t border-white/10 my-6"></div>
+            {/* Horizontalni Divider - smanjene margine i podignut gore */}
+            <div className="border-t border-white/10 mt-4 mb-4"></div>
 
             {/* Donji deo: AI Odgovor */}
             {structuredAnswer && (
-              <div className="relative overflow-hidden z-10 mt-6">
-                <div className="flex items-center gap-2 mb-4">
+              <div className="relative overflow-hidden z-10 mt-4">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
                     <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
                   </div>
