@@ -115,7 +115,7 @@ export default function SearchResultsPage() {
           <span className="text-white/20">/</span>
           <span className="text-white/60">Pretraga</span>
         </div>
-        <h1 className="text-4xl font-black text-white mb-4">Rezultati pretrage</h1>
+        <h1 className="text-4xl font-black text-white mb-4 text-center md:text-left">Rezultati pretrage</h1>
         <p className="text-white/60">
           Prikazujemo rezultate za: <span className="text-[#ffad3a] font-bold">"{query}"</span>
         </p>

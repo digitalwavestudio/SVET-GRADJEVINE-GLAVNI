@@ -93,13 +93,13 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
                 ? 'opacity-0 -translate-y-10 scale-[0.96] pointer-events-none h-0 overflow-hidden mb-0' 
                 : 'opacity-100 translate-y-0 scale-100 mb-12'
             }`}>
-              <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase relative mb-8 text-center">
+              <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase relative mb-8 text-center md:text-left">
                 SVE ZA GRAĐEVINU
                 <div>
                   <span className="text-secondary">NA JEDNOM MESTU</span>
                 </div>
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-4xl mx-auto font-medium leading-relaxed relative text-center">
+              <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-4xl font-medium leading-relaxed relative text-center md:text-left mx-auto md:mx-0">
                 Poslovi, mašine, placevi, ketering, smeštaj, baza majstora i
                 kompanije - jedinstven sistem za brze povezivanje i efikasnije
                 poslovanje.
@@ -111,7 +111,7 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
               isSearchActive ? 'mt-0' : 'mt-[10px] md:mt-[110px]'
             }`}>
               {/* Main HUD Search Module - Now Above Categories */}
-              <div className={`relative group/searchwrapper max-w-[970px] mx-auto transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              <div className={`relative group/searchwrapper max-w-[970px] mx-auto md:mx-0 transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isSearchActive ? 'mb-0' : 'mb-12 md:mb-[204px]'
               }`}>
                 <AiSearchBar vertical={currentVertical} isLoading={isLoading} />

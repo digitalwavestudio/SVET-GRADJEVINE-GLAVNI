@@ -8,6 +8,13 @@ interface AiSearchResult {
 
 interface AiAskResult {
   answer: string;
+  parsedIntent: {
+    vertikala: string;
+    zanimanje: string;
+    lokacija: string;
+    tipPosla: string;
+  };
+  confidence: number;
   count: number;
   error?: string;
   page: number;
@@ -85,12 +92,14 @@ Vrati SAMO {"url":"..."} ili {"url":null}. NISTA DRUGO.`;
   }
 }
 
+const DEFAULT_INTENT = { vertikala: "Poslovi", zanimanje: "", lokacija: "", tipPosla: "" };
+
 export async function searchAndAnswer(query: string, page = 1, pageSize = 10): Promise<AiAskResult> {
   const startTime = Date.now();
   const log = (msg: string) => console.log(`[AiAsk] ${msg}`);
 
   if (!query || typeof query !== "string") {
-    return { answer: "", count: 0, page: 1, pageSize: 10, totalPages: 0, error: "Nema upita" };
+    return { answer: "", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: "Nema upita" };
   }
 
   log(`1. Primljen query: "${query}"`);
@@ -107,24 +116,41 @@ Izvuci:
 - profession: zanimanje slug (npr. tesar, krovopokrivac, zidar, armirač, fasader, moler, keramicar, bravar, elektricar, vodoinstalater, stolar, parketar, gipsar, izolater, rukovalac)
 - city: grad slug (npr. beograd, nis, novi-sad, kragujevac, subotica, zrenjanin, krusevac, cacak, novi-pazar, kraljevo, leskovac, sabac, smederevo, pozarevac, uzice, vranje, sumadija, nisava, srbija)
 - keywords: niz sinonima i srodnih termina za pretragu (min 2, max 5, na primer za "tesar": ["tesar", "tesari", "oplata", "salovanje", "krov"])
+- tipPosla: tip posla na srpskom (npr. "Rad u inostranstvu", "Građevinski radovi", "Rad na objektima", "Infrastruktura")
 
-Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. Ako nema, vrednost je null ili prazan niz.`;
+Gradovi van Srbije (nemacka, austrija, hrvatska, slovenija, crna-gora, bosna) = "Rad u inostranstvu".
+Ako je grad u Srbiji = "Lokalni radovi" ili specifičniji tip.
+
+Vrati SAMO {"profession": ..., "city": ..., "keywords": [...], "tipPosla": "..."} u JSON formatu. Ako nema, vrednost je null ili prazan niz.`;
 
     const parseText = await callGemini(parsePrompt);
     if (!parseText) {
       log("2. Gemini vratio null odgovor");
-      return { answer: "Nisam uspeo da obradim upit.", count: 0, page: 1, pageSize: 10, totalPages: 0 };
+      return { answer: "Nisam uspeo da obradim upit.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0 };
     }
     log(`2. Gemini odgovorio za ${Date.now() - t1}ms: ${parseText.slice(0, 200)}`);
 
     if (Date.now() - startTime > timeoutMs) {
       log("TIMEOUT nakon prvog Gemini poziva");
-      return { answer: "Predugo traje obrada. Probaj kraći upit.", count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
+      return { answer: "Predugo traje obrada. Probaj kraći upit.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
     }
 
-    const { profession, city, keywords } = JSON.parse(cleanJson(parseText));
+    const { profession, city, keywords, tipPosla } = JSON.parse(cleanJson(parseText));
     const kwList: string[] = Array.isArray(keywords) ? keywords : [];
-    log(`3. Parsiran: profession="${profession || ''}" city="${city || ''}" keywords=[${kwList.join(', ')}]`);
+    log(`3. Parsiran: profession="${profession || ''}" city="${city || ''}" keywords=[${kwList.join(', ')}] tipPosla="${tipPosla || ''}"`);
+
+    const parsedIntent = {
+      vertikala: "Poslovi",
+      zanimanje: profession ? profession.charAt(0).toUpperCase() + profession.slice(1).replace(/-/g, ' ') : query,
+      lokacija: city ? city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, ' ') : "Srbija",
+      tipPosla: tipPosla || (city && ['nemacka', 'austrija', 'hrvatska', 'slovenija', 'crna-gora', 'bosna'].includes(city) ? "Rad u inostranstvu" : "Lokalni radovi"),
+    };
+
+    // Base confidence from parse quality
+    let baseConfidence = 50;
+    if (profession && city) baseConfidence = 90;
+    else if (profession) baseConfidence = 75;
+    else if (kwList.length > 0) baseConfidence = 55;
 
     // 4. Firestore pretraga po prioritetu
     log("4. Izvrsavam Firestore query...");
@@ -163,7 +189,7 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. A
 
     if (Date.now() - startTime > timeoutMs) {
       log("TIMEOUT nakon Firestore query-a");
-      return { answer: "Predugo traje obrada. Probaj kraći upit.", count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
+      return { answer: "Predugo traje obrada. Probaj kraći upit.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
     }
 
     // 5. Filtriramo u kodu: samo aktivni poslovi
@@ -244,21 +270,77 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. A
 
     log(`6. Saljem ${geminiListings.length}/${resultCount} oglasa Gemini-ju na odgovor...`);
     const t4 = Date.now();
+
+    // Calculate salary stats
+    const salaries = allListings.filter((l: any) => l.plataMin != null).map((l: any) => ({ min: l.plataMin || 0, max: l.plataMax || l.plataMin || 0 }));
+    const avgMin = salaries.length > 0 ? Math.round(salaries.reduce((s: number, l: any) => s + l.min, 0) / salaries.length) : 0;
+    const avgMax = salaries.length > 0 ? Math.round(salaries.reduce((s: number, l: any) => s + l.max, 0) / salaries.length) : 0;
+
+    // Count locations
+    const locCounts: Record<string, number> = {};
+    allListings.forEach((l: any) => {
+      const loc = l.loc || l.location || "Srbija";
+      locCounts[loc] = (locCounts[loc] || 0) + 1;
+    });
+    const topLocs = Object.entries(locCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([loc]) => loc.charAt(0).toUpperCase() + loc.slice(1).replace(/-/g, ' '));
+
     const answerPrompt = `Korisnik je pitao: "${query}"
 
-Pronađeni oglasi u bazi:
+Pronađeni oglasi u bazi (${resultCount} ukupno):
 ${listingsText}
 
-Daj odgovor korisniku na srpskom. Reci mu koliko oglasa je pronađeno (${resultCount}) i ukratko opiši šta je dostupno. Ako nema potpunog poklapanja, reci mu iskreno. Ne izmišljaj informacije koje nisu u oglasima.`;
+Statistika:
+- Prosečna satnica: ${avgMin} - ${avgMax} €/h
+- Top lokacije: ${topLocs.join(', ')}
+
+NA OVO PITANJE MORAŠ ODGOVORITI U JSON FORMATU. Vrati SAMO validan JSON:
+{
+  "summary": "Kratak uvodni paragraf (1-2 rečenice) koji pominje upit, koliko oglasa je pronađeno i gde su najviše ponude.",
+  "bullets": [
+    {"emoji": "🎯", "text": "Informacija o satnicama i platama (pominji konkretne cifre iz oglasa)"},
+    {"emoji": "💰", "text": "Informacija o tipovima poslova i projektima"},
+    {"emoji": "🏗️", "text": "Informacija o pogodnostima (smještaj, prevoz, obrok)"},
+    {"emoji": "✨", "text": "Savet o korišćenju filtera ili dodatne informacije"}
+  ],
+  "closing": "Završna rečenica koja upućuje na ispod listu oglasa."
+}
+
+Pravila:
+- Piši na srpskom jeziku
+- Koristi podebljane reči za ključne informacije (kao **6 do 17 €/h**)
+- Budu konkretni - pominji cifre iz oglasa
+- Ne izmišljaj informacije koje nisu u oglasima
+- Bullet poeni moraju imati emoji prefix`;
 
     const answerText = await callGemini(answerPrompt);
     log(`6. Gemini odgovorio za ${Date.now() - t4}ms: "${(answerText || '').slice(0, 100)}..."`);
+
+    // Parse structured answer
+    let structuredAnswer = null;
+    try {
+      structuredAnswer = JSON.parse(cleanJson(answerText || ''));
+    } catch {
+      // Fallback to plain text
+      structuredAnswer = { summary: answerText || `Pronađeno ${resultCount} oglasa za "${query}".`, bullets: [], closing: "" };
+    }
+
+    // Adjust confidence based on results
+    let confidence = baseConfidence;
+    if (resultCount > 0) confidence = Math.min(confidence + 5, 99);
+    else confidence = Math.max(confidence - 20, 20);
+
+    // Update lokacija with actual top locations if available
+    if (topLocs.length > 0 && (!city || city === "srbija")) {
+      parsedIntent.lokacija = topLocs.join(", ");
+    }
 
     const totalTime = Date.now() - startTime;
     log(`7. Ukupno vreme: ${totalTime}ms`);
 
     return {
-      answer: answerText || `Pronađeno ${resultCount} oglasa za "${query}".`,
+      answer: JSON.stringify(structuredAnswer),
+      parsedIntent,
+      confidence,
       count: resultCount,
       page: validPage,
       pageSize,
@@ -270,8 +352,8 @@ Daj odgovor korisniku na srpskom. Reci mu koliko oglasa je pronađeno (${resultC
     const msg = e instanceof Error ? e.message : String(e);
     log(`GRESKA (${elapsed}ms): ${msg}`);
     if (elapsed > timeoutMs) {
-      return { answer: "Predugo traje obrada. Probaj kraći upit.", count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
+      return { answer: "Predugo traje obrada. Probaj kraći upit.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
     }
-    return { answer: "Došlo je do greške pri pretrazi.", count: 0, page: 1, pageSize: 10, totalPages: 0, error: msg };
+    return { answer: "Došlo je do greške pri pretrazi.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: msg };
   }
 }

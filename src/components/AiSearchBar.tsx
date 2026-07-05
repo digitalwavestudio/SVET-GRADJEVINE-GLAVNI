@@ -23,7 +23,7 @@ export function AiSearchBar({ isLoading }: AiSearchBarProps) {
   const handleSearch = useCallback(() => {
     const q = query.trim();
     if (!q) return;
-    navigate('/?q=' + encodeURIComponent(q));
+    navigate('/ai-pretraga?q=' + encodeURIComponent(q));
   }, [query, navigate]);
 
   return (

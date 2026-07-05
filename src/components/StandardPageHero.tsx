@@ -79,7 +79,7 @@ export function StandardPageHero({
             
             {/* Title Zone - Row 2 (240px) - Locked height for H1 */}
             <div className="md:h-[240px] flex flex-col justify-center">
-              <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase">
+              <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase text-center md:text-left">
                 {title}
                 {titleAccent && (
                   <>

@@ -14,6 +14,7 @@ import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
 import { apiClient } from '@/src/lib/apiClient';
 import { JobCard } from '@/src/modules/jobs/components/JobCard';
+import { BrainIllustration } from '@/src/components/BrainIllustration';
 import shieldMaster from '@/src/assets/images/shield-master.png';
 
 interface ListingItem {
@@ -38,6 +39,13 @@ interface ListingItem {
 
 interface AiResponse {
   answer: string;
+  parsedIntent?: {
+    vertikala: string;
+    zanimanje: string;
+    lokacija: string;
+    tipPosla: string;
+  };
+  confidence?: number;
   count: number;
   listings?: ListingItem[];
 }
@@ -507,6 +515,27 @@ function parseMarkdown(text: string) {
 function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
   const listings = data.listings || [];
   const stats = useMemo(() => extractStats(listings), [listings]);
+  const intent = data.parsedIntent;
+  const confidence = data.confidence || 0;
+
+  const structuredAnswer = useMemo(() => {
+    if (!data.answer) return null;
+    try {
+      return JSON.parse(data.answer) as { summary: string; bullets: Array<{ emoji: string; text: string }>; closing: string };
+    } catch {
+      return { summary: data.answer, bullets: [], closing: '' };
+    }
+  }, [data.answer]);
+
+  const handleCopy = () => {
+    if (!structuredAnswer) return;
+    const text = `${structuredAnswer.summary}\n\n${structuredAnswer.bullets.map(b => `${b.emoji} ${b.text}`).join('\n')}\n\n${structuredAnswer.closing}`;
+    navigator.clipboard.writeText(text);
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+  };
 
   return (
     <div className="bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-3xl border-t border-white/20 border-x border-b border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] rounded-[24px] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
@@ -518,75 +547,145 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
       
       <div className="space-y-6 relative z-10">
         
-        {/* Dashboard Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-          <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-3">
-            <h3 className="text-white text-md md:text-lg font-headline font-black uppercase tracking-wider flex items-center gap-2">
-              PRIKAZUJEMO REZULTATE ZA: <span className="text-secondary drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{query.toUpperCase()}</span>
-            </h3>
-            <div className="bg-secondary/10 border border-secondary/20 px-2.5 py-0.5 rounded-[6px] text-[10px] font-black text-secondary tracking-widest uppercase font-headline ml-0 md:ml-0">
-              Pronađeno: {data.count || listings.length}
+        {/* Row 1: AI Header + AI Understanding Card */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Left: AI Header */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
+              </div>
+              <span className="text-[10px] font-headline font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
             </div>
-          </div>
-          <div className="hidden md:flex items-center gap-2">
-            <span className="text-[10px] font-black tracking-widest text-secondary uppercase font-headline">
-              🤖 AI PRETRAGA
-            </span>
-          </div>
-        </div>
-
-        {/* Sekcija: STATISTIČKI PREGLED REZULTATA */}
-        <div className="space-y-3">
-          <span className="text-[11px] font-headline font-black uppercase tracking-widest text-secondary block">
-            Statistički pregled rezultata:
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <h2 className="text-2xl md:text-3xl font-black text-white mb-1 font-headline">
+              Pronađeno {data.count || listings.length} oglasa
+            </h2>
+            <p className="text-on-surface-variant text-sm mb-4 font-headline">za {query}</p>
             
-            {/* Kartica 1: Zanimanja (Levo) */}
-            <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card cursor-default">
-              <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-                <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">engineering</span>
-                <span className="hidden md:inline">Zanimanja</span>
-                <span className="inline md:hidden">Zanimanje:</span>
-              </div>
-              <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.professions}</p>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={handleCopy} className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all font-headline">
+                <span className="material-symbols-outlined text-sm">content_copy</span>
+                Kopiraj sažetak
+              </button>
+              <button onClick={handleShare} className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all font-headline">
+                <span className="material-symbols-outlined text-sm">share</span>
+                Podeli
+              </button>
             </div>
-
-            {/* Kartica 2: Lokacije (Sredina) */}
-            <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card cursor-default">
-              <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-                <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">distance</span>
-                <span className="hidden md:inline">Lokacije</span>
-                <span className="inline md:hidden">Lokacija:</span>
-              </div>
-              <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.locations}</p>
-            </div>
-
-            {/* Kartica 3: Satnice (Desno) */}
-            <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card cursor-default">
-              <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-                <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">payments</span>
-                <span>Satnice</span>
-              </div>
-              <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.rates}</p>
-            </div>
-
           </div>
+
+          {/* Right: AI Understanding Card */}
+          {intent && (
+            <div className="w-full lg:w-80 bg-gradient-to-br from-[#0c1e3d]/80 to-[#071329]/60 backdrop-blur-3xl border border-white/10 rounded-[18px] p-5 relative overflow-hidden shrink-0 shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
+              <div className="absolute -top-6 -right-6 w-[140px] h-[140px] bg-secondary/10 rounded-full blur-[50px] pointer-events-none"></div>
+              <BrainIllustration className="absolute -right-2 -top-2 w-32 h-32 opacity-25" />
+              <h3 className="text-[10px] font-headline font-black tracking-[0.3em] uppercase text-secondary mb-2 relative z-10">AI RAZUMEVANJE UPITA</h3>
+              <div className="flex items-baseline gap-2 mb-4 relative z-10">
+                <span className="text-4xl font-black text-secondary font-headline drop-shadow-[0_2px_8px_rgba(254,191,13,0.3)]">{confidence}%</span>
+                <span className="text-xs text-on-surface-variant">pouzdanost</span>
+              </div>
+              <div className="space-y-2 relative z-10">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  <span className="text-white/60 font-headline">Vertikala:</span>
+                  <span className="text-white font-bold font-headline">{intent.vertikala}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  <span className="text-white/60 font-headline">Zanimanje:</span>
+                  <span className="text-white font-bold font-headline">{intent.zanimanje}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  <span className="text-white/60 font-headline">Lokacija:</span>
+                  <span className="text-white font-bold font-headline">{intent.lokacija}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  <span className="text-white/60 font-headline">Tip posla:</span>
+                  <span className="text-white font-bold font-headline">{intent.tipPosla}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Sekcija: DETALJNA AI ANALIZA (Celom širinom) */}
-        <div className="space-y-3 border-t border-white/[0.06] pt-5">
-          <span className="text-[11px] font-headline font-black uppercase tracking-widest text-secondary block">
-            ODGOVOR:
-          </span>
+        {/* Row 2: AI Answer Container */}
+        {structuredAnswer && (
           <div className="bg-white/[0.02] border border-white/5 rounded-[18px] py-8 md:py-10 px-6 md:px-8 min-h-[200px] shadow-[0_8px_30px_rgb(0,0,0,0.3)] relative overflow-hidden transition-all hover:bg-white/[0.03] hover:border-white/10">
-            {/* Blago svetlo unutar analize */}
             <div className="absolute -top-12 -right-12 w-[120px] h-[120px] bg-secondary/5 rounded-full blur-[40px] pointer-events-none"></div>
+            <BrainIllustration className="absolute -right-8 -bottom-8 w-48 h-48 opacity-[0.07]" />
             
-            <div 
-              className="relative z-10"
-              dangerouslySetInnerHTML={{ __html: parseMarkdown(data.answer) }}
-            />
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+                <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
+              </div>
+              <h3 className="text-[11px] font-headline font-black uppercase tracking-widest text-secondary">AI ODGOVOR</h3>
+            </div>
+            
+            <div className="relative z-10 space-y-4">
+              <p className="text-slate-300 leading-relaxed font-body text-base md:text-lg"
+                 dangerouslySetInnerHTML={{ __html: structuredAnswer.summary.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white tracking-wide">$1</strong>') }} 
+              />
+              
+              {structuredAnswer.bullets.length > 0 && (
+                <div className="space-y-3">
+                  {structuredAnswer.bullets.map((bullet: { emoji: string; text: string }, i: number) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="text-lg shrink-0 mt-0.5">{bullet.emoji}</span>
+                      <p className="text-slate-300 text-base leading-relaxed font-body"
+                         dangerouslySetInnerHTML={{ __html: bullet.text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-secondary tracking-wide">$1</strong>') }} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {structuredAnswer.closing && (
+                <p className="text-slate-400 text-sm mt-4 pt-4 border-t border-white/5 font-body leading-relaxed">
+                  {structuredAnswer.closing}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Row 3: Stat Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
+            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
+              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">person</span>
+              <span>ZANIMANJE</span>
+            </div>
+            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{intent?.zanimanje || stats.professions}</p>
+            <p className="text-on-surface-variant text-xs font-headline">Glavna pretraga</p>
+          </div>
+
+          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
+            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
+              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">location_on</span>
+              <span>LOKACIJE</span>
+            </div>
+            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{intent?.lokacija || stats.locations}</p>
+            <p className="text-on-surface-variant text-xs font-headline">{listings.length} oglasa</p>
+          </div>
+
+          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
+            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
+              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">payments</span>
+              <span>SATNICE</span>
+            </div>
+            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.rates}</p>
+            <p className="text-on-surface-variant text-xs font-headline">Prosečna satnica</p>
+          </div>
+
+          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
+            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
+              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">inventory_2</span>
+              <span>UKUPNO OGLASA</span>
+            </div>
+            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{data.count || listings.length}</p>
+            <p className="text-on-surface-variant text-xs font-headline">Aktivnih oglasa</p>
           </div>
         </div>
 

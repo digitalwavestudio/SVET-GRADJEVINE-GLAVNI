@@ -305,7 +305,7 @@ export default function MarketplacePage() {
             <div className="flex items-start gap-4">
               <div className="w-[8px] h-16 bg-secondary mt-1"></div>
               <div>
-                <h2 className="text-[38px] leading-[36px] font-black text-white uppercase tracking-tighter">
+                <h2 className="text-[38px] leading-[36px] font-black text-white uppercase tracking-tighter text-center md:text-left">
                   AKTIVNA <br /> <span className="text-secondary">PONUDA</span>
                 </h2>
                 <p className="text-[12px] font-black mt-2 tracking-widest uppercase">
