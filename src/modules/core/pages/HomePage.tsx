@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import CtaSection from '@/src/components/CtaSection';
 import SeoHead from '@/src/components/SeoHead';
 import HeroSection from '@/src/modules/core/components/home/HeroSection';
@@ -53,6 +52,7 @@ export default function HomePage() {
   const [aiData, setAiData] = useState<AiResponse | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const fetchedQuery = useRef('');
   
   // Chip filtering states
@@ -77,6 +77,7 @@ export default function HomePage() {
       setAiData(null);
       setAiLoading(false);
       setAiError(null);
+      setIsFadingOut(false);
       fetchedQuery.current = '';
       setActiveFilters([]);
     }
@@ -91,18 +92,26 @@ export default function HomePage() {
     setAiLoading(true);
     setAiError(null);
     setAiData(null);
+    setIsFadingOut(false);
     setActiveFilters([]);
 
     apiClient.post<AiResponse>('/ai/ask', { query })
       .then(res => {
-        setAiData(res);
+        setIsFadingOut(true);
+        setTimeout(() => {
+          setAiData(res);
+          setAiLoading(false);
+          setIsFadingOut(false);
+        }, 300);
       })
       .catch(err => {
         console.error('[AiSearch] error:', err);
-        setAiError('Greška prilikom učitavanja AI odgovora. Molimo pokušajte ponovo.');
-      })
-      .finally(() => {
-        setAiLoading(false);
+        setIsFadingOut(true);
+        setTimeout(() => {
+          setAiError('Greška prilikom učitavanja AI odgovora. Molimo pokušajte ponovo.');
+          setAiLoading(false);
+          setIsFadingOut(false);
+        }, 300);
       });
   }, [isSearchActive, query]);
 
@@ -170,143 +179,127 @@ export default function HomePage() {
       <HeroSection isSearchActive={isSearchActive} isLoading={aiLoading} />
 
       {isSearchActive ? (
-        <div className="max-w-7xl mx-auto px-4 md:px-8 pb-24 mt-8 md:mt-12 relative z-30 min-h-[400px] flex flex-col items-center justify-start">
-          <AnimatePresence mode="wait">
-            {/* Učitavanje / Skeleton State */}
-            {aiLoading && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0, y: 25 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -25 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-gradient-to-br from-[#0c1e3d]/95 to-[#071329]/85 backdrop-blur-3xl border border-white/10 rounded-[28px] py-14 px-6 md:px-12 text-center space-y-7 shadow-[0_15px_50px_rgba(0,0,0,0.85)] relative overflow-hidden flex flex-col items-center justify-center min-h-[390px] w-full"
-              >
-                {/* Pozadinske svetleće kugle za ambijent */}
-                <div className="absolute -top-12 -left-12 w-[200px] h-[200px] bg-secondary/15 rounded-full blur-[80px] pointer-events-none animate-fluid-orb-1"></div>
-                <div className="absolute -bottom-12 -right-12 w-[200px] h-[200px] bg-secondary/10 rounded-full blur-[80px] pointer-events-none animate-fluid-orb-2"></div>
-                
-                {/* Veliki logo - prelep i zatamnjen sa laganim disanjem */}
-                <div className="relative group/logo flex items-center justify-center">
-                  <div className="absolute inset-0 bg-secondary/10 rounded-full blur-[50px] scale-95 animate-pulse"></div>
-                  <img 
-                    src={shieldMaster} 
-                    alt="Svet Građevine" 
-                    className="w-[220px] md:w-[280px] h-auto object-contain relative z-10 drop-shadow-[0_4px_30px_rgba(254,191,13,0.25)] animate-pulse" 
-                  />
-                </div>
-
-                {/* Tekst učitavanja */}
-                <div className="space-y-3 relative z-10">
-                  <h4 className="text-secondary font-headline font-black text-xl md:text-2xl uppercase tracking-widest animate-pulse">
-                    VAŠI REZULTATI SE UČITAVAJU
-                  </h4>
-                  <p className="text-xs md:text-sm text-slate-400 font-headline font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 opacity-80">
-                    <span>Češljamo bazu aktivnih oglasa...</span>
-                    <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-ping"></span>
-                  </p>
-                </div>
-
-                {/* Suptilna linija progresa */}
-                <div className="w-[180px] md:w-[240px] h-1.5 bg-white/10 rounded-full overflow-hidden relative z-10">
-                  <div className="h-full bg-secondary rounded-full w-[45%] animate-loading-bar"></div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Greška u pretrazi */}
-            {!aiLoading && aiError && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[18px] p-8 text-center space-y-4 w-full"
-              >
-                <span className="material-symbols-outlined text-red-500 text-5xl font-black">warning</span>
-                <h3 className="text-white text-xl font-bold uppercase tracking-tight">Došlo je do greške</h3>
-                <p className="text-on-surface-variant max-w-md mx-auto">{aiError}</p>
-                <button 
-                  onClick={() => { fetchedQuery.current = ''; navigate(location.pathname + location.search); }}
-                  className="px-6 py-2.5 bg-secondary !text-black font-bold rounded-lg hover:bg-yellow-400 transition-colors uppercase text-sm tracking-wide"
-                >
-                  Pokušaj ponovo
-                </button>
-              </motion.div>
-            )}
-
-            {/* Uspešno učitani rezultati */}
-            {!aiLoading && !aiError && aiData && (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-                className="space-y-8 w-full"
-              >
-                {/* AI Compact Response Card */}
-                <AiCompactCard query={query} data={aiData} />
-
-                {/* Filter Chips */}
-                <FilterChips 
-                  listings={aiData.listings || []} 
-                  activeFilters={activeFilters} 
-                  setActiveFilters={setActiveFilters} 
+        <div className={`max-w-7xl mx-auto px-4 md:px-8 pb-24 relative z-30 min-h-[400px] flex flex-col items-center justify-start w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          aiLoading ? 'mt-24 md:mt-36' : 'mt-8 md:mt-12'
+        }`}>
+          {/* Učitavanje / Skeleton State */}
+          {aiLoading && (
+            <div 
+              className={`bg-gradient-to-br from-[#0c1e3d]/95 to-[#071329]/85 backdrop-blur-3xl border border-white/10 rounded-[28px] py-14 px-6 md:px-12 text-center space-y-7 shadow-[0_15px_50px_rgba(0,0,0,0.85)] relative overflow-hidden flex flex-col items-center justify-center min-h-[390px] w-full transition-all duration-300 ${
+                isFadingOut ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
+              }`}
+            >
+              {/* Pozadinske svetleće kugle za ambijent */}
+              <div className="absolute -top-12 -left-12 w-[200px] h-[200px] bg-secondary/15 rounded-full blur-[80px] pointer-events-none animate-fluid-orb-1"></div>
+              <div className="absolute -bottom-12 -right-12 w-[200px] h-[200px] bg-secondary/10 rounded-full blur-[80px] pointer-events-none animate-fluid-orb-2"></div>
+              
+              {/* Veliki logo - prelep i zatamnjen sa laganim disanjem */}
+              <div className="relative group/logo flex items-center justify-center">
+                <div className="absolute inset-0 bg-secondary/10 rounded-full blur-[50px] scale-95 animate-pulse"></div>
+                <img 
+                  src={shieldMaster} 
+                  alt="Svet Građevine" 
+                  className="w-[220px] md:w-[280px] h-auto object-contain relative z-10 drop-shadow-[0_4px_30px_rgba(254,191,13,0.25)] animate-pulse" 
                 />
+              </div>
 
-                {/* Listings Output */}
-                <div className="space-y-4">
-                  {filteredListings.length > 0 ? (
-                    filteredListings.map((item, idx) => (
-                      <div 
-                        key={item.id} 
-                        className="opacity-0 animate-slide-up"
-                        style={{ 
-                          animationDelay: `${idx * 60}ms`,
-                          animationFillMode: 'forwards'
-                        }}
-                      >
-                        <JobCard 
-                          job={item} 
-                          viewMode="list" 
-                          prefetch={prefetchPlaceholder} 
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[18px] p-8 text-center space-y-4">
-                      <span className="material-symbols-outlined text-secondary text-5xl font-black">search_off</span>
-                      <h3 className="text-white text-xl font-bold uppercase tracking-tight">
-                        {aiData.listings && aiData.listings.length > 0 ? 'Nema oglasa za odabrane filtere' : 'Nema rezultata za vaš upit'}
-                      </h3>
-                      <p className="text-on-surface-variant max-w-md mx-auto">
-                        {aiData.listings && aiData.listings.length > 0 
-                          ? 'Pokušajte da isključite neki od filtera kako biste videli više oglasa.' 
-                          : 'Trenutno nema oglasa koji potpuno odgovaraju vašem upitu. Ispod su najnoviji aktivni oglasi.'}
-                      </p>
+              {/* Tekst učitavanja */}
+              <div className="space-y-3 relative z-10">
+                <h4 className="text-secondary font-headline font-black text-xl md:text-2xl uppercase tracking-widest animate-pulse">
+                  VAŠI REZULTATI SE UČITAVAJU
+                </h4>
+                <p className="text-xs md:text-sm text-slate-400 font-headline font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 opacity-80">
+                  <span>Češljamo bazu aktivnih oglasa...</span>
+                  <span className="w-1.5 h-1.5 bg-secondary rounded-full animate-ping"></span>
+                </p>
+              </div>
 
-                      {(!aiData.listings || aiData.listings.length === 0) && (
-                        <div className="pt-8 border-t border-white/5 space-y-4 text-left max-w-4xl mx-auto">
-                          <h4 className="text-secondary font-black uppercase text-xs tracking-wider mb-4">Najnoviji aktivni poslovi:</h4>
-                          <div className="space-y-4">
-                            {latestJobs.slice(0, 3).map((job: any) => (
-                              <JobCard 
-                                key={job.id} 
-                                job={job} 
-                                viewMode="list" 
-                                prefetch={prefetchPlaceholder} 
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      )}
+              {/* Suptilna linija progresa */}
+              <div className="w-[180px] md:w-[240px] h-1.5 bg-white/10 rounded-full overflow-hidden relative z-10">
+                <div className="h-full bg-secondary rounded-full w-[45%] animate-loading-bar"></div>
+              </div>
+            </div>
+          )}
+
+          {/* Greška u pretrazi */}
+          {!aiLoading && aiError && (
+            <div className="bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[18px] p-8 text-center space-y-4 w-full animate-fade-in">
+              <span className="material-symbols-outlined text-red-500 text-5xl font-black">warning</span>
+              <h3 className="text-white text-xl font-bold uppercase tracking-tight">Došlo je do greške</h3>
+              <p className="text-on-surface-variant max-w-md mx-auto">{aiError}</p>
+              <button 
+                onClick={() => { fetchedQuery.current = ''; navigate(location.pathname + location.search); }}
+                className="px-6 py-2.5 bg-secondary !text-black font-bold rounded-lg hover:bg-yellow-400 transition-colors uppercase text-sm tracking-wide"
+              >
+                Pokušaj ponovo
+              </button>
+            </div>
+          )}
+
+          {/* Uspešno učitani rezultati */}
+          {!aiLoading && !aiError && aiData && (
+            <div className="space-y-8 w-full animate-fade-in animate-slide-up">
+              {/* AI Compact Response Card */}
+              <AiCompactCard query={query} data={aiData} />
+
+              {/* Filter Chips */}
+              <FilterChips 
+                listings={aiData.listings || []} 
+                activeFilters={activeFilters} 
+                setActiveFilters={setActiveFilters} 
+              />
+
+              {/* Listings Output */}
+              <div className="space-y-4">
+                {filteredListings.length > 0 ? (
+                  filteredListings.map((item, idx) => (
+                    <div 
+                      key={item.id} 
+                      className="opacity-0 animate-slide-up"
+                      style={{ 
+                        animationDelay: `${idx * 60}ms`,
+                        animationFillMode: 'forwards'
+                      }}
+                    >
+                      <JobCard 
+                        job={item} 
+                        viewMode="list" 
+                        prefetch={prefetchPlaceholder} 
+                      />
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  ))
+                ) : (
+                  <div className="bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[18px] p-8 text-center space-y-4 w-full">
+                    <span className="material-symbols-outlined text-secondary text-5xl font-black">search_off</span>
+                    <h3 className="text-white text-xl font-bold uppercase tracking-tight">
+                      {aiData.listings && aiData.listings.length > 0 ? 'Nema oglasa za odabrane filtere' : 'Nema rezultata za vaš upit'}
+                    </h3>
+                    <p className="text-on-surface-variant max-w-md mx-auto">
+                      {aiData.listings && aiData.listings.length > 0 
+                        ? 'Pokušajte da isključite neki od filtera kako biste videli više oglasa.' 
+                        : 'Trenutno nema oglasa koji potpuno odgovaraju vašem upitu. Ispod su najnoviji aktivni oglasi.'}
+                    </p>
+
+                    {(!aiData.listings || aiData.listings.length === 0) && (
+                      <div className="pt-8 border-t border-white/5 space-y-4 text-left max-w-4xl mx-auto">
+                        <h4 className="text-secondary font-black uppercase text-xs tracking-wider mb-4">Najnoviji aktivni poslovi:</h4>
+                        <div className="space-y-4">
+                          {latestJobs.slice(0, 3).map((job: any) => (
+                            <JobCard 
+                              key={job.id} 
+                              job={job} 
+                              viewMode="list" 
+                              prefetch={prefetchPlaceholder} 
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <>
