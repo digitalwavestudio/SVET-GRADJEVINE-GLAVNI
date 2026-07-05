@@ -57,7 +57,9 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
     <>
       <section className={`relative z-50 flex flex-col justify-start transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] [perspective:1000px] bg-surface-container-lowest ${
         isSearchActive
-          ? 'h-[220px] md:h-[260px] pt-28 md:pt-36 pb-6'
+          ? isLoading
+            ? 'h-0 pt-0 pb-0 overflow-hidden opacity-0 pointer-events-none'
+            : 'h-[220px] md:h-[260px] pt-28 md:pt-36 pb-6'
           : 'min-h-screen pt-36 md:pt-[240px] pb-8 md:pb-16'
       }`}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
