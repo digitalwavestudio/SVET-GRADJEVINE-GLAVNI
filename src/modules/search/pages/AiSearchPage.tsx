@@ -253,7 +253,7 @@ export default function AiSearchPage() {
           {/* AI Header + Understanding Card */}
           <div className="flex flex-col lg:flex-row gap-6 mb-8 items-stretch">
             {/* Left: AI Header */}
-            <div className="flex-1 bg-[#121c27]/40 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+            <div className="flex-1 bg-[#0c1520]/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
@@ -296,7 +296,7 @@ export default function AiSearchPage() {
 
             {/* Right: AI Understanding Card */}
             {data.parsedIntent && (
-              <div className="w-full lg:w-96 bg-[#121c27]/80 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-2xl">
+              <div className="w-full lg:w-96 bg-[#0c1520]/80 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xl">
                 {/* Zlatni svetleći prstenovi i mozak sa mockup-a */}
                 <div className="absolute -right-10 -top-10 w-44 h-44 pointer-events-none z-0">
                   {/* Spoljni prsten */}
@@ -344,7 +344,7 @@ export default function AiSearchPage() {
 
           {/* AI Answer Container */}
           {structuredAnswer && (
-            <div className="bg-[#121c27]/40 border border-white/5 rounded-2xl p-6 md:p-8 mb-8 relative overflow-hidden shadow-xl">
+            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-6 md:p-8 mb-8 relative overflow-hidden shadow-xl">
               <BrainIllustration className="absolute -right-8 -bottom-8 w-48 h-48 opacity-[0.05] pointer-events-none" />
               
               <div className="flex items-center gap-2 mb-4">
@@ -399,7 +399,7 @@ export default function AiSearchPage() {
           {/* Stat Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {/* ZANIMANJE */}
-            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
                 <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
               </div>
@@ -411,7 +411,7 @@ export default function AiSearchPage() {
             </div>
 
             {/* LOKACIJE */}
-            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
                 <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
               </div>
@@ -423,7 +423,7 @@ export default function AiSearchPage() {
             </div>
 
             {/* SATNICE */}
-            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
                 <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
               </div>
@@ -435,7 +435,7 @@ export default function AiSearchPage() {
             </div>
 
             {/* UKUPNO OGLASA */}
-            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+            <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300 shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
                 <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
               </div>
@@ -568,7 +568,7 @@ export default function AiSearchPage() {
 
             {/* Filter Sidebar - Desktop */}
             <div className={`w-full lg:w-72 shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-              <div className="bg-surface-container border border-white/5 rounded-2xl p-5 sticky top-24">
+              <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 sticky top-24 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-black text-white">Brzi filteri</h3>
                   <button onClick={resetFilters} className="text-[10px] font-bold text-white/40 hover:text-white flex items-center gap-1">
