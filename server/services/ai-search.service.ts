@@ -17,12 +17,24 @@ interface AiAskResult {
     id: string;
     title: string;
     location: string;
+    loc: string;
     salary: string;
+    comp: string;
     company: string;
+    companyName: string;
+    companyId: string | null;
+    isCompanyVerified: boolean;
     description: string;
     isPremium: boolean;
     isUrgent: boolean;
     createdAt: string;
+    logo: string | null;
+    logoPlaceholder: string | null;
+    plataMin: number | null;
+    plataMax: number | null;
+    salaryType: string;
+    benefits: string[];
+    viewsCount: number;
   }>;
 }
 
@@ -160,6 +172,18 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. A
       return data.type === "job" && data.status === "active";
     });
 
+    // Premium na vrh, zatim po createdAt desc
+    filtered.sort((a: any, b: any) => {
+      const aData = a.data();
+      const bData = b.data();
+      const aP = aData.isPremium ? 1 : 0;
+      const bP = bData.isPremium ? 1 : 0;
+      if (bP !== aP) return bP - aP;
+      const aT = aData.createdAt?.toDate?.()?.getTime() || new Date(aData.createdAt || 0).getTime();
+      const bT = bData.createdAt?.toDate?.()?.getTime() || new Date(bData.createdAt || 0).getTime();
+      return bT - aT;
+    });
+
     // 6. Fallback ako nema rezultata
     if (filtered.length === 0) {
       log("5. Nema rezultata, vracam najnovije oglase");
@@ -186,11 +210,11 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. A
         location: data.location || data.locationSlug || "",
         loc: data.loc || data.location || "",
         salary: data.plataMin && data.plataMax
-          ? `${data.plataMin}-${data.plataMax} ${data.salaryType || "eur/h"}`
+          ? `${data.plataMin}-${data.plataMax} ${data.salaryType === "hourly" ? "po satu" : "mesečno"}`
           : "",
         plataMin: data.plataMin !== undefined ? data.plataMin : null,
         plataMax: data.plataMax !== undefined ? data.plataMax : null,
-        salaryType: data.salaryType || "eur/h",
+        salaryType: data.salaryType || "hourly",
         company: data.companyName || data.comp || "",
         companyName: data.companyName || data.comp || "",
         comp: data.comp || data.company || "",
@@ -198,6 +222,10 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. A
         isUrgent: !!data.isUrgent,
         logo: data.logo || null,
         logoPlaceholder: data.logoPlaceholder || null,
+        benefits: Array.isArray(data.benefits) ? data.benefits : [],
+        viewsCount: typeof data.viewsCount === 'number' ? data.viewsCount : 0,
+        companyId: data.companyId || null,
+        isCompanyVerified: !!data.isCompanyVerified,
         createdAt: ts?.toDate ? ts.toDate().toISOString() : (typeof ts === 'string' ? ts : ''),
       };
     });
