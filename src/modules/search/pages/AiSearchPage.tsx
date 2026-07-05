@@ -291,7 +291,7 @@ export default function AiSearchPage() {
           {/* Ujedinjeni AI Kontejner sa Mockup-a */}
           <div className="bg-[#0c1520]/80 border border-white/10 rounded-[28px] p-6 md:p-8 mb-8 shadow-xl shadow-black/40">
             {/* Gornji red: Header + Understanding Card (Grid layout da se desni boks raširi) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-0">
               {/* Levo: Header informacije */}
               <div className="lg:col-span-7 flex flex-col justify-start">
                 <div className="mb-4">
@@ -383,12 +383,12 @@ export default function AiSearchPage() {
               )}
             </div>
 
-            {/* Horizontalni Divider - smanjene margine i podignut gore */}
-            <div className="border-t border-white/10 mt-4 mb-4"></div>
+            {/* Horizontalni Divider - smanjene margine i podignut gore, skraćen da ide samo do ivice boksa sa mozgom */}
+            <div className="border-t border-white/10 mt-[-20px] mb-4 w-full lg:w-[58%]"></div>
 
             {/* Donji deo: AI Odgovor */}
             {structuredAnswer && (
-              <div className="relative overflow-hidden z-10 mt-4">
+              <div className="relative overflow-hidden z-10 mt-2">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
                     <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
