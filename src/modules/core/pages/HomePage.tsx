@@ -506,15 +506,15 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
         
         {/* Dashboard Header */}
         <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-3">
             <h3 className="text-white text-md md:text-lg font-headline font-black uppercase tracking-wider flex items-center gap-2">
               PRIKAZUJEMO REZULTATE ZA: <span className="text-secondary drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{query.toUpperCase()}</span>
             </h3>
-            <div className="bg-secondary/10 border border-secondary/20 px-2.5 py-0.5 rounded-[6px] text-[10px] font-black text-secondary tracking-widest uppercase font-headline">
+            <div className="bg-secondary/10 border border-secondary/20 px-2.5 py-0.5 rounded-[6px] text-[10px] font-black text-secondary tracking-widest uppercase font-headline ml-4 md:ml-0">
               Pronađeno: {data.count || listings.length}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <span className="text-[10px] font-black tracking-widest text-secondary uppercase font-headline">
               🤖 AI PRETRAGA
             </span>
