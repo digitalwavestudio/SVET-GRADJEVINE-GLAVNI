@@ -1379,6 +1379,7 @@ ${breadcrumbHtml}
       // Passthrough for SPA-only routes handled by React Router (no server pre-render needed)
       const spaPassthroughPrefixes = [
         "/pretraga", "/profil", "/postavi-oglas",
+        "/ai-pretraga",
         "/pravila-oglasavanja", "/privatnost", "/uslovi-koriscenja",
         "/kalkulator", "/kalkulatori", "/digitalni-alati",
         "/korisni-linkovi", "/zajednica", "/oprema",
