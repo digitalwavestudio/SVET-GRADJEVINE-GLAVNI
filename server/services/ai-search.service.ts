@@ -184,12 +184,20 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...]} u JSON formatu. A
         title: data.title || "",
         description: (data.description || "").slice(0, 300),
         location: data.location || data.locationSlug || "",
+        loc: data.loc || data.location || "",
         salary: data.plataMin && data.plataMax
           ? `${data.plataMin}-${data.plataMax} ${data.salaryType || "eur/h"}`
           : "",
+        plataMin: data.plataMin !== undefined ? data.plataMin : null,
+        plataMax: data.plataMax !== undefined ? data.plataMax : null,
+        salaryType: data.salaryType || "eur/h",
         company: data.companyName || data.comp || "",
+        companyName: data.companyName || data.comp || "",
+        comp: data.comp || data.company || "",
         isPremium: !!data.isPremium,
         isUrgent: !!data.isUrgent,
+        logo: data.logo || null,
+        logoPlaceholder: data.logoPlaceholder || null,
         createdAt: ts?.toDate ? ts.toDate().toISOString() : (typeof ts === 'string' ? ts : ''),
       };
     });

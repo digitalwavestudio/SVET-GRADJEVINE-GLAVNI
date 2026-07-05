@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/context/AuthContext';
 import { apiClient } from '@/src/lib/apiClient';
 
 export const MobileBottomNav: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -24,9 +25,8 @@ export const MobileBottomNav: React.FC = () => {
     if (!q) return;
     setIsSearchOpen(false);
     setSearchQuery('');
-    window.location.href = '/ai-pretraga?q=' + encodeURIComponent(q);
+    navigate('/?q=' + encodeURIComponent(q));
   };
-
   useEffect(() => {
     if (isSearchOpen && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 200);

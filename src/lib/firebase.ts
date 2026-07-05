@@ -25,7 +25,7 @@ export function getLazyGoogleProvider() {
 
 let dbInstance: any = null;
 try {
-  dbInstance = initializeFirestore(app, {}, firebaseConfig.firestoreDatabaseId);
+  dbInstance = initializeFirestore(app, {}, (firebaseConfig as any).firestoreDatabaseId);
 } catch (err: any) {
   console.warn('[FIREBASE] Firestore init failed:', err?.message || err);
 }

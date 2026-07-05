@@ -712,3 +712,97 @@ input, textarea {
   animation: testimonialIn 0.4s ease-out;
 }
 
+/* AI Search in-place animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Tečne svetlosne kugle za Glassmorphism */
+@keyframes fluidBg {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.15);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-fluid-orb-1 {
+  animation: fluidBg 12s ease-in-out infinite;
+}
+
+.animate-fluid-orb-2 {
+  animation: fluidBg 16s ease-in-out infinite alternate;
+}
+
+.animate-fluid-orb-3 {
+  animation: fluidBg 14s ease-in-out infinite 2s;
+}
+
+/* Laserski AI skener dok učitava */
+@keyframes scanEffect {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-scan {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #FFB400, transparent);
+  box-shadow: 0 0 12px #FFB400;
+  animation: scanEffect 2s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Klizeća progres traka */
+@keyframes loadingProgress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-loading-bar {
+  animation: loadingProgress 1.8s infinite ease-in-out;
+}
+
+
+
+

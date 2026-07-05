@@ -1,24 +1,34 @@
-import { useState, useCallback } from 'react';
+// @ts-nocheck
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/src/components/ui/Button';
 
 export interface AiSearchBarProps {
   vertical?: string;
+  isLoading?: boolean;
 }
 
-export function AiSearchBar(props: AiSearchBarProps) {
-  const [query, setQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+export function AiSearchBar({ isLoading }: AiSearchBarProps) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlQuery = searchParams.get('q') || '';
+  
+  const [query, setQuery] = useState(urlQuery);
+
+  // Sync with URL query when it changes externally
+  useEffect(() => {
+    setQuery(urlQuery);
+  }, [urlQuery]);
 
   const handleSearch = useCallback(() => {
     const q = query.trim();
     if (!q) return;
-    setIsSearching(true);
-    window.location.href = '/ai-pretraga?q=' + encodeURIComponent(q);
-  }, [query]);
+    navigate('/?q=' + encodeURIComponent(q));
+  }, [query, navigate]);
 
   return (
     <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full">
-      <div className="w-full md:flex-1 h-[64px] md:h-[84px] bg-[#13212e]/60 backdrop-blur-3xl border border-white/10 rounded-[12px] flex items-center pl-4 md:pl-8 pr-2 shadow-2xl transition-all hover:bg-[#192735]/80 group">
+      <div className="w-full md:flex-1 h-[60px] md:h-[76px] bg-[#13212e]/60 backdrop-blur-3xl border border-white/10 rounded-[14px] flex items-center pl-4 md:pl-8 pr-2 shadow-2xl transition-all duration-300 hover:border-secondary focus-within:border-secondary hover:bg-[#192735]/80 group">
         <span className="material-symbols-outlined text-secondary text-2xl md:text-3xl font-black group-focus-within:rotate-12 transition-transform">auto_awesome</span>
         {/* Mobile Input */}
         <input
@@ -44,12 +54,13 @@ export function AiSearchBar(props: AiSearchBarProps) {
       <Button
         onClick={handleSearch}
         variant="primary"
-        disabled={isSearching || !query.trim()}
-        className="w-full md:w-auto px-6 md:px-10 h-[64px] md:h-[84px] rounded-[12px] font-black uppercase tracking-wider text-sm md:text-base shadow-none flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none transition-all hover:bg-[#ffad3a]"
-        icon={isSearching ? 'sync' : 'auto_awesome'}
+        disabled={isLoading || !query.trim()}
+        className="w-full md:w-auto px-6 md:px-10 h-[60px] md:h-[76px] rounded-[14px] font-black uppercase tracking-wider text-sm md:text-base shadow-none flex items-center justify-center gap-3 active:scale-95 shrink-0 border-none transition-all hover:bg-[#ffad3a]"
+        icon={isLoading ? 'sync' : 'auto_awesome'}
       >
-        {isSearching ? 'PRETRAŽUJEM' : 'AI PRETRAGA'}
+        {isLoading ? 'PRETRAŽUJEM' : 'AI PRETRAGA'}
       </Button>
     </div>
   );
 }
+

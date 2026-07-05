@@ -8,3 +8,4 @@ export const getSearchRouter = () => [
   <Route key="pretraga" path="/pretraga" element={<SearchResultsPage />} />,
   <Route key="ai-pretraga" path="/ai-pretraga" element={<AiSearchPage />} />
 ];
+
