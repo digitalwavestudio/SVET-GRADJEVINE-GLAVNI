@@ -62,6 +62,44 @@ const TABS = [
   { id: 'alati', label: 'Alati', icon: 'construction' },
 ];
 
+const getBulletIcon = (emoji: string) => {
+  const baseClass = "w-8 h-8 rounded-full flex items-center justify-center shrink-0";
+  const cleanEmoji = emoji.trim();
+  if (cleanEmoji === '🎯') {
+    return (
+      <div className={`${baseClass} bg-rose-500/10 border border-rose-500/20 text-rose-400`}>
+        <span className="material-symbols-outlined text-sm font-bold">track_changes</span>
+      </div>
+    );
+  }
+  if (cleanEmoji === '💰') {
+    return (
+      <div className={`${baseClass} bg-yellow-500/10 border border-yellow-500/20 text-yellow-400`}>
+        <span className="material-symbols-outlined text-sm font-bold">payments</span>
+      </div>
+    );
+  }
+  if (cleanEmoji === '🚚' || cleanEmoji === '🚗') {
+    return (
+      <div className={`${baseClass} bg-orange-500/10 border border-orange-500/20 text-orange-400`}>
+        <span className="material-symbols-outlined text-sm font-bold">local_shipping</span>
+      </div>
+    );
+  }
+  if (cleanEmoji === '➕') {
+    return (
+      <div className={`${baseClass} bg-teal-500/10 border border-teal-500/20 text-teal-400`}>
+        <span className="material-symbols-outlined text-sm font-bold">add</span>
+      </div>
+    );
+  }
+  return (
+    <div className={`${baseClass} bg-secondary/10 border border-secondary/20 text-secondary`}>
+      <span className="text-xs">{emoji}</span>
+    </div>
+  );
+};
+
 export default function AiSearchPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -252,10 +290,10 @@ export default function AiSearchPage() {
 
           {/* Ujedinjeni AI Kontejner sa Mockup-a */}
           <div className="bg-[#0c1520]/80 border border-white/10 rounded-[28px] p-6 md:p-8 mb-8 shadow-xl shadow-black/40">
-            {/* Gornji red: Header + Understanding Card */}
-            <div className="flex flex-col lg:flex-row gap-6 items-stretch justify-between mb-6">
+            {/* Gornji red: Header + Understanding Card (Grid layout da se desni boks raširi) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6">
               {/* Levo: Header informacije */}
-              <div className="flex-1 flex flex-col justify-between min-h-[180px]">
+              <div className="lg:col-span-7 flex flex-col justify-between min-h-[190px]">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
@@ -296,9 +334,9 @@ export default function AiSearchPage() {
                 </div>
               </div>
 
-              {/* Desno: AI Understanding Card */}
+              {/* Desno: AI Understanding Card (Raširen pomoću lg:col-span-5) */}
               {data.parsedIntent && (
-                <div className="w-full lg:w-96 bg-[#121c27]/40 border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-inner">
+                <div className="lg:col-span-5 bg-[#121c27]/45 border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-inner min-h-[190px]">
                   {/* Zlatni svetleći prstenovi i mozak sa mockup-a */}
                   <div className="absolute -right-10 -top-10 w-44 h-44 pointer-events-none z-0">
                     {/* Spoljni prsten */}
@@ -318,24 +356,25 @@ export default function AiSearchPage() {
                       <span className="text-xs text-white/40 font-bold">pouzdanost</span>
                     </div>
                   </div>
+                  {/* Kvačice zamenjene sa teal check ikonama kao na mockup-u */}
                   <div className="space-y-2.5 relative z-10">
                     <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Vertikala:</span>
                       <span className="text-white font-bold">{data.parsedIntent.vertikala}</span>
                     </div>
                     <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Zanimanje:</span>
                       <span className="text-white font-bold">{data.parsedIntent.zanimanje}</span>
                     </div>
                     <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Lokacija:</span>
                       <span className="text-white font-bold">{data.parsedIntent.lokacija}</span>
                     </div>
                     <div className="flex items-center gap-2.5 text-sm">
-                      <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span className="material-symbols-outlined text-teal-400 text-lg font-bold">check</span>
                       <span className="text-white/60">Tip posla:</span>
                       <span className="text-white font-bold">{data.parsedIntent.tipPosla}</span>
                     </div>
@@ -354,7 +393,7 @@ export default function AiSearchPage() {
                   <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
                     <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
                   </div>
-                  <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary">AI ODGOVOR</h3>
+                  <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary font-headline">AI ODGOVOR</h3>
                 </div>
                 
                 <div className="relative z-10">
@@ -363,11 +402,12 @@ export default function AiSearchPage() {
                   />
                   
                   {structuredAnswer.bullets.length > 0 && (
-                    <div className="space-y-3 mb-4">
+                    <div className="space-y-4 mb-4">
                       {structuredAnswer.bullets.map((bullet, i) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <span className="text-lg shrink-0 mt-0.5">{bullet.emoji}</span>
-                          <p className="text-white/80 text-sm leading-relaxed"
+                        <div key={i} className="flex items-start gap-4">
+                          {/* Zamena emojija sa prelepim okruglim Material ikonama */}
+                          {getBulletIcon(bullet.emoji)}
+                          <p className="text-white/80 text-sm leading-relaxed pt-1"
                              dangerouslySetInnerHTML={{ __html: bullet.text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-secondary font-bold">$1</strong>') }} 
                           />
                         </div>
