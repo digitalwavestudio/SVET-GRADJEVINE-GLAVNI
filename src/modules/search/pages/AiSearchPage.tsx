@@ -287,35 +287,37 @@ export default function AiSearchPage() {
             </div>
 
             {/* Right: AI Understanding Card */}
-            <div className="w-full lg:w-80 bg-gradient-to-br from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-5 relative overflow-hidden">
-              <BrainIllustration className="absolute -right-4 -top-4 w-32 h-32 opacity-20" />
-              <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary mb-3">AI RAZUMEVANJE UPITA</h3>
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-4xl font-black text-secondary">{data.confidence}%</span>
+            {data.parsedIntent && (
+              <div className="w-full lg:w-80 bg-gradient-to-br from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-5 relative overflow-hidden">
+                <BrainIllustration className="absolute -right-4 -top-4 w-32 h-32 opacity-20" />
+                <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary mb-3">AI RAZUMEVANJE UPITA</h3>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-4xl font-black text-secondary">{data.confidence}%</span>
+                </div>
+                <div className="space-y-2 relative z-10">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                    <span className="text-white/60">Vertikala:</span>
+                    <span className="text-white font-bold">{data.parsedIntent.vertikala}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                    <span className="text-white/60">Zanimanje:</span>
+                    <span className="text-white font-bold">{data.parsedIntent.zanimanje}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                    <span className="text-white/60">Lokacija:</span>
+                    <span className="text-white font-bold">{data.parsedIntent.lokacija}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                    <span className="text-white/60">Tip posla:</span>
+                    <span className="text-white font-bold">{data.parsedIntent.tipPosla}</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2 relative z-10">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
-                  <span className="text-white/60">Vertikala:</span>
-                  <span className="text-white font-bold">{data.parsedIntent.vertikala}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
-                  <span className="text-white/60">Zanimanje:</span>
-                  <span className="text-white font-bold">{data.parsedIntent.zanimanje}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
-                  <span className="text-white/60">Lokacija:</span>
-                  <span className="text-white font-bold">{data.parsedIntent.lokacija}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
-                  <span className="text-white/60">Tip posla:</span>
-                  <span className="text-white font-bold">{data.parsedIntent.tipPosla}</span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* AI Answer Container */}
@@ -364,7 +366,7 @@ export default function AiSearchPage() {
                 <span className="material-symbols-outlined text-secondary text-lg">person</span>
                 <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40">ZANIMANJE</span>
               </div>
-              <p className="text-white font-bold text-lg">{data.parsedIntent.zanimanje}</p>
+              <p className="text-white font-bold text-lg">{data.parsedIntent?.zanimanje || query || '-'}</p>
               <p className="text-white/40 text-xs">Glavna pretraga</p>
             </div>
             <div className="bg-surface-container border border-white/5 rounded-xl p-4">
@@ -372,7 +374,7 @@ export default function AiSearchPage() {
                 <span className="material-symbols-outlined text-secondary text-lg">location_on</span>
                 <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40">LOKACIJE</span>
               </div>
-              <p className="text-white font-bold text-lg truncate">{data.parsedIntent.lokacija}</p>
+              <p className="text-white font-bold text-lg truncate">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
               <p className="text-white/40 text-xs">{filterData.locations.length} lokacija</p>
             </div>
             <div className="bg-surface-container border border-white/5 rounded-xl p-4">
@@ -397,7 +399,7 @@ export default function AiSearchPage() {
           <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 mb-8 flex items-start gap-3">
             <span className="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">info</span>
             <p className="text-white/60 text-sm leading-relaxed">
-              Najviše oglasa u <strong className="text-white">{data.parsedIntent.lokacija}</strong>. 
+              Najviše oglasa u <strong className="text-white">{data.parsedIntent?.lokacija || 'svim lokacijama'}</strong>. 
               Prosečna satnica varira od <strong className="text-white">{filterData.salaryMin} do {filterData.salaryMax} €/h</strong> u zavisnosti od lokacije, iskustva i vrste posla.
             </p>
           </div>
@@ -428,7 +430,7 @@ export default function AiSearchPage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-black text-white">
-                  Oglasi za {data.parsedIntent.zanimanje.toLowerCase()} ({filteredListings.length})
+                  Oglasi za {(data.parsedIntent?.zanimanje || query || '-').toLowerCase()} ({filteredListings.length})
                 </h2>
                 <div className="relative">
                   <select
