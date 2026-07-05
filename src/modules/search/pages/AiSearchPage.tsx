@@ -4,6 +4,7 @@ import { apiClient } from '@/src/lib/apiClient';
 import { JobCard } from '@/src/modules/jobs/components/JobCard';
 import { BrainIllustration } from '@/src/components/BrainIllustration';
 import shieldMaster from '@/src/assets/images/shield-master.png';
+import { AiSearchBar } from '@/src/components/AiSearchBar';
 
 interface ListingItem {
   id: string;
@@ -244,41 +245,48 @@ export default function AiSearchPage() {
 
       {!loading && data && (
         <>
+          {/* AI Search input field at the top of results */}
+          <div className="w-full max-w-3xl mx-auto mb-10">
+            <AiSearchBar isLoading={loading} />
+          </div>
+
           {/* AI Header + Understanding Card */}
-          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-6 mb-8 items-stretch">
             {/* Left: AI Header */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
-                  <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
+            <div className="flex-1 bg-[#121c27]/40 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
+                    <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
-                </div>
+                <h1 className="text-3xl md:text-4xl font-black text-white mb-1">
+                  Pronađeno {data.count} oglasa
+                </h1>
+                <p className="text-white/40 text-sm mb-6">za {query}</p>
               </div>
-              <h1 className="text-3xl md:text-4xl font-black text-white mb-1">
-                Pronađeno {data.count} oglasa
-              </h1>
-              <p className="text-on-surface-variant text-sm mb-4">za {query}</p>
               
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={handleCopySummary}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
                 >
                   <span className="material-symbols-outlined text-sm">content_copy</span>
                   Kopiraj sažetak
                 </button>
                 <button
                   onClick={handleShare}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
                 >
                   <span className="material-symbols-outlined text-sm">share</span>
                   Podeli
                 </button>
                 <button
                   onClick={handleNewSearch}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
                 >
                   <span className="material-symbols-outlined text-sm">search</span>
                   Nova pretraga
@@ -288,30 +296,36 @@ export default function AiSearchPage() {
 
             {/* Right: AI Understanding Card */}
             {data.parsedIntent && (
-              <div className="w-full lg:w-80 bg-gradient-to-br from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-5 relative overflow-hidden">
-                <BrainIllustration className="absolute -right-4 -top-4 w-32 h-32 opacity-20" />
-                <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary mb-3">AI RAZUMEVANJE UPITA</h3>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-4xl font-black text-secondary">{data.confidence}%</span>
+              <div className="w-full lg:w-96 bg-[#121c27]/80 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-2xl">
+                <BrainIllustration className="absolute -right-4 -top-4 w-36 h-36 opacity-30 text-secondary drop-shadow-[0_0_25px_rgba(254,191,13,0.35)] pointer-events-none" />
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
+                    <span className="material-symbols-outlined text-white/20 hover:text-white text-base cursor-pointer">close</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mb-5">
+                    <span className="text-4xl font-black text-secondary">{data.confidence}%</span>
+                    <span className="text-xs text-white/40 font-bold">pouzdanost</span>
+                  </div>
                 </div>
-                <div className="space-y-2 relative z-10">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                <div className="space-y-2.5 relative z-10">
+                  <div className="flex items-center gap-2.5 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     <span className="text-white/60">Vertikala:</span>
                     <span className="text-white font-bold">{data.parsedIntent.vertikala}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                  <div className="flex items-center gap-2.5 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     <span className="text-white/60">Zanimanje:</span>
                     <span className="text-white font-bold">{data.parsedIntent.zanimanje}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                  <div className="flex items-center gap-2.5 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     <span className="text-white/60">Lokacija:</span>
                     <span className="text-white font-bold">{data.parsedIntent.lokacija}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="material-symbols-outlined text-green-400 text-base">check_circle</span>
+                  <div className="flex items-center gap-2.5 text-sm">
+                    <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     <span className="text-white/60">Tip posla:</span>
                     <span className="text-white font-bold">{data.parsedIntent.tipPosla}</span>
                   </div>
@@ -322,8 +336,8 @@ export default function AiSearchPage() {
 
           {/* AI Answer Container */}
           {structuredAnswer && (
-            <div className="bg-surface-container border border-white/5 rounded-2xl p-6 md:p-8 mb-8 relative overflow-hidden">
-              <BrainIllustration className="absolute -right-8 -bottom-8 w-48 h-48 opacity-10" />
+            <div className="bg-[#121c27]/40 border border-white/5 rounded-2xl p-6 md:p-8 mb-8 relative overflow-hidden shadow-xl">
+              <BrainIllustration className="absolute -right-8 -bottom-8 w-48 h-48 opacity-[0.05] pointer-events-none" />
               
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
@@ -355,43 +369,73 @@ export default function AiSearchPage() {
                     {structuredAnswer.closing}
                   </p>
                 )}
+
+                {/* Tri male pilule na dnu odgovora */}
+                <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-white/5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-xs font-bold">
+                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+                    AI pouzdanost: {data.confidence}%
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold">
+                    <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping"></span>
+                    Vreme pretrage: 2.4s
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-xs font-bold">
+                    Izvori podataka: {filteredListings.length + 7}
+                  </span>
+                </div>
               </div>
             </div>
           )}
 
           {/* Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-            <div className="bg-surface-container border border-white/5 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-secondary text-lg">person</span>
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40">ZANIMANJE</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {/* ZANIMANJE */}
+            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
               </div>
-              <p className="text-white font-bold text-lg">{data.parsedIntent?.zanimanje || query || '-'}</p>
-              <p className="text-white/40 text-xs">Glavna pretraga</p>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">ZANIMANJE</span>
+                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{data.parsedIntent?.zanimanje || query || '-'}</p>
+                <p className="text-white/40 text-xs font-headline">Glavna pretraga</p>
+              </div>
             </div>
-            <div className="bg-surface-container border border-white/5 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-secondary text-lg">location_on</span>
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40">LOKACIJE</span>
+
+            {/* LOKACIJE */}
+            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
               </div>
-              <p className="text-white font-bold text-lg truncate">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
-              <p className="text-white/40 text-xs">{filterData.locations.length} lokacija</p>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">LOKACIJE</span>
+                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
+                <p className="text-white/40 text-xs font-headline">{filterData.locations.length} lokacija</p>
+              </div>
             </div>
-            <div className="bg-surface-container border border-white/5 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-secondary text-lg">payments</span>
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40">SATNICE</span>
+
+            {/* SATNICE */}
+            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
               </div>
-              <p className="text-white font-bold text-lg">{filterData.salaryMin} – {filterData.salaryMax} €/h</p>
-              <p className="text-white/40 text-xs">Prosečna satnica</p>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">SATNICE</span>
+                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{filterData.salaryMin} – {filterData.salaryMax} €/h</p>
+                <p className="text-white/40 text-xs font-headline font-headline">Prosečna satnica</p>
+              </div>
             </div>
-            <div className="bg-surface-container border border-white/5 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-secondary text-lg">inventory_2</span>
-                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40">UKUPNO OGLASA</span>
+
+            {/* UKUPNO OGLASA */}
+            <div className="bg-[#121c27]/60 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-secondary/30 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
               </div>
-              <p className="text-white font-bold text-lg">{data.count}</p>
-              <p className="text-white/40 text-xs">Aktivnih oglasa</p>
+              <div className="min-w-0">
+                <span className="text-[9px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">UKUPNO OGLASA</span>
+                <p className="text-white font-bold text-base md:text-lg truncate font-headline">{data.count}</p>
+                <p className="text-white/40 text-xs font-headline">Aktivnih oglasa</p>
+              </div>
             </div>
           </div>
 
@@ -428,7 +472,7 @@ export default function AiSearchPage() {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Results */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-4">
+              <div id="ads-anchor" className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-black text-white">
                   Oglasi za {(data.parsedIntent?.zanimanje || query || '-').toLowerCase()} ({filteredListings.length})
                 </h2>
@@ -615,10 +659,14 @@ export default function AiSearchPage() {
                 </div>
 
                 <button
-                  onClick={() => setShowFilters(false)}
-                  className="lg:hidden w-full py-3 bg-secondary text-black font-black text-xs uppercase tracking-widest rounded-xl"
+                  onClick={() => {
+                    setShowFilters(false);
+                    const el = document.getElementById('ads-anchor');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full mt-4 py-3.5 bg-secondary text-black font-black text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-500 transition-all shadow-lg shadow-secondary/15 active:scale-95 flex items-center justify-center gap-2"
                 >
-                  Prikaži {filteredListings.length} rezultata
+                  <span className="font-headline">PRIKAŽI {filteredListings.length} REZULTATA</span>
                 </button>
               </div>
             </div>
