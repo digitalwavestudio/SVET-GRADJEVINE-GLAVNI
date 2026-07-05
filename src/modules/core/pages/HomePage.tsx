@@ -510,7 +510,7 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
             <h3 className="text-white text-md md:text-lg font-headline font-black uppercase tracking-wider flex items-center gap-2">
               PRIKAZUJEMO REZULTATE ZA: <span className="text-secondary drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{query.toUpperCase()}</span>
             </h3>
-            <div className="bg-secondary/10 border border-secondary/20 px-2.5 py-0.5 rounded-[6px] text-[10px] font-black text-secondary tracking-widest uppercase font-headline ml-4 md:ml-0">
+            <div className="bg-secondary/10 border border-secondary/20 px-2.5 py-0.5 rounded-[6px] text-[10px] font-black text-secondary tracking-widest uppercase font-headline ml-0 md:ml-0">
               Pronađeno: {data.count || listings.length}
             </div>
           </div>
@@ -532,7 +532,8 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
             <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card cursor-default">
               <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
                 <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">engineering</span>
-                <span>Zanimanja</span>
+                <span className="hidden md:inline">Zanimanja</span>
+                <span className="inline md:hidden">Zanimanje:</span>
               </div>
               <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.professions}</p>
             </div>
@@ -541,7 +542,8 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
             <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card cursor-default">
               <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
                 <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">distance</span>
-                <span>Lokacije</span>
+                <span className="hidden md:inline">Lokacije</span>
+                <span className="inline md:hidden">Lokacija:</span>
               </div>
               <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.locations}</p>
             </div>
@@ -574,11 +576,14 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
           </div>
         </div>
 
-        <div className="text-[10px] text-on-surface-variant uppercase tracking-widest font-headline font-bold flex justify-between items-center pt-4 mt-4 border-t border-white/[0.06]">
-          <span>Prikazano {listings.length} od {data.count || listings.length} oglasa</span>
-          <span className="text-secondary font-black flex items-center gap-1 uppercase tracking-wider font-headline">
-            Pogledaj oglase ispod 
-            <span className="material-symbols-outlined text-xs animate-[bounce_1.5s_infinite]">arrow_downward</span>
+        <div className="text-[10px] text-on-surface-variant uppercase tracking-widest font-headline font-bold flex flex-col md:flex-row justify-between items-center gap-2 md:gap-0 pt-4 mt-4 border-t border-white/[0.06] text-center md:text-left">
+          <span className="block">Prikazano {listings.length} od {data.count || listings.length} oglasa</span>
+          <span className="text-secondary font-black flex flex-col md:flex-row items-center gap-1 uppercase tracking-wider font-headline">
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-xs animate-[bounce_1.5s_infinite] mr-1">arrow_downward</span>
+              <span>Pogledaj</span>
+            </span>
+            <span>oglase ispod</span>
           </span>
         </div>
       </div>
@@ -626,7 +631,7 @@ function FilterChips({ listings, activeFilters, setActiveFilters }: FilterChipsP
   };
 
   return (
-    <div className="flex flex-col gap-3 py-4 border-b border-white/[0.06] relative z-20">
+    <div className="hidden md:flex flex-col gap-3 py-4 border-b border-white/[0.06] relative z-20">
       <span className="text-[11px] font-headline font-black uppercase tracking-widest text-secondary block font-headline">
         Brzo filtriranje oglasa:
       </span>
