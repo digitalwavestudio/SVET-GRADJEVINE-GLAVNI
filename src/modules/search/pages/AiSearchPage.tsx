@@ -297,8 +297,16 @@ export default function AiSearchPage() {
             {/* Right: AI Understanding Card */}
             {data.parsedIntent && (
               <div className="w-full lg:w-96 bg-[#121c27]/80 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-2xl">
-                <BrainIllustration className="absolute -right-4 -top-4 w-36 h-36 opacity-30 text-secondary drop-shadow-[0_0_25px_rgba(254,191,13,0.35)] pointer-events-none" />
-                <div>
+                {/* Zlatni svetleći prstenovi i mozak sa mockup-a */}
+                <div className="absolute -right-10 -top-10 w-44 h-44 pointer-events-none z-0">
+                  {/* Spoljni prsten */}
+                  <div className="absolute inset-0 rounded-full border border-secondary/20 bg-secondary/[0.02] blur-[1px] scale-90 animate-pulse"></div>
+                  {/* Unutrašnji prsten */}
+                  <div className="absolute inset-4 rounded-full border border-secondary/35 bg-secondary/[0.04] blur-[2px] scale-95 shadow-[inset_0_0_15px_rgba(254,191,13,0.15)]"></div>
+                  {/* Sam mozak */}
+                  <BrainIllustration className="absolute inset-6 w-32 h-32 opacity-95 text-secondary drop-shadow-[0_0_30px_rgba(254,191,13,0.7)]" />
+                </div>
+                <div className="relative z-10">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
                     <span className="material-symbols-outlined text-white/20 hover:text-white text-base cursor-pointer">close</span>
