@@ -62,43 +62,35 @@ const TABS = [
   { id: 'alati', label: 'Alati', icon: 'construction' },
 ];
 
-const getBulletIcon = (emoji: string) => {
-  const baseClass = "w-8 h-8 rounded-full flex items-center justify-center shrink-0";
-  const cleanEmoji = emoji.trim();
-  if (cleanEmoji === '🎯') {
-    return (
-      <div className={`${baseClass} bg-rose-500/10 border border-rose-500/20 text-rose-400`}>
-        <span className="material-symbols-outlined text-sm font-bold">track_changes</span>
-      </div>
-    );
-  }
-  if (cleanEmoji === '💰') {
-    return (
-      <div className={`${baseClass} bg-yellow-500/10 border border-yellow-500/20 text-yellow-400`}>
-        <span className="material-symbols-outlined text-sm font-bold">payments</span>
-      </div>
-    );
-  }
-  if (cleanEmoji === '🚚' || cleanEmoji === '🚗') {
-    return (
-      <div className={`${baseClass} bg-orange-500/10 border border-orange-500/20 text-orange-400`}>
-        <span className="material-symbols-outlined text-sm font-bold">local_shipping</span>
-      </div>
-    );
-  }
-  if (cleanEmoji === '➕') {
-    return (
-      <div className={`${baseClass} bg-teal-500/10 border border-teal-500/20 text-teal-400`}>
-        <span className="material-symbols-outlined text-sm font-bold">add</span>
-      </div>
-    );
-  }
-  return (
-    <div className={`${baseClass} bg-secondary/10 border border-secondary/20 text-secondary`}>
-      <span className="text-xs">{emoji}</span>
-    </div>
-  );
-};
+function applyBoldRules(text: string) {
+  let parsed = text.replace(/\*\*(.*?)\*\*/g, (_, content) => {
+    if (/\b(?:Srbij[iaue]|Slovenij[iaue]|Hrvatsk[oiaeu]|Nemačk[oiaeu]|Austrij[iaue]|Beograd[ua]?|Borč[iau]?|Zlatibor[ua]?|Negotin[au]?|Subotic[iau]?|Niš[ua]?|Hvar[ua]?|Split[ua]?|Zagreb[au]?|Kragujevac[au]?|Kruševac[au]?|Zrenjanin[au]?|Sremsk[aeiou]\s+Mitrovic[aeiou]?|Nov[iom]?\s+Sad[ua]?|Pančev[oau]?|Pancev[oau]?|Inostranstv[ou]|Inostranstva|Crn[aeiou]\s+Gor[aeiou]?|Bosn[aeiou]?|Makedonij[iaue]?|Rumunij[iaue]?|Mađarsk[aeiou]?|Madarsk[aeiou]?|Bugarsk[aeiou]?)\b/i.test(content)) {
+      return `<strong class="font-bold text-white tracking-wide">${content}</strong>`;
+    }
+    if (/\d+[.,]?\d*\s*(?:€|eur|evra)/i.test(content)) {
+      return `<strong class="font-bold text-secondary tracking-wide">${content}</strong>`;
+    }
+    if (/(smeštaj|smestaj|obrok|hrana|prevoz|viz|radn[a-z]* dozvol|dokumentacija|radn[a-z]* oprema|alat|oprema)/i.test(content)) {
+      return `<strong class="font-bold text-white">${content}</strong>`;
+    }
+    if (/(satnica|plata)/i.test(content)) {
+      return `<strong class="font-bold text-secondary">${content}</strong>`;
+    }
+    return `<strong class="font-bold text-white tracking-wide">${content}</strong>`;
+  });
+  parsed = parsed.replace(/\*/g, '');
+  parsed = parsed.replace(/(\b(?:Srbij[iaue]|Slovenij[iaue]|Hrvatsk[oiaeu]|Nemačk[oiaeu]|Austrij[iaue]|Beograd[ua]?|Borč[iau]?|Zlatibor[ua]?|Negotin[au]?|Subotic[iau]?|Niš[ua]?|Hvar[ua]?|Split[ua]?|Zagreb[au]?|Kragujevac[au]?|Kruševac[au]?|Zrenjanin[au]?|Sremsk[aeiou]\s+Mitrovic[aeiou]?|Nov[iom]?\s+Sad[ua]?|Pančev[oau]?|Pancev[oau]?|Inostranstv[ou]|Inostranstva|Crn[aeiou]\s+Gor[aeiou]?|Bosn[aeiou]?|Makedonij[iaue]?|Rumunij[iaue]?|Mađarsk[aeiou]?|Madarsk[aeiou]?|Bugarsk[aeiou]?)\b)/gi, '<strong class="font-bold text-white tracking-wide">$1</strong>');
+  parsed = parsed.replace(/(smeštaj[a-z]*|smestaj[a-z]*|obrok[a-z]*|hran[a-z]*|prevoz[a-z]*|viz[a-z]*|radn[a-z]* dozvol[a-z]*|dokumentacij[a-z]*|radn[a-z]* oprem[a-z]*|alata?|oprem[a-z]*)/gi, '<strong class="font-bold text-white">$1</strong>');
+  parsed = parsed.replace(/(\b\d+\s*oglas[aeiou]\b)/gi, '<strong class="font-bold text-white">$1</strong>');
+  parsed = parsed.replace(/(\b\d+[.,]\d+\s*[-–]\s*\d+[.,]\d+\s*(?:€|eur|evra)?\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
+  parsed = parsed.replace(/(\b\d+\s*[-–]\s*\d+\s*(?:€|eur|evra)\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
+  parsed = parsed.replace(/(\b\d+[.,]?\d*\s*(?:€|eur|evra)\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
+  parsed = parsed.replace(/za posao (\w+)/gi, 'za posao <strong class="font-bold text-white uppercase tracking-wide">$1</strong>');
+  parsed = parsed.replace(/ZA '(\w+)' PO LOKACIJAMA/gi, "ZA '<strong class=\"font-bold text-white uppercase tracking-wide\">$1</strong>' PO LOKACIJAMA");
+  return parsed;
+}
+
+const getBulletIcon = (_emoji: string) => null;
 
 export default function AiSearchPage() {
   const [searchParams] = useSearchParams();
@@ -309,24 +301,24 @@ export default function AiSearchPage() {
                   <p className="text-white/40 text-base mb-4">za <span className="text-[#febf0d] font-bold">{query}</span></p>
                 </div>
                 
-                <div className="flex flex-wrap gap-2">
+                <div className="hidden sm:flex flex-col sm:flex-row gap-2 sm:gap-2">
                   <button
                     onClick={handleCopySummary}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-sm">content_copy</span>
                     Kopiraj sažetak
                   </button>
                   <button
                     onClick={handleShare}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-sm">share</span>
                     Podeli
                   </button>
                   <button
                     onClick={handleNewSearch}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
                   >
                     <span className="material-symbols-outlined text-sm">search</span>
                     Nova pretraga
@@ -342,9 +334,9 @@ export default function AiSearchPage() {
                       <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
                       <span className="material-symbols-outlined text-white/20 hover:text-white text-base cursor-pointer">close</span>
                     </div>
-                    <div className="flex items-baseline gap-2 mb-4">
-                      <span className="text-6xl font-extrabold text-secondary">{data.confidence}%</span>
-                      <span className="text-xs text-white/40 font-bold">pouzdanost</span>
+                    <div className="flex flex-col md:flex-row md:items-baseline gap-0 md:gap-2 mb-4">
+                      <span className="text-6xl font-extrabold text-teal-400 leading-none">{data.confidence}%</span>
+                      <span className="text-sm md:text-base text-white/60 font-bold">pouzdanost</span>
                     </div>
                   </div>
                   {/* Kvačice zamenjene sa teal check ikonama kao na mockup-u */}
@@ -387,7 +379,7 @@ export default function AiSearchPage() {
 
             {/* Donji deo: AI Odgovor */}
             {structuredAnswer && (
-              <div className="relative overflow-hidden z-10 mt-2">
+              <div className="relative z-10 mt-20 md:mt-2">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
                     <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
@@ -397,7 +389,7 @@ export default function AiSearchPage() {
                 
                 <div className="relative z-10">
                   <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
-                     dangerouslySetInnerHTML={{ __html: structuredAnswer.summary.replace(/\*\*(.*?)\*\*/g, '<strong class="text-secondary font-bold">$1</strong>') }} 
+                     dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.summary) }} 
                   />
                   
                   {structuredAnswer.bullets.length > 0 && (
@@ -407,30 +399,30 @@ export default function AiSearchPage() {
                           {/* Zamena emojija sa prelepim okruglim Material ikonama */}
                           {getBulletIcon(bullet.emoji)}
                           <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
-                             dangerouslySetInnerHTML={{ __html: bullet.text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-secondary font-bold">$1</strong>') }} 
+                             dangerouslySetInnerHTML={{ __html: applyBoldRules(bullet.text) }} 
                           />
                         </div>
                       ))}
                     </div>
                   )}
                   
-                  {structuredAnswer.closing && (
-                    <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5">
-                      {structuredAnswer.closing}
-                    </p>
+                   {structuredAnswer.closing && (
+                    <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5"
+                       dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.closing) }} 
+                    />
                   )}
 
-                  {/* Redizajnirane velike pilule sa smanjenim uglovima i većim fontom */}
-                  <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-white/5">
-                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm md:text-base font-bold shadow-md">
+                  {/* Pilule sa statistikama */}
+                  <div className="flex flex-col sm:flex-row gap-2 mt-5 pt-4 border-t border-white/5">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
                       <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                       AI pouzdanost: {data.confidence}%
                     </span>
-                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl text-sm md:text-base font-bold shadow-md">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
                       <span className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
                       Vreme pretrage: 2.4s
                     </span>
-                    <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl text-sm md:text-base font-bold shadow-md">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
                       Izvori podataka: {filteredListings.length + 7}
                     </span>
                   </div>
@@ -440,67 +432,67 @@ export default function AiSearchPage() {
           </div>
 
           {/* Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mb-8">
             {/* ZANIMANJE */}
-            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">ZANIMANJE</span>
-                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{data.parsedIntent?.zanimanje || query || '-'}</p>
-                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">Glavna pretraga</p>
+                <span className="text-[11px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">ZANIMANJE</span>
+                <p className="text-white font-bold text-base md:text-lg font-headline truncate">{data.parsedIntent?.zanimanje || query || '-'}</p>
+                <p className="text-white/40 text-xs md:text-xs font-headline">Glavna pretraga</p>
               </div>
             </div>
 
             {/* LOKACIJE */}
-            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">LOKACIJE</span>
-                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
-                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">{filterData.locations.length} lokacija</p>
+                <span className="text-[11px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">LOKACIJE</span>
+                <p className="text-white font-bold text-base md:text-lg font-headline truncate">{data.parsedIntent?.lokacija || 'Sve lokacije'}</p>
+                <p className="text-white/40 text-xs md:text-xs font-headline">{filterData.locations.length} lokacija</p>
               </div>
             </div>
 
             {/* SATNICE */}
-            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">SATNICE</span>
-                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{filterData.salaryMin} – {filterData.salaryMax} €/h</p>
-                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">Prosečna satnica</p>
+                <span className="text-[11px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">SATNICE</span>
+                <p className="text-white font-bold text-base md:text-lg font-headline truncate">{filterData.salaryMin} – {filterData.salaryMax} €/h</p>
+                <p className="text-white/40 text-xs md:text-xs font-headline">Prosečna satnica</p>
               </div>
             </div>
 
             {/* UKUPNO OGLASA */}
-            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-3 md:p-5 flex items-center gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                <span className="material-symbols-outlined text-lg md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
+            <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline truncate">UKUPNO OGLASA</span>
-                <p className="text-white font-bold text-sm md:text-lg truncate font-headline">{data.count}</p>
-                <p className="text-white/40 text-[10px] md:text-xs font-headline truncate">Aktivnih oglasa</p>
+                <span className="text-[11px] md:text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">UKUPNO OGLASA</span>
+                <p className="text-white font-bold text-base md:text-lg font-headline truncate">{data.count}</p>
+                <p className="text-white/40 text-xs md:text-xs font-headline">Aktivnih oglasa</p>
               </div>
             </div>
           </div>
 
           {/* Info Text */}
-          <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 mb-8 flex items-start gap-3">
-            <span className="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">info</span>
+          <div className="bg-white/[0.02] border border-white/5 rounded-lg md:rounded-xl p-4 mb-8 flex items-start gap-3">
+            <span className="hidden md:inline material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">info</span>
             <p className="text-white/60 text-base leading-relaxed">
               Najviše oglasa u <strong className="text-white">{data.parsedIntent?.lokacija || 'svim lokacijama'}</strong>. 
               Prosečna satnica varira od <strong className="text-white">{filterData.salaryMin} do {filterData.salaryMax} €/h</strong> u zavisnosti od lokacije, iskustva i vrste posla.
             </p>
           </div>
 
-          {/* Tabs */}
-          <div className="flex flex-wrap gap-2 mb-6 pb-4 border-b border-white/5">
+          {/* Tabs - samo desktop */}
+          <div className="hidden md:flex flex-wrap gap-2 mb-6 pb-4 border-b border-white/5">
             {TABS.map(tab => (
               <button
                 key={tab.id}
@@ -523,7 +515,7 @@ export default function AiSearchPage() {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Results */}
             <div className="flex-1 min-w-0">
-              <div id="ads-anchor" className="flex items-center justify-between mb-4">
+              <div id="ads-anchor" className="hidden md:flex items-center justify-between mb-4">
                 <h2 className="text-lg font-black text-white">
                   Oglasi za {(data.parsedIntent?.zanimanje || query || '-').toLowerCase()} ({filteredListings.length})
                 </h2>
@@ -541,10 +533,10 @@ export default function AiSearchPage() {
                 </div>
               </div>
 
-              {/* Mobile Filter Toggle */}
+              {/* Mobile Filter Toggle - hidden */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden w-full mb-4 py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 flex items-center justify-center gap-2"
+                className="hidden"
               >
                 <span className="material-symbols-outlined text-sm">filter_list</span>
                 Brzi filteri
@@ -611,9 +603,9 @@ export default function AiSearchPage() {
 
             {/* Filter Sidebar - Desktop */}
             <div className={`w-full lg:w-72 shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-              <div className="bg-[#0c1520]/80 border border-white/10 rounded-2xl p-5 sticky top-24 shadow-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-black text-white">Brzi filteri</h3>
+              <div className="bg-slate-950 border border-white/[0.08] rounded-[10px] p-5 sticky top-24 shadow-xl">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="text-sm font-black text-white/50 uppercase tracking-[0.2em]">Brzi filteri</h3>
                   <button onClick={resetFilters} className="text-[10px] font-bold text-white/40 hover:text-white flex items-center gap-1">
                     <span className="material-symbols-outlined text-xs">refresh</span>
                     PONIŠTI SVE
@@ -621,19 +613,22 @@ export default function AiSearchPage() {
                 </div>
 
                 {/* Lokacija */}
-                <div className="mb-5">
-                  <h4 className="text-xs font-bold text-white/60 mb-3">Lokacija</h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Lokacija</h4>
+                  <div className="space-y-3 max-h-40 overflow-y-auto">
                     {filterData.locations.map(loc => (
-                      <label key={loc.name} className="flex items-center gap-2 cursor-pointer group">
-                        <input
-                          type="checkbox"
-                          checked={selectedLocations.includes(loc.name)}
-                          onChange={() => toggleLocation(loc.name)}
-                          className="w-4 h-4 rounded border-white/20 bg-white/5 text-secondary focus:ring-secondary"
-                        />
-                        <span className="text-xs text-white/60 group-hover:text-white transition-colors">
-                          {loc.name} ({loc.count})
+                      <label key={loc.name} className="flex items-center gap-4 cursor-pointer group h-10">
+                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
+                          <input
+                            type="checkbox"
+                            checked={selectedLocations.includes(loc.name)}
+                            onChange={() => toggleLocation(loc.name)}
+                            className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer"
+                          />
+                          <span className="absolute material-symbols-outlined text-xs text-slate-950 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300 font-black">check</span>
+                        </div>
+                        <span className={`text-base font-bold transition-colors duration-300 ${selectedLocations.includes(loc.name) ? 'text-white font-bold' : 'text-white/50 group-hover:text-white/90'}`}>
+                          {loc.name} <span className="text-white/30 font-normal">({loc.count})</span>
                         </span>
                       </label>
                     ))}
@@ -641,42 +636,49 @@ export default function AiSearchPage() {
                 </div>
 
                 {/* Satnica */}
-                <div className="mb-5">
-                  <h4 className="text-xs font-bold text-white/60 mb-3">Satnica (€/h)</h4>
-                  <div className="px-2">
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Satnica (€/h)</h4>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-[10px] text-white/40 font-bold uppercase">Raspon</span>
+                    <span className="text-xs text-secondary font-black">{salaryRange[0]}€ — {salaryRange[1]}€</span>
+                  </div>
+                  <div className="px-1">
                     <input
                       type="range"
                       min={filterData.salaryMin}
                       max={filterData.salaryMax}
                       value={salaryRange[1]}
                       onChange={(e) => setSalaryRange([salaryRange[0], Number(e.target.value)])}
-                      className="w-full accent-secondary"
+                      className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-secondary"
                     />
-                    <div className="flex justify-between text-[10px] text-white/40 mt-1">
-                      <span>{filterData.salaryMin} €</span>
-                      <span>{salaryRange[1]} €</span>
+                    <div className="flex justify-between mt-1 px-1">
+                      <span className="text-[10px] text-white/40">{filterData.salaryMin} €</span>
+                      <span className="text-[10px] text-white/40">{salaryRange[1]} €</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Smeštaj */}
-                <div className="mb-5">
-                  <h4 className="text-xs font-bold text-white/60 mb-3">Smeštaj</h4>
-                  <div className="space-y-2">
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Smeštaj</h4>
+                  <div className="space-y-3">
                     {[
                       { value: 'all', label: 'Sve' },
                       { value: 'yes', label: 'Obezeđen smeštaj' },
                       { value: 'no', label: 'Nije obezbeđen' },
                     ].map(opt => (
-                      <label key={opt.value} className="flex items-center gap-2 cursor-pointer group">
-                        <input
-                          type="radio"
-                          name="smestaj"
-                          checked={filterSmestaj === opt.value}
-                          onChange={() => setFilterSmestaj(opt.value)}
-                          className="w-4 h-4 border-white/20 bg-white/5 text-secondary focus:ring-secondary"
-                        />
-                        <span className="text-xs text-white/60 group-hover:text-white transition-colors">
+                      <label key={opt.value} className="flex items-center gap-4 cursor-pointer group h-10">
+                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
+                          <input
+                            type="radio"
+                            name="smestaj"
+                            checked={filterSmestaj === opt.value}
+                            onChange={() => setFilterSmestaj(opt.value)}
+                            className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded-full bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer"
+                          />
+                          <div className="absolute w-2.5 h-2.5 bg-slate-950 rounded-full opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300"></div>
+                        </div>
+                        <span className={`text-base font-bold transition-colors duration-300 ${filterSmestaj === opt.value ? 'text-white' : 'text-white/50 group-hover:text-white/90'}`}>
                           {opt.label}
                         </span>
                       </label>
@@ -685,23 +687,26 @@ export default function AiSearchPage() {
                 </div>
 
                 {/* Prevoz */}
-                <div className="mb-5">
-                  <h4 className="text-xs font-bold text-white/60 mb-3">Prevoz</h4>
-                  <div className="space-y-2">
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Prevoz</h4>
+                  <div className="space-y-3">
                     {[
                       { value: 'all', label: 'Sve' },
                       { value: 'yes', label: 'Obezeđen prevoz' },
                       { value: 'no', label: 'Nije obezbeđen' },
                     ].map(opt => (
-                      <label key={opt.value} className="flex items-center gap-2 cursor-pointer group">
-                        <input
-                          type="radio"
-                          name="prevoz"
-                          checked={filterPrevoz === opt.value}
-                          onChange={() => setFilterPrevoz(opt.value)}
-                          className="w-4 h-4 border-white/20 bg-white/5 text-secondary focus:ring-secondary"
-                        />
-                        <span className="text-xs text-white/60 group-hover:text-white transition-colors">
+                      <label key={opt.value} className="flex items-center gap-4 cursor-pointer group h-10">
+                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
+                          <input
+                            type="radio"
+                            name="prevoz"
+                            checked={filterPrevoz === opt.value}
+                            onChange={() => setFilterPrevoz(opt.value)}
+                            className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded-full bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer"
+                          />
+                          <div className="absolute w-2.5 h-2.5 bg-slate-950 rounded-full opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300"></div>
+                        </div>
+                        <span className={`text-base font-bold transition-colors duration-300 ${filterPrevoz === opt.value ? 'text-white' : 'text-white/50 group-hover:text-white/90'}`}>
                           {opt.label}
                         </span>
                       </label>
@@ -715,7 +720,7 @@ export default function AiSearchPage() {
                     const el = document.getElementById('ads-anchor');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="w-full mt-4 py-3.5 bg-secondary text-black font-black text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-500 transition-all shadow-lg shadow-secondary/15 active:scale-95 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-secondary !text-black font-black rounded-[10px] uppercase tracking-widest text-sm hover:bg-yellow-500 transition-all shadow-lg shadow-secondary/15 active:scale-95 flex items-center justify-center gap-2"
                 >
                   <span className="font-headline">PRIKAŽI {filteredListings.length} REZULTATA</span>
                 </button>
@@ -724,14 +729,14 @@ export default function AiSearchPage() {
           </div>
 
           {/* CTA Section */}
-          <div className="mt-12 bg-gradient-to-r from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4 min-w-0 w-full">
-            <div className="flex items-center gap-4 min-w-0 flex-1 w-full">
-              <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-secondary text-xl">rocket_launch</span>
+          <div className="mt-12 bg-gradient-to-r from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 rounded-2xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4 min-w-0 w-full">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 min-w-0 flex-1 w-full">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/20 rounded-full flex items-center justify-center shrink-0 mt-0.5 md:mt-0">
+                <span className="material-symbols-outlined text-secondary text-lg md:text-xl">rocket_launch</span>
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-white font-black text-lg break-words">Niste pronašli ono što tražite?</h3>
-                <p className="text-white/50 text-sm break-words">Promenite kriterijume pretrage i budite što detaljniji u opisu.</p>
+                <h3 className="text-white font-black text-sm md:text-lg leading-tight">Niste pronašli ono što tražite?</h3>
+                <p className="text-white/50 text-xs md:text-sm leading-tight mt-1 md:mt-0">Promenite kriterijume pretrage i budite što detaljniji u opisu.</p>
               </div>
             </div>
             <button
@@ -749,18 +754,18 @@ export default function AiSearchPage() {
             </button>
           </div>
 
-          {/* Trust Signals (Povećane za 3 stupnja) */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {/* Trust Signals */}
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {[
               { icon: 'verified', title: 'Provereni poslodavci', desc: 'Svi poslodavci su verifikovani' },
               { icon: 'paid', title: 'Sigurna isplata', desc: 'Redovna i sigurna isplata zarade' },
               { icon: 'support_agent', title: 'Podrška 24/7', desc: 'Uvek tu za sva vaša pitanja' },
               { icon: 'speed', title: 'Brza pretraga', desc: 'AI pretraga štedi vaše vreme' },
             ].map((item, i) => (
-              <div key={i} className="text-center p-4 flex flex-col items-center justify-center">
-                <span className="material-symbols-outlined text-secondary text-5xl mb-3 shrink-0">{item.icon}</span>
-                <h4 className="text-white font-bold text-base mb-1.5">{item.title}</h4>
-                <p className="text-white/40 text-xs md:text-sm text-center">{item.desc}</p>
+              <div key={i} className="text-center p-4 md:p-6 flex flex-col items-center justify-center">
+                <span className="material-symbols-outlined text-secondary text-5xl md:text-7xl mb-3 md:mb-4 shrink-0">{item.icon}</span>
+                <h4 className="text-white font-bold text-base md:text-xl mb-1.5 md:mb-2">{item.title}</h4>
+                <p className="text-white/40 text-xs md:text-base text-center">{item.desc}</p>
               </div>
             ))}
           </div>

@@ -127,7 +127,7 @@ export function useHeroSearch() {
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (globalQuery.trim()) {
-      navigate(`/pretraga?q=${encodeURIComponent(globalQuery)}`);
+      navigate(`/ai-pretraga?q=${encodeURIComponent(globalQuery)}`);
       return;
     }
     handleCategorySearch();

@@ -66,14 +66,14 @@ export function StandardPageHero({
             className="flex-2 max-w-4xl col-start-1 animate-fade-in-up"
           >
             {/* Badge Zone - Row 1 (40px) */}
-            <div className="md:h-full flex items-center mb-6 md:mb-0">
+            <div className="md:h-full flex items-center justify-center md:justify-start mb-6 md:mb-0">
               {badge && (
-                <div className="flex items-center gap-4">
-                  <div className="hidden md:block h-px w-10 bg-secondary/30"></div>
-                  <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">
-                    {badge}
-                  </span>
-                </div>
+                  <div className="flex items-center justify-center md:justify-start gap-4">
+                    <div className="hidden md:block h-px w-10 bg-secondary/30"></div>
+                    <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">
+                      {badge}
+                    </span>
+                  </div>
               )}
             </div>
             
@@ -93,8 +93,8 @@ export function StandardPageHero({
             {/* Subtitle Zone - Row 3 (120px) */}
             <div className="md:h-full">
               {subtitle && (
-                <div className="relative md:pl-8 h-full border-l-0 md:border-l-2 border-secondary/30 flex items-center mt-6 md:mt-0">
-                  <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-3xl font-medium leading-relaxed">
+                <div className="relative md:pl-8 h-full border-l-0 md:border-l-2 border-secondary/30 flex items-center justify-center md:justify-start mt-6 md:mt-0">
+                  <p className="text-center md:text-left text-base sm:text-lg md:text-xl text-slate-200 max-w-3xl w-full font-medium leading-relaxed">
                     {subtitle}
                   </p>
                 </div>

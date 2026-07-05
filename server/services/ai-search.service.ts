@@ -54,7 +54,7 @@ async function callGemini(prompt: string) {
   const response = await client.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
-    config: { temperature: 0.0, maxOutputTokens: 1000 },
+    config: { temperature: 0.1, maxOutputTokens: 2000 },
   });
   return response.text || null;
 }
@@ -198,6 +198,22 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...], "tipPosla": "..."
       return data.type === "job" && data.status === "active";
     });
 
+    // 5b. Filtriranje po gradu ako je korisnik ukucao (npr "tesar beograd")
+    if (city) {
+      const citySlug = city.toLowerCase();
+      const byCity = filtered.filter((d: any) => {
+        const data = d.data();
+        const loc = (data.locationSlug || data.location || "").toLowerCase().replace(/\s+/g, '-');
+        return loc === citySlug || loc.includes(citySlug);
+      });
+      if (byCity.length >= 2) {
+        filtered = byCity;
+        log(`5b. Filtrirano na "${city}": ${filtered.length} oglasa`);
+      } else {
+        log(`5b. Samo ${byCity.length} oglasa za "${city}", prikazujem sve lokacije (premalo rezultata)`);
+      }
+    }
+
     // Premium na vrh, zatim po createdAt desc
     filtered.sort((a: any, b: any) => {
       const aData = a.data();
@@ -276,6 +292,30 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...], "tipPosla": "..."
     const avgMin = salaries.length > 0 ? Math.round(salaries.reduce((s: number, l: any) => s + l.min, 0) / salaries.length) : 0;
     const avgMax = salaries.length > 0 ? Math.round(salaries.reduce((s: number, l: any) => s + l.max, 0) / salaries.length) : 0;
 
+    // Per-country salary stats
+    const germanyKeywords = ['nemacka', 'nemačka', 'germany'];
+    const serbiaKeywords = ['srbija', 'beograd', 'nis', 'novi-sad', 'kragujevac', 'subotica', 'kraljevo', 'zrenjanin', 'krusevac', 'cacak', 'novi-pazar', 'leskovac', 'sabac', 'smederevo', 'pozarevac', 'uzice', 'vranje', 'zlatibor'];
+    const germanyListings = allListings.filter((l: any) => {
+      const loc = (l.loc || l.location || '').toLowerCase().replace(/\s+/g, '-');
+      return germanyKeywords.some(k => loc.includes(k));
+    });
+    const serbiaListings = allListings.filter((l: any) => {
+      const loc = (l.loc || l.location || '').toLowerCase().replace(/\s+/g, '-');
+      return serbiaKeywords.some(k => loc.includes(k));
+    });
+    const calcCountryAvg = (list: any[]) => {
+      const sals = list.filter((l: any) => l.plataMin != null).map((l: any) => ({ min: l.plataMin || 0, max: l.plataMax || l.plataMin || 0 }));
+      if (sals.length === 0) return '';
+      const mn = Math.round(sals.reduce((s: number, l: any) => s + l.min, 0) / sals.length);
+      const mx = Math.round(sals.reduce((s: number, l: any) => s + l.max, 0) / sals.length);
+      return `${mn}–${mx} €/h`;
+    };
+    const srAvg = calcCountryAvg(serbiaListings);
+    const deAvg = calcCountryAvg(germanyListings);
+    const countrySalaryLine = [];
+    if (srAvg) countrySalaryLine.push(`Prosečna satnica za Srbiju: **${srAvg}**`);
+    if (deAvg) countrySalaryLine.push(`Prosečna satnica za Nemačku: **${deAvg}**`);
+
     // Count locations
     const locCounts: Record<string, number> = {};
     allListings.forEach((l: any) => {
@@ -291,26 +331,33 @@ ${listingsText}
 
 Statistika:
 - Prosečna satnica: ${avgMin} - ${avgMax} €/h
+${countrySalaryLine.length > 0 ? '- ' + countrySalaryLine.join('\n- ') : ''}
 - Top lokacije: ${topLocs.join(', ')}
+- Broj oglasa sa smeštajem: ${allListings.filter((l: any) => l.benefits?.includes('smestaj')).length}
+- Broj oglasa sa prevozom: ${allListings.filter((l: any) => l.benefits?.includes('prevoz')).length}
+- Broj oglasa sa obrokom: ${allListings.filter((l: any) => l.benefits?.includes('topli-obrok') || l.benefits?.includes('hrana')).length}
+
+SISTEM: Ti si tržišni analitičar. Analiziraš OVE konkretne oglase iznad. Ne izmišljaš ništa što ne vidiš u podacima. Ne koristiš floskule "građevinski projekti", "rad na gradilištima", "pomoćni radnici". Pišeš SAMO ono što stoji u oglasima iznad.
 
 NA OVO PITANJE MORAŠ ODGOVORITI U JSON FORMATU. Vrati SAMO validan JSON:
 {
-  "summary": "Kratak uvodni paragraf (1-2 rečenice) koji pominje upit, koliko oglasa je pronađeno i gde su najviše ponude.",
+  "summary": "Uvod (1 rečenica): **Pronađeno je X oglasa za posao **ZANIMANJE****. Uvek boldiraj i napiši zanimanje VELIKIM SLOVIMA. SAMO ovo — NE dodaji lokacije, one su u prvom bullettu.",
   "bullets": [
-    {"emoji": "🎯", "text": "Informacija o satnicama i platama (pominji konkretne cifre iz oglasa)"},
-    {"emoji": "💰", "text": "Informacija o tipovima poslova i projektima"},
-    {"emoji": "🏗️", "text": "Informacija o pogodnostima (smještaj, prevoz, obrok)"},
-    {"emoji": "✨", "text": "Savet o korišćenju filtera ili dodatne informacije"}
+    {"emoji": "", "text": "PRONADJENO OGLASA ZA 'ZANIMANJE' PO LOKACIJAMA:<br>**Beograd** (8), **Nemačka** (5), **Hrvatska** (3), i ostale lokacije sa brojem oglasa. Boldiraj SVAKI grad/državu i broj. ZANIMANJE napiši VELIKIM SLOVIMA i BOLDIRAJ."},
+    {"emoji": "", "text": "CENOVNI VODIČ PO LOKACIJAMA:<br>Navedi svaku lokaciju sa satnicom u novom redu, boldirano.<br>Npr: <br>**Nemačka** **13–17 €/h**<br>**Beograd** **6–11 €/h**<br>**Hrvatska** **6–9 €/h**<br><br>Zatim: Najviše plaća **{lokacija}** sa **X-Y €/h**.<br>Prosečna satnica za Srbiju: **X-Y €/h** (ako ima podataka)<br>Prosečna satnica za Nemačku: **X-Y €/h** (ako ima podataka).<br>Nemoj da kažeš uvek Nemačka. Napiši stvarno šta podaci kažu."},
+    {"emoji": "", "text": "🏠 Smeštaj: **X/Y** | 🚌 Prevoz: **X/Y** | 🍽️ Obrok: **X/Y**<br>Ovo su podaci iz oglasa. Broj oglasa koji nude smeštaj, prevoz i obrok."},
+    {"emoji": "", "text": "SAVET:<br>💡 **Najbolji deal:** opiši najbolju kombinaciju cene i pogodnosti iz oglasa. Ako ima i Srbije i Nemačke, razdvoji: najbolje u Srbiji vs najbolje u Nemačkoj.<br>💡 **Alternativa:** ako traženi grad ima malo oglasa, predloži obližnje lokacije sa više ponuda.<br>💡 **Prijava:** naglasi šta poslodavci najviše traže (iz oglasa) i preporuči da se to istakne u prijavi."}
   ],
-  "closing": "Završna rečenica koja upućuje na ispod listu oglasa."
+  "closing": "Ispod je lista oglasa koje smo pronašli. Klikni na 'Pogledaj' za detalje."
 }
 
 Pravila:
 - Piši na srpskom jeziku
-- Koristi podebljane reči za ključne informacije (kao **6 do 17 €/h**)
-- Budu konkretni - pominji cifre iz oglasa
-- Ne izmišljaj informacije koje nisu u oglasima
-- Bullet poeni moraju imati emoji prefix`;
+- **boldiraj** SVE: gradove, države, cifre, €/h, nazive zahteva, brojeve oglasa
+- BELEŽI SAMO ono što vidiš u oglasima iznad — ne dodaji ništa po defaultu za to zanimanje
+- Ako nema podataka za nešto (npr nema smeštaja ni u jednom oglasu), NE PIŠI to polje
+- Prva rečenica summary uvek počinje sa **Pronađeno je X oglasa za posao {zanimanje}.**`;
+
 
     const answerText = await callGemini(answerPrompt);
     log(`6. Gemini odgovorio za ${Date.now() - t4}ms: "${(answerText || '').slice(0, 100)}..."`);
