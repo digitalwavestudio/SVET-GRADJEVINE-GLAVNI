@@ -232,6 +232,8 @@ mediaRouter.post(
           },
         });
 
+        await blob.makePublic();
+
         publicUrl = `https://storage.googleapis.com/${bucket.name}/${encodeURIComponent(fileName)}`;
       } catch (storageError: any) {
         console.error("[GCS_UPLOAD_FAIL]", storageError?.message || storageError);

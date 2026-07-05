@@ -222,12 +222,12 @@ function wrapFirestoreObject<T extends object>(obj: T): T {
 
           if (result instanceof Promise) {
             let finalPromise = result;
-            if (prop === 'get') {
-              const targetMetadata = target as FirestoreObjectMetadata;
-              const targetPath = getTargetPath(targetMetadata);
-              let timeoutMs = 30000;
-              if (targetPath && targetPath.startsWith('settings/')) timeoutMs = 15000;
-              else if (targetPath && targetPath.startsWith('metadata/')) timeoutMs = 15000;
+              if (prop === 'get') {
+                const targetMetadata = target as FirestoreObjectMetadata;
+                const targetPath = getTargetPath(targetMetadata);
+                let timeoutMs = 30000;
+                if (targetPath && targetPath.startsWith('settings/')) timeoutMs = 15000;
+                else if (targetPath && targetPath.startsWith('metadata/')) timeoutMs = 15000;
 
               finalPromise = withTimeout(
                 result,

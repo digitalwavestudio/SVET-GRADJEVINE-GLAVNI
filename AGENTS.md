@@ -356,12 +356,39 @@ Potpuno različiti domeni. `AdminStatsService.getGlobalStats()` čita iz `metada
 - `server/services/admin/` folder — sadrži svih 8 admin servisa
 - `server/controllers/admin-*.controller.ts` — 4 kontrolera po domenu
 
-## Bundle Size (Uncompressed, initial load ~1.6MB)
-- `vendor-core`: 460KB (React, Router, Query)
-- `vendor-firebase`: 242KB (Firebase SDK)
-- `vendor-other`: 263KB (misc vendors)
-- `vendor-data`: 146KB (date libs)
-- `vendor-ui`: 75KB
-- `vendor-firebase-auth`: 88KB
-- `index`: 314KB (app code)
-- `vendor-charts` (434KB) i `vendor-motion` (128KB) su lazy-loaded — ne utiču na initial load
+## 💾 Session 10 — Base64 Logo → Firebase Storage Migration (2026-07-04)
+
+**Problem:** Logo-i su bili base64 stringovi (~783KB svaki) direktno u Firestore dokumentima. Query od 20 poslova vukao 13.5MB i trajao 35s.
+
+**Rešenje:** Migracija svih 93 base64 logoa u Firebase Storage (`svet-gradjevine-eu.firebasestorage.app`). U Firestore `logo` polju sada stoji Storage URL (ne menjan naziv polja — sve postojeće reference rade bez izmene).
+
+**Rezultat:** 20 poslova = 41KB (sa 13.5MB). Query vreme sa 35s na ~3s.
+
+### Kako je urađeno
+| Fajl | Šta |
+|---|---|
+| `server/scripts/migrate-logos.ts` | **NOV** — skripta: čita base64 → dekodira → upload u Storage → update Firestore |
+| `server/services/ai-search.service.ts` | Uklonjen `.select()` (nepotreban — logo je sad URL od ~100 karaktera) |
+| `server/utils/firestore-utils.ts` | Timeout vraćen na 30000ms (ranije 60000ms radi testa) |
+
+### Ako treba ponovo da se pokrene migracija
+```powershell
+npx tsx server/scripts/migrate-logos.ts
+```
+Skripta preskače dokumente koji već imaju URL logo (ne base64).
+
+### Firebase Storage setup
+- **Bucket:** `svet-gradjevine-eu.firebasestorage.app`
+- **Security rules:**
+  ```
+  match /logos/{allPaths=**} {
+    allow read: if true;
+    allow write: if request.auth != null;
+  }
+  ```
+- **Path format:** `logos/{listingId}.{ext}`
+- **Public URL format:** `https://firebasestorage.googleapis.com/v0/b/svet-gradjevine-eu.firebasestorage.app/o/logos%2F{listingId}.{ext}?alt=media`
+
+### Lekcija
+Base64 u Firestore je anti-patern. Logo/coverImage moraju biti URL-ovi ka Firebase Storage, max nekoliko stotina bajtova u dokumentu. Ovo je najveća optimizacija za performanse Firestore query-ja.
+

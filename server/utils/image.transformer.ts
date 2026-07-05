@@ -67,7 +67,7 @@ export class ImageTransformer {
 
     return {
       ...doc,
-      ...(logo && { logo: this.getOptimizedUrl(logo, size) }),
+      ...(logo && { logo }),
       ...(photoURL && {
         photoURL: this.getOptimizedUrl(photoURL, size),
       }),

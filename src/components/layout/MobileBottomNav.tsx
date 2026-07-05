@@ -19,24 +19,12 @@ export const MobileBottomNav: React.FC = () => {
   const dashboardPath = user ? '/kontrolna-tabla' : '/prijava';
   const messagesPath = user ? '/poruke' : '/prijava';
 
-  const handleSearchSubmit = async () => {
+  const handleSearchSubmit = () => {
     const q = searchQuery.trim();
     if (!q) return;
-    setIsSearching(true);
-    try {
-      const res = await apiClient.post<{ url: string | null }>('/ai/search-intent', { query: q });
-      if (res?.url) {
-        setIsSearchOpen(false);
-        setSearchQuery('');
-        window.location.href = res.url;
-      } else {
-        setShowNoResult(true);
-      }
-    } catch {
-      setShowNoResult(true);
-    } finally {
-      setIsSearching(false);
-    }
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    window.location.href = '/ai-pretraga?q=' + encodeURIComponent(q);
   };
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@/src/components/ui/Button';
-import { apiClient } from '@/src/lib/apiClient';
 
 export interface AiSearchBarProps {
   vertical?: string;
@@ -9,39 +8,15 @@ export interface AiSearchBarProps {
 export function AiSearchBar(props: AiSearchBarProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const [showNoResult, setShowNoResult] = useState(false);
 
-  const handleSearch = useCallback(async () => {
-    if (!query.trim()) return;
+  const handleSearch = useCallback(() => {
+    const q = query.trim();
+    if (!q) return;
     setIsSearching(true);
-    try {
-      const res = await apiClient.post<{ url: string | null }>('/ai/search-intent', { query });
-      if (res?.url) {
-        window.location.href = res.url;
-      } else {
-        setShowNoResult(true);
-      }
-    } catch {
-      setShowNoResult(true);
-    } finally {
-      setIsSearching(false);
-    }
+    window.location.href = '/ai-pretraga?q=' + encodeURIComponent(q);
   }, [query]);
 
   return (
-    <>
-    {showNoResult && (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowNoResult(false)}>
-        <div className="bg-[#13212e] border border-white/10 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl" onClick={e => e.stopPropagation()}>
-          <span className="material-symbols-outlined text-5xl text-secondary mb-4 block">search_off</span>
-          <h3 className="text-white text-xl font-bold mb-2">Nema rezultata</h3>
-          <p className="text-slate-300 mb-6">Nismo pronašli odgovarajuću stranicu za tvoju pretragu. Probaj drugačije da opišeš šta tražiš.</p>
-          <Button variant="primary" onClick={() => setShowNoResult(false)}>
-            U redu
-          </Button>
-        </div>
-      </div>
-    )}
     <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full">
       <div className="w-full md:flex-1 h-[64px] md:h-[84px] bg-[#13212e]/60 backdrop-blur-3xl border border-white/10 rounded-[12px] flex items-center pl-4 md:pl-8 pr-2 shadow-2xl transition-all hover:bg-[#192735]/80 group">
         <span className="material-symbols-outlined text-secondary text-2xl md:text-3xl font-black group-focus-within:rotate-12 transition-transform">auto_awesome</span>
@@ -76,6 +51,5 @@ export function AiSearchBar(props: AiSearchBarProps) {
         {isSearching ? 'PRETRAŽUJEM' : 'AI PRETRAGA'}
       </Button>
     </div>
-    </>
   );
 }
