@@ -143,8 +143,7 @@ export function useAuthNode() {
          // Defensive: claims may be undefined on rare token edge cases (logout race, refresh latency)
          const claims = tokenResult?.claims ?? {};
 
-         const isAdminUser = !!claims.admin;
-         const previewRole = isAdminUser ? safeStorage.getItem('admin_preview_role') : null;
+         const previewRole = safeStorage.getItem('admin_preview_role');
 
          if (claims.role) {
             // We have enough to show the UI
@@ -180,17 +179,16 @@ export function useAuthNode() {
             const meData = await apiClient.get<User>('/users/me');
             // Defensive: backend may return null/undefined if the profile is mid-deletion or quota-stopped
             if (meData && typeof meData === 'object') {
-               const isMeAdmin = meData.isAdmin || meData.role === 'admin';
-               const currentPreviewRole = isMeAdmin ? safeStorage.getItem('admin_preview_role') : null;
+             const currentPreviewRole = safeStorage.getItem('admin_preview_role');
 
-               const combinedData = {
-                  ...meData,
-                  id: firebaseUser.uid,
-                  emailVerified: firebaseUser.emailVerified,
-                  photoURL: firebaseUser.photoURL || meData.photoURL || '',
-                  role: (currentPreviewRole || meData.role || claims.role || 'standard') as UserRole,
-                  isAdmin: isMeAdmin || !!claims.admin,
-                } as User;
+                const combinedData = {
+                   ...meData,
+                   id: firebaseUser.uid,
+                   emailVerified: firebaseUser.emailVerified,
+                   photoURL: firebaseUser.photoURL || meData.photoURL || '',
+                   role: (currentPreviewRole || meData.role || claims.role || 'standard') as UserRole,
+                   isAdmin: meData.isAdmin || meData.role === 'admin' || !!claims.admin,
+                 } as User;
                 if (isMountedFn.current) {
                   const cachedUser = (() => {
                     try {
