@@ -43,7 +43,7 @@ export const getUserAnalytics = async (
   next: NextFunction,
 ) => {
   try {
-    res.json({ stats: [] });
+    res.json([]);
   } catch (err) {
     next(err);
   }

@@ -22,6 +22,50 @@
 
 **Ako se nešto sjebe, vrati se na:** `git checkout ec4b15e`
 
+## 🏗️ Session 11 — Google Login, Dashboard Fix, SPA Passthrough (2026-07-06)
+
+### Šta je urađeno
+
+#### Google Login / Domain (LIVE)
+- **Authorized domains**: U Firebase Console → Authentication → Settings → Authorized domains, dodati `www.svetgradjevine.com` i `svetgradjevine.com` (ranije nije bilo, pa je Google login pucao sa `auth/unauthorized-domain`).
+- **Redirekcija**: `svetgradjevine.com` → `www.svetgradjevine.com` podešena na DreamHost nivou.
+
+#### Role fix (LIVE)
+- **Problem**: User (mancoresolution@gmail.com) imao `role: "standard"` umesto `role: "poslodavac"`, pa je dashboard prikazivao `StandardDashboardUI` umesto `EmployerDashboardUI`.
+- **Fix**: User je manuelno izabrao "Građevinska firma" → `Izbor uloge` → rola postavljena na `poslodavac`. Token sad sadrži: `"role": "poslodavac", "admin": true`.
+
+#### Fixevi u kodu (čekaju deploy)
+
+| Fajl | Promena | Razlog |
+|---|---|---|
+| `server/middleware/spa.middleware.ts:1380-1386` | Dodato `"/kontrolna-tabla", "/moj-profil", "/poruke", "/novcanik", "/podrska", "/politika-privatnosti"` u `spaPassthroughPrefixes` | Bez ovoga, direktan URL `/kontrolna-tabla` vraća 404 (server ne prepoznaje dashboard rute) |
+| `src/modules/dashboard/hooks/useDashboardNavigation.ts:92-98` | Uklonjen prefetch za `/construction/user-site` | Endpoint ne postoji na serveru, izazivao 404 u konzoli |
+| `firestore.indexes.json` | Dodat composite index za `collectionGroup("conversations")` — `participants` (ARRAY_CONTAINS) + `lastMessageAt` (DESC) | Inbox poruka je pucao sa 500 zbog nedostajućeg indeksa |
+| `server/controllers/metrics.controller.ts` | `getUserAnalytics` vraća `[]` umesto `{stats: []}` | Uzrok `T.map is not a function` crash-a u AnalyticsDashboardUI (Array.isArray guard je već u izvornom kodu) |
+
+#### Ostali problemi na LIVE sajtu
+- **`/api/telemetry/auth` 404** — star production build, nema u izvornom kodu
+- **SSE 503** — stream endpoint nije dostupan
+- Oboje će biti rešeno redeploy-em
+
+#### Dupli biznis profil
+Postoje 2 profila, oba su **namerno** (nisu bag):
+1. `/moj-profil` (SettingsPage) — čuva u `users/{uid}.businessProfile` (brzi profil, ime firme, PIB, logo)
+2. `/moj-profil/firma` (MyCompanyPage) — čuva kao `listings/{id}` (detaljni javni profil sa portfolio slikama)
+
+### Šta treba deploy-ovati
+
+```powershell
+# 1. Build
+npm run build
+
+# 2. Deploy na Cloud Run
+gcloud run deploy svet-gra-evine --source .
+
+# 3. Firestore indeksi
+firebase deploy --only firestore:indexes
+```
+
 ## 🖼️ Session 7 — Business Logo/Cover Image Fix (2026-07-03)
 
 **Problem:** 

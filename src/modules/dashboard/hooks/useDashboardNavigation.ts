@@ -90,11 +90,7 @@ export function useDashboardNavigation() {
         });
         break;
       case '/moj-profil/gradiliste':
-        queryClient.prefetchQuery({
-          queryKey: ['construction-site', uid],
-          queryFn: async () => (await apiClient.get<Record<string, unknown>>(`/construction/user-site`)) || {},
-          staleTime: 5 * 60 * 1000
-        });
+        // gradiliste endpoint jos nije implementiran na serveru
         break;
       case '/moj-profil/firma':
         // Prefetches business profile data if necessary

@@ -192,15 +192,14 @@ async function startServer() {
     app.use(rateLimitShield);
 
     // Content-Security-Policy: mirrors the meta tag in index.html, but enforced
-    // by the server too (defense-in-depth). 'unsafe-eval' only in dev (Vite),
-    // HMR websocket only in dev. Production tightens to unsafe-inline + known origins.
+    // by the server too (defense-in-depth).
     const isDev = env.NODE_ENV !== "production";
     const cspDirectives = {
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
         "'unsafe-inline'",
-        ...(isDev ? ["'unsafe-eval'"] : []),
+        "'unsafe-eval'",
         "https://apis.google.com",
         "https://accounts.google.com",
         "https://www.googletagmanager.com",

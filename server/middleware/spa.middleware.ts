@@ -1383,6 +1383,8 @@ ${breadcrumbHtml}
         "/pravila-oglasavanja", "/privatnost", "/uslovi-koriscenja",
         "/kalkulator", "/kalkulatori", "/digitalni-alati",
         "/korisni-linkovi", "/zajednica", "/oprema",
+        "/kontrolna-tabla", "/moj-profil", "/poruke",
+        "/novcanik", "/podrska", "/politika-privatnosti",
       ];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
