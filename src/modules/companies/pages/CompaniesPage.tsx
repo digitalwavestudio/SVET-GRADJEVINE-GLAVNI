@@ -105,7 +105,7 @@ function CompaniesPage() {
                       {(company as any).isPremiumPartner && (
                         <div className="flex items-center gap-1 bg-gradient-to-r from-secondary to-yellow-400 !text-black px-2 py-0.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.3)] transform transition-transform group-hover:scale-105">
                           <span className="material-symbols-outlined text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-                          PREMIUM
+                          PLAĆENI OGLAS
                         </div>
                       )}
                     </div>

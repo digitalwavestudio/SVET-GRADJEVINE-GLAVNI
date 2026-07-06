@@ -15,7 +15,7 @@ import * as z from 'zod';
 
 const companySchema = z.object({
   name: z.string().min(1, 'Naziv firme je obavezan'),
-  pib: z.string().min(1, 'PIB je obavezan'),
+  pib: z.string().optional(),
   locationSlug: z.string().optional(),
   phone: z.string().optional(),
   description: z.string().optional(),
@@ -337,7 +337,7 @@ export default function MyCompanyPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">PIB (Javno vidljiv) *</label>
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">PIB (Javno vidljiv) (opciono)</label>
                 <input 
                   {...register('pib')}
                   className="w-full bg-white/5 border border-white/10 rounded-[10px] p-4 text-xs font-bold text-white uppercase outline-none focus:border-secondary transition-all"

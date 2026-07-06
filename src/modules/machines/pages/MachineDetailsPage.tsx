@@ -189,7 +189,7 @@ export default function MachineDetailsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 {machine.isPremium && (
                   <span className="bg-gradient-to-r from-secondary/20 to-yellow-600/20 text-secondary border border-secondary/20 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(254,191,13,0.15)]">
-                    <Zap size={14} className="fill-secondary" /> PREMIUM OGLAS
+                    <Zap size={14} className="fill-secondary" /> PLAĆENI OGLAS
                   </span>
                 )}
                 <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border flex items-center gap-1.5 ${machine.adType === 'prodaja' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-secondary/10 text-secondary border-secondary/30'}`}>

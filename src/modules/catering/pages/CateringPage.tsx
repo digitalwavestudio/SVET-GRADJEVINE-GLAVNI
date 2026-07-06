@@ -438,7 +438,7 @@ const CateringCard = React.memo(({ cat }: { cat: CateringOffer }) => {
            )}
            {cat.isPremium && (
              <div className="bg-secondary !text-black text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 uppercase tracking-widest shadow-lg w-fit">
-               ⭐ PREMIUM
+               ⭐ PLAĆENI OGLAS
              </div>
            )}
         </div>

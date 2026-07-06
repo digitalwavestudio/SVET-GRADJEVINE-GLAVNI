@@ -45,7 +45,6 @@ export function Step1({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <Input name="companyName" label="Naziv firme" placeholder="Npr. Građevinac DOO" required />
-            <Input name="companyPIB" label="PIB / Matični broj" placeholder="Minimalno 8 cifara" required />
             
             <Select 
               name="location" 

@@ -16,7 +16,7 @@ export default function TermsPage() {
             </div>
             <div>
               <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">Uslovi Korišćenja</h1>
-              <p className="text-slate-400 mt-2">Poslednji put ažurirano: Maj 2026</p>
+              <p className="text-slate-400 mt-2">Poslednji put ažurirano: Jul 2026</p>
             </div>
           </div>
 
@@ -37,10 +37,15 @@ export default function TermsPage() {
               <li>Platforma ne snosi pravnu odgovornost za konflikte nastale između poslodavca i zaposlenog sačuvanog putem oglasa.</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-white mt-12 mb-4">3. Premium oglasi i plaćanja</h2>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">3. Premium oglasi, uplate i pravo na odustanak</h2>
             <p className="mb-4">
-              Uplate za istaknute ("Premium") oglase podležu našoj politici refundacije samo ukoliko usluga nije isporučena usled tehničke greške portala.
+              Uplate za istaknute ("Premium") oglase podležu sledećim pravilima:
             </p>
+            <ul className="list-disc pl-6 mb-4 space-y-2">
+              <li><strong>Pravo na odustanak u roku od 14 dana:</strong> Kao potrošač, imate pravo da odustanete od kupovine SG kredita bez navođenja razloga u roku od 14 dana od dana uplate, u skladu sa Zakonom o zaštiti potrošača. Zahtev za povraćaj sredstava pošaljite na email ili putem kontakt forme.</li>
+              <li><strong>Izuzetak:</strong> Kada potrošite SG kredite na objavu ili promociju oglasa, smatra se da ste izričito pristali na pružanje usluge pre isteka roka za odustanak i time gubite pravo na odustanak u vezi sa tim sredstvima.</li>
+              <li><strong>Tehničke greške:</strong> Ukoliko premium usluga nije isporučena usled tehničke greške portala, imate pravo na povraćaj utrošenih kredita ili ponovnu objavu oglasa.</li>
+            </ul>
 
             <div className="mt-12 p-6 bg-red-500/10 border border-red-500/20 rounded-[10px] flex items-start gap-4">
               <AlertCircle className="w-6 h-6 text-red-500 shrink-0 mt-1" />

@@ -80,7 +80,7 @@ export default function PromoteModal({ isOpen, onClose, entityId, collection, is
 
           <div className="mb-6 bg-white/5 border border-white/10 rounded-[10px] p-4 flex justify-between items-center text-sm font-black uppercase tracking-widest">
             <span className="text-white/60">Stanje u novčaniku:</span>
-            <span className={currentBalance > 0 ? "text-secondary" : "text-white"}>{currentBalance} SG Kredita</span>
+            <span className={currentBalance > 0 ? "text-secondary" : "text-white"}>{currentBalance} SG Kredita ({currentBalance} RSD)</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -94,7 +94,7 @@ export default function PromoteModal({ isOpen, onClose, entityId, collection, is
                     <div className="text-white/40 font-bold uppercase text-[10px] tracking-widest">Dana</div>
                   </div>
                   <div className="mt-6 pt-6 border-t border-white/5">
-                    <div className="text-xl font-black text-white mb-4">{pkg.cost} SG Kredita</div>
+                    <div className="text-xl font-black text-white mb-4">{pkg.cost} SG Kredita ({pkg.cost} RSD)</div>
                     <button 
                       onClick={() => handlePromote(pkg.days, pkg.cost)}
                       disabled={cantAfford || loading}

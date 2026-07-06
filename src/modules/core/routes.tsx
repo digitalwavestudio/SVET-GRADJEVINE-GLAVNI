@@ -23,6 +23,7 @@ export const getCoreRouter = () => [
   <Route key="o-nama" path="/o-nama" element={<AboutPage />} />,
   <Route key="uslovi" path="/uslovi-koriscenja" element={<TermsPage />} />,
   <Route key="privatnost" path="/privatnost" element={<PrivacyPage />} />,
+  <Route key="politika-privatnosti" path="/politika-privatnosti" element={<PrivacyPage />} />,
   <Route key="pravila" path="/pravila-oglasavanja" element={<AffiliateRulesPage />} />
 ];
 

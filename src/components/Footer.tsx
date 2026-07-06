@@ -11,10 +11,10 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer role="contentinfo" className="bg-[#070b14] w-full pt-10 md:pt-24 pb-24 md:pb-12 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
+    <footer role="contentinfo" className="bg-[#070b14] w-full pt-4 md:pt-14 pb-25 md:pb-10 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       {/* Background glow removed as per request */}
       <div className="max-w-[1920px] mx-auto w-full relative z-10">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8 lg:gap-8 mb-8 lg:mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8 lg:gap-8 mb-4 lg:mb-6">
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left lg:-mt-6">
             <Link to="/" className="flex items-center gap-3 group mb-4 lg:mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg md:-ml-8" aria-label="Svet Građevine home">
@@ -142,34 +142,44 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col lg:flex-row justify-between items-center gap-6 relative">
+        <div className="mt-4 pt-6 border-t border-white/5 relative">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">
-            <ThemeToggle className="mt-0" />
-            
-            {/* Trust Badges */}
-            <div className="group flex items-center gap-3 px-4 py-2.5 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(34,197,94,0.15)] transition-all duration-300 ml-0 lg:ml-4 cursor-default relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-              <span className="material-symbols-outlined text-[20px] text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">security</span>
-              <span className="text-white/80 group-hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10">Sigurna Platforma</span>
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* Left: Trust Badges */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 flex-wrap justify-center" role="navigation" aria-label="Footer navigation">
+              <ThemeToggle className="mt-0" />
+              
+              <div className="group flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(34,197,94,0.15)] transition-all duration-300 ml-0 lg:ml-4 cursor-default relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <span className="material-symbols-outlined text-[18px] text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">security</span>
+                <span className="text-white/80 group-hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10 whitespace-nowrap">Sigurna Platforma</span>
+              </div>
+              
+              <div className="group flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-default relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <span className="material-symbols-outlined text-[18px] text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">verified</span>
+                <span className="text-white/80 group-hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10 whitespace-nowrap">Verifikovani Korisnici</span>
+              </div>
+
+              <div className="group flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(168,85,247,0.15)] transition-all duration-300 cursor-default relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <span className="material-symbols-outlined text-[18px] text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">lock</span>
+                <span className="text-white/80 group-hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10 whitespace-nowrap">Sigurno Plaćanje</span>
+              </div>
             </div>
             
-            <div className="group flex items-center gap-3 px-4 py-2.5 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.15)] transition-all duration-300 cursor-default relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-              <span className="material-symbols-outlined text-[20px] text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">verified</span>
-              <span className="text-white/80 group-hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10">Verifikovani Korisnici</span>
+            {/* Center: SG Group Legal */}
+            <div className="text-slate-500 text-[11px] leading-relaxed text-center space-y-1">
+              <p className="font-bold text-white/60">SG Group</p>
+              <p>PIB: 114632588 &nbsp;|&nbsp; Matični broj: 67731875</p>
+              <p>Tekući račun: 265-1630310011188-16</p>
             </div>
 
-            <div className="group flex items-center gap-3 px-4 py-2.5 rounded-[10px] bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_rgba(168,85,247,0.15)] transition-all duration-300 cursor-default relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-              <span className="material-symbols-outlined text-[20px] text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:scale-110 transition-transform duration-300 relative z-10">lock</span>
-              <span className="text-white/80 group-hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-300 relative z-10">Sigurno Plaćanje</span>
+            {/* Right: Copyright */}
+            <div className="text-blue-400 text-[11px] font-bold uppercase tracking-widest text-center lg:text-right whitespace-nowrap mb-8 md:mb-0">
+              © {new Date().getFullYear()} SVET GRAĐEVINE. SVA PRAVA ZADRŽANA.
             </div>
-          </div>
-          
-          <div className="text-blue-400 text-xs font-bold uppercase tracking-widest text-center mt-6 lg:mt-0">
-            © {new Date().getFullYear()} SVET GRAĐEVINE. SVA PRAVA ZADRŽANA.
           </div>
         </div>
       </div>

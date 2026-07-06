@@ -191,7 +191,7 @@ export default function RealEstateDetailPage() {
                   </span>
                   {plot.isPremium && (
                     <span className="bg-secondary !text-black px-3 py-1 rounded-full text-[10px] font-black tracking-widest flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[10px]">star</span> PREMIUM
+                      <span className="material-symbols-outlined text-[10px]">star</span> PLAĆENI OGLAS
                     </span>
                   )}
                   {plot.isUrgent && (

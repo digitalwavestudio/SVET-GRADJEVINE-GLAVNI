@@ -516,7 +516,7 @@ const AccommodationCard = React.memo(({ acc, viewMode }: { acc: any; viewMode: '
           )}
           {acc.isPremium && (
             <span className="bg-secondary !text-black font-black px-2 py-0.5 text-[8px] tracking-widest rounded-sm shadow-lg flex items-center gap-1 w-fit uppercase">
-              <span className="material-symbols-outlined text-[10px]">star</span> PREMIUM
+              <span className="material-symbols-outlined text-[10px]">star</span> PLAĆENI OGLAS
             </span>
           )}
         </div>

@@ -247,7 +247,7 @@ export default function JobDetailsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 {jobData.isPremium && (
                   <span className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 text-yellow-400 border border-yellow-500/20 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
-                    <Zap size={14} className="fill-yellow-500" /> PREMIUM POSAO
+                    <Zap size={14} className="fill-yellow-500" /> PLAĆENI OGLAS
                   </span>
                 )}
                 {jobData.isUrgent && (

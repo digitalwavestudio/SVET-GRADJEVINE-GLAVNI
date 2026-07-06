@@ -223,6 +223,9 @@ export class BaseAdStrategy {
       return {
         id: adId,
         data: adData,
+        userEmail: userData.email || "",
+        package: rawData.paket || null,
+        packagePrice,
         outboxDocId: outboxRef.id,
         outboxPayload: outboxPayloadObj,
       };
@@ -245,6 +248,43 @@ export class BaseAdStrategy {
     }
 
     CacheInvalidationService.onAdChange(this.category, uid);
+
+    AuditService.log({
+      action: AuditAction.AD_CREATED,
+      userId: uid,
+      targetType: this.entityType,
+      targetId: result.id,
+      details: {
+        category: this.category,
+        title: result.data?.title || result.data?.name || "",
+        package: result.package,
+        price: result.packagePrice,
+        status: result.data?.status,
+        isPremium: !!result.data?.isPremium,
+      },
+    });
+
+    if (result.userEmail) {
+      const { emailService } = await import("../emailService.ts");
+      const title = result.data?.title || result.data?.name || "";
+      const now = new Date().toISOString().split("T")[0];
+      emailService.sendEmail({
+        to: result.userEmail,
+        subject: `Oglasna deklaracija: ${title}`,
+        html: `
+          <h2>Oglasna deklaracija</h2>
+          <p><strong>Datum:</strong> ${now}</p>
+          <p><strong>Oglas:</strong> ${title}</p>
+          <p><strong>Kategorija:</strong> ${this.category}</p>
+          <p><strong>Status:</strong> ${result.data?.status || "aktivan"}</p>
+          <p><strong>Paket:</strong> ${result.package || "besplatan"}</p>
+          <p><strong>Cena:</strong> ${result.packagePrice || 0} RSD</p>
+          <p><strong>ID oglasa:</strong> ${result.id}</p>
+          <hr>
+          <p style="color:#666;font-size:12px;">Oglasnu deklaraciju čuvajte najmanje 2 godine (Član 19 Zakona o oglašavanju).</p>
+        `,
+      }).catch((err: Error) => console.error("[OGLASNA DEKLARACIJA] Email failed:", err.message));
+    }
 
     return { id: result.id };
   }

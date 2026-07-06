@@ -102,7 +102,7 @@ export interface FormDataState {
 
   // Company
   companyName: string;
-  companyPIB: string;
+  companyPIB?: string;
   companyAddress: string;
   companyFoundedYear: string;
   companyDescription: string;

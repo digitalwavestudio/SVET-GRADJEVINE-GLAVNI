@@ -489,7 +489,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
 
     const STEP_FIELDS_MAP: Record<string, Record<number, string[]>> = {
       company: {
-        1: ['companyName', 'companyPIB', 'location', 'companyAddress', 'companyDescription', 'phone', 'companyWorkingHours', 'companyIG', 'companyFB', 'companyWeb'],
+        1: ['companyName', 'location', 'companyAddress', 'companyDescription', 'phone', 'companyWorkingHours', 'companyIG', 'companyFB', 'companyWeb'],
         2: ['companyMainCats', 'companySubCats', 'companyCoverage', 'companyCoverageValue'],
         3: ['companySubCats', 'companyReferences', 'companyTeamSpecialties', 'companyLicenses', 'companyCertifications', 'companyEquipmentSummary', 'companyPortfolioImages']
       },

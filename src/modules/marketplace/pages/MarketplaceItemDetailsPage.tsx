@@ -165,7 +165,7 @@ const MarketplaceItemDetailsPage = () => {
                  )}
                  {item.isPremium && (
                    <div className="absolute top-8 left-8">
-                     <Badge variant="secondary" className="bg-indigo-600 text-white border-none px-6 py-2 text-xs font-black italic shadow-2xl">PREMIUM OGLAS</Badge>
+                     <Badge variant="secondary" className="bg-indigo-600 text-white border-none px-6 py-2 text-xs font-black italic shadow-2xl">PLAĆENI OGLAS</Badge>
                    </div>
                  )}
                </div>

@@ -47,7 +47,7 @@ export function JobHeroSection({
           <div className="flex flex-wrap gap-2 mb-6">
             {jobData.isActive && <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-black px-3 py-1 rounded-full border border-emerald-500/30">AKTIVAN OGLAS</span>}
             {jobData.isUrgent && <span className="bg-error/20 text-error text-[10px] font-black px-3 py-1 rounded-full border border-error/30">HITNO</span>}
-            {jobData.isPremium && <span className="bg-secondary/20 text-secondary text-[10px] font-black px-3 py-1 rounded-full border border-secondary/30">PREMIUM</span>}
+            {jobData.isPremium && <span className="bg-secondary/20 text-secondary text-[10px] font-black px-3 py-1 rounded-full border border-secondary/30">PLAĆENI OGLAS</span>}
             <span className="bg-white/5 text-white/60 text-[10px] font-black px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5 shadow-sm">
               <span className="material-symbols-outlined text-[14px] text-secondary">visibility</span>
               {(jobData.viewsCount || 0) + (isTrackedInSession ? 1 : 0)} PREGLEDA

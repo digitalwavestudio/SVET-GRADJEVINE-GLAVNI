@@ -16,7 +16,7 @@ export default function PrivacyPage() {
             </div>
             <div>
               <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">Politika Privatnosti</h1>
-              <p className="text-slate-400 mt-2">Poslednji put ažurirano: Maj 2026</p>
+              <p className="text-slate-400 mt-2">Poslednji put ažurirano: Jul 2026</p>
             </div>
           </div>
 

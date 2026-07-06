@@ -17,6 +17,7 @@ import {
   runAuditLogsCleanup, resetCircuitBreakerOrCache, setupAlgolia,
 } from "../controllers/admin-settings.controller.ts";
 import { validateRequest, validateSettings } from "../middleware/validate.ts";
+import { db } from "../config/firebase.ts";
 import { verifyUserSchema } from "@svet-gradjevine/shared";
 import { adminTriggerLimiter } from "../middleware/rate-limit.middleware.ts";
 
@@ -151,6 +152,53 @@ adminRouter.post("/broadcast", adminTriggerLimiter, sendBroadcast);
 adminRouter.get("/broadcasts", adminTriggerLimiter, getBroadcasts);
 
 adminRouter.get("/audit-logs", adminTriggerLimiter, getAuditLogs);
+adminRouter.get("/oglasna-deklaracija/:listingId", adminTriggerLimiter, async (req, res) => {
+  try {
+    const { listingId } = req.params;
+    const [listingSnap, transSnap, auditSnap] = await Promise.all([
+      db.collection("listings").doc(listingId).get(),
+      db.collection("transactions").where("adId", "==", listingId).orderBy("createdAt", "desc").limit(1).get(),
+      db.collection("audit_logs").where("targetId", "==", listingId).orderBy("timestamp", "desc").get(),
+    ]);
+
+    if (!listingSnap.exists) return res.status(404).json({ error: "Listing nije pronađen" });
+
+    const listing = listingSnap.data() as Record<string, any> | undefined;
+    const trans = transSnap.docs[0]?.data() as Record<string, any> | undefined;
+    const auditTrail = auditSnap.docs.map(d => ({
+      id: d.id, ...d.data(),
+      timestamp: (d.data() as any)?.timestamp?.toDate?.()?.toISOString() || null,
+    }));
+
+    if (!listing) return res.status(404).json({ error: "Listing nije pronađen" });
+
+    res.json({
+      listing: {
+        id: listingSnap.id,
+        title: listing.title || listing.name || "",
+        type: listing.type,
+        status: listing.status,
+        authorId: listing.authorId,
+        isPremium: listing.isPremium || false,
+        isUrgent: listing.isUrgent || false,
+        createdAt: listing.createdAt?.toDate?.()?.toISOString() || null,
+      },
+      oglasnaDeklaracija: {
+        sadrzajOglasa: listing.title || listing.name || "",
+        kategorija: listing.type || "",
+        oglasivacId: listing.authorId || "",
+        datumPostavljanja: listing.createdAt?.toDate?.()?.toISOString() || null,
+        status: listing.status,
+        premium: listing.isPremium || false,
+        cenaPaketa: trans?.amount || listing.packagePrice || null,
+        paket: trans?.packageId || listing.paket || null,
+      },
+      auditTrail,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 adminRouter.post(
   "/moderate/:collection/:id",
   adminTriggerLimiter,
