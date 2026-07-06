@@ -7,10 +7,9 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { generateProfessionalServiceListSchema } from '@/src/lib/seoSchema';
 import DynamicSEO from '@/src/components/DynamicSEO';
-import { Breadcrumbs } from '@/src/components/Breadcrumbs';
+
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { APP_CONFIG } from '@/src/constants/config';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterSelect, FilterCTA, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
@@ -23,7 +22,6 @@ import { useCollectionStats, useRoleStats, useFilteredCount } from '@/src/hooks/
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
 import { AiSearchBar } from '@/src/components/AiSearchBar';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 
 export default function MastersPage() {
   const { user } = useAuth();
@@ -236,10 +234,8 @@ export default function MastersPage() {
         jsonLd={[itemListSchema]}
       />
 
-      <Breadcrumbs items={breadcrumbItems} />
-
       <StandardPageHero
-        badge="GRAĐEVINSKA INDUSTRIJA — SRBIJA & REGION"
+        badge="SRBIJA & REGION"
         title="PRONAĐI"
         titleAccent="MAJSTORA."
         subtitle="Pretražite bazu od preko 2.800 verifikovanih profesionalaca i angažujte najbolje za vaš projekat."
@@ -542,14 +538,6 @@ export default function MastersPage() {
           </div>
         </div>
       </main>
-
-      <CrossVerticalHub 
-        gradSlug={!gradSlug || gradSlug === 'all' ? undefined : gradSlug} 
-        zanimanjeSlug={!zanimanjeSlug || zanimanjeSlug === 'SVE' ? undefined : zanimanjeSlug} 
-        currentVertical="majstori" 
-      />
-
-      <SeoContentBlock type="majstori" grad={gradSlug ?? undefined} zanimanje={zanimanjeSlug ?? undefined} itemCount={masters.length} />
     </div>
   );
 }

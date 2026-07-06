@@ -57,7 +57,7 @@ export function StandardPageHero({
       </div>
 
       <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">
-        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-[129px] md:pt-[225px] pb-20 md:pb-0">
+        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-[159px] md:pt-[225px] pb-20 md:pb-0">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
@@ -66,7 +66,7 @@ export function StandardPageHero({
             className="flex-2 max-w-4xl col-start-1 animate-fade-in-up"
           >
             {/* Badge Zone - Row 1 (40px) */}
-            <div className="md:h-full flex items-center justify-center md:justify-start mb-6 md:mb-0">
+            <div className="h-[28px] md:h-full flex items-center justify-center md:justify-start mb-6 md:mb-0 overflow-hidden">
               {badge && (
                   <div className="flex items-center justify-center md:justify-start gap-4">
                     <div className="hidden md:block h-px w-10 bg-secondary/30"></div>
@@ -102,7 +102,7 @@ export function StandardPageHero({
             </div>
 
             {/* Actions Zone - Row 4 (Auto) - Search bar starts here */}
-            <div className="pt-8">
+            <div className="pt-[47px]">
               {children}
             </div>
           </motion.div>

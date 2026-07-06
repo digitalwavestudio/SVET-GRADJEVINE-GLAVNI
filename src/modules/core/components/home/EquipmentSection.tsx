@@ -76,7 +76,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               )}
             </div>
             {/* Category Sidebar */}
-            <div className="bg-surface-container-low p-6 sm:p-10 rounded-[10px] border border-white/10 flex flex-col relative shadow-xl overflow-hidden group/sidebar h-full">
+            <div className="hidden md:flex bg-surface-container-low p-6 sm:p-10 rounded-[10px] border border-white/10 flex-col relative shadow-xl overflow-hidden group/sidebar h-full">
                <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 blur-[60px] pointer-events-none group-hover/sidebar:bg-secondary/20 transition-colors duration-500"></div>
                <div className="absolute top-0 left-0 w-[2px] bg-secondary h-0 group-hover/sidebar:h-full transition-all duration-700"></div>
 

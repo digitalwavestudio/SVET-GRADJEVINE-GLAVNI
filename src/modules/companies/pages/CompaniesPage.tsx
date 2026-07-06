@@ -7,7 +7,6 @@ import { Link, useParams } from 'react-router-dom';
 import { ListingSkeleton } from '@/src/components/ListingSkeleton';
 import NoResults from '@/src/components/ui/NoResults';
 import Spinner from '@/src/components/ui/Spinner';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
 import DynamicSEO from '@/src/components/DynamicSEO';
 import { COMPANY_MAIN_CATEGORIES } from '@/src/constants/companyTaxonomy';
 import { LOCATIONS } from '@/src/constants/taxonomy';
@@ -202,7 +201,6 @@ function CompaniesPage() {
         </div>
       </section>
 
-      <SeoContentBlock type="firme" grad={grad ?? undefined} />
     </div>
   );
 }

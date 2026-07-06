@@ -5,6 +5,9 @@ import { JobCard } from '@/src/modules/jobs/components/JobCard';
 import { BrainIllustration } from '@/src/components/BrainIllustration';
 import shieldMaster from '@/src/assets/images/shield-master.png';
 import { AiSearchBar } from '@/src/components/AiSearchBar';
+import { LOCATIONS, SECTORS, PROFESSIONS, BENEFITS } from '@/src/constants/taxonomy';
+import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterCTA } from '@/src/modules/core/components/filters/FilterComponents';
+import { LocationCombobox } from '@/src/components/LocationCombobox';
 
 interface ListingItem {
   id: string;
@@ -109,6 +112,12 @@ export default function AiSearchPage() {
   const [filterSmestaj, setFilterSmestaj] = useState<string>('all');
   const [filterPrevoz, setFilterPrevoz] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const [selectedProfession, setSelectedProfession] = useState<string | null>(null);
+  const [professionSearch, setProfessionSearch] = useState('');
+  const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
+  const [filterRadius, setFilterRadius] = useState('50');
+  const [salaryType, setSalaryType] = useState<'hourly' | 'monthly'>('hourly');
 
   const fetchData = useCallback(async (p: number) => {
     if (!query) { setLoading(false); return; }
@@ -196,29 +205,22 @@ export default function AiSearchPage() {
       });
     }
     
-    if (salaryRange[0] > 0 || salaryRange[1] < 30) {
+    const salaryMax = salaryType === 'hourly' ? 30 : 5000;
+    if (salaryRange[0] > 0 || salaryRange[1] < salaryMax) {
       result = result.filter(l => {
         if (l.plataMin == null) return true;
         return l.plataMin >= salaryRange[0] && (l.plataMax || l.plataMin) <= salaryRange[1];
       });
     }
     
-    if (filterSmestaj !== 'all') {
+    if (selectedBenefits.length > 0) {
       result = result.filter(l => {
-        const has = l.benefits?.includes('smestaj');
-        return filterSmestaj === 'yes' ? has : !has;
+        return selectedBenefits.every(b => l.benefits?.includes(b));
       });
     }
-    
-    if (filterPrevoz !== 'all') {
-      result = result.filter(l => {
-        const has = l.benefits?.includes('prevoz');
-        return filterPrevoz === 'yes' ? has : !has;
-      });
-    }
-    
+
     return result;
-  }, [data?.listings, selectedLocations, salaryRange, filterSmestaj, filterPrevoz]);
+  }, [data?.listings, selectedLocations, salaryRange, selectedBenefits, selectedSector, selectedProfession, salaryType]);
 
   const toggleLocation = (loc: string) => {
     setSelectedLocations(prev => 
@@ -229,8 +231,12 @@ export default function AiSearchPage() {
   const resetFilters = () => {
     setSelectedLocations([]);
     setSalaryRange([0, 30]);
-    setFilterSmestaj('all');
-    setFilterPrevoz('all');
+    setSelectedSector(null);
+    setSelectedProfession(null);
+    setProfessionSearch('');
+    setSelectedBenefits([]);
+    setFilterRadius('50');
+    setSalaryType('hourly');
   };
 
   const prefetch = useCallback(() => {}, []);
@@ -603,128 +609,266 @@ export default function AiSearchPage() {
 
             {/* Filter Sidebar - Desktop */}
             <div className={`w-full lg:w-72 shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-              <div className="bg-slate-950 border border-white/[0.08] rounded-[10px] p-5 sticky top-24 shadow-xl">
-                <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-sm font-black text-white/50 uppercase tracking-[0.2em]">Brzi filteri</h3>
-                  <button onClick={resetFilters} className="text-[10px] font-bold text-white/40 hover:text-white flex items-center gap-1">
-                    <span className="material-symbols-outlined text-xs">refresh</span>
-                    PONIŠTI SVE
-                  </button>
-                </div>
+              <FilterSidebar>
+                <FilterClearButton 
+                  onClick={() => {
+                    setFilterRadius('50');
+                    setProfessionSearch('');
+                    setSelectedSector(null);
+                    setSelectedProfession(null);
+                    setSelectedProfession(null);
+                    setSelectedLocations([]);
+                    setSelectedBenefits([]);
+                    setSalaryRange([0, 30]);
+                    resetFilters();
+                  }}
+                />
 
-                {/* Lokacija */}
-                <div className="mb-6">
-                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Lokacija</h4>
-                  <div className="space-y-3 max-h-40 overflow-y-auto">
-                    {filterData.locations.map(loc => (
-                      <label key={loc.name} className="flex items-center gap-4 cursor-pointer group h-10">
-                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
-                          <input
-                            type="checkbox"
-                            checked={selectedLocations.includes(loc.name)}
-                            onChange={() => toggleLocation(loc.name)}
-                            className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer"
-                          />
-                          <span className="absolute material-symbols-outlined text-xs text-slate-950 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300 font-black">check</span>
-                        </div>
-                        <span className={`text-base font-bold transition-colors duration-300 ${selectedLocations.includes(loc.name) ? 'text-white font-bold' : 'text-white/50 group-hover:text-white/90'}`}>
-                          {loc.name} <span className="text-white/30 font-normal">({loc.count})</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Satnica */}
-                <div className="mb-6">
-                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Satnica (€/h)</h4>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-[10px] text-white/40 font-bold uppercase">Raspon</span>
-                    <span className="text-xs text-secondary font-black">{salaryRange[0]}€ — {salaryRange[1]}€</span>
-                  </div>
-                  <div className="px-1">
-                    <input
-                      type="range"
-                      min={filterData.salaryMin}
-                      max={filterData.salaryMax}
-                      value={salaryRange[1]}
-                      onChange={(e) => setSalaryRange([salaryRange[0], Number(e.target.value)])}
-                      className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-secondary"
+                {/* Location Filter */}
+                <FilterSection title="Lokacija">
+                  <div className="space-y-4">
+                    <LocationCombobox 
+                      selectedLocation={selectedLocations.length > 0 ? selectedLocations[0] : null}
+                      onChange={(slug) => {
+                        if (slug) setSelectedLocations([slug]);
+                        else setSelectedLocations([]);
+                      }}
                     />
-                    <div className="flex justify-between mt-1 px-1">
-                      <span className="text-[10px] text-white/40">{filterData.salaryMin} €</span>
-                      <span className="text-[10px] text-white/40">{salaryRange[1]} €</span>
+                    {selectedLocations.length > 0 && selectedLocations[0] !== 'all' && (
+                      <div className="pt-2">
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="text-xs font-bold text-white/60">Radijus pretrage:</label>
+                          <span className="text-xs font-bold text-secondary">+{filterRadius} km</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="100" 
+                          step="5"
+                          value={filterRadius}
+                          onChange={(e) => setFilterRadius(e.target.value)}
+                          className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-secondary"
+                        />
+                        <div className="flex justify-between mt-1 px-1">
+                          <span className="text-[10px] text-white/40">Samo grad</span>
+                          <span className="text-[10px] text-white/40">+100 km</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </FilterSection>
+
+                {/* Salary Filter with Type Toggle */}
+                <FilterSection title={salaryType === 'hourly' ? 'Satnica' : 'Plata'}>
+                  <div className="flex gap-1 mb-4 p-0.5 bg-slate-900 rounded-xl border border-white/5">
+                    <button
+                      onClick={() => {
+                        setSalaryType('hourly');
+                        setSalaryRange([0, 30]);
+                      }}
+                      className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+                        salaryType === 'hourly'
+                          ? 'bg-secondary !text-black shadow-sm shadow-secondary/20'
+                          : 'text-white/40 hover:text-white'
+                      }`}
+                    >
+                      Satnica
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSalaryType('monthly');
+                        setSalaryRange([0, 5000]);
+                      }}
+                      className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+                        salaryType === 'monthly'
+                          ? 'bg-secondary !text-black shadow-sm shadow-secondary/20'
+                          : 'text-white/40 hover:text-white'
+                      }`}
+                    >
+                      Plata
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-[10px] text-white/40 font-bold uppercase">Raspon ({salaryType === 'hourly' ? '€/h' : '€'})</span>
+                    <span className="text-xs text-secondary font-black">{salaryRange[0]} &mdash; {salaryRange[1]}{salaryType === 'hourly' ? ' €/h' : ' €'}</span>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className={`relative ${salaryType === 'monthly' ? 'h-1' : 'h-1.5'} bg-white/5 rounded-full overflow-hidden`}>
+                      <div 
+                        className="absolute h-full bg-secondary" 
+                        style={{ 
+                          left: `${(salaryRange[0] / (salaryType === 'hourly' ? 30 : 5000)) * 100}%`, 
+                          right: `${100 - (salaryRange[1] / (salaryType === 'hourly' ? 30 : 5000)) * 100}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-white/40 font-bold uppercase mb-1 block">Min</label>
+                        <input 
+                          type="number" 
+                          value={salaryRange[0]}
+                          max={salaryRange[1]}
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            const max = salaryType === 'hourly' ? 30 : 5000;
+                            setSalaryRange([Math.max(0, Math.min(v, salaryRange[1])), salaryRange[1]]);
+                          }}
+                          className="w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-xs text-white outline-none focus:border-secondary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[10px] text-white/40 font-bold uppercase mb-1 block">Max</label>
+                        <input 
+                          type="number" 
+                          value={salaryRange[1]}
+                          min={salaryRange[0]}
+                          max={salaryType === 'hourly' ? 30 : 5000}
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            const max = salaryType === 'hourly' ? 30 : 5000;
+                            setSalaryRange([salaryRange[0], Math.min(v, max)]);
+                          }}
+                          className="w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-xs text-white outline-none focus:border-secondary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </FilterSection>
 
-                {/* Smeštaj */}
-                <div className="mb-6">
-                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Smeštaj</h4>
+                {/* Sector Filter */}
+                <FilterSection title="Sektor">
                   <div className="space-y-3">
-                    {[
-                      { value: 'all', label: 'Sve' },
-                      { value: 'yes', label: 'Obezeđen smeštaj' },
-                      { value: 'no', label: 'Nije obezbeđen' },
-                    ].map(opt => (
-                      <label key={opt.value} className="flex items-center gap-4 cursor-pointer group h-10">
-                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
-                          <input
-                            type="radio"
-                            name="smestaj"
-                            checked={filterSmestaj === opt.value}
-                            onChange={() => setFilterSmestaj(opt.value)}
-                            className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded-full bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer"
-                          />
-                          <div className="absolute w-2.5 h-2.5 bg-slate-950 rounded-full opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300"></div>
-                        </div>
-                        <span className={`text-base font-bold transition-colors duration-300 ${filterSmestaj === opt.value ? 'text-white' : 'text-white/50 group-hover:text-white/90'}`}>
-                          {opt.label}
-                        </span>
-                      </label>
+                    <FilterRadio 
+                      name="ai-sector" 
+                      label="Svi sektori" 
+                      checked={selectedSector === null} 
+                      onChange={() => {
+                        setSelectedSector(null);
+                        setSelectedProfession(null);
+                      }}
+                    />
+                    {SECTORS.map((sector) => (
+                      <FilterRadio 
+                        key={sector.slug} 
+                        name="ai-sector" 
+                        label={sector.name} 
+                        checked={selectedSector === sector.slug} 
+                        onChange={() => {
+                          setSelectedSector(sector.slug);
+                          setSelectedProfession(null);
+                          setProfessionSearch('');
+                        }}
+                      />
                     ))}
                   </div>
-                </div>
+                </FilterSection>
 
-                {/* Prevoz */}
-                <div className="mb-6">
-                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-[0.15em] mb-4">Prevoz</h4>
-                  <div className="space-y-3">
-                    {[
-                      { value: 'all', label: 'Sve' },
-                      { value: 'yes', label: 'Obezeđen prevoz' },
-                      { value: 'no', label: 'Nije obezbeđen' },
-                    ].map(opt => (
-                      <label key={opt.value} className="flex items-center gap-4 cursor-pointer group h-10">
-                        <div className="relative flex items-center justify-center w-6 h-6 shrink-0">
-                          <input
-                            type="radio"
-                            name="prevoz"
-                            checked={filterPrevoz === opt.value}
-                            onChange={() => setFilterPrevoz(opt.value)}
-                            className="peer appearance-none w-full h-full border border-white/10 group-hover:border-white/40 group-hover:bg-white/5 rounded-full bg-slate-800/80 checked:bg-secondary checked:border-secondary checked:shadow-[0_0_15px_rgba(250,204,21,0.3)] focus:border-secondary/80 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] transition-all cursor-pointer"
-                          />
-                          <div className="absolute w-2.5 h-2.5 bg-slate-950 rounded-full opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 pointer-events-none transition-all duration-300"></div>
+                {/* Profession Filter */}
+                <FilterSection title="Zanimanje">
+                  <div className="mb-3">
+                    <input 
+                      type="text"
+                      value={professionSearch}
+                      onChange={(e) => setProfessionSearch(e.target.value)}
+                      placeholder="Pretraži zanimanja..."
+                      className="w-full bg-slate-900 border border-white/5 hover:border-secondary/30 rounded-[10px] px-4 py-3 text-sm text-white outline-none focus:border-secondary/80 focus:bg-slate-950 focus:shadow-[0_0_15px_rgba(254,191,13,0.15)] placeholder:text-white/30 transition-all"
+                    />
+                  </div>
+                  {professionSearch || selectedSector ? <div className="space-y-1 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                    <div 
+                      onClick={() => { setSelectedProfession(null); setProfessionSearch(''); }}
+                      className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === null ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+                    >
+                      Sva zanimanja
+                    </div>
+                    {(() => {
+                      let allProf: { slug: string; name: string; sectorSlug: string }[] = [];
+                      if (selectedSector) {
+                        allProf = (PROFESSIONS[selectedSector] || []).map(p => ({ ...p, sectorSlug: selectedSector! }));
+                      } else {
+                        Object.entries(PROFESSIONS).forEach(([sectorSlug, prods]) => {
+                          prods.forEach(p => allProf.push({ ...p, sectorSlug }));
+                        });
+                      }
+                      const filtered = professionSearch
+                        ? allProf.filter(p => p.name.toLowerCase().includes(professionSearch.toLowerCase()))
+                        : allProf;
+                      return filtered.map((prof) => (
+                        <div 
+                          key={prof.slug}
+                          onClick={() => {
+                            setProfessionSearch('');
+                            if (prof.slug === selectedProfession) {
+                              setSelectedProfession(null);
+                            } else {
+                              if (!selectedSector || prof.sectorSlug !== selectedSector) {
+                                setSelectedSector(prof.sectorSlug);
+                              }
+                              setSelectedProfession(prof.slug);
+                            }
+                          }}
+                          className={`px-3 py-2 text-xs cursor-pointer transition-all rounded-[10px] mb-1 ${selectedProfession === prof.slug ? 'bg-secondary !text-black font-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+                        >
+                          {!selectedSector && prof.sectorSlug && (
+                            <span className="text-[8px] text-white/20 uppercase tracking-wider mr-2">
+                              [{SECTORS.find(s => s.slug === prof.sectorSlug)?.name || prof.sectorSlug}]
+                            </span>
+                          )}
+                          {prof.name}
                         </div>
-                        <span className={`text-base font-bold transition-colors duration-300 ${filterPrevoz === opt.value ? 'text-white' : 'text-white/50 group-hover:text-white/90'}`}>
-                          {opt.label}
-                        </span>
-                      </label>
+                      ));
+                    })()}
+                    {(() => {
+                      if (!professionSearch && !selectedSector) return null;
+                      let allProf: { slug: string; name: string; sectorSlug: string }[] = [];
+                      if (selectedSector) {
+                        allProf = (PROFESSIONS[selectedSector] || []).map(p => ({ ...p, sectorSlug: selectedSector! }));
+                      } else {
+                        Object.entries(PROFESSIONS).forEach(([sectorSlug, prods]) => {
+                          prods.forEach(p => allProf.push({ ...p, sectorSlug }));
+                        });
+                      }
+                      const filtered = professionSearch
+                        ? allProf.filter(p => p.name.toLowerCase().includes(professionSearch.toLowerCase()))
+                        : allProf;
+                      return filtered.length === 0 ? <div className="text-xs text-white/30 text-center py-4">Nema rezultata za "{professionSearch}"</div> : null;
+                    })()}
+                  </div> : (
+                    <div className="text-xs text-white/30 text-center py-4">Izaberite sektor ili ukucajte zanimanje</div>
+                  )}
+                </FilterSection>
+
+                {/* Benefits Filter */}
+                <FilterSection title="Benefiti">
+                  <div className="space-y-4">
+                    {BENEFITS.map((benefit) => (
+                      <FilterToggle 
+                        key={benefit.slug} 
+                        label={benefit.name} 
+                        checked={selectedBenefits.includes(benefit.slug)} 
+                        onChange={() => {
+                          setSelectedBenefits(prev =>
+                            prev.includes(benefit.slug)
+                              ? prev.filter(b => b !== benefit.slug)
+                              : [...prev, benefit.slug]
+                          );
+                        }}
+                      />
                     ))}
                   </div>
-                </div>
+                </FilterSection>
 
-                <button
-                  onClick={() => {
-                    setShowFilters(false);
-                    const el = document.getElementById('ads-anchor');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="w-full py-4 bg-secondary !text-black font-black rounded-[10px] uppercase tracking-widest text-sm hover:bg-yellow-500 transition-all shadow-lg shadow-secondary/15 active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <span className="font-headline">PRIKAŽI {filteredListings.length} REZULTATA</span>
-                </button>
-              </div>
+                {/* CTA Card */}
+                <FilterCTA 
+                  title="POSTAVITE OGLAS ZA POSAO"
+                  description="PRONAĐITE NAJBOLJE MAJSTORE, INŽENJERE I STRUČNE TIMOVE ZA VAŠE PROJEKTE."
+                  buttonText="POSTAVI OGLAS"
+                  onClick={() => navigate('/postavi-oglas')}
+                  icon="person_add"
+                />
+              </FilterSidebar>
             </div>
           </div>
 
@@ -755,15 +899,14 @@ export default function AiSearchPage() {
           </div>
 
           {/* Trust Signals */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             {[
               { icon: 'verified', title: 'Provereni poslodavci', desc: 'Svi poslodavci su verifikovani' },
-              { icon: 'paid', title: 'Sigurna isplata', desc: 'Redovna i sigurna isplata zarade' },
               { icon: 'support_agent', title: 'Podrška 24/7', desc: 'Uvek tu za sva vaša pitanja' },
               { icon: 'speed', title: 'Brza pretraga', desc: 'AI pretraga štedi vaše vreme' },
             ].map((item, i) => (
               <div key={i} className="text-center p-4 md:p-6 flex flex-col items-center justify-center">
-                <span className="material-symbols-outlined text-secondary text-5xl md:text-7xl mb-3 md:mb-4 shrink-0">{item.icon}</span>
+                <span className="material-symbols-outlined text-secondary text-5xl md:text-9xl mb-3 md:mb-4 shrink-0">{item.icon}</span>
                 <h4 className="text-white font-bold text-base md:text-xl mb-1.5 md:mb-2">{item.title}</h4>
                 <p className="text-white/40 text-xs md:text-base text-center">{item.desc}</p>
               </div>

@@ -95,8 +95,8 @@ export const CategoryNodes: React.FC<CategoryNodesProps> = ({
         })}
       </div>
 
-      {/* Desktop Tech Scanner Grid */}
-      <div className="hidden md:grid grid-cols-4 gap-x-12 gap-y-16 mb-16">
+      {/* Desktop Tech Scanner Grid - hidden, moved to Filter dropdown */}
+      <div className="hidden">
         {HERO_TABS.map((tab, idx) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

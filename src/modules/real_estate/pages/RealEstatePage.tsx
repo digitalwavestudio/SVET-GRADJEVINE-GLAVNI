@@ -10,8 +10,6 @@ import DynamicSEO from '@/src/components/DynamicSEO';
 import { generateRealEstateListSchema } from '@/src/lib/seoSchema';
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterInput, FilterSelect, FilterToggle, FilterCTA, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
 import { APP_CONFIG } from '@/src/constants/config';
@@ -579,13 +577,6 @@ export default function RealEstatePage() {
           </div>
       </section>
 
-      <CrossVerticalHub 
-        gradSlug={!gradSlug || gradSlug === 'all' ? undefined : gradSlug} 
-        zanimanjeSlug={!namenaSlug || namenaSlug === 'SVE' ? undefined : namenaSlug} 
-        currentVertical="placevi" 
-      />
-
-      <SeoContentBlock type="placevi" grad={gradSlug || undefined} zanimanje={namenaSlug || undefined} />
     </div>
   );
 }

@@ -23,6 +23,8 @@ interface JobFiltersProps {
   salaryRange: [number, number];
   setSalaryRange: (range: [number, number]) => void;
   handleApplyFilters: () => void;
+  salaryType?: 'hourly' | 'monthly';
+  setSalaryType?: (t: 'hourly' | 'monthly') => void;
 }
 
 export function JobFilters({
@@ -33,10 +35,15 @@ export function JobFilters({
   selectedLocations, filterRadius, setFilterRadius, toggleLocation, setSelectedLocations,
   selectedBenefits, toggleBenefit, setSelectedBenefits,
   salaryRange, setSalaryRange,
-  handleApplyFilters
+  handleApplyFilters,
+  salaryType = 'hourly',
+  setSalaryType = undefined as unknown as (t: 'hourly' | 'monthly') => void,
 }: JobFiltersProps) {
   const navigate = useNavigate();
   const [professionSearch, setProfessionSearch] = useState('');
+  const [localSalaryType, setLocalSalaryType] = useState<'hourly' | 'monthly'>('hourly');
+  const activeSalaryType = salaryType ?? localSalaryType;
+  const updateSalaryType = setSalaryType ?? setLocalSalaryType;
 
   let allProfessions: { slug: string; name: string; sectorSlug: string }[] = [];
   if (selectedSector) {
@@ -101,20 +108,48 @@ export function JobFilters({
         </div>
       </FilterSection>
 
-      {/* Salary Filter */}
-      <FilterSection title="Plata">
+      {/* Salary Filter with Type Toggle */}
+      <FilterSection title={activeSalaryType === 'hourly' ? 'Satnica' : 'Plata'}>
+        <div className="flex gap-1 mb-4 p-0.5 bg-slate-900 rounded-xl border border-white/5">
+          <button
+            onClick={() => {
+              updateSalaryType('hourly');
+              setSalaryRange([0, 30]);
+            }}
+            className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+              activeSalaryType === 'hourly'
+                ? 'bg-secondary !text-black shadow-sm shadow-secondary/20'
+                : 'text-white/40 hover:text-white'
+            }`}
+          >
+            Satnica
+          </button>
+          <button
+            onClick={() => {
+              updateSalaryType('monthly');
+              setSalaryRange([0, 5000]);
+            }}
+            className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+              activeSalaryType === 'monthly'
+                ? 'bg-secondary !text-black shadow-sm shadow-secondary/20'
+                : 'text-white/40 hover:text-white'
+            }`}
+          >
+            Plata
+          </button>
+        </div>
         <div className="flex justify-between items-center mb-6">
-          <span className="text-[10px] text-white/40 font-bold uppercase">Raspon (Eura)</span>
-          <span className="text-xs text-secondary font-black">{salaryRange[0]}€ &mdash; {salaryRange[1]}€</span>
+          <span className="text-[10px] text-white/40 font-bold uppercase">Raspon ({activeSalaryType === 'hourly' ? '€/h' : '€'})</span>
+          <span className="text-xs text-secondary font-black">{salaryRange[0]} &mdash; {salaryRange[1]}{activeSalaryType === 'hourly' ? ' €/h' : ' €'}</span>
         </div>
         
         <div className="space-y-4">
-          <div className="relative h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className={`relative ${activeSalaryType === 'monthly' ? 'h-1' : 'h-1.5'} bg-white/5 rounded-full overflow-hidden`}>
             <div 
               className="absolute h-full bg-secondary" 
               style={{ 
-                left: `${(salaryRange[0] / 5000) * 100}%`, 
-                right: `${100 - (salaryRange[1] / 5000) * 100}%` 
+                left: `${(salaryRange[0] / (activeSalaryType === 'hourly' ? 30 : 5000)) * 100}%`, 
+                right: `${100 - (salaryRange[1] / (activeSalaryType === 'hourly' ? 30 : 5000)) * 100}%` 
               }}
             ></div>
           </div>
@@ -124,7 +159,11 @@ export function JobFilters({
               <input 
                 type="number" 
                 value={salaryRange[0]}
-                onChange={(e) => setSalaryRange([Number(e.target.value), salaryRange[1]])}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  const max = activeSalaryType === 'hourly' ? 30 : 5000;
+                  setSalaryRange([Math.max(0, Math.min(v, salaryRange[1])), salaryRange[1]]);
+                }}
                 className="w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-xs text-white outline-none focus:border-secondary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
@@ -133,7 +172,11 @@ export function JobFilters({
               <input 
                 type="number" 
                 value={salaryRange[1]}
-                onChange={(e) => setSalaryRange([salaryRange[0], Number(e.target.value)])}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  const max = activeSalaryType === 'hourly' ? 30 : 5000;
+                  setSalaryRange([salaryRange[0], Math.min(v, max)]);
+                }}
                 className="w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2 text-xs text-white outline-none focus:border-secondary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>

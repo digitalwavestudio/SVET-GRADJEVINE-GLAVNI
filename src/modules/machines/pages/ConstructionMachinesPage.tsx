@@ -10,7 +10,6 @@ import DynamicSEO from '@/src/components/DynamicSEO';
 import { generateProductListSchema } from '@/src/lib/seoSchema';
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { APP_CONFIG } from '@/src/constants/config';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterSelect, FilterInput, FilterCTA, ActiveFilterChips, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
@@ -30,7 +29,6 @@ import { AiSearchBar } from '@/src/components/AiSearchBar';
 import { ListingSkeleton } from '@/src/components/ListingSkeleton';
 import { useCollectionStats, useCount, useFilteredCount } from '@/src/hooks/useCollectionStats';
 import { AnalyticsDashboardUI } from '@/src/components/AnalyticsDashboardUI';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 
 export default function ConstructionMachinesPage() {
   const params = useParams();
@@ -704,13 +702,6 @@ export default function ConstructionMachinesPage() {
         </div>
       </section>
 
-      <CrossVerticalHub 
-        gradSlug={!gradSlug || gradSlug === 'all' ? undefined : gradSlug} 
-        zanimanjeSlug={!kategorijaSlug || kategorijaSlug === 'all' ? undefined : kategorijaSlug} 
-        currentVertical="masine" 
-      />
-
-      <SeoContentBlock type="masine" grad={gradSlug ?? undefined} zanimanje={kategorijaSlug ?? undefined} />
     </div>
   );
 }

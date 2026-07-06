@@ -1,9 +1,7 @@
 import React, { ReactNode } from 'react';
 import DynamicSEO from '@/src/components/DynamicSEO';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { StandardPageHero } from '@/src/components/StandardPageHero';
 import { UnifiedFilterBar, UnifiedFilterBarProps } from './UnifiedFilterBar';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 
 interface BaseNichePageProps {
   seoType: "poslovi" | "masine" | "smestaj" | "ketering" | "placevi" | "firme" | "majstori" | "alat-i-oprema" | "berza";
@@ -58,13 +56,6 @@ export const BaseNichePage: React.FC<BaseNichePageProps> = ({
         {children}
       </main>
 
-      <CrossVerticalHub 
-        gradSlug={grad === 'all' ? undefined : grad} 
-        zanimanjeSlug={zanimanje === 'all' || zanimanje === 'SVE' ? undefined : zanimanje} 
-        currentVertical={seoType} 
-      />
-
-      <SeoContentBlock type={seoType} grad={grad} zanimanje={zanimanje} />
     </div>
   );
 };

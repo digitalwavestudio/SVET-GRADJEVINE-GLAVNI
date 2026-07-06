@@ -10,7 +10,6 @@ import { Breadcrumbs } from '@/src/components/Breadcrumbs';
 import DynamicSEO from '@/src/components/DynamicSEO';
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
 import { APP_CONFIG } from '@/src/constants/config';
 import { ACCOMMODATION_AMENITIES, ACCOMMODATION_TYPES, LOCATIONS } from '@/src/constants/taxonomy';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterSelect, FilterInput, FilterToggle, FilterCTA, ActiveFilterChips, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
@@ -24,8 +23,6 @@ import { AiSearchBar } from '@/src/components/AiSearchBar';
 import { ListingSkeleton } from '@/src/components/ListingSkeleton';
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 import { AnalyticsDashboardUI } from '@/src/components/AnalyticsDashboardUI';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
-
 import { resolveRouteFilters } from '@/src/lib/routeFilters';
 
 export default function AccommodationPage() {
@@ -584,14 +581,6 @@ export default function AccommodationPage() {
           </div>
         </div>
       </section>
-
-      <CrossVerticalHub 
-        gradSlug={!gradSlug || gradSlug === 'all' ? undefined : gradSlug} 
-        zanimanjeSlug={!tipSlug || tipSlug === 'all' ? undefined : tipSlug} 
-        currentVertical="smestaj" 
-      />
-
-      <SeoContentBlock type="smestaj" grad={gradSlug || undefined} zanimanje={tipSlug || undefined} />
     </div>
   );
 }

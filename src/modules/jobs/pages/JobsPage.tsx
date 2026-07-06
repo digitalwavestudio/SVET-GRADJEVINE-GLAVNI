@@ -2,7 +2,7 @@ import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { Briefcase } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams, Link } from 'react-router-dom';
-import { Breadcrumbs } from '@/src/components/Breadcrumbs';
+
 import { generateJobPostingListSchema } from '@/src/lib/seoSchema';
 import DynamicSEO from '@/src/components/DynamicSEO';
 import { useDebounce } from '@/src/hooks/useDebounce';
@@ -26,8 +26,6 @@ import { useJobs, usePremiumJobs } from '@/src/modules/jobs/hooks/useJobs';
 import { useCollectionStats, useCount } from '@/src/hooks/useCollectionStats';
 
 const AnalyticsDashboardUI = lazy(() => import('@/src/components/AnalyticsDashboardUI').then(m => ({ default: m.AnalyticsDashboardUI })));
-const CrossVerticalHub = lazy(() => import('@/src/components/CrossVerticalHub').then(m => ({ default: m.CrossVerticalHub })));
-const SeoContentBlock = lazy(() => import('@/src/components/SeoContentBlock'));
 
 function JobsPage() {
   const prefetch = usePrefetch();
@@ -512,8 +510,6 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
     <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary min-h-screen">
       <DynamicSEO type="poslovi" grad={grad ?? undefined} zanimanje={zanimanje ?? undefined} jsonLd={[itemListSchema]} />
 
-      <Breadcrumbs items={breadcrumbItems} />
-
       <StandardPageHero
         badge="Oglasi za Posao"
         title="Poslovi"
@@ -744,19 +740,10 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
         getInitials={getInitials}
       />
 
-      <Suspense>
-        <CrossVerticalHub 
-          gradSlug={!grad || grad === 'all' ? undefined : grad} 
-          zanimanjeSlug={!zanimanje || zanimanje === 'SVE' ? undefined : zanimanje} 
-          currentVertical="poslovi" 
-        />
-      </Suspense>
-
-      <Suspense>
-        <SeoContentBlock type="poslovi" grad={grad ?? undefined} zanimanje={zanimanje ?? undefined} itemCount={totalJobsCount} />
-      </Suspense>
     </div>
   );
 }
 
 export default JobsPage;
+
+

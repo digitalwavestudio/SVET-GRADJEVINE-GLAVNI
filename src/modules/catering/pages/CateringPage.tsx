@@ -8,8 +8,6 @@ import DynamicSEO from '@/src/components/DynamicSEO';
 import { generateFoodEstablishmentListSchema } from '@/src/lib/seoSchema';
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
-import SeoContentBlock from '@/src/components/SeoContentBlock';
-import { CrossVerticalHub } from '@/src/components/CrossVerticalHub';
 import ThemeToggle from '@/src/components/ThemeToggle';
 import { APP_CONFIG } from '@/src/constants/config';
 import { KITCHEN_TYPES, LOCATIONS } from '@/src/constants/taxonomy';
@@ -416,13 +414,6 @@ export default function CateringPage() {
           </div>
         </main>
 
-      <CrossVerticalHub 
-        gradSlug={!grad || grad === 'all' ? undefined : grad} 
-        zanimanjeSlug={!searchParams.get('type') || searchParams.get('type') === 'SVE' ? undefined : searchParams.get('type')!} 
-        currentVertical="ketering" 
-      />
-
-      <SeoContentBlock type="ketering" grad={grad} zanimanje={searchParams.get('type') || undefined} />
     </div>
   );
 }

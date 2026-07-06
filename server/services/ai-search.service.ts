@@ -339,24 +339,32 @@ ${countrySalaryLine.length > 0 ? '- ' + countrySalaryLine.join('\n- ') : ''}
 
 SISTEM: Ti si tržišni analitičar. Analiziraš OVE konkretne oglase iznad. Ne izmišljaš ništa što ne vidiš u podacima. Ne koristiš floskule "građevinski projekti", "rad na gradilištima", "pomoćni radnici". Pišeš SAMO ono što stoji u oglasima iznad.
 
+Pravila za format odgovora:
+- Summary: **Pronađeno je UKUPNO oglasa za posao ZANIMANJE**. UKUPNO = ukupan broj iz zagrade "({resultCount} ukupno)". ZANIMANJE napiši VELIKIM SLOVIMA i BOLDIRAJ. SAMO jedna rečenica, NE dodaji lokacije.
+- Lokacije bullet: PRONADJENO OGLASA ZA 'ZANIMANJE' PO LOKACIJAMA — svaki grad/državu boldiraj i broj. ZANIMANJE VELIKIM SLOVIMA boldirano.
+- CENOVNI VODIČ: svaku lokaciju sa satnicom u novom redu, boldirano. Zatim "Najviše plaća" linija. Odvojenu prosečnu satnicu za Srbiju i Nemačku ako ima podataka. Ne piši uvek Nemačka.
+- SAVET: najbolji deal iz podataka. Ako ima i Srbije i Nemačke, razdvoji. Alternativa ako je malo oglasa. Prijava — šta poslodavci traže.
+- Ne piši instrukcije i pravila u odgovor. Samo čist sadržaj.
+
 NA OVO PITANJE MORAŠ ODGOVORITI U JSON FORMATU. Vrati SAMO validan JSON:
 {
-  "summary": "Uvod (1 rečenica): **Pronađeno je X oglasa za posao **ZANIMANJE****. Uvek boldiraj i napiši zanimanje VELIKIM SLOVIMA. SAMO ovo — NE dodaji lokacije, one su u prvom bullettu.",
+  "summary": "**Pronađeno je X oglaza za posao FASADER**",
   "bullets": [
-    {"emoji": "", "text": "PRONADJENO OGLASA ZA 'ZANIMANJE' PO LOKACIJAMA:<br>**Beograd** (8), **Nemačka** (5), **Hrvatska** (3), i ostale lokacije sa brojem oglasa. Boldiraj SVAKI grad/državu i broj. ZANIMANJE napiši VELIKIM SLOVIMA i BOLDIRAJ."},
-    {"emoji": "", "text": "CENOVNI VODIČ PO LOKACIJAMA:<br>Navedi svaku lokaciju sa satnicom u novom redu, boldirano.<br>Npr: <br>**Nemačka** **13–17 €/h**<br>**Beograd** **6–11 €/h**<br>**Hrvatska** **6–9 €/h**<br><br>Zatim: Najviše plaća **{lokacija}** sa **X-Y €/h**.<br>Prosečna satnica za Srbiju: **X-Y €/h** (ako ima podataka)<br>Prosečna satnica za Nemačku: **X-Y €/h** (ako ima podataka).<br>Nemoj da kažeš uvek Nemačka. Napiši stvarno šta podaci kažu."},
-    {"emoji": "", "text": "🏠 Smeštaj: **X/Y** | 🚌 Prevoz: **X/Y** | 🍽️ Obrok: **X/Y**<br>Ovo su podaci iz oglasa. Broj oglasa koji nude smeštaj, prevoz i obrok."},
-    {"emoji": "", "text": "SAVET:<br>💡 **Najbolji deal:** opiši najbolju kombinaciju cene i pogodnosti iz oglasa. Ako ima i Srbije i Nemačke, razdvoji: najbolje u Srbiji vs najbolje u Nemačkoj.<br>💡 **Alternativa:** ako traženi grad ima malo oglasa, predloži obližnje lokacije sa više ponuda.<br>💡 **Prijava:** naglasi šta poslodavci najviše traže (iz oglasa) i preporuči da se to istakne u prijavi."}
+    {"emoji": "", "text": "PRONADJENO OGLASA ZA 'FASADER' PO LOKACIJAMA:<br>**Beograd** (5), **Ostalo u Srbiji** (4), **Novi Sad** (1), **Pančevo** (2), **Slovenija** (1)"},
+    {"emoji": "", "text": "CENOVNI VODIČ PO LOKACIJAMA:<br>**Beograd** **6–11 €/h**<br>**Novi Sad** **7–10 €/h**<br><br>Najviše plaća **Beograd** sa **6–11 €/h**.<br>Prosečna satnica: **6–11 €/h**"},
+    {"emoji": "", "text": "🏠 Smeštaj: **3/12** | 🚌 Prevoz: **5/12** | 🍽️ Obrok: **2/12**"},
+    {"emoji": "", "text": "SAVET:<br>💡 **Najbolji deal:** opiši najbolju ponudu.<br>💡 **Alternativa:** ako je malo oglasa, predloži obližnje.<br>💡 **Prijava:** istakni tražene veštine iz oglasa."}
   ],
   "closing": "Ispod je lista oglasa koje smo pronašli. Klikni na 'Pogledaj' za detalje."
 }
 
 Pravila:
 - Piši na srpskom jeziku
-- **boldiraj** SVE: gradove, države, cifre, €/h, nazive zahteva, brojeve oglasa
-- BELEŽI SAMO ono što vidiš u oglasima iznad — ne dodaji ništa po defaultu za to zanimanje
+- NE piši instrukcije, pravila ili uputstva u odgovor — samo čist sadržaj
+- BELEŽI SAMO ono što vidiš u oglasima iznad — ne dodaji ništa po defaultu
 - Ako nema podataka za nešto (npr nema smeštaja ni u jednom oglasu), NE PIŠI to polje
-- Prva rečenica summary uvek počinje sa **Pronađeno je X oglasa za posao {zanimanje}.**`;
+- UKUPNO u summary je broj iz zagrade "({resultCount} ukupno)"`;
+
 
 
     const answerText = await callGemini(answerPrompt);

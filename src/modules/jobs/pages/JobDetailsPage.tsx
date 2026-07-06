@@ -416,49 +416,6 @@ export default function JobDetailsPage() {
             </div>
           </section>
 
-          {/* Map Section */}
-          {(jobData.tacnaLokacija || jobData.location) && (
-            <section className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
-              <div className="p-6 sm:p-8 border-b border-white/5 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-                    <MapPin size={20} />
-                  </div>
-                  Lokacija
-                </h2>
-              </div>
-              <div className="h-64 sm:h-[300px] w-full relative">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  frameBorder={0}
-                  scrolling="no"
-                  marginHeight={0}
-                  marginWidth={0}
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(jobData.tacnaLokacija || jobData.location)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
-                  className="absolute inset-0 grayscale contrast-125 opacity-70 hover:grayscale-0 hover:opacity-100 hover:contrast-100 transition-all duration-700"
-                  title="Mesto rada"
-                ></iframe>
-                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_50px_rgba(11,15,25,0.8)]"></div>
-              </div>
-              <div className="p-6 sm:p-8 bg-white/[0.01] flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-center sm:text-left">
-                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider mb-1 block">Tačna adresa</span>
-                  <p className="text-white/90 text-sm font-medium">{jobData.tacnaLokacija || jobData.location}</p>
-                </div>
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(jobData.tacnaLokacija || jobData.location)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
-                >
-                  <MapPin size={16} />
-                  <span>Otvori mapu</span>
-                </a>
-              </div>
-            </section>
-          )}
-
           <div className="pt-4">
             <SimilarJobsSlider
               jobData={jobData}
