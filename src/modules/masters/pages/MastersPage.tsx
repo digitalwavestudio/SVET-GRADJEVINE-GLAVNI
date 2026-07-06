@@ -11,8 +11,6 @@ import DynamicSEO from '@/src/components/DynamicSEO';
 import LoadingState from '@/src/components/LoadingState';
 import NoResults from '@/src/components/ui/NoResults';
 import { APP_CONFIG } from '@/src/constants/config';
-import { FilterSidebar, FilterClearButton, FilterSection, FilterSelect, FilterCTA, MarketStatsWidget, SortingBar, ViewToggle } from '@/src/modules/core/components/filters/FilterComponents';
-import { LocationCombobox } from '@/src/components/LocationCombobox';
 import { Button } from '@/src/components/ui/Button';
 import { LOCATIONS, PROFESSIONS, SECTORS } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
@@ -251,153 +249,10 @@ export default function MastersPage() {
       </StandardPageHero>
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 relative z-20 py-12">
-        <div className="flex flex-col-reverse lg:flex-row-reverse gap-12 mb-16">
-        {/* Sidebar Filters */}
-        <FilterSidebar>
-          <MarketStatsWidget 
-            stats={{ 
-              total: masterCount || 0, 
-              trend: "14", 
-              category: "MAJSTORA" 
-            }} 
-          />
-          {/* Lokacija - Prva na vrhu */}
-          <FilterSection title="LOKACIJA">
-            <div className="space-y-4">
-              <LocationCombobox 
-                selectedLocation={localLocation !== 'SVE' ? localLocation : null}
-                onChange={(slug) => setLocalLocation(slug || 'SVE')}
-              />
-              
-              {localLocation !== 'SVE' && (
-                <div className="pt-2">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-xs font-bold text-white/60">Radijus pretrage:</label>
-                    <span className="text-xs font-bold text-secondary">+{filterRadius} km</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="100" 
-                    step="5"
-                    value={filterRadius}
-                    onChange={(e) => setFilterRadius(e.target.value)}
-                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-secondary"
-                  />
-                  <div className="flex justify-between mt-1 px-1">
-                    <span className="text-[10px] text-white/40">Samo grad</span>
-                    <span className="text-[10px] text-white/40">+100 km</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </FilterSection>
-
-          {/* Clear All Button */}
-          {(localLocation !== 'SVE' || localSector !== 'SVE' || localSelectedProfession !== 'SVE' || filterRadius !== '50' || verifiedOnly) && (
-            <FilterClearButton 
-              onClick={() => {
-                setLocalLocation('SVE');
-                setFilterRadius('50');
-                setLocalSector('SVE');
-                setLocalSelectedProfession('SVE');
-                setVerifiedOnly(false);
-              }}
-            />
-          )}
-
-          <FilterSection title="POVERENJE & BEZBEDNOST">
-            <label className="flex items-center gap-3 cursor-pointer group bg-green-500/5 hover:bg-green-500/10 border border-green-500/20 p-4 rounded-[10px] transition-colors">
-              <input 
-                type="checkbox"
-                className="w-5 h-5 rounded-[4px] border-green-500/40 bg-transparent text-green-500 focus:ring-green-500/20 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
-                checked={verifiedOnly}
-                onChange={(e) => setVerifiedOnly(e.target.checked)}
-              />
-              <div className="flex flex-col">
-                <span className="text-[11px] font-black text-green-400 uppercase tracking-widest leading-none mb-1 shadow-[0_0_10px_rgba(34,197,94,0.3)] flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,1)]"></span>
-                  SAMO VERIFIKOVANI IZVOĐAČI
-                </span>
-                <span className="text-[9px] text-white/50 font-bold uppercase tracking-wider">Trgovina sa 100% garancijom</span>
-              </div>
-            </label>
-          </FilterSection>
-
-          <FilterSection title="SEKTOR & ZANIMANJE">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">SEKTOR</label>
-                <FilterSelect
-                  value={localSector}
-                  onChange={(e) => {
-                    setLocalSector(e.target.value);
-                    setLocalSelectedProfession('SVE');
-                  }}
-                >
-                  <option value="SVE" className="bg-[#111a22]">Svi sektori</option>
-                  {SECTORS.map(s => (
-                    <option key={s.slug} value={s.slug} className="bg-[#111a22]">{s.name}</option>
-                  ))}
-                </FilterSelect>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">ZANIMANJE</label>
-                <FilterSelect
-                  value={localSelectedProfession}
-                  onChange={(e) => setLocalSelectedProfession(e.target.value)}
-                  disabled={localSector === 'SVE'}
-                >
-                  <option value="SVE" className="bg-[#111a22]">{localSector === 'SVE' ? 'Prvo izaberite sektor' : 'Sva zanimanja'}</option>
-                  {availableProfessions.map(p => (
-                    <option key={p.slug} value={p.slug} className="bg-[#111a22]">{p.name}</option>
-                  ))}
-                </FilterSelect>
-              </div>
-            </div>
-          </FilterSection>
-
-            
-
-
-          
-          <FilterCTA 
-            title="REGISTRUJTE SE KAO MAJSTOR"
-            description="KREIRAJTE SVOJ MAJSTORSKI PROFIL I POVEŽITE SE SA NAJVEĆIM GRAĐEVINSKIM FIRMAMA U SRBIJI."
-            buttonText="KREIRAJ PROFIL"
-            onClick={() => navigate('/postavi-oglas')}
-            icon="engineering"
-          />
-        </FilterSidebar>
+        <div className="flex flex-col gap-12 mb-16">
 
         {/* Candidates Grid */}
         <div className="flex-1 w-full space-y-10">
-          <div className="flex justify-between items-end border-b border-white/5 pb-6 mb-8">
-            <div className="flex items-start gap-4">
-              <div className="w-[8px] h-16 bg-secondary mt-1"></div>
-              <div>
-                <h3 className="text-[38px] leading-[36px] font-black text-white uppercase tracking-tighter">
-                  Aktivna <br /> <span className="text-secondary">Ponuda</span>
-                </h3>
-                <p className="text-[12px] font-black mt-2 tracking-widest uppercase">
-                  <span className="text-white/40">ukupno:</span> <span className="text-secondary">{masters.length} oglasa u opticaju</span>
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-6">
-              <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
-            </div>
-          </div>
-
-          <SortingBar 
-            currentSort={sortBy}
-            options={[
-              { value: 'experience', label: 'PO ISKUSTVU' },
-              { value: 'name', label: 'PO IMENU' }
-            ]}
-            onChange={(val) => setSortBy(val as any)}
-          />
 
           {loading && masters.length === 0 ? (
               <LoadingState count={6} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" />
