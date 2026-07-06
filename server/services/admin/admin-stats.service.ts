@@ -305,9 +305,10 @@ export class AdminStatsService {
       // 3. Real Users Count
       const usersSnap = await db.collection("users").count().get();
 
-      // 4. Companies Count — firme su u users kolekciji sa role == "company"
-      const companiesSnap = await db.collection("users")
-        .where("role", "==", "company")
+      // 4. Companies Count — firme su u listings kolekciji sa type == "company"
+      const companiesSnap = await db.collection("listings")
+        .where("type", "==", "company")
+        .where("status", "==", "active")
         .count()
         .get();
 

@@ -135,8 +135,8 @@ export default function CtaSection() {
                 Pridruži se liderima
               </span>
               <h1 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-white mb-6 leading-[1.05] relative w-full min-w-0 drop-shadow-sm">
-                POSTANITE DEO <br className="hidden sm:block" />
-                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] drop-shadow-[0_0_15px_rgba(59,130,246,0.3)] block sm:inline">GRAĐEVINSKE MREŽE</span>
+                  POSTANITE DEO <br className="hidden sm:block" />
+                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] block sm:inline">GRAĐEVINSKE MREŽE</span>
               </h1>
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">
                 Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
@@ -144,15 +144,14 @@ export default function CtaSection() {
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Link 
                   to="/prijava"
-                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:shadow-[0_10px_40px_rgba(59,130,246,0.5)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] overflow-hidden w-full sm:w-auto"
+                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 min-h-[56px] overflow-hidden w-full sm:w-auto"
                 >
-                  <div className="absolute inset-0 rounded-[12px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full ease-out"></div>
                   <span className="material-symbols-outlined relative z-10">person_add</span>
                   <span className="relative z-10 tracking-wide">REGISTRUJTE SE BESPLATNO</span>
                 </Link>
                 <Link 
                   to="/postavi-oglas"
-                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-secondary hover:bg-yellow-400 !text-black font-black text-sm sm:text-lg rounded-[12px] shadow-[0_10px_30px_rgba(254,191,13,0.2)] hover:shadow-[0_10px_40px_rgba(254,191,13,0.4)] hover:-translate-y-1 transition-all duration-300 min-h-[56px] w-full sm:w-auto"
+                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-secondary hover:bg-yellow-400 !text-black font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 min-h-[56px] w-full sm:w-auto"
                 >
                   <span className="material-symbols-outlined relative z-10" style={{ fontVariationSettings: "'FILL' 0" }}>add_circle</span>
                   <span className="tracking-wide relative z-10">POSTAVI OGLAS</span>
@@ -163,7 +162,7 @@ export default function CtaSection() {
             <div className="lg:col-span-5 relative w-full min-w-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full min-w-0">
                 {/* Stats Card */}
-                <div className="col-span-1 sm:col-span-2 p-4 sm:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 relative overflow-hidden group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 h-fit mt-0 sm:mt-6 w-full">
+                <div className="col-span-1 sm:col-span-2 p-4 sm:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 relative overflow-hidden group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 h-auto sm:h-fit mt-0 sm:mt-6 w-full min-h-[180px] sm:min-h-0">
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50 z-0"></div>
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
                     <span className="material-symbols-outlined text-6xl text-white">groups</span>
