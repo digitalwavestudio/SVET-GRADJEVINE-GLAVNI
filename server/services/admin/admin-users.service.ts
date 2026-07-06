@@ -152,10 +152,6 @@ export class AdminUsersService {
   }
 
   static async getUsers(limit = 15, lastDocId?: string, searchQ?: string) {
-    const cacheKey = `admin_users_${limit}_${lastDocId || "initial"}_${searchQ || "none"}`;
-    const cached = await CacheService.get<{ users: Record<string, unknown>[]; lastVisibleId: string | null; nextPageToken: string | null; hasMore: boolean }>(cacheKey);
-    if (cached) return cached;
-
     let q: FirebaseFirestore.Query = db.collection("users");
 
     if (searchQ) {
@@ -193,7 +189,6 @@ export class AdminUsersService {
       hasMore: result.length === limit
     });
 
-    await CacheService.set(cacheKey, payload, 60000); // 1 min cache
     return payload;
   }
 }

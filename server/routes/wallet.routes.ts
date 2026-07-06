@@ -255,6 +255,13 @@ walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
       });
     });
 
+    // Invalidate BFF cache so dashboard shows updated balance immediately
+    await Promise.allSettled([
+      CacheService.delete(`dashboard_metrics:${targetUserId}`),
+      CacheService.delete(`wallet_dashboard:${targetUserId}`),
+      CacheService.delete(`bff_wallet_user:${targetUserId}`),
+    ]);
+
     res.json({
       success: true,
       message: `Uspešno dodato ${amount} RSD korisniku.`,

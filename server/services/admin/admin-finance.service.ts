@@ -33,6 +33,13 @@ export class AdminFinanceService {
       });
     });
 
+    // Invalidate BFF cache so dashboard shows updated balance immediately
+    await Promise.allSettled([
+      CacheService.delete(`dashboard_metrics:${userId}`),
+      CacheService.delete(`wallet_dashboard:${userId}`),
+      CacheService.delete(`bff_wallet_user:${userId}`),
+    ]);
+
     return { success: true };
   }
 

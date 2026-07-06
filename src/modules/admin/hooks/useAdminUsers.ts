@@ -29,8 +29,8 @@ export function useAdminUsers(searchQ: string = "") {
       },
       getNextPageParam: (lastPage) => lastPage?.nextPageParam,
       initialPageParam: null as string | null,
-      staleTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      staleTime: 0,
+      refetchOnWindowFocus: true,
     });
 
   const allUsers = data ? data.pages.flatMap((page) => page.users) : [];

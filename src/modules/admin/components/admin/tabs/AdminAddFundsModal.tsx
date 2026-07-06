@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '@/src/context/AuthContext';
-
+import { useQueryClient } from '@tanstack/react-query';
 import { getLazyAuth } from '@/src/lib/firebase';
-import { walletService } from '@/src/modules/checkout/services/walletService';
 
 interface AdminAddFundsModalProps {
   isOpen: boolean;
@@ -17,6 +15,7 @@ export function AdminAddFundsModal({ isOpen, onClose, targetUserId, targetUserNa
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<number>(1000);
   const [description, setDescription] = useState<string>('Manuelna dopuna (Uplata na račun)');
+  const queryClient = useQueryClient();
 
   const handleFund = async () => {
     if (amount <= 0) {
@@ -30,9 +29,22 @@ export function AdminAddFundsModal({ isOpen, onClose, targetUserId, targetUserNa
 
     try {
       setLoading(true);
-      await walletService.adminAddFunds(targetUserId, amount, description);
+      const auth = await getLazyAuth();
+      const token = auth?.currentUser ? await auth.currentUser.getIdToken() : null;
+      const res = await fetch('/api/wallet/admin/add-funds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ targetUserId, amount, description }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'API greška' }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
       toast.success(`Uspešno dodato ${amount} SG Kredita.`);
-      onClose();
+      window.location.reload();
     } catch (err: any) {
       toast.error(err.message || 'Greška pri dodavanju sredstava');
     } finally {
