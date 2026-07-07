@@ -1,6 +1,7 @@
 import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { logger } from "../../utils/logger.ts";
+import { generateBreadcrumbSchema } from "@svet-gradjevine/shared";
 
 export interface SEOEntityData {
   [key: string]: unknown;
@@ -104,16 +105,9 @@ export class SEOSchemaService {
   public static generateBreadcrumbSchema(
     items: { name: string; item: string }[],
   ) {
-    return {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: items.map((it, idx) => ({
-        "@type": "ListItem",
-        position: idx + 1,
-        name: it.name,
-        item: it.item,
-      })),
-    };
+    return generateBreadcrumbSchema(
+      items.map((it) => ({ name: it.name, url: it.item })),
+    );
   }
 
   public static async generateStructuredData(

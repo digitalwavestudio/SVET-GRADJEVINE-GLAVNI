@@ -35,7 +35,7 @@ export default function ApplicationsPage() {
     if (!user) return;
     try {
       await updateApplicationStatus({ appId, status: newStatus, jobId, userId: user.id, role });
-      clearDashboardCache();
+      clearDashboardCache(user.id);
     } catch (err) {
       console.error("Došlo je do greške:", err);
     }

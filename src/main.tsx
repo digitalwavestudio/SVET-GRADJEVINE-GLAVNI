@@ -7,8 +7,6 @@ import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persi
 import { HelmetProvider } from 'react-helmet-async';
 import { queryClient } from '@/src/lib/queryClient';
 import { initZodLocalization } from '@svet-gradjevine/shared';
-import { initFrontendTracing } from '@/src/lib/tracing';
-import { initErrorMonitor } from '@/src/lib/errorMonitor';
 import { installGlobalErrorHandler } from '@/src/lib/globalErrorHandler';
 import ErrorBoundary from '@/src/components/common/ErrorBoundary';
 import App from '@/src/App';
@@ -18,8 +16,6 @@ import App from '@/src/App';
 installGlobalErrorHandler();
 
 initZodLocalization();
-// initFrontendTracing();
-// initErrorMonitor();
 import './index.css';
 
 

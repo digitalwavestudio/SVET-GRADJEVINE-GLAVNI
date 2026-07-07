@@ -1,1 +1,3 @@
-export const mutationGuard = (fn: any) => fn;
+export const mutationGuard = <T>(fn: () => Promise<T>): Promise<T> => {
+  return fn();
+};
