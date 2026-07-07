@@ -73,30 +73,41 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
         <div className="space-y-5">
           <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Pogodnosti objekta</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {ACCOMMODATION_AMENITIES.map(amenity => (
-              <label 
-                key={amenity.slug} 
-                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-[10px] border-2 cursor-pointer transition-all duration-300 ${(watch('amenities') || []).includes(amenity.slug) ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/5 scale-[1.02]' : 'border-white/5 bg-white/[0.02] hover:border-white/20'}`}
-              >
-                <input 
-                  type="checkbox" 
-                  checked={(watch('amenities') || []).includes(amenity.slug)}
-                  onChange={() => handleAmenityToggle(amenity.slug)}
-                  className="hidden" 
-                />
-                <span className={`material-symbols-outlined text-2xl transition-colors ${(watch('amenities') || []).includes(amenity.slug) ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                  {amenity.slug === 'parking-kamion' ? 'local_shipping' : 
-                   amenity.slug === 'parking-bager' ? 'construction' : 
-                   amenity.slug === 'klima' ? 'ac_unit' :
-                   amenity.slug === 'wifi' ? 'wifi' : 
-                   amenity.slug === 'ves-masina' ? 'local_laundry_service' : 
-                   amenity.slug === 'kuhinja' ? 'restaurant' : 'check_circle'}
-                </span>
-                <span className={`text-[8px] font-black uppercase tracking-widest text-center leading-tight transition-colors ${(watch('amenities') || []).includes(amenity.slug) ? 'text-white' : 'text-on-surface-variant'}`}>
-                  {amenity.name}
-                </span>
-              </label>
-            ))}
+            {ACCOMMODATION_AMENITIES.map(amenity => {
+              const isChecked = (watch('amenities') || []).includes(amenity.slug);
+              return (
+                <label 
+                  key={amenity.slug} 
+                  className={`flex flex-col items-center justify-center gap-4 p-5 rounded-[12px] border cursor-pointer transition-all duration-500 backdrop-blur-md shadow-[0_4px_15px_rgba(0,0,0,0.15)] ${
+                    isChecked 
+                      ? 'border-secondary bg-secondary/[0.08] shadow-[0_0_25px_rgba(254,191,13,0.15)] scale-[1.03]' 
+                      : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20'
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={isChecked}
+                    onChange={() => handleAmenityToggle(amenity.slug)}
+                    className="hidden" 
+                  />
+                  <span className={`material-symbols-outlined text-2xl transition-all duration-300 ${
+                    isChecked ? 'text-secondary drop-shadow-[0_0_8px_rgba(254,191,13,0.6)] scale-110' : 'text-white/40'
+                  }`}>
+                    {amenity.slug === 'parking-kamion' ? 'local_shipping' : 
+                     amenity.slug === 'parking-bager' ? 'construction' : 
+                     amenity.slug === 'klima' ? 'ac_unit' :
+                     amenity.slug === 'wifi' ? 'wifi' : 
+                     amenity.slug === 'ves-masina' ? 'local_laundry_service' : 
+                     amenity.slug === 'kuhinja' ? 'restaurant' : 'check_circle'}
+                  </span>
+                  <span className={`text-[8px] font-black uppercase tracking-widest text-center leading-tight transition-all duration-300 ${
+                    isChecked ? 'text-white [text-shadow:0_0_10px_rgba(255,255,255,0.2)]' : 'text-white/50'
+                  }`}>
+                    {amenity.name}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </div>
 
@@ -116,7 +127,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
                 <button
                   type="button"
                   onClick={() => setValue('accParkingAvailable', !watch('accParkingAvailable'))}
-                  className={`py-4 rounded-[10px] border-2 flex items-center justify-center gap-2 transition-all ${watch('accParkingAvailable') ? 'bg-secondary/10 border-secondary text-secondary font-black' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                  className={`py-4 rounded-[10px] border flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                    watch('accParkingAvailable') 
+                      ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                      : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                  }`}
                 >
                   <span className="material-symbols-outlined text-lg">local_parking</span>
                   <span className="text-[10px] font-black uppercase tracking-widest">Parking</span>
@@ -124,7 +139,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
                 <button
                   type="button"
                   onClick={() => setValue('accTruckAccess', !watch('accTruckAccess'))}
-                  className={`py-4 rounded-[10px] border-2 flex items-center justify-center gap-2 transition-all ${watch('accTruckAccess') ? 'bg-secondary/10 border-secondary text-secondary font-black' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                  className={`py-4 rounded-[10px] border flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                    watch('accTruckAccess') 
+                      ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                      : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                  }`}
                 >
                   <span className="material-symbols-outlined text-lg">fire_truck</span>
                   <span className="text-[10px] font-black uppercase tracking-widest leading-none">Put za kamion</span>
@@ -141,7 +160,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
               <button
                 type="button"
                 onClick={() => setValue('accInvoiceAvailable', !watch('accInvoiceAvailable'))}
-                className={`w-full py-4 rounded-[10px] border-2 flex items-center justify-center gap-3 transition-all ${watch('accInvoiceAvailable') ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                className={`w-full py-4 rounded-[10px] border flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                  watch('accInvoiceAvailable') 
+                    ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                    : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                }`}
               >
                 <span className="material-symbols-outlined text-xl">receipt_long</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">Plaćanje preko računa (Faktura)</span>
@@ -172,7 +195,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
             <button
               type="button"
               onClick={() => setValue('accLaundryAvailable', !formData.accLaundryAvailable)}
-              className={`py-6 rounded-[10px] border-2 flex flex-col items-center gap-3 transition-all ${formData.accLaundryAvailable ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+              className={`py-6 rounded-[10px] border flex flex-col items-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                formData.accLaundryAvailable 
+                  ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                  : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+              }`}
             >
               <span className="material-symbols-outlined text-2xl">local_laundry_service</span>
               <span className="text-[10px] font-black uppercase tracking-widest">Veš mašina</span>
@@ -180,7 +207,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
             <button
               type="button"
               onClick={() => setValue('accKitchenAvailable', !formData.accKitchenAvailable)}
-              className={`py-6 rounded-[10px] border-2 flex flex-col items-center gap-3 transition-all ${formData.accKitchenAvailable ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+              className={`py-6 rounded-[10px] border flex flex-col items-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                formData.accKitchenAvailable 
+                  ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                  : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+              }`}
             >
               <span className="material-symbols-outlined text-2xl">soup_kitchen</span>
               <span className="text-[10px] font-black uppercase tracking-widest">Kuhinja</span>
@@ -188,7 +219,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
             <button
               type="button"
               onClick={() => setValue('accWifiAvailable', !formData.accWifiAvailable)}
-              className={`py-6 rounded-[10px] border-2 flex flex-col items-center gap-3 transition-all ${formData.accWifiAvailable ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+              className={`py-6 rounded-[10px] border flex flex-col items-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                formData.accWifiAvailable 
+                  ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                  : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+              }`}
             >
               <span className="material-symbols-outlined text-2xl">wifi</span>
               <span className="text-[10px] font-black uppercase tracking-widest">WiFi Internet</span>
@@ -196,7 +231,11 @@ export function Step2Accommodation({ nextStep, prevStep }: { nextStep?: () => vo
             <button
               type="button"
               onClick={() => setValue('accAirConditioning', !formData.accAirConditioning)}
-              className={`py-6 rounded-[10px] border-2 flex flex-col items-center gap-3 transition-all ${formData.accAirConditioning ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+              className={`py-6 rounded-[10px] border flex flex-col items-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                formData.accAirConditioning 
+                  ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                  : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+              }`}
             >
               <span className="material-symbols-outlined text-2xl">airlight</span>
               <span className="text-[10px] font-black uppercase tracking-widest">Klima</span>

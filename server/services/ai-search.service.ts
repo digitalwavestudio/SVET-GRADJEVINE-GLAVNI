@@ -45,7 +45,7 @@ interface AiAskResult {
   }>;
 }
 
-async function callGemini(prompt: string) {
+export async function callGemini(prompt: string) {
   const client = new GoogleGenAI({
     vertexai: true,
     project: "svet-gradjevine-eu",

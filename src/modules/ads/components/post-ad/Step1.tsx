@@ -3,7 +3,6 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MACHINE_CATEGORIES, MACHINE_SUBCATEGORIES } from '@/src/constants/machineTaxonomy';
 import { TaxonomyItem, ACCOMMODATION_TYPES, KITCHEN_TYPES, LOCATIONS, PROFESSIONS, REAL_ESTATE_PURPOSES, SECTORS, MARKETPLACE_CATEGORIES } from '@/src/constants/taxonomy';
-import { AiAutofillButton } from '@/src/modules/ads/components/post-ad/AiAutofillButton';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { Input } from '@/src/components/ui/form/Input';
 import { Select } from '@/src/components/ui/form/Select';
@@ -38,9 +37,6 @@ export function Step1({
               <span className="material-symbols-outlined text-secondary">business_center</span>
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Osnovne informacije o firmi</h2>
-            <div className="w-full md:w-auto md:ml-auto mt-3 md:mt-0">
-              <AiAutofillButton selectedCategory={selectedCategory} />
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -98,9 +94,6 @@ export function Step1({
               </span>
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Osnovne informacije</h2>
-            <div className="w-full md:w-auto md:ml-auto mt-3 md:mt-0">
-              <AiAutofillButton selectedCategory={selectedCategory} />
-            </div>
           </div>
           
           <div className="space-y-8">

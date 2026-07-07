@@ -34,6 +34,9 @@ const getFriendlyCategory = (job: any) => {
 };
 
 const getFriendlySalary = (job: any) => {
+  if (job.isNegotiable) {
+    return 'Pozvati';
+  }
   const min = job.plataMin;
   const max = job.plataMax;
   

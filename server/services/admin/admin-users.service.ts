@@ -154,6 +154,16 @@ export class AdminUsersService {
   static async getUsers(limit = 15, lastDocId?: string, searchQ?: string) {
     let q: FirebaseFirestore.Query = db.collection("users");
 
+    let total = 0;
+    if (!searchQ && !lastDocId) {
+      try {
+        const countSnap = await db.collection("users").count().get();
+        total = countSnap.data().count;
+      } catch (e) {
+        console.error("Error fetching user count", e);
+      }
+    }
+
     if (searchQ) {
       if (searchQ.includes("@")) {
         q = q.where("email", "==", searchQ.toLowerCase()).limit(5);
@@ -186,7 +196,8 @@ export class AdminUsersService {
       users: result,
       lastVisibleId,
       nextPageToken: lastVisibleId,
-      hasMore: result.length === limit
+      hasMore: result.length === limit,
+      ...(total ? { total } : {})
     });
 
     return payload;

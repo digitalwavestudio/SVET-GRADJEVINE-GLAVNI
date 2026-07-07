@@ -25,6 +25,7 @@ export function useAdminUsers(searchQ: string = "") {
         return {
           users: usersList,
           nextPageParam: fetchedData?.hasMore ? fetchedData.lastVisibleId : null,
+          total: fetchedData?.total,
         };
       },
       getNextPageParam: (lastPage) => lastPage?.nextPageParam,
@@ -34,6 +35,7 @@ export function useAdminUsers(searchQ: string = "") {
     });
 
   const allUsers = data ? data.pages.flatMap((page) => page.users) : [];
+  const totalUsers = data?.pages?.[0]?.total || 0;
 
   const toggleUserSuspensionMutation = useMutation({
     mutationFn: async ({ userId, newStatus, reason }: { userId: string; newStatus: 'suspended' | 'active'; reason: string }) => {
@@ -98,6 +100,7 @@ export function useAdminUsers(searchQ: string = "") {
 
   return {
     allUsers,
+    totalUsers,
     isLoading,
     hasMore: hasNextPage,
     isFetchingNextPage,

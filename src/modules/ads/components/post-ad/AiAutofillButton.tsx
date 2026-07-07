@@ -1,172 +1,60 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useFormContext } from 'react-hook-form';
-import { generateAdData } from '@/src/lib/aiService';
+import { processAiCommand } from '@/src/lib/aiService';
 
 export function AiAutofillButton({ selectedCategory }: { selectedCategory: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [filledFields, setFilledFields] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const formContext = useFormContext();
-  const setValue = formContext?.setValue;
+  const { getValues, setValue } = useFormContext();
 
   const handleGenerate = async () => {
-    if (!description.trim() || !setValue) return;
     setIsLoading(true);
-    setFilledFields(null);
     setError(null);
 
-    const result = await generateAdData(description, selectedCategory);
-    
-    if (result._error) {
-      setError(result._error);
+    const formData = getValues();
+    const prompt = `Generiši profesionalan i detaljan opis za oglas na sajtu Svet Građevine u kategoriji "${selectedCategory}". 
+Evo podataka koje je korisnik do sada uneo:
+${JSON.stringify(formData, null, 2)}
+
+Tvoj zadatak je da napišeš SAMO tekst opisa (bez ikakvih uvodnih poruka poput "Evo opisa", samo gotov tekst koji ide direktno u polje za opis). 
+Tekst treba da bude ubedljiv, čitljiv, gramatički ispravan, u profesionalnom tonu, formatiran sa novim redovima. Ne dodaji Markdown formatiranje osim novih redova.`;
+
+    try {
+      const responseText = await processAiCommand(prompt);
+      // Clean up potential markdown code blocks if the AI hallucinates them
+      const cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
+      setValue('opis', cleanText, { shouldValidate: true, shouldDirty: true });
+    } catch (err) {
+      console.error("Greška pri generisanju opisa:", err);
+      setError("Došlo je do greške prilikom generisanja opisa. Pokušajte ponovo.");
+    } finally {
       setIsLoading(false);
-      return;
-    }
-
-    const filled: string[] = [];
-
-    Object.entries(result).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
-        if (key === 'opis') {
-          setValue('opis', value as string);
-          filled.push('opis');
-        } else if (key === 'location') {
-          setValue('location', value as string);
-          filled.push('lokacija');
-        } else if (key === 'benefits' && Array.isArray(value)) {
-          setValue('benefits', value);
-          filled.push('benefits');
-        } else if (key === 'amenities' && Array.isArray(value)) {
-          setValue('amenities', value);
-          filled.push('amenities');
-        } else if (key === 'companyMainCats' && Array.isArray(value)) {
-          setValue('companyMainCats', value);
-          filled.push('kategorije');
-        } else if (key === 'plotInfrastructure' && typeof value === 'object') {
-          setValue('plotInfrastructure', value);
-          filled.push('infrastruktura');
-        } else {
-          setValue(key, value);
-          filled.push(key);
-        }
-      }
-    });
-
-    setFilledFields(filled);
-    setIsLoading(false);
-
-    if (filled.length > 0) {
-      setTimeout(() => {
-        setIsOpen(false);
-        setFilledFields(null);
-        setDescription('');
-      }, 2500);
     }
   };
 
   return (
-    <>
+    <div className="w-full">
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
-        className="group flex w-full md:w-auto bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] hover:from-[#fb8c00] hover:to-[#ffeb3b] !text-black px-5 py-6 md:py-3 rounded-[10px] font-bold transition-all duration-300 hover:shadow-lg hover:shadow-secondary/30 text-sm md:text-[11px] uppercase tracking-widest items-center justify-center leading-[1.1] text-center hover:-translate-y-0.5 active:scale-95"
+        onClick={handleGenerate}
+        disabled={isLoading}
+        className="group flex w-full bg-[#121b22] border border-[#ffad3a]/30 hover:border-[#ffad3a]/70 hover:bg-[#1a252f] text-[#ffad3a] px-5 py-4 rounded-[10px] font-black transition-all duration-300 shadow-[0_4px_20px_rgba(255,173,58,0.1)] hover:shadow-[0_4px_25px_rgba(255,173,58,0.25)] text-xs md:text-sm uppercase tracking-widest items-center justify-center text-center hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed gap-3"
       >
-        AI popunjavanje<br />oglasa
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => { if (!isLoading) { setIsOpen(false); setFilledFields(null); } }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-[#0B1219] border border-white/10 rounded-[10px] p-8 max-w-lg w-full mx-4 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div>
-                  <h3 className="text-lg font-black uppercase tracking-tight font-headline">AI popunjavanje oglasa</h3>
-                  <p className="text-xs text-white/40">Opišite oglas običnim tekstom, a veštačka inteligencija automatski popunjava lokaciju, sektor, zanimanje, platu i ostala polja forme</p>
-                </div>
-              </div>
-
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Npr: Potreban tesar za rad u Beogradu, plata 1000e mesecno, pocetak odmah, puno radno vreme"
-                className="w-full h-32 bg-white/5 border border-white/10 rounded-[10px] p-4 text-white text-sm placeholder:text-white/20 resize-none focus:outline-none focus:border-secondary/50 transition-colors"
-                disabled={isLoading}
-              />
-
-              <div className="flex gap-3 mt-4">
-                <button
-                  type="button"
-                  onClick={() => { setIsOpen(false); setFilledFields(null); }}
-                  className="flex-1 px-4 py-3 rounded-[10px] text-sm font-black uppercase tracking-wider border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition-all"
-                  disabled={isLoading}
-                >
-                  Odustani
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={isLoading || !description.trim()}
-                  className="flex-1 px-4 py-3 rounded-[10px] text-sm font-black uppercase tracking-wider bg-secondary text-black hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
-                      Generišem...
-                    </>
-                  ) : (
-                    <>
-                      <span className="material-symbols-outlined text-base">auto_awesome</span>
-                      Generiši
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-[10px] flex items-start gap-2"
-                >
-                  <span className="material-symbols-outlined text-red-500 text-base mt-0.5">error</span>
-                  <div>
-                    <p className="text-sm text-red-400 font-bold">{error}</p>
-                  </div>
-                </motion.div>
-              )}
-
-              {filledFields && filledFields.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-[10px] flex items-start gap-2"
-                >
-                  <span className="material-symbols-outlined text-green-500 text-base mt-0.5">check_circle</span>
-                  <div>
-                    <p className="text-sm text-green-400 font-bold">Popunjeno {filledFields.length} polje/a</p>
-                    <p className="text-xs text-white/40">{filledFields.join(', ')}</p>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          </motion.div>
+        {isLoading ? (
+          <>
+            <span className="material-symbols-outlined animate-spin text-lg md:text-xl">progress_activity</span>
+            <span>Generišem detaljan opis...</span>
+          </>
+        ) : (
+          <>
+            <span className="material-symbols-outlined text-lg md:text-xl group-hover:animate-pulse">auto_awesome</span>
+            <span>Generiši opis pomoću AI</span>
+          </>
         )}
-      </AnimatePresence>
-    </>
+      </button>
+      {error && (
+        <p className="text-red-400 text-[10px] font-bold mt-2 ml-1 uppercase tracking-wider">{error}</p>
+      )}
+    </div>
   );
 }

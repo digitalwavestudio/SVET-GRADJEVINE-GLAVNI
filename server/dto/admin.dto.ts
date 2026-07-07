@@ -69,7 +69,8 @@ export const adminUserListResponseSchema = z.object({
   users: z.array(adminUserResponseSchema),
   lastVisibleId: z.string().nullable(),
   nextPageToken: z.string().nullable(),
-  hasMore: z.boolean()
+  hasMore: z.boolean(),
+  total: z.number().optional()
 });
 
 export const moderationQueueItemSchema = z.object({

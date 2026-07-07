@@ -20,6 +20,58 @@ interface CategorySelectorProps {
   userRole?: string;
 }
 
+const CATEGORY_THEMES: Record<string, {
+  borderActive: string;
+  bgActive: string;
+  shadowActive: string;
+  borderHover: string;
+  iconColor: string;
+  textGlow: string;
+  iconBgActive: string;
+  badgeGlow: string;
+}> = {
+  job: {
+    borderActive: "border-blue-500/80 ring-1 ring-blue-500/30",
+    bgActive: "bg-gradient-to-b from-[#0c1835]/80 to-[#050814]/85",
+    shadowActive: "shadow-[0_0_50px_rgba(59,130,246,0.3)] scale-[1.02] -translate-y-1",
+    borderHover: "hover:border-blue-500/40 hover:bg-slate-900/60 hover:-translate-y-1",
+    iconColor: "text-blue-400",
+    textGlow: "text-blue-400 [text-shadow:0_0_15px_rgba(59,130,246,0.4)]",
+    iconBgActive: "bg-blue-500/20 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.4)]",
+    badgeGlow: "text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]",
+  },
+  accommodation: {
+    borderActive: "border-emerald-500/80 ring-1 ring-emerald-500/30",
+    bgActive: "bg-gradient-to-b from-[#0a2316]/80 to-[#030c07]/85",
+    shadowActive: "shadow-[0_0_50px_rgba(16,185,129,0.3)] scale-[1.02] -translate-y-1",
+    borderHover: "hover:border-emerald-500/40 hover:bg-slate-900/60 hover:-translate-y-1",
+    iconColor: "text-emerald-400",
+    textGlow: "text-emerald-400 [text-shadow:0_0_15px_rgba(16,185,129,0.4)]",
+    iconBgActive: "bg-emerald-500/20 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.4)]",
+    badgeGlow: "text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]",
+  },
+  catering: {
+    borderActive: "border-amber-500/80 ring-1 ring-amber-500/30",
+    bgActive: "bg-gradient-to-b from-[#211505]/80 to-[#0b0701]/85",
+    shadowActive: "shadow-[0_0_50px_rgba(245,158,11,0.3)] scale-[1.02] -translate-y-1",
+    borderHover: "hover:border-amber-500/40 hover:bg-slate-900/60 hover:-translate-y-1",
+    iconColor: "text-amber-400",
+    textGlow: "text-amber-400 [text-shadow:0_0_15px_rgba(245,158,11,0.4)]",
+    iconBgActive: "bg-amber-500/20 border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.4)]",
+    badgeGlow: "text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]",
+  },
+  default: {
+    borderActive: "border-secondary/80 ring-1 ring-secondary/30",
+    bgActive: "bg-gradient-to-b from-[#1c140a]/85 to-[#070502]/85",
+    shadowActive: "shadow-[0_0_50px_rgba(254,191,13,0.3)] scale-[1.02] -translate-y-1",
+    borderHover: "hover:border-secondary/40 hover:bg-slate-900/60 hover:-translate-y-1",
+    iconColor: "text-secondary",
+    textGlow: "text-secondary [text-shadow:0_0_15px_rgba(254,191,13,0.3)]",
+    iconBgActive: "bg-secondary border-secondary shadow-[0_0_20px_rgba(254,191,13,0.4)]",
+    badgeGlow: "text-secondary drop-shadow-[0_0_8px_rgba(254,191,13,0.5)]",
+  }
+};
+
 export const CategorySelector: React.FC<CategorySelectorProps> = ({
   options,
   selectedCategory,
@@ -38,19 +90,12 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
     <div className="min-h-screen bg-[#0B1219] text-white flex flex-col pt-32 pb-20 px-6 relative overflow-hidden font-body">
       <div className="absolute inset-0 futuristic-grid opacity-20 pointer-events-none"></div>
 
-      <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center gap-6 mb-12 sm:mb-20 relative z-10 mt-4 sm:mt-10">
-        <Link to="/" className="flex flex-col items-center sm:items-start leading-none hover:opacity-80 transition-opacity">
-          <img src={logoUrl || logoImage} alt="Svet Građevine" className="h-12 sm:h-16 md:h-20 w-auto object-contain drop-shadow-md" />
+      {/* BACKGROUND BLOBS REMOVED AS REQUESTED */}
+
+      <div className="max-w-7xl mx-auto w-full flex justify-center items-center mb-8 sm:mb-20 relative z-10 mt-2 sm:mt-10">
+        <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
+          <img src={logoUrl || logoImage} alt="Svet Građevine" className="!h-16 md:!h-32 !w-auto max-w-[200px] md:max-w-none object-contain drop-shadow-md mx-auto" />
         </Link>
-        <div className="flex flex-col items-center sm:items-end">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">POČETNI KORAK</span>
-            <span className="text-xs font-black uppercase tracking-widest text-white">PROFILISANJE</span>
-          </div>
-          <div className="w-32 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-            <div className="w-2/3 h-full bg-secondary"></div>
-          </div>
-        </div>
       </div>
 
       <div className="relative z-10 max-w-5xl w-full mx-auto text-center flex-1 flex flex-col justify-center">
@@ -63,25 +108,39 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-            {options.map((opt, idx) => (
-              <motion.div
-                key={opt.id}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 * idx }}
-                onClick={() => handleCategoryClick(opt.id, opt.disabled)}
-                tabIndex={opt.disabled ? 0 : undefined}
-                className={`p-10 rounded-[10px] border-2 text-left transition-all duration-500 group/tooltip relative overflow-hidden ${opt.disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'} ${selectedCategory === opt.id && !opt.disabled ? "border-secondary bg-secondary/5" : "border-white/5 bg-white/[0.02] " + (!opt.disabled ? "hover:border-secondary/50 hover:bg-secondary/5" : "")}`}
-              >
-                <div className={`w-16 h-16 rounded-[10px] flex items-center justify-center mb-8 ${!opt.disabled && "group-hover:scale-110"} transition-transform border ${selectedCategory === opt.id && !opt.disabled ? "bg-secondary border-secondary" : "bg-surface-container-high border-white/10"}`}>
-                  <span className={`material-symbols-outlined text-3xl ${selectedCategory === opt.id && !opt.disabled ? "!text-black" : "text-secondary"}`}>{opt.icon}</span>
-                </div>
-                <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 font-headline transition-colors ${selectedCategory === opt.id && !opt.disabled ? "text-secondary" : "text-white"}`}>{opt.title}</h3>
-                <p className="text-[10px] font-black tracking-[0.2em] text-on-surface-variant uppercase">{opt.subtitle}</p>
+            {options.map((opt, idx) => {
+              const isSelected = selectedCategory === opt.id && !opt.disabled;
+              const theme = CATEGORY_THEMES[opt.id] || CATEGORY_THEMES.default;
+              return (
+                <motion.div
+                  key={opt.id}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 * idx }}
+                  onClick={() => handleCategoryClick(opt.id, opt.disabled)}
+                  tabIndex={opt.disabled ? 0 : undefined}
+                  className={`p-10 rounded-[24px] border text-center transition-all duration-500 group/tooltip relative overflow-hidden backdrop-blur-xl flex flex-col items-center justify-center ${
+                    opt.disabled 
+                      ? 'cursor-not-allowed opacity-40 border-white/5 bg-slate-950/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]' 
+                      : 'cursor-pointer'
+                  } ${
+                    isSelected
+                      ? `${theme.borderActive} ${theme.bgActive} ${theme.shadowActive}`
+                      : `border-white/10 bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] ${theme.borderHover}`
+                  }`}
+                >
+                  <div className={`w-16 h-16 rounded-[12px] flex items-center justify-center mb-6 ${!opt.disabled && "group-hover:scale-110"} transition-all duration-300 border ${
+                    isSelected 
+                      ? theme.iconBgActive
+                      : "bg-white/5 border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] group-hover:border-secondary/50 group-hover:bg-secondary/[0.05]"
+                  }`}>
+                    <span className={`material-symbols-outlined text-3xl ${isSelected ? "!text-black" : "text-secondary"}`}>{opt.icon}</span>
+                  </div>
+                  <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 font-headline whitespace-pre-line leading-tight transition-all duration-300 ${isSelected ? theme.textGlow : "text-white group-hover:text-secondary"}`}>{opt.title}</h3>
 
-                <div className={`absolute top-6 right-6 transition-all duration-300 ${selectedCategory === opt.id && !opt.disabled ? "opacity-100 scale-100" : "opacity-0 scale-50"}`}>
-                  <span className="material-symbols-outlined text-secondary text-3xl">check_circle</span>
-                </div>
+                  <div className={`absolute top-6 right-6 transition-all duration-300 ${isSelected ? "opacity-100 scale-100" : "opacity-0 scale-50"}`}>
+                    <span className={`material-symbols-outlined text-3xl ${theme.badgeGlow}`}>check_circle</span>
+                  </div>
 
                 {opt.disabled && (
                   <>
@@ -105,24 +164,10 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                   </>
                 )}
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
-      </div>
-
-      <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center gap-6 mt-16 sm:mt-20 pt-8 border-t border-white/5 relative z-10 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-center sm:text-left">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center">
-          <span>© 2026 Svet Građevine. Izgrađeno sa preciznošću.</span>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/kontakt" className="hover:text-white transition-colors">Uslovi korišćenja</Link>
-            <Link to="/kontakt" className="hover:text-white transition-colors">Politika privatnosti</Link>
-            <Link to="/kontakt" className="hover:text-white transition-colors">Kontakt podrške</Link>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-          <span>Sistem: Operativan</span>
-        </div>
       </div>
     </div>
   );

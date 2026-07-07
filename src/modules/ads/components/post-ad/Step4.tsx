@@ -132,14 +132,18 @@ export function Step4({
     }
     
     // For job categories
+    if (formData.isNegotiable) {
+      return "Po dogovoru / Pozvati";
+    }
     if (formData.plataMin || formData.plataMax) {
-      const typeLabel = formData.salaryType === "hourly" ? "sat" : "mesec";
       const min = formData.plataMin ? Number(formData.plataMin).toLocaleString("sr-RS") : "0";
       const max = formData.plataMax ? Number(formData.plataMax).toLocaleString("sr-RS") : "0";
-      return `${min} - ${max} EUR / ${typeLabel}`;
+      const dynSlug = formData.dinamikaIsplate || "";
+      const typeLabel = dynSlug === "po-satu" ? "sat" : dynSlug === "mesecna" ? "mesec" : dynSlug === "dnevna" ? "dan" : dynSlug === "nedeljna" ? "nedelja" : dynSlug === "po-m2" ? "m2" : "";
+      return `${min} - ${max} EUR${typeLabel ? ` / ${typeLabel}` : ''}`;
     }
 
-    return "Nije definisana plata / satnica";
+    return "Cena nije definisana";
   };
 
   // Find standard, premium, and urgent packages specifically
@@ -159,21 +163,28 @@ export function Step4({
         className="relative z-10 w-full mx-auto"
       >
         {/* Navigation Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20">
+        <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-6 mb-12">
+          <div className="flex items-center justify-center md:justify-start gap-4 text-center md:text-left w-full md:w-auto">
+            <div className="hidden md:flex w-12 h-12 bg-secondary/10 rounded-[10px] items-center justify-center border border-secondary/20">
               <span className="material-symbols-outlined text-secondary">
                 {selectedCategory === "company" ? "public" : "verified"}
               </span>
             </div>
             <h2 className="text-3xl font-black uppercase tracking-tight font-headline">
-              {selectedCategory === "company" ? "Oblast i Paket" : "Pregled i Naplata"}
+              {selectedCategory === "company" ? (
+                <>Oblast i Paket</>
+              ) : (
+                <>
+                  <span className="md:hidden">Pregled<br/>i Naplata</span>
+                  <span className="hidden md:inline">Pregled i Naplata</span>
+                </>
+              )}
             </h2>
           </div>
           <button
             type="button"
             onClick={prevStep}
-            className="bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black font-black uppercase tracking-widest text-xs px-6 py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(254,191,13,0.3)] hover:scale-[1.02] flex items-center gap-2"
+            className="hidden md:flex bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black font-black uppercase tracking-widest text-xs px-6 py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(254,191,13,0.3)] hover:scale-[1.02] items-center gap-2"
           >
             <span className="material-symbols-outlined text-sm font-black">arrow_back</span>
             Vrati se na izmene
@@ -455,8 +466,9 @@ export function Step4({
               )}
 
               {premiumPkg.recommended && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black text-xs font-black uppercase tracking-[0.25em] px-8 py-2 rounded-full shadow-[0_4px_20px_rgba(254,191,13,0.5)] whitespace-nowrap z-30 animate-pulse border border-yellow-200/50">
-                  ★ PREPORUČENO
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] text-black text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] px-6 py-1.5 rounded-full shadow-[0_0_25px_rgba(254,191,13,0.6)] whitespace-nowrap z-30 flex items-center gap-1.5 border border-white/30">
+                  <span className="material-symbols-outlined text-[14px] animate-bounce" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  PREPORUČENO
                 </div>
               )}
 
@@ -803,7 +815,7 @@ export function Step4({
 
             {/* Safety guarantees (Full width footer) */}
             <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-4 max-w-sm">
+              <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-3 md:gap-4 max-w-sm">
                 <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400 shrink-0">
                   <span className="material-symbols-outlined text-[20px]">shield</span>
                 </div>
@@ -831,7 +843,7 @@ export function Step4({
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 max-w-sm">
+              <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-3 md:gap-4 max-w-sm">
                 <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
                   <span className="material-symbols-outlined text-[20px]">verified</span>
                 </div>

@@ -49,13 +49,17 @@ export function Step2Catering({ nextStep, prevStep }: { nextStep?: () => void; p
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10">
           <div className="space-y-6">
             <h3 className="text-xs font-black uppercase text-secondary tracking-widest flex items-center gap-2">
-              <span className="material-symbols-outlined">business_center</span> Poslovni uslovi i Kapacitet
+              <span className="material-symbols-outlined">business_center</span> Uslovi i Kapacitet
             </h3>
             <div className="space-y-4">
               <button
                 type="button"
                 onClick={() => setValue('catInvoiceAvailable', !watch('catInvoiceAvailable'))}
-                className={`w-full py-4 rounded-[10px] border-2 flex items-center justify-center gap-3 transition-all ${watch('catInvoiceAvailable') ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                className={`w-full py-4 rounded-[10px] border flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                  watch('catInvoiceAvailable') 
+                    ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                    : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                }`}
               >
                 <span className="material-symbols-outlined text-xl">receipt_long</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">Plaćanje preko računa (Faktura)</span>
@@ -86,7 +90,11 @@ export function Step2Catering({ nextStep, prevStep }: { nextStep?: () => void; p
               <button
                 type="button"
                 onClick={() => setValue('catHaccpCertified', !watch('catHaccpCertified'))}
-                className={`w-full py-4 rounded-[10px] border-2 flex items-center justify-center gap-3 transition-all ${watch('catHaccpCertified') ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                className={`w-full py-4 rounded-[10px] border flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                  watch('catHaccpCertified') 
+                    ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                    : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                }`}
               >
                 <span className="material-symbols-outlined text-xl">health_and_safety</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">HACCP Sertifikovan</span>
@@ -94,7 +102,11 @@ export function Step2Catering({ nextStep, prevStep }: { nextStep?: () => void; p
               <button
                 type="button"
                 onClick={() => setValue('catPackagingIncluded', !watch('catPackagingIncluded'))}
-                className={`w-full py-4 rounded-[10px] border-2 flex items-center justify-center gap-3 transition-all ${watch('catPackagingIncluded') ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-white/5 border-white/5 text-on-surface-variant hover:border-white/20'}`}
+                className={`w-full py-4 rounded-[10px] border flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                  watch('catPackagingIncluded') 
+                    ? 'bg-secondary/[0.08] border-secondary text-white shadow-[0_0_20px_rgba(254,191,13,0.15)]' 
+                    : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                }`}
               >
                 <span className="material-symbols-outlined text-xl">inventory_2</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">Ambalaža i pribor u ceni obroka</span>

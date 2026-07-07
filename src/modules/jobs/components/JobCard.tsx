@@ -26,12 +26,15 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
   const friendlyLoc = LOCATIONS.find(l => l.slug === job.loc || l.slug === job.location)?.name || job.loc || job.location || 'Srbija';
 
   const getSalaryDisplay = () => {
+    if (job.isNegotiable) {
+      return 'Pozvati';
+    }
     if (job.plataMin != null) {
       const min = Number(job.plataMin).toLocaleString();
       const max = job.plataMax != null ? ` – ${Number(job.plataMax).toLocaleString()}` : '';
       return `${min}${max} €`;
     }
-    return job.sal || job.salary || 'Dogovor';
+    return job.sal || job.salary || 'Po dogovoru';
   };
 
   const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);

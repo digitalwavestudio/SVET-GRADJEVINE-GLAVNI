@@ -198,7 +198,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
                 <div className="min-w-0">
                   <p className="text-white/30 text-[9px] uppercase tracking-widest mb-0.5 font-bold">Zarada</p>
                   <p className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 font-black text-xl sm:text-2xl truncate">
-                    {job.plataMin != null
+                    {job.isNegotiable ? 'Pozvati' : job.plataMin != null
                       ? `${Number(job.plataMin).toLocaleString()}${job.plataMax != null ? ` - ${Number(job.plataMax).toLocaleString()}` : ''} €`
                       : job.sal 
                         ? `${job.sal} €`

@@ -23,6 +23,7 @@ export function UsersTab(_props: UsersTabProps) {
 
   const { 
     allUsers, 
+    totalUsers,
     isLoading, 
     hasMore, 
     isFetchingNextPage, 
@@ -49,30 +50,41 @@ export function UsersTab(_props: UsersTabProps) {
        exit={{ opacity: 0, y: -20 }}
        className="bg-[#0A0F14] border border-white/5 rounded-[10px] overflow-hidden"
     >
-       <div className="p-4 sm:p-10 border-b border-white/5 flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
-          <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">LISTA REGISTROVANIH KORISNIKA</h3>
-          <div className="relative w-full sm:w-96">
-             <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-white/20">search</span>
-             <input 
-               value={localQuery}
-               onChange={handleSearch}
-               aria-label="Unos polja"
-               type="text" 
-               placeholder="PRETRAŽI PO EMAILU ILI FIRMI..." 
-               className="w-full bg-white/5 border border-white/10 rounded-[10px] py-3 pl-12 pr-4 text-xs font-bold text-white outline-none focus:border-secondary/50 transition-all uppercase" 
-             />
+       <div className="p-4 sm:p-10 border-b border-white/5 flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
+             <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">
+               LISTA REGISTROVANIH KORISNIKA
+             </h3>
+             <div className="relative w-full sm:w-96">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-white/20">search</span>
+                <input 
+                  value={localQuery}
+                  onChange={handleSearch}
+                  aria-label="Unos polja"
+                  type="text" 
+                  placeholder="PRETRAŽI PO EMAILU ILI FIRMI..." 
+                  className="w-full bg-white/5 border border-white/10 rounded-[10px] py-3 pl-12 pr-4 text-xs font-bold text-white outline-none focus:border-secondary/50 transition-all uppercase" 
+                />
+             </div>
+          </div>
+          <div className="bg-secondary/10 border border-secondary/20 rounded-[10px] p-6 flex items-center justify-between backdrop-blur-md">
+            <div>
+              <div className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] mb-1">UKUPAN BROJ KORISNIKA NA SAJTU</div>
+              <div className="text-3xl font-black text-white">{totalUsers.toLocaleString()}</div>
+            </div>
+            <span className="material-symbols-outlined text-4xl text-secondary/30">group</span>
           </div>
        </div>
        <div className="w-full overflow-x-auto">
           <table className="w-full block md:table border-collapse">
              <thead className="hidden md:table-header-group">
-                <tr className="bg-white/[0.02]">
-                   <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">KORISNIK / FIRMA</th>
-                   <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">ULOGA</th>
-                   <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">STATUS</th>
-                   <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">AKTIVNOST</th>
-                   <th className="px-8 py-6 text-right text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">AKCIJE</th>
-                </tr>
+                 <tr className="bg-white/[0.02]">
+                    <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">KORISNIK / FIRMA</th>
+                    <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">ULOGA</th>
+                    <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">OGLASI</th>
+                    <th className="px-8 py-6 text-left text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">SG KREDITI</th>
+                    <th className="px-8 py-6 text-right text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">AKCIJE</th>
+                 </tr>
              </thead>
              <tbody className="block md:table-row-group divide-y md:divide-y-0 divide-white/5">
                 {isLoading ? (
@@ -107,60 +119,52 @@ export function UsersTab(_props: UsersTabProps) {
                 ) : allUsers.length > 0 ? allUsers.map((u: any, i) => {
                    const userName = u.company || u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Nepoznat';
                    const userRole = u.role ? u.role.toString().toUpperCase() : 'STANDARD';
-                   const userStatus = u.businessProfile?.isPremium ? 'PREMIUM' : (u.businessProfile?.isVerified ? 'VERIFIED' : 'STANDARD');
-                   const joinedDate = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('sr-RS') : 'NEPOZNATO';
-                   const initial = userName.charAt(0).toUpperCase();
 
                    return (
-                       <tr key={u.id || i} className="block md:table-row border-b border-white/5 p-4 md:p-0 hover:bg-white/[0.01] transition-colors relative">
-                          <td className="block md:table-cell md:px-8 py-3 md:py-6">
-                             <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                <div className="flex items-center gap-4">
-                                   <div className="w-10 h-10 bg-white/5 rounded-[10px] flex items-center justify-center font-black text-secondary shrink-0">{initial}</div>
-                                   <div>
-                                      <div className="text-sm font-black text-white uppercase tracking-tight">{userName}</div>
-                                      <div className="text-[10px] font-bold text-white/20 break-all">{u.email}</div>
-                                   </div>
-                                </div>
-                                {/* Mobile inline badges */}
-                                <div className="flex flex-wrap md:hidden items-center gap-2 mt-2">
-                                   <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-[4px]">{userRole}</span>
-                                   <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-[4px] border ${
-                                      userStatus === 'PREMIUM' ? 'bg-secondary/10 border-secondary/20 text-secondary' : 
-                                      userStatus === 'VERIFIED' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-white/5 border-white/10 text-white/40'
-                                   }`}>{userStatus}</span>
-                                   {u.status === 'suspended' && (
-                                     <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black rounded-[4px] uppercase tracking-widest">SUSPENDOVAN</span>
-                                   )}
-                                </div>
-                             </div>
-                          </td>
-                          <td className="hidden md:table-cell px-8 py-6">
-                             <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-[10px]">{userRole}</span>
-                          </td>
-                          <td className="hidden md:table-cell px-8 py-6">
-                             <span className={`text-[10px] font-black uppercase tracking-widest ${
-                                userStatus === 'PREMIUM' ? 'text-secondary font-black' : 
-                                userStatus === 'VERIFIED' ? 'text-green-500' : 'text-white/30'
-                             }`}>{userStatus}</span>
-                             {u.status === 'suspended' && <span className="ml-2 px-2 py-0.5 bg-red-500/20 text-red-500 text-[8px] font-black rounded uppercase">suspended</span>}
-                          </td>
-                          <td className="hidden md:table-cell px-8 py-6">
-                             <div className="text-[10px] font-black text-white uppercase tracking-tighter">{joinedDate}</div>
-                             <div className="text-[8px] font-bold text-white/20 uppercase tracking-widest mb-1">ID: {u.id?.slice(0, 8)}...</div>
-                             <div className="text-[10px] font-black text-secondary tracking-widest uppercase bg-secondary/10 px-2 py-0.5 rounded inline-block">
-                               {(u.walletBalance || 0).toLocaleString()} SGK
-                             </div>
-                          </td>
-                          <td className="block md:table-cell md:px-8 pt-4 pb-2 md:py-6 text-right md:flex md:items-center md:justify-end gap-2">
+                       <tr key={u.id || i} className="block md:table-row border-b border-white/5 p-4 md:p-0 hover:bg-white/[0.01] transition-colors relative">                           <td className="block md:table-cell md:px-8 py-3 md:py-6">
+                              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                 <div className="flex items-center gap-4">
+                                    <div className="w-8 text-[12px] font-black text-white/30 text-right shrink-0">{(totalUsers || allUsers.length) - i}.</div>
+                                    <div>
+                                       <div className="text-sm font-black text-white uppercase tracking-tight flex items-center gap-2">
+                                         {userName}
+                                         {u.status === 'suspended' && (
+                                           <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black rounded-[4px] uppercase tracking-widest">SUSPENDOVAN</span>
+                                         )}
+                                       </div>
+                                       <div className="flex items-center gap-3 mt-0.5">
+                                         <div className="text-[13px] font-bold text-white/70 break-all">{u.email}</div>
+                                         <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest border-l border-white/10 pl-3">ID: {u.id?.slice(0, 8)}</div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 {/* Mobile inline badges */}
+                                 <div className="flex flex-wrap md:hidden items-center gap-2 mt-2">
+                                    <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-[4px]">{userRole}</span>
+                                 </div>
+                              </div>
+                           </td>
+                           <td className="hidden md:table-cell px-8 py-6">
+                              <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-[10px]">{userRole}</span>
+                           </td>
+                           <td className="hidden md:table-cell px-8 py-6">
+                              <div className="text-[14px] font-black text-white">{u.adsCount || 0}</div>
+                              <div className="text-[8px] font-bold text-white/30 uppercase tracking-widest">OGLASA</div>
+                           </td>
+                           <td className="hidden md:table-cell px-8 py-6">
+                              <div className="text-[18px] font-black text-secondary tracking-tight">
+                                {(u.walletBalance || 0).toLocaleString()} <span className="text-[10px] text-secondary/60">SGK</span>
+                              </div>
+                           </td>
+                           <td className="block md:table-cell md:px-8 pt-4 pb-2 md:py-6 text-right md:flex md:items-center md:justify-end gap-2">
                              <div className="flex gap-2 w-full md:w-auto">
                              <button
                                onClick={() => setFundingUser({ id: u.id, name: userName })}
-                               className="flex-1 md:flex-none h-10 px-4 md:px-0 md:w-10 bg-secondary/10 text-secondary hover:bg-secondary hover:!text-black rounded-[10px] transition-all flex items-center justify-center gap-2 md:gap-0"
+                               className="flex-1 md:flex-none h-10 px-6 bg-white/[0.03] hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-secondary/50 text-secondary rounded-[10px] transition-all duration-300 flex items-center justify-center gap-3 group shadow-[0_4px_15px_rgba(0,0,0,0.2)] hover:shadow-[0_0_20px_rgba(255,215,0,0.15)]"
                                title="Manuelna dopuna novčanika"
                              >
-                                <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
-                                <span className="md:hidden text-[9px] font-black uppercase tracking-widest">Dopuna</span>
+                                <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">account_balance_wallet</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest">Dopuna</span>
                              </button>
                              <button 
                                onClick={() => {
@@ -172,13 +176,14 @@ export function UsersTab(_props: UsersTabProps) {
                                     reason 
                                  });
                                }}
-                               className={`flex-1 md:flex-none h-10 px-4 md:px-0 md:w-10 rounded-[10px] transition-all flex items-center justify-center gap-2 md:gap-0 border ${
-                                 u.status === 'suspended' ? 'bg-green-500/10 text-green-500 border-green-500/30 hover:bg-green-500 hover:text-white' : 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white'
+                               className={`flex-1 md:flex-none w-10 h-10 rounded-[10px] transition-all duration-300 flex items-center justify-center backdrop-blur-md border shadow-[0_4px_15px_rgba(0,0,0,0.2)] group ${
+                                 u.status === 'suspended' 
+                                   ? 'bg-green-500/10 border-green-500/20 text-green-500 hover:bg-green-500/20 hover:border-green-500/40 hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]' 
+                                   : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20 hover:border-red-500/40 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]'
                                }`}
                                title={u.status === 'suspended' ? "Aktiviraj korisnika" : "Suspenduj korisnika"}
                              >
-                                <span className="material-symbols-outlined text-lg">{u.status === 'suspended' ? 'play_arrow' : 'block'}</span>
-                                <span className="md:hidden text-[9px] font-black uppercase tracking-widest">{u.status === 'suspended' ? 'Aktiviraj' : 'Suspenduj'}</span>
+                                <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform drop-shadow-md">{u.status === 'suspended' ? 'play_arrow' : 'block'}</span>
                              </button>
                              </div>
                           </td>

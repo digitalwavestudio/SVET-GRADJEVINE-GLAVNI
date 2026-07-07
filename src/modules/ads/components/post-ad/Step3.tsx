@@ -4,6 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { BENEFITS, ACCOMMODATION_AMENITIES } from '@/src/constants/taxonomy';
 import { COMPANY_MAIN_CATEGORIES, COMPANY_SUB_CATEGORIES } from '@/src/constants/companyTaxonomy';
+import { AiAutofillButton } from '@/src/modules/ads/components/post-ad/AiAutofillButton';
 import { MAX_IMAGE_SIZE_KB, MAX_AD_IMAGES } from '@/src/constants/limits';
 
 export function Step3({
@@ -191,19 +192,22 @@ export function Step3({
       {/* STEP 3 - Others */}
       {selectedCategory !== 'company' && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20">
+          <div className="flex items-center justify-center md:justify-start gap-4 mb-10">
+            <div className="hidden md:flex w-12 h-12 bg-secondary/10 rounded-[10px] items-center justify-center border border-secondary/20">
               <span className="material-symbols-outlined text-secondary">description</span>
             </div>
-            <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Opis i Kontakt</h2>
+            <h2 className="text-3xl font-black uppercase tracking-tight font-headline text-center md:text-left w-full md:w-auto">Opis i Kontakt</h2>
           </div>
           
           <div className="space-y-8">
             <div className="space-y-3">
+              <div className="w-full mb-6">
+                <AiAutofillButton selectedCategory={selectedCategory} />
+              </div>
               <div className="flex justify-between items-end ml-1">
                 <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Detaljan opis posla *</label>
                 <span className={`text-[10px] font-black uppercase tracking-widest ${formData.opis?.length < 50 ? 'text-error' : 'text-secondary'}`}>
-                  {formData.opis?.length || 0} / 3000
+                  {formData.opis?.length || 0} / 1000
                 </span>
               </div>
               <div className="relative group">
@@ -232,9 +236,9 @@ export function Step3({
                     type="tel"
                     {...register('phone')}
                     placeholder="Npr. 0601234567"
-                    className={`w-full bg-white/5 border-2 ${errors.phone ? 'border-error/50' : 'border-white/5'} rounded-[10px] px-6 py-5 text-white focus:border-secondary/50 outline-none transition-all font-bold group-hover:bg-white/[0.08]`}
+                    className={`w-full bg-transparent border ${errors.phone ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} rounded-[10px] px-6 py-5 text-white focus:border-[#ffad3a]/50 focus:bg-[#070d14]/80 focus:shadow-[0_0_20px_rgba(254,191,13,0.1)] outline-none transition-all duration-300 font-bold group-hover:bg-white/[0.06] group-hover:border-white/20 autofill:!bg-transparent autofill:!text-white [-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s] [-webkit-autofill]:[-webkit-text-fill-color:white]`}
                   />
-                  <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-hover:text-secondary transition-colors">call</span>
+                  <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-hover:text-[#ffad3a] transition-colors">call</span>
                 </div>
                 {errors.phone && <p className="text-error text-[10px] font-bold mt-1 ml-1 uppercase tracking-wider">{errors.phone.message as string}</p>}
               </div>
@@ -244,14 +248,22 @@ export function Step3({
                   <button
                     type="button"
                     onClick={() => setValue('viber', !formData.viber)}
-                    className={`flex-1 py-5 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 ${formData.viber ? 'bg-[#7360F2]/10 border-[#7360F2] text-[#7360F2]' : 'bg-white/5 border-white/5 text-on-surface-variant hover:bg-white/10'}`}
+                    className={`flex-1 py-5 rounded-[10px] border transition-all duration-300 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                      formData.viber 
+                        ? 'bg-[#7360F2]/15 border-[#7360F2]/50 text-white shadow-[0_0_20px_rgba(115,96,242,0.25)]' 
+                        : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                    }`}
                   >
                     Viber
                   </button>
                   <button
                     type="button"
                     onClick={() => setValue('whatsapp', !formData.whatsapp)}
-                    className={`flex-1 py-5 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 ${formData.whatsapp ? 'bg-[#25D366]/10 border-[#25D366] text-[#25D366]' : 'bg-white/5 border-white/5 text-on-surface-variant hover:bg-white/10'}`}
+                    className={`flex-1 py-5 rounded-[10px] border transition-all duration-300 font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(0,0,0,0.15)] backdrop-blur-md ${
+                      formData.whatsapp 
+                        ? 'bg-[#25D366]/15 border-[#25D366]/50 text-white shadow-[0_0_20px_rgba(37,211,102,0.25)]' 
+                        : 'bg-white/[0.02] border-white/10 text-white/50 hover:bg-white/[0.06] hover:border-white/20 hover:text-white'
+                    }`}
                   >
                     WhatsApp
                   </button>
@@ -260,10 +272,10 @@ export function Step3({
             </div>
 
             {selectedCategory !== 'job' && (
-            <div className="p-8 bg-white/[0.02] rounded-[10px] border border-white/5 mt-6 group hover:bg-white/[0.04] transition-all">
+            <div className="p-8 bg-white/[0.02] rounded-[12px] border border-white/10 mt-6 group hover:bg-white/[0.04] hover:border-white/20 transition-all backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
               <div className="flex flex-col md:flex-row items-start gap-8">
-                <div className="w-20 h-20 bg-secondary/10 rounded-[10px] flex items-center justify-center shrink-0 border border-secondary/20">
-                  <span className="material-symbols-outlined text-4xl text-secondary">add_photo_alternate</span>
+                <div className="w-20 h-20 bg-secondary/5 rounded-[12px] flex items-center justify-center shrink-0 border border-secondary/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                  <span className="material-symbols-outlined text-4xl text-secondary drop-shadow-[0_0_8px_rgba(254,191,13,0.3)]">add_photo_alternate</span>
                 </div>
                 <div className="flex-1 w-full">
                   <h4 className="text-xl font-black uppercase tracking-tight mb-2 font-headline">Vizuelni identitet oglasa</h4>
@@ -276,12 +288,12 @@ export function Step3({
                     {formData.images?.length > 0 && (
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                         {formData.images.map((img: string, idx: number) => (
-                          <div key={idx} className="relative aspect-square rounded-[10px] overflow-hidden border border-white/10 group/img">
+                          <div key={idx} className="relative aspect-square rounded-[10px] overflow-hidden border border-white/10 group/img shadow-[0_4px_15px_rgba(0,0,0,0.2)]">
                             <img width="800" height="600" decoding="async" src={img} alt="Oglas" className="w-full h-full object-cover" loading="lazy" />
                             <button 
                               type="button"
                               onClick={() => removeImage?.(idx)}
-                              className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-[10px] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                              className="absolute top-1.5 right-1.5 w-7 h-7 bg-black/80 text-white rounded-[8px] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
                             >
                               <span className="material-symbols-outlined text-sm">close</span>
                             </button>
@@ -291,7 +303,7 @@ export function Step3({
                           <button 
                             type="button"
                             onClick={() => document.getElementById('ad-image-upload')?.click()}
-                            className="aspect-square rounded-[10px] border-2 border-dashed border-white/10 flex items-center justify-center hover:border-secondary/50 hover:bg-secondary/5 transition-all"
+                            className="aspect-square rounded-[12px] border border-dashed border-white/20 flex items-center justify-center hover:border-secondary/50 hover:bg-secondary/[0.03] hover:shadow-[0_0_15px_rgba(254,191,13,0.1)] transition-all duration-300"
                           >
                             <span className="material-symbols-outlined text-white/20">add</span>
                           </button>
@@ -312,7 +324,7 @@ export function Step3({
                         <button 
                           type="button"
                           onClick={() => document.getElementById('ad-image-upload')?.click()}
-                          className="bg-white/5 hover:bg-white/10 text-white font-black px-6 py-3 rounded-[10px] transition-all text-[10px] uppercase tracking-widest flex items-center gap-2 border border-white/10"
+                          className="bg-white/[0.03] hover:bg-white/[0.08] text-white font-black px-6 py-3.5 rounded-[10px] transition-all duration-300 text-[10px] uppercase tracking-widest flex items-center gap-2 border border-white/10 hover:border-secondary/50 shadow-[0_4px_15px_rgba(0,0,0,0.15)]"
                         >
                           <span className="material-symbols-outlined text-[18px]">collections</span> Dodaj Slike
                         </button>

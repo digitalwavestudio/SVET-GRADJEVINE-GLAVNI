@@ -335,13 +335,15 @@ export default function JobDetailsPage() {
               <div className="flex items-center gap-2 text-white/40 mb-2">
                 <Wallet size={16} />
                 <span className="text-[10px] font-bold uppercase tracking-wider">
-                  {jobData.salaryType === 'hourly' ? 'Satnica' : 'Mesečna plata'}
+                  {jobData.dinamikaIsplate === 'po-satu' ? 'Satnica' : jobData.dinamikaIsplate === 'mesecna' ? 'Mesečna plata' : 'Kompenzacija'}
                 </span>
               </div>
               <span className="text-lg md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600">
-                  {jobData.plataMin != null
-                    ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} €`
-                    : 'Po dogovoru'}
+                  {jobData.isNegotiable 
+                    ? 'Pozvati' 
+                    : jobData.plataMin != null
+                      ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} €`
+                      : 'Po dogovoru'}
               </span>
             </div>
             
@@ -565,9 +567,9 @@ export default function JobDetailsPage() {
       <StickyDetailCTABar
         phone={jobData.phone || jobData.telefon || jobData.applicationPhone || ''}
         onMessage={handleStartChat}
-        price={jobData.plataMin != null ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''}` : undefined}
-        currency="EUR"
-        priceLabel="PLATA"
+        price={jobData.isNegotiable ? 'Pozvati' : jobData.plataMin != null ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''}` : undefined}
+        currency={jobData.isNegotiable ? '' : 'EUR'}
+        priceLabel={jobData.isNegotiable ? 'CENA' : 'PLATA'}
         ctaText={!hasApplied && !isOwner ? "PRIJAVI SE" : hasApplied ? "PRIJAVLJEN" : undefined}
         onCtaClick={!hasApplied && !isOwner ? handleApply : undefined}
       />

@@ -130,12 +130,12 @@ export default function PostAdPage() {
     }
 
     const allOptions = [
-      { id: "job", title: "Postavljam oglas za posao", subtitle: "ZA FIRME I POSLODAVCE", icon: "work" },
-      { id: "accommodation", title: "Reklamiram smeštaj za radnike", subtitle: "ZA VLASNIKE SMEŠTAJA", icon: "home_work" },
-      { id: "catering", title: "Oglašavam svoje ketering usluge", subtitle: "ZA KETERING SLUŽBE", icon: "restaurant" },
-      { id: "machines", title: "Prodajem ili izdajem mašinu", subtitle: "ZA VLASNIKE MAŠINA", icon: "precision_manufacturing", disabled: true },
-      { id: "plot", title: "Prodajem ili izdajem plac", subtitle: "ZA VLASNIKE PLACA", icon: "landscape", disabled: true },
-      { id: "marketplace", title: "Alat i oprema (Polovno)", subtitle: "POLOVAN ALAT I OPREMA", icon: "build", disabled: true },
+      { id: "job", title: "Postavljam\noglas za posao", subtitle: "", icon: "work" },
+      { id: "accommodation", title: "Reklamiram\nsmeštaj za radnike", subtitle: "", icon: "home_work" },
+      { id: "catering", title: "Oglašavam svoje\nketering usluge", subtitle: "", icon: "restaurant" },
+      { id: "machines", title: "Izdajem ili Prodajem\nGrađevinsku mašinu", subtitle: "", icon: "precision_manufacturing", disabled: true },
+      { id: "plot", title: "Prodajem ili izdajem\nplac ili zemljiste", subtitle: "", icon: "landscape", disabled: true },
+      { id: "marketplace", title: "Alat i oprema\n(Polovno!)", subtitle: "", icon: "build", disabled: true },
     ];
 
     return (
@@ -158,6 +158,8 @@ export default function PostAdPage() {
       />
 
       <div className="absolute inset-0 futuristic-grid opacity-10 pointer-events-none"></div>
+
+      {/* BACKGROUND BLOBS REMOVED AS REQUESTED */}
 
       <div className={`mx-auto px-4 md:px-6 relative z-10 mt-16 transition-all duration-500 ${step === 4 ? 'max-w-7xl' : 'max-w-4xl'}`}>
         <div className="mb-16 text-center">
@@ -211,8 +213,11 @@ export default function PostAdPage() {
         <FormProvider {...methods}>
           <form
             onSubmit={methods.handleSubmit(onFormSubmit as any)}
-            className={step === 4 ? "relative" : "bg-white/[0.03] backdrop-blur-xl p-5 md:p-12 rounded-[10px] border border-white/10 shadow-2xl relative overflow-hidden"}
+            className={step === 4 ? "relative" : "bg-slate-950/40 backdrop-blur-3xl p-4 sm:p-8 md:p-14 rounded-[24px] md:rounded-[32px] border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.6)] relative overflow-hidden"}
           >
+            {step !== 4 && (
+              <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-secondary/40 to-transparent pointer-events-none"></div>
+            )}
             <input
               type="text"
               id="website_url_trap"
