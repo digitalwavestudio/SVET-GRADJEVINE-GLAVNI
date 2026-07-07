@@ -415,14 +415,6 @@ export default function JobDetailsPage() {
               )}
             </div>
           </section>
-
-          <div className="pt-4">
-            <SimilarJobsSlider
-              jobData={jobData}
-              displaySimilarJobs={similarJobs}
-              buildJobUrl={buildJobUrl}
-            />
-          </div>
         </article>
 
         {/* Sidebar */}
@@ -540,6 +532,16 @@ export default function JobDetailsPage() {
           </div>
         </aside>
       </main>
+
+      {similarJobs && similarJobs.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full border-t border-white/5 mt-12 relative z-10">
+          <SimilarJobsSlider
+            jobData={jobData}
+            displaySimilarJobs={similarJobs}
+            buildJobUrl={buildJobUrl}
+          />
+        </div>
+      )}
 
       <JobApplicationModal
         isOpen={showApplicationModal}

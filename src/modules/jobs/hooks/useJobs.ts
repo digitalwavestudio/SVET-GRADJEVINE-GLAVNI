@@ -227,21 +227,17 @@ export function useCheckApplied(jobId: string, userId: string) {
 
 export function useSimilarJobs(
   jobId: string,
-  locationSlug?: string,
-  professionSlug?: string,
+  _locationSlug?: string,
+  _professionSlug?: string,
 ) {
   const filters: Record<string, unknown> = { status: 'active' };
-  if (professionSlug) filters.title = professionSlug;
-  if (locationSlug) filters.location = locationSlug;
-  const hasFilters = !!professionSlug || !!locationSlug;
 
   return useQuery<JobResponse[], Error>({
-    queryKey: [...queryKeys.jobs.similar(jobId), locationSlug, professionSlug],
+    queryKey: queryKeys.jobs.similar(jobId),
     queryFn: async () => {
-      const response = await jobsService.fetchJobs(filters, null, 12);
-      return (response.items || []).filter(j => j.id !== jobId).slice(0, 8);
+      const response = await jobsService.fetchJobs(filters, null, 15);
+      return (response.items || []).filter(j => j.id !== jobId).slice(0, 10);
     },
-    enabled: hasFilters,
     staleTime: 5 * 60 * 1000,
   });
 }

@@ -12,6 +12,61 @@ interface SimilarJobsSliderProps {
 export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: SimilarJobsSliderProps) {
   if (!displaySimilarJobs || displaySimilarJobs.length === 0) return null;
 
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  const [canScrollRight, setCanScrollRight] = React.useState(true);
+
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+    }
+  };
+
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', checkScroll);
+      checkScroll();
+      window.addEventListener('resize', checkScroll);
+    }
+    return () => {
+      if (el) el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [displaySimilarJobs]);
+
+  // Autoplay
+  React.useEffect(() => {
+    let interval: any;
+    if (displaySimilarJobs.length > 0) {
+      interval = setInterval(() => {
+        if (scrollRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+          if (scrollLeft + clientWidth >= scrollWidth - 10) {
+            scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            // Skrolujemo za širinu jedne kartice
+            const firstCard = scrollRef.current.firstElementChild as HTMLElement;
+            const cardWidth = firstCard ? firstCard.clientWidth + 16 : 300;
+            scrollRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
+          }
+        }
+      }, 4000);
+    }
+    return () => clearInterval(interval);
+  }, [displaySimilarJobs]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const firstCard = scrollRef.current.firstElementChild as HTMLElement;
+      const cardWidth = firstCard ? firstCard.clientWidth + 16 : 300;
+      const offset = direction === 'left' ? -cardWidth : cardWidth;
+      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
   const renderBadge = (job: any) => {
     if (job.isPremium) return <span className="flex items-center gap-1 px-2.5 py-1 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-[8px] text-[9px] font-black uppercase tracking-widest shadow-[0_0_12px_rgba(234,179,8,0.2)]"><span className="material-symbols-outlined text-[11px]" style={{fontVariationSettings:"'FILL' 1"}}>hotel_class</span>Premium</span>;
     if (job.isUrgent) return <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-2.5 py-1 rounded-[8px] text-[9px] font-black uppercase tracking-widest">Hitno</span>;
@@ -26,22 +81,43 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
   };
 
   return (
-    <section className="mt-8 w-full" role="region" aria-label="Slični poslovi">
-      <div className="flex items-center justify-between gap-2 mb-6 w-full flex-wrap sm:flex-nowrap">
+    <section className="w-full" role="region" aria-label="Slični poslovi">
+      <div className="flex items-center justify-between gap-4 mb-6 w-full flex-wrap sm:flex-nowrap">
         <h2 className="text-[16px] sm:text-2xl font-black text-white uppercase tracking-tight shrink-0">
           Još sličnih poslova
         </h2>
-        <Link to="/poslovi" className="text-yellow-500 font-bold text-[11px] sm:text-sm uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1 shrink-0">
-          Prikaži sve <span className="material-symbols-outlined text-[16px] sm:text-[20px]">arrow_forward</span>
-        </Link>
+        <div className="flex items-center gap-4 shrink-0 ml-auto">
+          {/* Strelice za navigaciju */}
+          <div className="hidden sm:flex items-center gap-2">
+            <button
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all ${canScrollLeft ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20' : 'bg-transparent border-white/5 text-white/20 cursor-not-allowed'}`}
+              aria-label="Prethodni poslovi"
+            >
+              <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all ${canScrollRight ? 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20' : 'bg-transparent border-white/5 text-white/20 cursor-not-allowed'}`}
+              aria-label="Sledeći poslovi"
+            >
+              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+          <Link to="/poslovi" className="text-yellow-500 font-bold text-[11px] sm:text-sm uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+            Prikaži sve <span className="material-symbols-outlined text-[16px] sm:text-[20px]">arrow_forward</span>
+          </Link>
+        </div>
       </div>
 
-      <div className="flex overflow-x-auto gap-4 sm:gap-6 pb-6 pt-2 px-2 -mx-2 snap-x snap-mandatory scrollbar-hide relative z-20" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div ref={scrollRef} className="flex overflow-x-auto gap-4 pb-6 pt-2 px-2 -mx-2 snap-x snap-mandatory scrollbar-hide relative z-20" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {displaySimilarJobs.map((job, index) => (
           <Link
             key={index}
             to={buildJobUrl(job)}
-            className={`snap-center sm:snap-start shrink-0 group relative rounded-2xl overflow-hidden border transition-all duration-300 w-full sm:w-[350px] ${job.isPremium ? 'border-yellow-500/50 bg-yellow-500/[0.03] shadow-[0_0_40px_rgba(234,179,8,0.05)] hover:bg-yellow-500/[0.05]' : 'bg-[#0B0F19] border-white/10 hover:border-white/20'}`}
+            className={`snap-center sm:snap-start shrink-0 group relative rounded-2xl overflow-hidden border transition-all duration-300 w-[280px] sm:w-[calc((100%-16px)/2)] md:w-[calc((100%-32px)/3)] lg:w-[calc((100%-48px)/4)] ${job.isPremium ? 'border-yellow-500/50 bg-yellow-500/[0.03] shadow-[0_0_40px_rgba(234,179,8,0.05)] hover:bg-yellow-500/[0.05]' : 'bg-[#0B0F19] border-white/10 hover:border-white/20'}`}
             onClick={() => trackEvent()}
           >
             <div className="p-3 sm:p-5 flex flex-col h-full">
