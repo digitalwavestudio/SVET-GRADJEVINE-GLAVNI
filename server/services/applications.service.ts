@@ -49,7 +49,7 @@ export class ApplicationsService {
     if (!withinDailyLimit)
       throw new AppError("Dostigli ste dnevni limit prijava.", 429);
 
-    return await db.runTransaction(async (transaction) => {
+    const result = await db.runTransaction(async (transaction) => {
       // 1. Verify Listing exists
       const adRef = db.collection("listings").doc(adId);
       const adSnap = await transaction.get(adRef);
@@ -129,7 +129,7 @@ export class ApplicationsService {
 
     // Trend tracking van transakcije
     TrendTracker.recordApplication(employerId).catch(() => {});
-    return { id: appId };
+    return { id: result.id };
   }
 
   static async updateApplicationStatus(

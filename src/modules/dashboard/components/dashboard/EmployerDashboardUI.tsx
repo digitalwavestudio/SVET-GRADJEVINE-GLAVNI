@@ -56,64 +56,59 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
       variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } }}}
       className="flex flex-col gap-12"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 md:p-10">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-secondary text-sm">dashboard</span>
-                <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Komandni centar</h4>
-              </div>
-              <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-sm">
-                Pratite koliko radnika je pregledalo vaše objavljene poslove i koliko njih se prijavilo.
-              </p>
+      <div className="w-full bg-[#0A0F14] border border-white/5 rounded-[10px] p-6 md:p-10">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="material-symbols-outlined text-secondary text-sm">dashboard</span>
+              <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Komandni centar</h4>
             </div>
+            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-sm">
+              Pratite koliko radnika je pregledalo vaše objavljene poslove i koliko njih se prijavilo.
+            </p>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex p-1 bg-white/[0.02] border border-white/5 rounded-[8px]">
-                <button 
-                  onClick={() => setTimeframe('day')}
-                  className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'day' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                >
-                  Dan
-                </button>
-                <button 
-                  onClick={() => setTimeframe('week')}
-                  className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'week' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                >
-                  7 Dana
-                </button>
-                <button 
-                  onClick={() => setTimeframe('month')}
-                  className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'month' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
-                >
-                  30 Dana
-                </button>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="flex p-1 bg-white/[0.02] border border-white/5 rounded-[8px]">
+              <button 
+                onClick={() => setTimeframe('day')}
+                className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'day' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+              >
+                Dan
+              </button>
+              <button 
+                onClick={() => setTimeframe('week')}
+                className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'week' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+              >
+                7 Dana
+              </button>
+              <button 
+                onClick={() => setTimeframe('month')}
+                className={`px-4 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest transition-all ${timeframe === 'month' ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+              >
+                30 Dana
+              </button>
             </div>
           </div>
-          <DashboardGuard variant="inline" title="Greška u grafikonu poseta">
-            <Suspense fallback={<ChartSkeleton />}>
-              <DashboardCharts data={charts?.dailyAnalytics?.map(d => ({
-                name: d.date,
-                prijave: d.applications,
-                pregledi: d.views
-              }))} />
-            </Suspense>
-          </DashboardGuard>
         </div>
-
-        <div className="lg:col-span-1">
-        </div>
-
-        <Suspense fallback={null}>
-          <PaymentInstructionsModal 
-            isOpen={!!selectedAdForPayment} 
-            onClose={() => setSelectedAdForPayment(null)} 
-            ad={selectedAdForPayment} 
-          />
-        </Suspense>
+        <DashboardGuard variant="inline" title="Greška u grafikonu poseta">
+          <Suspense fallback={<ChartSkeleton />}>
+            <DashboardCharts data={charts?.dailyAnalytics?.map(d => ({
+              name: d.date,
+              prijave: d.applications,
+              pregledi: d.views
+            }))} />
+          </Suspense>
+        </DashboardGuard>
       </div>
+
+      <Suspense fallback={null}>
+        <PaymentInstructionsModal 
+          isOpen={!!selectedAdForPayment} 
+          onClose={() => setSelectedAdForPayment(null)} 
+          ad={selectedAdForPayment} 
+        />
+      </Suspense>
 
                 <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 }}} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
           <div className="flex items-center gap-4 w-full sm:w-auto">
