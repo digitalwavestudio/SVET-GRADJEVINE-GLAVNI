@@ -4,6 +4,7 @@ import { AdminStatsService } from "./admin/admin-stats.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError, NotFoundError } from "../utils/appError.ts";
 import { RateLimiterService } from "./rate-limiter.service.ts";
+import { TrendTracker } from "./trend-tracker.service.ts";
 
 export class ApplicationsService {
   private static logger = new Logger({ service: "ApplicationsService" });
@@ -123,8 +124,12 @@ export class ApplicationsService {
         version: 1,
       });
 
-      return { id: appId };
+      return { id: appId, employerId };
     });
+
+    // Trend tracking van transakcije
+    TrendTracker.recordApplication(employerId).catch(() => {});
+    return { id: appId };
   }
 
   static async updateApplicationStatus(
