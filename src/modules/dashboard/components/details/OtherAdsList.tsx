@@ -72,30 +72,29 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-black text-white uppercase tracking-tight mb-1 group-hover:text-secondary transition-colors whitespace-pre-wrap break-words leading-tight">{ad.title || ad.adTitle || ad.name}</h3>
-                  <div className="flex flex-col gap-1 mt-1.5">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                      <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{ad.typeLabel}</span>
-                      
-                      {ad.createdAt && (
-                        <span className="text-[9px] font-bold text-white/20 uppercase tracking-wider flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5" title="Datum postavljanja">
-                          <span className="material-symbols-outlined text-[11px] text-white/30">calendar_today</span>
-                          Objavljeno: {(() => {
-                            const date = ad.createdAt?.toDate ? ad.createdAt.toDate() : new Date(ad.createdAt);
-                            return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
-                          })()}
-                        </span>
-                      )}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5 text-[10px] font-bold">
+                    <span className="text-white/40 uppercase tracking-widest shrink-0">{ad.typeLabel}</span>
+                    
+                    {ad.createdAt && (
+                      <span className="text-white/60 uppercase tracking-wider flex items-center gap-1 shrink-0" title="Datum postavljanja">
+                        <span className="material-symbols-outlined text-[12px] text-white/40">calendar_today</span>
+                        Objavljeno: {(() => {
+                          const date = ad.createdAt?.toDate ? ad.createdAt.toDate() : new Date(ad.createdAt);
+                          return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
+                        })()}
+                      </span>
+                    )}
 
-                      {ad.createdAt && (
-                        <span className="text-[9px] font-bold text-white/20 uppercase tracking-wider flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5" title="Datum isteka oglasa">
-                          <span className="material-symbols-outlined text-[11px] text-white/30">event_busy</span>
-                          Ističe: {(() => {
-                            const date = ad.createdAt?.toDate ? ad.createdAt.toDate() : new Date(ad.createdAt);
-                            const expDate = new Date(date.getTime() + 30 * 24 * 60 * 60 * 1000);
-                            return expDate.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
-                          })()}
-                        </span>
-                      )}
+                    {ad.createdAt && (
+                      <span className="text-white/60 uppercase tracking-wider flex items-center gap-1 shrink-0" title="Datum isteka oglasa">
+                        <span className="material-symbols-outlined text-[12px] text-white/40">event_busy</span>
+                        Ističe: {(() => {
+                          const date = ad.createdAt?.toDate ? ad.createdAt.toDate() : new Date(ad.createdAt);
+                          const expDate = new Date(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+                          return expDate.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
+                        })()}
+                      </span>
+                    )}
 
                       {ad.collName === 'companies' && (
                         <div className="flex items-center gap-1.5">
@@ -136,7 +135,6 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                     </div>
                   </div>
                 </div>
-              </div>
 
               <div className="mt-2 md:mt-0 flex md:block items-center justify-between md:col-span-2 md:text-center">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">STATUS</span>
