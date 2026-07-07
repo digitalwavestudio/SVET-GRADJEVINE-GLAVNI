@@ -293,6 +293,13 @@ export class AdminStatsService {
         .get();
       const activeJobs = activeJobsSnap.data().count;
 
+      // 1c. Ukupno aktivnih oglasa
+      const activeAdsSnap = await db.collection("listings")
+        .where("status", "==", "active")
+        .count()
+        .get();
+      const activeAds = activeAdsSnap.data().count;
+
       // 2. Revenue & Premium Sampling with strict BATCHING and LIMIT (PROMPT 9)
       // Instead of an uncapped scan, we use limit(100) as requested.
       const premiumSnap = await db.collection("listings")
@@ -315,6 +322,7 @@ export class AdminStatsService {
       const reconciledStats = {
         totalJobs: counts.total_jobs || 0,
         activeJobs,
+        activeAds,
         companiesCount: companiesSnap.data().count,
         machinesCount: counts.total_machines || 0,
         accommodationsCount: counts.total_accommodations || 0,

@@ -29,7 +29,7 @@ export function AdminStatsGrid() {
 
   const statCards = [
     {
-      label: "UKUPNO AKTIVNIH",
+      label: "AKTIVNI OGLASI",
       value: activeAds,
       icon: "campaign",
       color: "blue",
