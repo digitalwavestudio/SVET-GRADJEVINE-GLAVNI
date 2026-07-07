@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { useMemo, useEffect, useState } from 'react';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import { useInView } from 'react-intersection-observer';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@/src/modules/core';
 import { useAuth } from '@/src/context/AuthContext';
 import { getJobLink } from '@/src/lib/routeFilters';
@@ -10,6 +10,8 @@ import { useMyApplicationsNode } from '@/src/modules/dashboard/hooks/useMyApplic
 
 export default function MyApplicationsPage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const filterJobId = searchParams.get('jobId');
   const [localQuery, setLocalQuery] = useState('');
   const debouncedQuery = useDebounce(localQuery, 400);
   
@@ -40,6 +42,7 @@ export default function MyApplicationsPage() {
     if (!user) return [];
     
     return applications
+      .filter(app => !filterJobId || app.jobId === filterJobId)
       .map(app => {
         const job = jobs.find(j => j.id === app.jobId);
         
@@ -79,7 +82,7 @@ export default function MyApplicationsPage() {
           jobId: app.jobId,
         };
       });
-  }, [applications, jobs, user]);
+  }, [applications, jobs, user, filterJobId]);
 
   return (
     <DashboardLayout>
@@ -90,9 +93,17 @@ export default function MyApplicationsPage() {
             animate={{ opacity: 1, x: 0 }}
           >
             <h1 className="text-4xl font-black tracking-tighter uppercase mb-1">MOJE PRIJAVE</h1>
-            <div className="flex items-center gap-2 text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">
-              <span className="w-2 h-2 rounded-full bg-secondary"></span>
-              PRATITE STATUS VAŠIH KONKURSA U REALNOM VREMENU
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">
+                <span className="w-2 h-2 rounded-full bg-secondary"></span>
+                PRATITE STATUS VAŠIH KONKURSA U REALNOM VREMENU
+              </div>
+              {filterJobId && (
+                <div className="flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-md px-2 py-0.5 md:ml-2">
+                  <span className="text-[9px] font-black text-secondary uppercase tracking-wider">FILTRIRANO PO OGLASU</span>
+                  <Link to="/moj-profil/prijave" className="text-[9px] font-black text-white hover:text-secondary uppercase tracking-wider underline">PRIKAŽI SVE</Link>
+                </div>
+              )}
             </div>
           </motion.div>
 

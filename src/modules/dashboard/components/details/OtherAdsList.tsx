@@ -27,12 +27,12 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
       )}
       <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] overflow-hidden">
         <div className="hidden md:block p-8 border-b border-white/5 bg-white/[0.01]">
-          <div className="grid grid-cols-6 gap-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">
-            <div className="col-span-2">NASLOV I TIP</div>
-            <div>STATUS</div>
-            <div>PREGLEDI</div>
-            <div>PRIJAVE / UPITI</div>
-            <div className="text-right">AKCIJE</div>
+          <div className="grid grid-cols-12 gap-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">
+            <div className="col-span-4">NASLOV I TIP</div>
+            <div className="col-span-2 text-center">STATUS</div>
+            <div className="col-span-1 text-center">PREGLEDI</div>
+            <div className="col-span-1 text-center">PRIJAVE / UPITI</div>
+            <div className="col-span-4 text-right">AKCIJE</div>
           </div>
         </div>
         
@@ -54,9 +54,9 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                   damping: 28,
                   mass: 0.8
                 }}
-                className="p-4 md:p-8 flex flex-col md:grid md:grid-cols-6 gap-4 md:items-center border-b border-white/5 md:border-0 hover:bg-white/[0.02] transition-all group"
+                className="p-4 md:p-8 flex flex-col md:grid md:grid-cols-12 gap-4 md:items-center border-b border-white/5 md:border-0 hover:bg-white/[0.02] transition-all group"
               >
-              <div className="md:col-span-2 flex flex-row items-start gap-4 md:gap-6">
+              <div className="md:col-span-4 flex flex-row items-start gap-4 md:gap-6">
                 <div className="w-12 h-12 md:w-14 md:h-14 bg-white/5 rounded-[10px] flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-secondary/30 transition-all font-black text-white/20 text-xl group-hover:bg-secondary/10 group-hover:text-secondary shrink-0">
                   {ad.logo ? (
                     <OptimizedImage 
@@ -72,83 +72,107 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-black text-white uppercase tracking-tight mb-1 group-hover:text-secondary transition-colors whitespace-pre-wrap break-words leading-tight">{ad.title || ad.adTitle || ad.name}</h3>
-                  <div className="flex items-center gap-3">
-                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{ad.typeLabel}</p>
-                    {ad.collName === 'companies' && (
-                      <div className="flex items-center gap-1.5">
-                        {((ad.portfolioImages?.length ?? 0) > 0 || (ad.references?.length ?? 0) > 0 || (ad.licenses?.length ?? 0) > 0 || (ad.certifications?.length ?? 0) > 0) && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-[8px] font-black text-blue-400 uppercase tracking-tight" title="Proširen B2B profil">
-                            <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>corporate_fare</span>
-                            Enriched
-                          </span>
-                        )}
-                        {(ad.portfolioImages?.length ?? 0) > 0 && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-secondary/10 border border-secondary/20 rounded text-[8px] font-black text-secondary uppercase tracking-tight">
-                            <span className="material-symbols-outlined text-[10px]">photo_library</span>
-                            {ad.portfolioImages?.length}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {ad.collName === 'accommodations' && (
-                      <div className="flex items-center gap-1.5">
-                        {(ad.invoiceAvailable || ad.parkingAvailable || ad.truckAccess) && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-[8px] font-black text-blue-400 uppercase tracking-tight" title="B2B Smeštaj">
-                            <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
-                            B2B Ready
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {ad.collName === 'catering' && (
-                      <div className="flex items-center gap-1.5">
-                        {(ad.invoiceAvailable || ad.haccpCertified || ad.packagingIncluded || (ad.dailyCapacityMeals ?? 0) > 0) && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-[8px] font-black text-orange-400 uppercase tracking-tight" title="B2B Ketering">
-                            <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>restaurant</span>
-                            B2B Ready
-                          </span>
-                        )}
-                      </div>
-                    )}
+                  <div className="flex flex-col gap-1 mt-1.5">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                      <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{ad.typeLabel}</span>
+                      
+                      {ad.createdAt && (
+                        <span className="text-[9px] font-bold text-white/20 uppercase tracking-wider flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5" title="Datum postavljanja">
+                          <span className="material-symbols-outlined text-[11px] text-white/30">calendar_today</span>
+                          Objavljeno: {(() => {
+                            const date = ad.createdAt?.toDate ? ad.createdAt.toDate() : new Date(ad.createdAt);
+                            return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
+                          })()}
+                        </span>
+                      )}
+
+                      {ad.createdAt && (
+                        <span className="text-[9px] font-bold text-white/20 uppercase tracking-wider flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5" title="Datum isteka oglasa">
+                          <span className="material-symbols-outlined text-[11px] text-white/30">event_busy</span>
+                          Ističe: {(() => {
+                            const date = ad.createdAt?.toDate ? ad.createdAt.toDate() : new Date(ad.createdAt);
+                            const expDate = new Date(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+                            return expDate.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
+                          })()}
+                        </span>
+                      )}
+
+                      {ad.collName === 'companies' && (
+                        <div className="flex items-center gap-1.5">
+                          {((ad.portfolioImages?.length ?? 0) > 0 || (ad.references?.length ?? 0) > 0 || (ad.licenses?.length ?? 0) > 0 || (ad.certifications?.length ?? 0) > 0) && (
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-[8px] font-black text-blue-400 uppercase tracking-tight" title="Proširen B2B profil">
+                              <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>corporate_fare</span>
+                              Enriched
+                            </span>
+                          )}
+                          {(ad.portfolioImages?.length ?? 0) > 0 && (
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 bg-secondary/10 border border-secondary/20 rounded text-[8px] font-black text-secondary uppercase tracking-tight">
+                              <span className="material-symbols-outlined text-[10px]">photo_library</span>
+                              {ad.portfolioImages?.length}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {ad.collName === 'accommodations' && (
+                        <div className="flex items-center gap-1.5">
+                          {(ad.invoiceAvailable || ad.parkingAvailable || ad.truckAccess) && (
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-[8px] font-black text-blue-400 uppercase tracking-tight" title="B2B Smeštaj">
+                              <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
+                              B2B Ready
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {ad.collName === 'catering' && (
+                        <div className="flex items-center gap-1.5">
+                          {(ad.invoiceAvailable || ad.haccpCertified || ad.packagingIncluded || (ad.dailyCapacityMeals ?? 0) > 0) && (
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-[8px] font-black text-orange-400 uppercase tracking-tight" title="B2B Ketering">
+                              <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>restaurant</span>
+                              B2B Ready
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-2 md:mt-0 flex md:block items-center justify-between">
+              <div className="mt-2 md:mt-0 flex md:block items-center justify-between md:col-span-2 md:text-center">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">STATUS</span>
-                <DashboardAdStatusBadge status={ad.status} />
+                <div className="inline-block"><DashboardAdStatusBadge status={ad.status} /></div>
               </div>
               
-              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter">
+              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter md:col-span-1 md:text-center">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">PREGLEDI</span>
                 {ad.viewsCount || 0}
               </div>
 
-              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter">
+              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter md:col-span-1 md:text-center">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">PRIJAVE / UPITI</span>
                 {ad.applicantsCount || 0}
               </div>
               
-                <div className="text-right flex justify-start md:justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t border-white/5 md:border-0">
+              <div className="md:col-span-4 text-right flex flex-row items-center justify-start md:justify-end gap-3 mt-4 md:mt-0 pt-4 md:pt-0 border-t border-white/5 md:border-0 w-full min-w-0">
                 {ad.collName === 'companies' && (
                   <Link 
                     to={`/firma/${ad.id}`} 
-                    className="w-10 h-10 rounded-[10px] bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all"
+                    className="w-8 h-8 rounded-[8px] bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all shrink-0"
                     title="Pogledaj profil"
                   >
-                    <span className="material-symbols-outlined text-lg">visibility</span>
+                    <span className="material-symbols-outlined text-base">visibility</span>
                   </Link>
                 )}
                   
-                  <DashboardAdActions 
-                    ad={ad} 
-                    size="sm" 
-                    collection={ad.collName || ''} 
-                    onPromote={onPromote} 
-                    onApprove={onApprove} 
-                    onDelete={onDelete} 
-                  />
-                </div>
+                <DashboardAdActions 
+                  ad={ad} 
+                  size="sm" 
+                  collection={ad.collName || ''} 
+                  onPromote={onPromote} 
+                  onApprove={onApprove} 
+                  onDelete={onDelete} 
+                />
+              </div>
             </motion.div>
             );
           })}

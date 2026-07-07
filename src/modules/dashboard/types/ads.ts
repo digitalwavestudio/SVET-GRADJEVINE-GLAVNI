@@ -42,4 +42,6 @@ export interface MachineAdData {
   haccpCertified?: boolean;
   packagingIncluded?: boolean;
   dailyCapacityMeals?: number;
+  createdAt?: any;
+  expiresAt?: any;
 }
