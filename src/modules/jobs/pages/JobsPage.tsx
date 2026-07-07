@@ -605,11 +605,12 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
               <div className="flex items-start gap-4">
                 <div className="w-[8px] h-16 bg-secondary mt-1"></div>
                 <div>
-                  <h3 className="text-[38px] leading-[36px] font-black text-white uppercase tracking-tighter italic">
+                  <h3 className="text-[35px] md:text-[38px] leading-[36px] font-black text-white uppercase tracking-tighter italic">
                     Aktivna <br /> <span className="text-secondary">Ponuda</span>
                   </h3>
                   <p className="text-[10px] font-black mt-2 tracking-[0.3em] uppercase">
-                    <span className="text-white/40">UKUPNO PRONAĐENO:</span> <span className="text-secondary">{activeJobsCount} OGLASA</span>
+                    <span className="text-white/40">UKUPNO PRONAĐENO:</span><br />
+                    <span className="text-secondary">{activeJobsCount} OGLASA</span>
                   </p>
                 </div>
               </div>

@@ -23,17 +23,8 @@ export default function ProfileHealth({ score, hideButton }: ProfileHealthProps)
             {score}% <span className="text-blue-500">KOMPLETAN</span>
           </div>
         </div>
-        <div className="relative w-16 h-16">
-          <svg className="w-full h-full transform -rotate-90">
-            <circle
-              cx="32"
-              cy="32"
-              r="28"
-              stroke="currentColor"
-              strokeWidth="4"
-              fill="transparent"
-              className="text-white/5"
-            />
+        <div className="relative w-20 h-20 md:w-16 md:h-16">
+          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
             <circle
               cx="32"
               cy="32"

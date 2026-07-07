@@ -19,7 +19,7 @@ export default function JobsSection({ latestJobs = [] }: any) {
             <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Pogledajte sveže oglase za posao u građevinskoj industriji.</p>
             <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
           </div>
-          <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/poslovi">
+          <Link className="text-secondary font-bold hidden md:flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/poslovi">
             Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
           </Link>
         </div>
@@ -42,7 +42,7 @@ export default function JobsSection({ latestJobs = [] }: any) {
 
         <Link
           to="/postavi-oglas"
-          className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+          className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 h-[56px] sm:h-[68px] rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center text-center shadow-gold-glow-subtle"
         >
           POSTAVI OGLAS ZA POSAO
         </Link>

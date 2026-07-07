@@ -11,7 +11,7 @@ export default function Footer() {
   const { logoUrl } = useBrandLogo();
 
   return (
-    <footer role="contentinfo" className="bg-[#070b14] w-full pt-4 md:pt-14 pb-25 md:pb-10 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
+     <footer role="contentinfo" className="bg-[#070b14] w-full pt-4 md:pt-14 pb-4 md:pb-10 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       {/* Background glow removed as per request */}
       <div className="max-w-[1920px] mx-auto w-full relative z-10">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8 lg:gap-8 mb-4 lg:mb-6">
@@ -177,7 +177,7 @@ export default function Footer() {
             </div>
 
             {/* Right: Copyright */}
-            <div className="text-blue-400 text-[11px] font-bold uppercase tracking-widest text-center lg:text-right whitespace-nowrap mb-8 md:mb-0">
+            <div className="text-blue-400 text-[11px] font-bold uppercase tracking-widest text-center lg:text-right whitespace-normal lg:whitespace-nowrap mb-8 md:mb-0 max-w-[240px] mx-auto lg:mx-0 lg:max-w-none">
               © {new Date().getFullYear()} SVET GRAĐEVINE. SVA PRAVA ZADRŽANA.
             </div>
           </div>

@@ -416,14 +416,14 @@ export default function Navbar() {
                         }
                         setIsOpen(false);
                       }}
-                      className={`group/item relative flex items-center gap-3 py-3 px-4 min-h-12 rounded-xl text-sm font-bold transition-all duration-200 justify-start ${link.disabled ? 'group/tooltip cursor-not-allowed opacity-70' : ''} ${
+                      className={`group/item relative flex items-center gap-2.5 py-2.5 px-3 min-h-10 rounded-xl text-xs font-bold transition-all duration-200 justify-start ${link.disabled ? 'group/tooltip cursor-not-allowed opacity-70' : ''} ${
                         active && !link.disabled
                           ? "bg-secondary/10 text-white"
                           : "text-slate-300 hover:bg-white/5 hover:text-white"
                       }`}
                     >
                       <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active && !link.disabled ? "h-7 bg-secondary" : "h-0 bg-secondary group-hover/item:h-6"}`} />
-                      <span className={`material-symbols-outlined text-[22px] transition-all duration-200 ${active && !link.disabled ? "text-secondary opacity-100" : "opacity-50 group-hover/item:opacity-100 group-hover/item:text-secondary group-hover/item:scale-110"}`}>{link.icon}</span>
+                      <span className={`material-symbols-outlined text-[18px] transition-all duration-200 ${active && !link.disabled ? "text-secondary opacity-100" : "opacity-50 group-hover/item:opacity-100 group-hover/item:text-secondary group-hover/item:scale-110"}`}>{link.icon}</span>
                       <span className="uppercase tracking-wider flex-1">{link.label}</span>
                       {link.disabled && renderDisabledTooltip(true)}
                     </Link>
@@ -440,18 +440,18 @@ export default function Navbar() {
                     <a
                       href="/kontrolna-tabla"
                       onClick={() => setIsOpen(false)}
-                      className="w-full py-4 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-sm flex items-center justify-center gap-2 transition-all duration-200"
+                      className="w-full py-3 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-xs flex items-center justify-center gap-2 transition-all duration-200"
                     >
-                      <span className="material-symbols-outlined text-lg">dashboard</span>
+                      <span className="material-symbols-outlined text-base">dashboard</span>
                       KONTROLNA TABLA
                     </a>
                   ) : (
                     <a
                       href="/prijava"
                       onClick={() => setIsOpen(false)}
-                      className="w-full py-4 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-sm flex items-center justify-center gap-2 transition-all duration-200"
+                      className="w-full py-3 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-xs flex items-center justify-center gap-2 transition-all duration-200"
                     >
-                      <span className="material-symbols-outlined text-lg">login</span>
+                      <span className="material-symbols-outlined text-base">login</span>
                       PRIJAVI SE
                     </a>
                   )}
@@ -461,9 +461,9 @@ export default function Navbar() {
               <a
                 href="/postavi-oglas"
                 onClick={() => setIsOpen(false)}
-                className="w-full py-4 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-2xl text-center font-black uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:-translate-y-0.5 transition-all duration-200 mt-1 mb-safe-bottom"
+                className="w-full py-3 bg-gradient-to-br from-[#FEBF0D] to-[#F8A010] !text-black rounded-2xl text-center font-black uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:-translate-y-0.5 transition-all duration-200 mt-1 mb-safe-bottom"
               >
-                <span className="material-symbols-outlined text-lg">add_circle</span>
+                <span className="material-symbols-outlined text-base">add_circle</span>
                 Postavi Oglas
               </a>
             </div>

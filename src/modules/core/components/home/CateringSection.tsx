@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { UI_TOKENS } from '@/src/lib/uiTokens';
 
 export default function CateringSection({ latestAccommodations = [], latestCaterings = [] }: any) {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Obezbedite kvalitetan smeštaj i odmor vašim timovima blizu gradilišta.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/smestaj">
+            <Link className="text-secondary font-bold hidden md:flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/smestaj">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
@@ -81,7 +80,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
           </div>
           <Link 
             to="/postavi-oglas"
-            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 h-[56px] sm:h-[68px] rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center text-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA SMEŠTAJ
           </Link>
@@ -101,7 +100,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Topli obroci i redovna ishrana obezbeđeni direktno na radnom mestu.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/ketering">
+            <Link className="text-secondary font-bold hidden md:flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/ketering">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
@@ -191,7 +190,7 @@ export default function CateringSection({ latestAccommodations = [], latestCater
           </div>
           <Link 
             to="/postavi-oglas"
-            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 h-[56px] sm:h-[68px] rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center text-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA KETERING
           </Link>

@@ -8,20 +8,15 @@ import { useDashboardMetrics, useDashboardTrends } from '@/src/modules/dashboard
 import ChartSkeleton from '@/src/modules/dashboard/components/dashboard/ChartSkeleton';
 import { SyncIndicator } from '@/src/modules/dashboard/components/dashboard/SyncIndicator';
 import { RecentAd, ChartTrendData } from '../../types';
-import { useAuth } from '@/src/context/AuthContext';
-import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
-import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
 
 const DashboardCharts = lazy(() => import('@/src/modules/dashboard/components/DashboardCharts'));
 const PaymentInstructionsModal = lazy(() => import('@/src/modules/ads/components/ads/PaymentInstructionsModal').then(module => ({ default: module.PaymentInstructionsModal })));
 
 const EmployerDashboardUI = memo(function EmployerDashboardUI() {
-  const { user } = useAuth();
   const { data: statsData } = useDashboardMetrics();
   const { data: trends = [] } = useDashboardTrends();
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<RecentAd | null>(null);
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('month');
-  const profileScore = calculateProfileScore(user);
 
   const recentAds: RecentAd[] = Array.isArray(statsData?.recentAds) 
     ? statsData.recentAds.map((ad) => ({
@@ -66,8 +61,8 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="material-symbols-outlined text-secondary text-sm">monitoring</span>
-                <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Statistika vaših oglasa</h4>
+                <span className="material-symbols-outlined text-secondary text-sm">dashboard</span>
+                <h4 className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Komandni centar</h4>
               </div>
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest max-w-sm">
                 Pratite koliko radnika je pregledalo vaše objavljene poslove i koliko njih se prijavilo.
@@ -108,10 +103,7 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
           </DashboardGuard>
         </div>
 
-        <div className="lg:col-span-1 flex flex-col justify-stretch">
-          <DashboardGuard variant="inline" title="Zdravlje profila">
-            <ProfileHealth score={profileScore} hideButton={false} />
-          </DashboardGuard>
+        <div className="lg:col-span-1">
         </div>
 
         <Suspense fallback={null}>
@@ -147,6 +139,16 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
              </div>
           </div>
 
+          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-purple-400/30 transition-all flex flex-col justify-between min-h-[130px]">
+             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">PREMIUM OGLASI</div>
+             <div>
+               <div className="text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter">
+                  {statsData?.premiumAdsCount !== undefined ? statsData.premiumAdsCount : "0"}
+               </div>
+               <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KUPLJENI ARTIKLI</div>
+             </div>
+           </div>
+
           <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-emerald-500/30 transition-all flex flex-col justify-between min-h-[130px]">
              <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">AKTIVNI PAKET</div>
              <div>
@@ -156,16 +158,6 @@ const EmployerDashboardUI = memo(function EmployerDashboardUI() {
                 <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest leading-tight">
                   {statsData?.activePackage && statsData.activePackage !== "Nema paketa" ? "AKTIVAN PAKET" : "PREMIUM PROMOCIJE"}
                </div>
-             </div>
-          </div>
-
-          <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-5 lg:p-6 group hover:border-purple-400/30 transition-all flex flex-col justify-between min-h-[130px]">
-             <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">PREMIUM OGLASI</div>
-             <div>
-               <div className="text-3xl lg:text-4xl font-black text-purple-400 tracking-tighter">
-                  {statsData?.premiumAdsCount !== undefined ? statsData.premiumAdsCount : "0"}
-               </div>
-               <div className="text-[8px] font-bold text-white/20 uppercase mt-1 tracking-widest">KUPLJENI ARTIKLI</div>
              </div>
           </div>
 

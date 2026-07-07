@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { CalendarWidget } from '@/src/modules/real_estate/components/construction/CalendarWidget';
 import { DayReportModal } from '@/src/modules/real_estate/components/construction/DayReportModal';
@@ -13,17 +13,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/src/lib/apiClient';
 
 import { ConstructionStatsGrid } from '@/src/modules/real_estate/components/construction/ConstructionStatsGrid';
-import { WeatherConditionsWidget } from '@/src/modules/real_estate/components/construction/WeatherConditionsWidget';
-import { MapRadarWidget } from '@/src/modules/real_estate/components/construction/MapRadarWidget';
 import { DigitalDiaryWidget } from '@/src/modules/real_estate/components/construction/DigitalDiaryWidget';
 import { PayrollWidget } from '@/src/modules/real_estate/components/construction/PayrollWidget';
-import { PortfolioGridWidget } from '@/src/modules/real_estate/components/construction/PortfolioGridWidget';
-import { LiveFeedWidget } from '@/src/modules/real_estate/components/construction/LiveFeedWidget';
 
 import { WorkerStatus, CalendarEvent, DayData } from '@/src/modules/real_estate/components/construction/types';
 
 export default function ConstructionSitePage() {
-  const mapRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   const { user } = useAuth();
@@ -148,9 +143,6 @@ export default function ConstructionSitePage() {
     }
   });
 
-  // Moving state
-  const [workerToMove, setWorkerToMove] = useState<string | null>(null);
-
   // Helper da bezbedno vadimo trenutne radnike
   const workers = siteWorkers[activeSiteId] || [];
   const resources = siteResources[activeSiteId] || [];
@@ -216,20 +208,6 @@ export default function ConstructionSitePage() {
   const updateWorker = async (id: string, field: keyof WorkerStatus, value: unknown) => {
     if (!activeSiteId) return;
     updateWorkerMutation.mutate({ id, data: { [field]: value } });
-  };
-
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!workerToMove || !mapRef.current) return;
-
-    const rect = mapRef.current.getBoundingClientRect();
-    let newX = ((e.clientX - rect.left) / rect.width) * 100;
-    let newY = ((e.clientY - rect.top) / rect.height) * 100;
-
-    newX = Math.max(2, Math.min(98, newX));
-    newY = Math.max(2, Math.min(98, newY));
-
-    updateWorker(workerToMove, 'location', { x: newX, y: newY });
-    setWorkerToMove(null); // Završeno premeštanje
   };
 
   const handleDeleteSite = async (id: string, e: React.MouseEvent) => {
@@ -563,42 +541,6 @@ export default function ConstructionSitePage() {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* VREMENSKI I TERENSKI USLOVI WIDGET */}
-        <WeatherConditionsWidget />
-
-        {/* MAP RADAR SECTION - VRACEN I UNAPREDJEN */}
-        {!isAllSites && (
-          <MapRadarWidget 
-             workers={workers}
-             workerToMove={workerToMove}
-             setWorkerToMove={setWorkerToMove}
-             mapRef={mapRef}
-             handleMapClick={handleMapClick}
-             getHours={getHours}
-          />
-        )}
-
-        {/* PORTFOLIO GRID + LIVE FEED - uvek vidljivi */}
-        <div className="flex flex-col xl:flex-row gap-6 mt-4">
-           <PortfolioGridWidget 
-              sites={sites}
-              siteWorkers={siteWorkers}
-              siteResources={siteResources}
-              setActiveSiteId={(id) => setActiveSiteId(id || '')}
-              handleAddSite={handleAddSite}
-              getHours={getHours}
-           />
-
-           <LiveFeedWidget 
-              setIsHistoryModalOpen={setIsHistoryModalOpen}
-              sites={sites}
-              siteWorkers={siteWorkers}
-              diaryLogs={diaryLogs}
-              events={events}
-              today={today}
-           />
         </div>
 
         {/* Site-specific widgets */}

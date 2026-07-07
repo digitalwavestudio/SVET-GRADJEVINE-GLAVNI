@@ -23,106 +23,106 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
   const proRoles = [
     {
       slug: 'majstor',
-      title: 'JA SAM MAJSTOR / RADNIK',
+      title: 'MAJSTOR / RADNIK',
       subtitle: 'PRONAĐI POSAO & KLIJENTE',
-      description: 'Napravite digitalni profil, istaknite svoje veštine, CV i portfolio radova. Budite vidljivi poslodavcima u najvećoj bazi građevinskih radnika na Balkanu.',
+      description: 'Napravite profesionalni profil, predstavite svoje iskustvo i pronađite nove poslovne prilike u građevinskoj industriji.',
       icon: 'engineering',
       color: 'text-amber-400 border-amber-500/20 hover:border-amber-400 hover:shadow-amber-500/10',
       bgGlow: 'bg-amber-500/10',
       tagColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
       btnBg: 'bg-amber-400 !text-black hover:bg-amber-300',
-      benefits: ['Lični online portfolio radova', 'Direktan kontakt sa firmama', 'Bez posrednika i provizija']
+      benefits: ['Profesionalni profil sa CV-jem', 'Portfolio radova i preporuke', 'Prijavljivanje na oglase za posao']
     },
     {
       slug: 'poslodavac',
       title: 'GRAĐEVINSKA FIRMA',
       subtitle: 'ZAPOSLI EKIPU ILI MAJSTORE',
-      description: 'Objavite oglase za posao i građevinske projekte. Pretražite bazu slobodnih majstora i radnika, te direktno ugovorite saradnju i kooperaciju.',
+      description: 'Predstavite svoju firmu, objavljujte oglase za posao i pronađite majstore, radnike i saradnike.',
       icon: 'business',
       color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
       bgGlow: 'bg-emerald-500/10',
       tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
-      benefits: ['Neograničeno postavljanje oglasa', 'Pristup bazi aktivnih radnika', 'Statistika pregleda i prijava']
+      benefits: ['Profil građevinske firme', 'Objavljivanje oglasa za posao', 'Pretraga kandidata i prijava']
     },
     {
       slug: 'smestaj',
       title: 'SMEŠTAJ ZA RADNIKE',
       subtitle: 'IZNAJMI SMEŠTAJNE KAPACITETE',
-      description: 'Prikažite svoje stanove, pansione, hostele ili radničke kontejnere. Povežite se sa građevinskim firmama koje traže smeštaj za svoje terenske radnike.',
+      description: 'Oglašavajte smeštajne kapacitete namenjene građevinskim firmama i radnicima na terenu.',
       icon: 'home_pin',
       color: 'text-sky-400 border-sky-500/20 hover:border-sky-400 hover:shadow-sky-500/10',
       bgGlow: 'bg-sky-500/10',
       tagColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
       btnBg: 'bg-sky-400 !text-black hover:bg-sky-300',
-      benefits: ['Direktan kontakt sa firmama', 'Isticanje lokacije i kapaciteta', 'Popunjenost tokom cele godine']
+      benefits: ['Objavljivanje smeštajnih kapaciteta', 'Fotografije, cene i raspoloživost', 'Direktan kontakt sa zainteresovanima']
     },
     {
       slug: 'ketering',
-      title: 'KETERING & ISHRANA RADNIKA',
+      title: 'KETERING I ISHRANA RADNIKA',
       subtitle: 'DOSTAVA HRANE NA GRADILIŠTA',
-      description: 'Ponudite kuvana jela i organizovanu ishranu za radnike na gradilištima. Povežite se sa firmama koje brinu o ishrani svojih zaposlenih na terenu.',
+      description: 'Predstavite svoju ponudu i povežite se sa građevinskim firmama koje organizuju ishranu zaposlenih.',
       icon: 'restaurant',
       color: 'text-amber-500 border-amber-600/20 hover:border-amber-500 hover:shadow-amber-500/10',
       bgGlow: 'bg-amber-600/10',
       tagColor: 'bg-amber-600/10 text-amber-500 border-amber-600/20',
       btnBg: 'bg-amber-500 !text-black hover:bg-amber-400',
-      benefits: ['Kreiranje dnevnih menija', 'Dugoročni ugovori sa firmama', 'Povećanje obima porudžbina']
+      benefits: ['Predstavljanje ponude i menija', 'Definisanje uslova isporuke', 'Direktni upiti i dogovor saradnje']
     },
     {
       slug: 'masine',
-      title: 'MAŠINE I OPREMA',
+      title: 'MAŠINE I OPREMA (uskoro)',
       subtitle: 'NAJAM ILI PRODAJA MEHANIZACIJE',
-      description: 'Iznajmite ili prodajte bagere, dizalice, skele, oplate i prateću građevinsku opremu. Budite prvi izbor izvođačima radova u potrazi za opremom.',
+      description: 'Objavljujte oglase za prodaju ili iznajmljivanje građevinskih mašina, alata i opreme.',
       icon: 'construction',
       color: 'text-orange-400 border-orange-500/20 hover:border-orange-400 hover:shadow-orange-500/10',
       bgGlow: 'bg-orange-500/10',
       tagColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
       btnBg: 'bg-orange-400 !text-black hover:bg-orange-300',
-      benefits: ['Pregledan katalog mašina', 'Cenovnik najma po danu/satu', 'Direktni upiti od izvođača'],
+      benefits: ['Oglasi za prodaju i najam', 'Detaljne specifikacije opreme', 'Direktna komunikacija sa kupcima'],
       isComingSoon: true
     },
     {
       slug: 'placevi',
-      title: 'PLACEVI I ZONE',
+      title: 'PLACEVI I ZONE (uskoro)',
       subtitle: 'INDUSTRIJSKO ZEMLJIŠTE I PROSTORI',
-      description: 'Prodajte ili iznajmite građevinska zemljišta, skladišta, hale ili placeve u industrijskim zonama. Privucite investitore i izvođače radova.',
+      description: 'Oglašavajte građevinska zemljišta, hale, skladišta i druge poslovne nekretnine.',
       icon: 'landscape',
       color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
       bgGlow: 'bg-emerald-500/10',
       tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
-      benefits: ['Detaljne specifikacije zemljišta', 'Lokacijski prikaz i plan zone', 'Direktan kontakt sa investitorima'],
+      benefits: ['Oglasi za zemljišta i objekte', 'Prikaz lokacije i karakteristika', 'Kontakt sa investitorima i izvođačima'],
       isComingSoon: true
     },
     {
       slug: 'partner',
-      title: 'PARTNER AFFILIATE',
+      title: 'PARTNER AFFILIATE (uskoro)',
       subtitle: 'PREPORUČI I ZARADI PROVIZIJU',
-      description: 'Promovišite našu platformu i ostvarite procenat od svake uplate Vaših preporučenih korisnika. Dobijate lični affiliate kod i detaljnu statistiku zarade.',
+      description: 'Preporučite platformu drugim korisnicima i ostvarite proviziju za svaku uspešnu preporuku.',
       icon: 'handshake',
       color: 'text-orange-500/50 border-orange-500/10 hover:border-orange-500/30 hover:shadow-orange-500/5',
       bgGlow: 'bg-orange-500/5',
       tagColor: 'bg-orange-500/5 text-orange-500/50 border-orange-500/10',
       btnBg: 'bg-orange-600/30 text-white/50 cursor-not-allowed',
-      benefits: ['Automatsko praćenje preporuka', 'Isplate na tekući račun', 'Marketing materijali i podrška'],
+      benefits: ['Lični affiliate link', 'Praćenje preporuka i zarade', 'Pregled provizija i isplata'],
       isComingSoon: true
     }
   ];
 
   return (
-    <div className="space-y-16 py-8">
+    <div className="space-y-16 pt-4 pb-8 md:py-8">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-6">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary/10 border border-secondary/20 rounded-full">
+        <div className="hidden md:inline-flex items-center gap-2 px-4 py-1.5 bg-secondary/10 border border-secondary/20 rounded-full">
           <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
           <span className="text-[10px] md:text-xs font-black text-secondary uppercase tracking-[0.25em]">AKTIVACIJA PREMIUM PROFILA</span>
         </div>
-        <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
+        <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-[1.15] mt-2.5 md:mt-0">
           IZABERITE VAŠU <span className="text-secondary">ULOGU</span> NA PORTALU
         </h2>
         <p className="text-white/40 font-bold text-sm uppercase tracking-widest leading-relaxed">
-          Aktivacijom specifične uloge otvarate potpuno novi set alata, kontrolnu tablu i mogućnosti prilagođene Vašoj delatnosti.
+          Svaka uloga donosi poseban skup funkcija, alata i kontrolnu tablu prilagođenu vašoj delatnosti.
         </p>
       </div>
 
@@ -145,7 +145,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
               
               {/* Top Section */}
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="hidden md:flex items-center justify-between">
                   <div className={`w-16 h-16 rounded-[12px] ${role.bgGlow} ${role.color.split(' ')[0]} border border-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500`}>
                     <span className="material-symbols-outlined text-4xl font-light">{role.icon}</span>
                   </div>
@@ -154,11 +154,11 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
                   </span>
                 </div>
 
-                <div className="space-y-3">
-                  <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none">
+                <div className="space-y-5 md:space-y-3">
+                  <h3 className="text-2xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight">
                     {role.title}
                   </h3>
-                  <p className="text-xs md:text-sm text-white/40 font-bold uppercase tracking-wider leading-relaxed">
+                  <p className="text-sm md:text-sm text-white/40 font-bold uppercase tracking-wider leading-relaxed">
                     {role.description}
                   </p>
                 </div>
@@ -169,7 +169,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
                 {role.benefits.map((benefit, bIndex) => (
                   <div key={bIndex} className="flex items-center gap-3">
                     <span className={`material-symbols-outlined text-base shrink-0 ${role.color.split(' ')[0]}`}>check_circle</span>
-                    <span className="text-[10px] md:text-xs font-black text-white/70 uppercase tracking-wider leading-none">{benefit}</span>
+                    <span className="text-xs md:text-xs font-black text-white/70 uppercase tracking-wider leading-none">{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -177,13 +177,23 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
               {/* Action Button */}
               {role.isComingSoon ? (
                 <div className="relative w-full group/btn" tabIndex={0}>
-                  <button
-                    disabled
-                    className="w-full py-4 md:py-5 bg-white/5 text-white/20 border border-white/5 font-black text-xs md:text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2 pointer-events-none"
-                  >
-                    USKORO
-                    <span className="material-symbols-outlined text-lg">hourglass_empty</span>
-                  </button>
+                  <div className="md:hidden">
+                    <button
+                      disabled
+                      className="w-full py-4 bg-white/5 text-white/20 border border-white/5 font-black text-xs tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed block text-center pointer-events-none"
+                    >
+                      USKORO
+                    </button>
+                  </div>
+                  <div className="hidden md:block">
+                    <button
+                      disabled
+                      className="w-full py-5 bg-white/5 text-white/20 border border-white/5 font-black text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2 pointer-events-none"
+                    >
+                      USKORO
+                      <span className="material-symbols-outlined text-lg">hourglass_empty</span>
+                    </button>
+                  </div>
                   {/* Glassmorphism popup */}
                   <>
                     {/* Mobile Tooltip */}
@@ -206,31 +216,30 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
                   </>
                 </div>
               ) : (
-                <button
-                  onClick={() => handleSelectRole(role.slug)}
-                  className={`w-full py-4 md:py-5 rounded-[12px] font-black text-xs md:text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} flex items-center justify-center gap-2`}
-                >
-                  AKTIVIRAJ PROFIL
-                  <span className="material-symbols-outlined text-lg transition-transform duration-300 group-hover:translate-x-1.5">arrow_forward</span>
-                </button>
+                <div className="relative w-full">
+                  <div className="md:hidden">
+                    <button
+                      onClick={() => handleSelectRole(role.slug)}
+                      className={`w-full py-4 rounded-[12px] font-black text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} block text-center`}
+                    >
+                      AKTIVIRAJ PROFIL
+                    </button>
+                  </div>
+                  <div className="hidden md:block">
+                    <button
+                      onClick={() => handleSelectRole(role.slug)}
+                      className={`w-full py-5 rounded-[12px] font-black text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} flex items-center justify-center gap-2`}
+                    >
+                      AKTIVIRAJ PROFIL
+                      <span className="material-symbols-outlined text-lg transition-transform duration-300 group-hover:translate-x-1.5">arrow_forward</span>
+                    </button>
+                  </div>
+                </div>
               )}
 
             </div>
           </motion.div>
         ))}
-      </div>
-
-      {/* Footer Skip Selection */}
-      <div className="text-center pt-8">
-        <button
-          onClick={() => {
-            if (onSkip) onSkip();
-            else navigate('/moj-profil');
-          }}
-          className="px-8 py-4 bg-white/5 border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all rounded-[10px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em]"
-        >
-          ŽELIM DA OSTANEM STANDARDNI KORISNIK ZA SADA
-        </button>
       </div>
     </div>
   );

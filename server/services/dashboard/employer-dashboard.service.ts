@@ -73,9 +73,39 @@ export class DashboardEmployerService {
               premiumAdsCount = statsData?.premiumAdsCount || statsData?.totalPremiumPurchases || 0;
               lastPaymentAmount = statsData?.lastPaymentAmount || 0;
               lastPaymentAt = statsData?.lastPaymentAt || null;
-            } else if (statsDoc.status === "rejected") {
-              logger.warn("[DashboardService] user_stats read failed:", (statsDoc as PromiseRejectedResult).reason?.message);
-              isFirestoreHealthy = false;
+            } else {
+              // Fallback: if user_stats doc doesn't exist, compute from listings directly
+              try {
+                const adsSnap = await db.collection("listings")
+                  .where("authorId", "==", uid)
+                  .where("status", "in", ["active", "approved", "pending"])
+                  .get();
+                totalAds = adsSnap.docs.filter(d => d.data().status !== "deleted").length;
+                premiumAdsCount = adsSnap.docs.filter(d => d.data().isPremium === true).length;
+
+                const walletSnap = await db.collection("wallets").doc(uid).get();
+                if (walletSnap.exists) {
+                  const w = walletSnap.data();
+                  totalSpend = w?.totalSpent || w?.balance || 0;
+                  activePackage = w?.packageName || "Nema paketa";
+                }
+
+                // Write computed stats back so next load hits cache
+                db.collection("user_stats").doc(uid).set({
+                  activeAds: totalAds,
+                  premiumAdsCount,
+                  totalSpend,
+                  activePackage,
+                  pendingApplications: pendingAppsCount,
+                  totalViews,
+                  updatedAt: new Date(),
+                }).catch(e => logger.warn("[DashboardService] Failed to persist fallback user_stats:", e));
+              } catch (fallbackErr) {
+                logger.warn("[DashboardService] Fallback stats computation failed:", fallbackErr);
+              }
+              if (statsDoc.status === "rejected") {
+                logger.warn("[DashboardService] user_stats read failed:", (statsDoc as PromiseRejectedResult).reason?.message);
+              }
             }
 
             // Fallback for totalAds uses cached value from user_stats

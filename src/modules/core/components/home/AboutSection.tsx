@@ -37,7 +37,7 @@ export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamic
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
                 
                 <div className="relative z-10">
-                  <div className="w-12 h-1.5 bg-secondary mb-6 rounded-full shadow-[0_0_15px_rgba(254,191,13,0.5)]"></div>
+                  <div className="hidden md:block w-12 h-1.5 bg-secondary mb-6 rounded-full shadow-[0_0_15px_rgba(254,191,13,0.5)]"></div>
                   <span className="material-symbols-outlined text-secondary mb-6 block text-4xl relative z-10 group-hover:scale-110 transition-transform duration-300" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                   <h4 className="text-2xl md:text-3xl font-black text-white uppercase mb-2 md:mb-3 tracking-tighter">Premium Firme</h4>
                   <p className="text-slate-400 text-sm leading-relaxed max-w-sm font-medium mb-8">Ekskluzivni pristup najbolje ocenjenim građevinskim kompanijama u regionu.</p>

@@ -46,14 +46,14 @@ export default function MyInquiriesPage() {
     <DashboardLayout>
       <div className="space-y-8">
         <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-black uppercase tracking-tighter">MOJI UPITI I PORUKE</h1>
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest leading-relaxed max-w-2xl">
-            OVDE MOŽETE PRATITI SVE UPITE KOJE STE POSLALI POSLODAVCIMA, VLASNICIMA SMEŠTAJA I PONUĐAČIMA USLUGA.
+          <h1 className="text-4xl font-black uppercase tracking-tighter text-center md:text-left">MOJE PORUKE</h1>
+          <p className="text-white/40 text-xs font-bold uppercase tracking-widest leading-relaxed max-w-2xl text-center md:text-left">
+            OVDE MOŽETE PRATITI SVE PORUKE KOJE STE POSLALI POSLODAVCIMA, VLASNICIMA SMEŠTAJA I PONUĐAČIMA USLUGA.
           </p>
         </div>
 
         {/* Navigation Bar / Tabs */}
-        <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 p-1.5 bg-white/5 border border-white/10 rounded-[10px] w-full md:w-fit">
+        <div className="grid grid-cols-1 md:flex md:flex-wrap gap-2 p-1.5 bg-white/5 border border-white/10 rounded-[10px] w-full">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -125,7 +125,7 @@ export default function MyInquiriesPage() {
                 </Link>
               ))
             ) : (
-              <div className="py-20 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[10px]">
+              <div className="py-20 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[10px] mb-4">
                 <span className="material-symbols-outlined text-6xl text-white/5 mb-6">mark_email_read</span>
                 <h3 className="text-lg font-black text-white/20 uppercase tracking-widest">NEMA PRONAĐENIH UPITA</h3>
                 <p className="text-xs font-bold text-white/10 uppercase tracking-[0.2em] mt-2">IZABERITE DRUGU KATEGORIJU ILI ZAPOČNITE NOVI UPIT</p>

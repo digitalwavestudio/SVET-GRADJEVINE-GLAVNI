@@ -122,7 +122,7 @@ export default function MyApplicationsPage() {
       </div>
 
         <div className="bg-[#0A0F14] border border-white/5 rounded-[10px] overflow-hidden shadow-2xl">
-          <div className="p-8 border-b border-white/5 bg-white/[0.01]">
+          <div className="hidden md:block p-8 border-b border-white/5 bg-white/[0.01]">
             <div className="grid grid-cols-5 gap-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">
               <div className="col-span-2">POSLODAVAC I POZICIJA</div>
               <div>LOKACIJA / PLATA</div>
@@ -206,7 +206,7 @@ export default function MyApplicationsPage() {
         </div>
 
         {/* Tips Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
           <div className="bg-gradient-to-br from-blue-500/10 to-transparent border border-blue-500/20 rounded-[10px] p-8">
             <span className="material-symbols-outlined text-blue-500 mb-4">info</span>
             <h4 className="text-xs font-black text-white uppercase tracking-tight mb-2">SAVET ZA INTERVJU</h4>
@@ -214,8 +214,8 @@ export default function MyApplicationsPage() {
               AKO JE VAŠ STATUS "PRIHVAĆENO", OBAVEZNO POGLEDAJTE DETALJE OGLASA JOŠ JEDNOM I PRIPREMITE PITANJA O GRADILIŠTU.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-secondary/10 to-transparent border border-secondary/20 rounded-[10px] p-8">
-            <span className="material-symbols-outlined text-secondary mb-4">history</span>
+          <div className="bg-gradient-to-br from-secondary/10 to-transparent border border-secondary/20 rounded-[10px] p-8 text-center md:text-left">
+            <span className="material-symbols-outlined text-secondary mb-4 hidden md:block">history</span>
             <h4 className="text-xs font-black text-white uppercase tracking-tight mb-2">ISTORIJA PRIJAVA</h4>
             <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider leading-relaxed">
               VAŠE PRIJAVE SE ČUVAJU 12 MESECI. MOŽETE IH KORISTITI KAO REFERENCU ZA BUDUĆE KONKURSE.

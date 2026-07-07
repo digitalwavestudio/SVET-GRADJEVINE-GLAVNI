@@ -1,7 +1,6 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UI_TOKENS } from '@/src/lib/uiTokens';
 
 export default function EquipmentSection({ latestMachines = [], latestRealEstate = [] }: any) {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Pronađite bagere, kranove, utovarivače i ostalu opremu za vaš sledeći projekat.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/gradjevinske-masine">
+            <Link className="text-secondary font-bold hidden md:flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/gradjevinske-masine">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
@@ -106,7 +105,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               
               <Link 
                 to="/gradjevinske-masine"
-                className="w-full mt-10 py-4 md:py-5 flex items-center justify-center gap-2 uppercase font-black text-xs tracking-[0.1em] md:tracking-[0.2em] bg-secondary !text-black hover:bg-yellow-400 transition-all duration-500 rounded-[12px] shadow-lg hover:scale-[1.02]"
+                className="w-full mt-10 h-[56px] sm:h-[68px] flex items-center justify-center gap-2 uppercase font-black text-sm md:text-lg tracking-wider md:tracking-widest bg-secondary !text-black hover:bg-yellow-400 transition-all duration-500 rounded-[10px] shadow-lg hover:scale-[1.02]"
               >
                 Sve mašine
                 <span className="material-symbols-outlined text-sm">arrow_right_alt</span>
@@ -116,7 +115,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           
           <Link 
             to="/postavi-oglas"
-            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 py-4 md:py-6 rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center shadow-gold-glow-subtle"
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 h-[56px] sm:h-[68px] rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center text-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA MAŠINE
           </Link>
@@ -136,7 +135,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">Investicione prilike širom regiona. Pronađite idealno zemljište za gradnju.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
-            <Link className="text-secondary font-bold flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/placevi">
+            <Link className="text-secondary font-bold hidden md:flex items-center gap-2 pt-2 hover:scale-110 transition-transform duration-300 origin-left md:origin-right shrink-0" to="/placevi">
               Pogledaj sve <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
@@ -180,7 +179,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
           </div>
           <Link 
             to="/postavi-oglas"
-            className={UI_TOKENS.BTN_PRIMARY + " w-full mt-8 py-6 flex items-center justify-center text-lg rounded-[10px]"}
+            className="w-full mt-8 bg-secondary !text-black font-black px-6 md:px-10 h-[56px] sm:h-[68px] rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-wider md:tracking-widest text-sm md:text-lg flex items-center justify-center text-center shadow-gold-glow-subtle"
           >
             POSTAVI OGLAS ZA PLACEVE
           </Link>

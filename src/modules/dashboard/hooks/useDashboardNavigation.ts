@@ -114,13 +114,11 @@ export function useDashboardNavigation() {
         return [
           { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'NADZORNI CENTAR', path: '/moj-profil/gradiliste', icon: 'monitoring' },
-          { label: 'BIZNIS PROFIL', path: '/moj-profil/firma', icon: 'domain' },
+          { label: 'VAŠ BIZNIS PROFIL', path: '/moj-profil/firma', icon: 'domain' },
           { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
           { label: 'PRIJAVE', path: '/moj-profil/prijave', icon: 'assignment' },
           { label: 'UPITI', path: '/moj-profil/upiti', icon: 'mark_email_unread' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
-          { label: 'OBAVEŠTENJA', path: '/moj-profil/obavestenja', icon: 'notifications' },
-          { label: 'VERIFIKACIJA', path: '/moj-profil/verifikacija', icon: 'verified' },
           { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
         ];
@@ -189,11 +187,11 @@ export function useDashboardNavigation() {
       default:
         return [
           { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
-          { label: 'MOJI UPITI', path: '/moj-profil/upiti', icon: 'mark_email_unread' },
-          { label: 'MOJE PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
-          { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },
           { label: 'IZBOR ULOGE', path: '/moj-profil/izbor-uloge', icon: 'rocket_launch' },
+          { label: 'PORUKE', path: '/moj-profil/upiti', icon: 'mark_email_unread' },
+          { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },
+          { label: 'PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
         ];
     }

@@ -118,11 +118,11 @@ export default React.memo(function DashboardHeader({
   if (!user) return null;
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 min-h-[140px]">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 min-h-[140px] px-4 md:px-0">
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="flex items-center gap-6"
+        className="flex items-center gap-4 md:gap-6 min-w-0"
       >
         <div className="relative group">
           <input
@@ -136,7 +136,7 @@ export default React.memo(function DashboardHeader({
           {logoSrc && !isShield ? (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="w-28 h-28 md:w-32 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-white flex items-center justify-center p-2.5 shadow-2xl group/logo"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-white flex items-center justify-center p-2.5 shadow-2xl group/logo shrink-0"
             >
               <img
                 width="800"
@@ -165,7 +165,7 @@ export default React.memo(function DashboardHeader({
           ) : isShield ? (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="w-28 h-28 md:w-32 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-[#0A0F14] border border-white/10 flex items-center justify-center shadow-2xl group/logo"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-[10px] overflow-hidden relative cursor-pointer bg-[#0A0F14] border border-white/10 flex items-center justify-center shadow-2xl group/logo shrink-0"
             >
               <span className="material-symbols-outlined text-slate-400 text-5xl group-hover/logo:scale-110 transition-transform">shield</span>
               
@@ -186,7 +186,7 @@ export default React.memo(function DashboardHeader({
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="w-28 h-28 md:w-32 md:h-32 rounded-[10px] bg-white/[0.02] border-2 border-dashed border-white/10 flex items-center justify-center hover:border-secondary transition-all"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-[10px] bg-white/[0.02] border-2 border-dashed border-white/10 flex items-center justify-center hover:border-secondary transition-all shrink-0"
             >
               <span className="material-symbols-outlined text-white/20">
                 add_photo_alternate
@@ -196,7 +196,7 @@ export default React.memo(function DashboardHeader({
         </div>
 
         {user?.role === 'poslodavac' && (
-          <div className="relative group">
+          <div className="relative group hidden md:block">
             <input
               aria-label="Upload Cover"
               type="file"
@@ -237,9 +237,9 @@ export default React.memo(function DashboardHeader({
           </div>
         )}
 
-        <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex flex-wrap items-center gap-4 mb-2">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter uppercase text-white w-full leading-tight">
+            <h1 className="max-sm:text-xl sm:text-3xl md:text-4xl font-black tracking-tighter uppercase text-white w-full leading-tight">
               {greeting}, <br className="sm:hidden" />
               <span className="text-secondary block sm:inline mt-1 sm:mt-0">{userName || user.email}</span>
             </h1>
@@ -257,41 +257,38 @@ export default React.memo(function DashboardHeader({
               {(error as Error).message}
             </div>
           )}
-          <div className="text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">
+          <div className="text-white/40 font-bold text-[10px] md:text-xs tracking-[0.2em] uppercase hidden md:block">
             {briefing}
           </div>
         </div>
       </motion.div>
 
-      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
-        {/* Wallet Balans is enabled for all roles including administrators */}
-        {(
-          <Button
-            to="/novcanik"
-            variant="ghost"
-            className="h-[120px] w-full md:w-[320px] bg-gradient-to-br from-green-950/20 via-slate-900/95 to-black border border-green-400/30 hover:border-green-400 px-12 flex items-center justify-center gap-6 relative overflow-hidden group shadow-[0_0_40px_rgba(34,197,94,0.15)] hover:shadow-[0_0_50px_rgba(34,197,94,0.25)] transition-all shrink-0 rounded-[14px] transform hover:-translate-y-0.5"
-          >
-            {roleData.walletVerified && (
-              <div className="absolute top-0 right-0 p-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_15px_rgba(74,222,128,0.9)]"></div>
-              </div>
-            )}
-            <div className="w-16 h-16 rounded-[14px] bg-gradient-to-br from-green-500/25 to-green-500/5 border border-green-400/40 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0 shadow-[0_0_20px_rgba(74,222,128,0.25)]">
-              <span className="material-symbols-outlined text-green-400 text-3xl font-light" style={{ textShadow: "0 0 15px rgba(74,222,128,0.6)" }}>
-                {roleData.walletVerified ? "security" : "account_balance_wallet"}
-              </span>
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto min-w-0">
+        <Link
+          to="/novcanik"
+          className="h-[100px] md:h-[120px] w-full md:w-[320px] bg-gradient-to-br from-green-950/20 via-slate-900/95 to-black border border-green-400/30 hover:border-green-400 px-4 md:px-12 flex items-center gap-3 md:gap-6 relative group shadow-[0_0_40px_rgba(34,197,94,0.15)] hover:shadow-[0_0_50px_rgba(34,197,94,0.25)] transition-all shrink-0 rounded-[14px] transform hover:-translate-y-0.5 text-white"
+        >
+          {roleData.walletVerified && (
+            <div className="absolute top-0 right-0 p-2.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_15px_rgba(74,222,128,0.9)]"></div>
             </div>
-            <div className="text-left flex flex-col justify-center">
-              <div className="text-xs font-black text-white/50 uppercase tracking-[0.2em] mb-2 flex items-center gap-1 leading-none">
-                {roleData.walletVerified ? "Verifikovan" : "Novčanik"}
-                {roleData.walletVerified && <span className="text-[8px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-[3px] font-black leading-none ml-1">SECURE</span>}
-              </div>
-              <div className="text-3xl font-black text-green-400 group-hover:text-green-300 transition-colors tracking-tight leading-none flex items-center gap-2">
-                {(roleData.walletBalance ?? user?.walletBalance ?? 0).toLocaleString("sr-RS")} <span className="text-white/40 text-sm font-bold">Kredita</span>
-              </div>
+          )}
+          <div className="w-11 h-11 md:w-16 md:h-16 rounded-[14px] bg-gradient-to-br from-green-500/25 to-green-500/5 border border-green-400/40 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0 shadow-[0_0_20px_rgba(74,222,128,0.25)]">
+            <span className="material-symbols-outlined text-green-400 text-2xl md:text-3xl font-light" style={{ textShadow: "0 0 15px rgba(74,222,128,0.6)" }}>
+              {roleData.walletVerified ? "security" : "account_balance_wallet"}
+            </span>
+          </div>
+          <div className="text-left flex flex-col justify-center">
+            <div className="text-[10px] md:text-xs font-black text-white/50 uppercase tracking-[0.2em] mb-0.5 md:mb-2 leading-none">
+              {roleData.walletVerified ? "Verifikovan" : "Novčanik"}
+              {roleData.walletVerified && <span className="text-[8px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-[3px] font-black leading-none ml-1">SECURE</span>}
             </div>
-          </Button>
-        )}
+            <div className="text-xl md:text-3xl font-black text-green-400 leading-none whitespace-nowrap">
+              {(roleData.walletBalance ?? user?.walletBalance ?? 0).toLocaleString("sr-RS")}
+              <span className="text-white/40 text-[9px] md:text-sm font-bold ml-1.5">Kredita</span>
+            </div>
+          </div>
+        </Link>
       </div>
     </div>
   );

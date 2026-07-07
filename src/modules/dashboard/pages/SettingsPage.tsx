@@ -233,7 +233,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-10 px-4">
+      <div className="max-w-7xl mx-auto space-y-10">
         {user?.syncStatus === 'syncing' && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
@@ -270,8 +270,8 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-4xl font-black tracking-tighter uppercase mb-1">{user?.role === 'poslodavac' ? 'BIZNIS PROFIL' : 'MOJ PROFIL'}</h1>
-          <p className="text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">UPRAVLJAJTE VAŠIM PODACIMA I BIOGRAFIJOM</p>
+          <h1 className="text-4xl font-black tracking-tighter uppercase mb-1 text-center md:text-left">{user?.role === 'poslodavac' ? 'VAŠ BIZNIS PROFIL' : 'MOJ PROFIL'}</h1>
+          <p className="text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase text-center md:text-left">UPRAVLJAJTE VAŠIM PODACIMA I BIOGRAFIJOM</p>
         </motion.div>
 
          <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
@@ -297,10 +297,12 @@ export default function SettingsPage() {
 
           {/* Content Area */}
           <div className={tabs.length > 1 ? "lg:col-span-3 space-y-6" : "lg:col-span-4 space-y-6"}>
-            <ProfileHealth score={liveScore} hideButton={true} />
+            <div className="hidden md:block">
+              <ProfileHealth score={liveScore} hideButton={true} />
+            </div>
             
             <div className={activeSection === 'profile'
-              ? "bg-[#0A0F14] border border-white/5 rounded-[10px] p-4 md:p-10" 
+              ? "bg-[#0A0F14] border border-white/5 rounded-[10px] px-0 md:px-10 py-6" 
               : "space-y-6"
             }>
               {activeSection === 'profile' && (
@@ -351,8 +353,8 @@ export default function SettingsPage() {
                 </motion.div>
               )}
 
-              <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-end gap-4">
-                <button onClick={() => window.location.href = '/kontrolna-tabla'} className="w-full md:w-auto px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase text-white/40 hover:text-white transition-all">ODUSTANI</button>
+              <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-center md:justify-end gap-4">
+                <button onClick={() => window.location.href = '/kontrolna-tabla'} className="w-full md:w-auto px-8 py-4 rounded-[10px] text-[10px] font-black tracking-widest uppercase text-white/60 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all">ODUSTANI</button>
                 <button 
                   onClick={handleSave}
                   disabled={isSaving || user?.syncStatus === 'syncing'}

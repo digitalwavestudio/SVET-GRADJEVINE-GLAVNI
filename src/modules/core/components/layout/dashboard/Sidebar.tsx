@@ -96,11 +96,11 @@ export const Sidebar = memo(({
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <span className="block text-sm text-white font-black truncate leading-tight">{userName}</span>
+              <span className="block text-sm text-white font-black leading-tight">{userName}</span>
+              <span className="block text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/60 mt-1 w-fit">
+                {role}
+              </span>
             </div>
-            <span className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/60">
-              {role}
-            </span>
           </div>
         </div>
       </div>
@@ -133,13 +133,13 @@ export const Sidebar = memo(({
           const isActive = location.pathname === item.path;
           const isNadzorniCentar = item.label === 'NADZORNI CENTAR';
           
-          const linkClassName = isNadzorniCentar
+           const linkClassName = isNadzorniCentar
             ? 'flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative bg-gradient-to-r from-[#0061a5] to-[#60a5fa] text-white hover:from-[#00518c] hover:to-[#5095ea] shadow-lg shadow-[#0061a5]/20 font-black'
             : `group/item flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-200 relative ${
                 isActive 
                   ? 'bg-secondary !text-black shadow-lg shadow-secondary/10' 
                   : 'text-white/50 hover:text-white hover:bg-white/5'
-              } ${item.label === 'IZBOR ULOGE' && pulseRoleSelection ? 'animate-[pulse_1s_ease-in-out_3] ring-2 ring-secondary/50' : ''}`;
+              } ${item.label === 'IZBOR ULOGE' ? 'animate-[pulse_2s_ease-in-out_infinite] !text-secondary' : ''}`;
 
           return (
             <Link

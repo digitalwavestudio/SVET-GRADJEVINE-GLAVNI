@@ -13,7 +13,6 @@ const MyAdsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: 
 const SettingsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-settings" */ './pages/SettingsPage'));
 const AccountSettingsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-account-settings" */ './pages/AccountSettingsPage'));
 const WalletPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-wallet" */ './pages/WalletPage'));
-const VerificationCenterPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-verification" */ './pages/VerificationCenterPage'));
 const MyInquiriesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-inquiries" */ './pages/MyInquiriesPage'));
 const DashboardModule = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-module" */ './index.tsx'));
 const StatsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-stats" */ './pages/StatsPage'));
@@ -36,7 +35,6 @@ export const prefetchDashboard = () => {
       import(/* webpackPrefetch: true, webpackChunkName: "dashboard-home" */ './pages/DashboardPage'),
       import(/* webpackPrefetch: true, webpackChunkName: "dashboard-my-ads" */ './pages/MyAdsPage'),
       import(/* webpackPrefetch: true, webpackChunkName: "dashboard-favorites" */ './pages/FavoritesPage'),
-      import(/* webpackPrefetch: true, webpackChunkName: "dashboard-verification" */ './pages/VerificationCenterPage'),
       import(/* webpackPrefetch: true, webpackChunkName: "dashboard-applications" */ './pages/MyApplicationsPage')
     ]).catch((err) => {
       // Fail-safe tracking to not impact primary thread experience
@@ -61,7 +59,6 @@ export const getDashboardRouter = () => [
   <Route key="moj-profil" path="/moj-profil" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />,
   <Route key="kontrolna-tabla" path="/kontrolna-tabla" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />,
   <Route key="obavestenja" path="/moj-profil/obavestenja" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />,
-  <Route key="verifikacija" path="/moj-profil/verifikacija" element={<ProtectedRoute><VerificationCenterPage /></ProtectedRoute>} />,
   <Route key="oglasi" path="/moj-profil/oglasi" element={<ProtectedRoute><MyAdsPage /></ProtectedRoute>} />,
   <Route key="prijave" path="/moj-profil/prijave" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />,
   <Route key="omiljeni" path="/moj-profil/omiljeni" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />,

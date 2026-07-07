@@ -230,17 +230,17 @@ bffRouter.get(
       // Bezbednosni Caching Breaker
       const breakerTimeout = setTimeout(async () => {
         if (!res.headersSent) {
-          logger.warn(`[LatencyBreaker] Request exceeded 5000ms for user: ${req.user?.uid}. Serving L1 memory cache fallback.`);
+          logger.warn(`[LatencyBreaker] Request exceeded 15000ms for user: ${req.user?.uid}. Serving L1 memory cache fallback.`);
           const staleData = (await CacheService.get(`bff_cache_tiered:${req.user?.uid || req.user?.id}:${role}`, true)) || {};
           // Temporarily disable the breaker success/failure recording for timeout response
           res.json({
             ...(typeof staleData === "object" ? staleData : {}),
             success: true,
-            _metaWarning: "Sistem je trenutno opterećen (latencija > 5000ms), prikazujemo poslednju sačuvanu verziju podataka."
+            _metaWarning: "Sistem je trenutno opterećen (latencija > 15000ms), prikazujemo poslednju sačuvanu verziju podataka."
           });
           breaker.recordFailure().catch(err => console.error("[CircuitBreaker] recordFailure in breakerTimeout failed:", err));
         }
-      }, 5000);
+      }, 15000);
 
       res.on("finish", () => clearTimeout(breakerTimeout));
       res.on("close", () => clearTimeout(breakerTimeout));
@@ -296,15 +296,15 @@ bffRouter.get(
 
       const breakerTimeout = setTimeout(async () => {
         if (!res.headersSent) {
-          logger.warn(`[LatencyBreaker] Request exceeded 5000ms for metrics user: ${req.user?.uid}.`);
+          logger.warn(`[LatencyBreaker] Request exceeded 15000ms for metrics user: ${req.user?.uid}.`);
           const staleData = (await CacheService.get(`dashboard_metrics_${req.user?.uid || req.user?.id}`, true)) || {};
           res.json({
             success: true,
             data: typeof staleData === "object" ? staleData : {},
-            _metaWarning: "Sistem opterećen (latencija > 5000ms), prikazujemo poslednje poznate podatke."
+            _metaWarning: "Sistem opterećen (latencija > 15000ms), prikazujemo poslednje poznate podatke."
           });
         }
-      }, 5000);
+      }, 15000);
 
       res.on("finish", () => clearTimeout(breakerTimeout));
       res.on("close", () => clearTimeout(breakerTimeout));

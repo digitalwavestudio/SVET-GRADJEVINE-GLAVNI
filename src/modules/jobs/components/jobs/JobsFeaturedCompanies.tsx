@@ -16,16 +16,7 @@ export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ co
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-secondary/[0.03] via-transparent to-transparent"></div>
       
       <div className="max-w-7xl mx-auto px-8 relative z-10 mb-16">
-        <div className="flex flex-col items-center justify-center gap-6">
-          <div className="flex items-center gap-4">
-             <div className="w-12 h-[2px] bg-secondary/50"></div>
-             <h2 className="text-center text-3xl md:text-4xl font-headline font-black uppercase tracking-tighter text-white">
-               Istaknuti <span className="text-secondary">poslodavci</span>
-             </h2>
-             <div className="w-12 h-[2px] bg-secondary/50"></div>
-          </div>
-          <p className="text-on-surface-variant text-sm tracking-widest uppercase font-bold text-center">Kompanije koje trenutno traže radnike</p>
-        </div>
+  
       </div>
       
       <div className="overflow-hidden relative w-full z-10">

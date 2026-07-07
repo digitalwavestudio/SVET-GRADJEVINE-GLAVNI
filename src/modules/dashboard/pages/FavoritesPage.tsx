@@ -204,8 +204,8 @@ export default function FavoritesPage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <h1 className="text-4xl font-black tracking-tighter uppercase mb-1">OMILJENI OGLASI</h1>
-            <div className="flex items-center gap-2 text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase">
+            <h1 className="text-4xl font-black tracking-tighter uppercase mb-1 text-center md:text-left">OMILJENI OGLASI</h1>
+            <div className="flex items-center gap-2 text-white/40 font-bold text-[10px] tracking-[0.2em] uppercase justify-center md:justify-start">
               <span className="w-2 h-2 rounded-full bg-secondary"></span>
               VAŠA LISTA ZANIMLJIVOSTI
             </div>
@@ -232,7 +232,7 @@ export default function FavoritesPage() {
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+          <div className="hidden md:flex flex-wrap items-center gap-2 w-full xl:w-auto">
             {[
               { id: 'all', label: 'SVI', icon: 'apps' },
               { id: 'job', label: 'POSLOVI', icon: 'work' },
@@ -256,9 +256,7 @@ export default function FavoritesPage() {
                 {cat.label}
               </button>
             ))}
-
             <div className="h-10 w-[1px] bg-white/5 mx-2 hidden xl:block" />
-
             <select 
               value={sortBy}
               onChange={(e) => setBy(e.target.value)}

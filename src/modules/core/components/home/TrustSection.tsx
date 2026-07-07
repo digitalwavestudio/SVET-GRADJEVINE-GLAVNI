@@ -26,7 +26,7 @@ export default function TrustSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {TRUST_ITEMS.map((item, i) => (
             <div key={i} className="text-center p-4 md:p-6 flex flex-col items-center justify-center">
-              <span className="material-symbols-outlined text-secondary text-6xl md:!text-[3rem] mb-4 md:mb-6 shrink-0">
+              <span className="material-symbols-outlined text-secondary text-7xl md:!text-[3rem] mb-4 md:mb-6 shrink-0">
                 {item.icon}
               </span>
               <h4 className="text-white font-bold text-lg md:text-2xl mb-2">{item.title}</h4>

@@ -338,8 +338,8 @@ export const SortingBar = ({ currentSort, options, onChange }: {
   options: { value: string; label: string }[],
   onChange: (value: string) => void 
 }) => (
-  <div className="bg-slate-950 border border-white/5 rounded-[10px] p-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-8 shadow-2xl gap-2 sm:gap-0">
-    <div className="flex items-center gap-1 overflow-x-auto no-scrollbar px-2 w-full sm:w-auto">
+  <div className="bg-slate-950 border border-white/5 rounded-[10px] p-2 hidden md:flex md:flex-row items-center justify-between mb-8 shadow-2xl gap-2">
+    <div className="flex items-center gap-1 overflow-x-auto no-scrollbar px-2 w-full">
       <span className="material-symbols-outlined text-white/20 text-lg mr-2 shrink-0">sort</span>
       {options.map((opt) => (
         <button

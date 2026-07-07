@@ -144,17 +144,15 @@ export default function CtaSection() {
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Link 
                   to="/prijava"
-                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 min-h-[56px] overflow-hidden w-full sm:w-auto"
+                  className="group relative flex items-center justify-center px-6 sm:px-10 h-[56px] sm:h-[68px] bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 overflow-hidden w-full sm:w-auto"
                 >
-                  <span className="material-symbols-outlined relative z-10">person_add</span>
-                  <span className="relative z-10 tracking-wide">REGISTRUJTE SE BESPLATNO</span>
+                  <span className="relative z-10 tracking-wide text-center">REGISTRUJTE SE BESPLATNO</span>
                 </Link>
                 <Link 
                   to="/postavi-oglas"
-                  className="group relative flex items-center justify-center gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-secondary hover:bg-yellow-400 !text-black font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 min-h-[56px] w-full sm:w-auto"
+                  className="group relative flex items-center justify-center px-6 sm:px-10 h-[56px] sm:h-[68px] bg-secondary hover:bg-yellow-400 !text-black font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
                 >
-                  <span className="material-symbols-outlined relative z-10" style={{ fontVariationSettings: "'FILL' 0" }}>add_circle</span>
-                  <span className="tracking-wide relative z-10">POSTAVI OGLAS</span>
+                  <span className="tracking-wide relative z-10 text-center">POSTAVI OGLAS</span>
                 </Link>
               </div>
             </div>

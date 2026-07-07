@@ -18,15 +18,15 @@ export default function SupportPage() {
     { 
       icon: 'call', 
       label: 'TELEFONSKA PODRŠKA', 
-      value: '+381 66 275 532', 
-      desc: 'Pozovite nas svakog radnog dana za brzu pomoć pri registraciji i oglašavanju.',
+      value: '+381 66 27 55 32', 
+      desc: 'Pozovite nas za pomoć pri registraciji, oglašavanju i placanju.',
       action: 'tel:+38166275532',
       actionLabel: 'POZOVITE NAS'
     },
     { 
       icon: 'schedule', 
       label: 'RADNO VREME KANCELARIJE', 
-      value: 'Pon - Pet: 08:00h - 16:00h', 
+      value: '08:00h - 20:00h', 
       desc: 'Naš tim je dostupan za pozive. Vikendom i praznicima koristite isključivo email.',
       action: '/kontakt', // Link to contact form
       actionLabel: 'POGLEDAJTE DETALJE'
@@ -118,7 +118,6 @@ export default function SupportPage() {
                       className="inline-flex items-center justify-center gap-1.5 w-full bg-white/5 group-hover:bg-secondary group-hover:!text-black text-white font-black py-3 rounded-[4px] text-xs tracking-[0.15em] uppercase transition-all duration-300 shadow-md"
                     >
                       <span>{item.actionLabel}</span>
-                      <span className="material-symbols-outlined text-xs transition-transform group-hover:translate-x-1">arrow_forward</span>
                     </a>
                   ) : (
                     <div className="w-full bg-white/5 text-white/40 font-black py-3 rounded-[4px] text-xs tracking-[0.15em] uppercase border border-white/5">
@@ -134,8 +133,7 @@ export default function SupportPage() {
         {/* FAQs accordion */}
         <div className="bg-[#0E1318] border border-white/5 rounded-[6px] p-8 md:p-10 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-secondary/50 via-orange-500/50 to-transparent"></div>
-          <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-8 flex items-center gap-3">
-            <span className="material-symbols-outlined text-secondary text-2xl">quiz</span>
+          <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-8 text-center md:text-left">
             ČESTO POSTAVLJANA PITANJA
           </h3>
           <div className="space-y-4">
@@ -148,13 +146,10 @@ export default function SupportPage() {
                 >
                   <button
                     onClick={() => toggleFaq(i)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left gap-4 transition-colors"
+                    className="w-full px-6 py-5 flex items-center justify-center text-center gap-4 transition-colors"
                   >
                     <span className={`text-sm font-black uppercase tracking-wide transition-colors duration-300 ${isOpen ? 'text-secondary' : 'text-white/80 hover:text-white'}`}>
                       {faq.q}
-                    </span>
-                    <span className={`material-symbols-outlined text-base transition-transform duration-300 ${isOpen ? 'rotate-180 text-secondary' : 'text-white/30'}`}>
-                      expand_more
                     </span>
                   </button>
                   <AnimatePresence initial={false}>
@@ -165,7 +160,7 @@ export default function SupportPage() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25, ease: 'easeInOut' }}
                       >
-                        <div className="px-6 pb-6 pt-2 border-t border-white/5">
+                        <div className="px-6 pb-6 pt-2 border-t border-white/5 text-center md:text-left">
                           <p className="text-xs text-white/70 font-medium tracking-wide leading-relaxed">
                             {faq.a}
                           </p>
@@ -194,9 +189,9 @@ export default function SupportPage() {
             </p>
             <a 
               href="/kontakt" 
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-secondary to-orange-500 !text-black font-black px-12 py-5 rounded-[4px] hover:from-secondary/90 hover:to-orange-500/90 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs tracking-[0.2em] uppercase shadow-lg shadow-secondary/20"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-secondary to-orange-500 !text-black font-black px-10 md:px-12 py-5 rounded-[4px] hover:from-secondary/90 hover:to-orange-500/90 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs tracking-[0.2em] uppercase shadow-lg shadow-secondary/20 mx-auto w-full md:w-fit"
             >
-              <span className="material-symbols-outlined text-sm">mail</span>
+              <span className="material-symbols-outlined text-sm hidden md:inline">mail</span>
               KONTAKTIRAJTE NAS
             </a>
           </div>

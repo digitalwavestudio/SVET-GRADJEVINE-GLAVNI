@@ -29,7 +29,7 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
           ? isLoading
             ? 'h-0 pt-0 pb-0 overflow-hidden opacity-0 pointer-events-none'
             : 'h-[220px] md:h-[260px] pt-28 md:pt-36 pb-6'
-          : 'min-h-[580px] sm:min-h-[620px] md:min-h-screen pt-[210px] md:pt-[240px] pb-20 md:pb-16'
+          : 'min-h-[480px] sm:min-h-[520px] md:min-h-screen pt-[159px] md:pt-[240px] pb-20 md:pb-16'
       }`}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div
@@ -60,7 +60,7 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
             <div className={`transition-all duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] origin-top ${
               isSearchActive 
                 ? 'opacity-0 -translate-y-10 scale-[0.96] pointer-events-none h-0 overflow-hidden mb-0' 
-                : 'opacity-100 translate-y-0 scale-100 mb-[94px] md:mb-12'
+                : 'opacity-100 translate-y-0 scale-100 mb-11 md:mb-12'
             }`}>
               <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase relative mb-8 text-center md:text-left">
                 SVE ZA GRAĐEVINU
@@ -77,11 +77,11 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
 
             {/* Cyber-HUD Universal Search & Category Nodes */}
             <div className={`relative z-20 w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              isSearchActive ? 'mt-0' : 'mt-[24px] md:mt-[110px]'
+              isSearchActive ? 'mt-0' : 'mt-0 md:mt-[110px]'
             }`}>
               {/* Main HUD Search Module - Now Above Categories */}
               <div className={`relative group/searchwrapper max-w-[970px] mx-auto md:mx-0 transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                isSearchActive ? 'mb-0' : 'mb-16 md:mb-[204px]'
+                isSearchActive ? 'mb-0' : 'mb-0 md:mb-[204px]'
               }`}>
                 <AiSearchBar vertical={currentVertical} isLoading={isLoading} />
               </div>
