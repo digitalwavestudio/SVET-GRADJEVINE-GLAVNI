@@ -53,7 +53,13 @@ function DashboardContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const [welcomeOpen, setWelcomeOpen] = useState(location.state?.welcome === true);
+  const [welcomeOpen, setWelcomeOpen] = useState(() => {
+    if (location.state?.welcome === true && user?.id) {
+      const hasSeen = localStorage.getItem(`hasSeenWelcome_${user.id}`);
+      return !hasSeen;
+    }
+    return false;
+  });
 
   const isUpgradeOpen = useDashboardUIStore((state) => state.isUpgradeOpen);
   const setIsUpgradeOpen = useDashboardUIStore((state) => state.setIsUpgradeOpen);
@@ -140,35 +146,47 @@ function DashboardContent() {
 
       {/* Welcome Modal */}
       {welcomeOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-surface border border-outline-variant/20 rounded-[16px] w-full max-w-md p-8 relative shadow-2xl">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
-                <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>celebration</span>
+        <div className="fixed inset-0 bg-[#0B1219]/60 backdrop-blur-xl z-[200] flex items-center justify-center p-4 transition-all duration-500">
+          <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[32px] w-full max-w-md p-10 relative shadow-[0_30px_80px_rgba(0,0,0,0.8)] overflow-hidden">
+            {/* Apple-like ambient glows */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-secondary/10 rounded-full blur-[60px] pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px] pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
+            
+            <div className="text-center relative z-10">
+              <div className="w-24 h-24 rounded-[24px] bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-8 shadow-inner overflow-hidden">
+                <img src="/logo-icon.png" alt="Svet Građevine Logo" className="w-16 h-16 object-contain" />
               </div>
-              <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-3">Dobrodošli na Svet Građevine!</h2>
-              <p className="text-on-surface-variant text-sm font-medium mb-6">
-                Imate <span className="text-primary font-bold text-base">1.500 SG kredita</span> za objavu oglasa.
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4 font-headline leading-tight">
+                Dobrodošli na <br/><span className="text-secondary">Svet Građevine!</span>
+              </h2>
+              <p className="text-on-surface-variant text-sm font-bold mb-8">
+                Poklonili smo vam <span className="text-white bg-white/10 px-2 py-0.5 rounded uppercase tracking-widest text-[10px] ml-1">1.500 SG kredita</span> za objavu oglasa.
               </p>
               {!user?.emailVerified && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-[10px] p-4 mb-6 text-left">
-                  <p className="text-amber-500 text-xs font-bold flex items-start gap-2">
-                    <span className="material-symbols-outlined text-base mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-                    <span>Poslali smo vam email sa linkom za potvrdu. Proverite inbox (i spam folder) i kliknite na link da biste mogli da postavljate oglase.</span>
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-[16px] p-5 mb-8 text-left backdrop-blur-md">
+                  <p className="text-amber-500 text-xs font-bold flex items-start gap-3">
+                    <span className="material-symbols-outlined text-lg mt-0.5">warning</span>
+                    <span className="leading-relaxed">Poslali smo vam email sa linkom za potvrdu. Proverite inbox (i spam folder) i kliknite na link da biste mogli da postavljate oglase.</span>
                   </p>
                 </div>
               )}
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-4">
                 <button
-                  onClick={() => setWelcomeOpen(false)}
-                  className="flex-1 bg-primary text-black font-black py-4 rounded-[10px] uppercase tracking-widest text-sm shadow-lg shadow-primary/20 hover:brightness-110 transition-all"
+                  onClick={() => {
+                    setWelcomeOpen(false);
+                    localStorage.setItem(`hasSeenWelcome_${user?.id}`, "true");
+                  }}
+                  className="w-full bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black font-black py-4 rounded-[16px] uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(254,191,13,0.3)] hover:brightness-110 hover:scale-[1.02] transition-all duration-300"
                 >
                   Razumem, kreni
                 </button>
                 <Link
                   to="/novcanik"
-                  onClick={() => setWelcomeOpen(false)}
-                  className="flex-1 bg-outline-variant/20 text-white font-black py-4 rounded-[10px] uppercase tracking-widest text-sm hover:brightness-110 transition-all text-center leading-[1.2] flex items-center justify-center"
+                  onClick={() => {
+                    setWelcomeOpen(false);
+                    localStorage.setItem(`hasSeenWelcome_${user?.id}`, "true");
+                  }}
+                  className="w-full bg-white/5 border border-white/10 text-white font-black py-4 rounded-[16px] uppercase tracking-widest text-xs hover:bg-white/10 hover:border-white/20 transition-all duration-300 text-center flex items-center justify-center"
                 >
                   Pogledaj novčanik
                 </Link>

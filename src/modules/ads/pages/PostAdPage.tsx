@@ -159,7 +159,7 @@ export default function PostAdPage() {
 
       <div className="absolute inset-0 futuristic-grid opacity-10 pointer-events-none"></div>
 
-      <div className="max-w-4xl mx-auto px-6 relative z-10 mt-16">
+      <div className={`mx-auto px-4 md:px-6 relative z-10 mt-16 transition-all duration-500 ${step === 4 ? 'max-w-7xl' : 'max-w-4xl'}`}>
         <div className="mb-16 text-center">
           <motion.div
             initial={{ y: -20, opacity: 0 }}
@@ -211,7 +211,7 @@ export default function PostAdPage() {
         <FormProvider {...methods}>
           <form
             onSubmit={methods.handleSubmit(onFormSubmit as any)}
-            className="bg-white/[0.03] backdrop-blur-xl p-5 md:p-12 rounded-[10px] border border-white/10 shadow-2xl relative overflow-hidden"
+            className={step === 4 ? "relative" : "bg-white/[0.03] backdrop-blur-xl p-5 md:p-12 rounded-[10px] border border-white/10 shadow-2xl relative overflow-hidden"}
           >
             <input
               type="text"

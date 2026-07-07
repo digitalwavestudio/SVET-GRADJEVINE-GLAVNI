@@ -156,7 +156,7 @@ export function Step4({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-5xl mx-auto"
+        className="relative z-10 w-full mx-auto"
       >
         {/* Navigation Header */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
@@ -173,9 +173,10 @@ export function Step4({
           <button
             type="button"
             onClick={prevStep}
-            className="text-on-surface-variant font-black uppercase tracking-widest text-[10px] hover:text-white transition-colors bg-white/5 px-4 py-2 rounded-[8px] border border-white/10"
+            className="bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black font-black uppercase tracking-widest text-xs px-6 py-3 rounded-xl hover:brightness-110 transition-all shadow-[0_0_20px_rgba(254,191,13,0.3)] hover:scale-[1.02] flex items-center gap-2"
           >
-            ← Vrati se na izmene
+            <span className="material-symbols-outlined text-sm font-black">arrow_back</span>
+            Vrati se na izmene
           </button>
         </div>
 
@@ -228,8 +229,9 @@ export function Step4({
 
         {/* Regular Ad Preview Section */}
         {selectedCategory !== "company" && (
-           <div className="mb-12 bg-slate-900/30 backdrop-blur-xl p-8 md:p-10 rounded-[24px] border border-white/10 relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-             <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
+           <div className="mb-12 bg-slate-950/40 backdrop-blur-3xl p-8 md:p-10 rounded-[32px] border border-white/10 relative overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
+             <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
+             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none translate-y-1/2 -translate-x-1/3"></div>
              
              <div className="relative z-10">
                <div className="flex justify-between items-center mb-8 pb-4 border-b border-white/5">
@@ -247,14 +249,56 @@ export function Step4({
                </div>
 
                <div className="flex flex-col md:flex-row justify-between gap-8">
-                 <div className="flex-1 space-y-2">
-                   <span className="text-[10px] font-black text-secondary uppercase tracking-[0.3em] block">
-                     Naslov oglasa
-                   </span>
-                   <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight font-headline leading-tight">
-                     {autoTitle}
-                   </h3>
-                 </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="inline-flex items-center gap-2 mb-2 bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_2px_10px_rgba(254,191,13,0.1)]">
+                      <span className="material-symbols-outlined text-[14px]">apartment</span>
+                      {formData.companyName || "Vaša firma"}
+                    </div>
+                    <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] block mt-2">
+                      Naslov oglasa
+                    </span>
+                    <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight font-headline leading-tight">
+                      {autoTitle}
+                    </h3>
+                    
+                    {formData.opis && (
+                      <div className="mt-4 pt-4 border-t border-white/5">
+                        <span className="text-xs font-black text-on-surface-variant uppercase tracking-widest font-headline block mb-2">
+                          Detaljan opis posla
+                        </span>
+                        <p className="text-base font-medium text-white/90 leading-relaxed whitespace-pre-wrap line-clamp-4">
+                          {formData.opis}
+                        </p>
+                      </div>
+                    )}
+                    {(formData.phone || formData.viber || formData.whatsapp) && (
+                      <div className="mt-4 pt-4 border-t border-white/5 space-y-2">
+                        <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block">
+                          Kontakt podaci
+                        </span>
+                        <div className="flex flex-wrap gap-5 text-base font-black">
+                          {formData.phone && (
+                            <div className="flex items-center gap-2 text-white">
+                              <span className="material-symbols-outlined text-xl text-secondary">phone</span>
+                              {formData.phone}
+                            </div>
+                          )}
+                          {formData.viber && (
+                            <div className="flex items-center gap-2 text-[#7360f2]">
+                              <span className="material-symbols-outlined text-xl">call</span>
+                              Viber
+                            </div>
+                          )}
+                          {formData.whatsapp && (
+                            <div className="flex items-center gap-2 text-[#25D366]">
+                              <span className="material-symbols-outlined text-xl">chat</span>
+                              WhatsApp
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                  
                  <div className="flex flex-col md:items-end gap-6 min-w-[200px]">
                     <div>
@@ -269,7 +313,7 @@ export function Step4({
                                 ? "Satnica"
                                 : "Plata"}
                       </span>
-                      <span className="font-black text-white text-xl md:text-right block">
+                      <span className="font-black text-2xl md:text-3xl md:text-right block bg-clip-text text-transparent bg-gradient-to-r from-secondary via-yellow-400 to-secondary">
                         {getFormattedPrice()}
                       </span>
                     </div>
@@ -304,12 +348,13 @@ export function Step4({
                    <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block mb-4">
                      {selectedCategory === "accommodation" ? "Pogodnosti" : "Benefiti za kandidate"}
                    </span>
-                   <div className="flex flex-wrap gap-2">
+                   <div className="flex flex-wrap gap-3">
                      {(selectedCategory === "accommodation" ? formData.amenities : formData.benefits)?.map((slug: string) => {
                        const list = selectedCategory === "accommodation" ? ACCOMMODATION_AMENITIES : BENEFITS;
                        const name = list.find((b) => b.slug === slug)?.name;
                        return (
-                         <span key={slug} className="bg-white/5 border border-white/10 px-4 py-2 rounded-[8px] text-[10px] font-black uppercase tracking-widest text-white/80">
+                         <span key={slug} className="bg-secondary/10 border border-secondary/20 text-secondary px-4 py-2 rounded-[12px] text-[11px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.15)] flex items-center gap-2">
+                           <span className="material-symbols-outlined text-[14px]">check</span>
                            {name}
                          </span>
                        );
@@ -325,11 +370,11 @@ export function Step4({
         )}
 
         {/* SaaS Packages Grid Header */}
-        <div className="text-center mb-10">
-          <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight font-headline">
+        <div className="text-center my-16">
+          <h3 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tight font-headline">
             Odaberite Paket Vidljivosti
           </h3>
-          <p className="text-on-surface-variant font-medium mt-2 max-w-xl mx-auto text-sm">
+          <p className="text-on-surface-variant font-medium mt-4 max-w-2xl mx-auto text-base md:text-lg">
             Želite li da vaš oglas vidi maksimalan broj korisnika? Odaberite Premium ili Hitno paket za vrhunske pozicije na portalu.
           </p>
         </div>
@@ -341,40 +386,38 @@ export function Step4({
           {standardPkg && (
             <div
               onClick={() => setValue("paket", "standard")}
-              className={`relative p-8 rounded-[24px] border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
+              className={`relative p-6 rounded-[24px] text-center border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
                 ${isStandardSelected 
-                  ? "border-blue-500/80 bg-gradient-to-b from-[#0c1835]/70 to-[#050814]/70 shadow-[0_0_40px_rgba(59,130,246,0.25)] ring-1 ring-blue-500/30 scale-[1.02] z-10" 
-                  : "border-white/5 bg-slate-900/30 hover:border-blue-500/30 hover:bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+                  ? "border-blue-500/80 bg-gradient-to-b from-[#0c1835]/70 to-[#050814]/70 shadow-[0_0_40px_rgba(59,130,246,0.25)] ring-1 ring-blue-500/30 scale-[1.02] -translate-y-2 z-10" 
+                  : "border-white/5 bg-slate-900/30 hover:border-blue-500/30 hover:bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-2"
                 }`}
             >
-              <div className="space-y-6 relative z-10">
+              <div className="space-y-4 relative z-10">
                 <div>
                   <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isStandardSelected ? "text-blue-400" : "text-white"}`}>
-                    {standardPkg.name}
+                    STANDARD
                   </h4>
                   <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider opacity-65">
-                    {standardPkg.desc}
+                    Standardno prikazivanje
                   </p>
                 </div>
 
-                <div className="py-3 border-y border-white/5 flex items-baseline gap-2">
-                  {standardPkg.oldPrice && (
-                    <span className="text-on-surface-variant line-through text-xs opacity-60 font-bold mr-1">
-                      {standardPkg.oldPrice}
-                    </span>
-                  )}
-                  <span className={`font-black text-3xl md:text-4xl tracking-tight ${standardPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
-                    {standardPkg.priceNum > 0 ? standardPkg.priceNum.toLocaleString("sr-RS") : "0"}
+                <div className="py-2 border-y border-white/5 flex flex-col items-center justify-center gap-1">
+                  <span className={`font-black text-3xl tracking-tight ${standardPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
+                    1.000
                   </span>
                   <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">
-                    {standardPkg.priceNum > 0 ? "SG KREDITA" : "BESPLATNO"}
+                    SG KREDITA (RSD)
                   </span>
                 </div>
 
-                <ul className="space-y-4">
-                  {standardPkg.features.map((f: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 leading-relaxed">
-                      <span className={`material-symbols-outlined text-[16px] shrink-0 mt-0.5 ${isStandardSelected ? "text-blue-400" : "text-blue-500/60"}`}>
+                <ul className="space-y-3 py-2">
+                  {[
+                    "Osnovna pozicija u oglasniku",
+                    "30 dana trajanje oglasa"
+                  ].map((f: string, i: number) => (
+                    <li key={i} className="flex flex-row items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 text-left">
+                      <span className="material-symbols-outlined text-[16px] text-green-500 shrink-0">
                         check_circle
                       </span>
                       <span>{f}</span>
@@ -385,7 +428,7 @@ export function Step4({
 
               <button
                 type="button"
-                className={`w-full py-4 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-8 relative z-10 
+                className={`w-full py-3 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-6 relative z-10 
                   ${isStandardSelected 
                     ? "bg-white text-black font-black hover:bg-slate-100" 
                     : "border border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
@@ -400,10 +443,10 @@ export function Step4({
           {premiumPkg && (
             <div
               onClick={() => setValue("paket", premiumPkg.id)}
-              className={`relative p-8 rounded-[24px] border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
+              className={`relative p-6 md:py-8 rounded-[24px] text-center border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer md:scale-[1.08] z-20
                 ${isPremiumSelected 
-                  ? "border-secondary bg-gradient-to-b from-[#1c140a]/80 to-[#070502]/80 shadow-[0_0_55px_rgba(254,191,13,0.3)] ring-1 ring-secondary/50 scale-[1.02] z-10" 
-                  : "border-secondary/20 bg-slate-900/30 hover:border-secondary/50 hover:bg-[#1a150c]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+                  ? "border-secondary bg-gradient-to-b from-[#1c140a]/80 to-[#070502]/80 shadow-[0_0_55px_rgba(254,191,13,0.3)] ring-1 ring-secondary/50 -translate-y-2" 
+                  : "border-secondary/20 bg-slate-900/30 hover:border-secondary/50 hover:bg-[#1a150c]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-2"
                 }`}
             >
               {/* Premium Glow effect */}
@@ -412,40 +455,41 @@ export function Step4({
               )}
 
               {premiumPkg.recommended && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-secondary text-black text-[9px] font-black uppercase tracking-[0.22em] px-5 py-1.5 rounded-full shadow-[0_4px_20px_rgba(254,191,13,0.5)] whitespace-nowrap z-20">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black text-xs font-black uppercase tracking-[0.25em] px-8 py-2 rounded-full shadow-[0_4px_20px_rgba(254,191,13,0.5)] whitespace-nowrap z-30 animate-pulse border border-yellow-200/50">
                   ★ PREPORUČENO
                 </div>
               )}
 
-              <div className="space-y-6 relative z-10">
+              <div className="space-y-4 relative z-10">
                 <div>
-                  <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isPremiumSelected ? "text-secondary font-black drop-shadow-[0_0_15px_rgba(254,191,13,0.3)]" : "text-secondary/90"} flex items-center gap-2`}>
-                    {premiumPkg.name}
+                  <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isPremiumSelected ? "text-secondary font-black drop-shadow-[0_0_15px_rgba(254,191,13,0.3)]" : "text-secondary/90"} flex justify-center items-center gap-2`}>
+                    PREMIUM OGLAS
                     <span className="material-symbols-outlined text-lg animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
                   </h4>
                   <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider opacity-65">
-                    {premiumPkg.desc}
+                    Za ozbiljnije oglašivače
                   </p>
                 </div>
 
-                <div className="py-3 border-y border-white/5 flex items-baseline gap-2">
-                  {premiumPkg.oldPrice && (
-                    <span className="text-on-surface-variant line-through text-xs opacity-60 font-bold mr-1">
-                      {premiumPkg.oldPrice}
-                    </span>
-                  )}
-                  <span className={`font-black text-3xl md:text-4xl tracking-tight ${premiumPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
-                    {premiumPkg.priceNum > 0 ? premiumPkg.priceNum.toLocaleString("sr-RS") : "0"}
+                <div className="py-2 border-y border-white/5 flex flex-col items-center justify-center gap-1">
+                  <span className={`font-black text-3xl tracking-tight ${premiumPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
+                    2.000
                   </span>
                   <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">
-                    {premiumPkg.priceNum > 0 ? "SG KREDITA" : "BESPLATNO"}
+                    SG KREDITA (RSD)
                   </span>
                 </div>
 
-                <ul className="space-y-4">
-                  {premiumPkg.features.map((f: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 leading-relaxed">
-                      <span className={`material-symbols-outlined text-[16px] shrink-0 mt-0.5 text-secondary`}>
+                <ul className="space-y-3 py-2">
+                  {[
+                    "Naslovna strana",
+                    "Uvek na vrhu pretrage",
+                    "Poseban dizajn i boja",
+                    "Bedž PREMIUM",
+                    "30 dana trajanje oglasa"
+                  ].map((f: string, i: number) => (
+                    <li key={i} className="flex flex-row items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 text-left">
+                      <span className="material-symbols-outlined text-[16px] text-green-500 shrink-0">
                         check_circle
                       </span>
                       <span>{f}</span>
@@ -456,7 +500,7 @@ export function Step4({
 
               <button
                 type="button"
-                className={`w-full py-4 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-8 relative z-10 
+                className={`w-full py-3 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-6 relative z-10 
                   ${isPremiumSelected 
                     ? "bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black font-black hover:brightness-110 shadow-[0_0_20px_rgba(254,191,13,0.3)]" 
                     : "border border-secondary/20 text-secondary/80 hover:bg-secondary/5"
@@ -471,10 +515,10 @@ export function Step4({
           {urgentPkg && (
             <div
               onClick={() => setValue("paket", "urgent")}
-              className={`relative p-8 rounded-[24px] border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
+              className={`relative p-6 rounded-[24px] text-center border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
                 ${isUrgentSelected 
-                  ? "border-blue-500 bg-gradient-to-b from-[#0b1b3f]/80 to-[#040915]/80 shadow-[0_0_45px_rgba(59,130,246,0.3)] ring-1 ring-blue-500/50 scale-[1.02] z-10" 
-                  : "border-blue-500/10 bg-slate-900/30 hover:border-blue-500/40 hover:bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+                  ? "border-blue-500 bg-gradient-to-b from-[#0b1b3f]/80 to-[#040915]/80 shadow-[0_0_45px_rgba(59,130,246,0.3)] ring-1 ring-blue-500/50 scale-[1.02] -translate-y-2 z-10" 
+                  : "border-blue-500/10 bg-slate-900/30 hover:border-blue-500/40 hover:bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-2"
                 }`}
             >
               {/* Blue Glow effect */}
@@ -482,34 +526,35 @@ export function Step4({
                 <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none transition-transform duration-700 bg-blue-500/10 blur-[40px]"></div>
               )}
 
-              <div className="space-y-6 relative z-10">
+              <div className="space-y-4 relative z-10">
                 <div>
                   <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isUrgentSelected ? "text-blue-400 font-black drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-white"}`}>
-                    {urgentPkg.name}
+                    HITNO (URGENT)
                   </h4>
                   <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider opacity-65">
-                    {urgentPkg.desc}
+                    Najviši prioritet
                   </p>
                 </div>
 
-                <div className="py-3 border-y border-white/5 flex items-baseline gap-2">
-                  {urgentPkg.oldPrice && (
-                    <span className="text-on-surface-variant line-through text-xs opacity-60 font-bold mr-1">
-                      {urgentPkg.oldPrice}
-                    </span>
-                  )}
-                  <span className={`font-black text-3xl md:text-4xl tracking-tight ${urgentPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
-                    {urgentPkg.priceNum > 0 ? urgentPkg.priceNum.toLocaleString("sr-RS") : "0"}
+                <div className="py-2 border-y border-white/5 flex flex-col items-center justify-center gap-1">
+                  <span className={`font-black text-3xl tracking-tight ${urgentPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
+                    4.000
                   </span>
                   <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">
-                    {urgentPkg.priceNum > 0 ? "SG KREDITA" : "BESPLATNO"}
+                    SG KREDITA (RSD)
                   </span>
                 </div>
 
-                <ul className="space-y-4">
-                  {urgentPkg.features.map((f: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 leading-relaxed">
-                      <span className={`material-symbols-outlined text-[16px] shrink-0 mt-0.5 ${isUrgentSelected ? "text-blue-400" : "text-blue-500/60"}`}>
+                <ul className="space-y-3 py-2">
+                  {[
+                    "Naslovna strana",
+                    "Uvek na vrhu pretrage",
+                    "Poseban dizajn i boja",
+                    "Bedž Hitno",
+                    "7 dana trajanje oglasa"
+                  ].map((f: string, i: number) => (
+                    <li key={i} className="flex flex-row items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 text-left">
+                      <span className="material-symbols-outlined text-[16px] text-green-500 shrink-0">
                         check_circle
                       </span>
                       <span>{f}</span>
@@ -520,7 +565,7 @@ export function Step4({
 
               <button
                 type="button"
-                className={`w-full py-4 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-8 relative z-10 
+                className={`w-full py-3 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-6 relative z-10 
                   ${isUrgentSelected 
                     ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 text-white font-black hover:brightness-110 shadow-[0_0_20px_rgba(59,130,246,0.3)]" 
                     : "border border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
@@ -570,6 +615,22 @@ export function Step4({
                   </div>
                 </div>
 
+                {/* Faktura Option (Disabled / Soon) */}
+                <div className="p-5 rounded-2xl border border-white/5 opacity-40 bg-[#0b132b]/40 flex items-center justify-between cursor-not-allowed">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 text-on-surface-variant">
+                      <span className="material-symbols-outlined">receipt_long</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                        Faktura
+                        <span className="text-[9px] bg-secondary/20 text-secondary px-2 py-0.5 rounded font-black uppercase tracking-widest">USKORO!</span>
+                      </p>
+                      <p className="text-xs text-on-surface-variant font-bold font-sans">Plaćanje za pravna lica</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Credit Card Option (Disabled / Soon) */}
                 <div className="p-5 rounded-2xl border border-white/5 opacity-40 bg-[#0b132b]/40 flex items-center justify-between cursor-not-allowed">
                   <div className="flex items-center gap-4">
@@ -581,23 +642,43 @@ export function Step4({
                         Platna kartica
                         <span className="text-[9px] bg-secondary/20 text-secondary px-2 py-0.5 rounded font-black uppercase tracking-widest">USKORO!</span>
                       </p>
-                      <p className="text-xs text-on-surface-variant font-bold">Visa, Mastercard, Dina</p>
+                      <div className="flex gap-2 mt-1">
+                        <span className="text-[9px] bg-white/10 text-white px-1.5 py-0.5 rounded font-bold uppercase">VISA</span>
+                        <span className="text-[9px] bg-white/10 text-white px-1.5 py-0.5 rounded font-bold uppercase">Mastercard</span>
+                        <span className="text-[9px] bg-white/10 text-white px-1.5 py-0.5 rounded font-bold uppercase">Dina</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Bank Invoice Option (Disabled / Soon) */}
+                {/* E-Banking Option (Disabled / Soon) */}
                 <div className="p-5 rounded-2xl border border-white/5 opacity-40 bg-[#0b132b]/40 flex items-center justify-between cursor-not-allowed">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 text-on-surface-variant">
-                      <span className="material-symbols-outlined">receipt_long</span>
+                      <span className="material-symbols-outlined">account_balance</span>
                     </div>
                     <div>
                       <p className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                        E-banking / Uplatnica
+                        E-Banking / Uplatnica
                         <span className="text-[9px] bg-secondary/20 text-secondary px-2 py-0.5 rounded font-black uppercase tracking-widest">USKORO!</span>
                       </p>
-                      <p className="text-xs text-on-surface-variant font-bold font-sans">Plaćanje direktno na račun firme</p>
+                      <p className="text-xs text-on-surface-variant font-bold font-sans">Plaćanje preko web bankarstva</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* mBanking Option (Disabled / Soon) */}
+                <div className="p-5 rounded-2xl border border-white/5 opacity-40 bg-[#0b132b]/40 flex items-center justify-between cursor-not-allowed">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 text-on-surface-variant">
+                      <span className="material-symbols-outlined">qr_code_scanner</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                        mBanking (IPS QR)
+                        <span className="text-[9px] bg-secondary/20 text-secondary px-2 py-0.5 rounded font-black uppercase tracking-widest">USKORO!</span>
+                      </p>
+                      <p className="text-xs text-on-surface-variant font-bold font-sans">Plaćanje skeniranjem koda</p>
                     </div>
                   </div>
                 </div>
@@ -605,7 +686,24 @@ export function Step4({
 
               {/* Right Side: Order Summary Card */}
               <div className="space-y-6">
-                <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-4">
+                {/* Wallet Balance Card */}
+                <div className="bg-[#111827]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-[40px] pointer-events-none"></div>
+                  <div className="flex items-center gap-3 mb-6 relative z-10">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-black">
+                      <span className="material-symbols-outlined text-[16px] font-black">account_balance_wallet</span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-green-500">Dostupna sredstva</span>
+                  </div>
+                  <div className="relative z-10">
+                    <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mb-1">Trenutni saldo</p>
+                    <p className="text-3xl font-black text-white flex items-baseline gap-2">
+                      {walletBalance.toLocaleString("sr-RS")} <span className="text-green-500 text-sm tracking-widest uppercase">Kredita</span>
+                    </p>
+                  </div>
+                </div>
+
+                <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-4 mt-6">
                   Pregled porudžbine
                 </h4>
                 
@@ -627,8 +725,16 @@ export function Step4({
 
                   <div className="border-t border-white/5 pt-4 space-y-3 text-xs">
                     <div className="flex justify-between text-on-surface-variant font-bold">
-                      <span>Cena paketa:</span>
+                      <span>Osnovna cena paketa:</span>
                       <span className="text-white">{selectedPkg ? selectedPkg.priceNum.toLocaleString("sr-RS") : "0"} SG</span>
+                    </div>
+                    <div className="flex justify-between text-on-surface-variant font-bold">
+                      <span>PDV (0% - Oslobođeno):</span>
+                      <span className="text-white">0 SG</span>
+                    </div>
+                    <div className="flex justify-between text-on-surface-variant font-bold">
+                      <span>Trajanje objave oglasa:</span>
+                      <span className="text-white">{selectedPkg?.id === 'urgent' ? '7 dana' : '30 dana'}</span>
                     </div>
                     {systemConfig?.holidayModeActive && selectedPkg?.isDiscounted && (
                       <div className="flex justify-between text-red-400 font-bold">
@@ -645,19 +751,10 @@ export function Step4({
 
                 {/* Balance Status & Pay Button */}
                 <div className="space-y-4 pt-4">
-                  {isInsufficientFunds ? (
-                    <div className="bg-error/10 border border-error/20 p-4 rounded-xl text-center">
-                      <p className="text-error text-xs font-black uppercase tracking-wider">
-                        Nemate dovoljno SG Kredita.
-                      </p>
-                      <p className="text-error/70 text-[10px] font-bold mt-1 uppercase tracking-wider">
-                        Potrebno još: {(currentPackagePrice - walletBalance).toLocaleString("sr-RS")} SG
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-xl text-center">
-                      <p className="text-green-400 text-xs font-bold uppercase tracking-wider">
-                        Preostalo na računu nakon objave: {(walletBalance - currentPackagePrice).toLocaleString("sr-RS")} SG Kredita
+                  {isInsufficientFunds && (
+                    <div className="bg-error/10 border border-error/20 p-3 rounded-xl text-center">
+                      <p className="text-error text-[10px] font-black uppercase tracking-wider">
+                        Nedostaje još: {(currentPackagePrice - walletBalance).toLocaleString("sr-RS")} SG kredita za objavu
                       </p>
                     </div>
                   )}
@@ -700,6 +797,47 @@ export function Step4({
                       Posetite Vaš Profil za dopunu SG Kredita
                     </p>
                   )}
+                </div>
+              </div>
+            </div>
+
+            {/* Safety guarantees (Full width footer) */}
+            <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-4 max-w-sm">
+                <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400 shrink-0">
+                  <span className="material-symbols-outlined text-[20px]">shield</span>
+                </div>
+                <div>
+                  <p className="text-white text-[11px] font-black uppercase tracking-widest mb-1">100% Sigurna Platforma</p>
+                  <p className="text-on-surface-variant text-[10px] font-medium leading-relaxed">Svi vaši podaci su zaštićeni vrhunskom SSL enkripcijom.</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center">
+                {/* Fallback to text if image isn't available yet */}
+                <img 
+                  src="/visa-mastercard.png" 
+                  alt="Visa Mastercard" 
+                  className="h-10 object-contain opacity-90 hover:opacity-100 transition-opacity" 
+                  onError={(e) => { 
+                    e.currentTarget.style.display = 'none'; 
+                    const nextEl = e.currentTarget.nextElementSibling;
+                    if (nextEl) (nextEl as HTMLElement).style.display = 'flex';
+                  }} 
+                />
+                <div style={{ display: 'none' }} className="flex gap-4">
+                  <span className="text-white font-black text-xl italic">VISA</span>
+                  <span className="text-white font-black text-xl italic">Mastercard</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 max-w-sm">
+                <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                  <span className="material-symbols-outlined text-[20px]">verified</span>
+                </div>
+                <div>
+                  <p className="text-white text-[11px] font-black uppercase tracking-widest mb-1">Garantovana isporuka</p>
+                  <p className="text-on-surface-variant text-[10px] font-medium leading-relaxed">Oglas se aktivira momentalno po uspešnoj uplati.</p>
                 </div>
               </div>
             </div>
