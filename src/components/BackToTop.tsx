@@ -7,20 +7,16 @@ export default function BackToTop() {
 
   useEffect(() => {
     let ticking = false;
-    let cachedScrollHeight = document.documentElement.scrollHeight;
-    let cachedInnerHeight = window.innerHeight;
-
-    const updateLayoutCache = () => {
-      cachedScrollHeight = document.documentElement.scrollHeight;
-      cachedInnerHeight = window.innerHeight;
-    };
 
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const totalScroll = cachedScrollHeight - cachedInnerHeight;
+          const scrollHeight = document.documentElement.scrollHeight;
+          const innerHeight = window.innerHeight;
+          const totalScroll = scrollHeight - innerHeight;
           const scrollY = window.scrollY;
           const progress = totalScroll > 0 ? (scrollY / totalScroll) * 100 : 0;
+          
           setScrollProgress(progress);
           setIsVisible(scrollY > 300);
           ticking = false;
@@ -30,10 +26,8 @@ export default function BackToTop() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', updateLayoutCache, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', updateLayoutCache);
     };
   }, []);
 
