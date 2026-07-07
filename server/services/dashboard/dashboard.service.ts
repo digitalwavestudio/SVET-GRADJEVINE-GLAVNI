@@ -37,10 +37,11 @@ export class DashboardService {
 
   static async aggregateDashboardData(userId: string, role: string, isAdmin: boolean, reqUser: UserMatchProfile | null = null) {
     try {
-      const cached = (await CacheService.get(`bff_cache_tiered:${userId}`)) || 
-                     (await CacheService.get(`swr:bff_cache_tiered:${userId}`));
+      const roleSuffix = role?.toLowerCase() || "unknown";
+      const cached = (await CacheService.get(`bff_cache_tiered:${userId}:${roleSuffix}`)) || 
+                     (await CacheService.get(`swr:bff_cache_tiered:${userId}:${roleSuffix}`));
       if (cached) {
-        console.info(`⚡ [DashboardService] Instant prewarm fast-path hit! Read consolidated Redis bff_cache_tiered:${userId}.`);
+        console.info(`⚡ [DashboardService] Instant prewarm fast-path hit! Read consolidated Redis bff_cache_tiered:${userId}:${roleSuffix}.`);
         return cached;
       }
     } catch (cacheErr: unknown) {
