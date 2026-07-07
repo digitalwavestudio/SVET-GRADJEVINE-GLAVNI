@@ -201,7 +201,7 @@ statsRouter.get("/counts", async (req, res, next) => {
   try {
     const stats = await AdminStatsService.getGlobalStats();
     res.json({
-      jobs: stats.totalJobs || 0,
+      jobs: stats.activeJobs || stats.totalJobs || 0,
       accommodations: stats.accommodationsCount || 0,
       machines: stats.machinesCount || 0,
       masters: stats.mastersCount || 0,
@@ -324,7 +324,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
         const globalStats = await AdminStatsService.getGlobalStats();
 
         const fieldMap: Record<string, string> = {
-          jobs: "totalJobs",
+          jobs: "activeJobs",
           companies: "companiesCount",
           machines: "machinesCount",
           accommodations: "accommodationsCount",
