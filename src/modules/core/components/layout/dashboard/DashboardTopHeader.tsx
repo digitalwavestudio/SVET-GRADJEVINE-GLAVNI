@@ -137,7 +137,7 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
   React.useEffect(() => { setImgError(false); }, [profileSrc]);
   return (
     <header className="hidden md:flex h-20 border-b border-white/5 bg-[#070B0F] sticky top-0 z-40 w-full">
-      <div className="w-full max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-end h-full">
+      <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 flex items-center justify-end h-full">
         <div className="flex items-center gap-6">
           <Link to="/postavi-oglas" className="hidden lg:flex items-center gap-2 bg-secondary !text-black px-5 py-2 rounded-[10px] font-black text-[10px] tracking-widest uppercase hover:bg-yellow-400 transition-all shadow-sm shadow-secondary/10">
             <span className="material-symbols-outlined text-lg">add_circle</span>

@@ -194,12 +194,17 @@ export class AdminStatsService {
       if (doc.exists) {
         const d = doc.data();
         if (d) {
-          // Čitamo activeJobs iz šardova u realnom vremenu (increment/decrement na svaki oglas)
+          // Čitamo activeJobs i activeAds iz šardova u realnom vremenu (increment/decrement na svaki oglas)
           try {
             const shardsSnap = await db.collection("metadata/global_stats/shards").get();
             let activeJobs = 0;
-            shardsSnap.forEach(s => { activeJobs += s.data().activeJobs || 0; });
+            let activeAds = 0;
+            shardsSnap.forEach(s => { 
+              activeJobs += s.data().activeJobs || 0; 
+              activeAds += s.data().activeAds || 0;
+            });
             d.activeJobs = activeJobs;
+            d.activeAds = activeAds;
           } catch (e) {
             // Fallback — koristi admin_stats vrednost
           }
