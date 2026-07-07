@@ -11,147 +11,46 @@ import { AdminStatsService } from "../admin/admin-stats.service.ts";
 
 export class JobsCoreService {
   static async getPublicJobs(limit: number = 100, cursor?: string) {
-    // OPTIMIZATION: Cache only first page (no cursor), reuse for all pages via client-side revalidation
-    // This prevents N cache keys for N pages = N Firestore reads
-    const cacheKey = `public_jobs_v2_${limit}`;  // ← No cursor in key!
-    const t0_cache = Date.now();
-    let cached: any = null;
-    
-    // Return cached FIRST page for all requests, let client handle pagination with cursor
-    if (!cursor) {
-      cached = await CacheService.get(cacheKey);
-      console.log(`[TIMING] CacheService.get(${cacheKey}): ${Date.now() - t0_cache}ms`);
-      if (cached) {
-        const samplePremium = (cached as any).docs?.slice(0, 5).filter((d: any) => d.isPremium).length;
-        console.log(`[PREMIUM_DEBUG] Cached data: ${(cached as any).docs?.length || 0} docs, premium in first 5: ${samplePremium}`);
-        return cached;
-      }
-    }
+    const db = getDb();
 
     try {
-      // Bypass proxy to avoid circuit-breaker returning empty wrapped data
-      const t0_db = Date.now();
-      const rawDb = getDb();
-      console.log(`[TIMING] getDb(): ${Date.now() - t0_db}ms`);
-
-      // Fetch from Firestore - use top-level collection, not collectionGroup
-      const t0_query = Date.now();
-      let q = rawDb
-        .collection("listings")  // ← Use collection() instead of collectionGroup()
+      const snap = await db
+        .collection("listings")
         .where("type", "==", "job")
         .where("status", "==", "active")
-        .orderBy("createdAt", "desc");
-        
-      if (cursor) {
-        let docId = cursor;
-        if (typeof cursor === "string" && cursor.startsWith("cursor_")) {
-          try {
-            const decoded = Buffer.from(cursor.replace("cursor_", ""), "base64").toString("utf-8");
-            const parsed = JSON.parse(decoded);
-            if (parsed.id) docId = parsed.id;
-          } catch {}
-        }
-        const cursorDoc = await rawDb.collection("listings").doc(docId).get();
-        if (cursorDoc.exists) {
-            q = q.startAfter(cursorDoc);
-        }
-      }
-
-      const snap = await q
-        .limit(limit)
         .select(
-          "title",
-          "name",
-          "description",
-          "price",
-          "location",
-          "loc",
-          "type",
-          "status",
-          "createdAt",
-          "images",
-          "isPremium",
-          "isUrgent",
-          "comp",
-          "salary",
-          "sal",
-          "logo",
-          "plataMin",
-          "plataMax",
-          "salaryType",
-          "benefits",
-          "benefiti",
-          "rawBenefits",
-          "smestaj",
-          "prevoz",
-          "hrana",
-          "housing",
-          "transport",
-          "food",
-          "topliObrok",
+          "title", "name", "description", "price", "location", "loc",
+          "type", "status", "createdAt", "images", "isPremium", "isUrgent",
+          "comp", "salary", "sal", "logo", "plataMin", "plataMax",
+          "salaryType", "benefits", "benefiti", "rawBenefits",
+          "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
         )
         .get();
 
-      const t0_map = Date.now();
-      console.log(`[TIMING] Firestore .get() took: ${t0_map - t0_query}ms, docs: ${snap.docs.length}`);
-      const rawDocs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
-      const premiumSample = rawDocs.slice(0, 10).filter((d: any) => d.isPremium).length;
-      console.log(`[PREMIUM_DEBUG] Raw Firestore docs: ${rawDocs.length}, isPremium in first 10: ${premiumSample}, sample isPremium values:`, rawDocs.slice(0, 5).map((d: any) => ({ id: d.id, isPremium: d.isPremium, isUrgent: d.isUrgent })));
-      // cursorDoc je poslednji dokument koji TREBA da ostane na ovoj strani (pageSize-ti u query order-u)
-      // Ovaj ID čuvamo PRE sortiranja da bi startAfter() radio korektno
-      const pageSize = limit - 1;
-      const cursorDocId = rawDocs.length > pageSize ? rawDocs[pageSize - 1].id : null;
-      // Sort premiums and urgent first (samo za prikaz)
-      rawDocs.sort((a: any, b: any) => {
+      let docs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
+      docs.sort((a: any, b: any) => {
         if (a.isPremium && !b.isPremium) return -1;
         if (!a.isPremium && b.isPremium) return 1;
         if (a.isUrgent && !b.isUrgent) return -1;
         if (!a.isUrgent && b.isUrgent) return 1;
-        return 0;
+        const ta = a.createdAt?.toDate?.()?.getTime() || new Date(a.createdAt).getTime() || 0;
+        const tb = b.createdAt?.toDate?.()?.getTime() || new Date(b.createdAt).getTime() || 0;
+        return tb - ta;
       });
-      console.log(`[TIMING] .map()+sort took: ${Date.now() - t0_map}ms`);
+      docs = docs.slice(0, limit);
 
-      const response = {
-        docs: rawDocs,
+      const pageSize = limit - 1;
+      const cursorDocId = docs.length > pageSize ? docs[pageSize - 1].id : null;
+
+      return {
+        docs,
         _cursorDocId: cursorDocId,
         lastVisible: cursorDocId,
-        hasMore: rawDocs.length > pageSize,
+        hasMore: docs.length > pageSize,
       };
-      
-      // OPTIMIZATION: Cache only first page (no cursor), extends TTL on every view
-      if (rawDocs.length > 0 && !cursor) {
-        const t0_set = Date.now();
-        await CacheService.set(cacheKey, response, 3600000);  // 60 min TTL
-        console.log(`[TIMING] CacheService.set(): ${Date.now() - t0_set}ms`);
-      } else if (!cursor) {
-        console.log(`[JOBS_CORE] Skipping cache for ${cacheKey}: empty result`);
-      }
-      console.log(`[TIMING] TOTAL getPublicJobs: ${Date.now() - t0_cache}ms`);
-      return response;
-    } catch (error: any) {
-      const err = error as Error & { details?: string; code?: number };
-      const errMsg = err?.message || "";
-      const isQuotaError = 
-        errMsg.includes("Quota limit exceeded") || 
-        errMsg.includes("RESOURCE_EXHAUSTED") ||
-        err?.details?.includes("Quota limit exceeded") ||
-        err?.code === 8;
-
-      // Check for missing composite index
-      const isIndexError = errMsg.includes("The query requires an index");
-        
-      if (isIndexError) {
-        console.error("[JOBS] MISSING COMPOSITE INDEX! Create index for: type↑, status↑, createdAt↓");
-        console.error("[JOBS] Index link (from error):", errMsg.match(/https:\/\/console\.firebase[^\s]*/)?.[0] || "N/A");
-      } else if (isQuotaError) {
-        console.error("[JOBS] Firestore QUOTA EXCEEDED. Serving fallback/stale data.");
-      } else {
-        console.error("[JOBS] Firestore error:", errMsg);
-      }
-      
-      // Try to return stale cache if database is down or quota hit
-      console.log("[JOBS] getPublicJobs returning empty - cached:", !!cached, "error:", isIndexError ? "INDEX_MISSING" : isQuotaError ? "QUOTA" : "OTHER");
-      return cached || { docs: [], lastVisible: null, hasMore: false, warning: isQuotaError ? "Quota hit" : undefined };
+    } catch (err: any) {
+      console.error("[JOBS] getPublicJobs error:", err?.message || err);
+      return { docs: [], lastVisible: null, hasMore: false, warning: err?.message };
     }
   }
 

@@ -153,8 +153,6 @@ export class UnifiedSearchService {
     try {
       let countQ: FirebaseFirestore.Query = db.collection("listings");
       if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
-      // count() zahteva isti indeks kao i regularni query; koristimo (type, createdAt desc) koji postoji
-      countQ = countQ.orderBy("createdAt", "desc");
       const countSnap = await countQ.count().get();
       totalHits = countSnap.data().count;
     } catch (e) {
@@ -163,7 +161,7 @@ export class UnifiedSearchService {
 
     q = q.orderBy("createdAt", "desc");
     const queryLimit = needsLargeBatch ? Math.max(pageSize, 1000) : pageSize;
-    q = q.limit(queryLimit);  // N+1 fix: čitamo tačno pageSize, ne pageSize+1
+    q = q.limit(queryLimit);
 
     if (lastVisibleId) {
       const lastDoc = await db.collection(isProfileSearch ? "users" : "listings").doc(lastVisibleId).get();
@@ -190,8 +188,10 @@ export class UnifiedSearchService {
         const aP = (a as any).isPremium ? 1 : 0;
         const bP = (b as any).isPremium ? 1 : 0;
         if (bP !== aP) return bP - aP;
-        const aT = (a as any).createdAt?.toMillis?.() || (a as any).createdAt || 0;
-        const bT = (b as any).createdAt?.toMillis?.() || (b as any).createdAt || 0;
+        const cA = (a as any).createdAt;
+        const cB = (b as any).createdAt;
+        const aT = cA?.toMillis?.() ?? (typeof cA === 'string' ? new Date(cA).getTime() : cA) ?? 0;
+        const bT = cB?.toMillis?.() ?? (typeof cB === 'string' ? new Date(cB).getTime() : cB) ?? 0;
         return bT - aT;
       });
 

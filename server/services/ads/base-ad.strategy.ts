@@ -132,8 +132,8 @@ export class BaseAdStrategy {
         isUrgent: rawData.paket === "urgent",
         ...(premiumUntil ? { premiumUntil } : {}),
         ...(urgentUntil ? { urgentUntil } : {}),
-        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         viewsCount: 0,
         searchKeywords: searchKeywords.slice(0, 50),
         _geoloc: (rawData as { location?: { coordinates?: { lat: number, lng: number } } })?.location?.coordinates

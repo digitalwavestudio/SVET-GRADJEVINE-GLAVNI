@@ -26,6 +26,8 @@ import { favoritesRouter } from "./favorites.routes.ts";
 import { systemRouter } from "./system.routes.ts";
 import { mediaRouter } from "./media.routes.ts";
 import { rfqRouter } from "./rfq.routes.ts";
+import { followRouter } from "./follow.routes.ts";
+import { publicActivityRouter } from "./public-activity.routes.ts";
 import aiRouter from "./ai.routes.ts";
 
 
@@ -405,6 +407,8 @@ apiRouter.use("/reports", reportsRouter);
 apiRouter.use("/verification", verificationRouter);
 apiRouter.use("/favorites", favoritesRouter);
 apiRouter.use("/system", systemRouter);
+apiRouter.use("/follow", followRouter);
+apiRouter.use("/feed", publicActivityRouter);
 
 // Frontend error logging (used by entry-client.tsx window.onerror handler)
 apiRouter.post("/dev/log-error", async (req, res) => {

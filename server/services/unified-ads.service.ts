@@ -231,12 +231,11 @@ export class UnifiedAdsService {
           if (options.isPremium) query = query.where("isPremium", "==", true);
 
           query = query.orderBy("createdAt", "desc");
-
-          const snap = await query.limit(options.limit || 12).get();
+          const snap = await query.limit(Math.max(options.limit || 12, 100)).get();
 
           if (snap.empty) return finalFallback;
 
-          const results = snap.docs.map((doc) => {
+          let results = snap.docs.map((doc) => {
             const d = doc.data();
             return {
               id: doc.id,
@@ -244,6 +243,14 @@ export class UnifiedAdsService {
               createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt,
             };
           });
+
+          results.sort((a: any, b: any) => {
+            const cA = a.createdAt, cB = b.createdAt;
+            const aT = cA?.toMillis?.() ?? (typeof cA === 'string' ? new Date(cA).getTime() : cA) ?? 0;
+            const bT = cB?.toMillis?.() ?? (typeof cB === 'string' ? new Date(cB).getTime() : cB) ?? 0;
+            return bT - aT;
+          });
+          results = results.slice(0, options.limit || 12);
 
           if (options.isPremium && results.length > 0) {
             console.log(`[PREMIUM_DEBUG] getPromotedAds found ${results.length} premium docs, types:`, results.map((r: any) => ({ id: r.id, type: r.type, isPremium: r.isPremium, title: r.title })));

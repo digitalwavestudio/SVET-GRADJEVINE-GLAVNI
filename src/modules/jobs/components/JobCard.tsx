@@ -214,11 +214,6 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             {job.isPremium && (
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50"></div>
             )}
-            {isNovo && (
-              <span className="absolute top-3 right-3 bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-[0.1em] z-20 shadow-md">
-                NOVO
-              </span>
-            )}
           </>
         )}
 
@@ -266,9 +261,16 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             </div>
             {viewMode === 'list' && (
               <div className="ml-auto text-right flex flex-col items-end">
-                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
-                  {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
-                </span>
+                <div className="flex items-center gap-1.5 mb-2">
+                  {isNovo && (
+                    <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-[0.1em] shadow-md">
+                      NOVO
+                    </span>
+                  )}
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none">
+                    {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
+                  </span>
+                </div>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-[22px] font-sans leading-none tracking-tight">
                   {getSalaryDisplay()}
                 </span>

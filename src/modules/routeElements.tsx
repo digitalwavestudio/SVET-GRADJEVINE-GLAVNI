@@ -16,6 +16,7 @@ import { getAdsRouter } from '@/src/modules/ads/routes';
 import { getCheckoutRouter } from '@/src/modules/checkout/routes';
 import { getMastersRouter } from '@/src/modules/masters/routes';
 import { getSearchRouter } from '@/src/modules/search/routes';
+import { getSocialRouter } from '@/src/modules/social/routes';
 import { RootLayout } from '@/src/components/RootLayout';
 import GlobalRouteError from '@/src/components/GlobalRouteError';
 
@@ -35,6 +36,7 @@ export function getRouteElements() {
         {getAdsRouter()}
         {getCheckoutRouter()}
         {getSearchRouter()}
+        {getSocialRouter()}
         {getDashboardPublicRouter()}
         {getToolsPublicRouter()}
       </Route>

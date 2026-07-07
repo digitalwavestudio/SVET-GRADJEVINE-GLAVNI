@@ -3,8 +3,19 @@ import crypto from "crypto";
 import { db, admin } from "../config/firebase.ts";
 import { CacheService } from "../services/cache.service.ts";
 import { SSEService } from "../services/sse.service.ts";
+import { PublicActivityService } from "../services/public-activity.service.ts";
 
 export function setupActivitySubscriber() {
+  eventBus.on(
+    DomainEvents.AD_CREATED,
+    async (payload) => {
+      try {
+        await PublicActivityService.writeForAdCreated(payload);
+      } catch (err) {
+        console.error("[PublicActivity] Failed to write for AD_CREATED:", err);
+      }
+    },
+  );
   eventBus.on(
     DomainEvents.APPLICATION_SUBMITTED,
     async (payload) => {
@@ -196,6 +207,26 @@ export function setupActivitySubscriber() {
           `[EventSubscriber] Notification failed for USER_VERIFIED ${userId}:`,
           err,
         );
+      }
+    },
+  );
+
+  eventBus.on(
+    DomainEvents.AD_UPDATED,
+    async (payload) => {
+      try {
+        const wasPremium = !!(payload.oldData as any)?.isPremium;
+        const isPremiumNow = !!(payload.newData as any)?.isPremium;
+        if (!wasPremium && isPremiumNow) {
+          await PublicActivityService.writeForAdUpgraded({
+            id: payload.id,
+            category: payload.category,
+            uid: payload.uid,
+            title: payload.title,
+          });
+        }
+      } catch (err) {
+        console.error("[PublicActivity] Failed to write for AD_UPDATED premium:", err);
       }
     },
   );

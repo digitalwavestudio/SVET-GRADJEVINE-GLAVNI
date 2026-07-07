@@ -10,6 +10,7 @@ import EquipmentSection from '@/src/modules/core/components/home/EquipmentSectio
 import CateringSection from '@/src/modules/core/components/home/CateringSection';
 import JobsSection from '@/src/modules/core/components/home/JobsSection';
 import AboutSection from '@/src/modules/core/components/home/AboutSection';
+import { FeedWidget } from '@/src/modules/social';
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
 import { apiClient } from '@/src/lib/apiClient';
@@ -333,6 +334,10 @@ export default function HomePage() {
 
           <div className="scroll-fade-in">
             <CateringSection latestAccommodations={latestAccommodations} latestCaterings={latestCaterings} />
+          </div>
+
+          <div className="scroll-fade-in">
+            <FeedWidget className="py-12 md:py-16" />
           </div>
 
           <div className="scroll-fade-in">

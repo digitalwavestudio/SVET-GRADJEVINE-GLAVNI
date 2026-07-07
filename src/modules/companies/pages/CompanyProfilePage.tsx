@@ -16,6 +16,7 @@ import { useRealEstateList } from '@/src/modules/real_estate';
 import { generateLocalBusinessSchema, generateBreadcrumbSchema } from '@/src/lib/seoSchema';
 import { APP_CONFIG } from '@/src/constants/config';
 import { LOCATIONS } from '@/src/constants/taxonomy';
+import { FollowButton } from '@/src/modules/social';
 import { CompanyHeroSection } from '@/src/modules/companies/components/company/CompanyHeroSection';
 import { CompanyInfoTab } from '@/src/modules/companies/components/company/CompanyInfoTab';
 import { CompanyAdsTabsContent } from '@/src/modules/companies/components/company/CompanyAdsTabsContent';
@@ -172,6 +173,7 @@ export default function CompanyProfilePage() {
                 <span className="material-symbols-outlined text-[14px]">location_on</span>
                 {LOCATIONS.find(l => l.slug === company.locationSlug)?.name || 'Srbija'}, Srbija
               </span>
+              <FollowButton targetId={company.authorId || company.id || ''} />
             </div>
             {company.website && (
               <a href={company.website.startsWith('http') ? company.website : `https://${company.website}`}

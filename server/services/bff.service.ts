@@ -136,7 +136,7 @@ export const bffService = {
       withTimeout(UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       withTimeout(UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       withTimeout(UnifiedSearchService.search("caterings", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
-      withTimeout(UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 5), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
+      withTimeout(UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 10), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
     ]);
 
     const gStats = (
@@ -189,17 +189,23 @@ export const bffService = {
 
     if (!premiumJobsRaw.length) {
       try {
-        const snap = await db.collectionGroup("listings")
+        const snap = await db.collection("listings")
           .where("status", "==", "active")
           .where("isPremium", "==", true)
-          .orderBy("createdAt", "desc")
-          .limit(12)
+          .limit(100)
           .get();
         if (!snap.empty) {
           premiumJobsRaw = snap.docs.map((doc) => {
             const d = doc.data();
             return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
           }) as RawAdData[];
+          premiumJobsRaw.sort((a: any, b: any) => {
+            const cA = a.createdAt, cB = b.createdAt;
+            const aT = cA?.toMillis?.() ?? (typeof cA === 'string' ? new Date(cA).getTime() : cA) ?? 0;
+            const bT = cB?.toMillis?.() ?? (typeof cB === 'string' ? new Date(cB).getTime() : cB) ?? 0;
+            return bT - aT;
+          });
+          premiumJobsRaw = premiumJobsRaw.slice(0, 12);
         }
       } catch {}
     }
@@ -211,17 +217,23 @@ export const bffService = {
 
     if (!urgentJobsRaw.length) {
       try {
-        const snap = await db.collectionGroup("listings")
+        const snap = await db.collection("listings")
           .where("status", "==", "active")
           .where("isUrgent", "==", true)
-          .orderBy("createdAt", "desc")
-          .limit(12)
+          .limit(100)
           .get();
         if (!snap.empty) {
           urgentJobsRaw = snap.docs.map((doc) => {
             const d = doc.data();
             return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
           }) as RawAdData[];
+          urgentJobsRaw.sort((a: any, b: any) => {
+            const cA = a.createdAt, cB = b.createdAt;
+            const aT = cA?.toMillis?.() ?? (typeof cA === 'string' ? new Date(cA).getTime() : cA) ?? 0;
+            const bT = cB?.toMillis?.() ?? (typeof cB === 'string' ? new Date(cB).getTime() : cB) ?? 0;
+            return bT - aT;
+          });
+          urgentJobsRaw = urgentJobsRaw.slice(0, 12);
         }
       } catch {}
     }
@@ -289,18 +301,21 @@ export const bffService = {
     const latestCaterings = buildMappedDocs<Record<string, unknown>>(cateringsData).map((c) =>
       snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
     );
-    const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData).map((j) =>
-      snippet(j, [
-        "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
-        "loc", "location",
-        "sal", "salary", "plataMin", "plataMax", "salaryType",
-        "comp", "company", "companyName", "companyId", "isCompanyVerified",
-        "logo", "logoPlaceholder", "authorName",
-        "benefits", "benefiti", "rawBenefits",
-        "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
-        "viewsCount", "cat", "status"
-      ])
-    );
+    const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData)
+      .filter((j: any) => !j.isPremium)
+      .slice(0, 5)
+      .map((j) =>
+        snippet(j, [
+          "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
+          "loc", "location",
+          "sal", "salary", "plataMin", "plataMax", "salaryType",
+          "comp", "company", "companyName", "companyId", "isCompanyVerified",
+          "logo", "logoPlaceholder", "authorName",
+          "benefits", "benefiti", "rawBenefits",
+          "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
+          "viewsCount", "cat", "status"
+        ])
+      );
     const latestArticles: any[] = [];
 
     const result: HomepageDataResult = {

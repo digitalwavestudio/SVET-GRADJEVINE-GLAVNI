@@ -2057,6 +2057,20 @@
       "collectionGroup": "metadata",
       "fieldPath": "homepage",
       "indexes": []
+    },
+    {
+      "collectionGroup": "public_activities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "actorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ]
 }

@@ -13,7 +13,6 @@ const MyAdsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: 
 const SettingsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-settings" */ './pages/SettingsPage'));
 const AccountSettingsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-account-settings" */ './pages/AccountSettingsPage'));
 const WalletPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-wallet" */ './pages/WalletPage'));
-const MyInquiriesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-inquiries" */ './pages/MyInquiriesPage'));
 const DashboardModule = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-module" */ './index.tsx'));
 const StatsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-stats" */ './pages/StatsPage'));
 const PublicProfilePage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-public-profile" */ './pages/PublicProfilePage'));
@@ -63,7 +62,6 @@ export const getDashboardRouter = () => [
   <Route key="prijave" path="/moj-profil/prijave" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />,
   <Route key="omiljeni" path="/moj-profil/omiljeni" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />,
   <Route key="pretrage" path="/moj-profil/pretrage" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />,
-  <Route key="upiti" path="/moj-profil/upiti" element={<ProtectedRoute><MyInquiriesPage /></ProtectedRoute>} />,
   <Route key="kapaciteti" path="/moj-profil/kapaciteti" element={<ProtectedRoute><MyAccommodationCapacitiesPage /></ProtectedRoute>} />,
   <Route key="narudzbine" path="/moj-profil/narudzbine" element={<ProtectedRoute><MyCateringOrdersPage /></ProtectedRoute>} />,
   <Route key="dostava" path="/moj-profil/dostava" element={<ProtectedRoute><MyCateringDeliveryPage /></ProtectedRoute>} />,
