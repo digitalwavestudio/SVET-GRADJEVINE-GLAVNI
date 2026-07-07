@@ -57,7 +57,7 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                 className="p-4 md:p-8 flex flex-col md:grid md:grid-cols-12 gap-4 md:items-center border-b border-white/5 md:border-0 hover:bg-white/[0.02] transition-all group"
               >
               <div className="md:col-span-4 flex flex-row items-start gap-4 md:gap-6">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-white/5 rounded-[10px] flex items-center justify-center overflow-hidden border border-white/5 group-hover:border-secondary/30 transition-all font-black text-white/20 text-xl group-hover:bg-secondary/10 group-hover:text-secondary shrink-0">
+                <div className="hidden md:flex w-12 h-12 md:w-14 md:h-14 bg-white/5 rounded-[10px] items-center justify-center overflow-hidden border border-white/5 group-hover:border-secondary/30 transition-all font-black text-white/20 text-xl group-hover:bg-secondary/10 group-hover:text-secondary shrink-0">
                   {ad.logo ? (
                     <OptimizedImage 
                       src={ad.logo} 
@@ -132,21 +132,39 @@ export function OtherAdsList({ ads, showTitle = true, onPromote, onApprove, onDe
                           )}
                         </div>
                       )}
+
+                    {/* Mobilni detalji (Status, Pregledi, Prijave) */}
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2.5 pt-2 border-t border-white/5 md:hidden text-[9px] font-black text-white/40 uppercase tracking-widest w-full">
+                      <div className="flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5">
+                        <span>Status:</span>
+                        <DashboardAdStatusBadge status={ad.status} />
+                      </div>
+                      <div className="flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5">
+                        <span className="material-symbols-outlined text-[10px] text-white/30">visibility</span>
+                        <span>Pregledi: {ad.viewsCount || 0}</span>
+                      </div>
+                      {ad.postType === 'job' && (
+                        <div className="flex items-center gap-1 bg-white/[0.02] border border-white/5 rounded px-1.5 py-0.5">
+                          <span className="material-symbols-outlined text-[10px] text-white/30">assignment</span>
+                          <span>Prijave: {ad.applicantsCount || 0}</span>
+                        </div>
+                      )}
+                    </div>
                     </div>
                   </div>
                 </div>
 
-              <div className="mt-2 md:mt-0 flex md:block items-center justify-between md:col-span-2 md:text-center">
+              <div className="hidden md:block md:col-span-2 md:text-center">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">STATUS</span>
                 <div className="inline-block"><DashboardAdStatusBadge status={ad.status} /></div>
               </div>
               
-              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter md:col-span-1 md:text-center">
+              <div className="hidden md:block md:col-span-1 md:text-center text-sm font-black text-white tracking-tighter">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">PREGLEDI</span>
                 {ad.viewsCount || 0}
               </div>
 
-              <div className="flex md:block items-center justify-between text-sm font-black text-white tracking-tighter md:col-span-1 md:text-center">
+              <div className="hidden md:block md:col-span-1 md:text-center text-sm font-black text-white tracking-tighter">
                 <span className="md:hidden text-[10px] font-black text-white/40 uppercase tracking-widest">PRIJAVE / UPITI</span>
                 {ad.applicantsCount || 0}
               </div>
