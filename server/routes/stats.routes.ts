@@ -358,7 +358,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
             const todaySnap = await db.collection("listings")
               .where("type", "==", targetType)
               .where("status", "==", "active")
-              .where("createdAt", ">=", todayStart)
+              .where("createdAt", ">=", todayStart.toISOString())
               .count()
               .get();
             today = todaySnap.data().count;
