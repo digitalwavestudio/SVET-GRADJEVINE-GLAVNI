@@ -123,13 +123,15 @@ export function UsersTab(_props: UsersTabProps) {
                                    </div>
                                 </div>
                                 {/* Mobile inline badges */}
-                                <div className="flex md:hidden items-center gap-2 mt-2">
-                                   <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded-[6px]">{userRole}</span>
-                                   <span className={`text-[8px] font-black uppercase tracking-widest ${
-                                      userStatus === 'PREMIUM' ? 'text-secondary font-black' : 
-                                      userStatus === 'VERIFIED' ? 'text-green-500' : 'text-white/30'
+                                <div className="flex flex-wrap md:hidden items-center gap-2 mt-2">
+                                   <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-[4px]">{userRole}</span>
+                                   <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-[4px] border ${
+                                      userStatus === 'PREMIUM' ? 'bg-secondary/10 border-secondary/20 text-secondary' : 
+                                      userStatus === 'VERIFIED' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-white/5 border-white/10 text-white/40'
                                    }`}>{userStatus}</span>
-                                   {u.status === 'suspended' && <span className="px-2 py-0.5 bg-red-500/20 text-red-500 text-[8px] font-black rounded uppercase">suspended</span>}
+                                   {u.status === 'suspended' && (
+                                     <span className="px-2 py-0.5 bg-red-500/10 border border-red-500/20 text-red-500 text-[8px] font-black rounded-[4px] uppercase tracking-widest">SUSPENDOVAN</span>
+                                   )}
                                 </div>
                              </div>
                           </td>
@@ -151,13 +153,14 @@ export function UsersTab(_props: UsersTabProps) {
                              </div>
                           </td>
                           <td className="block md:table-cell md:px-8 pt-4 pb-2 md:py-6 text-right md:flex md:items-center md:justify-end gap-2">
-                             <div className="flex gap-2">
+                             <div className="flex gap-2 w-full md:w-auto">
                              <button
                                onClick={() => setFundingUser({ id: u.id, name: userName })}
-                               className="w-10 h-10 bg-secondary/10 text-secondary hover:bg-secondary hover:!text-black rounded-[10px] transition-all flex items-center justify-center p-0"
+                               className="flex-1 md:flex-none h-10 px-4 md:px-0 md:w-10 bg-secondary/10 text-secondary hover:bg-secondary hover:!text-black rounded-[10px] transition-all flex items-center justify-center gap-2 md:gap-0"
                                title="Manuelna dopuna novčanika"
                              >
                                 <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
+                                <span className="md:hidden text-[9px] font-black uppercase tracking-widest">Dopuna</span>
                              </button>
                              <button 
                                onClick={() => {
@@ -169,13 +172,13 @@ export function UsersTab(_props: UsersTabProps) {
                                     reason 
                                  });
                                }}
-                               className={`w-10 h-10 rounded-[10px] transition-all flex items-center justify-center p-0 border ${
+                               className={`flex-1 md:flex-none h-10 px-4 md:px-0 md:w-10 rounded-[10px] transition-all flex items-center justify-center gap-2 md:gap-0 border ${
                                  u.status === 'suspended' ? 'bg-green-500/10 text-green-500 border-green-500/30 hover:bg-green-500 hover:text-white' : 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white'
                                }`}
                                title={u.status === 'suspended' ? "Aktiviraj korisnika" : "Suspenduj korisnika"}
                              >
                                 <span className="material-symbols-outlined text-lg">{u.status === 'suspended' ? 'play_arrow' : 'block'}</span>
-                                <span className="md:hidden ml-2 text-xs font-black uppercase tracking-widest">{u.status === 'suspended' ? 'Aktiviraj' : 'Suspenduj'}</span>
+                                <span className="md:hidden text-[9px] font-black uppercase tracking-widest">{u.status === 'suspended' ? 'Aktiviraj' : 'Suspenduj'}</span>
                              </button>
                              </div>
                           </td>
