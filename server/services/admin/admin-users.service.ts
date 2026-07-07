@@ -124,7 +124,7 @@ export class AdminUsersService {
     if (!userDoc.exists) return { success: false, error: "User not found" };
 
     const userData = userDoc.data()!;
-    let isAdmin = userData.role === "admin";
+    let isAdmin = userData.role === "admin" || userData.admin === true;
     if (!isAdmin) {
       const adminDoc = await db.collection("admins").doc(uid).get();
       if (adminDoc.exists) {
