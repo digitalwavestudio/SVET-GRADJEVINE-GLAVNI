@@ -20,20 +20,21 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
     if (formData.dinamikaIsplate) details.push(`Isplata: ${formData.dinamikaIsplate}`);
     if (formData.benefits?.length) details.push(`Benefiti: ${formData.benefits.join(', ')}`);
 
-    const prompt = `Napiši KOMPLETAN opis oglasa za posao na sajtu Svet Građevine (srpski jezik, ćirilica ili latinica - izaberi sam).
+    const prompt = `Napiši KOMPLETAN opis oglasa za posao na sajtu Svet Građevine (srpski jezik).
 
 Podaci koje OBAVEZNO moraš ugraditi u tekst:
 ${details.map(d => `- ${d}`).join('\n')}
 
 Kategorija oglasa: ${selectedCategory}
 
-VAŽNA PRAVILA:
-1. Napiši GOTOV, objavljiv tekst — bez ikakvih zagrada, bez [Placeholder] ili [Naziv pozicije].
-2. Podatke iznad UGRADI direktno u rečenice.
-3. Završi sa "Može se krenuti odmah sa radom!"
-4. Na kraju dodaj: "Za sve ostale informacije i više detalja pozvati na broj telefona."
-5. Nema uvodnih poruka tipa "Evo opisa" ili "Naravno".
-6. Samo tekst, nema markdown formatiranja.`;
+KRUTA PRAVILA:
+1. Nema uvodnog naslova — ne piši "Oglas za posao", "Pozicija:", "Opis posla:" niti bilo šta slično na početku.
+2. Tekst počinje DIREKTNO rečenicom poput "Tražimo...".
+3. Nema generičkih floskula poput "poznavanje tehnika građenja i materijala" — samo konkretne stvari.
+4. Nema zagrada, nema [Placeholder].
+5. Završi sa "Može se krenuti odmah sa radom!".
+6. Na samom kraju dodaj: "Za sve ostale informacije i više detalja pozvati na broj telefona."
+7. Samo tekst, nema markdown, nema bullet lista sa zvezdicama (*).`;
 
     try {
       const responseText = await processAiCommand(prompt);
