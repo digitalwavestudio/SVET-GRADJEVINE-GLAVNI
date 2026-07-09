@@ -69,7 +69,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
 
   const renderBadge = (job: any) => {
     if (job.isPremium) return <span className="flex items-center gap-1 px-2.5 py-1 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-[8px] text-[9px] font-black uppercase tracking-widest shadow-[0_0_12px_rgba(234,179,8,0.2)]"><span className="material-symbols-outlined text-[11px]" style={{fontVariationSettings:"'FILL' 1"}}>hotel_class</span>Premium</span>;
-    if (job.isUrgent) return <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-2.5 py-1 rounded-[8px] text-[9px] font-black uppercase tracking-widest">Hitno</span>;
+    if (job.isUrgent) return <span className="backdrop-blur-sm bg-red-500/10 text-red-500 border border-red-500/20 px-2.5 py-1 rounded-[8px] text-[9px] font-black uppercase tracking-widest shadow-[0_0_12px_rgba(239,68,68,0.2)]">Hitno</span>;
     
     if (job.createdAt) {
       const now = new Date();

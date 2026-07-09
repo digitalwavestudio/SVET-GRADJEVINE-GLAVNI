@@ -48,7 +48,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {isLoading ? (
               // Skeletons during loading
               [...Array(12)].map((_, i) => (
@@ -87,20 +87,19 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50 z-0"></div>
                     
                     <div className="p-5 flex flex-col w-full h-full relative z-20 pointer-events-none">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-start mb-0">
+                        <div className="flex flex-col gap-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.1)] w-max">
+                            <span className="backdrop-blur-sm bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(239,68,68,0.25)] w-max">
                               <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
                             </span>
                             {isNovo && (
-                              <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-[0.1em] shadow-md">NOVO</span>
+                              <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-[0.1em] shadow-md">NOVO</span>
                             )}
                           </div>
-                          <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">{ad.time || 'Danas'}</span>
                         </div>
                         
-                        <div className="w-[48px] h-[48px] min-w-[48px] max-w-[48px] bg-white rounded-full p-1 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
+                        <div className="w-[56px] h-[56px] min-w-[56px] max-w-[56px] md:w-[64px] md:h-[64px] md:min-w-[64px] md:max-w-[64px] bg-white rounded-full p-1.5 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
                           {ad.logo ? (
                             <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain rounded-full" alt={`Logo firme ${ad.comp}`} referrerPolicy="no-referrer" />
                           ) : (
@@ -109,13 +108,17 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         </div>
                       </div>
 
-                      <h3 className="font-black text-lg md:text-xl text-white mb-1 uppercase line-clamp-2 tracking-tight group-hover:text-red-400 transition-colors duration-300">
-                        {ad.title}
-                      </h3>
-                      
+                        <h3 className="text-xl md:text-2xl font-black text-white group-hover/card:text-red-400 transition-colors duration-300 -mt-4 mb-1 uppercase break-words tracking-tight leading-tight">
+                          {(() => {
+                            const t = ad.title?.replace(' — ', ' ') || 'Hitno';
+                            const i = t.lastIndexOf(' ');
+                            if (i === -1) return t;
+                            return <>{t.slice(0, i)}<br />{t.slice(i + 1)}</>;
+                          })()}
+                        </h3>
                       <div className="mb-4 relative z-20">
                         <div className="flex items-center gap-1">
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 via-red-200 to-white text-[10px] md:text-xs font-black uppercase tracking-widest">
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs md:text-xs font-black uppercase tracking-widest">
                             {ad.comp || 'Svet Građevine'}
                           </span>
                           {ad.isCompanyVerified && (
@@ -151,27 +154,20 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         );
                       })()}
 
-                      <div className="flex flex-col gap-2 mb-4 mt-auto">
-                        <span className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                          <span className="material-symbols-outlined text-[12px] text-red-400">location_on</span> {ad.loc}
+                      <div className="pt-4 border-t border-white/5 relative z-10 flex items-end justify-between md:pointer-events-auto pointer-events-none">
+                        <span className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-[12px] text-blue-400">visibility</span> {ad.viewsCount || 0}
                         </span>
-                        {(ad.plataMin != null || ad.plataMax != null) && (
-                          <div className="flex items-center justify-between">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
-                              {ad.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
-                            </span>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-lg font-sans leading-none tracking-tight">
+                        {(ad.plataMin != null || ad.plataMax != null) ? (
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Satnica</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-xl md:text-2xl font-sans leading-none tracking-tight">
                               {ad.plataMin ? `${ad.plataMin}${ad.plataMax != null ? ` – ${ad.plataMax}` : ''}` : ad.plataMax} €
                             </span>
                           </div>
+                        ) : (
+                          <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Po dogovoru</span>
                         )}
-                      </div>
-
-                      <div className="pt-4 border-t border-white/5 relative z-10 flex items-center justify-center md:pointer-events-auto pointer-events-none">
-                        <div className="w-full justify-center bg-white/5 group-hover:bg-white/10 text-white border border-white/10 font-black px-4 py-2.5 rounded-[10px] transition-all text-[10px] uppercase tracking-widest flex items-center gap-2 relative z-20 shadow-sm md:opacity-100 opacity-0">
-                           POGLEDAJ OGLAS
-                           <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                        </div>
                       </div>
                     </div>
                   </div>

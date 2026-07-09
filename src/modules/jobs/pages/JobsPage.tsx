@@ -83,8 +83,11 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
   const premiumJobs = useMemo(() => premiumQueryData?.pages.flatMap(page => page.items) || [], [premiumQueryData]);
   const urgentJobs = useMemo(() => jobs.filter((j: any) => j.isUrgent), [jobs]);
   const allJobsPremiumFirst = useMemo(() => {
-    const premiumIds = new Set(premiumJobs.map(j => j.id));
-    return [...premiumJobs, ...jobs.filter(j => !premiumIds.has(j.id))];
+    const ids = new Set<string>();
+    const urgent = jobs.filter((j: any) => j.isUrgent && !ids.has(j.id) && ids.add(j.id));
+    const premium = premiumJobs.filter((j: any) => !ids.has(j.id) && ids.add(j.id));
+    const rest = jobs.filter((j: any) => !ids.has(j.id));
+    return [...urgent, ...premium, ...rest];
   }, [premiumJobs, jobs]);
 
   const [visibleCount, setVisibleCount] = useState(15);

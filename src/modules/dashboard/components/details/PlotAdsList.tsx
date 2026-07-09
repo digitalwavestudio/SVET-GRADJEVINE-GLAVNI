@@ -53,8 +53,8 @@ export function PlotAdsList({ ads, onPromote, onApprove, onDelete }: PlotAdsList
                   </span>
                 )}
                 
-                {ad.isPremium && <span className="bg-secondary/20 text-secondary border border-secondary/20 font-black text-[9px] tracking-widest uppercase px-3 py-1.5 rounded-full flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">hotel_class</span> Premium</span>}
-                {ad.isUrgent && <span className="bg-orange-500/20 text-orange-500 border border-orange-500/20 font-black text-[9px] tracking-widest uppercase px-3 py-1.5 rounded-full flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">bolt</span> Hitno</span>}
+                {ad.isPremium && <span className="backdrop-blur-sm bg-secondary/20 text-secondary border border-secondary/20 font-black text-[9px] tracking-widest uppercase px-3 py-1.5 rounded-md flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">hotel_class</span> Premium</span>}
+                {ad.isUrgent && <span className="backdrop-blur-sm bg-orange-500/20 text-orange-500 border border-orange-500/20 font-black text-[9px] tracking-widest uppercase px-3 py-1.5 rounded-md flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">bolt</span> Hitno</span>}
               </div>
 
               <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-2 group-hover:text-secondary transition-colors">

@@ -73,8 +73,8 @@ export function MachineAdsList({ ads, onPromote, onApprove, onDelete }: MachineA
                   <div>
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <DashboardAdStatusBadge status={ad.status} />
-                      {ad.isPremium && <span className="bg-white/10 text-white font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-full border border-white/10 flex items-center gap-1"><span className="material-symbols-outlined text-[10px] text-[#ffad3a]">star</span> Premium</span>}
-                      {ad.isUrgent && <span className="bg-orange-500/20 text-orange-500 font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-full border border-orange-500/20 flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">bolt</span> Hitno</span>}
+                      {ad.isPremium && <span className="backdrop-blur-sm bg-white/10 text-white font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-md border border-white/10 flex items-center gap-1"><span className="material-symbols-outlined text-[10px] text-[#ffad3a]">star</span> Premium</span>}
+                      {ad.isUrgent && <span className="backdrop-blur-sm bg-orange-500/20 text-orange-500 font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded-md border border-orange-500/20 flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">bolt</span> Hitno</span>}
                     </div>
                     <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight group-hover:text-[#ffad3a] transition-colors">{ad.adTitle || ad.title}</h3>
                     <p className="text-[10px] font-black text-[#a2acb9] tracking-widest uppercase mt-1">{ad.manufacturer || ad.brand} • {ad.modelstr || ad.model || 'N/A'}</p>

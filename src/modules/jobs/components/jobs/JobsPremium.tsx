@@ -135,7 +135,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                       {/* Title & Desc */}
                       <div className="flex-1 min-w-0 font-sans">
                         <div className="flex flex-col md:flex-row md:items-center justify-between md:gap-2 gap-1.5 mb-2 relative z-10 w-full items-start md:flex-wrap">
-                          <span className="bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] md:text-[10px] font-black px-2 md:px-2.5 py-0.5 md:py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(254,191,13,0.2)]">
+                          <span className="backdrop-blur-sm bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] md:text-[10px] font-black px-2 md:px-2.5 py-0.5 md:py-1 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(254,191,13,0.3)]">
                             <span className="material-symbols-outlined text-[10px] md:text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium Oglas
                           </span>
                           {/* Category Badge on Mobile/Desktop */}
@@ -144,7 +144,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-bold text-white mb-1.5 uppercase break-words leading-tight">
+                        <h3 className="text-lg md:text-2xl font-black text-white mb-1.5 uppercase break-words leading-tight">
                           <Link onMouseEnter={() => prefetch('job', job.id)} to={buildJobUrl(job)} className="after:absolute after:inset-0">
                             {(() => {
                               const t = (job.title || 'Premium Posao').replace(' — ', ' ');
