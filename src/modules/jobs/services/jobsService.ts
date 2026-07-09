@@ -42,6 +42,10 @@ const JOBS_COLLECTION = 'listings';
 
 const jobExtendedSchema = jobSchema.extend({
   id: z.string(),
+  authorId: z.string().optional(),
+  companyId: z.string().nullable().optional(),
+  authorName: z.string().optional(),
+  isCompanyVerified: z.boolean().optional(),
   createdAt: z.unknown().optional(),
   updatedAt: z.unknown().optional(),
   searchableText: z.string().optional()

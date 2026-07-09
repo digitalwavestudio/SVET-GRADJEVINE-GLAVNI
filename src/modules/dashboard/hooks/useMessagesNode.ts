@@ -388,10 +388,18 @@ export function useMessagesNode(
       }
 
       try {
+        const backendAdData = adData
+          ? {
+              id: adData.id,
+              title: adData.title,
+              category: (adData as any).category || adData.type || "jobs",
+            }
+          : undefined;
+
         const data = await apiClient.post<{ id: string }>("/messages/create", {
           partnerId,
           initialMessage,
-          adData,
+          adData: backendAdData,
         });
         if (!data || !data.id) throw new Error("Neuspjesno kreiranje");
 
