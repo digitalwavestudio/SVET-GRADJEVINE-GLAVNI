@@ -36,8 +36,11 @@ PRAVILA:
     try {
       const responseText = await processAiCommand(prompt);
       let cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
-      // Strip any leading header lines
-      cleanText = cleanText.replace(/^(Oglas\s*za\s*posao|Pozicija:.*|Opis\s*posla:.*)[\s\S]*?(Tražimo)/i, '$2');
+      // Ukloni uvodne headere - sve do prvog "Tražimo", "Potreban", "Pozicija" itd
+      const adStart = cleanText.match(/(Tražimo|Potreban|Potrebni|Pozivamo|Zaposljavamo|Trazimo)/i);
+      if (adStart && adStart.index && adStart.index > 0) {
+        cleanText = cleanText.slice(adStart.index);
+      }
       setValue('opis', cleanText, { shouldValidate: true, shouldDirty: true });
     } catch (err) {
       console.error("Greška pri generisanju opisa:", err);
