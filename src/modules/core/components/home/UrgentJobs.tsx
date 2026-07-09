@@ -26,6 +26,13 @@ const buildAdUrl = (ad: any) => {
 export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: any) {
   const navigate = useNavigate();
 
+  const parseDate = (val: any) => {
+    if (!val) return null;
+    if (typeof val === 'object' && val !== null && typeof val.toDate === 'function') return val.toDate();
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
   return (<>
     {/* Hitni Oglasi */}
       <section className="py-12 md:py-24 bg-surface-container-low">
@@ -58,6 +65,8 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
             ) : urgentJobs && urgentJobs.length > 0 ? (
               urgentJobs.slice(0, 12).map((ad: any) => {
                 const url = buildAdUrl(ad);
+                const createdDate = parseDate(ad.createdAt);
+                const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
                 return (
                   <div 
                     key={ad.id}
@@ -80,9 +89,14 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                     <div className="p-5 flex flex-col w-full h-full relative z-20 pointer-events-none">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex flex-col gap-1.5">
-                          <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.1)] w-max">
-                            <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(239,68,68,0.1)] w-max">
+                              <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
+                            </span>
+                            {isNovo && (
+                              <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-[0.1em] shadow-md">NOVO</span>
+                            )}
+                          </div>
                           <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">{ad.time || 'Danas'}</span>
                         </div>
                         
@@ -100,9 +114,14 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                       </h3>
                       
                       <div className="mb-4 relative z-20">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 via-red-200 to-white text-[10px] md:text-xs font-black uppercase tracking-widest">
-                          {ad.comp || 'Svet Građevine'}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-300 via-red-200 to-white text-[10px] md:text-xs font-black uppercase tracking-widest">
+                            {ad.comp || 'Svet Građevine'}
+                          </span>
+                          {ad.isCompanyVerified && (
+                            <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                          )}
+                        </div>
                       </div>
 
                       {(() => {
@@ -136,10 +155,15 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         <span className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                           <span className="material-symbols-outlined text-[12px] text-red-400">location_on</span> {ad.loc}
                         </span>
-                        {ad.salary && (
-                          <span className="flex items-center gap-1.5 text-slate-300 text-[10px] font-bold uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-[12px] text-secondary">payments</span> {ad.salary}
-                          </span>
+                        {(ad.plataMin != null || ad.plataMax != null) && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                              {ad.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
+                            </span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-lg font-sans leading-none tracking-tight">
+                              {ad.plataMin ? `${ad.plataMin}${ad.plataMax != null ? ` – ${ad.plataMax}` : ''}` : ad.plataMax} €
+                            </span>
+                          </div>
                         )}
                       </div>
 
