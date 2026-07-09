@@ -20,25 +20,24 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
     if (formData.dinamikaIsplate) details.push(`Isplata: ${formData.dinamikaIsplate}`);
     if (formData.benefits?.length) details.push(`Benefiti: ${formData.benefits.join(', ')}`);
 
-    const prompt = `Napiši KOMPLETAN opis oglasa za posao na sajtu Svet Građevine (srpski jezik).
+    const prompt = `Napiši tekst za posao na Svet Građevine (srpski jezik).
 
-Podaci koje OBAVEZNO moraš ugraditi u tekst:
+Podaci koje moraš ugraditi:
 ${details.map(d => `- ${d}`).join('\n')}
 
-Kategorija oglasa: ${selectedCategory}
+Kategorija: ${selectedCategory}
 
-KRUTA PRAVILA:
-1. Nema uvodnog naslova — ne piši "Oglas za posao", "Pozicija:", "Opis posla:" niti bilo šta slično na početku.
-2. Tekst počinje DIREKTNO rečenicom poput "Tražimo...".
-3. Nema generičkih floskula poput "poznavanje tehnika građenja i materijala" — samo konkretne stvari.
-4. Nema zagrada, nema [Placeholder].
-5. Završi sa "Može se krenuti odmah sa radom!".
-6. Na samom kraju dodaj: "Za sve ostale informacije i više detalja pozvati na broj telefona."
-7. Samo tekst, nema markdown, nema bullet lista sa zvezdicama (*).`;
+PRAVILA:
+1. Tekst kreće DIREKTNO — ništa pre "Tražimo...", nema "Oglas za posao", nema "Pozicija:", nema uvoda.
+2. Samo konkretno, nema generičkih rečenica.
+3. Završi sa "Može se krenuti odmah sa radom! Za sve ostale informacije i više detalja pozvati na broj telefona."
+4. Samo običan tekst, nema zvezdica, nema markdowna.`;
 
     try {
       const responseText = await processAiCommand(prompt);
-      const cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
+      let cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
+      // Strip any leading header lines
+      cleanText = cleanText.replace(/^(Oglas\s*za\s*posao|Pozicija:.*|Opis\s*posla:.*)[\s\S]*?(Tražimo)/i, '$2');
       setValue('opis', cleanText, { shouldValidate: true, shouldDirty: true });
     } catch (err) {
       console.error("Greška pri generisanju opisa:", err);
