@@ -215,7 +215,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                     {/* Bottom Row: Footer Row */}
                     <div className="flex-1 flex flex-col justify-end">
                       <div className="flex flex-col-reverse md:flex-row md:justify-between items-start md:items-center w-full relative z-10 pt-3 gap-4 md:gap-0">
-                      <div className="w-full md:w-auto justify-center md:justify-start bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black px-5 py-3 rounded-[10px] transition-all text-[10px] md:text-xs uppercase tracking-widest flex items-center gap-2 shrink-0 relative z-20 shadow-sm">
+                      <div className="w-full md:w-auto justify-center md:justify-start bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black px-5 py-3 rounded-[10px] transition-all text-[10px] md:text-xs uppercase tracking-widest flex items-center gap-2 shrink-0 relative z-20 shadow-sm md:opacity-100 opacity-0 md:pointer-events-auto pointer-events-none">
                         {job.type === 'company' || job.isPremiumPartner ? 'POGLEDAJ FIRMU' : 'POGLEDAJ OGLAS'}
                         <span className="material-symbols-outlined text-sm">arrow_forward</span>
                       </div>

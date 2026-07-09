@@ -105,6 +105,33 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         </span>
                       </div>
 
+                      {(() => {
+                        const b = ad.benefits || ad.benefiti || [];
+                        const hasSmestaj = b.includes('smestaj');
+                        const hasPrevoz = b.includes('prevoz');
+                        const hasHrana = b.includes('topli-obrok') || b.includes('hrana');
+                        if (!hasSmestaj && !hasPrevoz && !hasHrana) return null;
+                        return (
+                          <div className="flex flex-wrap gap-1 mb-3 relative z-10">
+                            {hasSmestaj && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                                <span className="material-symbols-outlined text-[10px] text-green-400">home</span> Smeštaj
+                              </span>
+                            )}
+                            {hasPrevoz && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                                <span className="material-symbols-outlined text-[10px] text-blue-400">commute</span> Prevoz
+                              </span>
+                            )}
+                            {hasHrana && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                                <span className="material-symbols-outlined text-[10px] text-yellow-400">restaurant</span> Hrana
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
+
                       <div className="flex flex-col gap-2 mb-4 mt-auto">
                         <span className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                           <span className="material-symbols-outlined text-[12px] text-red-400">location_on</span> {ad.loc}
@@ -116,8 +143,8 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         )}
                       </div>
 
-                      <div className="pt-4 border-t border-white/5 relative z-10 flex items-center justify-center pointer-events-auto">
-                        <div className="w-full justify-center bg-white/5 group-hover:bg-white/10 text-white border border-white/10 font-black px-4 py-2.5 rounded-[10px] transition-all text-[10px] uppercase tracking-widest flex items-center gap-2 relative z-20 shadow-sm">
+                      <div className="pt-4 border-t border-white/5 relative z-10 flex items-center justify-center md:pointer-events-auto pointer-events-none">
+                        <div className="w-full justify-center bg-white/5 group-hover:bg-white/10 text-white border border-white/10 font-black px-4 py-2.5 rounded-[10px] transition-all text-[10px] uppercase tracking-widest flex items-center gap-2 relative z-20 shadow-sm md:opacity-100 opacity-0">
                            POGLEDAJ OGLAS
                            <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                         </div>

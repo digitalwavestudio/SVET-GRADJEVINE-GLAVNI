@@ -27,7 +27,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
               {latestMachines.length > 0 ? (
                 <div className="flex overflow-x-auto no-scrollbar gap-6 pb-4 md:grid md:grid-cols-2 md:gap-8 scroll-smooth w-full h-full">
                   {latestMachines.map((machine: any, idx: number) => (
-                  <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-full md:w-auto h-full flex flex-col">
+                  <div key={machine.id || idx} className="bg-surface-container-lowest rounded-[10px] overflow-hidden border border-outline-variant/10 group shrink-0 w-full md:w-auto h-full flex flex-col cursor-pointer" onClick={() => navigate(`/gradjevinske-masine/${machine.id}`)}>
                     <div className="h-48 overflow-hidden relative shrink-0">
                       <OptimizedImage src={machine.images?.[0] || ""} fallbackType="machine" alt={machine.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         
@@ -57,7 +57,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                         <button 
                           onClick={() => navigate(`/gradjevinske-masine/${machine.id}`)}
                           aria-label={`Pogledaj detalje ${machine.title}`}
-                          className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20"
+                          className="p-2 rounded-[10px] border border-outline-variant/20 hover:bg-secondary hover:border-secondary transition-all duration-300 group/btn shadow-lg hover:shadow-secondary/20 md:opacity-100 opacity-0"
                         >
                           <span className="material-symbols-outlined group-hover/btn:text-on-secondary transition-colors text-white">chevron_right</span>
                         </button>
@@ -164,7 +164,7 @@ export default function EquipmentSection({ latestMachines = [], latestRealEstate
                     <span className="text-2xl sm:text-3xl font-black shrink-0">
                       {plot.price ? `€${plot.price.toLocaleString()}` : 'Po upitu'}
                     </span>
-                    <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] !text-black px-5 py-2.5 sm:px-8 sm:py-3 rounded-[10px] font-black hover:from-[#fb8c00] hover:to-[#ffeb3b] transition-all duration-300 uppercase shadow-lg shadow-yellow-500/20 text-sm sm:text-base shrink-0">Detalji</button>
+                    <button className="bg-gradient-to-br from-[#ffeb3b] to-[#fb8c00] !text-black px-5 py-2.5 sm:px-8 sm:py-3 rounded-[10px] font-black hover:from-[#fb8c00] hover:to-[#ffeb3b] transition-all duration-300 uppercase shadow-lg shadow-yellow-500/20 text-sm sm:text-base shrink-0 md:opacity-100 opacity-0">Detalji</button>
                   </div>
                 </div>
               </div>
