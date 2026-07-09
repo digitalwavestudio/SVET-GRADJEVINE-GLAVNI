@@ -131,22 +131,7 @@ export const bffService = {
     ] = await Promise.allSettled([
       withTimeout(AdminStatsService.getGlobalStats(), 120000, {}),
       withTimeout(UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }), 120000, []),
-      withTimeout((async () => {
-        try {
-          const snap = await db.collection("listings")
-            .where("type", "==", "job")
-            .where("status", "==", "active")
-            .where("isUrgent", "==", true)
-            .orderBy("createdAt", "desc")
-            .limit(12)
-            .get();
-          if (snap.empty) return [];
-          return snap.docs.map(doc => {
-            const d = doc.data();
-            return { id: doc.id, ...d, createdAt: d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : d.createdAt };
-          }) as RawAdData[];
-        } catch { return []; }
-      })(), 120000, []),
+      withTimeout(UnifiedAdsService.getPromotedAds({ isUrgent: true, limit: 12 }), 120000, []),
       withTimeout(UnifiedSearchService.search("machines", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       withTimeout(UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       withTimeout(UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
