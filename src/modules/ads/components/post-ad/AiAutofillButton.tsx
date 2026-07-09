@@ -12,16 +12,31 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
     setError(null);
 
     const formData = getValues();
-    const prompt = `Generiši profesionalan i detaljan opis za oglas na sajtu Svet Građevine u kategoriji "${selectedCategory}". 
-Evo podataka koje je korisnik do sada uneo:
-${JSON.stringify(formData, null, 2)}
+    const details: string[] = [];
+    if (formData.profession) details.push(`Pozicija: ${formData.profession}`);
+    if (formData.sector) details.push(`Sektor: ${formData.sector}`);
+    if (formData.location) details.push(`Lokacija: ${formData.location}`);
+    if (formData.plataMin || formData.plataMax) details.push(`Zarada: ${formData.plataMin || ''}${formData.plataMin && formData.plataMax ? ' - ' : ''}${formData.plataMax || ''} EUR`);
+    if (formData.dinamikaIsplate) details.push(`Isplata: ${formData.dinamikaIsplate}`);
+    if (formData.benefits?.length) details.push(`Benefiti: ${formData.benefits.join(', ')}`);
 
-Tvoj zadatak je da napišeš SAMO tekst opisa (bez ikakvih uvodnih poruka poput "Evo opisa", samo gotov tekst koji ide direktno u polje za opis). 
-Tekst treba da bude ubedljiv, čitljiv, gramatički ispravan, u profesionalnom tonu, formatiran sa novim redovima. Ne dodaji Markdown formatiranje osim novih redova.`;
+    const prompt = `Napiši KOMPLETAN opis oglasa za posao na sajtu Svet Građevine (srpski jezik, ćirilica ili latinica - izaberi sam).
+
+Podaci koje OBAVEZNO moraš ugraditi u tekst:
+${details.map(d => `- ${d}`).join('\n')}
+
+Kategorija oglasa: ${selectedCategory}
+
+VAŽNA PRAVILA:
+1. Napiši GOTOV, objavljiv tekst — bez ikakvih zagrada, bez [Placeholder] ili [Naziv pozicije].
+2. Podatke iznad UGRADI direktno u rečenice.
+3. Završi sa "Može se krenuti odmah sa radom!"
+4. Na kraju dodaj: "Za sve ostale informacije i više detalja pozvati na broj telefona."
+5. Nema uvodnih poruka tipa "Evo opisa" ili "Naravno".
+6. Samo tekst, nema markdown formatiranja.`;
 
     try {
       const responseText = await processAiCommand(prompt);
-      // Clean up potential markdown code blocks if the AI hallucinates them
       const cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
       setValue('opis', cleanText, { shouldValidate: true, shouldDirty: true });
     } catch (err) {
