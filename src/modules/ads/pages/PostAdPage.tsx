@@ -213,7 +213,7 @@ export default function PostAdPage() {
         <FormProvider {...methods}>
           <form
             onSubmit={methods.handleSubmit(onFormSubmit as any)}
-            className={step === 4 ? "relative" : "bg-slate-950/40 backdrop-blur-3xl p-4 sm:p-8 md:p-14 rounded-[24px] md:rounded-[32px] border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.6)] relative overflow-hidden"}
+            className={step === 4 ? "relative" : "bg-slate-950/40 backdrop-blur-3xl p-4 sm:p-8 md:p-14 rounded-[24px] md:rounded-[32px] border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.6)] relative"}
           >
             {step !== 4 && (
               <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-secondary/40 to-transparent pointer-events-none"></div>

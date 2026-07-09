@@ -200,15 +200,7 @@ export function Step1({
               required 
             />
 
-            <Input 
-              name="tacnaLokacija" 
-              label={selectedCategory === 'accommodation' ? 'Tačna adresa smeštaja' : 
-                     selectedCategory === 'plot' ? 'Tačna lokacija placa (Naselje / Adresa)' :
-                     'Tačna adresa / Lokacija'}
-              placeholder="Unesite adresu ili naselje"
-              icon="map"
-              description="Precizna lokacija nam pomaže da automatski generišemo mapu gradilišta, što radnicima olakšava dolazak do vašeg smeštaja bez lutanja."
-            />
+
           </div>
 
           <div className="mt-16 flex justify-between">

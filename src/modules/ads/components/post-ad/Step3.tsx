@@ -205,7 +205,7 @@ export function Step3({
                 <AiAutofillButton selectedCategory={selectedCategory} />
               </div>
               <div className="flex justify-between items-end ml-1">
-                <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Detaljan opis posla *</label>
+                <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Detaljan tekst oglasa *</label>
                 <span className={`text-[10px] font-black uppercase tracking-widest ${formData.opis?.length < 50 ? 'text-error' : 'text-secondary'}`}>
                   {formData.opis?.length || 0} / 1000
                 </span>
@@ -236,7 +236,7 @@ export function Step3({
                     type="tel"
                     {...register('phone')}
                     placeholder="Npr. 0601234567"
-                    className={`w-full bg-transparent border ${errors.phone ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} rounded-[10px] px-6 py-5 text-white focus:border-[#ffad3a]/50 focus:bg-[#070d14]/80 focus:shadow-[0_0_20px_rgba(254,191,13,0.1)] outline-none transition-all duration-300 font-bold group-hover:bg-white/[0.06] group-hover:border-white/20 autofill:!bg-transparent autofill:!text-white [-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s] [-webkit-autofill]:[-webkit-text-fill-color:white]`}
+                    className={`w-full bg-[#070d14] border ${errors.phone ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} rounded-[10px] px-6 py-5 text-white focus:border-[#ffad3a]/50 focus:bg-[#070d14] focus:shadow-[0_0_20px_rgba(254,191,13,0.1)] outline-none transition-all duration-300 font-bold group-hover:bg-white/[0.06] group-hover:border-white/20 [-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s,color_0s_ease-in-out_0s] [-webkit-autofill]:[background-color:#070d14!important] [-webkit-autofill]:[-webkit-text-fill-color:white!important] [-webkit-autofill]:[box-shadow:0_0_0px_1000px_#070d14_inset!important]`}
                   />
                   <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-hover:text-[#ffad3a] transition-colors">call</span>
                 </div>

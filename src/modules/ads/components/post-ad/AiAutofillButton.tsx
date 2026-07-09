@@ -42,13 +42,13 @@ Tekst treba da bude ubedljiv, čitljiv, gramatički ispravan, u profesionalnom t
       >
         {isLoading ? (
           <>
-            <span className="material-symbols-outlined animate-spin text-lg md:text-xl">progress_activity</span>
-            <span>Generišem detaljan opis...</span>
+            <span className="material-symbols-outlined text-lg md:text-xl group-hover:animate-pulse">auto_awesome</span>
+            <span>Generiši tekst oglasa pomoću AI</span>
           </>
         ) : (
           <>
             <span className="material-symbols-outlined text-lg md:text-xl group-hover:animate-pulse">auto_awesome</span>
-            <span>Generiši opis pomoću AI</span>
+            <span>Generiši tekst oglasa pomoću AI</span>
           </>
         )}
       </button>

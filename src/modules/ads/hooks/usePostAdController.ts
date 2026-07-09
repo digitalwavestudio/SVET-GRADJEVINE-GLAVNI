@@ -514,7 +514,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         2: ['marketCondition', 'marketValue']
       },
       job: {
-        1: ['sector', 'profession', 'location'],
+        1: ['sector', 'location'],
         2: ['plataMin', 'plataMax', 'dinamikaIsplate']
       }
     };
@@ -525,6 +525,11 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
 
     if (step === 3 && selectedCategory !== 'company') {
       fieldsToValidate = commonStep3Fields;
+    }
+
+    const isNegotiable = watch('isNegotiable');
+    if (selectedCategory === 'job' && step === 2 && isNegotiable) {
+      fieldsToValidate = fieldsToValidate.filter(f => f !== 'plataMin' && f !== 'plataMax');
     }
 
     const isValid = await trigger(fieldsToValidate);
