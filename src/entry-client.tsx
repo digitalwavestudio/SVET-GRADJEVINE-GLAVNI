@@ -141,6 +141,12 @@ if (!rootElement) {
       <Root />
     </StrictMode>
   );
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
+
   if (hasSsr) {
     hydrateRoot(rootElement, app, {
       onRecoverableError(error) {

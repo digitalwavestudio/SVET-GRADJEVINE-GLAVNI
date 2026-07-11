@@ -110,6 +110,9 @@ export default defineConfig(({mode}) => {
       isProd && VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
+        strategies: 'injectManifest',
+        srcDir: '.',
+        filename: 'sw.js',
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
           navigateFallbackDenylist: [/^\/__/],
