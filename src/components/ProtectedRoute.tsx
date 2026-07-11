@@ -26,16 +26,8 @@ export default function ProtectedRoute({
     return <Navigate to="/prijava" state={{ from: location }} replace />;
   }
 
-  // Email verification enforcement (admin bypass via server-side claims)
-  const isSuperAdmin = user?.isAdmin;
-  if (requireAuth && user && !user.emailVerified && !isSuperAdmin) {
-    // If user is not verified, we might want to redirect them to a verification notice page
-    // For now, let's just use the login page with a state or separate verification page if it exists
-    return <Navigate to="/prijava" state={{ from: location, error: 'Molimo potvrdite vaš email pre nastavka.' }} replace />;
-  }
-
   if (allowedRoles && user) {
-    if (!isSuperAdmin && !allowedRoles.includes(user.role)) {
+    if (!user?.isAdmin && !allowedRoles.includes(user.role)) {
       return <Navigate to="/moj-profil/izbor-uloge" replace />;
     }
   }

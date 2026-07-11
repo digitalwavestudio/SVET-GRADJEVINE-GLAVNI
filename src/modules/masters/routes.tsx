@@ -10,7 +10,7 @@ export const getMastersRouter = () => [
   <Route key="majstori-zanimanje" path="/majstori/:zanimanje" element={<MastersPage />} loader={masterLoader} />,
   <Route key="majstori-grad" path="/majstori/:grad" element={<MastersPage />} loader={masterLoader} />,
   <Route key="majstori" path="/majstori" element={<MastersPage />} loader={masterLoader} />,
+  <Route key="majstori-id" path="/majstori/profil/:id" element={<MasterProfilePage />} />,
   <Route key="majstori-silo" path="/majstor/:zanat/:grad/:id" element={<MasterProfilePage />} />,
-  <Route key="majstori-id" path="/majstori/:id" element={<MasterProfilePage />} />,
   <Route key="majstor-id" path="/majstor/:id" element={<MasterProfilePage />} />
 ];

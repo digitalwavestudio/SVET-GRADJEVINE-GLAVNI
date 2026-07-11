@@ -380,11 +380,6 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     if (!user) return;
 
     return (async () => {
-      if (!user?.emailVerified && user?.role !== 'admin') {
-        showError("Vaš email nije verifikovan. Molimo verifikujte email pre postavljanja oglasa.");
-        return;
-      }
-
       if (imageUpload.isUploadingImages) {
         showError("Molimo sačekajte da se slike otpreme pre objavljivanja oglasa.");
         return;

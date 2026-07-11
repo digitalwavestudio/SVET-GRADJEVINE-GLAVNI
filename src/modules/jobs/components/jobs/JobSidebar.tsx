@@ -67,19 +67,15 @@ export function JobSidebar({
             <div className="flex justify-between items-center text-sm border-b border-white/5 pb-2">
               <dt className="text-on-surface-variant font-bold">Telefon:</dt>
               <dd>
-                {isLoggedIn ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-secondary font-bold">{jobData.companyDetails?.phone || jobData.telefon}</span>
-                    <button 
-                      onClick={() => navigator.clipboard.writeText(jobData.companyDetails?.phone || jobData.telefon)}
-                      className="px-2 py-1 border border-white/20 rounded text-[10px] font-black text-white hover:bg-white hover:text-on-surface transition-all uppercase tracking-tighter"
-                    >
-                      KOPIRAJ
-                    </button>
-                  </div>
-                ) : (
-                  <span className="text-on-surface-variant italic text-xs">Skriveno</span>
-                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-secondary font-bold">{jobData.companyDetails?.phone || jobData.telefon}</span>
+                  <button 
+                    onClick={() => navigator.clipboard.writeText(jobData.companyDetails?.phone || jobData.telefon)}
+                    className="px-2 py-1 border border-white/20 rounded text-[10px] font-black text-white hover:bg-white hover:text-on-surface transition-all uppercase tracking-tighter"
+                  >
+                    KOPIRAJ
+                  </button>
+                </div>
               </dd>
             </div>
             <div className="flex justify-between items-center text-sm border-b border-white/5 pb-2">
@@ -100,46 +96,34 @@ export function JobSidebar({
             <span>Prosečno vreme odgovora: {jobData.companyDetails?.responseTime || 'Brzo'}</span>
           </div>
           <div className="space-y-3">
-            {isLoggedIn ? (
-              <>
-                <button 
-                  onClick={() => !hasApplied && setShowApplicationModal(true)} 
-                  disabled={hasApplied || isApplicationPending(jobData.id)}
-                  className={(hasApplied ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default" : UI_TOKENS.BTN_PRIMARY) + " w-full flex items-center justify-center gap-2 mb-2 h-14 rounded-[10px] transition-all font-black uppercase tracking-widest text-xs"}
-                >
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>{hasApplied ? 'check_circle' : isApplicationPending(jobData.id) ? 'hourglass_empty' : 'send'}</span>
-                  {hasApplied ? 'PRIJAVA POSLATA' : isApplicationPending(jobData.id) ? 'SLANJE...' : 'Prijavi se na oglas'}
-                </button>
-                {(jobData.viber || jobData.whatsapp) && (
-                  <div className="flex gap-3">
-                    {jobData.viber && (
-                      <a href={`viber://chat?number=${(jobData.telefon || jobData.companyDetails?.phone || '').replace(/[^0-9+]/g, '')}`} className="flex-1 bg-[#7360f2] text-white py-4 rounded-[10px] font-black flex items-center justify-center gap-2 hover:brightness-110 shadow-lg transition-colors uppercase text-sm">
-                        <span className="material-symbols-outlined">chat</span>
-                        Viber
-                      </a>
-                    )}
-                    {jobData.whatsapp && (
-                      <a href={`https://wa.me/${(jobData.telefon || jobData.companyDetails?.phone || '').replace(/[^0-9+]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-[#25d366] text-white py-4 rounded-[10px] font-black flex items-center justify-center gap-2 hover:brightness-110 shadow-lg transition-colors uppercase text-sm">
-                        <span className="material-symbols-outlined">forum</span>
-                        WhatsApp
-                      </a>
-                    )}
-                  </div>
+            <button 
+              onClick={() => !hasApplied && setShowApplicationModal(true)} 
+              disabled={hasApplied || isApplicationPending(jobData.id)}
+              className={(hasApplied ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 cursor-default" : UI_TOKENS.BTN_PRIMARY) + " w-full flex items-center justify-center gap-2 mb-2 h-14 rounded-[10px] transition-all font-black uppercase tracking-widest text-xs"}
+            >
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>{hasApplied ? 'check_circle' : isApplicationPending(jobData.id) ? 'hourglass_empty' : 'send'}</span>
+              {hasApplied ? 'PRIJAVA POSLATA' : isApplicationPending(jobData.id) ? 'SLANJE...' : 'Prijavi se na oglas'}
+            </button>
+            {(jobData.viber || jobData.whatsapp) && (
+              <div className="flex gap-3">
+                {jobData.viber && (
+                  <a href={`viber://chat?number=${(jobData.telefon || jobData.companyDetails?.phone || '').replace(/[^0-9+]/g, '')}`} className="flex-1 bg-[#7360f2] text-white py-4 rounded-[10px] font-black flex items-center justify-center gap-2 hover:brightness-110 shadow-lg transition-colors uppercase text-sm">
+                    <span className="material-symbols-outlined">chat</span>
+                    Viber
+                  </a>
                 )}
-                <a href={`tel:${jobData.telefon || jobData.companyDetails?.phone}`} className="w-full border-2 border-white/20 text-white py-4 rounded-[10px] font-black flex items-center justify-center gap-2 hover:bg-white hover:text-on-surface transition-colors uppercase">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>phone</span>
-                  Pozovite poslodavca
-                </a>
-              </>
-            ) : (
-              <button 
-                onClick={() => navigate('/prijava')}
-                className={UI_TOKENS.BTN_PRIMARY + " w-full text-sm tracking-widest relative z-10"}
-              >
-                <span className="material-symbols-outlined">lock</span>
-                Prijavi se za kontakt
-              </button>
+                {jobData.whatsapp && (
+                  <a href={`https://wa.me/${(jobData.telefon || jobData.companyDetails?.phone || '').replace(/[^0-9+]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-[#25d366] text-white py-4 rounded-[10px] font-black flex items-center justify-center gap-2 hover:brightness-110 shadow-lg transition-colors uppercase text-sm">
+                    <span className="material-symbols-outlined">forum</span>
+                    WhatsApp
+                  </a>
+                )}
+              </div>
             )}
+            <a href={`tel:${jobData.telefon || jobData.companyDetails?.phone}`} className="w-full border-2 border-white/20 text-white py-4 rounded-[10px] font-black flex items-center justify-center gap-2 hover:bg-white hover:text-on-surface transition-colors uppercase">
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>phone</span>
+              Pozovite poslodavca
+            </a>
             <div className="flex gap-2 w-full mt-4">
               <button 
                 onClick={() => jobData?.id && toggleSavedJob(jobData.id)}

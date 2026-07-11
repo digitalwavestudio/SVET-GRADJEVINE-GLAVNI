@@ -80,7 +80,7 @@ export const switchRole = async (
     
     // Dozvoli postavljanje specifične uloge (npr. tokom registracije/onboarding-a)
     let newRole = req.body.role;
-    const allowedRoles = ['standard', 'majstor', 'poslodavac', 'smestaj', 'ketering', 'placevi', 'masine', 'partner'];
+    const allowedRoles = ['standard', 'majstor', 'poslodavac', 'partner'];
     
     if (newRole && !allowedRoles.includes(newRole)) {
       return res.status(400).json({ error: 'Neispravna uloga.' });
@@ -90,7 +90,34 @@ export const switchRole = async (
       newRole = data?.role === 'poslodavac' ? 'majstor' : 'poslodavac';
     }
 
-    await db.collection('users').doc(uid).update({ role: newRole });
+    const updateData: Record<string, any> = { role: newRole };
+    let listingId: string | null = null;
+
+    if (newRole === 'poslodavac') {
+      const oldCompanyId = data?.businessProfile?.companyId;
+      if (oldCompanyId) {
+        listingId = oldCompanyId;
+      } else {
+        listingId = db.collection('listings').doc().id;
+        await db.collection('listings').doc(listingId).set({
+          type: 'company',
+          authorId: uid,
+          role: 'poslodavac',
+          status: 'active',
+          name: '',
+          description: '',
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        updateData['businessProfile.companyId'] = listingId;
+        updateData['businessProfile.listingId'] = listingId;
+      }
+    } else if (newRole === 'majstor') {
+      listingId = uid;
+      updateData['businessProfile.listingId'] = uid;
+    }
+
+    await db.collection('users').doc(uid).update(updateData);
     
     // Enterprise Auth Sync: Update claims
     const currentRecord = await admin.auth().getUser(uid);
@@ -111,9 +138,9 @@ export const switchRole = async (
       userId: uid,
       ip: req.ip,
       userAgent: req.headers['user-agent'],
-      details: { oldRole: data?.role, newRole }
+      details: { oldRole: data?.role, newRole, listingId }
     });
-    res.json({ success: true, newRole });
+    res.json({ success: true, newRole, listingId });
   } catch (error) {
     next(error);
   }

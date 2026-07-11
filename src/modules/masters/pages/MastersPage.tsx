@@ -1,246 +1,69 @@
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import { VerticalCTA } from '@/src/components/VerticalCTA';
 import { HardHat } from 'lucide-react';
-import { VirtuosoGrid } from 'react-virtuoso';
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
-import { generateProfessionalServiceListSchema } from '@/src/lib/seoSchema';
-import DynamicSEO from '@/src/components/DynamicSEO';
-
-import LoadingState from '@/src/components/LoadingState';
+import { motion } from 'motion/react';
+import { useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { ListingSkeleton } from '@/src/components/ListingSkeleton';
 import NoResults from '@/src/components/ui/NoResults';
-import { APP_CONFIG } from '@/src/constants/config';
-import { Button } from '@/src/components/ui/Button';
-import { LOCATIONS, PROFESSIONS, SECTORS } from '@/src/constants/taxonomy';
-import { useAuth } from '@/src/context/AuthContext';
+import Spinner from '@/src/components/ui/Spinner';
+import { LOCATIONS, PROFESSIONS } from '@/src/constants/taxonomy';
 import { useMastersList } from '@/src/modules/masters/hooks/useMasters';
-import { useDebounce } from '@/src/hooks/useDebounce';
-import { useCollectionStats, useRoleStats, useFilteredCount } from '@/src/hooks/useCollectionStats';
-import { resolveRouteFilters } from '@/src/lib/routeFilters';
-import { StandardPageHero } from '@/src/components/StandardPageHero';
+import withSEOAndFilters from '@/src/hoc/withSEOAndFilters';
+import { usePrefetch } from '@/src/hooks/usePrefetch';
 import { AiSearchBar } from '@/src/components/AiSearchBar';
+import { resolveRouteFilters } from '@/src/lib/routeFilters';
+import { generateProfessionalServiceListSchema } from '@/src/lib/seoSchema';
+import { APP_CONFIG } from '@/src/constants/config';
+import { StandardPageHero } from '@/src/components/StandardPageHero';
+import { useCount } from '@/src/hooks/useCollectionStats';
 
-export default function MastersPage() {
-  const { user } = useAuth();
-  
-  // Memoize filters for stats hooks to prevent redundant queries
-  const onlineFilter = useMemo(() => [
-    { field: 'role', op: '==', value: 'master' }, 
-    { field: 'isOnline', op: '==', value: true }
-  ], []);
-  
-  const verifiedFilter = useMemo(() => [
-    { field: 'role', op: '==', value: 'master' }, 
-    { field: 'verified', op: '==', value: true }
-  ], []);
-
-  const { data: masterCount } = useRoleStats('master');
-  const { data: onlineCount } = useFilteredCount('users', onlineFilter);
-  const { data: recommendationCount } = useFilteredCount('users', verifiedFilter);
-
+function MastersPage() {
+  const prefetch = usePrefetch();
   const params = useParams();
-  const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
-  // Resolve routing ambiguity using central utility
   const resolved = resolveRouteFilters('majstori', params);
-  const { locationSlug: gradSlug, professionSlug: zanimanjeSlug } = resolved;
+  const gradSlug = resolved.locationSlug;
+  const zanimanjeSlug = resolved.professionSlug;
+  const { data: masterCount } = useCount('masters');
 
-  const [localSearchTerm, setLocalSearchTerm] = useState(searchParams.get('q') || '');
-  const debouncedSearch = useDebounce(localSearchTerm, 400);
-
-  const [localSector, setLocalSector] = useState('SVE');
-  const [localSelectedProfession, setLocalSelectedProfession] = useState(zanimanjeSlug || 'SVE');
-  const [localLocation, setLocalLocation] = useState(gradSlug || 'SVE');
-  const [filterRadius, setFilterRadius] = useState(searchParams.get('radius') || '50');
-  const [sortBy, setSortBy] = useState<'experience' | 'name'>('experience');
-  const [verifiedOnly, setVerifiedOnly] = useState(searchParams.get('verified') === 'true');
-
-  const debouncedRadius = useDebounce(filterRadius, 500);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  const searchParamsStr = searchParams.toString();
-  
-  const isNavigatingRef = useRef(false);
-
-  // URL State as Single Source of Truth
-  const activeFilters = useMemo(() => {
-    const currentParams = new URLSearchParams(searchParamsStr);
-    return {
-      profession: zanimanjeSlug || undefined,
-      location: gradSlug || undefined,
-      radius: currentParams.get('radius') ? Number(currentParams.get('radius')) : undefined,
-      search: currentParams.get('q') || undefined,
-      isVerified: currentParams.get('verified') === 'true' || undefined
-    };
-  }, [gradSlug, zanimanjeSlug, searchParamsStr]);
+  const activeFilters = useMemo(() => ({
+    profession: zanimanjeSlug || undefined,
+    location: gradSlug || undefined,
+  }), [gradSlug, zanimanjeSlug]);
 
   const { data, isLoading: loading, fetchNextPage: loadMore, hasNextPage } = useMastersList(activeFilters);
-  const { data: premiumData } = useMastersList({ ...activeFilters, isPremiumProfile: true }, { enabled: true } as any);
   const isDeepPagingLimitReached = Boolean(hasNextPage && data?.pages && data.pages.length >= 11);
   const hasMore = hasNextPage && !isDeepPagingLimitReached;
-  const masters = useMemo(() => {
-    const regular = data?.pages.flatMap(page => page?.docs || []) || [];
-    const premium = premiumData?.pages.flatMap(page => page?.docs || []) || [];
-    const seen = new Set<string | undefined>();
-    return [...premium, ...regular].filter(m => {
-      if (seen.has(m.id)) return false;
-      seen.add(m.id);
-      return true;
-    });
-  }, [data, premiumData]);
+  const masters = useMemo(() => data?.pages.flatMap(page => page?.docs || []) || [], [data]);
 
-  const handleApplyFilters = useCallback(() => {
-    const desiredProf = localSelectedProfession === 'SVE' ? null : localSelectedProfession;
-    const desiredLoc = localLocation === 'SVE' ? null : localLocation;
-    
-    const newParams = new URLSearchParams(searchParamsStr);
-    if (localSearchTerm.trim()) {
-      newParams.set('q', localSearchTerm.trim());
-    } else {
-      newParams.delete('q');
-    }
-    if (filterRadius && filterRadius !== '50') newParams.set('radius', filterRadius);
-    else newParams.delete('radius');
-
-    if (verifiedOnly) newParams.set('verified', 'true');
-    else newParams.delete('verified');
-
-    let newPath = '/majstori';
-    if (desiredProf && desiredLoc) newPath = `/majstori/${desiredProf}/${desiredLoc}`;
-    else if (desiredProf) newPath = `/majstori/${desiredProf}`;
-    else if (desiredLoc) newPath = `/majstori/${desiredLoc}`;
-
-    const currentPath = location.pathname;
-    const currentParams = searchParamsStr;
-    const targetParams = newParams.toString();
-
-    // STRICT NAVIGATION GUARD
-    if (currentPath !== newPath || currentParams !== targetParams) {
-      isNavigatingRef.current = true;
-      if (currentPath !== newPath) {
-        navigate(`${newPath}?${targetParams}`, { preventScrollReset: true });
-      } else {
-        setSearchParams(newParams, { preventScrollReset: true });
-      }
-      // Reset guard after short delay to allow URL to settle
-      setTimeout(() => { isNavigatingRef.current = false; }, 100);
-    }
-  }, [searchParamsStr, localSearchTerm, filterRadius, verifiedOnly, localSelectedProfession, localLocation, location.pathname, navigate, setSearchParams]);
-
-  // Auto apply filters - strictly guarded to prevent loops
-  useEffect(() => {
-    if (isNavigatingRef.current) return;
-
-    const currentParams = new URLSearchParams(searchParamsStr);
-    const currentQ = currentParams.get('q') || '';
-    const currentProf = zanimanjeSlug || 'SVE';
-    const currentLoc = gradSlug || 'SVE';
-    const currentRadius = currentParams.get('radius') || '50';
-    const currentVerified = currentParams.get('verified') === 'true';
-
-    if (debouncedSearch !== currentQ || localSelectedProfession !== currentProf || localLocation !== currentLoc || debouncedRadius !== currentRadius || verifiedOnly !== currentVerified) {
-      handleApplyFilters();
-    }
-  }, [debouncedSearch, localSelectedProfession, localLocation, debouncedRadius, verifiedOnly, handleApplyFilters, searchParamsStr, zanimanjeSlug, gradSlug]);
-
-  // Sync state with URL when searchParams/slugs change (handling back/forward)
-  useEffect(() => {
-    if (isNavigatingRef.current) return;
-
-    const currentParams = new URLSearchParams(searchParamsStr);
-    const q = currentParams.get('q') || '';
-    const urlProf = zanimanjeSlug || 'SVE';
-    const urlLoc = gradSlug || 'SVE';
-    const rad = currentParams.get('radius') || '50';
-    const ver = currentParams.get('verified') === 'true';
-
-    if (q !== localSearchTerm) setLocalSearchTerm(q);
-    if (urlProf !== localSelectedProfession) setLocalSelectedProfession(urlProf);
-    if (urlLoc !== localLocation) setLocalLocation(urlLoc);
-    if (rad !== filterRadius) setFilterRadius(rad);
-    if (ver !== verifiedOnly) setVerifiedOnly(ver);
-
-    // Sector detection logic
-    if (zanimanjeSlug) {
-      let foundSector = 'SVE';
-      for (const [sector, profs] of Object.entries(PROFESSIONS)) {
-        if (profs.some(p => p.slug === zanimanjeSlug)) {
-          foundSector = sector;
-          break;
-        }
-      }
-      setLocalSector(foundSector);
-    }
-  }, [searchParamsStr, zanimanjeSlug, gradSlug]);
-
-  const handleResetFilters = () => {
-    setLocalSearchTerm('');
-    setLocalSector('SVE');
-    setLocalSelectedProfession('SVE');
-    setLocalLocation('SVE');
-    setFilterRadius('50');
-    setVerifiedOnly(false);
-    navigate('/majstori');
-  };
-
-  const availableProfessions = localSector && localSector !== 'SVE' ? PROFESSIONS[localSector as keyof typeof PROFESSIONS] || [] : [];
   const locName = gradSlug ? LOCATIONS.find(l => l.slug === gradSlug)?.name : '';
   const profName = zanimanjeSlug ? [...Object.values(PROFESSIONS)].flat().find(p => p.slug === zanimanjeSlug)?.name : '';
-
   const itemListSchema = useMemo(() => generateProfessionalServiceListSchema(
     masters.slice(0, 20).map((m: any) => ({
       name: m.name || m.title,
-      url: `${APP_CONFIG.BASE_URL}/majstori/profil/${m.id}`,
+      url: `${APP_CONFIG.BASE_URL}/majstori/${m.id}`,
       description: m.description,
-      image: m.avatar || m.photo || m.images?.[0]
+      image: m.photo || m.avatar
     })),
     {
-      name: `Majstori i Građevinske Ekipe ${profName ? `- ${profName}` : ''} ${locName ? `u mestu ${locName}` : ''}`,
-      description: `Baza majstora i ekipa za građevinske radove ${locName ? `iz mesta ${locName}` : 'širom Srbije'}.`,
+      name: `Majstori ${profName ? `- ${profName}` : ''} ${locName ? `u mestu ${locName}` : ''}`,
+      description: `Baza majstora za građevinske radove ${locName ? `iz mesta ${locName}` : 'širom Srbije'}.`,
       url: `${APP_CONFIG.BASE_URL}/majstori${zanimanjeSlug ? `/${zanimanjeSlug}` : ''}${gradSlug ? `/${gradSlug}` : ''}`,
     }
   ), [masters, locName, profName, gradSlug, zanimanjeSlug]);
 
-  const breadcrumbItems = useMemo(() => {
-    const items: { label: string; path?: string }[] = [];
-    const hasZanimanje = zanimanjeSlug && zanimanjeSlug !== 'SVE';
-    const hasGrad = gradSlug && gradSlug !== 'all';
-    if (hasZanimanje || hasGrad) {
-      items.push({ label: 'Majstori', path: '/majstori' });
-    }
-    if (hasZanimanje) {
-      items.push({ label: profName || zanimanjeSlug!, path: hasGrad ? `/majstori/${zanimanjeSlug}` : undefined });
-    }
-    if (hasGrad) {
-      items.push({ label: locName || gradSlug! });
-    }
-    if (items.length === 0) {
-      items.push({ label: 'Majstori' });
-    }
-    return items;
-  }, [zanimanjeSlug, gradSlug, profName, locName]);
-
   return (
-    <div className="bg-surface min-h-screen text-on-surface font-sans selection:bg-secondary selection:text-on-secondary">
-      <DynamicSEO
-        type="majstori"
-        grad={gradSlug ?? undefined}
-        zanimanje={zanimanjeSlug ?? undefined}
-        jsonLd={[itemListSchema]}
-      />
-
+    <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary min-h-screen">
       <StandardPageHero
-        badge="SRBIJA & REGION"
-        title="PRONAĐI"
-        titleAccent="MAJSTORA."
-        subtitle="Pretražite bazu od preko 2.800 verifikovanih profesionalaca i angažujte najbolje za vaš projekat."
+        badge="BAZA MAJSTORA"
+        title="GRAĐEVINSKI"
+        titleAccent="MAJSTORI"
+        subtitle="Baza verifikovanih profesionalaca, majstora i ekipa za sve vrste građevinskih radova u Srbiji."
         stats={[
-          { label: "VERIFIKOVANI", value: masterCount?.toLocaleString() || "2.8K+", icon: "verified" },
-          { label: "NA MREŽI", value: onlineCount?.toLocaleString() || "140", icon: "sensors" },
-          { label: "PREPORUKE", value: recommendationCount?.toLocaleString() || "12k", icon: "recommend" }
+          { label: "Majstora u bazi", value: masterCount?.toLocaleString() || "2.8K+", icon: "verified" },
+          { label: "Aktivnih profila", value: masters.length?.toLocaleString() || "0", icon: "engineering" },
+          { label: "Premium", value: masters.filter((m: any) => m.isPremiumProfile)?.length?.toLocaleString() || "0", icon: "category" }
         ]}
       >
         <div className="mt-8 flex flex-col gap-4 max-w-4xl w-full">
@@ -248,151 +71,127 @@ export default function MastersPage() {
         </div>
       </StandardPageHero>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-8 relative z-20 py-12">
-        <div className="flex flex-col gap-12 mb-16">
-
-        {/* Candidates Grid */}
-        <div className="flex-1 w-full space-y-10">
-
-          {loading && masters.length === 0 ? (
-              <LoadingState count={6} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" />
-            ) : masters.length > 0 ? (
-              <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
-                {masters.map((candidate: any, index: number) => (
-                <div
-                  key={candidate.id}
-                  className={`group relative h-full bg-[#111a22]/60 backdrop-blur-xl border border-white/5 rounded-[10px] transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_0_30px_rgba(254,191,13,0.05)] hover:-translate-y-1 p-5 flex flex-col ${candidate.isPremiumProfile ? 'border-secondary/30 bg-secondary/[0.02] shadow-[0_0_40px_rgba(254,191,13,0.08)]' : ''}`}
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+        {loading && masters.length === 0 ? (
+          <ListingSkeleton count={6} viewMode="grid" />
+        ) : masters.length === 0 ? (
+          <NoResults message="Nije pronađen nijedan majstor." icon="engineering" />
+        ) : (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {masters.map((master: any, idx: number) => (
+                <motion.div
+                  key={master.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  className="group relative flex flex-col h-full bg-gradient-to-br from-[#111A22] to-[#050B10] border border-white/5 rounded-[10px] overflow-hidden transition-all duration-500 hover:border-secondary/30 hover:shadow-[0_15px_40px_-10px_rgba(254,191,13,0.15)] hover:-translate-y-1"
                 >
-                  {/* Premium Glow Effect */}
-                  {candidate.isPremiumProfile && (
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 blur-[60px] pointer-events-none"></div>
-                  )}
-
-                  <div className="relative z-10 h-full flex flex-col">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="relative">
-                        <OptimizedImage 
-                          src={candidate.photo || candidate.avatar || ""} 
-                          fallbackType="default" 
-                          alt={candidate.name || "Photo"} 
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
-                          containerClassName="w-16 h-16 rounded-sm overflow-hidden border border-white/10 bg-[#050f19] shadow-2xl" 
-                        />
-                          
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <span className={`px-2 py-0.5 rounded-sm text-[8px] font-black uppercase tracking-widest ${
-                          candidate.status as string === 'slobodan' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                          candidate.status as string === 'zauzet' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
-                          'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                        }`}>
-                          {candidate.status as string === 'slobodan' ? 'DOSTUPAN' : candidate.status as string === 'zauzet' ? 'ZAUZET' : 'USKORO'}
-                        </span>
-                      </div>
+                  <div className="relative h-24 md:h-36 w-full overflow-hidden">
+                    <div className="w-full h-full bg-gradient-to-tr from-[#0F1720] to-[#182330]"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050B10] via-[#050B10]/40 to-transparent opacity-90"></div>
+                    <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+                      {master.isPremiumProfile && (
+                        <div className="flex items-center gap-1 bg-gradient-to-r from-secondary to-yellow-400 !text-black px-2 py-0.5 rounded-[10px] text-[8px] font-black uppercase tracking-widest shadow-[0_4px_15px_rgba(254,191,13,0.3)] transform transition-transform group-hover:scale-105">
+                          <span className="material-symbols-outlined text-[10px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
+                          PLAĆENI OGLAS
+                        </div>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="mb-4">
-                      <h3 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-secondary transition-colors line-clamp-1 leading-none italic">
-                        {candidate.name}
-                      </h3>
-                      <p className="text-secondary text-[9px] font-bold uppercase tracking-[0.3em] mt-2 opacity-80">{candidate.profession}</p>
-                    </div>
-
-                    {candidate.verified && (
-                      <div className="flex items-center gap-1.5 mb-4 bg-[#0A1A0F]/80 border border-green-500/20 backdrop-blur-xl px-2 py-1 rounded-[4px] w-fit shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                        <span className="text-[7.5px] font-black tracking-[0.1em] uppercase text-green-400">Verifikovan</span>
-                      </div>
+                  <div className="absolute left-4 top-24 md:top-36 -translate-y-1/2 w-16 h-16 md:w-[80px] md:h-[80px] bg-white rounded-full flex items-center justify-center p-1.5 md:p-2 shadow-[0_8px_25px_rgba(0,0,0,0.5)] border-4 border-[#050B10] group-hover:border-secondary/20 transition-all duration-500 z-20 overflow-hidden">
+                    {master.photo ? (
+                      <OptimizedImage src={master.photo} alt={master.name} className="w-full h-full object-contain rounded-full" containerClassName="w-full h-full" />
+                    ) : (
+                      <span className="!text-black font-black text-2xl opacity-20">{master.name?.charAt(0) || 'M'}</span>
                     )}
+                  </div>
 
-                    <div className="grid grid-cols-2 gap-4 py-4 border-y border-white/5 mb-4">
-                      <div className="flex flex-col">
-                        <span className="text-[7px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none">Lokacija</span>
-                        <div className="flex items-center gap-1 text-white/60 text-[10px] font-bold">
-                          <span className="material-symbols-outlined text-secondary text-sm">location_on</span>
-                          {candidate.location}
-                        </div>
+                  <div className="relative px-4 pb-4 flex-grow flex flex-col pt-8 md:pt-11 z-10">
+                    <div className="flex items-start justify-between gap-2 mb-0">
+                      <div className="flex-1 min-w-0">
+                        <Link onMouseEnter={() => prefetch('master', master.id)} to={`/majstori/profil/${master.id}`} className="block group/link">
+                          <h3 className="text-xl font-black font-headline text-white uppercase tracking-tight group-hover/link:text-secondary transition-colors truncate">{master.name}</h3>
+                        </Link>
                       </div>
-                      <div className="flex flex-col border-l border-white/5 pl-4">
-                        <span className="text-[7px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none">Iskustvo</span>
-                        <div className="flex items-center gap-1 text-white/60 text-[10px] font-mono font-black uppercase">
-                          <span className="material-symbols-outlined text-secondary text-sm">history</span>
-                          {candidate.experience}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="hidden md:flex flex-wrap gap-1.5 mb-6 h-12 overflow-hidden items-start">
-                      {candidate.skills.slice(0, 3).map((s: string) => (
-                        <span key={s} className="px-2 py-1 bg-white/5 rounded-sm text-[8px] font-black text-white/40 uppercase tracking-widest border border-white/5">
-                          {s}
+                      {master.verified && (
+                        <span className="text-[9px] font-bold text-green-400 uppercase tracking-wider flex items-center gap-1 shrink-0 mt-1.5">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                          Verifikovan
                         </span>
-                      ))}
-                      {candidate.skills.length > 3 && (
-                        <span className="text-[8px] font-black text-white/20 uppercase tracking-widest ml-1">+{candidate.skills.length - 3} još</span>
                       )}
                     </div>
 
-                    {/* Action Block */}
-                    <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
-                       <div className="flex items-center gap-2">
-                         <div className="flex items-center gap-1 text-secondary font-black text-[10px] bg-secondary/10 px-1.5 py-0.5 rounded-sm font-mono">
-                           <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>shield_check</span>
-                           {candidate.profileScore || 95}%
-                         </div>
-                       </div>
-                       <Link
-                        to={`/majstori/${candidate.id}`}
-                        className="hidden md:inline-flex text-secondary font-black text-[9px] items-center gap-1 hover:underline uppercase tracking-widest"
-                      >
-                        POGLEDAJ PROFIL <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 my-1">
+                      {master.profession && (
+                        <span className="text-[11px] font-bold text-secondary tracking-wider flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[10px] text-white/40">work</span>
+                          {master.profession}
+                        </span>
+                      )}
+                      <span className="text-[11px] font-bold text-white/40 tracking-wider flex items-center gap-1 ml-auto">
+                        <span className="material-symbols-outlined text-[10px] text-white/40">location_on</span>
+                        {master.location || 'Nije navedeno'}
+                      </span>
+                    </div>
+
+                    <div className="border-t border-white/5 my-2"></div>
+
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mb-2 text-sm">
+                      {master.experience && (
+                        <span className="flex items-center gap-1 font-medium">
+                          <span className="material-symbols-outlined text-[11px] text-white/40">history</span>
+                          <span className="text-white/60">{master.experience}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-white/50 text-[13px] mb-3 line-clamp-5 leading-relaxed font-medium flex-grow">{master.description || ''}</p>
+                    <div className="pt-3 flex flex-col gap-2">
+                      <div className="flex flex-wrap gap-1">
+                        {Array.isArray(master.skills) && master.skills.slice(0, 3).map((s: string) => (
+                          <span key={s} className="bg-secondary/10 border border-secondary/20 text-secondary px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-[0.12em]">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                      <Link onMouseEnter={() => prefetch('master', master.id)} to={`/majstori/profil/${master.id}`} className="w-full bg-gradient-to-r from-secondary/20 to-secondary/10 hover:from-secondary hover:to-yellow-400 text-secondary hover:!text-black border border-secondary/20 hover:border-secondary transition-all px-4 py-2.5 rounded-md font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 group/btn">
+                        <span>Pogledaj profil</span>
+                        <span className="material-symbols-outlined text-[12px] transition-transform duration-300 group-hover/btn:translate-x-1">arrow_forward</span>
                       </Link>
                     </div>
                   </div>
+                </motion.div>
+              ))}
+            </div>
+            <div className="flex flex-col justify-center mt-12 gap-4 items-center">
+              {isDeepPagingLimitReached && (
+                <div className="w-full">
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-md text-center max-w-lg mx-auto">
+                    <p className="text-xs text-red-400 font-bold">
+                      Dosegli ste limit listanja.
+                    </p>
+                  </div>
                 </div>
-                ))}
-              </div>
-            ) : (
-              <NoResults 
-                message="TRENUTNO NEMA KANDIDATA KOJI SE POKLAPAJU SA VAŠIM KRITERIJUMIMA PRETRAGE." 
-                icon="engineering" 
-              />
-            )}
-
-            {isDeepPagingLimitReached && masters.length > 0 && (
-              <div className="mt-12 flex justify-center w-full">
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-[10px] text-center max-w-lg">
-                  <p className="text-xs text-red-400 font-bold">
-                    Dosegli ste limit listanja. Za specifičnije rezultate, molimo koristite konkretne filtere i pretragu gore.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {hasMore && masters.length > 0 && (
-              <div className="mt-12 flex justify-center w-full">
-                <button
-                  onClick={() => loadMore()}
-                  disabled={loading}
-                  className="bg-secondary !text-black px-12 h-14 rounded-[10px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-all shadow-[0_10px_20px_rgba(254,191,13,0.15)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                >
-                  {loading ? 'UČITAVANJE...' : 'PRIKAŽI JOŠ KANDIDATA'}
+              )}
+              {hasMore && (
+                <button onClick={() => loadMore()} disabled={loading} className="bg-secondary flex items-center gap-2 !text-black font-black px-8 py-4 rounded-md text-xs uppercase tracking-widest hover:bg-yellow-400 transition-all disabled:opacity-50">
+                  {loading && <Spinner className="w-4 h-4" />}
+                  {loading ? 'UČITAVANJE...' : 'Učitaj još'}
                 </button>
-              </div>
-            )}
-
-            <div className="mt-4">
-              <VerticalCTA 
-                title="MAJSTOR STE?"
-                description="REGISTRUJTE SVOJ PROFIL, POKAŽITE SVOJE RADOVE I DOBIJTE PONUDE ZA RAD NA NAJVEĆIM GRADILIŠTIMA."
-                buttonText="KREIRAJ PROFIL"
-                buttonLink="/postavi-oglas"
-                icon={HardHat}
-              />
+              )}
             </div>
           </div>
+        )}
+
+        <div className="mt-16">
+          <VerticalCTA title="MAJSTOR STE?" description="REGISTRUJTE SVOJ PROFIL, POKAŽITE SVOJE RADOVE I DOBIJTE PONUDE ZA RAD NA NAJVEĆIM GRADILIŠTIMA." buttonText="KREIRAJ PROFIL" buttonLink="/postavi-oglas" icon={HardHat} />
         </div>
-      </main>
+      </section>
     </div>
   );
 }
+
+export default withSEOAndFilters(MastersPage, 'majstori');

@@ -92,13 +92,11 @@ export class UnifiedSearchService {
 
     let q: FirebaseFirestore.Query;
 
-    // Oglasi firmi i majstora su sada u listings bazi! (migracija na jedinstveni sistem)
-    const isProfileSearch = false; // Privremeno (ili trajno) ukidamo legacy pretragu po users kolekciji za sve
-
-    if (isProfileSearch) {
+    // Majstori su u users kolekciji (role == "majstor"),
+    // firme i ostali oglasi su u listings kolekciji
+    if (category === "masters" || entityType === "master") {
       q = db.collection("users");
-      const targetRole = category === "masters" || entityType === "master" ? "majstor" : "company";
-      q = q.where("role", "==", targetRole);
+      q = q.where("role", "==", "majstor");
     } else {
       q = db.collection("listings");
       if (entityType && entityType !== "all") q = q.where("type", "==", entityType);
@@ -148,13 +146,18 @@ export class UnifiedSearchService {
     if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
     if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
-    // Get total count — koristi postojeći indeks (type, createdAt desc)
+    // Get total count
     let totalHits: number | undefined;
     try {
-      let countQ: FirebaseFirestore.Query = db.collection("listings");
-      if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
-      const countSnap = await countQ.count().get();
-      totalHits = countSnap.data().count;
+      if (category === "masters" || entityType === "master") {
+        const countSnap = await db.collection("users").where("role", "==", "majstor").count().get();
+        totalHits = countSnap.data().count;
+      } else {
+        let countQ: FirebaseFirestore.Query = db.collection("listings");
+        if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
+        const countSnap = await countQ.count().get();
+        totalHits = countSnap.data().count;
+      }
     } catch (e) {
       console.error(`[UnifiedSearch] count query failed:`, e);
     }
@@ -164,7 +167,8 @@ export class UnifiedSearchService {
     q = q.limit(queryLimit);
 
     if (lastVisibleId) {
-      const lastDoc = await db.collection(isProfileSearch ? "users" : "listings").doc(lastVisibleId).get();
+      const lastColl = (category === "masters" || entityType === "master") ? "users" : "listings";
+      const lastDoc = await db.collection(lastColl).doc(lastVisibleId).get();
       if (lastDoc.exists) q = q.startAfter(lastDoc);
     }
 

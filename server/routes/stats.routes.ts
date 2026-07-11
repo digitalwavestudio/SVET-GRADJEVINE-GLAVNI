@@ -306,6 +306,7 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
       "plots",
       "marketplace",
       "companies",
+      "masters",
       "users",
     ];
     if (!validCollections.includes(collectionName)) {

@@ -178,43 +178,25 @@ export function JobHeroSection({
               <span className="material-symbols-outlined text-6xl">contact_phone</span>
             </div>
             
-            {isLoggedIn ? (
-              <>
-                <p className="text-on-surface-variant text-sm mb-4 relative z-10">Sviđa vam se ovaj oglas? Prijavite se odmah!</p>
-                <div className="flex flex-col gap-3 w-full relative z-10">
-                  <a href={`tel:${jobData.telefon}`} className={UI_TOKENS.BTN_PRIMARY + " w-full flex items-center justify-center gap-3"}>
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>phone</span>
-                    Pozovite odmah
-                  </a>
-                  {jobData.companyId && (
-                    <button 
-                      onClick={handleStartChat}
-                      className="w-full h-14 rounded-[10px] bg-white/5 border border-white/10 flex items-center justify-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] text-white hover:bg-white/10 transition-all"
-                    >
-                      <span className="material-symbols-outlined text-secondary">forum</span>
-                      Pošalji Poruku
-                    </button>
-                  )}
-                </div>
-                <p className="mt-4 text-[10px] text-on-surface-variant uppercase tracking-tighter relative z-10">Referentni broj oglasa: #SG-{jobData?.id?.substring(0, 6) || 'XXXXXX'}</p>
-              </>
-            ) : (
-              <>
-                <p className="text-on-surface-variant text-sm mb-4 relative z-10 font-bold">Kontakt podaci su sakriveni</p>
-                <div className="w-full bg-surface-container-highest py-4 rounded-[10px] font-black text-lg flex items-center justify-center gap-3 mb-4 blur-sm opacity-50 select-none relative z-10">
-                  <span className="material-symbols-outlined">phone</span>
-                  +381 6X XXX XXX
-                </div>
-                <button 
-                  onClick={() => navigate('/prijava')}
-                  className={UI_TOKENS.BTN_PRIMARY + " w-full relative z-10"}
-                >
-                  <span className="material-symbols-outlined text-[18px]">lock_open</span>
-                  Prijavi se da vidiš
-                </button>
-                <p className="mt-4 text-[10px] text-on-surface-variant uppercase tracking-tighter relative z-10">Samo za registrovane korisnike</p>
-              </>
-            )}
+            <>
+              <p className="text-on-surface-variant text-sm mb-4 relative z-10">Sviđa vam se ovaj oglas? Prijavite se odmah!</p>
+              <div className="flex flex-col gap-3 w-full relative z-10">
+                <a href={`tel:${jobData.telefon}`} className={UI_TOKENS.BTN_PRIMARY + " w-full flex items-center justify-center gap-3"}>
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>phone</span>
+                  Pozovite odmah
+                </a>
+                {jobData.companyId && (
+                  <button 
+                    onClick={handleStartChat}
+                    className="w-full h-14 rounded-[10px] bg-white/5 border border-white/10 flex items-center justify-center gap-3 font-black text-[10px] uppercase tracking-[0.2em] text-white hover:bg-white/10 transition-all"
+                  >
+                    <span className="material-symbols-outlined text-secondary">forum</span>
+                    Pošalji Poruku
+                  </button>
+                )}
+              </div>
+              <p className="mt-4 text-[10px] text-on-surface-variant uppercase tracking-tighter relative z-10">Referentni broj oglasa: #SG-{jobData?.id?.substring(0, 6) || 'XXXXXX'}</p>
+            </>
           </div>
           <RelatedSEO locationSlug={jobData.locationSlug} currentType="jobs" />
         </div>

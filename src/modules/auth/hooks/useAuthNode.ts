@@ -574,7 +574,13 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         queryClient.clear();
         
         if (window.location.pathname.includes('/izbor-uloge')) {
-          window.location.href = '/moj-profil';
+          if (data.newRole === 'majstor' && (data as any).listingId) {
+            window.location.href = `/majstori/profil/${(data as any).listingId}`;
+          } else if (data.newRole === 'poslodavac' && (data as any).listingId) {
+            window.location.href = `/firma/${(data as any).listingId}`;
+          } else {
+            window.location.href = '/moj-profil';
+          }
         } else {
           window.location.reload();
         }

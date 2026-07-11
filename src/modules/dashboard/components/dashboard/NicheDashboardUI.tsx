@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
 import NicheWidgets from '@/src/modules/dashboard/components/NicheWidgets';
-import { getCateringLink, getMachineLink, getPlotLink } from '@/src/lib/routeFilters';
 import ChartSkeleton from '@/src/modules/dashboard/components/dashboard/ChartSkeleton';
 import { calculateProfileScore } from '@/src/modules/dashboard/utils/profileCompletion';
 import ProfileHealth from '@/src/modules/dashboard/components/ProfileHealth';
@@ -21,9 +20,6 @@ interface NicheDashboardUIProps {
 const NicheDashboardUI = memo(function NicheDashboardUI({ setIsUpgradeOpen, dashboardBff }: NicheDashboardUIProps) {
   const { user } = useAuth();
   const userRole = user?.role;
-  const isCatering = userRole === 'ketering';
-  const isMasine = userRole === 'masine';
-  const isPlacevi = userRole === 'placevi';
   const profileScore = calculateProfileScore(user);
   
   const roleData = dashboardBff?.stats || {};
@@ -74,9 +70,7 @@ const NicheDashboardUI = memo(function NicheDashboardUI({ setIsUpgradeOpen, dash
             <div className="space-y-4">
                {roleData.recentAds?.length > 0 ? roleData.recentAds.map((ad: any, i: number) => {
                  let detailUrl = '#';
-                 if (isCatering && ad.id) detailUrl = getCateringLink(ad.id);
-                 if (isMasine && ad.id) detailUrl = getMachineLink(ad.id);
-                 if (isPlacevi && ad.id) detailUrl = getPlotLink(ad.id);
+                  if (ad.id) detailUrl = `/${ad.type || 'oglasi'}/${ad.id}`;
 
                  return (
                    <div key={ad.id || `ad-${i}`} className="bg-white/[0.02] border border-white/10 p-5 rounded-[10px] flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/5 transition-all group">

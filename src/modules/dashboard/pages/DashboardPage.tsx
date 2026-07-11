@@ -35,12 +35,6 @@ const MasterDashboardUI = lazy(
 const EmployerDashboardUI = lazy(
   () => import("@/src/modules/dashboard/components/dashboard/EmployerDashboardUI")
 );
-const AccommodationDashboardUI = lazy(
-  () => import("@/src/modules/dashboard/components/dashboard/AccommodationDashboardUI")
-);
-const NicheDashboardUI = lazy(
-  () => import("@/src/modules/dashboard/components/dashboard/NicheDashboardUI")
-);
 const AnalyticsDashboardUI = lazy(
   () => import("@/src/modules/dashboard/components/dashboard/AnalyticsDashboardUI")
 );
@@ -113,10 +107,6 @@ function DashboardContent() {
       isEmployerRole: user?.role === "poslodavac",
       isMasterRole: user?.role === "majstor",
       isStandard: user?.role === "standard",
-      isAccommodationRole: user?.role === "smestaj",
-      isCateringRole: user?.role === "ketering",
-      isMasineRole: user?.role === "masine",
-      isPlaceviRole: user?.role === "placevi",
       isPartnerRole: user?.role === "partner",
     }),
     [user?.role, (user as { isAdmin?: boolean })?.isAdmin]
@@ -205,8 +195,6 @@ function DashboardContent() {
               userName={userName}
               isEmployerRole={roles.isEmployerRole}
               isStandard={roles.isStandard}
-              isAccommodationRole={roles.isAccommodationRole}
-              isCateringRole={roles.isCateringRole}
               onShareClick={() => setIsShareOpen(true)}
             />
           </Suspense>
@@ -259,27 +247,6 @@ function DashboardContent() {
                   </DashboardGuard>
                 )}
               </>
-            )}
-
-            {roles.isAccommodationRole && (
-              <DashboardGuard variant="inline" title="Greška u profilu smeštaja">
-                <Suspense fallback={<DashboardSkeleton />}>
-                  <AccommodationDashboardUI
-                    setIsUpgradeOpen={setIsUpgradeOpen}
-                  />
-                </Suspense>
-              </DashboardGuard>
-            )}
-
-            {(roles.isCateringRole || roles.isMasineRole || roles.isPlaceviRole) && (
-              <DashboardGuard variant="inline" title="Greška u specijalizovanom profilu">
-                <Suspense fallback={<DashboardSkeleton />}>
-                  <NicheDashboardUI
-                    setIsUpgradeOpen={setIsUpgradeOpen}
-                    dashboardBff={dashboardData}
-                  />
-                </Suspense>
-              </DashboardGuard>
             )}
 
             {roles.isPartnerRole && (

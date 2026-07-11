@@ -5,7 +5,7 @@ import { useBrandLogo } from '@/src/context/BrandContext';
 import logoImage from '@/src/assets/images/logo.webp';
 
 export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
-  const { switchRole } = useAuth();
+  const { switchRole, user } = useAuth();
   const { logoUrl } = useBrandLogo();
   const navigate = useNavigate();
 
@@ -22,91 +22,57 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
 
   const proRoles = [
     {
+      slug: 'standard',
+      title: 'STANDARDNI KORISNIK',
+      subtitle: 'PREGLEDAJ, PRONAĐI...',
+      description: 'Pristupite svim oglasima, prijavite se za posao, pošaljite poruke i postavljajte oglase bez ograničenja.',
+      icon: 'person',
+      color: 'text-blue-400 border-blue-500/20 hover:border-blue-400 hover:shadow-blue-500/10',
+      bgGlow: 'bg-blue-500/10',
+      tagColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+      btnBg: 'bg-blue-400 !text-black hover:bg-blue-300',
+      benefits: ['Pregled svih oglasa i kontakata', 'Postavljanje oglasa za sve kategorije', 'Čuvanje omiljenih oglasa'],
+      currentBg: 'bg-blue-400/20 text-blue-400 border-blue-500/30'
+    },
+    {
       slug: 'majstor',
       title: 'MAJSTOR / RADNIK',
       subtitle: 'PRONAĐI POSAO & KLIJENTE',
-      description: 'Napravite profesionalni profil, predstavite svoje iskustvo i pronađite nove poslovne prilike u građevinskoj industriji.',
+      description: 'Napravite profil, postavite slike svojih radova, opišite svoje iskustvo i pronađite nove poslovne prilike u građevinskoj industriji.',
       icon: 'engineering',
       color: 'text-amber-400 border-amber-500/20 hover:border-amber-400 hover:shadow-amber-500/10',
       bgGlow: 'bg-amber-500/10',
       tagColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
       btnBg: 'bg-amber-400 !text-black hover:bg-amber-300',
-      benefits: ['Profesionalni profil sa CV-jem', 'Portfolio radova i preporuke', 'Prijavljivanje na oglase za posao']
+      benefits: ['Profesionalni profil', 'Slike radova', 'Očekujte pozive od firmi'],
+      currentBg: 'bg-amber-400/20 text-amber-400 border-amber-500/30'
     },
     {
       slug: 'poslodavac',
       title: 'GRAĐEVINSKA FIRMA',
       subtitle: 'ZAPOSLI EKIPU ILI MAJSTORE',
       description: 'Predstavite svoju firmu, objavljujte oglase za posao i pronađite majstore, radnike i saradnike.',
-      icon: 'business',
-      color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
-      bgGlow: 'bg-emerald-500/10',
-      tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
-      benefits: ['Profil građevinske firme', 'Objavljivanje oglasa za posao', 'Pretraga kandidata i prijava']
-    },
-    {
-      slug: 'smestaj',
-      title: 'SMEŠTAJ ZA RADNIKE',
-      subtitle: 'IZNAJMI SMEŠTAJNE KAPACITETE',
-      description: 'Oglašavajte smeštajne kapacitete namenjene građevinskim firmama i radnicima na terenu.',
-      icon: 'home_pin',
-      color: 'text-sky-400 border-sky-500/20 hover:border-sky-400 hover:shadow-sky-500/10',
-      bgGlow: 'bg-sky-500/10',
-      tagColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
-      btnBg: 'bg-sky-400 !text-black hover:bg-sky-300',
-      benefits: ['Objavljivanje smeštajnih kapaciteta', 'Fotografije, cene i raspoloživost', 'Direktan kontakt sa zainteresovanima']
-    },
-    {
-      slug: 'ketering',
-      title: 'KETERING I ISHRANA RADNIKA',
-      subtitle: 'DOSTAVA HRANE NA GRADILIŠTA',
-      description: 'Predstavite svoju ponudu i povežite se sa građevinskim firmama koje organizuju ishranu zaposlenih.',
-      icon: 'restaurant',
-      color: 'text-amber-500 border-amber-600/20 hover:border-amber-500 hover:shadow-amber-500/10',
-      bgGlow: 'bg-amber-600/10',
-      tagColor: 'bg-amber-600/10 text-amber-500 border-amber-600/20',
-      btnBg: 'bg-amber-500 !text-black hover:bg-amber-400',
-      benefits: ['Predstavljanje ponude i menija', 'Definisanje uslova isporuke', 'Direktni upiti i dogovor saradnje']
-    },
-    {
-      slug: 'masine',
-      title: 'MAŠINE I OPREMA (uskoro)',
-      subtitle: 'NAJAM ILI PRODAJA MEHANIZACIJE',
-      description: 'Objavljujte oglase za prodaju ili iznajmljivanje građevinskih mašina, alata i opreme.',
       icon: 'construction',
-      color: 'text-orange-400 border-orange-500/20 hover:border-orange-400 hover:shadow-orange-500/10',
-      bgGlow: 'bg-orange-500/10',
-      tagColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-      btnBg: 'bg-orange-400 !text-black hover:bg-orange-300',
-      benefits: ['Oglasi za prodaju i najam', 'Detaljne specifikacije opreme', 'Direktna komunikacija sa kupcima'],
-      isComingSoon: true
-    },
-    {
-      slug: 'placevi',
-      title: 'PLACEVI I ZONE (uskoro)',
-      subtitle: 'INDUSTRIJSKO ZEMLJIŠTE I PROSTORI',
-      description: 'Oglašavajte građevinska zemljišta, hale, skladišta i druge poslovne nekretnine.',
-      icon: 'landscape',
       color: 'text-emerald-400 border-emerald-500/20 hover:border-emerald-400 hover:shadow-emerald-500/10',
       bgGlow: 'bg-emerald-500/10',
       tagColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       btnBg: 'bg-emerald-400 !text-black hover:bg-emerald-300',
-      benefits: ['Oglasi za zemljišta i objekte', 'Prikaz lokacije i karakteristika', 'Kontakt sa investitorima i izvođačima'],
-      isComingSoon: true
+      benefits: ['Profil građevinske firme', 'Objavljivanje oglasa za posao', 'Pretraga kandidata i prijava'],
+      currentBg: 'bg-emerald-400/20 text-emerald-400 border-emerald-500/30'
     },
     {
       slug: 'partner',
-      title: 'PARTNER AFFILIATE (uskoro)',
-      subtitle: 'PREPORUČI I ZARADI PROVIZIJU',
-      description: 'Preporučite platformu drugim korisnicima i ostvarite proviziju za svaku uspešnu preporuku.',
+      title: 'PARTNER PROGRAM (USKORO)',
+      subtitle: 'PREPORUČI I ZARADI',
+      description: 'Pretvorite svoju mrežu kontakata u dodatnu zaradu.\nDelite svoj partnerski link ili jedinstvenu šifru i ostvarujte proviziju za svaku uspešnu preporuku.',
       icon: 'handshake',
-      color: 'text-orange-500/50 border-orange-500/10 hover:border-orange-500/30 hover:shadow-orange-500/5',
-      bgGlow: 'bg-orange-500/5',
-      tagColor: 'bg-orange-500/5 text-orange-500/50 border-orange-500/10',
-      btnBg: 'bg-orange-600/30 text-white/50 cursor-not-allowed',
-      benefits: ['Lični affiliate link', 'Praćenje preporuka i zarade', 'Pregled provizija i isplata'],
-      isComingSoon: true
+      color: 'text-secondary border-secondary/20 hover:border-secondary hover:shadow-secondary/10',
+      bgGlow: 'bg-secondary/10',
+      tagColor: 'bg-secondary/10 text-secondary border-secondary/20',
+      btnBg: 'bg-secondary/20 text-secondary border-secondary/30 cursor-not-allowed',
+      benefits: ['Jedinstveni partnerski link', 'Lična preporučna šifra', 'Detaljna statistika preporuka', 'Evidencija zarade i isplata'],
+      isComingSoon: true,
+      colSpanFull: true
     }
   ];
 
@@ -116,13 +82,13 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       <div className="text-center max-w-3xl mx-auto space-y-6">
         <div className="hidden md:inline-flex items-center gap-2 px-4 py-1.5 bg-secondary/10 border border-secondary/20 rounded-full">
           <span className="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
-          <span className="text-[10px] md:text-xs font-black text-secondary uppercase tracking-[0.25em]">AKTIVACIJA PREMIUM PROFILA</span>
+          <span className="text-[10px] md:text-xs font-black text-secondary uppercase tracking-[0.25em]">KREIRAJTE SVOJ NALOG</span>
         </div>
         <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-[1.15] mt-2.5 md:mt-0">
-          IZABERITE VAŠU <span className="text-secondary">ULOGU</span> NA PORTALU
+          NAPRAVITE PROFIL NA <span className="text-secondary">SVETU GRAĐEVINE</span>
         </h2>
         <p className="text-white/40 font-bold text-sm uppercase tracking-widest leading-relaxed">
-          Svaka uloga donosi poseban skup funkcija, alata i kontrolnu tablu prilagođenu vašoj delatnosti.
+          Vaš profil, vaše objave, vaši oglasi – sve na jednom mestu!
         </p>
       </div>
 
@@ -134,17 +100,17 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.05 }}
-            className={`relative flex flex-col bg-gradient-to-br from-[#0C1017] to-[#040609] border-2 ${role.color} rounded-[20px] p-8 md:p-10 overflow-hidden group transition-all duration-500 hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.5)]`}
+            className={`relative flex flex-col bg-gradient-to-br from-[#0C1017] to-[#040609] border-2 ${role.color} ${role.colSpanFull ? 'lg:col-span-3' : ''} rounded-[20px] p-8 md:p-10 overflow-hidden group transition-all duration-500 hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.5)]`}
           >
             {/* Background Glow */}
             <div className={`absolute top-0 right-0 w-36 h-36 ${role.bgGlow} opacity-20 blur-[50px] -mr-16 -mt-16 group-hover:scale-125 transition-transform duration-700`}></div>
 
             {/* Tooltip za Coming Soon ulogu na hover (staro uklonjeno, ovo je glassmorphism ispod) */}
 
-            <div className="relative z-10 flex-1 flex flex-col justify-between space-y-10">
+            <div className="relative z-10 flex-1 flex flex-col">
               
-              {/* Top Section */}
-              <div className="space-y-6">
+              {/* Top Section - expands to push benefits to same position */}
+              <div className="flex-1 space-y-6">
                 <div className="hidden md:flex items-center justify-between">
                   <div className={`w-16 h-16 rounded-[12px] ${role.bgGlow} ${role.color.split(' ')[0]} border border-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500`}>
                     <span className="material-symbols-outlined text-4xl font-light">{role.icon}</span>
@@ -155,17 +121,17 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
                 </div>
 
                 <div className="space-y-5 md:space-y-3">
-                  <h3 className="text-2xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight">
+                  <h3 className="text-2xl md:text-2xl font-black text-white uppercase tracking-tight leading-tight text-center md:text-left">
                     {role.title}
                   </h3>
-                  <p className="text-sm md:text-sm text-white/40 font-bold uppercase tracking-wider leading-relaxed">
+                  <p className="text-sm md:text-sm text-white/40 font-bold uppercase tracking-wider leading-relaxed whitespace-pre-line text-center md:text-left">
                     {role.description}
                   </p>
                 </div>
               </div>
 
               {/* Benefits Checklist */}
-              <div className="border-t border-white/5 pt-6 space-y-3">
+              <div className="border-t border-white/5 pt-6 mt-6 space-y-3">
                 {role.benefits.map((benefit, bIndex) => (
                   <div key={bIndex} className="flex items-center gap-3">
                     <span className={`material-symbols-outlined text-base shrink-0 ${role.color.split(' ')[0]}`}>check_circle</span>
@@ -176,22 +142,21 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
 
               {/* Action Button */}
               {role.isComingSoon ? (
-                <div className="relative w-full group/btn" tabIndex={0}>
+                <div className="relative w-full group/btn mt-6" tabIndex={0}>
                   <div className="md:hidden">
                     <button
                       disabled
-                      className="w-full py-4 bg-white/5 text-white/20 border border-white/5 font-black text-xs tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed block text-center pointer-events-none"
+                      className={`w-full py-4 font-black text-xs tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed block text-center pointer-events-none border ${role.tagColor}`}
                     >
-                      USKORO
+                      USKORO!
                     </button>
                   </div>
                   <div className="hidden md:block">
                     <button
                       disabled
-                      className="w-full py-5 bg-white/5 text-white/20 border border-white/5 font-black text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2 pointer-events-none"
+                      className={`w-full py-5 font-black text-sm tracking-[0.2em] uppercase rounded-[12px] cursor-not-allowed flex items-center justify-center gap-2 pointer-events-none border ${role.tagColor}`}
                     >
-                      USKORO
-                      <span className="material-symbols-outlined text-lg">hourglass_empty</span>
+                      USKORO!
                     </button>
                   </div>
                   {/* Glassmorphism popup */}
@@ -216,24 +181,42 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
                   </>
                 </div>
               ) : (
-                <div className="relative w-full">
-                  <div className="md:hidden">
-                    <button
-                      onClick={() => handleSelectRole(role.slug)}
-                      className={`w-full py-4 rounded-[12px] font-black text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} block text-center`}
-                    >
-                      AKTIVIRAJ PROFIL
-                    </button>
-                  </div>
-                  <div className="hidden md:block">
-                    <button
-                      onClick={() => handleSelectRole(role.slug)}
-                      className={`w-full py-5 rounded-[12px] font-black text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} flex items-center justify-center gap-2`}
-                    >
-                      AKTIVIRAJ PROFIL
-                      <span className="material-symbols-outlined text-lg transition-transform duration-300 group-hover:translate-x-1.5">arrow_forward</span>
-                    </button>
-                  </div>
+                <div className="relative w-full mt-6">
+                  {user?.role === role.slug ? (
+                    <>
+                      <div className="md:hidden">
+                        <div className={`w-full py-4 rounded-[12px] font-black text-xs tracking-[0.2em] uppercase text-center border cursor-default ${role.currentBg}`}>
+                          TRENUTNO
+                        </div>
+                      </div>
+                      <div className="hidden md:block group/current">
+                        <div className={`w-full py-5 rounded-[12px] font-black text-sm tracking-[0.2em] uppercase flex items-center justify-center gap-2 border cursor-default ${role.currentBg}`}>
+                          TRENUTNO
+                          <span className="material-symbols-outlined text-lg transition-transform duration-300 group-hover/current:-translate-y-0.5">check_circle</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="md:hidden">
+                        <button
+                          onClick={() => handleSelectRole(role.slug)}
+                          className={`w-full py-4 rounded-[12px] font-black text-xs tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} block text-center`}
+                        >
+                          AKTIVIRAJ PROFIL
+                        </button>
+                      </div>
+                      <div className="hidden md:block">
+                        <button
+                          onClick={() => handleSelectRole(role.slug)}
+                          className={`w-full py-5 rounded-[12px] font-black text-sm tracking-[0.2em] uppercase transition-all duration-300 shadow-md ${role.btnBg} flex items-center justify-center gap-2`}
+                        >
+                          AKTIVIRAJ PROFIL
+                          <span className="material-symbols-outlined text-lg transition-transform duration-300 group-hover:translate-x-1.5">arrow_forward</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 

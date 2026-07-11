@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { UnifiedAdsService } from "../services/unified-ads.service.ts";
-import { authMiddleware, requireAuth, requireVerifiedEmail } from "../middleware/auth.middleware.ts";
+import { authMiddleware, requireAuth } from "../middleware/auth.middleware.ts";
 import { validateAdOwnership } from "../middleware/ownership.middleware.ts";
 import { AuditService } from "../services/audit.service.ts";
 import { adCreationLimiter } from "../middleware/rate-limit.middleware.ts";
@@ -278,7 +278,6 @@ adsRouter.patch(
 adsRouter.post(
   "/create",
   authMiddleware,
-  requireVerifiedEmail,
   adCreationLimiter,
   validateBody(createAdSchema),
   async (req, res, next) => {

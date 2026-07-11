@@ -238,17 +238,19 @@ export function ProfileSettingsTab({
           </div>
         </div>
 
-        <div className="pt-6 border-t border-white/5">
-          <div className="flex items-center gap-3 text-center md:text-left">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400/20 to-yellow-600/10 border border-yellow-500/30 flex items-center justify-center shrink-0 mx-auto md:mx-0">
-              <span className="material-symbols-outlined text-yellow-400 text-2xl">verified</span>
-            </div>
-            <div className="hidden md:block">
-              <div className="text-sm font-black text-white uppercase tracking-tight">VERIFIKOVANA FIRMA</div>
-              <p className="text-[9px] text-yellow-400/60 font-bold uppercase tracking-widest">ZLATNI BEDŽ · PROVEREN POSLODAVAC</p>
+        {user?.role === 'poslodavac' && (
+          <div className="pt-6 border-t border-white/5">
+            <div className="flex items-center gap-3 text-center md:text-left">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400/20 to-yellow-600/10 border border-yellow-500/30 flex items-center justify-center shrink-0 mx-auto md:mx-0">
+                <span className="material-symbols-outlined text-yellow-400 text-2xl">verified</span>
+              </div>
+              <div className="hidden md:block">
+                <div className="text-sm font-black text-white uppercase tracking-tight">VERIFIKOVANA FIRMA</div>
+                <p className="text-[9px] text-yellow-400/60 font-bold uppercase tracking-widest">ZLATNI BEDŽ · PROVEREN POSLODAVAC</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );

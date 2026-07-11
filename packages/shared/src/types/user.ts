@@ -2,10 +2,6 @@ export type UserRole =
   | 'standard' 
   | 'majstor' 
   | 'poslodavac' 
-  | 'smestaj' 
-  | 'ketering' 
-  | 'placevi' 
-  | 'masine' 
   | 'partner'
   | 'admin'
   // Legacy roles used in the UI:

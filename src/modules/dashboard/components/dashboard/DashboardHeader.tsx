@@ -15,8 +15,6 @@ interface DashboardHeaderProps {
   userName: string;
   isEmployerRole: boolean;
   isStandard: boolean;
-  isAccommodationRole: boolean;
-  isCateringRole: boolean;
   onShareClick: () => void;
 }
 
@@ -24,8 +22,6 @@ export default React.memo(function DashboardHeader({
   userName,
   isEmployerRole,
   isStandard,
-  isAccommodationRole,
-  isCateringRole,
   onShareClick,
 }: DashboardHeaderProps) {
   const { user, updateUser } = useAuth();

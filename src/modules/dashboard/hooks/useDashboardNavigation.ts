@@ -121,52 +121,12 @@ export function useDashboardNavigation() {
           { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
         ];
-      case 'smestaj':
-        return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
-          { label: 'MOJI OBJEKTI', path: '/moj-profil/oglasi', icon: 'hotel' },
-          { label: 'KAPACITETI', path: '/moj-profil/kapaciteti', icon: 'check_box' },
-          { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
-          { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
-          { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
-        ];
       case 'majstor':
         return [
           { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJE PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
           { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },
-          { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
-          { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
-          { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
-        ];
-      case 'ketering':
-        return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
-          { label: 'DANAŠNJI MENI', path: '/moj-profil/oglasi', icon: 'restaurant_menu' },
-          { label: 'NARUDŽBINE', path: '/moj-profil/narudzbine', icon: 'receipt_long' },
-          { label: 'DOSTAVA', path: '/moj-profil/dostava', icon: 'delivery_dining' },
-          { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
-          { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
-          { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
-        ];
-      case 'masine':
-        return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
-          { label: 'MOJA FLOTA', path: '/moj-profil/oglasi', icon: 'construction' },
-          { label: 'REZERVACIJE', path: '/moj-profil/rezervacije', icon: 'event_available' },
-          { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
-          { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
-          { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
-        ];
-      case 'placevi':
-        return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
-          { label: 'MOJI PLACEVI', path: '/moj-profil/oglasi', icon: 'landscape' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
           { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },

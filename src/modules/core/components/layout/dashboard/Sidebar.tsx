@@ -117,10 +117,6 @@ export const Sidebar = memo(({
             <option value="standard" className="bg-slate-900 text-white">Standardni (Onboarding)</option>
             <option value="majstor" className="bg-slate-900 text-white">Majstor</option>
             <option value="poslodavac" className="bg-slate-900 text-white">Građevinska Firma</option>
-            <option value="smestaj" className="bg-slate-900 text-white">Smeštaj za radnike</option>
-            <option value="ketering" className="bg-slate-900 text-white">Ketering</option>
-            <option value="placevi" className="bg-slate-900 text-white">Placevi</option>
-            <option value="masine" className="bg-slate-900 text-white">Mašine</option>
             <option value="partner" className="bg-slate-900 text-white">Partner</option>
           </select>
         </div>
@@ -133,13 +129,13 @@ export const Sidebar = memo(({
           const isActive = location.pathname === item.path;
           const isNadzorniCentar = item.label === 'NADZORNI CENTAR';
           
-           const linkClassName = isNadzorniCentar
-            ? 'flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative bg-gradient-to-r from-[#0061a5] to-[#60a5fa] text-white hover:from-[#00518c] hover:to-[#5095ea] shadow-lg shadow-[#0061a5]/20 font-black'
-            : `group/item flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-200 relative ${
-                isActive 
-                  ? 'bg-secondary !text-black shadow-lg shadow-secondary/10' 
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
-              } ${item.label === 'IZBOR ULOGE' ? 'animate-[pulse_2s_ease-in-out_infinite] !text-secondary' : ''}`;
+    const linkClassName = isNadzorniCentar
+     ? 'flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all group relative bg-gradient-to-r from-[#0061a5] to-[#60a5fa] text-white hover:from-[#00518c] hover:to-[#5095ea] shadow-lg shadow-[#0061a5]/20 font-black'
+     : `group/item flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-200 relative ${
+         isActive 
+           ? 'bg-secondary !text-black shadow-lg shadow-secondary/10' 
+           : 'text-white/50 hover:text-white hover:bg-white/5'
+       } ${item.label === 'IZBOR ULOGE' && !isActive ? 'animate-[pulse_2s_ease-in-out_infinite] !text-secondary' : ''}`;
 
           return (
             <Link

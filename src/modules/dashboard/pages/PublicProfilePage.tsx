@@ -386,7 +386,7 @@ export default function PublicProfilePage() {
 
                     <div className="space-y-4">
                       {userAds?.machines?.map((machine: Record<string, unknown>, idx: number) => (
-                        <Link key={machine.id || `machine-${idx}`} to={getMachineLink(String(machine.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
+                        <Link key={String(machine.id ?? idx)} to={getMachineLink(String(machine.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
                           <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-secondary group-hover:scale-110 transition-transform flex-shrink-0">
                             <span className="material-symbols-outlined text-2xl">precision_manufacturing</span>
                           </div>
@@ -398,7 +398,7 @@ export default function PublicProfilePage() {
                       ))}
 
                       {userAds?.accommodations?.map((acc: Record<string, unknown>, idx: number) => (
-                        <Link key={acc.id || `acc-${idx}`} to={getAccommodationLink(String(acc.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
+                        <Link key={String(acc.id ?? idx)} to={getAccommodationLink(String(acc.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
                           <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
                             <span className="material-symbols-outlined text-2xl">home_work</span>
                           </div>
@@ -410,7 +410,7 @@ export default function PublicProfilePage() {
                       ))}
 
                       {userAds?.caterings?.map((cat: Record<string, unknown>, idx: number) => (
-                        <Link key={cat.id || `cat-${idx}`} to={getCateringLink(String(cat.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
+                        <Link key={String(cat.id ?? idx)} to={getCateringLink(String(cat.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
                           <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform flex-shrink-0">
                             <span className="material-symbols-outlined text-2xl">restaurant</span>
                           </div>
@@ -422,7 +422,7 @@ export default function PublicProfilePage() {
                       ))}
 
                       {userAds?.plots?.map((plot: Record<string, unknown>, idx: number) => (
-                        <Link key={plot.id || `plot-${idx}`} to={getPlotLink(String(plot.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
+                        <Link key={String(plot.id ?? idx)} to={getPlotLink(String(plot.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
                           <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0">
                             <span className="material-symbols-outlined text-2xl">landscape</span>
                           </div>

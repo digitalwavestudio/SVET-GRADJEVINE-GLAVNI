@@ -51,7 +51,7 @@ const submitApplicationSchema = z.object({
 });
 
 export const switchRoleSchema = z.object({
-  role: z.enum(['standard', 'majstor', 'poslodavac', 'smestaj', 'ketering', 'placevi', 'masine', 'partner']).optional(),
+  role: z.enum(['standard', 'majstor', 'poslodavac', 'partner']).optional(),
 });
 
 

@@ -31,8 +31,6 @@ export function generateDailyBriefing(
 
   let briefing = '';
   const isEmployer = user.role === 'poslodavac';
-  const isCatering = user.role === 'ketering';
-  const isAccommodation = user.role === 'smestaj';
   const isStandard = user.role === 'standard';
 
   if (isStandard) {
@@ -54,21 +52,6 @@ export function generateDailyBriefing(
     } else {
        if (totalAds > 0) briefing = `TRENUTNO IMATE ${totalAds} AKTIVNA OGLASA I ZVANIČNO STE AKTIVAN POSLODAVAC.`;
        else briefing = `SREĆAN RAD! KREIRAJTE OGLAS KAKO BI KANDIDATI MOGLI DA VAS PRONAĐU.`;
-    }
-  } else if (isAccommodation) {
-    const totalBeds = roleData.nicheDetails?.totalBeds || 0;
-    const available = roleData.nicheDetails?.availableBeds || 0;
-    if (totalBeds > 0) {
-      briefing = `TRENUTNO IMATE ${available} SLOBODNIH OD UKUPNO ${totalBeds} KREVETA U PONUDI.`;
-    } else {
-      briefing = `POSTAVITE VAŠ PRVI OGLAS ZA SMEŠTAJ.`;
-    }
-  } else if (isCatering) {
-    const meals = roleData.nicheDetails?.dailyCapacityMeals || 0;
-    if (meals > 0) {
-      briefing = `DNEVNI KAPACITET: ${meals} OBROKA. VAŠI POSLOVI SU SPREMNI ZA DANAŠNJE ISPORUKE.`;
-    } else {
-      briefing = `DEFINIŠITE VAŠ DNEVNI KAPACITET OBROKA.`;
     }
   } else {
     // Radnik / Majstor

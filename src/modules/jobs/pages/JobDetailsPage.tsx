@@ -56,7 +56,6 @@ const getPaymentDynamicsLabel = (slug?: string) => {
 
 export default function JobDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const [showPhone, setShowPhone] = useState(false);
   const actualId = id ? extractJobId(id) : '';
   const { data: jobDataResult, isLoading: loading, isError } = useJobDetails(actualId);
   const jobData = jobDataResult as any;
@@ -612,72 +611,44 @@ export default function JobDetailsPage() {
 
               <div className="h-px w-full bg-white/5 mb-6" />
 
-              {isLoggedIn ? (
-                <div className="space-y-3">
+              <div className="space-y-3">
+                <a
+                  href={`tel:${phoneNumber}`}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 !text-black h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20"
+                >
+                  <Phone size={18} />
+                  Pozovi: {phoneNumber}
+                </a>
+                
+                <div className="grid grid-cols-2 gap-3">
                   <a
-                    href={showPhone ? `tel:${phoneNumber}` : '#'}
-                    onClick={(e) => {
-                      if (!showPhone) {
-                        e.preventDefault();
-                        setShowPhone(true);
-                        if (navigator.clipboard) {
-                          navigator.clipboard.writeText(phoneNumber).catch(() => {});
-                        }
-                      }
-                    }}
-                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 !text-black h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20"
+                    href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba5a] hover:to-[#0e7568] text-white shadow-lg shadow-[#25D366]/15 hover:shadow-[#25D366]/25 border-0 font-bold h-12 rounded-xl text-xs transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
                   >
-                    <Phone size={18} />
-                    {showPhone ? `Tel: ${phoneNumber}` : 'Prikaži Telefon'}
+                    <MessageCircle size={16} />
+                    WhatsApp
                   </a>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <a
-                      href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20ba5a] hover:to-[#0e7568] text-white shadow-lg shadow-[#25D366]/15 hover:shadow-[#25D366]/25 border-0 font-bold h-12 rounded-xl text-xs transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                    >
-                      <MessageCircle size={16} />
-                      WhatsApp
-                    </a>
-                    <a
-                      href={`https://viber.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-gradient-to-r from-[#7360F2] to-[#5a48d8] hover:from-[#604dec] hover:to-[#4937c5] text-white shadow-lg shadow-[#7360F2]/15 hover:shadow-[#7360F2]/25 border-0 font-bold h-12 rounded-xl text-xs transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                    >
-                      <Phone size={16} />
-                      Viber
-                    </a>
-                  </div>
-                  
-                  <button
-                    onClick={handleStartChat}
-                    className="w-full bg-gradient-to-r from-[#1E293B] to-[#0F172A] hover:from-[#334155] hover:to-[#1E293B] border border-white/10 text-white shadow-lg shadow-black/30 font-bold h-12 rounded-xl text-xs transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mt-3"
+                  <a
+                    href={`https://viber.me/${phoneNumber.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-[#7360F2] to-[#5a48d8] hover:from-[#604dec] hover:to-[#4937c5] text-white shadow-lg shadow-[#7360F2]/15 hover:shadow-[#7360F2]/25 border-0 font-bold h-12 rounded-xl text-xs transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
                   >
-                    <Send size={16} className="text-yellow-400" />
-                    Pošalji poruku na sajtu
-                  </button>
+                    <Phone size={16} />
+                    Viber
+                  </a>
                 </div>
-              ) : (
-                <div className="space-y-5">
-                  <div className="text-center">
-                    <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">Kontakt podaci zaštićeni</p>
-                    <div className="w-full bg-white/5 border border-white/10 h-14 rounded-xl font-bold text-lg flex items-center justify-center gap-3 blur-[3px] opacity-50 select-none">
-                      <Phone size={18} />
-                      <span>+381 6X XXX XXX</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => navigate('/prijava')}
-                    className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white h-14 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">lock_open</span>
-                    Prijavi se za kontakt
-                  </button>
-                </div>
-              )}
+                
+                <button
+                  onClick={handleStartChat}
+                  className="w-full bg-gradient-to-r from-[#1E293B] to-[#0F172A] hover:from-[#334155] hover:to-[#1E293B] border border-white/10 text-white shadow-lg shadow-black/30 font-bold h-12 rounded-xl text-xs transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mt-3"
+                >
+                  <Send size={16} className="text-yellow-400" />
+                  Pošalji poruku na sajtu
+                </button>
+              </div>
             </div>
 
             {/* Apply Button */}

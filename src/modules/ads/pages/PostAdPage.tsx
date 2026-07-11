@@ -102,33 +102,6 @@ export default function PostAdPage() {
   }
 
   if (!selectedCategory) {
-    const isEmployer = user?.role === 'poslodavac';
-    const hasCompanyName = !!(user as any)?.businessProfile?.name || !!(user as any)?.company;
-    const hasLogo = !!(user as any)?.businessProfile?.logo || !!(user as any)?.photoURL;
-    const canPostEmployerAds = hasCompanyName && hasLogo;
-
-    if (isEmployer && !canPostEmployerAds) {
-      return (
-        <div className="bg-[#0B1219] text-white min-h-screen pt-32 pb-32 relative overflow-hidden font-body flex items-center justify-center px-4">
-          <div className="max-w-xl w-full bg-white/[0.03] backdrop-blur-xl p-8 md:p-12 rounded-[10px] border border-white/10 shadow-2xl text-center">
-            <div className="w-20 h-20 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6 text-secondary">
-              <span className="material-symbols-outlined text-4xl">warning</span>
-            </div>
-            <h2 className="text-3xl font-black uppercase tracking-tighter mb-4 text-white">Nekompletan Profil</h2>
-            <p className="text-sm text-white/60 mb-8 font-medium leading-relaxed">
-              Da biste postavljali oglase za posao i izgledali profesionalno, morate popuniti <strong className="text-white">Naziv firme</strong> i postaviti <strong className="text-white">Logo</strong> u podešavanjima vašeg profila na Dashboardu.
-            </p>
-            <Link 
-              to="/dashboard"
-              className="inline-flex items-center justify-center px-8 py-4 bg-secondary text-black font-black uppercase tracking-widest text-[11px] rounded-[5px] hover:scale-105 transition-transform"
-            >
-              Idi na Dashboard i popuni profil
-            </Link>
-          </div>
-        </div>
-      );
-    }
-
     const allOptions = [
       { id: "job", title: "Postavljam\noglas za posao", subtitle: "", icon: "work" },
       { id: "accommodation", title: "Reklamiram\nsmeštaj za radnike", subtitle: "", icon: "home_work" },
