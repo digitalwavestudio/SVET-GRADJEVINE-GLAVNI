@@ -145,6 +145,9 @@ if (!rootElement) {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       window.location.reload();
     });
+    navigator.serviceWorker.ready.then(reg => {
+      setInterval(() => { reg.update(); }, 60000);
+    });
   }
 
   if (hasSsr) {
