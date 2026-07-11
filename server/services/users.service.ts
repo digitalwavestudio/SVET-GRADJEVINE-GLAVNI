@@ -511,7 +511,7 @@ export class UsersService {
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
       await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on update:", e?.message));
-      await CacheService.delete(`public_profile_${uid}`);
+    await CacheService.delete(`user_pub_profile:${uid}`);
     }
 
     if (name || photoURL) {

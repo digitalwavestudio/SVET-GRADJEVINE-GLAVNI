@@ -128,7 +128,7 @@ export const switchRole = async (
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
     await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[UsersController] Cache delete auth session:", e));
-    await CacheService.delete(`public_profile_${uid}`);
+    await CacheService.delete(`user_pub_profile:${uid}`);
 
     // We should sync stats as role changed
     eventBus.emit(DomainEvents.USER_UPDATED, { userId: uid });
