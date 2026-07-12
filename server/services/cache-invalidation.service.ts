@@ -53,6 +53,19 @@ export class CacheInvalidationService {
     } catch {
       // ignore dynamic import error
     }
+
+    // Delete Fast-Path Firestore docs so BFF recomputes fresh data
+    this._deleteFastPathDocs();
+  }
+
+  private static async _deleteFastPathDocs(): Promise<void> {
+    try {
+      const { db } = await import("../config/firebase.ts");
+      await db.doc("metadata/homepage_fastpath").delete();
+      await db.doc("metadata/promoted_ads_fastpath").delete();
+    } catch {
+      // ignore
+    }
   }
 
   static async onJobChange(uid: string): Promise<void> {
@@ -93,6 +106,8 @@ export class CacheInvalidationService {
     } catch {
       // ignore import error
     }
+
+    this._deleteFastPathDocs();
   }
 
   static async onAdminAdModeration(category: string): Promise<void> {
@@ -129,12 +144,15 @@ export class CacheInvalidationService {
     } catch {
       // ignore import error
     }
+
+    this._deleteFastPathDocs();
   }
 
   static async onUserProfileChange(uid: string): Promise<void> {
     await CacheService.invalidateByPrefixes([
       CACHE_PREFIXES.USER_PROFILE_CACHE + uid,
       CACHE_PREFIXES.AUTH_SESSION + uid,
+      CACHE_PREFIXES.PUBLIC_PROFILE + uid,
     ]).catch((err) =>
       console.error("[CacheInvalidation] onUserProfileChange error:", err)
     );

@@ -135,7 +135,7 @@ export class UnifiedAdsService {
     await CacheService.invalidateByPrefix(`myAds_${adData.authorId}`);
     await CacheService.invalidateByPrefix(`publicProfileAds_${adData.authorId}`);
     await CacheService.invalidateByPrefix("public_ads_");
-    await CacheService.invalidateByPrefix("search_ads_"); 
+    await CacheService.invalidateByPrefix("search_ads_");
 
     // Invalidate employer dashboard stats cache to resolve "Ghost" ads immediately
     const { DashboardService } = await import("./dashboard/dashboard.service.ts");

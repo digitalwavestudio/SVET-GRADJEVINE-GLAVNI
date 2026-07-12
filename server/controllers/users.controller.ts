@@ -5,6 +5,7 @@ import { UserTransformer } from "../bff/user.transformer.ts";
 import { db, admin } from "../config/firebase.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
 import { CacheService } from "../services/cache.service.ts";
+import { CacheKeys } from "../constants/cache-keys.ts";
 import { logger } from "../utils/logger.ts";
 
 export const forceSync = async (
@@ -128,7 +129,7 @@ export const switchRole = async (
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
     await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[UsersController] Cache delete auth session:", e));
-    await CacheService.delete(`user_pub_profile:${uid}`);
+    await CacheService.delete(CacheKeys.userPublicProfile(uid));
 
     // We should sync stats as role changed
     eventBus.emit(DomainEvents.USER_UPDATED, { userId: uid });
@@ -153,7 +154,7 @@ export const getPublicProfile = async (
 ) => {
   try {
     const { id } = req.params;
-    const l2ShieldKey = `user_pub_profile:${id}`;
+    const l2ShieldKey = CacheKeys.userPublicProfile(id);
 
     // 1. Redis L2 Shield (30 minutes)
     const cachedProfile = await CacheService.get<any>(l2ShieldKey);

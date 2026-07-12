@@ -456,7 +456,7 @@ export class UsersService {
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
     await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session:", e?.message));
-    await CacheService.delete(`user_pub_profile:${uid}`);
+    await CacheService.delete(CacheKeys.userPublicProfile(uid));
     await CacheService.delete(`user_events_${uid}`);
     CacheInvalidationService.onUserProfileChange(uid).catch(() => {});
     await CacheService.delete(`wallet_dashboard:${uid}`).catch(() => {});
@@ -512,7 +512,7 @@ export class UsersService {
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
       await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on update:", e?.message));
-    await CacheService.delete(`user_pub_profile:${uid}`);
+    await CacheService.delete(CacheKeys.userPublicProfile(uid));
     }
 
     if (name || photoURL) {
@@ -591,7 +591,7 @@ export class UsersService {
     await CacheService.delete(`user_me_${uid}:pub`);
     await CacheService.delete(`user_me_${uid}:priv`);
     await CacheService.delete(`auth_session:${uid}`).catch((e: any) => logger.warn("[Users] Invalidate auth_session on role change:", e?.message));
-    await CacheService.delete(`public_profile_${uid}`);
+    await CacheService.delete(CacheKeys.userPublicProfile(uid));
     await CacheService.delete(`wallet_dashboard:${uid}`).catch(() => {});
     await CacheService.delete(`bff_wallet_user:${uid}`).catch(() => {});
     return { success: true };

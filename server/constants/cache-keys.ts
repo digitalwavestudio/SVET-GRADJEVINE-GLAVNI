@@ -62,6 +62,9 @@ export const CACHE_PREFIXES = {
   USER_PROFILE_CACHE: "user:profile:cache:",
   AUTH_SESSION: "auth_session:",
 
+  // PUBLIC PROFILE
+  PUBLIC_PROFILE: "user:pub:profile:",
+
   // SEO & CONTENT
   SEO_SCHEMA: "seo:schema:",
   SEO_PRERENDER: "seo:prerender:",
@@ -114,4 +117,5 @@ export const CacheKeys = {
   swr: (key: string) => `${CACHE_PREFIXES.SWR_ENVELOPE}${key}`,
   swrLock: (key: string) => `${CACHE_PREFIXES.SWR_LOCK}${key}`,
   swrBackoff: (key: string) => `${CACHE_PREFIXES.SWR_BACKOFF}${key}`,
+  userPublicProfile: (uid: string) => `${CACHE_PREFIXES.PUBLIC_PROFILE}${uid}`,
 };

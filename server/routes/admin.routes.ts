@@ -14,7 +14,7 @@ import {
   runMigrations, reindexAll, updateSettings, getSettings,
   clearDashboardCache, sendBroadcast, getBroadcasts,
   getSupportTickets, getAbuseReports, getAuditLogs,
-  runAuditLogsCleanup, resetCircuitBreakerOrCache, setupAlgolia,
+  runAuditLogsCleanup, resetCircuitBreakerOrCache, setupAlgolia, flushCache,
 } from "../controllers/admin-settings.controller.ts";
 import { validateRequest, validateSettings } from "../middleware/validate.ts";
 import { db } from "../config/firebase.ts";
@@ -147,6 +147,7 @@ adminRouter.post("/sync/reindex", adminTriggerLimiter, reindexAll);
 adminRouter.post("/sync/algolia-setup", adminTriggerLimiter, setupAlgolia);
 adminRouter.patch("/settings/:type", adminTriggerLimiter, validateSettings, updateSettings);
 adminRouter.post("/cache/clear-dashboard", adminTriggerLimiter, clearDashboardCache);
+adminRouter.post("/cache/flush", adminTriggerLimiter, flushCache);
 adminRouter.post("/housekeeping/cleanup-audit-logs", adminTriggerLimiter, runAuditLogsCleanup);
 adminRouter.post("/broadcast", adminTriggerLimiter, sendBroadcast);
 adminRouter.get("/broadcasts", adminTriggerLimiter, getBroadcasts);

@@ -149,3 +149,24 @@ export const resetCircuitBreakerOrCache = async (req: Request, res: Response, ne
     res.json({ success: true, message });
   } catch (err) { next(err); }
 };
+
+export const flushCache = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user?.isAdmin) return res.status(403).json({ error: "Forbidden" });
+  try {
+    const { prefix } = req.query as { prefix?: string };
+    const { CacheService } = await import("../services/cache.service.ts");
+    const { CACHE_PREFIXES } = await import("../constants/cache-keys.ts");
+
+    if (prefix) {
+      await CacheService.invalidateByPrefix(prefix);
+      AuditService.logDestructive(req, "system", "ADMIN_FLUSH_CACHE", { prefix, type: "prefix" });
+      return res.json({ success: true, message: `Keš sa prefiksom "${prefix}" očišćen.` });
+    }
+
+    // Clear ALL known prefixes
+    const prefixes = Object.values(CACHE_PREFIXES).filter(v => typeof v === "string");
+    await CacheService.invalidateByPrefixes(prefixes);
+    AuditService.logDestructive(req, "system", "ADMIN_FLUSH_CACHE", { type: "all", prefixes });
+    res.json({ success: true, message: `Kompletan keš (${prefixes.length} prefiksa) očišćen.` });
+  } catch (err) { next(err); }
+};

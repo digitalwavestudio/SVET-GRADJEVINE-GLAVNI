@@ -151,9 +151,9 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
       }
 
       // 1. Try Cache first
-      const cacheMap = await CacheService.getMultiple<UserDTO>(keys.map(k => `public_profile_${k}`)).catch(() => new Map());
+      const cacheMap = await CacheService.getMultiple<UserDTO>(keys.map(k => CacheKeys.userPublicProfile(k))).catch(() => new Map());
       keys.forEach(key => {
-        const cached = cacheMap.get(`public_profile_${key}`);
+        const cached = cacheMap.get(CacheKeys.userPublicProfile(key));
         if (cached) fetchedUsers.set(key, cached);
       });
 
@@ -201,7 +201,7 @@ export const userProfileLoader = new DataLoader<string, UserDTO | null>(
                 };
 
                 fetchedUsers.set(doc.id, profile as UserDTO);
-                CacheService.set(`public_profile_${doc.id}`, profile, 60000).catch(err => console.error("[Cache] invalidation error:", err));
+                CacheService.set(CacheKeys.userPublicProfile(doc.id), profile, 60000).catch(err => console.error("[Cache] invalidation error:", err));
               });
             } catch (err) {
               logger.error(`[Dataloader] User profile Firestore query failed for chunk ${chunk.join(",")}:`, err);
