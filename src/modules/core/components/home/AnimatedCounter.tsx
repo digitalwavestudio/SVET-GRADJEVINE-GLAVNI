@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "" }: { end: number, duration?: number, delay?: number, suffix?: string }) => {
+const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "", className = "" }: { end: number, duration?: number, delay?: number, suffix?: string, className?: string }) => {
   const [count, setCount] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const counterRef = useRef<HTMLDivElement>(null);
@@ -59,7 +59,7 @@ const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "" }: { end
   }, [end, duration, delay, hasStarted]);
 
   return (
-    <span ref={counterRef} className="text-3xl sm:text-4xl font-black text-white block mb-2 uppercase">
+    <span ref={counterRef} className={`${className || "text-3xl sm:text-4xl"} font-black text-white block mb-2 uppercase`}>
       {count}{suffix}
     </span>
   );

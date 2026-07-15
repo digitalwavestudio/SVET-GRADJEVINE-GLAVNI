@@ -39,7 +39,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
   const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
 
-  const fallbackAuthor = job.authorName || job.userName || job.creatorName || job.contactName || job.contactPerson || job?.contact?.name || job?.contact?.person || job?.user?.name || job?.user?.displayName || 'Anonimni Korisnik';
+  const fallbackAuthor = job.authorName || job.userName || job.creatorName || job.contactName || job.contactPerson || job?.contact?.name || job?.contact?.person || job?.user?.name || job?.user?.displayName || 'Svet Građevine Član';
 
   const rawComp = job.comp || job.company || job.companyName;
   const companyNameDisplay = (rawComp && rawComp.toLowerCase() !== 'kompanija' && rawComp.toLowerCase() !== 'company') 
@@ -62,7 +62,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
   return (
     <article
       itemScope itemType="https://schema.org/JobPosting"
-      className={`group relative flex flex-col h-full min-h-[300px] md:min-h-0 rounded-[16px] transition-all duration-500 overflow-hidden ${
+      className={`group relative flex flex-col h-full self-stretch min-h-[300px] md:min-h-0 rounded-[16px] transition-all duration-500 ${
         isPremium
           ? 'border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1'
           : isUrgent
@@ -85,7 +85,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         isPremium ? 'via-secondary' : isUrgent ? 'via-red-500' : 'via-white/20'
       }`}></div>
 
-      <div className="p-5 flex flex-col w-full h-full relative z-20 pointer-events-none">
+      <div className="p-5 flex flex-col w-full flex-1 relative z-20 pointer-events-none">
         {/* Logo - absolute top-right */}
         <div className="absolute top-5 right-5 w-[56px] h-[56px] min-w-[56px] max-w-[56px] md:w-[64px] md:h-[64px] md:min-w-[64px] md:max-w-[64px] bg-white rounded-full p-1.5 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm z-10 flex items-center justify-center overflow-hidden">
           {job.logo ? (
@@ -98,9 +98,13 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               height={64}
             />
           ) : (
-            <span className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xs">
-              {getInitials(companyNameDisplay)}
-            </span>
+            <div className="relative w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-slate-800">
+              {/* Blurred background effect to simulate a blurred logo */}
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-black blur-[2px] scale-110"></div>
+              <div className="absolute inset-0 flex items-center justify-center opacity-40 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+              {/* Padlock icon in the center */}
+              <span className="material-symbols-outlined text-secondary relative z-10 text-[22px] md:text-[26px] drop-shadow-md">lock</span>
+            </div>
           )}
         </div>
 
@@ -124,8 +128,8 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         )}
 
         {/* Desktop: title + badges in one row */}
-        <div className="flex items-start gap-2 pr-[68px]">
-          <h3 className="text-xl md:text-2xl font-black text-white group-hover:text-secondary transition-colors duration-300 mt-1 mb-1 uppercase break-words tracking-tight leading-tight">
+        <div className="flex flex-wrap items-start gap-2 pr-[68px] mb-2">
+          <h3 className="text-xl md:text-2xl font-black text-white group-hover:text-secondary transition-colors duration-300 mt-1 uppercase break-words tracking-tight leading-tight flex-1 min-w-[120px]">
             {(() => {
               const t = job.title || '';
               const i = t.indexOf(' — ');

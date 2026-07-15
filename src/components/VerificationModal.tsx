@@ -47,10 +47,6 @@ export default function VerificationModal({ isOpen, onClose }: VerificationModal
 
   const niches: { id: BusinessNiche; label: string; icon: string }[] = [
     { id: 'gradjevina', label: 'GRAĐEVINSKA FIRMA', icon: 'engineering' },
-    { id: 'ketering', label: 'KETERING / HRANA', icon: 'restaurant' },
-    { id: 'smestaj', label: 'SMEŠTAJ RADNIKA', icon: 'bed' },
-    { id: 'placevi', label: 'PRODAJA PLACEVA', icon: 'landscape' },
-    { id: 'masine', label: 'NAJAM MAŠINA', icon: 'construction' },
   ];
 
   return (

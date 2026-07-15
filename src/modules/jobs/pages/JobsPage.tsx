@@ -77,7 +77,7 @@ function JobsPage() {
   return cleaned;
 }, [activeFilters]);
 
-const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
+const { data, isLoading: loadingJobs, hasNextPage, fetchNextPage, isFetchingNextPage } = useJobs(sanitizedFilters);
   const jobs = useMemo(() => data?.pages.flatMap(page => page.items) || [], [data]);
   const { data: premiumQueryData } = usePremiumJobs(sanitizedFilters, 12);
   const premiumJobs = useMemo(() => premiumQueryData?.pages.flatMap(page => page.items) || [], [premiumQueryData]);
@@ -90,12 +90,20 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
     return [...urgent, ...premium, ...rest];
   }, [premiumJobs, jobs]);
 
-  const [visibleCount, setVisibleCount] = useState(15);
-  useEffect(() => setVisibleCount(15), [allJobsPremiumFirst]);
+  const [visibleCount, setVisibleCount] = useState(20);
+  useEffect(() => setVisibleCount(20), [sanitizedFilters]);
   const displayedJobs = useMemo(() => allJobsPremiumFirst.slice(0, visibleCount), [allJobsPremiumFirst, visibleCount]);
-  const hasMore = visibleCount < allJobsPremiumFirst.length;
+  // hasMore = ima još lokalno učitanih ILI ima još na serveru
+  const hasMore = visibleCount < allJobsPremiumFirst.length || !!hasNextPage;
   const isDeepPagingLimitReached = false;
-  const loadMore = useCallback(() => setVisibleCount(prev => prev + 10), []);
+  const loadMore = useCallback(() => {
+    const nextCount = visibleCount + 20;
+    setVisibleCount(nextCount);
+    // Ako smo potrošili sve lokalno učitane, traži sledeću stranicu od servera
+    if (nextCount >= allJobsPremiumFirst.length && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [visibleCount, allJobsPremiumFirst.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const { data: jobStats } = useCollectionStats('jobs');
   const { data: companyCount } = useCount('companies');
@@ -517,11 +525,9 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
         badge="Oglasi za Posao"
         title="Poslovi"
         titleAccent="Građevina"
-        subtitle="Najveća baza poslova u građevinskom sektoru. Pronađi stalni zaposlenje ili angažman na projektu za svoj tim."
+        subtitle="Pronađite posao ili angažujte radnike iz najveće baze građevinskih poslova na jednom mestu."
         stats={[
               { label: "AKTIVNI OGLASI", value: (jobStats?.total ?? totalJobsCount).toLocaleString(), icon: "work" },
-          { label: "KOMPANIJE", value: companyCount != null ? companyCount.toLocaleString() : "400", icon: "business" },
-          { label: "NOVI DANAS", value: jobStats?.today != null ? jobStats.today.toLocaleString() : "12", icon: "new_releases" }
         ]}
       >
         <div className="mt-8 flex flex-col gap-4 max-w-4xl w-full">
@@ -667,6 +673,7 @@ const { data, isLoading: loadingJobs } = useJobs(sanitizedFilters);
               loadingJobs={loadingJobs}
               hasMore={hasMore}
               loadMore={loadMore}
+              loadingMore={isFetchingNextPage}
               prefetch={prefetch}
               handleResetFilters={() => {
                 setSearchQuery('');

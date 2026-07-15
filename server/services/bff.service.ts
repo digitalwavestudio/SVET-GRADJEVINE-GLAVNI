@@ -78,7 +78,7 @@ const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T
 
 export const bffService = {
   async getHomepageData(platform: string): Promise<HomepageDataResult> {
-    const cacheKey = `homepage_bff_${platform}_v8`;
+    const cacheKey = `homepage_bff_${platform}_v9`;
 
     const now = Date.now();
     const l1Cached = l1HomepageCache.get(cacheKey);
@@ -136,7 +136,15 @@ export const bffService = {
       withTimeout(UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       withTimeout(UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       withTimeout(UnifiedSearchService.search("caterings", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
-      withTimeout(UnifiedSearchService.search("jobs", { status: "active", skipCount: true }, 10), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
+      (async () => {
+        try {
+          const snap = await db.collection("listings").where("type", "==", "job").where("status", "in", ["active", "approved"]).orderBy("createdAt", "desc").limit(500).get();
+          return { docs: snap.docs.map(d => ({ id: d.id, ...d.data() })), lastVisibleId: snap.docs.length > 0 ? snap.docs[snap.docs.length - 1].id : null, hasMore: false, totalHits: snap.docs.length };
+        } catch (e) {
+          console.error("[BFF] Direct jobs query failed:", e);
+          return { docs: [], lastVisibleId: null, hasMore: false, totalHits: 0 };
+        }
+      })(),
     ]);
 
     const gStats = (
@@ -303,10 +311,8 @@ export const bffService = {
     const latestCaterings = buildMappedDocs<Record<string, unknown>>(cateringsData).map((c) =>
       snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
     );
-    const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData)
-      .filter((j: any) => !j.isPremium)
-      .slice(0, 5)
-      .map((j) =>
+      const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData)
+        .map((j) =>
         snippet(j, [
           "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
           "loc", "location",

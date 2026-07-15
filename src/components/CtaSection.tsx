@@ -139,7 +139,7 @@ export default function CtaSection() {
                 NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] block sm:inline">GRAĐEVINSKE MREŽE</span>
               </h1>
               <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">
-                Povezujemo vrhunske inženjere, arhitekte i majstore sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
+                Povezujemo poslodavce i radnike sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Link 
@@ -158,20 +158,10 @@ export default function CtaSection() {
             </div>
             {/* Visual Grid (Tactical UI) */}
             <div className="lg:col-span-5 relative w-full min-w-0">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full min-w-0">
-                {/* Stats Card */}
-                <div className="col-span-1 sm:col-span-2 p-4 sm:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 relative overflow-hidden group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 h-auto sm:h-fit mt-0 sm:mt-6 w-full min-h-[180px] sm:min-h-0">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50 z-0"></div>
-                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
-                    <span className="material-symbols-outlined text-6xl text-white">groups</span>
-                  </div>
-                  <div className="w-10 h-1.5 bg-blue-500 mb-6 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1 leading-none tracking-tight">{dynamicWorkersCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.2em] font-black break-words">Aktivnih Majstora</p>
-                </div>
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 w-full min-w-0 pt-12 lg:pt-32">
                 {/* Testimonial Card Slider */}
                 <div 
-                  className="order-first sm:order-none col-span-1 sm:col-span-2 p-4 sm:p-8 rounded-[16px] border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 via-slate-900 to-slate-950 relative overflow-hidden cursor-pointer transition-all duration-500 shadow-[0_4px_20px_rgba(99,102,241,0.1)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:border-indigo-500/60 hover:-translate-y-1 w-full group"
+                  className="p-4 sm:p-8 rounded-[16px] border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 via-slate-900 to-slate-950 relative overflow-hidden cursor-pointer transition-all duration-500 shadow-[0_4px_20px_rgba(99,102,241,0.1)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:border-indigo-500/60 hover:-translate-y-1 w-full group"
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50 z-0"></div>
                   <div className="absolute top-0 right-0 p-4 sm:p-6 opacity-5 group-hover:opacity-20 transition-opacity">
@@ -215,23 +205,6 @@ export default function CtaSection() {
                       />
                     ))}
                   </div>
-                </div>
-
-                {/* Secondary Stats */}
-                <div className="p-4 sm:p-8 rounded-[16px] border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-slate-900 to-slate-950 group hover:border-blue-500/60 transition-all duration-500 shadow-[0_4px_20px_rgba(59,130,246,0.1)] hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:-translate-y-1 relative overflow-hidden w-full flex flex-col">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50 z-0"></div>
-                  <div className="w-8 h-1 bg-blue-500 mb-6 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
-                  <span className="material-symbols-outlined text-blue-500 mb-6 block text-4xl group-hover:scale-110 transition-transform">business_center</span>
-                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1 tracking-tight">{dynamicFirmsCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words pt-2">Kompanija</p>
-                </div>
-
-                <div className="p-4 sm:p-8 rounded-[16px] border border-secondary/20 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 group hover:border-secondary/60 transition-all duration-500 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:shadow-[0_0_30px_rgba(254,191,13,0.2)] hover:-translate-y-1 relative overflow-hidden w-full flex flex-col">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
-                  <div className="w-8 h-1 bg-secondary mb-6 rounded-full shadow-[0_0_10px_rgba(254,191,13,0.5)]"></div>
-                  <span className="material-symbols-outlined text-secondary mb-6 block text-4xl group-hover:rotate-12 transition-transform">construction</span>
-                  <h3 className="text-2xl sm:text-3xl font-headline font-black text-white mb-1 tracking-tight">{totalAdsCount.toLocaleString('sr-RS')}+</h3>
-                  <p className="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-widest font-black break-words pt-2">Otvorenih Projekata</p>
                 </div>
               </div>
             </div>

@@ -90,7 +90,7 @@ export const jobsService = {
 
   async fetchJobs(
     filters: Record<string, unknown> | null | undefined,
-    _lastVisible?: string | { id: string } | null,
+    lastVisible?: string | { id: string } | null,
     _pageSize?: number
   ): Promise<JobsListResponse> {
     return withRetry(async () => {
@@ -104,12 +104,19 @@ export const jobsService = {
       for (const key of allowedFilterKeys) {
         if (f[key] !== undefined) cleanFilters[key] = f[key];
       }
+
+      // Extract string cursor
+      const cursorId = typeof lastVisible === 'string' ? lastVisible : (lastVisible as { id: string } | null)?.id || null;
+      // Use large page size to get all results — backend sorts in-memory so cursor doesn't work anyway
+      const pageSizeToUse = _pageSize || 500;
+
       const data = isEmptyFilter && !filters?.searchQuery
-        ? await apiClient.get<JobSearchApiResponse>('/jobs?pageSize=25')
+        ? await apiClient.get<JobSearchApiResponse>(`/jobs?pageSize=${pageSizeToUse}${cursorId ? `&cursor=${cursorId}` : ''}`)
         : await apiClient.post<JobSearchApiResponse>('/jobs/search', { 
             searchQuery: (filters?.searchQuery as string | undefined) || "", 
             filters: cleanFilters, 
-            pageSize: 25
+            pageSize: pageSizeToUse,
+            ...(cursorId ? { cursor: cursorId } : {}),
           });
 
       return {

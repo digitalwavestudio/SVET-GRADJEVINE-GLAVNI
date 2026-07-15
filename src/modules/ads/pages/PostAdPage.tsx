@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Step1 } from "@/src/modules/ads/components/post-ad/Step1";
 import { Step2 } from "@/src/modules/ads/components/post-ad/Step2";
@@ -12,35 +12,12 @@ import { FormProvider } from "react-hook-form";
 import { usePostAdController } from "@/src/modules/ads/hooks/usePostAdController";
 import { usePlatformSettings } from "@/src/modules/dashboard/hooks/useMyAds";
 import { SuccessState } from "@/src/modules/ads/components/post-ad/SuccessState";
-import { CategorySelector } from "@/src/modules/ads/components/post-ad/CategorySelector";
 import { AdOverlays } from "@/src/modules/ads/components/post-ad/AdOverlays";
-import {
-  jobSchema as jobSchema,
-  machineSchema as machineSchema,
-  accommodationSchema as accommodationSchema,
-  cateringSchema as cateringSchema,
-  realEstateSchema as realEstateSchema,
-  marketplaceSchema as marketplaceSchema,
-} from "@svet-gradjevine/shared";
+import { jobSchema } from "@svet-gradjevine/shared";
 import { getAutoTitle } from "@/src/modules/ads/utils/adUtils";
 
 const getValidationSchema = (category: string | null) => {
-  switch (category) {
-    case "job":
-      return jobSchema;
-    case "machines":
-      return machineSchema;
-    case "accommodation":
-      return accommodationSchema;
-    case "catering":
-      return cateringSchema;
-    case "plot":
-      return realEstateSchema;
-    case "marketplace":
-      return marketplaceSchema;
-    default:
-      return null;
-  }
+  return jobSchema;
 };
 
 export default function PostAdPage() {
@@ -81,7 +58,13 @@ export default function PostAdPage() {
 
   if (!user) return null;
 
-  const autoTitle = getAutoTitle(formData, selectedCategory, user);
+  const autoTitle = getAutoTitle(formData, selectedCategory || "job", user);
+
+  useEffect(() => {
+    if (!selectedCategory) setSelectedCategory("job");
+  }, []);
+
+  if (!selectedCategory) return null;
 
   if (isSubmitted) {
     const currentPackage = getPackageById(
@@ -95,29 +78,8 @@ export default function PostAdPage() {
         onReset={() => {
           setIsSubmitted(false);
           setStep(1);
-          setSelectedCategory(null);
+          setSelectedCategory("job");
         }}
-      />
-    );
-  }
-
-  if (!selectedCategory) {
-    const allOptions = [
-      { id: "job", title: "Postavljam\noglas za posao", subtitle: "", icon: "work" },
-      { id: "accommodation", title: "Reklamiram\nsmeštaj za radnike", subtitle: "", icon: "home_work" },
-      { id: "catering", title: "Oglašavam svoje\nketering usluge", subtitle: "", icon: "restaurant" },
-      { id: "machines", title: "Izdajem ili Prodajem\nGrađevinsku mašinu", subtitle: "", icon: "precision_manufacturing", disabled: true },
-      { id: "plot", title: "Prodajem ili izdajem\nplac ili zemljiste", subtitle: "", icon: "landscape", disabled: true },
-      { id: "marketplace", title: "Alat i oprema\n(Polovno!)", subtitle: "", icon: "build", disabled: true },
-    ];
-
-    return (
-      <CategorySelector
-        options={allOptions}
-        selectedCategory={selectedCategory}
-        onSelect={setSelectedCategory}
-        logoUrl={logoUrl || undefined}
-        userRole={user.role}
       />
     );
   }
@@ -145,15 +107,7 @@ export default function PostAdPage() {
             </span>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-8 font-headline leading-none">
               Postavi oglas{" "}
-              <span className="text-secondary">
-                {selectedCategory === "job"
-                  ? "za posao"
-                  : selectedCategory === "company"
-                    ? "za firmu"
-                    : selectedCategory === "accommodation"
-                      ? "za smeštaj"
-                      : "za uslugu"}
-              </span>
+              <span className="text-secondary">za posao</span>
             </h1>
           </motion.div>
 

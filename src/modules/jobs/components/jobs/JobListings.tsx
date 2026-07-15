@@ -31,6 +31,7 @@ interface JobListingsProps {
   handleResetFilters: () => void;
   prefetch: (type: string, id?: string) => void;
   isDeepPagingLimitReached?: boolean;
+  loadingMore?: boolean;
 }
 
 export function JobListings({
@@ -45,7 +46,8 @@ export function JobListings({
   loadMore,
   handleResetFilters,
   prefetch,
-  isDeepPagingLimitReached
+  isDeepPagingLimitReached,
+  loadingMore = false,
 }: JobListingsProps) {
   return (
     <div className="min-w-0 space-y-4">
@@ -89,17 +91,24 @@ export function JobListings({
       )}
 
       {hasMore && jobs.length > 0 && (
-        <div className="mt-12 text-center text-secondary font-black uppercase text-sm">
-           {loadingJobs ? (
-              "Učitavanje..."
+        <div className="mt-12 flex flex-col items-center gap-3">
+           {loadingMore || loadingJobs ? (
+              <div className="flex items-center gap-2 text-secondary text-xs font-black uppercase tracking-widest">
+                <span className="material-symbols-outlined animate-spin text-base">refresh</span>
+                Učitavanje...
+              </div>
            ) : (
               <button 
                  onClick={loadMore}
-                 className="px-8 py-3 bg-white/5 border border-white/10 rounded-[10px] text-white hover:bg-white/10 transition-colors uppercase tracking-widest text-xs"
+                 className="px-10 py-3.5 bg-secondary text-black font-black rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg hover:shadow-secondary/20 hover:-translate-y-0.5 active:translate-y-0"
               >
-                 Učitaj još oglasa
+                <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: '"FILL" 1' }}>expand_more</span>
+                Učitaj još oglasa
               </button>
            )}
+           <p className="text-white/30 text-[10px] uppercase tracking-widest">
+             Prikazano {filteredJobs.length} od {jobs.length}+ oglasa
+           </p>
         </div>
       )}
 

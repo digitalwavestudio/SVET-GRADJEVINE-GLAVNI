@@ -1,16 +1,12 @@
 import { lazy } from 'react';
-import { Route } from 'react-router-dom';
-import { masterLoader } from '@/src/lib/loaders';
-
-const MastersPage = lazy(() => import('./pages/MastersPage'));
-const MasterProfilePage = lazy(() => import('./pages/MasterProfilePage'));
+import { Route, Navigate } from 'react-router-dom';
 
 export const getMastersRouter = () => [
-  <Route key="majstori-grad-zanimanje" path="/majstori/:zanimanje/:grad" element={<MastersPage />} loader={masterLoader} />,
-  <Route key="majstori-zanimanje" path="/majstori/:zanimanje" element={<MastersPage />} loader={masterLoader} />,
-  <Route key="majstori-grad" path="/majstori/:grad" element={<MastersPage />} loader={masterLoader} />,
-  <Route key="majstori" path="/majstori" element={<MastersPage />} loader={masterLoader} />,
-  <Route key="majstori-id" path="/majstori/profil/:id" element={<MasterProfilePage />} />,
-  <Route key="majstori-silo" path="/majstor/:zanat/:grad/:id" element={<MasterProfilePage />} />,
-  <Route key="majstor-id" path="/majstor/:id" element={<MasterProfilePage />} />
+  <Route key="majstori-grad-zanimanje" path="/majstori/:zanimanje/:grad" element={<Navigate to="/" replace />} />,
+  <Route key="majstori-zanimanje" path="/majstori/:zanimanje" element={<Navigate to="/" replace />} />,
+  <Route key="majstori-grad" path="/majstori/:grad" element={<Navigate to="/" replace />} />,
+  <Route key="majstori" path="/majstori" element={<Navigate to="/" replace />} />,
+  <Route key="majstori-id" path="/majstori/profil/:id" element={<Navigate to="/" replace />} />,
+  <Route key="majstori-silo" path="/majstor/:zanat/:grad/:id" element={<Navigate to="/" replace />} />,
+  <Route key="majstor-id" path="/majstor/:id" element={<Navigate to="/" replace />} />
 ];

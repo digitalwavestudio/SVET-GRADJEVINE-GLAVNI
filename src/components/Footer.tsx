@@ -13,7 +13,7 @@ export default function Footer() {
   return (
     <footer role="contentinfo" className="bg-[#070b14] w-full pt-4 md:pt-14 pb-4 md:pb-10 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
       <div className="max-w-[1920px] mx-auto w-full relative z-10">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8 lg:gap-8 mb-4 lg:mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-10 gap-x-2 gap-y-8 lg:gap-x-2 mb-4 lg:mb-6">
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left lg:-mt-6">
             <Link to="/" className="flex items-center gap-3 group mb-4 lg:mb-8 touch-target focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg md:-ml-8" aria-label="Svet Građevine home">
@@ -36,59 +36,26 @@ export default function Footer() {
           </div>
 
           {/* Categories Columns */}
-          <div className="col-span-2 lg:col-span-4 mt-1 sm:mt-0">
+          <div className="col-span-2 lg:col-span-2 mt-1 sm:mt-0">
             <h4 className="text-secondary font-extrabold text-[11px] sm:text-[13px] tracking-widest uppercase mb-2.5 sm:mb-4 flex items-center justify-center sm:justify-start gap-2">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-secondary/70"></span> Kategorije
             </h4>
-            <ul className="grid grid-cols-2 gap-y-2 gap-x-2 sm:gap-x-4 lg:gap-y-4 lg:gap-x-8">
-              {[
+            <ul className="space-y-1.5 sm:space-y-3 flex flex-col items-center sm:items-start">
+              {([
                 { path: 'poslovi', label: 'Poslovi' },
-                { path: 'majstori', label: 'Majstori' },
                 { path: 'firme', label: 'Firme' },
-                { path: 'smestaj', label: 'Smeštaj' },
-                { path: 'ketering', label: 'Ketering' },
-                { path: 'alat-i-oprema', label: 'Alat i oprema', disabled: true },
-                { path: 'gradjevinske-masine', label: 'Mašine', disabled: true },
-                { path: 'placevi', label: 'Placevi', disabled: true },
                 { path: 'cene-i-statistika', label: 'Statistika' },
                 { path: 'kalkulator', label: 'AI Kalkulator' }
-              ].map((item) => {
-                const isDisabled = item.disabled;
+              ] as { path: string; label: string }[]).map((item) => {
                 return (
-                  <li key={item.path} className="flex items-center justify-center sm:justify-start text-center sm:text-left relative group/tooltip">
+                  <li key={item.path}>
                     <Link 
-                      to={`/${item.path}`} 
-                      onClick={(e) => {
-                        if (isDisabled) {
-                          e.preventDefault();
-                        }
-                      }}
-                      className={`inline-flex transition-all duration-300 text-sm sm:text-base font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline ${isDisabled ? 'text-white/20 cursor-not-allowed hover:text-white/30' : 'text-white/40 hover:text-secondary hover:translate-x-1 cursor-pointer'}`} 
+                      to={`/${item.path}`}
+                      className="text-white/40 hover:text-secondary hover:translate-x-1 inline-flex transition-all duration-300 text-sm sm:text-base font-medium touch-target focus:outline-none focus-visible:text-secondary focus-visible:underline"
                       aria-label={item.label}
                     >
                       {item.label}
                     </Link>
-                    {isDisabled && (
-                      <>
-                        {/* Mobile Tooltip */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-95 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50 w-max md:hidden">
-                          <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 py-1.5 px-3 rounded-[8px] shadow-lg flex items-center gap-1.5">
-                            <span className="material-symbols-outlined text-secondary text-[14px]">hourglass_empty</span>
-                            <span className="text-white/90 text-[11px] font-bold tracking-wide">Stiže uskoro!</span>
-                          </div>
-                        </div>
-                        {/* Desktop Tooltip */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-active/tooltip:scale-100 z-50 w-max hidden md:block">
-                          <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap md:min-w-[260px] flex flex-col items-start text-left">
-                            <div className="flex items-center gap-2.5 mb-2">
-                              <img src={logoUrl || logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md flex-shrink-0" />
-                              <span className="text-secondary font-black text-[11px] md:text-[12px] uppercase tracking-widest">USKORO!</span>
-                            </div>
-                            <p className="text-white/90 text-[12px] md:text-[13px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
-                          </div>
-                        </div>
-                      </>
-                    )}
                   </li>
                 );
               })}

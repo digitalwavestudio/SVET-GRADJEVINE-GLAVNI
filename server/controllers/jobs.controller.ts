@@ -13,7 +13,7 @@ export const getPublicJobs = async (
   next: NextFunction,
 ) => {
   try {
-    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 10, 1), 25);
+    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 20, 1), 1000);
     const limit = pageSize + 1;
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;
@@ -71,7 +71,7 @@ export const searchJobs = async (
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
     const platform = req.headers["x-client-platform"];
 
-    const pageSize = Math.min(Math.max(Number(validated?.pageSize) || 24, 1), 25);
+    const pageSize = Math.min(Math.max(Number(validated?.pageSize) || 20, 1), 1000);
 
     // Keširanje za premium/urgent poslove — i na naslovnoj (pageSize=6) i na /poslovi (pageSize=12)
     const cacheablePremium =

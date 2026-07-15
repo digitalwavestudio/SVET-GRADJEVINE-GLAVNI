@@ -112,7 +112,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
               {/* Header: Company & Badge */}
               <div className="flex flex-wrap justify-between items-center mb-4 gap-2 w-full">
                 <div className="flex items-center gap-2.5 min-w-[120px] flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 flex items-center justify-center text-white font-black text-lg border border-white/10 overflow-hidden shrink-0 shadow-inner">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 flex items-center justify-center text-white font-black text-lg border border-white/10 overflow-hidden shrink-0 shadow-inner relative">
                     {job.logo ? (
                       <OptimizedImage
                         src={job.logo}
@@ -123,11 +123,15 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
                         loading="lazy"
                       />
                     ) : (
-                      job.comp?.charAt(0) || job.companyName?.charAt(0) || 'P'
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-black blur-[1px] scale-110"></div>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-40 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+                        <span className="material-symbols-outlined text-secondary relative z-10 text-[18px]">lock</span>
+                      </>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-white font-bold text-xs sm:text-sm truncate w-full block tracking-wide">{job.comp || job.companyName || 'Svet Građevine'}</p>
+                    <p className="text-white font-bold text-xs sm:text-sm truncate w-full block tracking-wide">{job.comp || job.companyName || 'Svet Građevine Član'}</p>
                   </div>
                 </div>
                 <div className="shrink-0">{renderBadge(job)}</div>

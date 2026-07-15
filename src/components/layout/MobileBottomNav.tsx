@@ -214,7 +214,7 @@ export const MobileBottomNav: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Traži posao, mašine, firme..."
+                  placeholder="Traži posao..."
                   className="flex-1 bg-transparent text-lg text-white outline-none placeholder:text-white/30 font-medium px-4 py-4 relative z-10"
                 />
               </div>

@@ -1,22 +1,24 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import CtaSection from '@/src/components/CtaSection';
+import { VerticalCTA } from '@/src/components/VerticalCTA';
+import { Briefcase } from 'lucide-react';
+import { StandardPageHero } from '@/src/components/StandardPageHero';
+import { AiSearchBar } from '@/src/components/AiSearchBar';
 import SeoHead from '@/src/components/SeoHead';
-import HeroSection from '@/src/modules/core/components/home/HeroSection';
 import CalculatorBanner from '@/src/modules/core/components/home/CalculatorBanner';
-import UrgentJobs from '@/src/modules/core/components/home/UrgentJobs';
-import PremiumJobs from '@/src/modules/core/components/home/PremiumJobs';
-import EquipmentSection from '@/src/modules/core/components/home/EquipmentSection';
-import CateringSection from '@/src/modules/core/components/home/CateringSection';
-import JobsSection from '@/src/modules/core/components/home/JobsSection';
 import AboutSection from '@/src/modules/core/components/home/AboutSection';
 import { FeedWidget } from '@/src/modules/social';
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
 import { apiClient } from '@/src/lib/apiClient';
 import { JobCard } from '@/src/modules/jobs/components/JobCard';
+import { JobFilters } from '@/src/modules/jobs/components/jobs/JobFilters';
+import { JobsUrgent } from '@/src/modules/jobs/components/jobs/JobsUrgent';
+import { JobsPremium } from '@/src/modules/jobs/components/jobs/JobsPremium';
 import { BrainIllustration } from '@/src/components/BrainIllustration';
 import shieldMaster from '@/src/assets/images/shield-master.png';
+import { useJobs, usePremiumJobs } from '@/src/modules/jobs/hooks/useJobs';
 
 interface ListingItem {
   id: string;
@@ -143,6 +145,39 @@ export default function HomePage() {
     dynamicViewsCount
   } = statsValues;
 
+  // Učitaj SVE poslove direktno (ne samo 5 iz BFF) za Aktivna Ponuda sekciju
+  const { data: allJobsData, isLoading: loadingAllJobs, hasNextPage, fetchNextPage, isFetchingNextPage } = useJobs({});
+  const allJobs = useMemo(() => allJobsData?.pages.flatMap(p => p.items) || [], [allJobsData]);
+  const { data: premiumQueryData } = usePremiumJobs({}, 12);
+  const premiumJobsAll = useMemo(() => premiumQueryData?.pages.flatMap(p => p.items) || [], [premiumQueryData]);
+
+  const [isUrgentExpanded, setIsUrgentExpanded] = useState(false);
+  const [isPremiumExpanded, setIsPremiumExpanded] = useState(false);
+  const [sortBy, setSortBy] = useState('newest');
+  const [visibleCount, setVisibleCount] = useState(20);
+  const allJobsPremiumFirst = useMemo(() => {
+    const ids = new Set<string>();
+    // urgent iz allJobs
+    const urgent = allJobs.filter((j: any) => j.isUrgent && !ids.has(j.id) && ids.add(j.id));
+    // premium iz dedicated upita
+    const premium = premiumJobsAll.filter((j: any) => !ids.has(j.id) && ids.add(j.id));
+    // ostali
+    const rest = allJobs.filter((j: any) => !ids.has(j.id));
+    return [...urgent, ...premium, ...rest];
+  }, [allJobs, premiumJobsAll]);
+  useEffect(() => setVisibleCount(20), [allJobsPremiumFirst]);
+  const displayedJobs = useMemo(() => allJobsPremiumFirst.slice(0, visibleCount), [allJobsPremiumFirst, visibleCount]);
+  const hasMore = visibleCount < allJobsPremiumFirst.length || !!hasNextPage;
+  const loadMore = useCallback(() => {
+    const nextCount = visibleCount + 20;
+    setVisibleCount(nextCount);
+    if (nextCount >= allJobsPremiumFirst.length && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [visibleCount, allJobsPremiumFirst.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const getInitials = (name: string) => name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'SG';
+
   const handleCardClick = (to: string, state: any) => {
     navigate(to, { state });
   };
@@ -185,7 +220,19 @@ export default function HomePage() {
         jsonLd={[WEBSITE_SCHEMA, ORGANIZATION_SCHEMA]}
       />
       
-      <HeroSection isSearchActive={isSearchActive} isLoading={aiLoading} />
+      <StandardPageHero
+        badge="Oglasi za Posao"
+        title="Poslovi"
+        titleAccent="Građevina"
+        subtitle="Pronađite posao ili angažujte radnike iz najveće baze građevinskih poslova na jednom mestu."
+        stats={[
+          { label: "AKTIVNI OGLASI", value: (totalAdsCount || allJobsPremiumFirst.length).toLocaleString(), icon: "work" },
+        ]}
+      >
+        <div className="mt-8 flex flex-col gap-4 max-w-full w-full">
+          <AiSearchBar vertical="jobs" />
+        </div>
+      </StandardPageHero>
 
       {isSearchActive ? (
         <div className={`max-w-7xl mx-auto px-4 md:px-8 pb-24 relative z-30 min-h-[400px] flex flex-col items-center justify-start w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
@@ -312,28 +359,109 @@ export default function HomePage() {
         </div>
       ) : (
         <>
+          {/* Hitni poslovi */}
+          <div className="scroll-fade-in">
+            <JobsUrgent 
+              jobs={urgentJobs}
+              isExpanded={isUrgentExpanded}
+              setIsExpanded={setIsUrgentExpanded}
+              prefetch={prefetchPlaceholder}
+              getInitials={getInitials}
+              hasMore={false}
+              loadMore={() => {}}
+              loadingMore={false}
+            />
+          </div>
+
+          {/* Premium poslovi */}
+          <div className="scroll-fade-in">
+            <JobsPremium 
+              jobs={premiumJobs}
+              isExpanded={isPremiumExpanded}
+              setIsExpanded={setIsPremiumExpanded}
+              prefetch={prefetchPlaceholder}
+              getInitials={getInitials}
+              hasMore={false}
+              loadMore={() => {}}
+              loadingMore={false}
+            />
+          </div>
+
+          {/* Aktivna ponuda - full width, 4-col grid */}
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20">
+
+            {/* Header */}
+            <div className="flex justify-between items-end mb-8 border-b border-white/5 pb-4">
+              <div className="flex items-start gap-4">
+                <div className="w-[8px] h-16 bg-secondary mt-1"></div>
+                <div>
+                  <h3 className="text-[35px] md:text-[38px] leading-[36px] font-black text-white uppercase tracking-tighter italic">
+                    Aktivna <br /> <span className="text-secondary">Ponuda</span>
+                  </h3>
+                  <p className="text-[10px] font-black mt-2 tracking-[0.3em] uppercase">
+                    <span className="text-white/40">UKUPNO PRONAĐENO:</span><br />
+                    <span className="text-secondary">{allJobsPremiumFirst.length || totalAdsCount} OGLASA</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 4-col grid */}
+            {loadingAllJobs && displayedJobs.length === 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="bg-white/5 border border-white/5 rounded-[10px] h-44 animate-pulse" />
+                ))}
+              </div>
+            ) : displayedJobs.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch auto-rows-fr">
+                {displayedJobs.map((job: any) => (
+                  <JobCard key={job.id} job={job} viewMode="grid" prefetch={prefetchPlaceholder} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20">
+                <span className="material-symbols-outlined text-5xl text-white/20 mb-4 block">work_off</span>
+                <p className="text-white/40 text-sm">Trenutno nema aktivnih oglasa.</p>
+              </div>
+            )}
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="flex flex-col items-center gap-3 mt-10">
+                {isFetchingNextPage ? (
+                  <div className="flex items-center gap-2 text-secondary text-xs font-black uppercase tracking-widest">
+                    <span className="material-symbols-outlined animate-spin text-base">refresh</span>
+                    Učitavanje...
+                  </div>
+                ) : (
+                  <button
+                    onClick={loadMore}
+                    className="px-10 py-3.5 bg-secondary text-black font-black rounded-[10px] hover:bg-yellow-400 transition-all uppercase tracking-widest text-xs flex items-center gap-2 shadow-lg hover:shadow-secondary/20 hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: '"FILL" 1' }}>expand_more</span>
+                    Učitaj još oglasa
+                  </button>
+                )}
+                <p className="text-white/30 text-[10px] uppercase tracking-widest">
+                  Prikazano {displayedJobs.length} od {allJobsPremiumFirst.length}+ oglasa
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <VerticalCTA 
+              title="TRAŽITE RADNIKE?"
+              description="POSTAVITE OGLAS ZA POSAO I PRONAĐITE NAJBOLJE MAJSTORE, INŽENJERE I STRUČNE TIMOVE ZA VAŠE PROJEKTE."
+              buttonText="POSTAVI OGLAS"
+              buttonLink="/postavi-oglas"
+              icon={Briefcase}
+            />
+          </div>
+
           <div className="scroll-fade-in">
             <CalculatorBanner />
-          </div>
-
-          <div className="scroll-fade-in">
-            <UrgentJobs urgentJobs={urgentJobs} isLoading={isLoadingBff} />
-          </div>
-
-          <div className="scroll-fade-in">
-            <PremiumJobs premiumJobs={premiumJobs} handleCardClick={handleCardClick} />
-          </div>
-
-          <div className="scroll-fade-in">
-            <JobsSection latestJobs={latestJobs} />
-          </div>
-
-          <div className="scroll-fade-in">
-            <EquipmentSection latestMachines={latestMachines} latestRealEstate={latestRealEstate} />
-          </div>
-
-          <div className="scroll-fade-in">
-            <CateringSection latestAccommodations={latestAccommodations} latestCaterings={latestCaterings} />
           </div>
 
           <div className="scroll-fade-in">

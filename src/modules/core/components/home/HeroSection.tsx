@@ -63,15 +63,13 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
                 : 'opacity-100 translate-y-0 scale-100 mb-11 md:mb-12'
             }`}>
               <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase relative mb-8 text-center md:text-left">
-                SVE ZA GRAĐEVINU
+                Poslovi
                 <div>
-                  <span className="text-secondary">NA JEDNOM MESTU</span>
+                  <span className="text-secondary">Građevina</span>
                 </div>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-4xl font-medium leading-relaxed relative text-center md:text-left mx-auto md:mx-0">
-                Poslovi, mašine, placevi, ketering, smeštaj, baza majstora i
-                kompanije - jedinstven sistem za brze povezivanje i efikasnije
-                poslovanje.
+                Pronađite posao ili angažujte radnike iz najveće baze građevinskih poslova na jednom mestu.
               </p>
             </div>
 

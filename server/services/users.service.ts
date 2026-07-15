@@ -1,4 +1,5 @@
 import { CacheService } from "./cache.service.ts";
+import { CacheInvalidationService } from "./cache-invalidation.service.ts";
 import { CacheKeys } from "../constants/cache-keys.ts";
 import { db, admin as firebaseAdmin } from "../config/firebase.ts";
 import { FieldPath } from "firebase-admin/firestore";

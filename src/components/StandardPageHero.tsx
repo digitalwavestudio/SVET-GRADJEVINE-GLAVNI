@@ -56,14 +56,14 @@ export function StandardPageHero({
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 w-full relative z-20 md:h-full">
-        <div className="grid grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-[159px] md:pt-[225px] pb-20 md:pb-0">
+      <div className="max-w-[1400px] mx-auto px-8 w-full relative z-20 md:h-full">
+        <div className="grid lg:grid-cols-[1fr_auto] grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-[159px] md:pt-[225px] pb-20 md:pb-0">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex-2 max-w-4xl col-start-1 animate-fade-in-up"
+            className="flex-2 w-full col-start-1 animate-fade-in-up"
           >
             {/* Badge Zone - Row 1 (40px) */}
             <div className="h-[28px] md:h-full flex items-center justify-center md:justify-start mb-6 md:mb-0 overflow-hidden">
@@ -108,7 +108,7 @@ export function StandardPageHero({
           </motion.div>
 
           {/* Stats side - Positioned higher in the hero zone */}
-          <div className="hidden lg:block col-start-2 row-span-4 self-start pt-0 pl-12 pb-12">
+          <div className="hidden lg:block col-start-2 row-span-4 self-center pl-12 pb-12 mt-16">
             {(stats && stats.length > 0) || rightSlot ? (
               <motion.div 
                 initial={{ x: 40, opacity: 0 }}

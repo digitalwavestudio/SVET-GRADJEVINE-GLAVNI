@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { jobLoader } from '@/src/lib/loaders';
 
@@ -11,7 +11,7 @@ export function getJobsRouter() { return [
   <Route key="jobs-1" path="/poslovi/:zanimanje/:grad" element={<JobsPage />} loader={jobLoader} />,
   <Route key="jobs-2" path="/poslovi/:zanimanje" element={<JobsPage />} loader={jobLoader} />,
   <Route key="jobs-3" path="/poslovi/:grad" element={<JobsPage />} loader={jobLoader} />,
-  <Route key="jobs-4" path="/poslovi" element={<JobsPage />} loader={jobLoader} />,
+  <Route key="jobs-4" path="/poslovi" element={<Navigate to="/" replace />} />,
   <Route key="job-silo" path="/posao/:kategorija/:grad/:id" element={<JobDetailsPage />} />,
   <Route key="job-1" path="/job/:id" element={<JobDetailsPage />} />,
   <Route key="job-2" path="/posao/:id" element={<JobDetailsPage />} />,

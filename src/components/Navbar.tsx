@@ -115,172 +115,6 @@ export default function Navbar() {
             </Link>
           </div>
           
-          {isDesktop && (
-            <div className="flex items-center gap-1 bg-surface-container-lowest/30 backdrop-blur-md p-1.5 px-3 rounded-[10px] border border-white/5">
-              <Link to="/" className={navLinkClass("/")}>
-                <span className={isActive("/") ? "" : hoverGradient}>Naslovna</span>
-              </Link>
-              <Link to="/poslovi" className={navLinkClass("/poslovi")}>
-                <span className={isActive("/poslovi") ? "" : hoverGradient}>
-                  Poslovi
-                </span>
-              </Link>
-              <Link to="/majstori" className={navLinkClass("/majstori")}>
-                <span className={isActive("/majstori") ? "" : hoverGradient}>
-                  Majstori
-                </span>
-              </Link>
-              <Link to="/firme" className={navLinkClass("/firme")}>
-                <span className={isActive("/firme") ? "" : hoverGradient}>
-                  Firme
-                </span>
-              </Link>
-              <Link to="/smestaj" className={navLinkClass("/smestaj")}>
-                <span className={isActive("/smestaj") ? "" : hoverGradient}>
-                  Smeštaj
-                </span>
-              </Link>
-              <Link to="/ketering" className={navLinkClass("/ketering")}>
-                <span className={isActive("/ketering") ? "" : hoverGradient}>
-                  Ketering
-                </span>
-              </Link>
-              <Link to="/alat-i-oprema" className={navLinkClass("/alat-i-oprema", true)} onClick={(e) => e.preventDefault()} tabIndex={0}>
-                <span className={hoverGradient}>
-                  Alat i oprema
-                </span>
-                {renderDisabledTooltip(false)}
-              </Link>
-              <Link
-                to="/gradjevinske-masine"
-                className={navLinkClass("/gradjevinske-masine", true)}
-                onClick={(e) => e.preventDefault()}
-                tabIndex={0}
-              >
-                <span
-                  className={hoverGradient}
-                >
-                  Građevinske mašine
-                </span>
-                {renderDisabledTooltip(false)}
-              </Link>
-              <Link to="/placevi" className={navLinkClass("/placevi", true)} onClick={(e) => e.preventDefault()} tabIndex={0}>
-                <span className={hoverGradient}>
-                  Placevi
-                </span>
-                {renderDisabledTooltip(false)}
-              </Link>
-            </div>
-          )}
-
-          {!isBot && isDesktop && user && (
-            <div className="relative flex items-center justify-center min-w-[60px] mx-4 group/avatar">
-              <Link
-                to="/kontrolna-tabla"
-                className="w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden transition-all"
-                title="Kontrolna Tabla"
-              >
-                {profileSrc && !imgError ? (
-                  <img
-                    src={profileSrc}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                    onError={() => setImgError(true)}
-                  />
-                ) : (
-                  <span className="text-sm font-black !text-black">{userInitial}</span>
-                )}
-              </Link>
-
-              {/* Avatar Dropdown — moderan redizajn */}
-              <div className="absolute top-[calc(100%+12px)] right-0 w-[288px] opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50">
-                <div className="relative bg-[#0d141b] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col">
-                  {/* Glow linija na vrhu */}
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
-
-                  {/* User Header sa gradient pozadinom */}
-                  <div className="relative pl-0 pr-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
-                    <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
-                    <div className="relative flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
-                        {profileSrc && !imgError ? (
-                          <img
-                            src={profileSrc}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                            onError={() => setImgError(true)}
-                          />
-                        ) : (
-                          <span className="text-sm font-black !text-black">{userInitial}</span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        {(user as any)?.role && (
-                          <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">
-                            {(user as any).role}
-                          </span>
-                        )}
-                        <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Nav Items */}
-                  <div className="py-2 max-h-[340px] overflow-y-auto no-scrollbar">
-                    <div className="px-2 space-y-0.5">
-                      {navItems.map((item) => {
-                        const active = isActive(item.path);
-                        return (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 w-[250px] mx-auto ${
-                              active
-                                ? "bg-secondary/10 text-white"
-                                : "text-slate-400 hover:text-white hover:bg-white/5"
-                            }`}
-                          >
-                            <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active ? "h-6 bg-secondary" : "h-0 bg-secondary group-hover/item:h-5"}`} />
-                            <span className={`material-symbols-outlined text-[20px] transition-all duration-200 group-hover/item:scale-110 ${active ? "text-secondary opacity-100" : "opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary"}`}>{item.icon}</span>
-                            <span className="text-[11px] font-black tracking-wider uppercase flex-1">{item.label}</span>
-                            {item.badge && (
-                              <span className="bg-secondary text-black text-[10px] font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center leading-none flex items-center justify-center">{item.badge}</span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Suptilan tanki divider između opcija i footer akcija */}
-                  <div className="mx-4 h-px bg-white/10" />
-
-                  {/* Footer: Podešavanja & Odjava (bez pozadine) */}
-                  <div className="pb-2 pt-1 w-full text-center">
-                    <div className="px-2 space-y-0.5 w-full">
-                      <Link
-                        to="/podesavanja"
-                        className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 w-[250px] mx-auto"
-                      >
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-secondary rounded-r-full transition-all duration-300" />
-                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary transition-all duration-200 group-hover/item:scale-110 shrink-0">settings</span>
-                        <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Podešavanja</span>
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => logout()}
-                        className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-red-400/80 hover:text-red-400 hover:bg-red-500/10 w-[250px] mx-auto text-left"
-                      >
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-red-500 rounded-r-full transition-all duration-300" />
-                        <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:scale-110 transition-all duration-200 shrink-0">logout</span>
-                        <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Odjava</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="flex items-center gap-3 lg:gap-4 lg:ml-2">
             {isDesktop && (
@@ -295,14 +129,91 @@ export default function Navbar() {
                   Oglas
                 </Button>
 
+                {!isBot && user && (
+                  <div className="relative flex items-center group/avatar">
+                    <Link
+                      to="/kontrolna-tabla"
+                      className="w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden transition-all"
+                      title="Kontrolna Tabla"
+                    >
+                      {profileSrc && !imgError ? (
+                        <img
+                          src={profileSrc}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                          onError={() => setImgError(true)}
+                        />
+                      ) : (
+                        <span className="text-sm font-black !text-black">{userInitial}</span>
+                      )}
+                    </Link>
+                    {/* Dropdown — isti kao pre */}
+                    <div className="absolute top-[calc(100%+12px)] right-0 w-[288px] opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50">
+                      <div className="relative bg-[#0d141b] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col">
+                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
+                        <div className="relative pl-0 pr-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
+                          <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                          <div className="relative flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                              {profileSrc && !imgError ? (
+                                <img src={profileSrc} alt="Profile" className="w-full h-full object-cover" onError={() => setImgError(true)} />
+                              ) : (
+                                <span className="text-sm font-black !text-black">{userInitial}</span>
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              {(user as any)?.role && (
+                                <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">{(user as any).role}</span>
+                              )}
+                              <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="py-2 max-h-[340px] overflow-y-auto no-scrollbar">
+                          <div className="px-2 space-y-0.5">
+                            {navItems.map((item) => {
+                              const active = isActive(item.path);
+                              return (
+                                <Link
+                                  key={item.path}
+                                  to={item.path}
+                                  className={`group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 w-[250px] mx-auto ${
+                                    active ? "bg-secondary/10 text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
+                                  }`}
+                                >
+                                  <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active ? "h-6 bg-secondary" : "h-0 bg-secondary group-hover/item:h-5"}`} />
+                                  <span className={`material-symbols-outlined text-[20px] transition-all duration-200 group-hover/item:scale-110 ${active ? "text-secondary opacity-100" : "opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary"}`}>{item.icon}</span>
+                                  <span className="text-[11px] font-black tracking-wider uppercase flex-1">{item.label}</span>
+                                  {item.badge && (
+                                    <span className="bg-secondary text-black text-[10px] font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center leading-none flex items-center justify-center">{item.badge}</span>
+                                  )}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="mx-4 h-px bg-white/10" />
+                        <div className="pb-2 pt-1 w-full text-center">
+                          <div className="px-2 space-y-0.5 w-full">
+                            <Link to="/podesavanja" className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 w-[250px] mx-auto">
+                              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-secondary rounded-r-full transition-all duration-300" />
+                              <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary transition-all duration-200 group-hover/item:scale-110 shrink-0">settings</span>
+                              <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Podešavanja</span>
+                            </Link>
+                            <button type="button" onClick={() => logout()} className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-red-400/80 hover:text-red-400 hover:bg-red-500/10 w-[250px] mx-auto text-left">
+                              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-red-500 rounded-r-full transition-all duration-300" />
+                              <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:scale-110 transition-all duration-200 shrink-0">logout</span>
+                              <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Odjava</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {!isBot && !user && (
-                  <Button
-                    to="/prijava"
-                    variant="blue"
-                    icon="login"
-                  >
-                    Prijavi se
-                  </Button>
+                  <Button to="/prijava" variant="blue" icon="login">Prijavi se</Button>
                 )}
               </div>
             )}
@@ -393,39 +304,22 @@ export default function Navbar() {
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 mb-4 scrollbar-hide no-scrollbar">
               <nav role="menu" className="flex flex-col gap-1">
                 {[ 
-                  { path: "/", label: "Naslovna", icon: "home" },
-                  { path: "/poslovi", label: "Poslovi", icon: "work" },
-                  { path: "/majstori", label: "Majstori", icon: "engineering" },
-                  { path: "/firme", label: "Firme", icon: "domain" },
-                  { path: "/smestaj", label: "Smeštaj", icon: "bed" },
-                  { path: "/ketering", label: "Ketering", icon: "restaurant" },
-                  { path: "/alat-i-oprema", label: "Alat i oprema", icon: "build", disabled: true },
-                  { path: "/gradjevinske-masine", label: "Građevinske mašine", icon: "precision_manufacturing", disabled: true },
-                  { path: "/placevi", label: "Placevi", icon: "location_on", disabled: true }
-                ].map((link) => {
+                ].map((link: { path: string; label: string; icon: string; disabled?: boolean }) => {
                   const active = isActive(link.path);
                   return (
                     <Link
                       key={link.path}
                       to={link.path}
-                      tabIndex={link.disabled ? 0 : undefined}
-                      onClick={(e) => {
-                        if (link.disabled) {
-                          e.preventDefault();
-                          return;
-                        }
-                        setIsOpen(false);
-                      }}
-                      className={`group/item relative flex items-center gap-2.5 py-2.5 px-3 min-h-10 rounded-xl text-xs font-bold transition-all duration-200 justify-start ${link.disabled ? 'group/tooltip cursor-not-allowed opacity-70' : ''} ${
-                        active && !link.disabled
+                      onClick={() => setIsOpen(false)}
+                      className={`group/item relative flex items-center gap-2.5 py-2.5 px-3 min-h-10 rounded-xl text-xs font-bold transition-all duration-200 justify-start ${
+                        active
                           ? "bg-secondary/10 text-white"
                           : "text-slate-300 hover:bg-white/5 hover:text-white"
                       }`}
                     >
-                      <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active && !link.disabled ? "h-7 bg-secondary" : "h-0 bg-secondary group-hover/item:h-6"}`} />
-                      <span className={`material-symbols-outlined text-[18px] transition-all duration-200 ${active && !link.disabled ? "text-secondary opacity-100" : "opacity-50 group-hover/item:opacity-100 group-hover/item:text-secondary group-hover/item:scale-110"}`}>{link.icon}</span>
+                      <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active ? "h-7 bg-secondary" : "h-0 bg-secondary group-hover/item:h-6"}`} />
+                      <span className={`material-symbols-outlined text-[18px] transition-all duration-200 ${active ? "text-secondary opacity-100" : "opacity-50 group-hover/item:opacity-100 group-hover/item:text-secondary group-hover/item:scale-110"}`}>{link.icon}</span>
                       <span className="uppercase tracking-wider flex-1">{link.label}</span>
-                      {link.disabled && renderDisabledTooltip(true)}
                     </Link>
                   );
                 })}
