@@ -62,14 +62,14 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
                 ? 'opacity-0 -translate-y-10 scale-[0.96] pointer-events-none h-0 overflow-hidden mb-0' 
                 : 'opacity-100 translate-y-0 scale-100 mb-11 md:mb-12'
             }`}>
-              <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase relative mb-8 text-center md:text-left">
-                Poslovi
+              <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl font-[1000] md:font-[950] text-white leading-[0.95] tracking-[-0.02em] uppercase relative mb-8 text-center md:text-left">
+                Više od oglasnika.
                 <div>
-                  <span className="text-secondary">Građevina</span>
+                  <span className="text-secondary">Partner građevinske industrije.</span>
                 </div>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-4xl font-medium leading-relaxed relative text-center md:text-left mx-auto md:mx-0">
-                Pronađite posao ili angažujte radnike iz najveće baze građevinskih poslova na jednom mestu.
+                Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova i zaposlenih.
               </p>
             </div>
 

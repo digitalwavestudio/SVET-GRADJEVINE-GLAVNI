@@ -509,8 +509,7 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
         2: ['marketCondition', 'marketValue']
       },
       job: {
-        1: ['sector', 'location'],
-        2: ['plataMin', 'plataMax', 'dinamikaIsplate']
+        1: ['opis', 'phone', 'viber', 'whatsapp']
       }
     };
 
@@ -523,13 +522,17 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     }
 
     const isNegotiable = watch('isNegotiable');
-    if (selectedCategory === 'job' && step === 2 && isNegotiable) {
-      fieldsToValidate = fieldsToValidate.filter(f => f !== 'plataMin' && f !== 'plataMax');
-    }
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
-      setStep(step + 1);
+      if (selectedCategory === 'job' && step === 1) {
+        setStep(4);
+      } else if (selectedCategory === 'job') {
+        // Fallback for job category
+        setStep(step + 1);
+      } else {
+        setStep(step + 1);
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setTimeout(() => {
@@ -557,7 +560,11 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
   };
 
   const prevStep = () => {
-    setStep(step - 1);
+    if (selectedCategory === 'job' && step === 4) {
+      setStep(1);
+    } else {
+      setStep(step - 1);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

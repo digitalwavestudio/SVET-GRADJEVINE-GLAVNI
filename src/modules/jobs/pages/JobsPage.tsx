@@ -522,12 +522,11 @@ const { data, isLoading: loadingJobs, hasNextPage, fetchNextPage, isFetchingNext
       <DynamicSEO type="poslovi" grad={grad ?? undefined} zanimanje={zanimanje ?? undefined} jsonLd={[itemListSchema]} />
 
       <StandardPageHero
-        badge="Oglasi za Posao"
-        title="Poslovi"
-        titleAccent="Građevina"
-        subtitle="Pronađite posao ili angažujte radnike iz najveće baze građevinskih poslova na jednom mestu."
+        title="Više od"
+        titleAccent="oglasnika."
+        subtitle="Partner građevinske industrije. Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova i zaposlenih."
         stats={[
-              { label: "AKTIVNI OGLASI", value: (jobStats?.total ?? totalJobsCount).toLocaleString(), icon: "work" },
+              { label: "AKTIVNI OGLASI", value: `+${(jobStats?.total ?? totalJobsCount).toLocaleString()}`, icon: "work" },
         ]}
       >
         <div className="mt-8 flex flex-col gap-4 max-w-4xl w-full">

@@ -6,6 +6,7 @@ import { useBotDetector } from "@/src/hooks/useBotDetector";
 import { Button } from "@/src/components/ui/Button";
 import { useDashboardNavigation } from "@/src/modules/dashboard/hooks/useDashboardNavigation";
 import logoImage from "@/src/assets/images/logo.webp";
+import { AiSearchBar } from "@/src/components/AiSearchBar";
 
 export default function Navbar() {
   const location = useLocation();
@@ -115,8 +116,14 @@ export default function Navbar() {
             </Link>
           </div>
           
+          {/* AI Search Bar for Desktop */}
+          {isDesktop && (
+            <div className="flex-1 max-w-2xl mx-8 hidden lg:block">
+              <AiSearchBar vertical="jobs" minimal />
+            </div>
+          )}
 
-          <div className="flex items-center gap-3 lg:gap-4 lg:ml-2">
+          <div className="flex items-center gap-3 lg:gap-4 lg:ml-auto">
             {isDesktop && (
               <div className="flex items-center gap-3">
                 <Button

@@ -11,6 +11,7 @@ import { usePresence } from '@/src/hooks/usePresence';
 import { useRealtimeSync } from '@/src/hooks/useRealtimeSync';
 import QuotaBanner from '@/src/components/QuotaBanner';
 import ProgressBar from '@/src/components/ui/ProgressBar';
+import { AiChatWidget } from '@/src/components/AiChatWidget';
 
 const PageLoader = () => (
   <div className="bg-surface min-h-screen"></div>
@@ -79,6 +80,8 @@ export function RootLayout() {
         <Suspense fallback={<PageLoader />}>
           <Outlet />
         </Suspense>
+
+        <AiChatWidget />
       </div>
     </div>
   );

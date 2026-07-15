@@ -5,6 +5,7 @@ import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { BENEFITS, ACCOMMODATION_AMENITIES } from '@/src/constants/taxonomy';
 import { COMPANY_MAIN_CATEGORIES, COMPANY_SUB_CATEGORIES } from '@/src/constants/companyTaxonomy';
 import { AiAutofillButton } from '@/src/modules/ads/components/post-ad/AiAutofillButton';
+import { AiJobScore } from './AiJobScore';
 import { MAX_IMAGE_SIZE_KB, MAX_AD_IMAGES } from '@/src/constants/limits';
 
 export function Step3({
@@ -204,30 +205,34 @@ export function Step3({
               <div className="w-full mb-6">
                 <AiAutofillButton selectedCategory={selectedCategory} />
               </div>
-              <div className="flex justify-between items-end ml-1">
-                <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Detaljan tekst oglasa *</label>
-                <span className={`text-[10px] font-black uppercase tracking-widest ${formData.opis?.length < 50 ? 'text-error' : 'text-secondary'}`}>
-                  {formData.opis?.length || 0} / 1000
-                </span>
-              </div>
-              <div className="relative group">
-                <textarea 
-                  {...register('opis')}
-                  rows={10}
-                  className={`w-full bg-white/5 border-2 ${errors.opis ? 'border-error/50' : 'border-white/5'} rounded-[10px] px-6 py-6 text-white focus:border-secondary/50 outline-none transition-all font-medium group-hover:bg-white/[0.08] resize-none leading-relaxed`}
-                  placeholder={
-                    selectedCategory === 'marketplace' ? "Opišite predmet koji prodajete, njegovo stanje, razlog prodaje i specifikacije..." :
-                    selectedCategory === 'accommodation' ? "Opišite smeštajni kapacitet, blizinu gradilišta, pravila boravka i dodatne usluge..." :
-                    selectedCategory === 'catering' ? "Opišite Vašu ketering ponudu, kapacitete, način dostave i sastav obroka..." :
-                    selectedCategory === 'machines' ? "Opišite mašinu, njeno tehničko stanje, prethodne radove i istoriju održavanja..." :
-                    selectedCategory === 'plot' ? "Opišite plac, njegovu poziciju, mogućnosti gradnje i infrastrukturne prednosti..." :
-                    "Navedite ključna zaduženja, uslove rada, radno vreme i sve što smatrate bitnim za kandidate..."
-                  }
-                />
-              </div>
-              {errors.opis && <p className="text-error text-[10px] font-bold mt-1 ml-1 uppercase tracking-wider">{errors.opis.message as string}</p>}
+              
+              {selectedCategory !== 'job' && (
+                <>
+                  <div className="flex justify-between items-end ml-1">
+                    <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">Detaljan tekst oglasa *</label>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${formData.opis?.length < 50 ? 'text-error' : 'text-secondary'}`}>
+                      {formData.opis?.length || 0} / 1000
+                    </span>
+                  </div>
+                  <div className="relative group">
+                    <textarea 
+                      {...register('opis')}
+                      rows={10}
+                      className={`w-full bg-white/5 border-2 ${errors.opis ? 'border-error/50' : 'border-white/5'} rounded-[10px] px-6 py-6 text-white focus:border-secondary/50 outline-none transition-all font-medium group-hover:bg-white/[0.08] resize-none leading-relaxed`}
+                      placeholder={
+                        selectedCategory === 'marketplace' ? "Opišite predmet koji prodajete, njegovo stanje, razlog prodaje i specifikacije..." :
+                        selectedCategory === 'accommodation' ? "Opišite smeštajni kapacitet, blizinu gradilišta, pravila boravka i dodatne usluge..." :
+                        selectedCategory === 'catering' ? "Opišite Vašu ketering ponudu, kapacitete, način dostave i sastav obroka..." :
+                        selectedCategory === 'machines' ? "Opišite mašinu, njeno tehničko stanje, prethodne radove i istoriju održavanja..." :
+                        selectedCategory === 'plot' ? "Opišite plac, njegovu poziciju, mogućnosti gradnje i infrastrukturne prednosti..." :
+                        "Navedite ključna zaduženja, uslove rada, radno vreme i sve što smatrate bitnim za kandidate..."
+                      }
+                    />
+                  </div>
+                  {errors.opis && <p className="text-error text-[10px] font-bold mt-1 ml-1 uppercase tracking-wider">{errors.opis.message as string}</p>}
+                </>
+              )}
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-3">
                 <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Kontakt Telefon *</label>

@@ -5,7 +5,6 @@ import { Step2Plot } from '@/src/modules/ads/components/post-ad/step2/Step2Plot'
 import { Step2Catering } from '@/src/modules/ads/components/post-ad/step2/Step2Catering';
 import { Step2Marketplace } from '@/src/modules/ads/components/post-ad/step2/Step2Marketplace';
 import { Step2Machines } from '@/src/modules/ads/components/post-ad/step2/Step2Machines';
-import { Step2Job } from '@/src/modules/ads/components/post-ad/step2/Step2Job';
 
 export function Step2({
   selectedCategory,
@@ -24,7 +23,6 @@ export function Step2({
       {selectedCategory === 'catering' && <Step2Catering nextStep={nextStep} prevStep={prevStep} />}
       {selectedCategory === 'marketplace' && <Step2Marketplace nextStep={nextStep} prevStep={prevStep} />}
       {selectedCategory === 'machines' && <Step2Machines nextStep={nextStep} prevStep={prevStep} />}
-      {selectedCategory === 'job' && <Step2Job nextStep={nextStep} prevStep={prevStep} />}
     </>
   );
 }

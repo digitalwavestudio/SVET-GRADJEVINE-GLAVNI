@@ -5,7 +5,7 @@ interface JobsUrgentProps {
   jobs: any[];
   isExpanded: boolean;
   setIsExpanded: (expanded: boolean) => void;
-  prefetch: (type: 'job' | 'company', id?: string) => void;
+  prefetch: (type: string, id?: string) => void;
   getInitials: (name: string) => string;
   hasMore?: boolean;
   loadMore?: () => void;

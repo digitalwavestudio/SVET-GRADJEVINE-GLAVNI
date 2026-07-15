@@ -111,23 +111,19 @@ export default function PostAdPage() {
             </h1>
           </motion.div>
 
-          <div className="max-w-md mx-auto">
+          <div className="max-w-md mx-auto hidden sm:block">
             <div className="flex items-center justify-between text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] mb-4">
-              <span className={step >= 1 ? "text-secondary" : ""}>
-                01. Detalji
-              </span>
-              <span className={step >= 2 ? "text-secondary" : ""}>
-                02. Uslovi
-              </span>
-              <span className={step >= 3 ? "text-secondary" : ""}>
-                03. Opis
-              </span>
-              <span className={step >= 4 ? "text-secondary" : ""}>
-                04. Paket
-              </span>
+              <span className={step >= 1 ? "text-secondary" : ""}>01. Detalji</span>
+              {selectedCategory !== 'job' && (
+                <>
+                  <span className={step >= 2 ? "text-secondary" : ""}>02. Uslovi</span>
+                  <span className={step >= 3 ? "text-secondary" : ""}>03. Opis</span>
+                </>
+              )}
+              <span className={step >= 4 ? "text-secondary" : ""}>0{selectedCategory === 'job' ? '2' : '4'}. Paket</span>
             </div>
             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden flex gap-1">
-              {[1, 2, 3, 4].map((s) => (
+              {[1, ...(selectedCategory === 'job' ? [] : [2, 3]), 4].map((s) => (
                 <div
                   key={s}
                   className={`h-full flex-1 transition-all duration-500 rounded-full ${step >= s ? "bg-secondary shadow-[0_0_10px_rgba(254,191,13,0.5)]" : "bg-white/10"}`}
@@ -161,6 +157,7 @@ export default function PostAdPage() {
                 selectedCategory={selectedCategory!}
                 setSelectedCategory={setSelectedCategory}
                 nextStep={nextStep}
+                setStep={setStep}
               />
             )}
             {step === 2 && (

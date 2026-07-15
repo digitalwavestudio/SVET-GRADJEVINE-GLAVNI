@@ -20,7 +20,7 @@ export default function Footer() {
               <img width="800" height="600" decoding="async" src={logoUrl || logoImage} alt="Svet Građevine Logo" loading="lazy" className="w-[160px] md:w-[220px] h-auto max-h-[100px] object-contain drop-shadow-md" />
             </Link>
             <p className="hidden sm:block text-white/70 text-base leading-relaxed tracking-wide -mt-2 lg:-mt-4 mb-6 lg:mb-8 max-w-sm">
-              Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-white">najbolje građevinske poslove</strong>, pouzdane <strong className="font-bold text-white">majstore i radnike</strong>, iznajmite mehanizaciju ili pronađite adekvatan smeštaj i placeve.
+              Najveća regionalna platforma za građevinsku industriju. Pronađite <strong className="font-bold text-white">najbolje građevinske poslove</strong>, kao i pouzdane <strong className="font-bold text-white">majstore i radnike</strong>.
             </p>
             <div className="flex items-center justify-center sm:justify-start gap-4">
               <a href={APP_CONFIG.SOCIAL.FACEBOOK} target="_blank" rel="noopener noreferrer" aria-label="Posetite našu Facebook grupu" className="w-10 h-10 rounded-[10px] bg-white/10 border border-white/20 flex items-center justify-center text-slate-400 hover:bg-secondary hover:border-secondary hover:text-on-secondary hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,193,7,0.2)] transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">

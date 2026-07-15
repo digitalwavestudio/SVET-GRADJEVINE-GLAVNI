@@ -29,12 +29,37 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
     if (job.isNegotiable) {
       return 'Pozvati';
     }
-    if (job.plataMin != null) {
+
+    let salaryText = '';
+    if (job.plataMin != null && Number(job.plataMin) > 0) {
       const min = Number(job.plataMin).toLocaleString();
-      const max = job.plataMax != null ? ` – ${Number(job.plataMax).toLocaleString()}` : '';
-      return `${min}${max} €`;
+      const max = job.plataMax != null && Number(job.plataMax) > 0 && job.plataMax !== job.plataMin 
+        ? `-${Number(job.plataMax).toLocaleString()}` 
+        : '';
+      salaryText = `${min}${max} €`;
+    } else {
+      salaryText = job.sal || job.salary || 'Po dogovoru';
     }
-    return job.sal || job.salary || 'Po dogovoru';
+
+    // Fix redundant ranges like "5-5" -> "5" or "1000-1000" -> "1000"
+    salaryText = salaryText.replace(/(\d+)\s*-\s*\1/g, '$1');
+
+    // Style currency symbols to be smaller and slightly transparent
+    const parts = salaryText.split(/(€|eur|din|rsd)/i);
+    if (parts.length > 1) {
+      return (
+        <>
+          {parts.map((part, index) => {
+            if (/^(€|eur|din|rsd)$/i.test(part)) {
+              return <span key={index} className="text-[0.7em] opacity-70 ml-[2px]">{part}</span>;
+            }
+            return part;
+          })}
+        </>
+      );
+    }
+
+    return salaryText;
   };
 
   const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
@@ -62,12 +87,12 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
   return (
     <article
       itemScope itemType="https://schema.org/JobPosting"
-      className={`group relative flex flex-col h-full self-stretch min-h-[300px] md:min-h-0 rounded-[16px] transition-all duration-500 ${
+      className={`group relative flex flex-col h-full self-stretch min-h-[260px] md:min-h-[280px] rounded-[16px] transition-all duration-500 ${
         isPremium
           ? 'border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1'
           : isUrgent
             ? 'border border-red-500/30 bg-gradient-to-br from-red-500/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(239,68,68,0.05)] hover:border-red-500/60 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] hover:-translate-y-1'
-            : 'border border-white/10 bg-white/[0.02] shadow-lg hover:bg-white/[0.04] hover:border-white/20 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:-translate-y-1'
+            : 'border border-white/10 bg-white/[0.02] shadow-lg hover:bg-white/[0.04] hover:border-blue-400/30 hover:shadow-[0_0_30px_rgba(96,165,250,0.15)] hover:-translate-y-1'
       }`}
     >
       {createdDate && (
@@ -85,9 +110,9 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         isPremium ? 'via-secondary' : isUrgent ? 'via-red-500' : 'via-white/20'
       }`}></div>
 
-      <div className="p-5 flex flex-col w-full flex-1 relative z-20 pointer-events-none">
+      <div className="p-4 md:p-5 flex flex-col w-full flex-1 relative z-20 pointer-events-none">
         {/* Logo - absolute top-right */}
-        <div className="absolute top-5 right-5 w-[56px] h-[56px] min-w-[56px] max-w-[56px] md:w-[64px] md:h-[64px] md:min-w-[64px] md:max-w-[64px] bg-white rounded-full p-1.5 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm z-10 flex items-center justify-center overflow-hidden">
+        <div className="absolute top-4 right-4 w-[56px] h-[56px] min-w-[56px] max-w-[56px] md:w-[64px] md:h-[64px] md:min-w-[64px] md:max-w-[64px] bg-white/5 backdrop-blur-sm border border-white/10 rounded-full p-1 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm z-10 flex items-center justify-center overflow-hidden">
           {job.logo ? (
             <OptimizedImage
               src={job.logo}
@@ -129,7 +154,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
         {/* Desktop: title + badges in one row */}
         <div className="flex flex-wrap items-start gap-2 pr-[68px] mb-2">
-          <h3 className="text-xl md:text-2xl font-black text-white group-hover:text-secondary transition-colors duration-300 mt-1 uppercase break-words tracking-tight leading-tight flex-1 min-w-[120px]">
+          <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-secondary transition-colors duration-300 mt-1 uppercase break-words tracking-wide leading-tight flex-1 min-w-[120px]">
             {(() => {
               const t = job.title || '';
               const i = t.indexOf(' — ');
@@ -156,18 +181,18 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           )}
         </div>
 
-        <div className="mb-4 relative z-20">
+        <div className="pb-3 md:pb-4 border-b border-white/5 relative z-20">
           <div className="flex items-center gap-1">
             {job.companyId ? (
               <Link
                 to={`/firma/${job.companyId}`}
-                className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] hover:brightness-110 text-xs font-black uppercase tracking-widest relative z-20"
+                className="text-slate-400 hover:text-slate-200 text-xs font-bold uppercase tracking-widest relative z-20 transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 {companyNameDisplay}
               </Link>
             ) : (
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs font-black uppercase tracking-widest">
+              <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">
                 {companyNameDisplay}
               </span>
             )}
@@ -183,41 +208,40 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
           const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
           return (
-            <div className={`flex flex-wrap gap-1 relative z-10 ${hasSmestaj || hasPrevoz || hasHrana ? 'mb-3' : 'mb-3 h-[18px]'}`}>
-              {hasSmestaj && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                  <span className="material-symbols-outlined text-[10px] text-green-400">home</span> Smeštaj
-                </span>
-              )}
-              {hasPrevoz && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                  <span className="material-symbols-outlined text-[10px] text-blue-400">commute</span> Prevoz
-                </span>
-              )}
-              {hasHrana && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                  <span className="material-symbols-outlined text-[10px] text-yellow-400">restaurant</span> Hrana
-                </span>
+            <div className="mt-auto relative z-10 flex items-end justify-between min-h-[48px] pt-4">
+              {/* Left side: Badges or Views */}
+              <div className="flex flex-wrap items-center gap-1 max-w-[60%]">
+                {hasSmestaj && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                    <span className="material-symbols-outlined text-[10px] text-green-400">home</span> Smeštaj
+                  </span>
+                )}
+                {hasPrevoz && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                    <span className="material-symbols-outlined text-[10px] text-blue-400">commute</span> Prevoz
+                  </span>
+                )}
+                {hasHrana && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
+                    <span className="material-symbols-outlined text-[10px] text-yellow-400">restaurant</span> Hrana
+                  </span>
+                )}
+              </div>
+
+              {/* Right side: Salary */}
+              {(job.isNegotiable || job.plataMin != null || job.plataMax != null || job.sal || job.salary) ? (
+                <div className="flex flex-col items-end gap-0.5 shrink-0">
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Satnica</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-xl md:text-2xl font-sans leading-none tracking-tight">
+                    {getSalaryDisplay()}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest shrink-0 mb-1">Po dogovoru</span>
               )}
             </div>
           );
         })()}
-
-        <div className="mt-auto pt-4 border-t border-white/5 relative z-10 flex items-end justify-between">
-          <span className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-            <span className="material-symbols-outlined text-[12px] text-blue-400">visibility</span> {job.viewsCount || 0}
-          </span>
-          {(job.plataMin != null || job.plataMax != null || job.sal || job.salary) ? (
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}</span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-xl md:text-2xl font-sans leading-none tracking-tight">
-                {getSalaryDisplay()}
-              </span>
-            </div>
-          ) : (
-            <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Po dogovoru</span>
-          )}
-        </div>
       </div>
     </article>
   );

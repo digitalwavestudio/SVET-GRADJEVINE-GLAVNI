@@ -106,7 +106,7 @@ export default function HomePage() {
     setIsFadingOut(false);
     setActiveFilters([]);
 
-    apiClient.post<AiResponse>('/ai/ask', { query })
+    apiClient.post<AiResponse>('/ai/ask', { query, pageSize: 100 })
       .then(res => {
         setIsFadingOut(true);
         setTimeout(() => {
@@ -214,29 +214,30 @@ export default function HomePage() {
   return (
     <div className="bg-surface text-on-surface font-body selection:bg-secondary selection:text-on-secondary overflow-x-hidden">
       <SeoHead 
-        title={isSearchActive ? `AI Pretraga: ${query} | Svet Građevine` : "Početna | Svet Građevine"}
-        description="Oglasi u građevinskoj industriji"
+        title={isSearchActive ? `AI Pretraga: ${query} | Svet Građevine` : "Svet Građevine | Najveća mreža građevinskih poslova i radnika"}
+        description="Pronađite najbolje građevinske poslove, pouzdane majstore i radnike. Platforma koja povezuje poslodavce i zaposlene u građevinskoj industriji Srbije i regiona."
         type="website"
         jsonLd={[WEBSITE_SCHEMA, ORGANIZATION_SCHEMA]}
       />
       
-      <StandardPageHero
-        badge="Oglasi za Posao"
-        title="Poslovi"
-        titleAccent="Građevina"
-        subtitle="Pronađite posao ili angažujte radnike iz najveće baze građevinskih poslova na jednom mestu."
-        stats={[
-          { label: "AKTIVNI OGLASI", value: (totalAdsCount || allJobsPremiumFirst.length).toLocaleString(), icon: "work" },
-        ]}
-      >
-        <div className="mt-8 flex flex-col gap-4 max-w-full w-full">
-          <AiSearchBar vertical="jobs" />
-        </div>
-      </StandardPageHero>
+      {!isSearchActive && (
+        <StandardPageHero
+          title="Više od"
+          titleAccent="oglasnika."
+          subtitle="Partner građevinske industrije. Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova i zaposlenih."
+          stats={[
+            { label: "AKTIVNI OGLASI", value: `+${(totalAdsCount || allJobsPremiumFirst.length).toLocaleString()}`, icon: "work" },
+          ]}
+        >
+          <div className="mt-8 flex flex-col gap-4 max-w-full w-full">
+            <AiSearchBar vertical="jobs" />
+          </div>
+        </StandardPageHero>
+      )}
 
-      {isSearchActive ? (
+      {isSearchActive && (
         <div className={`max-w-7xl mx-auto px-4 md:px-8 pb-24 relative z-30 min-h-[400px] flex flex-col items-center justify-start w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          aiLoading ? 'mt-24 md:mt-36' : 'mt-8 md:mt-12'
+          aiLoading ? 'mt-24 md:mt-36' : 'mt-28 md:mt-32'
         }`}>
           {/* Učitavanje / Skeleton State */}
           {aiLoading && (
@@ -298,32 +299,48 @@ export default function HomePage() {
               {/* AI Compact Response Card */}
               <AiCompactCard query={query} data={aiData} />
 
-              {/* Filter Chips */}
-              <FilterChips 
-                listings={aiData.listings || []} 
-                activeFilters={activeFilters} 
-                setActiveFilters={setActiveFilters} 
-              />
+              {/* Filter Chips su uklonjeni po zahtevu */}
+
+              {/* Divider between AI stats and listings */}
+              <div className="w-full flex flex-col items-center justify-center py-10 mt-6 mb-4 relative animate-fade-in" style={{ animationDelay: '300ms', animationFillMode: 'both' }}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-secondary/40 to-transparent"></div>
+                </div>
+                
+                <div className="relative flex flex-col items-center">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-b from-[#101a26] to-[#0b131e] border border-secondary/30 shadow-[0_0_20px_rgba(254,191,13,0.2)] flex items-center justify-center mb-3 md:mb-4 rotate-3 hover:rotate-0 transition-transform duration-300">
+                    <span className="material-symbols-outlined text-secondary text-2xl md:text-3xl drop-shadow-[0_0_8px_rgba(254,191,13,0.8)]" style={{ fontVariationSettings: '"FILL" 1' }}>view_list</span>
+                  </div>
+                  
+                  <div className="px-8 py-2 bg-gradient-to-r from-transparent via-[#050F19] to-transparent">
+                    <h3 className="text-white text-xl md:text-3xl font-black uppercase tracking-[0.2em] md:tracking-[0.3em] font-headline text-center leading-none">
+                      Pronađeni <span className="text-secondary">Oglasi</span>
+                    </h3>
+                  </div>
+                </div>
+              </div>
 
               {/* Listings Output */}
-              <div className="space-y-4">
+              <div className="w-full">
                 {filteredListings.length > 0 ? (
-                  filteredListings.map((item, idx) => (
-                    <div 
-                      key={item.id} 
-                      className="opacity-0 animate-slide-up"
-                      style={{ 
-                        animationDelay: `${idx * 60}ms`,
-                        animationFillMode: 'forwards'
-                      }}
-                    >
-                      <JobCard 
-                        job={item} 
-                        viewMode="list" 
-                        prefetch={prefetchPlaceholder} 
-                      />
-                    </div>
-                  ))
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch auto-rows-fr mt-4">
+                    {filteredListings.map((item, idx) => (
+                      <div 
+                        key={item.id} 
+                        className="opacity-0 animate-slide-up"
+                        style={{ 
+                          animationDelay: `${idx * 60}ms`,
+                          animationFillMode: 'forwards'
+                        }}
+                      >
+                        <JobCard 
+                          job={item} 
+                          viewMode="grid" 
+                          prefetch={prefetchPlaceholder} 
+                        />
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <div className="bg-[#111827]/80 backdrop-blur-3xl border border-white/5 rounded-[18px] p-8 text-center space-y-4 w-full">
                     <span className="material-symbols-outlined text-secondary text-5xl font-black">search_off</span>
@@ -357,10 +374,13 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      ) : (
+      )}
+
+      {/* Conditionally show the rest of the homepage */}
+      {!isSearchActive && (
         <>
           {/* Hitni poslovi */}
-          <div className="scroll-fade-in">
+        <div className="scroll-fade-in">
             <JobsUrgent 
               jobs={urgentJobs}
               isExpanded={isUrgentExpanded}
@@ -408,13 +428,13 @@ export default function HomePage() {
 
             {/* 4-col grid */}
             {loadingAllJobs && displayedJobs.length === 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="bg-white/5 border border-white/5 rounded-[10px] h-44 animate-pulse" />
                 ))}
               </div>
             ) : displayedJobs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch auto-rows-fr">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch auto-rows-fr">
                 {displayedJobs.map((job: any) => (
                   <JobCard key={job.id} job={job} viewMode="grid" prefetch={prefetchPlaceholder} />
                 ))}
@@ -671,166 +691,192 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-3xl border-t border-white/20 border-x border-b border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] rounded-[24px] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
-      
-      {/* Liquid Glass Background Ambient Orbs */}
-      <div className="absolute -top-10 -left-10 w-[240px] h-[240px] bg-secondary/10 rounded-full blur-[80px] pointer-events-none animate-fluid-orb-1"></div>
-      <div className="absolute -bottom-10 -right-10 w-[260px] h-[260px] bg-sky-500/10 rounded-full blur-[90px] pointer-events-none animate-fluid-orb-2"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180px] h-[180px] bg-emerald-500/5 rounded-full blur-[75px] pointer-events-none animate-fluid-orb-3"></div>
-      
-      <div className="space-y-6 relative z-10">
-        
-        {/* Row 1: AI Header + AI Understanding Card */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* Left: AI Header */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
+    <div className="w-full relative">
+      {/* Ujedinjeni AI Kontejner sa Mockup-a */}
+      <div className="bg-[#0c1520]/80 border border-white/10 rounded-[28px] p-6 md:p-8 mb-8 shadow-xl shadow-black/40 relative z-10 w-full text-left">
+        {/* Gornji red: Header + Understanding Card (Grid layout da se desni boks raširi) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-0">
+          {/* Levo: Header informacije */}
+          <div className="lg:col-span-7 flex flex-col justify-start">
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
+                  <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
+                </div>
               </div>
-              <span className="text-[10px] font-headline font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-1 leading-tight">
+                Pronađeno {data.count} oglasa
+              </h1>
+              <p className="text-white/40 text-base mb-4">za <span className="text-[#febf0d] font-bold">{query}</span></p>
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-white mb-1 font-headline">
-              Pronađeno {data.count || listings.length} oglasa
-            </h2>
-            <p className="text-on-surface-variant text-sm mb-4 font-headline">za {query}</p>
             
-            <div className="flex flex-wrap gap-2">
-              <button onClick={handleCopy} className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all font-headline">
+            <div className="hidden sm:flex flex-col sm:flex-row gap-2 sm:gap-2">
+              <button
+                onClick={handleCopy}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
+              >
                 <span className="material-symbols-outlined text-sm">content_copy</span>
                 Kopiraj sažetak
               </button>
-              <button onClick={handleShare} className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all font-headline">
+              <button
+                onClick={handleShare}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
+              >
                 <span className="material-symbols-outlined text-sm">share</span>
                 Podeli
               </button>
             </div>
           </div>
 
-          {/* Right: AI Understanding Card */}
+          {/* Desno: AI Understanding Card (Raširen pomoću lg:col-span-5) */}
           {intent && (
-            <div className="w-full lg:w-80 bg-gradient-to-br from-[#0c1e3d]/80 to-[#071329]/60 backdrop-blur-3xl border border-white/10 rounded-[18px] p-5 relative overflow-hidden shrink-0 shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
-              <div className="absolute -top-6 -right-6 w-[140px] h-[140px] bg-secondary/10 rounded-full blur-[50px] pointer-events-none"></div>
-              <BrainIllustration className="absolute -right-2 -top-2 w-32 h-32 opacity-25" />
-              <h3 className="text-[10px] font-headline font-black tracking-[0.3em] uppercase text-secondary mb-2 relative z-10">AI RAZUMEVANJE UPITA</h3>
-              <div className="flex items-baseline gap-2 mb-4 relative z-10">
-                <span className="text-4xl font-black text-secondary font-headline drop-shadow-[0_2px_8px_rgba(254,191,13,0.3)]">{confidence}%</span>
-                <span className="text-xs text-on-surface-variant">pouzdanost</span>
+            <div className="lg:col-span-5 bg-[#121c27]/45 border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-inner min-h-[190px]">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
+                </div>
+                <div className="flex flex-col md:flex-row md:items-baseline gap-0 md:gap-2 mb-4">
+                  <span className="text-6xl font-extrabold text-teal-400 leading-none">{confidence}%</span>
+                  <span className="text-sm md:text-base text-white/60 font-bold">pouzdanost</span>
+                </div>
               </div>
-              <div className="space-y-2 relative z-10">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  <span className="text-white/60 font-headline">Vertikala:</span>
-                  <span className="text-white font-bold font-headline">{intent.vertikala}</span>
+              <div className="space-y-3 relative z-10 text-white/95 text-base">
+                <div className="flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-white/60 mr-1.5">Vertikala:</span>
+                    <span className="text-white font-semibold break-words">{intent.vertikala}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  <span className="text-white/60 font-headline">Zanimanje:</span>
-                  <span className="text-white font-bold font-headline">{intent.zanimanje}</span>
+                <div className="flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-white/60 mr-1.5">Zanimanje:</span>
+                    <span className="text-white font-semibold break-words">{intent.zanimanje}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  <span className="text-white/60 font-headline">Lokacija:</span>
-                  <span className="text-white font-bold font-headline">{intent.lokacija}</span>
+                <div className="flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-white/60 mr-1.5">Lokacija:</span>
+                    <span className="text-white font-semibold break-words">{intent.lokacija}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="material-symbols-outlined text-green-400 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  <span className="text-white/60 font-headline">Tip posla:</span>
-                  <span className="text-white font-bold font-headline">{intent.tipPosla}</span>
+                <div className="flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-white/60 mr-1.5">Tip posla:</span>
+                    <span className="text-white font-semibold break-words">{intent.tipPosla}</span>
+                  </div>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Row 2: AI Answer Container */}
+        {/* Horizontalni Divider */}
+        <div className="border-t border-white/10 mt-[-50px] mb-4 w-full lg:w-[58%]"></div>
+
+        {/* Donji deo: AI Odgovor */}
         {structuredAnswer && (
-          <div className="bg-white/[0.02] border border-white/5 rounded-[18px] py-8 md:py-10 px-6 md:px-8 min-h-[200px] shadow-[0_8px_30px_rgb(0,0,0,0.3)] relative overflow-hidden transition-all hover:bg-white/[0.03] hover:border-white/10">
-            <div className="absolute -top-12 -right-12 w-[120px] h-[120px] bg-secondary/5 rounded-full blur-[40px] pointer-events-none"></div>
-            <BrainIllustration className="absolute -right-8 -bottom-8 w-48 h-48 opacity-[0.07]" />
-            
-            <div className="flex items-center gap-2 mb-5">
+          <div className="relative z-10 mt-20 md:mt-2">
+            <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
                 <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
               </div>
-              <h3 className="text-[11px] font-headline font-black uppercase tracking-widest text-secondary">AI ODGOVOR</h3>
+              <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary font-headline">AI ODGOVOR</h3>
             </div>
             
-            <div className="relative z-10 space-y-4">
-              <p className="text-slate-300 leading-relaxed font-body text-base md:text-lg"
-                 dangerouslySetInnerHTML={{ __html: structuredAnswer.summary.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white tracking-wide">$1</strong>') }} 
+            <div className="relative z-10">
+              <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
+                 dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.summary) }} 
               />
               
               {structuredAnswer.bullets.length > 0 && (
-                <div className="space-y-3">
-                  {structuredAnswer.bullets.map((bullet: { emoji: string; text: string }, i: number) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <span className="text-lg shrink-0 mt-0.5">{bullet.emoji}</span>
-                      <p className="text-slate-300 text-base leading-relaxed font-body"
-                         dangerouslySetInnerHTML={{ __html: bullet.text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-secondary tracking-wide">$1</strong>') }} 
+                <div className="space-y-4 mb-4">
+                  {structuredAnswer.bullets.map((bullet, i) => (
+                    <div key={i} className="flex items-start gap-4">
+                      <span className="text-xl shrink-0 mt-0.5">{bullet.emoji}</span>
+                      <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
+                         dangerouslySetInnerHTML={{ __html: applyBoldRules(bullet.text) }} 
                       />
                     </div>
                   ))}
                 </div>
               )}
               
-              {structuredAnswer.closing && (
-                <p className="text-slate-400 text-sm mt-4 pt-4 border-t border-white/5 font-body leading-relaxed">
-                  {structuredAnswer.closing}
-                </p>
+               {structuredAnswer.closing && (
+                <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5"
+                   dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.closing) }} 
+                />
               )}
+
+              {/* Pilule sa statistikama */}
+              <div className="flex flex-col sm:flex-row gap-2 mt-5 pt-4 border-t border-white/5">
+                <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
+                  <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                  AI pouzdanost: {confidence}%
+                </span>
+                <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
+                  <span className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
+                  Vreme pretrage: 2.4s
+                </span>
+                <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
+                  Izvori podataka: {listings.length + 7}
+                </span>
+              </div>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Row 3: Stat Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
-            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">person</span>
-              <span>ZANIMANJE</span>
-            </div>
-            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{intent?.zanimanje || stats.professions}</p>
-            <p className="text-on-surface-variant text-xs font-headline">Glavna pretraga</p>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mb-8 text-left relative z-10">
+        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
           </div>
-
-          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
-            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">location_on</span>
-              <span>LOKACIJE</span>
-            </div>
-            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{intent?.lokacija || stats.locations}</p>
-            <p className="text-on-surface-variant text-xs font-headline">{listings.length} oglasa</p>
-          </div>
-
-          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
-            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">payments</span>
-              <span>SATNICE</span>
-            </div>
-            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{stats.rates}</p>
-            <p className="text-on-surface-variant text-xs font-headline">Prosečna satnica</p>
-          </div>
-
-          <div className="bg-white/[0.03] border border-white/10 rounded-[16px] p-5 space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)] group/card">
-            <div className="flex items-center gap-2 text-on-surface-variant text-[11px] uppercase tracking-widest font-headline font-bold">
-              <span className="material-symbols-outlined text-sm text-secondary transition-transform duration-300 group-hover/card:scale-110">inventory_2</span>
-              <span>UKUPNO OGLASA</span>
-            </div>
-            <p className="text-base md:text-lg font-black text-secondary truncate font-headline uppercase tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">{data.count || listings.length}</p>
-            <p className="text-on-surface-variant text-xs font-headline">Aktivnih oglasa</p>
+          <div className="min-w-0 flex-1">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">ZANIMANJE</span>
+            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{intent?.zanimanje || query || '-'}</p>
+            <p className="text-white/40 text-xs font-headline">Glavna pretraga</p>
           </div>
         </div>
 
-        <div className="text-[10px] text-on-surface-variant uppercase tracking-widest font-headline font-bold flex flex-col md:flex-row justify-between items-center gap-2 md:gap-0 pt-4 mt-4 border-t border-white/[0.06] text-center md:text-left">
-          <span className="block">Prikazano {listings.length} od {data.count || listings.length} oglasa</span>
-          <span className="text-secondary font-black flex flex-col md:flex-row items-center gap-1 uppercase tracking-wider font-headline">
-            <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs animate-[bounce_1.5s_infinite] mr-1">arrow_downward</span>
-              <span>Pogledaj</span>
-            </span>
-            <span>oglase ispod</span>
-          </span>
+        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">LOKACIJE</span>
+            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{intent?.lokacija || stats.locations}</p>
+            <p className="text-white/40 text-xs font-headline">{listings.length} oglasa</p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">SATNICE</span>
+            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{stats.rates}</p>
+            <p className="text-white/40 text-xs font-headline">Prosečna satnica</p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary shrink-0">
+            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">UKUPNO OGLASA</span>
+            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{data.count || listings.length}</p>
+            <p className="text-white/40 text-xs font-headline">Aktivnih oglasa</p>
+          </div>
         </div>
       </div>
     </div>

@@ -135,12 +135,12 @@ export default function CtaSection() {
                 Pridruži se liderima
               </span>
               <h1 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-white mb-6 leading-[1.05] relative w-full min-w-0 drop-shadow-sm">
-                  POSTANITE DEO <br className="hidden sm:block" />
-                NAJVEĆE <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] block sm:inline">GRAĐEVINSKE MREŽE</span>
+                NAŠA <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] block sm:inline">MISIJA</span>
               </h1>
-              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2">
-                Povezujemo poslodavce i radnike sa najznačajnijim projektima u regionu. Vaša karijera zaslužuje čvrst temelj.
-              </p>
+              <div className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2 space-y-4">
+                <p>Naša misija je da digitalizujemo građevinski sektor i učinimo pronalaženje poslova, radnika, partnera i usluga jednostavnijim, bržim i efikasnijim.</p>
+                <p>Kroz inovacije, kvalitetne alate i modernu tehnologiju gradimo najveću zajednicu građevinske industrije u Srbiji i regionu.</p>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Link 
                   to="/prijava"

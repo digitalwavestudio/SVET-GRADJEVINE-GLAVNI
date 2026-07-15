@@ -25,7 +25,8 @@ export const MobileBottomNav: React.FC = () => {
     if (!q) return;
     setIsSearchOpen(false);
     setSearchQuery('');
-    navigate('/ai-pretraga?q=' + encodeURIComponent(q));
+    navigate('/?q=' + encodeURIComponent(q));
+    setIsSearchOpen(false);
   };
   useEffect(() => {
     if (isSearchOpen && inputRef.current) {

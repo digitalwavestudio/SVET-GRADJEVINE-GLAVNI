@@ -2,23 +2,27 @@ import { motion } from 'motion/react';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MACHINE_CATEGORIES, MACHINE_SUBCATEGORIES } from '@/src/constants/machineTaxonomy';
-import { TaxonomyItem, ACCOMMODATION_TYPES, KITCHEN_TYPES, LOCATIONS, PROFESSIONS, REAL_ESTATE_PURPOSES, SECTORS, MARKETPLACE_CATEGORIES } from '@/src/constants/taxonomy';
+import { TaxonomyItem, ACCOMMODATION_TYPES, KITCHEN_TYPES, LOCATIONS, PROFESSIONS, REAL_ESTATE_PURPOSES, SECTORS, MARKETPLACE_CATEGORIES, PAYMENT_DYNAMICS, BENEFITS } from '@/src/constants/taxonomy';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { Input } from '@/src/components/ui/form/Input';
 import { Select } from '@/src/components/ui/form/Select';
 import { Textarea } from '@/src/components/ui/form/Textarea';
 import { StepProps } from '@/src/modules/ads/components/post-ad/types';
+import { AiMagicInput } from './AiMagicInput';
+import { AiJobScore } from './AiJobScore';
 
 export function Step1({
   setSelectedCategory,
   selectedCategory,
   nextStep,
+  setStep,
 }: {
   setSelectedCategory?: (c: string | null) => void;
   selectedCategory: string;
   nextStep?: () => void;
+  setStep?: (n: number) => void;
 }) {
-  const { watch, setValue, formState: { errors } } = useFormContext();
+  const { watch, setValue, register, formState: { errors } } = useFormContext();
   
   const sector = watch('sector');
   const machCategory = watch('machCategory');
@@ -26,6 +30,7 @@ export function Step1({
 
   const availableProfessions: TaxonomyItem[] = sector ? PROFESSIONS[sector] || [] : [];
   const availableSubcategories: TaxonomyItem[] = machCategory ? (MACHINE_SUBCATEGORIES[machCategory] || []) : [];
+  const opis = watch('opis');
 
   return (
     <>
@@ -36,7 +41,7 @@ export function Step1({
             <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20 shrink-0">
               <span className="material-symbols-outlined text-secondary">business_center</span>
             </div>
-            <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Osnovne informacije o firmi</h2>
+            <h2 className="text-3xl font-black uppercase tracking-tight font-headline text-center sm:text-left">Osnovne informacije o firmi</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -69,16 +74,16 @@ export function Step1({
             <Input name="companyWeb" label="Web sajt" placeholder="www.firma.rs" />
           </div>
 
-          <div className="flex justify-between mt-12">
+          <div className="mt-12 grid grid-cols-2 sm:flex sm:justify-between gap-4 w-full">
             <button 
               type="button"
               onClick={() => setSelectedCategory?.(null)}
-              className={UI_TOKENS.BTN_SECONDARY}
+              className={`${UI_TOKENS.BTN_SECONDARY} w-full sm:w-auto justify-center`}
             >
               Nazad
             </button>
-            <button type="button" onClick={nextStep} className={UI_TOKENS.BTN_POST_AD}>
-              Nastavi dalje <span className="material-symbols-outlined">arrow_forward</span>
+            <button type="button" onClick={nextStep} className={`${UI_TOKENS.BTN_POST_AD} w-full sm:w-auto justify-center`}>
+              Nastavi dalje
             </button>
           </div>
         </motion.div>
@@ -87,15 +92,68 @@ export function Step1({
       {/* STEP 1 - Generic Listings */}
       {selectedCategory !== 'company' && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10">
-          <div className="flex items-start md:items-center gap-4 mb-10 flex-wrap">
+          <div className="flex items-center sm:items-start md:items-center justify-center sm:justify-start gap-4 mb-10 flex-wrap">
             <div className="w-12 h-12 bg-secondary/10 rounded-[10px] flex items-center justify-center border border-secondary/20 shrink-0">
               <span className="material-symbols-outlined text-secondary">
                 {selectedCategory === 'accommodation' ? 'home' : 'search'}
               </span>
             </div>
-            <h2 className="text-3xl font-black uppercase tracking-tight font-headline">Osnovne informacije</h2>
+            <h2 className="text-3xl font-black uppercase tracking-tight font-headline text-center sm:text-left w-full sm:w-auto mt-2 sm:mt-0">Osnovne informacije</h2>
           </div>
           
+          {selectedCategory === 'job' && (
+            <div className="space-y-8 mb-8">
+              <AiJobScore />
+              <AiMagicInput selectedCategory={selectedCategory} setStep={setStep} />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <div className="space-y-3">
+                  <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Kontakt Telefon *</label>
+                  <div className="relative group">
+                    <input 
+                      type="tel"
+                      {...register('phone')}
+                      placeholder="Npr. 0601234567"
+                      className={`w-full bg-[#070d14] border ${errors?.phone ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} rounded-[10px] px-6 py-5 text-white focus:border-[#ffad3a]/50 focus:bg-[#070d14] focus:shadow-[0_0_20px_rgba(254,191,13,0.1)] outline-none transition-all duration-300 font-bold group-hover:bg-white/[0.06] group-hover:border-white/20 [-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s,color_0s_ease-in-out_0s] [-webkit-autofill]:[background-color:#070d14!important] [-webkit-autofill]:[-webkit-text-fill-color:white!important] [-webkit-autofill]:[box-shadow:0_0_0px_1000px_#070d14_inset!important]`}
+                    />
+                    <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-hover:text-[#ffad3a] transition-colors">call</span>
+                  </div>
+                  {errors?.phone && <p className="text-error text-[10px] font-bold mt-1 ml-1 uppercase tracking-wider">{errors.phone.message as string}</p>}
+                </div>
+                <div className="space-y-3">
+                  <label className="block text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] ml-1">Dostupni ste na</label>
+                  <div className="flex w-full h-[58px] justify-around items-center text-lg font-black">
+                    <button
+                      type="button"
+                      onClick={() => setValue('viber', !watch('viber'))}
+                      className={`flex items-center gap-2 transition-all hover:scale-105 ${
+                        watch('viber') 
+                          ? 'text-[#7360F2] opacity-100 drop-shadow-[0_0_10px_rgba(115,96,242,0.6)]' 
+                          : 'text-[#7360F2] opacity-80 hover:opacity-100'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-3xl">call</span>
+                      Viber
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setValue('whatsapp', !watch('whatsapp'))}
+                      className={`flex items-center gap-2 transition-all hover:scale-105 ${
+                        watch('whatsapp') 
+                          ? 'text-[#25D366] opacity-100 drop-shadow-[0_0_10px_rgba(37,211,102,0.6)]' 
+                          : 'text-[#25D366] opacity-80 hover:opacity-100'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-3xl">chat</span>
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
           <div className="space-y-8">
             {selectedCategory === 'accommodation' && (
               <Select 
@@ -152,24 +210,7 @@ export function Step1({
               </div>
             )}
 
-            {selectedCategory === 'job' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Select 
-                  name="sector" 
-                  label="Sektor delatnosti" 
-                  options={SECTORS.map(s => ({ value: s.slug, label: s.name }))} 
-                  required 
-                />
-                <Select 
-                  name="profession" 
-                  label="Zanimanje / Pozicija" 
-                  options={availableProfessions.map((p) => ({ value: p.slug, label: p.name }))} 
-                  icon="engineering" 
-                  disabled={!sector}
-                  required 
-                />
-              </div>
-            )}
+
 
             {selectedCategory === 'plot' && (
               <div className="space-y-6">
@@ -192,32 +233,33 @@ export function Step1({
               </div>
             )}
 
-            <Select 
-              name="location" 
-              label="Izaberite grad" 
-              options={LOCATIONS.map(l => ({ value: l.slug, label: l.name }))} 
-              icon="location_on" 
-              required 
-            />
+            {selectedCategory !== 'job' && (
+              <Select 
+                name="location" 
+                label="Izaberite grad" 
+                options={LOCATIONS.map(l => ({ value: l.slug, label: l.name }))} 
+                icon="location_on" 
+                required 
+              />
+            )}
 
 
           </div>
 
-          <div className="mt-16 flex justify-between">
+          <div className="mt-16 grid grid-cols-2 sm:flex sm:flex-row gap-4 sm:justify-between w-full">
             <button 
               type="button"
               onClick={() => setSelectedCategory?.(null)}
-              className={UI_TOKENS.BTN_SECONDARY}
+              className={`${UI_TOKENS.BTN_SECONDARY} w-full sm:w-auto justify-center`}
             >
               Nazad
             </button>
             <button 
               type="button"
               onClick={nextStep} 
-              className={UI_TOKENS.BTN_POST_AD}
+              className={`${UI_TOKENS.BTN_POST_AD} w-full sm:w-auto justify-center`}
             >
               Nastavi dalje
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
           </div>
         </motion.div>

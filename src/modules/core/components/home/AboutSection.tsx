@@ -9,13 +9,13 @@ export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamic
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
               <span className="text-secondary font-bold tracking-widest uppercase text-sm mb-4 block">Svet Građevine je mesto gde se posao u građevini pronalazi najbrže.</span>
-              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter mb-4 leading-[1.05] drop-shadow-sm">SVE ZA GRAĐEVINU <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-[#FFF5D6] to-secondary">NA JEDNOM MESTU</span></h2>
-              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed">Svet Građevine svakog meseca povezuje poslodavce i radnike na jednoj platformi. Brže do posla i novih projekata širom Srbije i regiona.</p>
+              <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[3.5rem] lg:text-[4rem] font-black uppercase tracking-tighter mb-4 leading-[1.05] drop-shadow-sm">GRADIMO VEZE KOJE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-[#FFF5D6] to-secondary">POKREĆU GRAĐEVINSKU INDUSTRIJU</span></h2>
+              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed">Verujemo da su uspešni projekti rezultat pravih ljudi na pravom mestu. Zato razvijamo platformu koja povezuje poslodavce sa kvalitetnim radnicima, pomaže firmama da pronađu nove klijente i omogućava profesionalcima da predstave svoje znanje i iskustvo.</p>
             </div>
             
             <div className="flex items-center justify-center">
               <div className="group cursor-pointer hover:scale-105 transition-transform duration-300 text-center">
-                <AnimatedCounter end={totalAdsCount} suffix="+" delay={0} className="text-5xl sm:text-6xl md:text-7xl" />
+                <AnimatedCounter end={totalAdsCount} prefix="+" delay={0} className="text-[90px] sm:text-[140px] md:text-[160px] leading-none tracking-tighter" />
                 <span className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant leading-tight block">Aktivnih oglasa</span>
               </div>
             </div>

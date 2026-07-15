@@ -45,7 +45,7 @@ interface AiAskResult {
   }>;
 }
 
-export async function callGemini(prompt: string) {
+export async function callGemini(prompt: string, temp = 0.1) {
   const client = new GoogleGenAI({
     vertexai: true,
     project: "svet-gradjevine-eu",
@@ -54,9 +54,109 @@ export async function callGemini(prompt: string) {
   const response = await client.models.generateContent({
     model: "gemini-2.5-flash-lite",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
-    config: { temperature: 0.1, maxOutputTokens: 2000 },
+    config: { temperature: temp, maxOutputTokens: 2000 },
   });
   return response.text || null;
+}
+
+export async function chatWithGemini(messages: {role: "user" | "model", content: string}[]) {
+  try {
+    const client = new GoogleGenAI({
+      vertexai: true,
+      project: "svet-gradjevine-eu",
+      location: "us-central1",
+    });
+    
+    // RAG Injection: provera da li korisnik pita za platu/satnicu/posao
+    const lastMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
+    let systemAddon = "";
+    
+    if (lastMsg.includes("satnic") || lastMsg.includes("plat") || lastMsg.includes("zarad") || lastMsg.includes("posa") || lastMsg.includes("posl") || lastMsg.includes("cen")) {
+       const professions = ['tesar', 'zidar', 'armirac', 'moler', 'fasader', 'keramicar', 'elektricar', 'vodoinstalater', 'bravar', 'stolar', 'parketar', 'gipsar', 'izolater', 'rukovalac', 'vozac', 'bagerista', 'kranista', 'pomocni', 'fizicki', 'inzenjer', 'monter', 'limar', 'varilac'];
+       // Jednostavna detekcija zanimanja
+       const foundProf = professions.find(p => lastMsg.includes(p) || lastMsg.includes(p.replace(/ar$/, 'ari')) || lastMsg.includes(p.replace(/ar$/, 'are')) || lastMsg.includes(p.replace(/c$/, 'ci')));
+       
+       if (foundProf) {
+         try {
+           const snap = await db.collection("listings")
+            .where("type", "==", "job")
+            .where("status", "==", "active")
+            .where("searchKeywords", "array-contains", foundProf)
+            .get();
+            
+           if (!snap.empty) {
+             let count = 0, minSum = 0, maxSum = 0, salaryCount = 0;
+             snap.docs.forEach(doc => {
+               const data = doc.data();
+               count++;
+               if (data.plataMin) {
+                 minSum += data.plataMin;
+                 maxSum += (data.plataMax || data.plataMin);
+                 salaryCount++;
+               }
+             });
+             
+             if (salaryCount > 0) {
+               systemAddon = `\n\n[SISTEMSKA INFORMACIJA - TRENUTNI PODACI IZ BAZE KORISTI IH ZA ODGOVOR]: Imamo ${count} aktivnih oglasa za zanimanje '${foundProf}'. Prosečna plata/satnica je od ${Math.round(minSum/salaryCount)} do ${Math.round(maxSum/salaryCount)} (iznosi do 20 su evri/sat, iznosi preko 500 su evri/mesec). Obavesti korisnika o ovim prosečnim cenama i uputi ga na stranicu /poslovi.`;
+             } else {
+               systemAddon = `\n\n[SISTEMSKA INFORMACIJA]: Imamo ${count} aktivnih oglasa za '${foundProf}', ali poslodavci nisu naveli tačne plate u oglasima. Uputi korisnika da pogleda detalje na stranici /poslovi.`;
+             }
+           } else {
+             systemAddon = `\n\n[SISTEMSKA INFORMACIJA]: Trenutno nema aktivnih oglasa za zanimanje '${foundProf}'.`;
+           }
+         } catch (e) {
+           console.error("Stats RAG error:", e);
+         }
+       } else {
+           // Opšta prosečna satnica
+           try {
+               const snap = await db.collection("listings")
+                .where("type", "==", "job")
+                .where("status", "==", "active")
+                .orderBy("createdAt", "desc")
+                .limit(50)
+                .get();
+               let count = 0, minSum = 0, maxSum = 0, salaryCount = 0;
+               snap.docs.forEach(doc => {
+                 const data = doc.data();
+                 count++;
+                 if (data.plataMin && data.plataMin < 30) { // samo satnice
+                   minSum += data.plataMin;
+                   maxSum += (data.plataMax || data.plataMin);
+                   salaryCount++;
+                 }
+               });
+               if (salaryCount > 0) {
+                   systemAddon = `\n\n[SISTEMSKA INFORMACIJA - TRENUTNI PODACI]: Opšta prosečna satnica u građevini (najnoviji oglasi) je oko ${Math.round(minSum/salaryCount)}-${Math.round(maxSum/salaryCount)} €/h. Plate variraju po zanatima.`;
+               }
+           } catch(e) {}
+       }
+    }
+
+    const formattedContents = messages.map(msg => ({
+      role: msg.role === "model" ? "model" : "user",
+      parts: [{ text: msg.content }]
+    }));
+
+    const systemPrompt = `Ti si "Svet Građevine Asistent", ljubazni ekspert za platformu Svet Građevine.
+Tvoj posao je da pomažeš korisnicima (majstorima i poslodavcima) oko traženja posla, cena, objave oglasa i navigacije.
+Budi kratak, jasan i uvek koristi srpski jezik. Ograniči odgovore na najviše 3-4 rečenice.
+Ukoliko te pitaju nešto van građevine ili platforme, ljubazno reci da si tu samo za Svet Građevine.${systemAddon}`;
+
+    const response = await client.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: formattedContents,
+      config: { 
+        temperature: 0.5, 
+        maxOutputTokens: 1000,
+        systemInstruction: systemPrompt
+      },
+    });
+    return response.text || "Izvinite, trenutno ne mogu da odgovorim. Pokušajte ponovo kasnije.";
+  } catch (error) {
+    console.error("[AiChat] Gemini failed:", error);
+    return "Došlo je do greške na serveru. Molim vas pokušajte kasnije.";
+  }
 }
 
 function cleanJson(text: string) {
@@ -410,5 +510,64 @@ Pravila:
       return { answer: "Predugo traje obrada. Probaj kraći upit.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: "timeout" };
     }
     return { answer: "Došlo je do greške pri pretrazi.", parsedIntent: DEFAULT_INTENT, confidence: 0, count: 0, page: 1, pageSize: 10, totalPages: 0, error: msg };
+  }
+}
+
+export async function parseAdIntent(text: string) {
+  try {
+    const prompt = `Analiziraj sledeći tekst oglasa za posao u građevini i izvuci ključne informacije.
+Tekst: "${text}"
+
+Vrati JSON objekat sa sledećim poljima (ako nešto ne možeš da zaključiš, ostavi prazno ili null):
+- sector (string): slug sektora, npr. 'visokogradnja', 'niskogradnja', 'zavrsni-radovi', 'instalacije', 'upravljanje-i-nadzor', 'masine-i-transport', 'pomocni-radovi'
+- profession (string): slug zanimanja (npr. 'tesar', 'zidar', 'armirac', 'moler', 'vozac', 'bagerista', 'inzenjer', 'keramicar', 'fizicki-radnik', 'vodoinstalater', 'elektricar')
+- location (string): slug grada ili države (npr. 'beograd', 'novi-sad', 'nemacka', 'austrija', 'minhen', 'slovenija', 'hrvatska')
+- plataMin (broj): minimalna plata (npr. 15 za 15e/h, ili 2000 za 2000e)
+- plataMax (broj): maksimalna plata
+- salaryType (string): 'po_satu', 'dnevno', 'mesecno', 'po_kvadratu', 'po_kubiku', 'dogovor'
+- benefits (niz stringova): tačno ovi ključevi ako postoje: 'smestaj', 'prevoz', 'hrana', 'osiguranje', 'prijava', 'alat', 'obuka', 'bonusi'
+
+VAŽNO PRAVILO: NEMOJ DA IZMIŠLJAŠ PODATKE! Ako korisnik nije eksplicitno napisao platu, satnicu, ili benefite (smeštaj, hrana, prevoz), OBAVEZNO ostavi ta polja prazna (null ili prazan niz)!
+Vrati ISKLJUČIVO validan JSON, bez markdauna.`;
+
+    const res = await callGemini(prompt);
+    if (!res) return null;
+    return JSON.parse(cleanJson(res));
+  } catch (error) {
+    console.error("[AiSearch] parseAdIntent error:", error);
+    return null;
+  }
+}
+
+export async function gradeAd(adData: any) {
+  try {
+    const prompt = `Ovo su podaci iz oglasa za posao u građevini:
+Zanimanje: ${adData.profession || 'Nije navedeno'}
+Lokacija: ${adData.location || 'Nije navedeno'}
+Zarada (iz forme): ${adData.plataMin || ''} - ${adData.plataMax || ''} ${adData.salaryType || ''}
+Benefiti (iz forme): ${(adData.benefits || []).join(', ')}
+Tekst oglasa: ${adData.opis || 'Nema opisa'}
+
+VAŽNO PRAVILO: Poslodavci često ne popune formu za platu i benefite, već to napišu direktno u "Tekst oglasa" (npr. "satnica 7-9 eur", "obezbeđen smeštaj i hrana"). 
+Kada ocenjuješ, OBAVEZNO pročitaj "Tekst oglasa" i ako se satnica, plata ili benefiti tu spominju, smatraj taj kriterijum ISPUNJENIM (daj maksimalne poene za taj deo). U građevini se zarada najčešće izražava kao SATNICA.
+
+Ocenite kvalitet ovog oglasa na skali od 0 do 100. Kriterijumi:
+- Jasnoća pozicije i lokacije (20%)
+- Informacije o zaradi / satnici (30%) - Oglasi bez ikakve satnice ili plate gube poene. Ako je satnica u tekstu, daj 30/30!
+- Informacije o benefitima (20%) - Smeštaj, prevoz, hrana. Ako se pominju u tekstu, daj 20/20!
+- Detaljnost opisa (30%)
+
+Vrati JSON objekat sa:
+- score (broj od 0 do 100)
+- feedback (string, 1-2 kratke rečenice. PRAVILO 1: Ako oglasu fali zarada, napiši "Dodajte preciznu informaciju o zaradi kako bi se privuklo više kandidata.". PRAVILO 2: Ako je sve tu (oglas ima zaradu, lokaciju, benefite i detaljan opis), napiši ISKLJUČIVO: "Odličan oglas! Imate sve ključne informacije." bez dodavanja onoga šta fali! VAŽNO: NEMOJ da spominješ "dogovor" ako ga korisnik nije napisao, i nemoj da ispisuješ kontradiktorne rečenice!)
+
+Vrati ISKLJUČIVO validan JSON, bez markdauna.`;
+
+    const res = await callGemini(prompt, 0);
+    if (!res) return { score: 0, feedback: "Nismo mogli da ocenimo oglas." };
+    return JSON.parse(cleanJson(res));
+  } catch (error) {
+    console.error("[AiSearch] gradeAd error:", error);
+    return { score: 0, feedback: "Greška pri ocenjivanju." };
   }
 }

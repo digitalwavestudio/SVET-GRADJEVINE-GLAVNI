@@ -352,8 +352,8 @@ input, textarea {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
-  /* Ensure any fixed width utilities collapse on mobile */
-  [class*="w-96"], [class*="w-20"], [class*="w-14"], [class*="w-12"] {
+  /* Ensure any fixed width utilities collapse on mobile, ali ne za floating dugmiće (AiChatWidget) */
+  [class*="w-96"]:not(.fixed), [class*="w-20"]:not(.fixed), [class*="w-14"]:not(.fixed), [class*="w-12"]:not(.fixed) {
     max-width: 100% !important;
     width: 100% !important;
   }

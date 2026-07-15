@@ -11,8 +11,9 @@ interface Stat {
 interface StandardPageHeroProps {
   badge?: string;
   title: React.ReactNode;
-  titleAccent?: string;
-  subtitle?: string;
+  titleAccent?: React.ReactNode;
+  titleClassName?: string;
+  subtitle?: React.ReactNode;
   backgroundImage?: string;
   children?: React.ReactNode;
   stats?: Stat[];
@@ -25,6 +26,7 @@ export function StandardPageHero({
   badge,
   title,
   titleAccent,
+  titleClassName,
   subtitle,
   backgroundImage,
   children,
@@ -57,7 +59,7 @@ export function StandardPageHero({
       </div>
 
       <div className="max-w-[1400px] mx-auto px-8 w-full relative z-20 md:h-full">
-        <div className="grid lg:grid-cols-[1fr_auto] grid-rows-[auto] md:grid-rows-[40px_240px_120px_auto] gap-6 md:gap-0 pt-[159px] md:pt-[225px] pb-20 md:pb-0">
+        <div className="grid lg:grid-cols-[1fr_auto] grid-rows-[auto] md:grid-rows-[40px_minmax(240px,auto)_minmax(120px,auto)_auto] gap-6 md:gap-x-0 md:gap-y-8 pt-[159px] md:pt-[225px] pb-20 md:pb-0">
           {/* Content side */}
           <motion.div 
             initial={{ x: -40, opacity: 0 }}
@@ -77,9 +79,9 @@ export function StandardPageHero({
               )}
             </div>
             
-            {/* Title Zone - Row 2 (240px) - Locked height for H1 */}
-            <div className="md:h-[240px] flex flex-col justify-center">
-              <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-[1000] md:font-[950] text-white leading-[0.85] tracking-[-0.05em] uppercase text-center md:text-left">
+            {/* Title Zone - Row 2 */}
+            <div className="md:min-h-[240px] flex flex-col justify-center">
+              <h1 className={`font-headline font-[1000] md:font-[950] text-white uppercase text-center md:text-left ${titleClassName || "text-5xl md:text-7xl lg:text-8xl leading-[0.85] tracking-[-0.05em]"}`}>
                 {title}
                 {titleAccent && (
                   <>
@@ -90,8 +92,8 @@ export function StandardPageHero({
               </h1>
             </div>
             
-            {/* Subtitle Zone - Row 3 (120px) */}
-            <div className="md:h-full">
+            {/* Subtitle Zone - Row 3 */}
+            <div className="md:min-h-[120px]">
               {subtitle && (
                 <div className="relative md:pl-8 h-full border-l-0 md:border-l-2 border-secondary/30 flex items-center justify-center md:justify-start mt-6 md:mt-0">
                   <p className="text-center md:text-left text-base sm:text-lg md:text-xl text-slate-200 max-w-3xl w-full font-medium leading-relaxed">

@@ -140,10 +140,17 @@ export function Step4({
       const max = formData.plataMax ? Number(formData.plataMax).toLocaleString("sr-RS") : "0";
       const dynSlug = formData.dinamikaIsplate || "";
       const typeLabel = dynSlug === "po-satu" ? "sat" : dynSlug === "mesecna" ? "mesec" : dynSlug === "dnevna" ? "dan" : dynSlug === "nedeljna" ? "nedelja" : dynSlug === "po-m2" ? "m2" : "";
-      return `${min} - ${max} EUR${typeLabel ? ` / ${typeLabel}` : ''}`;
+      
+      if (formData.plataMin && formData.plataMax) {
+        return `${min} - ${max} EUR${typeLabel ? ` / ${typeLabel}` : ''}`;
+      } else if (formData.plataMin) {
+        return `${min} EUR${typeLabel ? ` / ${typeLabel}` : ''}`;
+      } else {
+        return `do ${max} EUR${typeLabel ? ` / ${typeLabel}` : ''}`;
+      }
     }
 
-    return "Cena nije definisana";
+    return "Detalji u opisu";
   };
 
   // Find standard, premium, and urgent packages specifically
@@ -261,10 +268,12 @@ export function Step4({
 
                <div className="flex flex-col md:flex-row justify-between gap-8">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 mb-2 bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_2px_10px_rgba(254,191,13,0.1)]">
-                      <span className="material-symbols-outlined text-[14px]">apartment</span>
-                      {formData.companyName || "Vaša firma"}
-                    </div>
+                    {formData.companyName && (
+                      <div className="inline-flex items-center gap-2 mb-2 bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_2px_10px_rgba(254,191,13,0.1)]">
+                        <span className="material-symbols-outlined text-[14px]">apartment</span>
+                        {formData.companyName}
+                      </div>
+                    )}
                     <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] block mt-2">
                       Naslov oglasa
                     </span>
@@ -277,7 +286,7 @@ export function Step4({
                         <span className="text-xs font-black text-on-surface-variant uppercase tracking-widest font-headline block mb-2">
                           Detaljan opis posla
                         </span>
-                        <p className="text-base font-medium text-white/90 leading-relaxed whitespace-pre-wrap line-clamp-4">
+                        <p className="text-base font-medium text-white/90 leading-relaxed whitespace-pre-wrap">
                           {formData.opis}
                         </p>
                       </div>
@@ -320,9 +329,7 @@ export function Step4({
                             ? "Cena po obroku"
                             : selectedCategory === "machines"
                               ? "Tip oglasa"
-                              : formData.salaryType === "hourly"
-                                ? "Satnica"
-                                : "Plata"}
+                              : "Satnica"}
                       </span>
                       <span className="font-black text-2xl md:text-3xl md:text-right block bg-clip-text text-transparent bg-gradient-to-r from-secondary via-yellow-400 to-secondary">
                         {getFormattedPrice()}
@@ -354,7 +361,7 @@ export function Step4({
                  </div>
                </div>
 
-               {selectedCategory !== "catering" && selectedCategory !== "machines" && (
+               {selectedCategory !== "catering" && selectedCategory !== "machines" && selectedCategory !== "job" && (
                  <div className="mt-8 pt-6 border-t border-white/5">
                    <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em] block mb-4">
                      {selectedCategory === "accommodation" ? "Pogodnosti" : "Benefiti za kandidate"}

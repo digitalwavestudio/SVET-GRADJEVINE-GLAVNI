@@ -25,12 +25,16 @@ export const getProfessionName = (formData: Record<string, any>, selectedCategor
   const prof = PROFESSIONS[formData.sector]?.find(
     (p) => p.slug === formData.profession,
   );
-  return prof ? prof.name.split(" (")[0] : "";
+  if (prof) return prof.name.split(" (")[0];
+  // Fallback to capitalizing the raw profession string
+  return formData.profession.charAt(0).toUpperCase() + formData.profession.slice(1);
 };
 
 export const getLocationName = (location: string) => {
+  if (!location) return "";
   const loc = LOCATIONS.find((l) => l.slug === location);
-  return loc ? loc.name : "";
+  if (loc) return loc.name;
+  return location.charAt(0).toUpperCase() + location.slice(1);
 };
 
 export const getAutoTitle = (formData: Record<string, any>, selectedCategory: string | null, user: any) => {

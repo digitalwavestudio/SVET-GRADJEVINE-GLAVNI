@@ -134,3 +134,23 @@ export async function generateAdData(description: string, category: string): Pro
         return { _error: "AI servis trenutno nije dostupan" };
     }
 }
+
+export async function parseAdIntentFrontend(text: string): Promise<Record<string, any>> {
+    try {
+        const data = await apiClient.post<Record<string, any>>('/ai/parse-ad', { text });
+        return data;
+    } catch (err) {
+        console.error("AI parse-ad error:", err);
+        return { _error: "AI servis trenutno nije dostupan" };
+    }
+}
+
+export async function gradeAdScoreFrontend(adData: any): Promise<{score: number, feedback: string}> {
+    try {
+        const data = await apiClient.post<{score: number, feedback: string}>('/ai/grade-ad', { adData });
+        return data;
+    } catch (err) {
+        console.error("AI grade-ad error:", err);
+        return { score: 0, feedback: "AI ocenjivač trenutno nije dostupan." };
+    }
+}
