@@ -197,14 +197,35 @@ export class AdminStatsService {
           // Čitamo activeJobs i activeAds iz šardova u realnom vremenu (increment/decrement na svaki oglas)
           try {
             const shardsSnap = await db.collection("metadata/global_stats/shards").get();
-            let activeJobs = 0;
-            let activeAds = 0;
+            const shardSums: Record<string, number> = {
+              activeJobs: 0,
+              activeAds: 0,
+              totalJobs: 0,
+              accommodationsCount: 0,
+              machinesCount: 0,
+              cateringCount: 0,
+              realEstateCount: 0,
+              companiesCount: 0,
+              totalUsers: 0,
+              premiumPartners: 0,
+              premiumAds: 0,
+              urgentAds: 0,
+              pendingAds: 0
+            };
+            
             shardsSnap.forEach(s => { 
-              activeJobs += s.data().activeJobs || 0; 
-              activeAds += s.data().activeAds || 0;
+              const sData = s.data();
+              for (const key in shardSums) {
+                shardSums[key] += (sData[key] || 0);
+              }
             });
-            d.activeJobs = activeJobs;
-            d.activeAds = activeAds;
+            
+            // Overwrite doc data with real-time sums from shards
+            for (const key in shardSums) {
+              if (shardSums[key] > 0 || typeof d[key] === "undefined") {
+                 d[key] = shardSums[key];
+              }
+            }
           } catch (e) {
             // Fallback — koristi admin_stats vrednost
           }
