@@ -147,7 +147,7 @@ html {
     --color-primary: #0061a5;
     --color-on-primary: #ffffff;
     --color-secondary: #febf0d;
-    --color-on-secondary: <span className="material-symbols-outlined animate-chevron-bounce">arrow_forward</span>;
+    --color-on-secondary: #131c26;
   }
 }
 
@@ -803,6 +803,57 @@ input, textarea {
   animation: loadingProgress 1.8s infinite ease-in-out;
 }
 
+/* Light mode overrides for structural elements */
+.light ::-webkit-scrollbar-track { background: #f1f5f9; }
+.light ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+.light ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-
-
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+}
+.light .glass-card {
+  background: rgba(0, 0, 0, 0.03);
+}
+.light .hero-gradient {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.1) 100%);
+}
+.light .blueprint-bg {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+}
+.light .blueprint-pattern {
+  background-color: #f1f5f9;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+}
+.light .blueprint-overlay {
+  background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.95)), 
+              radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+}
+.light input, .light textarea {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}.light .light-nav-tooltip {
+  background-color: rgba(241, 245, 249, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+.light .light-nav-tooltip .text-white\/90 {
+  color: rgba(17, 24, 39, 0.9) !important;
+}
+.light .light-nav-dropdown {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+.light .light-nav-dropdown .text-white {
+  color: #111827 !important;
+}
+.light .light-nav-dropdown .text-slate-400 {
+  color: #475569 !important;
+}
+.light .light-nav-dropdown .hover\:text-white:hover {
+  color: #111827 !important;
+}
+.light .light-nav-dropdown .hover\:bg-white\/5:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+.light .light-nav-dropdown .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}

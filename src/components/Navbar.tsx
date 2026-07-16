@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/Button";
 import { useDashboardNavigation } from "@/src/modules/dashboard/hooks/useDashboardNavigation";
 import logoImage from "@/src/assets/images/logo.webp";
 import { AiSearchBar } from "@/src/components/AiSearchBar";
+import ThemeToggle from "@/src/components/ThemeToggle";
 
 export default function Navbar() {
   const location = useLocation();
@@ -77,7 +78,7 @@ export default function Navbar() {
     if (isMobile) {
       return (
         <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-95 group-hover/tooltip:scale-100 group-focus/tooltip:scale-100 group-active/tooltip:scale-100 z-50 w-max">
-          <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 py-1.5 px-3 rounded-[8px] shadow-lg flex items-center gap-1.5">
+          <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 py-1.5 px-3 rounded-[8px] shadow-lg flex items-center gap-1.5 light-nav-tooltip">
             <span className="material-symbols-outlined text-secondary text-[14px]">hourglass_empty</span>
             <span className="text-white/90 text-[11px] font-bold tracking-wide">Stiže uskoro!</span>
           </div>
@@ -87,7 +88,7 @@ export default function Navbar() {
 
     return (
       <div className="absolute top-full mt-2 w-max left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-focus/tooltip:scale-100 group-active/tooltip:scale-100 z-50">
-        <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap md:min-w-[260px] flex flex-col items-start text-left">
+        <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap md:min-w-[260px] flex flex-col items-start text-left light-nav-tooltip">
           <div className="flex items-center gap-2.5 mb-2">
             <img src={logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md flex-shrink-0" />
             <span className="text-secondary font-black text-[11px] md:text-[12px] uppercase tracking-widest">USKORO!</span>
@@ -126,6 +127,9 @@ export default function Navbar() {
           <div className="flex items-center gap-3 lg:gap-4 lg:ml-auto">
             {isDesktop && (
               <div className="flex items-center gap-3">
+                <div className="mr-2">
+                  <ThemeToggle className="" />
+                </div>
                 <Button
                   to="/postavi-oglas"
                   variant="nav-premium"
@@ -156,7 +160,7 @@ export default function Navbar() {
                     </Link>
                     {/* Dropdown — isti kao pre */}
                     <div className="absolute top-[calc(100%+12px)] right-0 w-[288px] opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50">
-                      <div className="relative bg-[#0d141b] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col">
+                      <div className="relative bg-[#0d141b] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col light-nav-dropdown">
                         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
                         <div className="relative pl-0 pr-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
                           <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
