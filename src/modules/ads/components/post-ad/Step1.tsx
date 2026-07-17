@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -31,6 +32,19 @@ export function Step1({
   const availableProfessions: TaxonomyItem[] = sector ? PROFESSIONS[sector] || [] : [];
   const availableSubcategories: TaxonomyItem[] = machCategory ? (MACHINE_SUBCATEGORIES[machCategory] || []) : [];
   const opis = watch('opis');
+  const plataMin = watch('plataMin');
+
+  useEffect(() => {
+    if (!opis || selectedCategory !== 'job') return;
+    const m = opis.match(/Satnica:\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
+    if (m) {
+      const v = m[1].replace(',', '.').replace(/\s+/g, '');
+      if (v !== (plataMin ?? '')) {
+        setValue('plataMin', v, { shouldDirty: true });
+        setValue('isNegotiable', false, { shouldDirty: true });
+      }
+    }
+  }, [opis, selectedCategory, setValue, plataMin]);
 
   return (
     <>

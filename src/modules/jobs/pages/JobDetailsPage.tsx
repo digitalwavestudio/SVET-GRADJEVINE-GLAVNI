@@ -406,14 +406,14 @@ export default function JobDetailsPage() {
               <div className="flex items-center gap-2 text-white/40 mb-2">
                 <Wallet size={18} />
                 <span className="text-xs md:text-sm font-bold uppercase tracking-wider">
-                  {jobData.salaryType === 'hourly' || jobData.dinamikaIsplate === 'po-satu' ? 'Satnica' : jobData.salaryType === 'monthly' || jobData.dinamikaIsplate === 'mesecna' ? 'Mesečna plata' : 'Zarada'}
+                  Satnica
                 </span>
               </div>
               <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 tracking-tight leading-none py-1 drop-shadow-[0_2px_10px_rgba(251,191,36,0.15)]">
                   {jobData.isNegotiable 
                     ? 'Pozvati' 
                     : jobData.plataMin != null
-                      ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} €`
+                      ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null && Number(jobData.plataMax) > 0 ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} €`
                       : 'Po dogovoru'}
               </span>
             </div>
@@ -703,9 +703,9 @@ export default function JobDetailsPage() {
       <StickyDetailCTABar
         phone={jobData.phone || jobData.telefon || jobData.applicationPhone || ''}
         onMessage={handleStartChat}
-        price={jobData.isNegotiable ? 'Pozvati' : jobData.plataMin != null ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''}` : undefined}
+        price={jobData.isNegotiable ? 'Pozvati' : jobData.plataMin != null ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null && Number(jobData.plataMax) > 0 ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''}` : undefined}
         currency={jobData.isNegotiable ? '' : 'EUR'}
-        priceLabel={jobData.isNegotiable ? 'CENA' : 'PLATA'}
+        priceLabel={jobData.isNegotiable ? 'CENA' : 'SATNICA'}
         ctaText={!hasApplied && !isOwner ? "PRIJAVI SE" : hasApplied ? "PRIJAVLJEN" : undefined}
         onCtaClick={!hasApplied && !isOwner ? handleApply : undefined}
       />
