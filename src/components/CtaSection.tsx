@@ -138,8 +138,8 @@ export default function CtaSection() {
                 NAŠA <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] block sm:inline">MISIJA</span>
               </h1>
               <div className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2 space-y-4">
-                <p>Naša misija je da digitalizujemo građevinski sektor i učinimo pronalaženje poslova, radnika, partnera i usluga jednostavnijim, bržim i efikasnijim.</p>
-                <p>Kroz inovacije, kvalitetne alate i modernu tehnologiju gradimo najveću zajednicu građevinske industrije u Srbiji i regionu.</p>
+                <p>Naša misija je da učinimo pronalaženje poslova i radnika jednostavnijim, bržim i efikasnijim.</p>
+                <p>Kroz kvalitetne alate, moderne tehnologije i kontinuirane inovacije, pružamo građevinskoj industriji u Srbiji i regionu pouzdanu platformu koja povezuje poslodavce, radnike i poslovne partnere, olakšava zapošljavanje i doprinosi razvoju celokupnog građevinskog sektora.</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
                 <Link 

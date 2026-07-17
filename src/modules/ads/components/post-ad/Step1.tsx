@@ -45,7 +45,7 @@ export function Step1({
       if (/^(na\s*)?15\s*dana$/.test(v) || /^petnaest\s*dana$/.test(v)) return 'na-15-dana';
       if (/^mesecna|mesecno|mesečna|mesečno$/.test(v) || v === 'plata') return 'mesecna';
       if (/^po\s*m2$|^kvadrat$|^m2$/.test(v)) return 'po-m2';
-      return null;
+      return val.trim();
     };
 
     const m = opis.match(/Satnica:\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
@@ -54,6 +54,18 @@ export function Step1({
       if (v !== (plataMin ?? '')) {
         setValue('plataMin', v, { shouldDirty: true });
         setValue('isNegotiable', false, { shouldDirty: true });
+      }
+    }
+
+    const locMatch = opis.match(/Mesto rada:\s*(.+?)(?:\n|$)/i);
+    if (locMatch && locMatch[1].trim()) {
+      const raw = locMatch[1].trim().toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
+      for (const loc of LOCATIONS) {
+        const n = loc.name.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
+        if (raw === loc.slug || raw === n) {
+          setValue('location', loc.slug, { shouldDirty: true, shouldValidate: true });
+          break;
+        }
       }
     }
 
