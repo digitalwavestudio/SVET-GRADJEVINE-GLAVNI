@@ -159,14 +159,16 @@ export class BaseAdStrategy {
 
       if (isPaidPackage) {
         const transRef = db.collection("transactions").doc();
+        const adTitle = rawData.title || rawData.adTitle || rawData.name || "";
         transaction.set(transRef, {
           userId: uid,
           adId: adId,
           type: "ad_payment_wallet",
           packageId: rawData.paket,
-          amount: packagePrice,
+          amount: -packagePrice,
           currency: "RSD",
           status: "completed",
+          description: `Plaćen oglas${adTitle ? ` - ${adTitle}` : ''} (${rawData.paket})`,
           referenceNumber: `SG-${adId.slice(0, 8).toUpperCase()}`,
           createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         });

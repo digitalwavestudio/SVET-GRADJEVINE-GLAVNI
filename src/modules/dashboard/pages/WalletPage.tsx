@@ -21,7 +21,7 @@ const PREMIUM_BENEFITS = [
 ];
 
 // ─── Transaction Row ─────────────────────────────────────────────────────────
-const TransactionRow = memo(({ transaction }: { transaction: any }) => {
+const TransactionRow = memo(({ transaction, runningBalance }: { transaction: any; runningBalance?: number }) => {
   const isPositive = transaction.amount > 0;
 
   const statusConfig: Record<string, { label: string; classes: string }> = {
@@ -81,6 +81,13 @@ const TransactionRow = memo(({ transaction }: { transaction: any }) => {
           <span className="text-[10px] ml-1 opacity-50 uppercase">Kredita</span>
         </div>
       </td>
+      {runningBalance !== undefined && (
+        <td className="py-5 text-right font-mono">
+          <div className="text-[11px] font-bold tabular-nums tracking-tighter text-white/40">
+            {runningBalance.toLocaleString()}
+          </div>
+        </td>
+      )}
     </tr>
   );
 });
@@ -519,12 +526,21 @@ export default function WalletPage() {
                               <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">OPIS</th>
                               <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase">STATUS</th>
                               <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase text-right">IZNOS</th>
+                              <th className="pb-4 text-[9px] font-black text-white/20 tracking-[0.2em] uppercase text-right">STANJE</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-white/5">
-                            {visibleTransactions.map((t: any) => (
-                              <TransactionRow key={t.id} transaction={t} />
-                            ))}
+                            {(() => {
+                              let running = walletBalance;
+                              const rows: { t: any; running: number }[] = [];
+                              for (const t of visibleTransactions) {
+                                rows.push({ t, running });
+                                running -= (t.amount || 0);
+                              }
+                              return rows.map(({ t, running }) => (
+                                <TransactionRow key={t.id} transaction={t} runningBalance={running} />
+                              ));
+                            })()}
                           </tbody>
                         </table>
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6">
