@@ -2044,21 +2044,6 @@
       "indexes": []
     },
     {
-      "collectionGroup": "listings",
-      "fieldPath": "comp",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "listings",
-      "fieldPath": "comp.logo",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "metadata",
-      "fieldPath": "homepage",
-      "indexes": []
-    },
-    {
       "collectionGroup": "public_activities",
       "queryScope": "COLLECTION",
       "fields": [
@@ -2085,6 +2070,23 @@
           "order": "DESCENDING"
         }
       ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "comp",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "comp.logo",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "metadata",
+      "fieldPath": "homepage",
+      "indexes": []
     }
   ]
 }
