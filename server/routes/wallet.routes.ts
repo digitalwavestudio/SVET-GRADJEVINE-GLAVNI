@@ -125,14 +125,10 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
 
       // --- WRITES ---
 
-      // A. Subtract balance (dual: users + wallets)
+      // A. Subtract balance
       transaction.update(userRef, {
         walletBalance: admin.firestore.FieldValue.increment(-cost),
       });
-      transaction.set(db.collection("wallets").doc(userId), {
-        balance: admin.firestore.FieldValue.increment(-cost),
-        lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
 
       // B. Create ledger entry
       const transactionRef = db.collection("transactions").doc();
@@ -229,14 +225,10 @@ walletRouter.post("/admin/add-funds", requireAuth, async (req, res, next) => {
         throw new Error("Korisnik nije pronađen");
       }
 
-      // Update User (dual: users + wallets)
+      // Update User
       transaction.update(userRef, {
         walletBalance: admin.firestore.FieldValue.increment(amount),
       });
-      transaction.set(db.collection("wallets").doc(targetUserId), {
-        balance: admin.firestore.FieldValue.increment(amount),
-        lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
 
       // Create Ledger Entry "Wire Transfer"
       const transactionRef = db.collection("transactions").doc();
@@ -433,10 +425,6 @@ walletRouter.post("/admin/approve-deposit/:id", requireAuth, async (req, res, ne
         transaction.update(userRef, {
           walletBalance: admin.firestore.FieldValue.increment(txData.amount),
         });
-        transaction.set(db.collection("wallets").doc(txData.userId), {
-          balance: admin.firestore.FieldValue.increment(txData.amount),
-          lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
 
         // Ažuriramo transakciju
         transaction.update(txRef, {
@@ -572,8 +560,8 @@ walletRouter.delete("/transactions", requireAuth, async (req, res, next) => {
 walletRouter.get("/balance", requireAuth, async (req, res, next) => {
   try {
     const userId = getReqUser(req).uid;
-    const walletSnap = await db.collection("wallets").doc(userId).get();
-    const balance = walletSnap.exists ? (walletSnap.data()?.balance || 0) : 0;
+    const userSnap = await db.collection("users").doc(userId).get();
+    const balance = userSnap.exists ? (userSnap.data()?.walletBalance || 0) : 0;
     res.json({ balance });
   } catch (error) {
     console.error("Fetch Balance Error:", error);

@@ -83,11 +83,11 @@ export class DashboardEmployerService {
                 totalAds = adsSnap.docs.filter(d => d.data().status !== "deleted").length;
                 premiumAdsCount = adsSnap.docs.filter(d => d.data().isPremium === true).length;
 
-                const walletSnap = await db.collection("wallets").doc(uid).get();
-                if (walletSnap.exists) {
-                  const w = walletSnap.data();
-                  totalSpend = w?.totalSpent || w?.balance || 0;
-                  activePackage = w?.packageName || "Nema paketa";
+                const userSnap = await db.collection("users").doc(uid).get();
+                if (userSnap.exists) {
+                  const u = userSnap.data();
+                  totalSpend = 0;
+                  activePackage = "Nema paketa";
                 }
 
                 // Write computed stats back so next load hits cache

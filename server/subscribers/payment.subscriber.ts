@@ -21,12 +21,7 @@ export const initPaymentSubscriber = () => {
       if (payload.amount && payload.amount > 0) {
         try {
           await db.runTransaction(async (transaction) => {
-            const walletRef = db.collection("wallets").doc(payload.userId);
             const userRef = db.collection("users").doc(payload.userId);
-            transaction.set(walletRef, {
-              balance: admin.firestore.FieldValue.increment(payload.amount),
-              lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            }, { merge: true });
             transaction.update(userRef, {
               walletBalance: admin.firestore.FieldValue.increment(payload.amount),
             });

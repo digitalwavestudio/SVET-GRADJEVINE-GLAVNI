@@ -212,13 +212,7 @@ export class UsersService {
           baseData.walletBalance = 5000; // 5.000 SG Kredita gratis za prve oglase
          baseData.freeAdsCount = 3;
          baseData.isPremiumProfile = false;
-         transaction.set(userRef, baseData, { merge: true });
-         // Create corresponding wallets doc to prevent desync
-         const walletRef = db.collection('wallets').doc(uid);
-         transaction.set(walletRef, {
-           balance: 1500,
-           lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-         }, { merge: true });
+          transaction.set(userRef, baseData, { merge: true });
       } else {
          const existingRole = userSnap.data()?.role;
          if (existingRole) {
@@ -227,15 +221,9 @@ export class UsersService {
          }
          // Fallback if existing user somehow lacks walletBalance entirely:
          const existingData = userSnap.data();
-         if (existingData && existingData.walletBalance === undefined) {
-             baseData.walletBalance = 5000;
-             // Also create wallet doc if missing
-             const walletRef = db.collection('wallets').doc(uid);
-             transaction.set(walletRef, {
-              balance: 5000,
-              lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-            }, { merge: true });
-         }
+          if (existingData && existingData.walletBalance === undefined) {
+              baseData.walletBalance = 5000;
+          }
          transaction.set(userRef, baseData, { merge: true });
       }
 

@@ -400,19 +400,15 @@ export const bffService = {
           const cachedWalletUser = await CacheService.getOrSet<{ wallet: any; user: any }>(
             walletUserCacheKey,
             async () => {
-              const [walletDoc, userDoc] = await Promise.all([
-                db.collection("wallets").doc(userId).get(),
-                internalUserLoader.load(userId),
-              ]);
-              return {
-                wallet: walletDoc.exists ? walletDoc.data() : null,
-                user: userDoc || null,
-              };
+          const userDoc = await internalUserLoader.load(userId);
+          return {
+            user: userDoc || null,
+          };
             },
             5 * 60 * 1000 // 5 minuta TTL
           );
 
-          const { wallet, user } = cachedWalletUser || { wallet: null, user: null };
+          const { user } = cachedWalletUser || { user: null };
           const uData = user || {};
           let fetchedRoles: string[] = [];
           if (uData.roles && Array.isArray(uData.roles)) {
@@ -422,8 +418,8 @@ export const bffService = {
           }
           
           walletData = {
-            balance: wallet ? (wallet.balance || 0) : (uData.walletBalance || 0),
-            lastAuditPassed: wallet ? (wallet.lastAuditPassed === true) : false,
+            balance: uData.walletBalance || 0,
+            lastAuditPassed: false,
             activeRoles: fetchedRoles
           };
           await CacheService.set(walletCacheKey, walletData, 300000); // 5min fallback cache
@@ -487,12 +483,8 @@ export const bffService = {
       walletUserCacheKey,
       async () => {
         const { internalUserLoader } = await import("../utils/dataloader.ts");
-        const [walletDoc, userDoc] = await Promise.all([
-          db.collection("wallets").doc(userId).get(),
-          internalUserLoader.load(userId),
-        ]);
+        const userDoc = await internalUserLoader.load(userId);
         return {
-          wallet: walletDoc.exists ? walletDoc.data() : null,
           user: userDoc || null,
         };
       },
@@ -516,8 +508,8 @@ export const bffService = {
           const statsObj = baseData.stats as Record<string, unknown>;
           delete statsObj.unreadActivities;
           delete statsObj.walletBalance;
-          if (walletUserData?.wallet) {
-            statsObj.walletBalance = walletUserData.wallet.balance || 0;
+          if (walletUserData?.user) {
+            statsObj.walletBalance = (walletUserData.user as Record<string, unknown>).walletBalance || 0;
           }
         }
 

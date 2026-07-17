@@ -34,7 +34,6 @@ export class BaseAdStrategy {
   public async createAd(rawData: any, uid: string) {
     const result = await db.runTransaction(async (transaction) => {
       const userRef = db.collection("users").doc(uid);
-      const walletRef = db.collection("wallets").doc(uid);
       const userSnap = await transaction.get(userRef);
       if (!userSnap.exists) throw new BadRequestError("Korisnik nije pronađen");
       const userData = userSnap.data() as any;
@@ -176,10 +175,6 @@ export class BaseAdStrategy {
           walletBalance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
           totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
         });
-        transaction.set(walletRef, {
-          balance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
-          lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
       } else {
         transaction.update(userRef, {
           totalAds: firebaseAdmin.firestore.FieldValue.increment(1),

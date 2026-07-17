@@ -20,13 +20,7 @@ export class AdminFinanceService {
     }
 
     await db.runTransaction(async (transaction) => {
-      const walletRef = db.collection("wallets").doc(userId);
       const userRef = db.collection("users").doc(userId);
-
-      transaction.set(walletRef, {
-        balance: firebaseAdmin.firestore.FieldValue.increment(delta),
-        lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
 
       transaction.update(userRef, {
         walletBalance: firebaseAdmin.firestore.FieldValue.increment(delta),
