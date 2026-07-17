@@ -1,7 +1,6 @@
 import { admin, db, ensureInitialized } from "../config/firebase.ts";
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { CacheService } from "../services/cache.service.ts";
-import { env } from "../config/env.ts";
 const getDefaultPermissions = (role: string): string[] => {
   switch (role) {
     case "admin": return ["*"];
@@ -131,6 +130,29 @@ export const authMiddleware = async (
         }).catch((e) => console.error("[AUTH] setCustomUserClaims fallback failed:", e));
       }
 
+      // Ako token ima rolu ali fali admin claim, proveri Firestore
+      if (resolvedRole !== "admin" && !decodedToken.admin) {
+        try {
+          const userDoc = await db.collection("users").doc(decodedToken.uid).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            const isAdmin = userData?.isAdmin || userData?.admin === true;
+            if (!isAdmin) {
+              const adminDoc = await db.collection("admins").doc(decodedToken.uid).get();
+              if (adminDoc.exists) {
+                resolvedRole = "admin";
+                resolvedPermissions = ["*"];
+              }
+            } else {
+              resolvedRole = "admin";
+              resolvedPermissions = ["*"];
+            }
+          }
+        } catch (e) {
+          // ignoriši, nastavi sa postojećom rolom
+        }
+      }
+
       const authUser = {
         ...decodedToken,
         role: resolvedRole,
@@ -202,11 +224,6 @@ export const requireAdmin = (
   next: NextFunction,
 ) => {
   res.setHeader("Cache-Control", "no-store, no-cache, private");
-
-  if (env.NODE_ENV !== "production" && req.user) {
-    return next();
-  }
-
   if (!req.user || !req.user.isAdmin) {
     return res.status(403).json({ error: "Forbidden: Admin access only" });
   }
