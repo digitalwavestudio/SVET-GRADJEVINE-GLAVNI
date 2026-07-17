@@ -185,7 +185,7 @@ export function useAuthNode() {
                    ...meData,
                    id: firebaseUser.uid,
                    emailVerified: firebaseUser.emailVerified,
-                   photoURL: firebaseUser.photoURL || meData.photoURL || '',
+                    photoURL: meData.photoURL || firebaseUser.photoURL || '',
                    role: (currentPreviewRole || meData.role || claims.role || 'standard') as UserRole,
                    isAdmin: meData.isAdmin || meData.role === 'admin' || !!claims.admin,
                  } as User;

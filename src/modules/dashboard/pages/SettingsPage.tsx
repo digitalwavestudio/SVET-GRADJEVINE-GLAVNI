@@ -177,29 +177,22 @@ export default function SettingsPage() {
         updateData.description = formData.description;
         updateData.facebook = formData.facebook;
         updateData.instagram = formData.instagram;
-        // Za firme, photoURL u formi se koristi kao logo
         updateData.businessProfile = {
           ...user.businessProfile,
           logo: formData.photoURL,
           coverImage: formData.coverImage,
           companyName: formData.company,
         };
-      } else if (user.role === 'majstor') {
-        updateData.profession = formData.profession;
-        updateData.description = formData.description;
-        updateData.facebook = formData.facebook;
-        updateData.instagram = formData.instagram;
-        updateData.photoURL = formData.photoURL;
-      } else if (user.role !== 'standard') {
-        // smestaj, ketering, masine, placevi, etc.
-        updateData.profession = formData.profession;
-        updateData.description = formData.description;
-        updateData.facebook = formData.facebook;
-        updateData.instagram = formData.instagram;
-        updateData.photoURL = formData.photoURL;
       } else {
-        // standard — samo osnovni podaci
+        if (formData.profession) updateData.profession = formData.profession;
+        if (formData.description) updateData.description = formData.description;
+        if (formData.facebook) updateData.facebook = formData.facebook;
+        if (formData.instagram) updateData.instagram = formData.instagram;
         updateData.photoURL = formData.photoURL;
+        updateData.businessProfile = {
+          ...user.businessProfile,
+          logo: formData.photoURL,
+        };
       }
 
       await updateUser(updateData);

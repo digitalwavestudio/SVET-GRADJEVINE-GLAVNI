@@ -33,7 +33,7 @@ export function ProfileSettingsTab({
         <div className="pb-10 border-b border-white/5 space-y-4">
           <h3 className="text-2xl font-black text-white uppercase tracking-tight">POZADINA PROFILA FIRME</h3>
           <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-relaxed">
-            OVA SLIKA ĆE SE PRIKAZIVATI KAO POZADINA VAŠEG BIZNIS PROFILA. <span className="text-secondary opacity-60">(LIMIT: 100KB)</span>
+            OVA SLIKA ĆE SE PRIKAZIVATI KAO POZADINA VAŠEG BIZNIS PROFILA.
           </p>
           <div className="relative group w-full h-48 bg-white/5 border border-white/10 rounded-[10px] flex items-center justify-center overflow-hidden cursor-pointer hover:border-secondary transition-all" onClick={() => coverInputRef?.current?.click()}>
             {formData.coverImage ? (
@@ -80,7 +80,7 @@ export function ProfileSettingsTab({
         <div className="flex-1 space-y-4 text-center md:text-left">
           <h3 className="text-2xl font-black text-white uppercase tracking-tight">IDENTITET NA PLATFORMI</h3>
           <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest leading-relaxed">
-            OVE INFORMACIJE SU JAVNE I POMAŽU KLIJENTIMA DA VAS PRONAĐU. FOTOGRAFIJA JE KLJUČNA ZA POVERENJE. <span className="text-secondary opacity-60">(LIMIT: 100KB)</span>
+            OVE INFORMACIJE SU JAVNE I POMAŽU KLIJENTIMA DA VAS PRONAĐU. FOTOGRAFIJA JE KLJUČNA ZA POVERENJE.
           </p>
         </div>
       </div>
