@@ -47,7 +47,7 @@ export function useGlobalSettings() {
         limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
         messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
         globalRateLimit: 100,
-        initialCredits: 1500,
+        initialCredits: 5000,
       };
     },
     staleTime: 5 * 60 * 1000,

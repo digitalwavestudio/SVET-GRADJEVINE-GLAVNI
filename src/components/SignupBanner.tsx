@@ -63,7 +63,7 @@ export default function SignupBanner() {
                   Start Budžet
                 </div>
                 <h3 className="text-sm sm:text-base md:text-lg text-slate-300 font-medium m-0 leading-snug">
-                  Registruj se sada i preuzmi <strong className="text-white font-black drop-shadow-[0_0_10px_rgba(254,191,13,0.3)] whitespace-nowrap">1.500 SG Kredita</strong> za prve oglase!
+                  Registruj se sada i preuzmi <strong className="text-white font-black drop-shadow-[0_0_10px_rgba(254,191,13,0.3)] whitespace-nowrap">5.000 SG Kredita</strong> za prve oglase!
                 </h3>
               </div>
             </div>

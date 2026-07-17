@@ -209,7 +209,7 @@ export class UsersService {
       if (isNew) {
          baseData.createdAt = firebaseAdmin.firestore.FieldValue.serverTimestamp();
          baseData.viewsCount = 0;
-         baseData.walletBalance = 1500; // 1500 SG Kredita gratis za prve oglase
+          baseData.walletBalance = 5000; // 5.000 SG Kredita gratis za prve oglase
          baseData.freeAdsCount = 3;
          baseData.isPremiumProfile = false;
          transaction.set(userRef, baseData, { merge: true });
@@ -228,11 +228,11 @@ export class UsersService {
          // Fallback if existing user somehow lacks walletBalance entirely:
          const existingData = userSnap.data();
          if (existingData && existingData.walletBalance === undefined) {
-            baseData.walletBalance = 1500;
-            // Also create wallet doc if missing
-            const walletRef = db.collection('wallets').doc(uid);
-            transaction.set(walletRef, {
-              balance: 1500,
+             baseData.walletBalance = 5000;
+             // Also create wallet doc if missing
+             const walletRef = db.collection('wallets').doc(uid);
+             transaction.set(walletRef, {
+              balance: 5000,
               lastUpdatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
             }, { merge: true });
          }

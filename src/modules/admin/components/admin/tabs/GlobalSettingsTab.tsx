@@ -44,7 +44,7 @@ const DEFAULT_SETTINGS: SettingsState = {
   limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
   messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
   globalRateLimit: 1000,
-  initialCredits: 1500
+  initialCredits: 5000
 };
 
 export function GlobalSettingsTab() {
@@ -84,7 +84,7 @@ export function GlobalSettingsTab() {
           maintenance_mode: !!data?.messages?.maintenance_mode
         },
         globalRateLimit: data?.globalRateLimit ?? 1000,
-        initialCredits: data?.initialCredits !== undefined ? data.initialCredits : 1500
+        initialCredits: data?.initialCredits !== undefined ? data.initialCredits : 5000
       };
       setSettings(mappedData);
     } catch (err) {
