@@ -3,6 +3,24 @@ import { motion } from 'motion/react';
 import { OnlineStatus } from '@/src/components/ui/OnlineStatus';
 import { Conversation } from '@/src/context/MessagesContext';
 
+const formatConvTime = (updatedAt: unknown): string => {
+  if (!updatedAt) return '';
+  let ts: number;
+  if (typeof updatedAt === 'object' && updatedAt !== null) {
+    const u = updatedAt as Record<string, unknown>;
+    if (typeof u.toMillis === 'function') ts = u.toMillis();
+    else if (typeof u.seconds === 'number') ts = u.seconds * 1000;
+    else ts = Date.now();
+  } else ts = Number(updatedAt) || Date.now();
+  const date = new Date(ts);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
+  if (diffDays === 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (diffDays === 1) return 'Juče';
+  if (diffDays < 7) return date.toLocaleDateString([], { weekday: 'short' });
+  return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
+};
+
 interface MessageSidebarProps {
   conversations?: Conversation[];
   loadMoreConversations?: () => void;
@@ -40,7 +58,8 @@ export function MessageSidebar({
     const searchLower = searchTerm.toLowerCase();
     const partnerName = (conv.partnerName || 'Korisnik').toLowerCase();
     const adTitle = (conv.adTitle || '').toLowerCase();
-    return partnerName.includes(searchLower) || adTitle.includes(searchLower);
+    const lastMsg = (typeof conv.lastMessage === 'string' ? conv.lastMessage : conv.lastMessage?.text || '').toLowerCase();
+    return partnerName.includes(searchLower) || adTitle.includes(searchLower) || lastMsg.includes(searchLower);
   });
 
   return (
@@ -108,7 +127,7 @@ export function MessageSidebar({
                   </h3>
                   {conv.updatedAt && (
                     <span className="text-[9px] text-white/20 font-bold uppercase">
-                      {new Date((((conv.updatedAt as unknown) as { toMillis?: () => number })?.toMillis) ? (((conv.updatedAt as unknown) as { toMillis?: () => number }).toMillis!()) : typeof conv.updatedAt === 'object' && conv.updatedAt !== null && 'seconds' in conv.updatedAt ? (conv.updatedAt as {seconds: number}).seconds * 1000 : Number(conv.updatedAt) || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {formatConvTime(conv.updatedAt)}
                     </span>
                   )}
                 </div>

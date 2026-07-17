@@ -88,7 +88,7 @@ export default function JobDetailsPage() {
   const [isApplying, setIsApplying] = useState(false);
   const { data: appliedResult } = useCheckApplied(actualId, user?.id || '');
   const hasApplied = !!appliedResult;
-  const { data: similarJobsResult, isLoading: loadingSimilar } = useSimilarJobs(actualId, jobData?.locationSlug, jobData?.professionSlug);
+  const { data: similarJobsResult, isLoading: loadingSimilar } = useSimilarJobs(actualId, jobData?.locationSlug, jobData?.professionSlug, jobData?.profession, jobData?.title);
   const similarJobs = (similarJobsResult as any[]) || [];
 
   const { isTrackedInSession } = useTrackView(!user?.isAdmin ? jobData?.id : null, 'listings', jobData?.companyId);

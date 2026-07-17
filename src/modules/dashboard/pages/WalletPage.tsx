@@ -20,9 +20,34 @@ const PREMIUM_BENEFITS = [
   { icon: 'analytics', label: 'Napredna analitika', desc: 'Detaljna statistika pregleda i prijava' },
 ];
 
+const TYPE_LABELS: Record<string, string> = {
+  wire_transfer: 'Poklon od Svet Građevine',
+  ad_payment_wallet: 'Plaćen oglas',
+  payment: 'Promocija',
+  PREMIUM_AKTIVACIJA: 'Premium paket',
+  deposit: 'Uplata',
+};
+
+const DESCRIPTION_FALLBACKS: Record<string, string> = {
+  wire_transfer: 'Dobili ste poklon kredite od Svet Građevine',
+  ad_payment_wallet: 'Objava oglasa na platformi',
+  payment: 'Promocija oglasa',
+  PREMIUM_AKTIVACIJA: 'Aktivacija premium paketa',
+  deposit: 'Uplata sredstava',
+};
+
+const DEBIT_TYPES = ['payment', 'ad_payment_wallet', 'PREMIUM_AKTIVACIJA'];
+
+const normalizeAmount = (t: any): number => {
+  const raw = t.amount || 0;
+  if (DEBIT_TYPES.includes(t.type)) return -Math.abs(raw);
+  return Math.abs(raw);
+};
+
 // ─── Transaction Row ─────────────────────────────────────────────────────────
 const TransactionRow = memo(({ transaction, runningBalance }: { transaction: any; runningBalance?: number }) => {
-  const isPositive = transaction.amount > 0;
+  const amount = normalizeAmount(transaction);
+  const isPositive = amount > 0;
 
   const statusConfig: Record<string, { label: string; classes: string }> = {
     completed: { label: 'PROCESUIRANO', classes: 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' },
@@ -50,7 +75,7 @@ const TransactionRow = memo(({ transaction, runningBalance }: { transaction: any
           </div>
           <div>
             <div className="text-[10px] font-black text-white tracking-widest uppercase mb-1">
-              {transaction.type || 'PRENOS'}
+              {TYPE_LABELS[transaction.type] || transaction.type || 'PRENOS'}
             </div>
             <div className="text-[9px] font-bold text-white/30 tracking-widest uppercase">
               {transaction.createdAt?.seconds
@@ -65,7 +90,7 @@ const TransactionRow = memo(({ transaction, runningBalance }: { transaction: any
       </td>
       <td className="py-5 pr-4">
         <div className="text-[11px] font-medium tracking-wide text-white/70 max-w-[200px] truncate">
-          {transaction.description || 'Sistemska transakcija / SG Krediti'}
+          {transaction.description || DESCRIPTION_FALLBACKS[transaction.type] || 'Sistemska transakcija'}
         </div>
       </td>
       <td className="py-5 pr-4">
@@ -77,7 +102,7 @@ const TransactionRow = memo(({ transaction, runningBalance }: { transaction: any
         <div className={`text-sm font-black tabular-nums tracking-tighter ${
           isPositive ? 'text-emerald-500' : 'text-white'
         }`}>
-          {isPositive ? '+' : ''}{transaction.amount.toLocaleString()}
+          {isPositive ? '+' : ''}{amount.toLocaleString()}
           <span className="text-[10px] ml-1 opacity-50 uppercase">Kredita</span>
         </div>
       </td>
@@ -535,7 +560,7 @@ export default function WalletPage() {
                               const rows: { t: any; running: number }[] = [];
                               for (const t of visibleTransactions) {
                                 rows.push({ t, running });
-                                running -= (t.amount || 0);
+                                running -= normalizeAmount(t);
                               }
                               return rows.map(({ t, running }) => (
                                 <TransactionRow key={t.id} transaction={t} runningBalance={running} />

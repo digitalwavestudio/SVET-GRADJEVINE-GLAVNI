@@ -75,7 +75,7 @@ export class UnifiedSearchService {
       Object.entries(stableFilters).filter(([_, v]) => v != null && v !== undefined)
     );
     const cacheKey = `search_v5:${category}:${pageSize}:${JSON.stringify(cleanFilters)}`;
-    const cached = await CacheService.get<UnifiedSearchResult>(cacheKey);
+    const cached = !filters.search ? await CacheService.get<UnifiedSearchResult>(cacheKey) : null;
     if (cached) return cached;
     let entityType = category;
     if (category && category !== "all" && category !== "marketplace") {
@@ -136,7 +136,7 @@ export class UnifiedSearchService {
     if (filters.highwayAccess) q = q.where("highwayAccess", "==", true);
     if (filters.railAccess) q = q.where("railAccess", "==", true);
     const targetProfession = filters.profession || filters.professionSlug;
-    const needsLargeBatch = !!targetProfession;
+    const needsLargeBatch = !!(targetProfession || filters.search);
     // professionSlug se filtrira client-side (linija 188) — nema Firestore indeksa za sve varijante
     if (filters.minPrice != null) q = q.where("price", ">=", Number(filters.minPrice));
     if (filters.maxPrice != null) q = q.where("price", "<=", Number(filters.maxPrice));
@@ -187,6 +187,10 @@ export class UnifiedSearchService {
       if (filters.isUrgent) docs = docs.filter((d: any) => d.isUrgent === true);
 
       if (targetProfession) docs = docs.filter((d: any) => d.professionSlug === targetProfession);
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        docs = docs.filter((d: any) => (d.title || '').toLowerCase().includes(q));
+      }
 
       docs = docs.sort((a, b) => {
         const aP = (a as any).isPremium ? 1 : 0;

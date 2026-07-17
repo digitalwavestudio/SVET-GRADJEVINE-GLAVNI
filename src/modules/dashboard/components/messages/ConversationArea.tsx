@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { OnlineStatus } from '@/src/components/ui/OnlineStatus';
 import { Conversation, Message } from '@/src/context/MessagesContext';
@@ -74,6 +75,17 @@ export function ConversationArea({
             <h3 className="text-lg font-black tracking-tighter uppercase text-white">
               {selectedConv?.partnerName || 'Odaberite razgovor'}
             </h3>
+            {selectedConv?.adTitle && (
+              <Link
+                to={selectedConv.adType === 'job' ? `/posao/${selectedConv.adId}` :
+                     selectedConv.adType === 'machine' ? `/gradjevinske-masine/${selectedConv.adId}` :
+                     selectedConv.adType === 'accommodation' ? `/smestaj/${selectedConv.adId}` :
+                     '#'}
+                className="text-[9px] font-black text-white/30 hover:text-secondary uppercase tracking-widest transition-colors block mt-0.5"
+              >
+                Razgovor o: {selectedConv.adTitle}
+              </Link>
+            )}
             {partnerTyping && (
               <motion.p 
                 initial={{ opacity: 0, y: -5 }}

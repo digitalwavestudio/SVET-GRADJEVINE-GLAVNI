@@ -229,13 +229,30 @@ export function useCheckApplied(jobId: string, userId: string) {
 
 export function useSimilarJobs(
   jobId: string,
-  _locationSlug?: string,
-  _professionSlug?: string,
+  locationSlug?: string,
+  professionSlug?: string,
+  profession?: string,
+  jobTitle?: string,
 ) {
   const filters: Record<string, unknown> = { status: 'active' };
 
+  if (professionSlug) {
+    filters.professionSlug = professionSlug;
+  } else if (profession) {
+    filters.profession = profession;
+  } else if (jobTitle) {
+    // Izbaci lokaciju iz naslova i traži po ostatku
+    const titleClean = jobTitle.replace(/[—–\-|/].*$/, '').trim().toLowerCase();
+    if (titleClean && titleClean.length > 2) {
+      filters.searchQuery = titleClean;
+    }
+  }
+  if (locationSlug) {
+    filters.locationSlug = locationSlug;
+  }
+
   return useQuery<JobResponse[], Error>({
-    queryKey: queryKeys.jobs.similar(jobId),
+    queryKey: [...queryKeys.jobs.similar(jobId), professionSlug || profession || jobTitle, locationSlug].filter(Boolean),
     queryFn: async () => {
       const response = await jobsService.fetchJobs(filters, null, 15);
       return (response.items || []).filter(j => j.id !== jobId).slice(0, 10);

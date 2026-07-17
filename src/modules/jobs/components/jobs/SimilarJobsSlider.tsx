@@ -3,14 +3,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '@/src/lib/analytics';
 
-const cleanTitle = (title: string, location: string) => {
-  if (!title) return '';
-  if (!location) return title;
-  const locLower = location.toLowerCase().trim();
-  const cleanRegex = new RegExp(`\\s*[-—/|]\\s*${locLower}\\s*$`, 'i');
-  return title.replace(cleanRegex, '').trim();
-};
-
 interface SimilarJobsSliderProps {
   jobData: any;
   displaySimilarJobs: any[];
@@ -137,10 +129,15 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
                 <div className="shrink-0">{renderBadge(job)}</div>
               </div>
 
-              {/* Title */}
-              <h3 className="text-white font-black text-[16px] sm:text-lg mb-4 uppercase tracking-tight group-hover:text-yellow-400 transition-colors line-clamp-2 leading-snug h-12">
-                {cleanTitle(job.title, job.loc || job.location)}
-              </h3>
+              {/* Title + Location */}
+              <div className="mb-4">
+                <h3 className="text-white font-black text-[16px] sm:text-lg uppercase tracking-tight group-hover:text-yellow-400 transition-colors leading-snug">
+                  {(job.title || 'Posao').split(/[—–\-|/]\s*/)[0]}
+                </h3>
+                <p className="text-white/50 font-bold text-xs uppercase tracking-wide mt-1">
+                  {job.location || job.locationName || job.loc || ''}
+                </p>
+              </div>
 
               {/* Meta Tags */}
               <div className="flex flex-wrap gap-1.5 mb-4">
@@ -152,11 +149,6 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
 
                   return (
                     <>
-                      <div className="flex items-center gap-1 bg-white/[0.04] backdrop-blur-sm px-2 py-1 rounded-lg text-[9px] text-white/70 font-bold uppercase tracking-wider border border-white/[0.05] shrink-0 max-w-full">
-                        <span className="material-symbols-outlined text-[12px] shrink-0">location_on</span>
-                        <span className="truncate">{job.loc || job.location || 'Srbija'}</span>
-                      </div>
-                      
                       {hasSmestaj && (
                         <div className="flex items-center gap-1 bg-green-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[9px] text-green-400 font-bold uppercase tracking-wider border border-green-500/20 shrink-0">
                           <span className="material-symbols-outlined text-[12px] shrink-0">home</span> Smeštaj
@@ -182,10 +174,10 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
               {/* Footer: Salary & Action */}
               <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-white/40 text-[9px] uppercase tracking-widest mb-0.5 font-bold">Zarada</p>
+                  <p className="text-white/40 text-[9px] uppercase tracking-widest mb-0.5 font-bold">Satnica</p>
                   <p className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 font-black text-lg sm:text-xl truncate">
                     {job.isNegotiable ? 'Pozvati' : job.plataMin != null
-                      ? `${Number(job.plataMin).toLocaleString()}${job.plataMax != null ? ` - ${Number(job.plataMax).toLocaleString()}` : ''} €`
+                      ? `${Number(job.plataMin).toLocaleString()}${job.plataMax != null && Number(job.plataMax) > 0 ? ` - ${Number(job.plataMax).toLocaleString()}` : ''} €`
                       : job.sal 
                         ? `${job.sal} €`
                         : job.salary
