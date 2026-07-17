@@ -18,11 +18,11 @@ export default function CalculatorBanner() {
             
             {/* Content */}
             <div className="flex-1 text-center lg:text-left">
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-tighter uppercase leading-tight">
-                <span className="text-secondary">Građevinski</span> Kalkulator
+              <h3 className="font-headline text-3xl sm:text-4xl md:text-5xl font-[1000] md:font-[950] text-white mb-4 tracking-tighter uppercase leading-tight drop-shadow-sm">
+                <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#febf0d_0%,#ffffff_60%)]">Građevinski</span> Kalkulator
               </h3>
-              <p className="hidden md:block text-base font-medium text-slate-400 max-w-2xl leading-relaxed">
-                Zidar, fasader ili keramičar? Izračunaj tačnu specifikaciju materijala i vremena u sekundi. Preciznost koja štedi novac i vreme.
+              <p className="text-white/50 text-sm md:text-base mb-8 leading-relaxed font-medium max-w-2xl uppercase">
+                ZIDAR, FASADER ILI KERAMIČAR? IZRAČUNAJ TAČNU SPECIFIKACIJU MATERIJALA I VREMENA U SEKUNDI. PRECIZNOST KOJA ŠTEDI NOVAC I VREME.
               </p>
             </div>
             
