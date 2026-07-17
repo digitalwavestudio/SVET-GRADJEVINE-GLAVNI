@@ -224,7 +224,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                           <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
                             {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
                           </span>
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] text-2xl md:text-3xl font-black font-sans leading-none tracking-tight whitespace-nowrap">
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] text-2xl md:text-[28px] font-black font-sans leading-none tracking-tight whitespace-nowrap">
                             {getFriendlySalary(job)}
                           </span>
                         </div>
