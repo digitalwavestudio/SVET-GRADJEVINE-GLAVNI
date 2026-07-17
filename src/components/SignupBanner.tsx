@@ -38,8 +38,8 @@ export default function SignupBanner() {
       <div
         className={`fixed bottom-0 left-0 right-0 z-[5000] p-4 sm:p-6 sm:pb-8 pointer-events-none flex justify-center transition-all duration-[0.8s] ease-[0.16,1,0.3,1] lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 lg:px-10 ${
           isVisible
-            ? "translate-y-0 opacity-100 scale-100 lg:translate-y-0"
-            : "translate-y-[200px] opacity-0 scale-95 lg:translate-y-0 lg:scale-90"
+            ? "translate-y-0 opacity-100 scale-100"
+            : "translate-y-[200px] opacity-0 scale-95 lg:scale-90"
         }`}
       >
           <div className={`w-full max-w-5xl bg-slate-950/80 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5),_0_0_40px_rgba(254,191,13,0.15)] rounded-[24px] lg:rounded-[32px] p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden ring-1 ring-white/5 ${isVisible ? 'pointer-events-auto' : 'pointer-events-none'}`}>
