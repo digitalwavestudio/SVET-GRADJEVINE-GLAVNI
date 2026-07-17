@@ -23,7 +23,7 @@ export function Step1({
   nextStep?: () => void;
   setStep?: (n: number) => void;
 }) {
-  const { watch, setValue, register, formState: { errors } } = useFormContext();
+  const { watch, setValue, register, getValues, formState: { errors } } = useFormContext();
   
   const sector = watch('sector');
   const machCategory = watch('machCategory');
@@ -36,6 +36,18 @@ export function Step1({
 
   useEffect(() => {
     if (!opis || selectedCategory !== 'job') return;
+
+    const mapPaymentDynamics = (val: string): string | null => {
+      const v = val.trim().toLowerCase();
+      if (v === '?' || v === '' || v === 'ne') return null;
+      if (/^dnevna|dnevno|dnevni$/.test(v)) return 'dnevna';
+      if (/^nedeljna|nedeljno|nedeljni$/.test(v)) return 'nedeljna';
+      if (/^(na\s*)?15\s*dana$/.test(v) || /^petnaest\s*dana$/.test(v)) return 'na-15-dana';
+      if (/^mesecna|mesecno|mesečna|mesečno$/.test(v) || v === 'plata') return 'mesecna';
+      if (/^po\s*m2$|^kvadrat$|^m2$/.test(v)) return 'po-m2';
+      return null;
+    };
+
     const m = opis.match(/Satnica:\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
     if (m) {
       const v = m[1].replace(',', '.').replace(/\s+/g, '');
@@ -44,7 +56,46 @@ export function Step1({
         setValue('isNegotiable', false, { shouldDirty: true });
       }
     }
-  }, [opis, selectedCategory, setValue, plataMin]);
+
+    const isplataMatch = opis.match(/Isplata:\s*(.+?)(?:\n|$)/i);
+    if (isplataMatch && isplataMatch[1].trim()) {
+      const slug = mapPaymentDynamics(isplataMatch[1].trim());
+      if (slug) {
+        setValue('dinamikaIsplate', slug, { shouldDirty: true });
+      }
+    }
+
+    const currentBenefits = new Set<string>((getValues('benefits') as string[]) || []);
+    let changed = false;
+
+    const benefitRules: { regex: RegExp; slug: string }[] = [
+      { regex: /Smeštaj:\s*(da|ne|dostupan|nije)/i, slug: 'smestaj' },
+      { regex: /Prevoz:\s*(da|ne|dostupan|nije)/i, slug: 'prevoz' },
+      { regex: /Hrana:\s*(da|ne|dostupan|nije)/i, slug: 'topli-obrok' },
+    ];
+
+    for (const { regex, slug } of benefitRules) {
+      const bm = opis.match(regex);
+      if (bm) {
+        const v = bm[1].toLowerCase();
+        if (v === 'da' || v === 'dostupan') {
+          if (!currentBenefits.has(slug)) {
+            currentBenefits.add(slug);
+            changed = true;
+          }
+        } else if (v === 'ne' || v === 'nije') {
+          if (currentBenefits.has(slug)) {
+            currentBenefits.delete(slug);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    if (changed) {
+      setValue('benefits', Array.from(currentBenefits), { shouldDirty: true });
+    }
+  }, [opis, selectedCategory, setValue, plataMin, getValues]);
 
   return (
     <>
