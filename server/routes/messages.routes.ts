@@ -349,10 +349,20 @@ messagesRouter.get("/inbox", requireAuth, async (req, res, next) => {
           // Remap chats with fully resolved data
           const enrichedChats = rawChats.map((data) => {
             const partnerId = data.participants.find((p: string) => p !== uid);
+            const partnerProfile = partnerId ? profileMap.get(partnerId) : null;
+            const partnerName =
+              partnerProfile?.company ||
+              partnerProfile?.companyName ||
+              (partnerProfile?.firstName
+                ? `${partnerProfile.firstName} ${partnerProfile.lastName || ""}`.trim()
+                : "") ||
+              partnerProfile?.displayName ||
+              "Korisnik";
 
             return {
               ...data,
-              partner: partnerId ? profileMap.get(partnerId) : null,
+              partner: partnerProfile,
+              partnerName,
               partnerPresence: partnerId
                 ? presenceMap.get(partnerId)
                 : { status: "offline" },

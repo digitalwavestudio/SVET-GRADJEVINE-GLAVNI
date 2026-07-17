@@ -222,8 +222,9 @@ export default function JobDetailsPage() {
       if (convId) {
         navigate(`/poruke/${convId}`);
       }
-    } catch {
-      console.error('Failed to start conversation');
+    } catch (e) {
+      console.error('Failed to start conversation', e);
+      toast.error('Greška pri pokretanju razgovora. Pokušajte ponovo.');
     }
   };
 

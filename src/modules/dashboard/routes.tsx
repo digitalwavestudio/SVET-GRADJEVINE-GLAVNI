@@ -69,6 +69,7 @@ export const getDashboardRouter = () => [
   <Route key="gradiliste" path="/moj-profil/gradiliste" element={<ProtectedRoute><ConstructionSitePage /></ProtectedRoute>} />,
   <Route key="firma" path="/moj-profil/firma" element={<ProtectedRoute><MyCompanyPage /></ProtectedRoute>} />,
   <Route key="poruke" path="/poruke" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />,
+  <Route key="poruke-id" path="/poruke/:convId" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />,
   <Route key="podesavanja" path="/podesavanja" element={<ProtectedRoute><AccountSettingsPage /></ProtectedRoute>} />,
   <Route key="novcanik" path="/novcanik" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />,
   <Route key="admin" path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboardPage /></ProtectedRoute>} />,

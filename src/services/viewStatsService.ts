@@ -77,12 +77,6 @@ export const viewStatsService = {
   async incrementThrottled(collectionName: string, docId: string, fieldName: string = 'viewsCount', authorId?: string) {
     if (!docId || !collectionName) return;
 
-    // 1. Provera sesije
-    const storageKey = `${VIEW_STORAGE_PREFIX}${collectionName}_${docId}_${fieldName}`;
-    if (safeSessionStorage.getItem(storageKey)) return; 
-    
-    safeSessionStorage.setItem(storageKey, 'true');
-
     // 2. Dodavanje u buffer (queue)
     const metricTypeMapping: Record<string, string> = {
       'viewsCount': 'view',

@@ -22,7 +22,7 @@ export function useRealtimeSync() {
           console.log('[QoS Polling] Performing transient cache synchronization...');
           queryClient.invalidateQueries({ queryKey: ['activities'] });
         }
-      }, 600000); // 10 minuta transient pulse is optimal for sandbox environment
+      }, 30000); // 30 sekundi — dovoljno često za poruke
 
       // Perform a quick initial pulse
       queryClient.invalidateQueries({ queryKey: ['activities'] });
@@ -89,7 +89,7 @@ export function useRealtimeSync() {
                 if (import.meta.env.DEV) console.log('[QoS Polling Fallback] Syncing...');
                 queryClient.invalidateQueries({ queryKey: ['activities'] });
               }
-            }, 600000);
+            }, 30000);
           }
         };
       } catch (err) {

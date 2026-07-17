@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { TrendTracker } from "../services/trend-tracker.service.ts";
-import { db } from "../config/firebase.ts";
+import { admin, db } from "../config/firebase.ts";
 
 export const getPrometheusMetrics = async (
   req: Request,
@@ -45,8 +45,15 @@ export const bulkRecordEvents = async (
         const authorId = event.authorId;
         if (authorId) {
           promises.push(TrendTracker.recordView(authorId));
-          processed++;
         }
+        if (event.targetId && event.collectionName) {
+          promises.push(
+            db.collection(event.collectionName).doc(event.targetId).update({
+              viewsCount: admin.firestore.FieldValue.increment(1),
+            }).catch(() => {}),
+          );
+        }
+        processed++;
       }
     }
 

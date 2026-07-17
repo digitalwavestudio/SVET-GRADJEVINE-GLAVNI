@@ -617,6 +617,7 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
         "/api/system/", "/system/",
         "/api/construction/", "/construction/",
         "/api/analytics/", "/analytics/",
+        "/api/metrics/", "/metrics/",
         "/api/favorites/", "/favorites/",
         "/api/logs", "/logs",
         "/api/admin/", "/admin/",

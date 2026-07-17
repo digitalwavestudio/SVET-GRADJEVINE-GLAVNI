@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { apiClient } from '@/src/lib/apiClient';
 import { DashboardLayout } from '@/src/modules/core';
 import OfferModal from '@/src/components/OfferModal';
@@ -13,6 +13,7 @@ import { ContextSidebar } from '../components/messages/ContextSidebar';
 export default function MessagesPage() {
   const { user, getIdToken } = useAuth();
   const navigate = useNavigate();
+  const { convId } = useParams();
   const { 
     conversations = [], 
     loadMoreConversations,
@@ -43,12 +44,16 @@ export default function MessagesPage() {
   }, [user, navigate]);
 
   useEffect(() => {
+    if (convId) {
+      setActiveConversationId(convId);
+      return;
+    }
     const searchParams = new URLSearchParams(window.location.search);
     const idParam = searchParams.get('id');
     if (idParam) {
       setActiveConversationId(idParam);
     }
-  }, [setActiveConversationId]);
+  }, [convId, setActiveConversationId]);
 
   const selectedConv = conversations.find(c => c.id === activeConversationId);
 

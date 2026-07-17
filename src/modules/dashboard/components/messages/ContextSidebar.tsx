@@ -59,19 +59,7 @@ export function ContextSidebar({ selectedConv }: ContextSidebarProps) {
           </div>
         )}
 
-        <div className="pt-8 border-t border-white/5">
-          <h4 className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mb-4 text-center">DOKUMENTACIJA</h4>
-          <div className="space-y-3">
-            <button className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-[10px] hover:bg-white/5 transition-all group">
-              <span className="material-symbols-outlined text-secondary text-lg">description</span>
-              <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">CV_MARKO_PERIC.PDF</span>
-            </button>
-            <button className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 rounded-[10px] hover:bg-white/5 transition-all group">
-              <span className="material-symbols-outlined text-secondary text-lg">image</span>
-              <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">SERTIFIKAT_RAD.JPG</span>
-            </button>
-          </div>
-        </div>
+
       </div>
 
       <div className="mt-auto pt-8">
