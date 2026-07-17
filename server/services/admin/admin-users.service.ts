@@ -192,13 +192,40 @@ export class AdminUsersService {
 
     const { adminUserListResponseSchema } = await import("../../dto/admin.dto.ts");
 
-    const payload = adminUserListResponseSchema.parse({
-      users: result,
-      lastVisibleId,
-      nextPageToken: lastVisibleId,
-      hasMore: result.length === limit,
-      ...(total ? { total } : {})
-    });
+    let payload: any;
+    try {
+      payload = adminUserListResponseSchema.parse({
+        users: result,
+        lastVisibleId,
+        nextPageToken: lastVisibleId,
+        hasMore: result.length === limit,
+        ...(total ? { total } : {})
+      });
+      // Provera da li se može serializovati
+      JSON.stringify(payload);
+    } catch (e) {
+      console.error("[AdminUsers] Serialization error in getUsers, returning sanitized data:", e);
+      const sanitized = result.map(u => {
+        const safe: Record<string, any> = { id: u.id };
+        for (const [k, v] of Object.entries(u)) {
+          if (v === null || v === undefined || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+            safe[k] = v;
+          } else if (Array.isArray(v)) {
+            safe[k] = v.filter(i => i === null || typeof i === 'string' || typeof i === 'number' || typeof i === 'boolean');
+          } else if (typeof v === 'object') {
+            try { JSON.stringify(v); safe[k] = v; } catch { safe[k] = String(v); }
+          }
+        }
+        return safe;
+      });
+      payload = adminUserListResponseSchema.parse({
+        users: sanitized,
+        lastVisibleId,
+        nextPageToken: lastVisibleId,
+        hasMore: result.length === limit,
+        ...(total ? { total } : {})
+      });
+    }
 
     return payload;
   }
