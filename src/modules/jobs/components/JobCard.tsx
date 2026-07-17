@@ -64,12 +64,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
   const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
 
-  const fallbackAuthor = job.authorName || job.userName || job.creatorName || job.contactName || job.contactPerson || job?.contact?.name || job?.contact?.person || job?.user?.name || job?.user?.displayName || 'Svet Građevine Član';
-
-  const rawComp = job.comp || job.company || job.companyName;
-  const companyNameDisplay = (rawComp && rawComp.toLowerCase() !== 'kompanija' && rawComp.toLowerCase() !== 'company') 
-    ? rawComp 
-    : fallbackAuthor;
+  const companyNameDisplay = job.authorSnapshot?.companyName || job.authorSnapshot?.displayName || job.comp || job.company || job.companyName || 'Svet Građevine Član';
 
   const titleParts = (job.title || '').split(/\s*—\s*|\s*-\s*/);
   const sektor = titleParts[0] || '';

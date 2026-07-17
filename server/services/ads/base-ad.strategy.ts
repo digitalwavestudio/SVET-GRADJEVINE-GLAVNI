@@ -87,8 +87,9 @@ export class BaseAdStrategy {
         new Set(textToIndex.split(/[\s,._-]+/).filter((w) => w.length > 2)),
       );
 
+      const fullName = [userData.firstName, userData.lastName].filter(Boolean).join(" ") || "";
       const authorSnapshot = {
-        displayName: userData.displayName || "",
+        displayName: fullName || userData.displayName || userData.name || "",
         photoURL: userData.photoURL || "",
         isVerified: (userData as { isVerified?: boolean })?.isVerified || false,
         role: userData.role || "standard",
@@ -124,6 +125,7 @@ export class BaseAdStrategy {
           (userData as { businessProfile?: { companyName?: string } })?.businessProfile?.companyName ||
           userData.businessProfile?.name ||
           (userData as { company?: string })?.company ||
+          fullName ||
           userData.displayName ||
           "Kompanija",
         logo: userData.businessProfile?.logo || userData.photoURL || "",
@@ -335,8 +337,9 @@ export class BaseAdStrategy {
       const userSnap = await transaction.get(userRef);
       if (userSnap.exists) {
         const userData = userSnap.data()!;
+        const fullName = [userData.firstName, userData.lastName].filter(Boolean).join(" ") || "";
         updateData.authorSnapshot = {
-          displayName: userData.displayName || "",
+          displayName: fullName || userData.displayName || userData.name || "",
           photoURL: userData.photoURL || "",
           isVerified: (userData as { isVerified?: boolean })?.isVerified || false,
           role: userData.role || "standard",
@@ -350,6 +353,7 @@ export class BaseAdStrategy {
           (userData as { businessProfile?: { companyName?: string } })?.businessProfile?.companyName ||
           userData.businessProfile?.name ||
           (userData as { company?: string })?.company ||
+          fullName ||
           userData.displayName ||
           "Kompanija";
         updateData.logo = userData.businessProfile?.logo || userData.photoURL || "";

@@ -123,7 +123,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-white font-bold text-xs sm:text-sm truncate w-full block tracking-wide">{job.comp || job.companyName || 'Svet Građevine Član'}</p>
+                    <p className="text-white font-bold text-xs sm:text-sm truncate w-full block tracking-wide">{job.authorSnapshot?.companyName || job.authorSnapshot?.displayName || job.comp || job.companyName || 'Svet Građevine Član'}</p>
                   </div>
                 </div>
                 <div className="shrink-0">{renderBadge(job)}</div>

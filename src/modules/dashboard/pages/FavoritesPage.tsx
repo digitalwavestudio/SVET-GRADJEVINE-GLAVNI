@@ -300,7 +300,7 @@ export default function FavoritesPage() {
                   {String(ad.title || ad.name || ad.brand || 'Oglas')}
                 </h3>
                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-8">
-                  {String(ad.company || ad.city || ad.location || 'Svet Građevine')}
+                  {String((ad.authorSnapshot as Record<string, unknown>)?.companyName || (ad.authorSnapshot as Record<string, unknown>)?.displayName || ad.company || ad.city || ad.location || 'Svet Građevine')}
                 </p>
 
                 <div className="flex gap-3">

@@ -101,9 +101,9 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         
                         <div className="w-[56px] h-[56px] min-w-[56px] max-w-[56px] md:w-[64px] md:h-[64px] md:min-w-[64px] md:max-w-[64px] bg-white rounded-full p-1.5 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
                           {ad.logo ? (
-                            <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain rounded-full" alt={`Logo firme ${ad.comp}`} referrerPolicy="no-referrer" />
+                            <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain rounded-full" alt={`Logo firme ${ad.authorSnapshot?.companyName || ad.authorSnapshot?.displayName || ad.comp || ''}`} referrerPolicy="no-referrer" />
                           ) : (
-                            <span className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xs">{(ad.comp?.charAt(0) || 'S')}</span>
+                            <span className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xs">{(ad.authorSnapshot?.companyName?.charAt(0) || ad.authorSnapshot?.displayName?.charAt(0) || ad.comp?.charAt(0) || 'S')}</span>
                           )}
                         </div>
                       </div>
@@ -119,7 +119,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                       <div className="mb-4 relative z-20">
                         <div className="flex items-center gap-1">
                           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs md:text-xs font-black uppercase tracking-widest">
-                            {ad.comp || 'Svet Građevine'}
+                            {ad.authorSnapshot?.companyName || ad.authorSnapshot?.displayName || ad.comp || 'Svet Građevine'}
                           </span>
                           {ad.isCompanyVerified && (
                             <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>

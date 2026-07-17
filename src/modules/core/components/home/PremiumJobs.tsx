@@ -138,7 +138,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                           <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full" loading="lazy" />
                         ) : (
                           <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-lg md:text-2xl">
-                            {job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}
+                            {job.authorSnapshot?.companyName?.charAt(0) || job.authorSnapshot?.displayName?.charAt(0) || job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}
                           </div>
                         )}
                       </div>
@@ -167,7 +167,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
 
                         <div className="mb-2">
                           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FDE68A] via-[#D4AF37] to-[#B45309] text-xs md:text-[13px] font-black uppercase tracking-widest relative z-20">
-                            {job.comp || 'Svet Građevine'}
+                            {job.authorSnapshot?.companyName || job.authorSnapshot?.displayName || job.comp || 'Svet Građevine'}
                           </span>
                           {job.isCompanyVerified && (
                             <span className="material-symbols-outlined text-green-500 text-[12px] font-black ml-1.5 align-middle" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>

@@ -440,6 +440,44 @@ export class UsersService {
       // Invalidate search cache so logo appears immediately on /firme and /poslovi
       CacheService.invalidateByPrefix("search_ads_").catch(() => {});
     }
+
+    // Sync name to user's listing documents when profile name changes
+    const nameFields = ["firstName", "lastName", "displayName", "name"];
+    const nameChanged = nameFields.some(f => publicUpdates[f] !== undefined);
+    if (nameChanged) {
+      const newFirstName = publicUpdates.firstName as string || existingData.firstName || "";
+      const newLastName = publicUpdates.lastName as string || existingData.lastName || "";
+      const fullName = [newFirstName, newLastName].filter(Boolean).join(" ") || "";
+      const newDisplayName = fullName || (publicUpdates.displayName as string) || existingData.displayName || (publicUpdates.name as string) || existingData.name || "";
+
+      if (newDisplayName) {
+        try {
+          const listingSnap = await db.collection("listings")
+            .where("authorId", "==", uid)
+            .where("status", "in", ["active", "approved"])
+            .limit(20)
+            .get();
+          if (!listingSnap.empty) {
+            const syncBatch = db.batch();
+            listingSnap.docs.forEach(doc => {
+              syncBatch.update(doc.ref, {
+                "authorSnapshot.displayName": newDisplayName,
+                comp: newDisplayName,
+              });
+            });
+            await syncBatch.commit();
+            logger.info(`[Users] Synced name to ${listingSnap.docs.length} listing(s) for user ${uid}`);
+            listingSnap.docs.forEach(doc => {
+              CacheService.delete(CacheKeys.adDetail(doc.id)).catch(() => {});
+            });
+          }
+        } catch (err) {
+          logger.warn(`[Users] Failed to sync name to listings for ${uid}:`, err);
+        }
+        CacheService.invalidateByPrefix("search_ads_").catch(() => {});
+      }
+    }
+
     // Clear DataLoader cache so search enrichment picks up fresh businessProfile
     userProfileLoader.clear(uid);
     await CacheService.delete(`user_me_${uid}:pub`);
