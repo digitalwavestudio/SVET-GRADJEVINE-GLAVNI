@@ -156,7 +156,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                           </span>
                         </div>
                         
-                        <h3 className="text-base md:text-2xl font-black text-white group-hover/card:text-secondary transition-colors duration-300 mb-1 uppercase break-words tracking-tight leading-tight">
+                        <h3 className="text-xl md:text-2xl font-black text-white group-hover/card:text-secondary transition-colors duration-300 mb-1 uppercase break-words tracking-tight leading-tight">
                           {(() => {
                             const t = displayTitle;
                             const i = t.lastIndexOf(' ');

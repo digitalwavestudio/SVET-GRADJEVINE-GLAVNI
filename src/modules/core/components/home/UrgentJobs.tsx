@@ -44,7 +44,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                 <span className="material-symbols-outlined text-[#ff512f] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>bolt</span>
               </div>
               <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-[1000] md:font-[950] uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4 leading-tight">HITNI<br className="md:hidden" /> OGLASI</h2>
-              <p className="text-on-surface-variant text-lg max-w-xl">Ponude i poslovi koji zahtevaju najbržu reakciju na tržištu.</p>
+              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-xl font-medium leading-relaxed">Ponude i poslovi koji zahtevaju najbržu reakciju na tržištu.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         {(ad.plataMin != null || ad.plataMax != null) ? (
                           <div className="flex flex-col items-end gap-1">
                             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Satnica</span>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-xl md:text-2xl font-sans leading-none tracking-tight">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-2xl md:text-3xl font-sans leading-none tracking-tight">
                               {ad.plataMin ? `${ad.plataMin}${ad.plataMax != null ? ` – ${ad.plataMax}` : ''}` : ad.plataMax} €
                             </span>
                           </div>

@@ -149,7 +149,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
 
         {/* Desktop: title + badges in one row */}
         <div className="flex flex-wrap items-start gap-2 pr-[68px] mb-2">
-          <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-secondary transition-colors duration-300 mt-1 uppercase break-words tracking-wide leading-tight flex-1 min-w-[120px]">
+          <h3 className="text-xl md:text-2xl font-black text-white group-hover:text-secondary transition-colors duration-300 mt-1 uppercase break-words tracking-tight leading-tight flex-1 min-w-[120px]">
             {(() => {
               const t = job.title || '';
               const i = t.indexOf(' — ');
@@ -227,7 +227,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               {(job.isNegotiable || job.plataMin != null || job.plataMax != null || job.sal || job.salary) ? (
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Satnica</span>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-xl md:text-2xl font-sans leading-none tracking-tight">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-2xl md:text-3xl font-sans leading-none tracking-tight">
                     {getSalaryDisplay()}
                   </span>
                 </div>
