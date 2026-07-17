@@ -226,7 +226,7 @@ export default function HomePage() {
           titleAccent="oglasnika."
           subtitle="Partner građevinske industrije. Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova i zaposlenih."
           stats={[
-            { label: "AKTIVNI OGLASI", value: `+${(totalAdsCount || allJobsPremiumFirst.length).toLocaleString()}`, icon: "work" },
+            { label: "AKTIVNI OGLASI", value: isLoadingBff ? "..." : `+${totalAdsCount.toLocaleString()}`, icon: "work" },
           ]}
         >
           <div className="mt-8 flex flex-col gap-4 max-w-full w-full">
@@ -420,7 +420,7 @@ export default function HomePage() {
                   </h3>
                   <p className="text-[10px] font-black mt-2 tracking-[0.3em] uppercase">
                     <span className="text-white/40">UKUPNO PRONAĐENO:</span><br />
-                    <span className="text-secondary">{allJobsPremiumFirst.length || totalAdsCount} OGLASA</span>
+                    <span className="text-secondary">{isLoadingBff ? '...' : totalAdsCount} OGLASA</span>
                   </p>
                 </div>
               </div>

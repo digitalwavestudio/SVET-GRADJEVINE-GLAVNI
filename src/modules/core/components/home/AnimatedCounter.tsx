@@ -4,6 +4,16 @@ const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "", prefix 
   const [count, setCount] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const counterRef = useRef<HTMLDivElement>(null);
+  const prevEndRef = useRef<number>(0);
+
+  // Resetuj animaciju ako end skoči sa 0 na pravi broj (BFF kasno odgovori)
+  useEffect(() => {
+    if (end > 0 && prevEndRef.current === 0 && hasStarted) {
+      setCount(0);
+      setHasStarted(false);
+    }
+    prevEndRef.current = end;
+  }, [end]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -27,7 +37,7 @@ const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "", prefix 
   }, [hasStarted]);
 
   useEffect(() => {
-    if (!hasStarted) return;
+    if (!hasStarted || end === 0) return;
 
     let startTimestamp: number | null = null;
     let animationFrameId: number;
@@ -65,4 +75,4 @@ const AnimatedCounter = ({ end, duration = 4000, delay = 0, suffix = "", prefix 
   );
 };
 
-export default AnimatedCounter;
+export default AnimatedCounter;

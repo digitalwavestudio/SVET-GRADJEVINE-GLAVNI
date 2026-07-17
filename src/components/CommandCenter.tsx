@@ -24,14 +24,14 @@ export default function CommandCenter() {
   const isBot = useBotDetector();
 
   const isEmployer = user?.role === 'poslodavac';
-  const isMaster = user?.role === 'majstor';
+  const isMaster = false;
 
   // O-O (Oauth-Obfuscation) & Skeleton Indexing: Botovima nije potreban Command Center
   if (isBot) return null;
 
   const commands: CommandItem[] = useMemo(() => [
     // Navigacija
-    { id: '1', label: 'KONTROLNA TABLA', category: 'NAVIGACIJA', path: '/kontrolna-tabla', icon: 'dashboard' },
+    { id: '1', label: 'MOJ PROFIL', category: 'NAVIGACIJA', path: '/moj-profil', icon: 'person' },
     { id: '2', label: 'PORUKE', category: 'KOMUNIKACIJA', path: '/poruke', icon: 'chat' },
     { id: '3', label: 'PODEŠAVANJA', category: 'SISTEM', path: '/podesavanja', icon: 'settings' },
     
@@ -42,9 +42,7 @@ export default function CommandCenter() {
     { id: 'e4', label: 'KANDIDATI', category: 'UPRAVLJANJE', path: '/moj-profil/kandidati', icon: 'group', roles: ['poslodavac'] },
     
     // Master Specific
-    { id: 'm1', label: 'TRAŽI POSAO', category: 'AKCIJE', path: '/poslovi', icon: 'search', roles: ['majstor'] },
-    { id: 'm2', label: 'MOJE PRIJAVE', category: 'UPRAVLJANJE', path: '/moj-profil/prijave', icon: 'assignment', roles: ['majstor'] },
-    { id: 'm3', label: 'AŽURIRAJ CV', category: 'PROFIL', path: '/moj-profil/cv', icon: 'description', roles: ['majstor'] },
+
     
     // General
     { id: 'g1', label: 'NOVČANIK', category: 'FINANSIJE', path: '/novcanik', icon: 'account_balance_wallet' },

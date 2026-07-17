@@ -8,10 +8,9 @@ export const calculateProfileScore = (user: Partial<User> | null): number => {
 
   // 1. Standard role (Običan korisnik)
   if (role === 'standard') {
-    if (user.name || (user.firstName && user.lastName)) score += 30;
+    if (user.name || (user.firstName && user.lastName)) score += 40;
     if (user.phone) score += 30;
-    if (user.photoURL) score += 20;
-    if (user.emailVerified) score += 20;
+    if (user.photoURL) score += 30;
     return Math.min(score, 100);
   }
 

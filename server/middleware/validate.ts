@@ -69,7 +69,7 @@ const promoteSchema = z.object({
   ]),
   durationDays: z.number().int().min(1).max(365),
   packageId: z.string().optional(),
-  promoteType: z.enum(["premium", "urgent", "premium_partner"]).default("premium"),
+  promoteType: z.enum(["premium", "urgent"]).default("premium"),
 });
 
 const adminFundSchema = z.object({
@@ -727,7 +727,6 @@ const globalSettingsUpdatesSchema = z.object({
     maintenance_mode: z.boolean().optional(),
   }).optional(),
   globalRateLimit: z.number().int().nonnegative().optional(),
-  initialCredits: z.number().nonnegative().optional(),
 }).passthrough();
 
 const platformSettingsUpdatesSchema = z.object({

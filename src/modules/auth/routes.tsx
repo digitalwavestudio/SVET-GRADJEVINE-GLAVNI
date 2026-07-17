@@ -20,5 +20,5 @@ export const getAuthRouter = () => [
 ];
 
 export const getAuthDashboardRouter = () => [
-  <Route key="izbor-uloge" path="/moj-profil/izbor-uloge" element={<ProtectedRoute><RoleSelectionPage /></ProtectedRoute>} />
+
 ];

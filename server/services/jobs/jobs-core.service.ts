@@ -175,7 +175,7 @@ export class JobsCoreService {
       safeJob.status = jobPayload.status === "draft" ? "draft" : "active";
       safeJob.viewsCount = 0;
       safeJob.applicantsCount = 0;
-      safeJob.isPremium = jobPayload.paket === "premium" || jobPayload.paket === "premium_partner";
+      safeJob.isPremium = jobPayload.paket === "premium";
       safeJob.isUrgent = jobPayload.paket === "urgent";
 
       const jobDocRef = db.collection("listings").doc();

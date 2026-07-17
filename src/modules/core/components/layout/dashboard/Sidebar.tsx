@@ -115,7 +115,7 @@ export const Sidebar = memo(({
             className="w-full bg-white/5 border border-white/10 rounded-[10px] p-3 text-[11px] font-black text-white uppercase outline-none focus:border-secondary transition-all"
           >
             <option value="standard" className="bg-slate-900 text-white">Standardni (Onboarding)</option>
-            <option value="majstor" className="bg-slate-900 text-white">Majstor</option>
+            <option value="majstor" className="bg-slate-900 text-white" style={{display:'none'}}>Majstor</option>
             <option value="poslodavac" className="bg-slate-900 text-white">Građevinska Firma</option>
             <option value="partner" className="bg-slate-900 text-white">Partner</option>
           </select>

@@ -27,7 +27,7 @@ export default function LoginPage() {
   }, []);
 
   // Handle redirect after login
-  const from = location.state?.from?.pathname || '/kontrolna-tabla';
+  const from = location.state?.from?.pathname || '/';
   const redirectError = location.state?.error;
 
   useEffect(() => {

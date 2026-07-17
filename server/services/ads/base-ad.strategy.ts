@@ -17,10 +17,9 @@ export class BaseAdStrategy {
 
   protected resolvePackagePrice(pkgId: string): number {
     if (!pkgId || pkgId === "free") return 0;
-    if (pkgId === "premium_partner") return 6000;
-    if (pkgId === "urgent") return 1500;
-    if (pkgId === "standard") return 500;
-    if (pkgId === "premium") return 1000;
+    if (pkgId === "urgent") return 4000;
+    if (pkgId === "standard") return 1000;
+    if (pkgId === "premium") return 2000;
     return 0;
   }
 
@@ -59,7 +58,7 @@ export class BaseAdStrategy {
       const currentWalletBalance = userData.walletBalance ?? userData.partnerBalance ?? 0;
       
       if (isPaidPackage && packagePrice <= 0 && rawData.paket !== "free") {
-        throw new BadRequestError(`Nepoznat paket: "${rawData.paket}". Dozvoljeni paketi su: standard, premium, urgent, premium_partner.`);
+        throw new BadRequestError(`Nepoznat paket: "${rawData.paket}". Dozvoljeni paketi su: standard, premium, urgent.`);
       }
       if (currentWalletBalance < packagePrice) {
         throw new BadRequestError(`Nemate dovoljno sredstava u Wallet-u za izabrani paket. Cena je ${packagePrice} SG Kredita, a vaš balans iznosi ${currentWalletBalance} SG Kredita. Molimo dopunite wallet.`);
@@ -105,8 +104,7 @@ export class BaseAdStrategy {
           urgentUntil = firebaseAdmin.firestore.Timestamp.fromDate(expiry);
         } else {
           const expiry = new Date();
-          if (rawData.paket === "premium_partner") expiry.setFullYear(expiry.getFullYear() + 10);
-          else if (packagePrice >= 3000) expiry.setMonth(expiry.getMonth() + 3);
+          if (packagePrice >= 3000) expiry.setMonth(expiry.getMonth() + 3);
           else expiry.setDate(expiry.getDate() + 30);
           premiumUntil = firebaseAdmin.firestore.Timestamp.fromDate(expiry);
         }
@@ -128,7 +126,7 @@ export class BaseAdStrategy {
         isCompanyVerified: (userData as { isVerified?: boolean })?.isVerified || false,
         status: "active" as AdStatus,
         moderationStatus: "approved",
-        isPremium: rawData.paket === "premium" || rawData.paket === "premium_partner",
+        isPremium: rawData.paket === "premium",
         isUrgent: rawData.paket === "urgent",
         ...(premiumUntil ? { premiumUntil } : {}),
         ...(urgentUntil ? { urgentUntil } : {}),
@@ -177,7 +175,6 @@ export class BaseAdStrategy {
         transaction.update(userRef, {
           walletBalance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
           totalAds: firebaseAdmin.firestore.FieldValue.increment(1),
-          ...(rawData.paket === "premium_partner" ? { isPremiumPartner: true, "businessProfile.premiumPartner": true } : {})
         });
         transaction.set(walletRef, {
           balance: firebaseAdmin.firestore.FieldValue.increment(-packagePrice),
@@ -507,7 +504,6 @@ export class BaseAdStrategy {
 
         if (
           data.paket === "premium" ||
-          data.paket === "premium_partner" ||
           data.paket === "pro" ||
           data.paket === "enterprise"
         ) {
@@ -519,14 +515,7 @@ export class BaseAdStrategy {
           }
         }
 
-        if (data.paket === "premium_partner") {
-          transaction.update(db.collection("users").doc(data.authorId), {
-            isPremiumPartner: true,
-            "businessProfile.premiumPartner": true,
-          });
-
-          await AdminStatsService.updateGlobalStats("premiumPartners" as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate", 1, false, "active", transaction);
-        }
+        
       } else {
         updateData.status = "rejected";
         updateData.rejectedAt = firebaseAdmin.firestore.FieldValue.serverTimestamp();

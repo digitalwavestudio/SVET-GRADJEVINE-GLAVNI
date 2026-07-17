@@ -56,7 +56,7 @@ const MyCompanyPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkNa
 
 export const getDashboardRouter = () => [
   <Route key="moj-profil" path="/moj-profil" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />,
-  <Route key="kontrolna-tabla" path="/kontrolna-tabla" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />,
+
   <Route key="obavestenja" path="/moj-profil/obavestenja" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />,
   <Route key="oglasi" path="/moj-profil/oglasi" element={<ProtectedRoute><MyAdsPage /></ProtectedRoute>} />,
   <Route key="prijave" path="/moj-profil/prijave" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />,

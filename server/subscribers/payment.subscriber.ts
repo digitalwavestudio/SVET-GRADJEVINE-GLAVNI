@@ -60,8 +60,8 @@ export const initPaymentSubscriber = () => {
         }
 
         if (
-          (payload.type === "ad_payment" && (payload.packageId === "premium" || payload.packageId === "pro" || payload.packageId === "premium_partner")) ||
-          (payload.type === "package_purchase" && (payload.packageId === "premium" || payload.packageId === "pro" || payload.packageId === "premium_partner"))
+          (payload.type === "ad_payment" && (payload.packageId === "premium" || payload.packageId === "pro")) ||
+          (payload.type === "package_purchase" && (payload.packageId === "premium" || payload.packageId === "pro"))
         ) {
           statsUpdates.premiumAdsCount = admin.firestore.FieldValue.increment(1);
           statsUpdates.totalPremiumPurchases = admin.firestore.FieldValue.increment(1);

@@ -156,9 +156,9 @@ authRouter.post('/devices/revoke-others', requireAuth, async (req, res, next) =>
 async function getInitialCredits(): Promise<number> {
   try {
     const settings = await AdminSettingsService.getSettings("global");
-    return (settings as any)?.initialCredits ?? 1500;
+    return (settings as any)?.initialCredits ?? 5000;
   } catch {
-    return 1500;
+    return 5000;
   }
 }
 

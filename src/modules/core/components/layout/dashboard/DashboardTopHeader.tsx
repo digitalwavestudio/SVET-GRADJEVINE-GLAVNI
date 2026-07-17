@@ -233,7 +233,7 @@ export const DashboardTopHeader: React.FC<DashboardTopHeaderProps> = ({ fileInpu
                   <span className="material-symbols-outlined text-secondary text-[14px]">workspace_premium</span>
                 )}
                 <div className="text-[9px] font-bold text-white/40 uppercase tracking-widest">
-                  {isEmployer ? (user.businessProfile?.niche || 'POSLODAVAC') : isMaster ? 'MAJSTOR' : 'STANDARD'}
+                  {isEmployer ? (user.businessProfile?.niche || 'POSLODAVAC') : 'SG ČLAN'}
                 </div>
               </div>
             </div>

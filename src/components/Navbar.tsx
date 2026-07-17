@@ -47,12 +47,12 @@ export default function Navbar() {
 
   const [imgError, setImgError] = useState(false);
   const profileSrc = user?.businessProfile?.logo || user?.photoURL || "";
-  const userInitial = ((user?.firstName?.[0] || "") + (user?.lastName?.[0] || "") || "UP").toUpperCase();
+  const userInitial = "SG";
 
   // Ime za prikaz: za firme (poslodavce) prioritet na ime firme, inače ime i prezime
   const displayName = (user as any)?.role === 'poslodavac'
-    ? (user?.company || (user as any)?.businessProfile?.companyName || user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Korisnik')
-    : (user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Korisnik');
+    ? (user?.company || (user as any)?.businessProfile?.companyName || user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim())
+    : (user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim());
 
   // Reset imgError when URL changes
   useEffect(() => {
@@ -119,7 +119,7 @@ export default function Navbar() {
           
           {/* AI Search Bar for Desktop */}
           {isDesktop && (
-            <div className="flex-1 max-w-2xl mx-8 hidden lg:block">
+            <div className="flex-1 max-w-3xl mx-4 hidden lg:block">
               <AiSearchBar vertical="jobs" minimal />
             </div>
           )}
@@ -127,9 +127,6 @@ export default function Navbar() {
           <div className="flex items-center gap-3 lg:gap-4 lg:ml-auto">
             {isDesktop && (
               <div className="flex items-center gap-3">
-                <div className="mr-2">
-                  <ThemeToggle className="" />
-                </div>
                 <Button
                   to="/postavi-oglas"
                   variant="nav-premium"
@@ -143,9 +140,9 @@ export default function Navbar() {
                 {!isBot && user && (
                   <div className="relative flex items-center group/avatar">
                     <Link
-                      to="/kontrolna-tabla"
-                      className="w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black hover:bg-primary hover:text-on-primary shadow-lg overflow-hidden transition-all"
-                      title="Kontrolna Tabla"
+                      to="/moj-profil"
+                      className="w-10 h-10 p-0 shrink-0 flex-none rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center hover:scale-105 hover:border-secondary transition-all overflow-hidden"
+                      title="Moj Profil"
                     >
                       {profileSrc && !imgError ? (
                         <img
@@ -155,28 +152,33 @@ export default function Navbar() {
                           onError={() => setImgError(true)}
                         />
                       ) : (
-                        <span className="text-sm font-black !text-black">{userInitial}</span>
+                        <span className="text-sm font-black text-white tracking-wider">{userInitial}</span>
                       )}
                     </Link>
                     {/* Dropdown — isti kao pre */}
                     <div className="absolute top-[calc(100%+12px)] right-0 w-[288px] opacity-0 invisible group-hover/avatar:opacity-100 group-hover/avatar:visible transition-all duration-300 translate-y-2 group-hover/avatar:translate-y-0 z-50">
                       <div className="relative bg-[#0d141b] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col light-nav-dropdown">
-                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
-                        <div className="relative pl-0 pr-4 py-4 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 overflow-hidden">
-                          <div className="absolute -top-8 -right-8 w-28 h-28 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                        <div className="relative p-4 border-b border-white/5 bg-black/20">
                           <div className="relative flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
                               {profileSrc && !imgError ? (
                                 <img src={profileSrc} alt="Profile" className="w-full h-full object-cover" onError={() => setImgError(true)} />
                               ) : (
-                                <span className="text-sm font-black !text-black">{userInitial}</span>
+                                <span className="text-sm font-black text-white tracking-wider">{userInitial}</span>
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              {(user as any)?.role && (
-                                <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">{(user as any).role}</span>
+                              {displayName ? (
+                                <>
+                                  {(user as any)?.role && (
+                                    <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">{(user as any).role === 'standard' ? 'SG ČLAN' : (user as any).role}</span>
+                                  )}
+                                  <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
+                                </>
+                              ) : (
+                                <span className="block text-sm text-white font-black truncate leading-tight">{(user as any).role === 'standard' ? 'SG ČLAN' : (user as any).role}</span>
                               )}
-                              <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
                             </div>
                           </div>
                         </div>
@@ -272,10 +274,9 @@ export default function Navbar() {
 
             {/* User / Greeting Header kartica */}
             {user ? (
-              <div className="relative mb-4 p-4 rounded-2xl bg-gradient-to-br from-secondary/10 via-white/[0.03] to-primary/5 border border-white/10 overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-secondary/20 to-transparent blur-xl pointer-events-none" />
+              <div className="relative mb-4 p-4 rounded-2xl bg-black/20 border border-white/10">
                 <div className="relative flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
                     {profileSrc && !imgError ? (
                       <img
                         src={profileSrc}
@@ -284,12 +285,12 @@ export default function Navbar() {
                         onError={() => setImgError(true)}
                       />
                     ) : (
-                      <span className="text-base font-black !text-black">{userInitial}</span>
+                      <span className="text-base font-black text-white tracking-wider">{userInitial}</span>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">Prijavljeni ste kao</span>
-                    <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
+                    <span className="block text-sm text-white font-black truncate leading-tight">{displayName || ((user as any).role === 'standard' ? 'SG ČLAN' : (user as any).role)}</span>
                   </div>
                 </div>
               </div>
@@ -343,7 +344,7 @@ export default function Navbar() {
                 <>
                   {user ? (
                     <a
-                      href="/kontrolna-tabla"
+                      href="/moj-profil"
                       onClick={() => setIsOpen(false)}
                       className="w-full py-3 bg-white/[0.06] hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-2xl text-center font-black text-xs flex items-center justify-center gap-2 transition-all duration-200"
                     >

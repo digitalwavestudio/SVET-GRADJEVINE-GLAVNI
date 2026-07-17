@@ -45,7 +45,7 @@ const promoteSchema = z.object({
   durationDays: z.number().int().min(1).max(365),
   packageId: z.string().optional(),
   promoteType: z
-    .enum(["premium", "urgent", "premium_partner"])
+    .enum(["premium", "urgent"])
     .default("premium"),
 });
 
@@ -153,12 +153,9 @@ walletRouter.post("/promote", requireAuth, async (req, res, next) => {
       const firestoreTimestamp =
         admin.firestore.Timestamp.fromDate(newPremiumUntil);
 
-      if (promoteType === "premium" || promoteType === "premium_partner") {
+      if (promoteType === "premium") {
         entityUpdates.isPremium = true;
         entityUpdates.premiumUntil = firestoreTimestamp;
-        if (collection === "companies" && promoteType === "premium_partner") {
-          entityUpdates.isPremiumPartner = true;
-        }
       } else {
         entityUpdates.isUrgent = true;
         entityUpdates.urgentUntil = firestoreTimestamp;

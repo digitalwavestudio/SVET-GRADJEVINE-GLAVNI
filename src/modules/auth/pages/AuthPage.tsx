@@ -39,7 +39,7 @@ export default function AuthPage() {
     document.title = "Prijava / Registracija - Svet Građevine";
   }, []);
 
-  const from = location.state?.from?.pathname || '/kontrolna-tabla';
+  const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -158,10 +158,8 @@ export default function AuthPage() {
       }
       if (!res || !res.ok) throw new Error('Greška prilikom formiranja profila.');
 
-      try { await _sendEmailVerification(user); } catch { /* ignore */ }
-
-      addToast('Uspešna registracija! Proverite email za potvrdu naloga.', 'success');
-      navigate('/kontrolna-tabla', { state: { welcome: true } });
+      addToast('Uspešna registracija!', 'success');
+      navigate('/', { state: { welcome: true } });
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') setError('Ova email adresa je već u upotrebi.');
       else if (err.code === 'auth/invalid-email') setError('Neispravan format email adrese.');

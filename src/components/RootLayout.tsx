@@ -5,7 +5,7 @@ import { initGA, trackPageView } from '@/src/lib/analytics';
 import NetworkStatus from '@/src/components/NetworkStatus';
 import CookieConsent from '@/src/components/CookieConsent';
 import BackToTop from '@/src/components/BackToTop';
-import { VerificationBanner } from '@/src/components/VerificationBanner';
+
 import { useAffiliateTracking } from '@/src/hooks/useAffiliateTracking';
 import { usePresence } from '@/src/hooks/usePresence';
 import { useRealtimeSync } from '@/src/hooks/useRealtimeSync';
@@ -71,7 +71,7 @@ export function RootLayout() {
       <div className="relative z-10">
         <ProgressBar />
         <QuotaBanner />
-        {location.pathname !== '/prijava' && <VerificationBanner />}
+
         <NetworkStatus />
         <CookieConsent />
         <ScrollRestoration />

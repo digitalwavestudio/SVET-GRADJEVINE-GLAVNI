@@ -128,6 +128,7 @@ export const bffService = {
       accommodationsData,
       cateringsData,
       jobsData,
+      realAdsCountData,
     ] = await Promise.allSettled([
       withTimeout(AdminStatsService.getGlobalStats(), 120000, {}),
       withTimeout(UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }), 120000, []),
@@ -143,6 +144,27 @@ export const bffService = {
         } catch (e) {
           console.error("[BFF] Direct jobs query failed:", e);
           return { docs: [], lastVisibleId: null, hasMore: false, totalHits: 0 };
+        }
+      })(),
+      (async () => {
+        try {
+          // Probaj efikasni count() aggregation
+          const countSnap = await db.collection("listings")
+            .where("status", "in", ["active", "approved"])
+            .count()
+            .get();
+          return countSnap.data().count;
+        } catch (_e) {
+          try {
+            // Fallback: select samo __name__ (minimal read) - bez .count() 
+            const snap = await db.collection("listings")
+              .where("status", "in", ["active", "approved"])
+              .select()
+              .get();
+            return snap.size;
+          } catch (_e2) {
+            return 0;
+          }
         }
       })(),
     ]);
@@ -166,11 +188,14 @@ export const bffService = {
     const totalAccommodations = gStats.accommodationsCount || 0;
     const totalCaterings = gStats.cateringCount || 0;
 
-    const calculatedAdsCount =
+    const realTotalAdsCount = realAdsCountData?.status === "fulfilled" ? (realAdsCountData.value as number) : 0;
+
+    const calculatedAdsCount = realTotalAdsCount > 0 ? realTotalAdsCount : (
       totalJobs +
       totalMachines +
       totalAccommodations +
-      totalCaterings;
+      totalCaterings
+    );
 
     const stats: HomepageStats = {
       totalJobs,

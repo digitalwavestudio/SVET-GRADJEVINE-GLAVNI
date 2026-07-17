@@ -87,11 +87,11 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
   return (
     <article
       itemScope itemType="https://schema.org/JobPosting"
-      className={`group relative flex flex-col h-full self-stretch min-h-[260px] md:min-h-[280px] rounded-[16px] transition-all duration-500 ${
+      className={`group relative flex flex-col h-full self-stretch min-h-[320px] md:min-h-[320px] rounded-[16px] transition-all duration-500 ${
         isPremium
           ? 'border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1'
           : isUrgent
-            ? 'border border-red-500/30 bg-gradient-to-br from-red-500/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(239,68,68,0.05)] hover:border-red-500/60 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] hover:-translate-y-1'
+            ? 'border border-red-500/15 bg-gradient-to-br from-red-500/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(239,68,68,0.03)] hover:border-red-500/30 hover:shadow-[0_0_20px_rgba(239,68,68,0.08)] hover:-translate-y-1'
             : 'border border-white/10 bg-white/[0.02] shadow-lg hover:bg-white/[0.04] hover:border-blue-400/30 hover:shadow-[0_0_30px_rgba(96,165,250,0.15)] hover:-translate-y-1'
       }`}
     >
@@ -137,7 +137,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         {(isUrgent || isPremium || isNovo) && (
           <div className="flex items-center gap-1.5 mb-2 pr-[68px] md:hidden">
             {isUrgent && (
-                <span className="backdrop-blur-sm bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(239,68,68,0.25)] w-max">
+                <span className="backdrop-blur-sm bg-red-500/8 text-red-400/80 border border-red-500/15 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 w-max">
                 <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
               </span>
             )}
@@ -165,7 +165,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           {(isUrgent || isPremium || isNovo) && (
             <div className="hidden md:flex items-center gap-1.5 shrink-0 mt-1">
               {isUrgent && (
-              <span className="backdrop-blur-sm bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(239,68,68,0.25)] w-max">
+              <span className="backdrop-blur-sm bg-red-500/8 text-red-400/80 border border-red-500/15 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 w-max">
                   <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
                 </span>
               )}

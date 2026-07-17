@@ -112,7 +112,6 @@ export function useDashboardNavigation() {
     switch (userRole) {
       case 'poslodavac':
         return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'NADZORNI CENTAR', path: '/moj-profil/gradiliste', icon: 'monitoring' },
           { label: 'VAŠ BIZNIS PROFIL', path: '/moj-profil/firma', icon: 'domain' },
           { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
@@ -123,7 +122,6 @@ export function useDashboardNavigation() {
         ];
       case 'majstor':
         return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'MOJE PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
           { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },
@@ -133,7 +131,6 @@ export function useDashboardNavigation() {
         ];
       case 'partner':
         return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
           { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
           { label: 'AFFILIATE LINKOVI', path: '/moj-profil/affiliate', icon: 'link' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble', badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined },
@@ -143,12 +140,12 @@ export function useDashboardNavigation() {
       case 'standard':
       default:
         return [
-          { label: 'KONTROLNA TABLA', path: '/kontrolna-tabla', icon: 'dashboard' },
-          { label: 'IZBOR ULOGE', path: '/moj-profil/izbor-uloge', icon: 'rocket_launch' },
+          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
+          { label: 'MOJI OGLASI', path: '/moj-profil/oglasi', icon: 'campaign' },
           { label: 'PORUKE', path: '/poruke', icon: 'chat_bubble' },
           { label: 'OMILJENI OGLASI', path: '/moj-profil/omiljeni', icon: 'bookmark' },
           { label: 'PRIJAVE', path: '/moj-profil/prijave', icon: 'send' },
-          { label: 'MOJ PROFIL', path: '/moj-profil', icon: 'account_circle' },
+          { label: 'NOVČANIK', path: '/novcanik', icon: 'account_balance_wallet' },
           { label: 'PODRŠKA', path: '/podrska', icon: 'help' },
         ];
     }

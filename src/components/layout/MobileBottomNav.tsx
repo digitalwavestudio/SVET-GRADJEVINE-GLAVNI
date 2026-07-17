@@ -17,7 +17,7 @@ export const MobileBottomNav: React.FC = () => {
   const isAuthPage = location.pathname === '/prijava';
   if (isAuthPage) return null;
 
-  const dashboardPath = user ? '/kontrolna-tabla' : '/prijava';
+  const dashboardPath = user ? '/moj-profil' : '/prijava';
   const messagesPath = user ? '/poruke' : '/prijava';
 
   const handleSearchSubmit = () => {

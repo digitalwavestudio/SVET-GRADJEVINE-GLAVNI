@@ -210,17 +210,6 @@ function DashboardContent() {
               </DashboardGuard>
             )}
 
-            {roles.isMasterRole && (
-              <DashboardGuard variant="inline" title="Greška u profilu majstora">
-                <Suspense fallback={<DashboardSkeleton />}>
-                  <MasterDashboardUI
-                    masterStatus={user.availability || "slobodan"}
-                    toggleMasterStatus={toggleMasterStatus}
-                    user={user}
-                  />
-                </Suspense>
-              </DashboardGuard>
-            )}
 
             {roles.isEmployerRole && (
               <>

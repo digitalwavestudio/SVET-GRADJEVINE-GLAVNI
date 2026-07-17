@@ -14,8 +14,8 @@ export interface AdPackage {
 const STANDARD_PAID: AdPackage = { 
   id: 'standard', 
   name: 'STANDARD', 
-  price: '500 SG Kredita (500 RSD)', 
-  priceNum: 500,
+  price: '1.000 SG Kredita (1.000 RSD)', 
+  priceNum: 1000,
   oldPrice: null, 
   desc: '30 dana • Standardno prikazivanje', 
   features: ['Objavite oglas', 'Osnovna pozicija u pretrazi'], 
@@ -25,41 +25,23 @@ const STANDARD_PAID: AdPackage = {
 export const PACKAGES_BY_CATEGORY: Record<string, AdPackage[]> = {
   job: [
     STANDARD_PAID,
-    { id: 'premium', name: 'PREMIUM OGLAS', price: '1.000 SG Kredita (1.000 RSD)', priceNum: 1000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
-    { id: 'urgent', name: 'HITNO (URGENT)', price: '1.500 SG Kredita (1.500 RSD)', priceNum: 1500, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
+    { id: 'premium', name: 'PREMIUM OGLAS', price: '2.000 SG Kredita (2.000 RSD)', priceNum: 2000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
+    { id: 'urgent', name: 'HITNO (URGENT)', price: '4.000 SG Kredita (4.000 RSD)', priceNum: 4000, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
   ],
   marketplace: [
     STANDARD_PAID,
-    { id: 'premium', name: 'PREMIUM OGLAS', price: '1.000 SG Kredita (1.000 RSD)', priceNum: 1000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
-    { id: 'urgent', name: 'HITNO (URGENT)', price: '1.500 SG Kredita (1.500 RSD)', priceNum: 1500, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
+    { id: 'premium', name: 'PREMIUM OGLAS', price: '2.000 SG Kredita (2.000 RSD)', priceNum: 2000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
+    { id: 'urgent', name: 'HITNO (URGENT)', price: '4.000 SG Kredita (4.000 RSD)', priceNum: 4000, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
   ],
   machines: [
     STANDARD_PAID,
-    { id: 'premium', name: 'PREMIUM OGLAS', price: '1.000 SG Kredita (1.000 RSD)', priceNum: 1000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
-    { id: 'urgent', name: 'HITNO (URGENT)', price: '1.500 SG Kredita (1.500 RSD)', priceNum: 1500, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
-  ],
-  accommodation: [
-    STANDARD_PAID,
-    { id: 'premium', name: 'PRETPLATA SMEŠTAJ', price: '3.000 SG Kredita (3.000 RSD)', priceNum: 3000, oldPrice: null, desc: '3 meseca • Premium pristup', features: ['Istaknuto u smeštaju', 'Dostupno radnicima'], color: 'secondary', recommended: true }
-  ],
-  catering: [
-    STANDARD_PAID,
-    { id: 'premium', name: 'PRETPLATA KETERING', price: '3.000 SG Kredita (3.000 RSD)', priceNum: 3000, oldPrice: null, desc: '3 meseca • Premium pristup', features: ['Istaknuto u keteringu', 'Dostupno na radovima'], color: 'secondary', recommended: true }
-  ],
-  plot: [
-    STANDARD_PAID,
-    { id: 'premium', name: 'PREMIUM OGLAS', price: '6.000 SG Kredita (6.000 RSD)', priceNum: 6000, oldPrice: null, desc: '3 meseca • Istaknuto prodaja/izdavanje placeva', features: ['Na vrhu pretrage', 'Istaknut dizajn'], color: 'secondary', recommended: true }
-  ],
-  company: [
-    { ...STANDARD_PAID, desc: 'Osnovna registracija firme', features: ['Upis u registar', 'Osnovni profil'] },
-    { id: 'premium_partner', name: 'PREMIUM PARTNER', price: '6.000 SG Kredita (6.000 RSD)', priceNum: 6000, oldPrice: null, desc: 'Jednokratno • Doživotni bedž', features: ['Bedž Premium Partner', 'Veća poverljivost', 'Istaknut profil'], color: 'secondary' }
+    { id: 'premium', name: 'PREMIUM OGLAS', price: '2.000 SG Kredita (2.000 RSD)', priceNum: 2000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
+    { id: 'urgent', name: 'HITNO (URGENT)', price: '4.000 SG Kredita (4.000 RSD)', priceNum: 4000, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
   ]
 };
 
 // Fallback for types that might map differently
 const mapCategory = (category: string) => {
-  if (category === 'real-estate') return 'plot';
-  if (category === 'business') return 'company';
   return category;
 };
 

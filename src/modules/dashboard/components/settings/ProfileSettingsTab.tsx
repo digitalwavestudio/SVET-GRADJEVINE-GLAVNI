@@ -65,7 +65,7 @@ export function ProfileSettingsTab({
           </div>
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="md:absolute md:-bottom-3 md:-right-3 w-12 h-12 bg-secondary !text-black rounded-[10px] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform mt-2 md:mt-0"
+            className="md:absolute md:-bottom-3 md:-right-3 w-12 h-12 bg-secondary !text-black rounded-[10px] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform mt-2 md:mt-0 z-10"
           >
             <input 
               type="file" 

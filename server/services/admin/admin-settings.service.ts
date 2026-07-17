@@ -16,18 +16,13 @@ export class AdminSettingsService {
     },
     global: {
       pricing: {
-        jobs: { standard: 500, premium: 1000, urgent: 1500 },
-        accommodations: { standard: 500, premium: 1000, urgent: 1500 },
-        caterings: { standard: 500, premium: 1000, urgent: 1500 },
-        marketplace: { standard: 500, premium: 1000, urgent: 1500 },
-        machines: { standard: 500, premium: 1000, urgent: 1500 },
-        plots: { standard: 500, premium: 1000, urgent: 1500 },
-        professional_monthly: 6000
+        jobs: { standard: 1000, premium: 2000, urgent: 4000 },
+        marketplace: { standard: 1000, premium: 2000, urgent: 4000 },
+        machines: { standard: 1000, premium: 2000, urgent: 4000 }
       },
-      limits: { free_listings_per_month: 3, max_images_per_ad: 10 },
+      limits: { max_images_per_ad: 10 },
       messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
-      globalRateLimit: 100,
-      initialCredits: 1500
+      globalRateLimit: 100
     },
     platform: {}
   };
@@ -140,8 +135,7 @@ export class AdminSettingsService {
                 pricing: { ...this.DEFAULTS.global.pricing, ...data?.pricing },
                 limits: { ...this.DEFAULTS.global.limits, ...data?.limits },
                 messages: { ...this.DEFAULTS.global.messages, ...data?.messages },
-                globalRateLimit: data?.globalRateLimit ?? this.DEFAULTS.global.globalRateLimit,
-                initialCredits: data?.initialCredits ?? this.DEFAULTS.global.initialCredits
+                globalRateLimit: data?.globalRateLimit ?? this.DEFAULTS.global.globalRateLimit
               };
             }
             if (type === "branding") {

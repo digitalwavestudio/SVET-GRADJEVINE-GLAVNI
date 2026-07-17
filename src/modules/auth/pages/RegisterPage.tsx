@@ -31,7 +31,7 @@ export default function RegisterPage() {
   }, []);
 
   // Handle redirect after registration
-  const from = location.state?.from?.pathname || '/kontrolna-tabla';
+  const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -130,15 +130,8 @@ export default function RegisterPage() {
           throw new Error('Greška prilikom formiranja profila na serveru nakon više pokušaja.');
       }
       
-      try {
-        await _sendEmailVerification(user);
-        addToast('Poslali smo vam email za potvrdu, proverite inbox', 'success');
-      } catch (e) {
-        console.error('Error sending verification', e);
-      }
-      
-      addToast('Uspešna registracija! Proverite email za potvrdu naloga.', 'success');
-      navigate('/kontrolna-tabla');
+      addToast('Uspešna registracija!', 'success');
+      navigate('/');
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {

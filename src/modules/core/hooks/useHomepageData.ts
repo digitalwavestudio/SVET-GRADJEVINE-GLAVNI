@@ -36,7 +36,7 @@ async function enrichLogo(jobs: any[]): Promise<any[]> {
 
 export function useHomepageData() {
   return useQuery({
-    queryKey: ["global", "homepage_data_v3"],
+    queryKey: ["global", "homepage_data_v4"],
     queryFn: async ({ signal }) => {
       const data = await apiClient.get<any>("/bff/homepage", { signal });
       if (!data) return {};
@@ -45,10 +45,10 @@ export function useHomepageData() {
       }
       return data;
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    staleTime: 0,
+    gcTime: 0,
     retry: 3,
     retryDelay: 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 }

@@ -23,7 +23,7 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
   const proRoles = [
     {
       slug: 'standard',
-      title: 'STANDARDNI KORISNIK',
+      title: 'SG ČLAN',
       subtitle: 'PREGLEDAJ, PRONAĐI...',
       description: 'Pristupite svim oglasima, prijavite se za posao, pošaljite poruke i postavljajte oglase bez ograničenja.',
       icon: 'person',
@@ -33,19 +33,6 @@ export default function RoleSelection({ onSkip }: { onSkip?: () => void }) {
       btnBg: 'bg-blue-400 !text-black hover:bg-blue-300',
       benefits: ['Pregled svih oglasa i kontakata', 'Postavljanje oglasa za sve kategorije', 'Čuvanje omiljenih oglasa'],
       currentBg: 'bg-blue-400/20 text-blue-400 border-blue-500/30'
-    },
-    {
-      slug: 'majstor',
-      title: 'MAJSTOR / RADNIK',
-      subtitle: 'PRONAĐI POSAO & KLIJENTE',
-      description: 'Napravite profil, postavite slike svojih radova, opišite svoje iskustvo i pronađite nove poslovne prilike u građevinskoj industriji.',
-      icon: 'engineering',
-      color: 'text-amber-400 border-amber-500/20 hover:border-amber-400 hover:shadow-amber-500/10',
-      bgGlow: 'bg-amber-500/10',
-      tagColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-      btnBg: 'bg-amber-400 !text-black hover:bg-amber-300',
-      benefits: ['Profesionalni profil', 'Slike radova', 'Očekujte pozive od firmi'],
-      currentBg: 'bg-amber-400/20 text-amber-400 border-amber-500/30'
     },
     {
       slug: 'poslodavac',
