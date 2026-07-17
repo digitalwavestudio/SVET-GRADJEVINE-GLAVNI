@@ -39,11 +39,16 @@ export class BaseAdStrategy {
       const userData = userSnap.data() as any;
 
       const isPaidPackage = !!rawData.paket;
-      let packagePrice = this.resolvePackagePrice(rawData.paket);
 
       const sysConfigRef = db.collection("system").doc("config");
       const sysConfigDoc = await transaction.get(sysConfigRef);
       const sysConfig = sysConfigDoc.exists ? sysConfigDoc.data() : null;
+
+      let packagePrice = this.resolvePackagePrice(rawData.paket);
+      const catKey = this.category === 'job' ? 'jobs' : this.category;
+      if (sysConfig?.pricing?.[catKey]?.[rawData.paket]) {
+        packagePrice = sysConfig.pricing[catKey][rawData.paket];
+      }
 
       if (sysConfig?.holidayModeActive && packagePrice > 0) {
         const applicable = sysConfig.applicablePackages || [];

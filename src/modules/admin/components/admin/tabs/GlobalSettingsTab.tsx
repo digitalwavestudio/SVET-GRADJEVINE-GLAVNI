@@ -143,11 +143,6 @@ export function GlobalSettingsTab() {
 
   const categories = [
     { key: 'jobs' as const, label: 'Poslovi' },
-    { key: 'accommodations' as const, label: 'Smeštaj' },
-    { key: 'caterings' as const, label: 'Ketering' },
-    { key: 'marketplace' as const, label: 'Alat i Oprema (Marketplace)' },
-    { key: 'machines' as const, label: 'Građevinske Mašine' },
-    { key: 'plots' as const, label: 'Placevi' }
   ];
 
   return (
