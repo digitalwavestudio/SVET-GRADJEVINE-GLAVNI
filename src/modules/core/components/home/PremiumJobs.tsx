@@ -191,20 +191,20 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                         if (!hasSmestaj && !hasPrevoz && !hasHrana) return null;
 
                         return (
-                          <div className="flex flex-wrap gap-2 items-center">
+                          <div className="flex flex-col gap-1.5">
                             {hasSmestaj && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                                <span className="material-symbols-outlined text-[12px] text-green-400">home</span> Smeštaj
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                                <span className="material-symbols-outlined text-[13px] text-green-400">home</span> Smeštaj
                               </span>
                             )}
                             {hasPrevoz && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                                <span className="material-symbols-outlined text-[12px] text-blue-400">commute</span> Prevoz
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                                <span className="material-symbols-outlined text-[13px] text-blue-400">commute</span> Prevoz
                               </span>
                             )}
                             {hasHrana && (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 border border-white/10 text-slate-300 text-[9px] rounded-md font-bold uppercase tracking-wider shadow-sm">
-                                <span className="material-symbols-outlined text-[12px] text-yellow-400">restaurant</span> Hrana
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                                <span className="material-symbols-outlined text-[13px] text-yellow-400">restaurant</span> Hrana
                               </span>
                             )}
                           </div>

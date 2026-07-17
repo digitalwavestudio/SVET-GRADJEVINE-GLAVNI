@@ -134,20 +134,20 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         const hasHrana = b.includes('topli-obrok') || b.includes('hrana');
                         if (!hasSmestaj && !hasPrevoz && !hasHrana) return null;
                         return (
-                          <div className="flex flex-wrap gap-1 mb-3 relative z-10">
+                          <div className="flex flex-col gap-1.5 mb-3 relative z-10">
                             {hasSmestaj && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                                <span className="material-symbols-outlined text-[10px] text-green-400">home</span> Smeštaj
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                                <span className="material-symbols-outlined text-[13px] text-green-400">home</span> Smeštaj
                               </span>
                             )}
                             {hasPrevoz && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                                <span className="material-symbols-outlined text-[10px] text-blue-400">commute</span> Prevoz
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                                <span className="material-symbols-outlined text-[13px] text-blue-400">commute</span> Prevoz
                               </span>
                             )}
                             {hasHrana && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white/5 border border-white/10 text-slate-300 text-[8px] rounded-md font-bold uppercase tracking-wider shadow-sm whitespace-nowrap">
-                                <span className="material-symbols-outlined text-[10px] text-yellow-400">restaurant</span> Hrana
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                                <span className="material-symbols-outlined text-[13px] text-yellow-400">restaurant</span> Hrana
                               </span>
                             )}
                           </div>

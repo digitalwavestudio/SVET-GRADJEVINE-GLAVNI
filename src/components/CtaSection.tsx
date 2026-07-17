@@ -128,37 +128,20 @@ export default function CtaSection() {
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 min-w-0">
-          <div className="grid lg:grid-cols-12 gap-12 items-stretch w-full min-w-0">
-            <div className="lg:col-span-7 flex flex-col space-y-8 min-w-0 pt-4 h-full">
-              <span className="self-start inline-flex items-center gap-2 py-1.5 px-4 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-blue-500/20 backdrop-blur-md shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                Pridruži se liderima
-              </span>
-              <h1 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-white mb-6 leading-[1.05] relative w-full min-w-0 drop-shadow-sm">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full min-w-0">
+            <div className="lg:col-span-7 flex flex-col space-y-6 min-w-0">
+              <h1 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-black uppercase tracking-tighter text-white leading-[1.05] relative w-full min-w-0 drop-shadow-sm">
                 NAŠA <span className="text-transparent bg-clip-text bg-[linear-gradient(110deg,#0061a5_0%,#3b82f6_50%,#60a5fa_100%)] block sm:inline">MISIJA</span>
               </h1>
-              <div className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-2 space-y-4">
+              <div className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed space-y-4">
                 <p>Naša misija je da učinimo pronalaženje poslova i radnika jednostavnijim, bržim i efikasnijim.</p>
                 <p>Kroz kvalitetne alate, moderne tehnologije i kontinuirane inovacije, pružamo građevinskoj industriji u Srbiji i regionu pouzdanu platformu koja povezuje poslodavce, radnike i poslovne partnere, olakšava zapošljavanje i doprinosi razvoju celokupnog građevinskog sektora.</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 w-full mt-auto pb-2">
-                <Link 
-                  to="/prijava"
-                  className="group relative flex items-center justify-center px-6 sm:px-10 h-[56px] sm:h-[68px] bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 overflow-hidden w-full sm:w-auto"
-                >
-                  <span className="relative z-10 tracking-wide text-center">REGISTRUJTE SE BESPLATNO</span>
-                </Link>
-                <Link 
-                  to="/postavi-oglas"
-                  className="group relative flex items-center justify-center px-6 sm:px-10 h-[56px] sm:h-[68px] bg-secondary hover:bg-yellow-400 !text-black font-black text-sm sm:text-lg rounded-[12px] hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
-                >
-                  <span className="tracking-wide relative z-10 text-center">POSTAVI OGLAS</span>
-                </Link>
-              </div>
+
             </div>
             {/* Visual Grid (Tactical UI) */}
             <div className="lg:col-span-5 relative w-full min-w-0">
-              <div className="grid grid-cols-1 gap-4 sm:gap-6 w-full min-w-0 pt-12 lg:pt-32">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 w-full min-w-0">
                 {/* Testimonial Card Slider */}
                 <div 
                   className="p-4 sm:p-8 rounded-[16px] border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 via-slate-900 to-slate-950 relative overflow-hidden cursor-pointer transition-all duration-500 shadow-[0_4px_20px_rgba(99,102,241,0.1)] hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:border-indigo-500/60 hover:-translate-y-1 w-full group"
