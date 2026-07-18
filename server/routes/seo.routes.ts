@@ -3,6 +3,7 @@ import { Router } from "express";
 import path from "path";
 import fs from "fs";
 import { APP_CONFIG } from "../../src/constants/config.ts";
+import { GERMAN_SLUGS } from "../constants/geo.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { SEODbService } from "../services/seo/seo-db.service.ts";
 import { SEOSchemaService } from "../services/seo/seo-schema.service.ts";
@@ -18,6 +19,20 @@ function replaceEnvPlaceholders(html: string): string {
     .replaceAll("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
     .replaceAll("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "")
     .replaceAll("%VITE_GA_MEASUREMENT_ID%", env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY");
+}
+
+function ensureHreflang(html: string, reqPath: string): string {
+  if (html.includes("hreflang=")) return html;
+  const base = `${APP_CONFIG.BASE_URL}${reqPath}`;
+  const isGerman = reqPath.split("/").some((seg) => GERMAN_SLUGS.has(seg));
+  const tags = [
+    `<link rel="alternate" hreflang="sr" href="${base}" />`,
+    `<link rel="alternate" hreflang="x-default" href="${base}" />`,
+  ];
+  if (isGerman) {
+    tags.push(`<link rel="alternate" hreflang="de" href="${base}" />`);
+  }
+  return html.replace("</head>", `${tags.join("\n")}\n</head>`);
 }
 
 export const seoRouter = Router();
@@ -59,7 +74,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
     if (cachedHtml) {
       res.setHeader("Cache-Control", "public, max-age=3600"); // 1h for humans
       res.setHeader("X-Cache", "HIT");
-      return res.send(replaceEnvPlaceholders(cachedHtml));
+      return res.send(ensureHreflang(replaceEnvPlaceholders(cachedHtml), req.path));
     }
   } catch (e) { console.error("[SEO] Cached HTML read error:", e); }
 
@@ -100,7 +115,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
 
       res.setHeader("Cache-Control", "public, max-age=600"); // 10 mins cache on fallback to allow fast warm-up
       res.setHeader("X-Cache", "MISS (Cold Cache Fallback)");
-      return res.send(replaceEnvPlaceholders(html));
+      return res.send(ensureHreflang(replaceEnvPlaceholders(html), req.path));
     }
 
     // Evaluate ETag via Render Engine to enable 304 Caching
@@ -115,7 +130,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
       meta,
     });
 
-    const replacedHtml = replaceEnvPlaceholders(html);
+    const replacedHtml = ensureHreflang(replaceEnvPlaceholders(html), req.path);
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.setHeader("X-Cache", "MISS");
     res.send(replacedHtml);
