@@ -162,6 +162,11 @@ interface MatchedRoute {
 }
 
 import { CITIES, CITY_DISPLAY, GERMAN_SLUGS, displayCity as formatCity } from "../constants/geo.ts";
+import { PROFESSIONS } from "../../src/constants/taxonomy.ts";
+// Build set of all known profession slugs for P-SEO validation
+const PROFESSION_SLUGS = new Set<string>(
+  Object.values(PROFESSIONS).flatMap((cats) => cats.map((c) => c.slug)),
+);
 
 // Ensure SSR output always has a canonical link — critical for SEO to avoid duplicate pages
 function ensureCanonical(html: string, reqPath: string): string {
@@ -1072,9 +1077,13 @@ export const createSpaMiddleware = () => {
           res.setHeader("X-Robots-Tag", "noindex, nofollow");
         }
 
-        // City whitelist: 3+ segment P-SEO URL sa nevalidnim gradom = 404
+        // City/profession whitelist: nevalidni slugovi = 404 (protiv crawl bloat-a)
         const isPseoRoute = !req.path.includes("~");
         if (isPseoRoute && pathSegments.length >= 3 && !CITIES.includes(lastSegment)) {
+          return res.status(404).send("Not Found");
+        }
+        // 2-segment P-SEO: lastSegment mora biti poznat grad ILI poznata profesija
+        if (isPseoRoute && pathSegments.length === 2 && !CITIES.includes(lastSegment) && !PROFESSION_SLUGS.has(lastSegment)) {
           return res.status(404).send("Not Found");
         }
 

@@ -2070,13 +2070,6 @@
           "order": "DESCENDING"
         }
       ]
-    }
-  ],
-  "fieldOverrides": [
-    {
-      "collectionGroup": "listings",
-      "fieldPath": "comp",
-      "indexes": []
     },
     {
       "collectionGroup": "users",
@@ -2091,6 +2084,13 @@
           "order": "DESCENDING"
         }
       ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "listings",
+      "fieldPath": "comp",
+      "indexes": []
     },
     {
       "collectionGroup": "listings",
