@@ -3,6 +3,7 @@ import { CacheService } from "../cache.service.ts";
 import { logger } from "../../utils/logger.ts";
 import { generateBreadcrumbSchema } from "@svet-gradjevine/shared";
 import { GERMAN_SLUGS as deSlugs } from "../../constants/geo.ts";
+import { APP_CONFIG } from "../../../src/constants/config.ts";
 
 function slugifyLocation(loc: string): string {
   return loc.toLowerCase()
@@ -182,7 +183,7 @@ export class SEOSchemaService {
     const id = data?.id;
     const schemas: Record<string, unknown>[] = [];
     const breadcrumbItems = [
-      { name: "PoÄetna", item: "https://svetgradjevine.com/" },
+      { name: "PoÄetna", item: "${APP_CONFIG.BASE_URL}/" },
     ];
 
     // Derived Canonical URL for the entity
@@ -193,27 +194,27 @@ export class SEOSchemaService {
     };
     const mappedType = typeMapping[type] || type;
     const canonicalEntityUrl = fullPath
-      ? `https://svetgradjevine.com${fullPath}`
-      : `https://svetgradjevine.com/${mappedType}/${id}`;
+      ? `${APP_CONFIG.BASE_URL}${fullPath}`
+      : `${APP_CONFIG.BASE_URL}/${mappedType}/${id}`;
 
     if (type === "jobs") {
       breadcrumbItems.push({
         name: "Poslovi",
-        item: "https://svetgradjevine.com/poslovi",
+        item: "${APP_CONFIG.BASE_URL}/poslovi",
       });
 
       const profession = data.kategorija || data.zanimanje || data.category;
       if (profession) {
         breadcrumbItems.push({
           name: profession,
-          item: `https://svetgradjevine.com/poslovi/${this.slugify(profession)}`,
+          item: `${APP_CONFIG.BASE_URL}/poslovi/${this.slugify(profession)}`,
         });
       }
 
       if (data.location) {
         const locationPath = profession
-          ? `https://svetgradjevine.com/poslovi/${this.slugify(profession)}/${this.slugify(data.location)}`
-          : `https://svetgradjevine.com/poslovi/${this.slugify(data.location)}`;
+          ? `${APP_CONFIG.BASE_URL}/poslovi/${this.slugify(profession)}/${this.slugify(data.location)}`
+          : `${APP_CONFIG.BASE_URL}/poslovi/${this.slugify(data.location)}`;
         breadcrumbItems.push({
           name: data.location,
           item: locationPath,
@@ -236,13 +237,13 @@ export class SEOSchemaService {
         hiringOrganization: {
           "@type": "Organization",
           "@id": companyId
-            ? `https://svetgradjevine.com/firma/${companyId}#org`
+            ? `${APP_CONFIG.BASE_URL}/firma/${companyId}#org`
             : undefined,
           name: data.companyName || "Svet GraÄ‘evine",
-          logo: "https://svetgradjevine.com/logo192.png",
+          logo: "${APP_CONFIG.BASE_URL}/logo192.png",
           url: companyId
-            ? `https://svetgradjevine.com/firma/${companyId}`
-            : "https://svetgradjevine.com",
+            ? `${APP_CONFIG.BASE_URL}/firma/${companyId}`
+            : "${APP_CONFIG.BASE_URL}",
         },
         jobLocation: {
           "@type": "Place",
@@ -276,12 +277,12 @@ export class SEOSchemaService {
     if (type === "companies") {
       breadcrumbItems.push({
         name: "Firme",
-        item: "https://svetgradjevine.com/firme",
+        item: "${APP_CONFIG.BASE_URL}/firme",
       });
       if (data.city) {
         breadcrumbItems.push({
           name: data.city,
-          item: `https://svetgradjevine.com/firme/${this.slugify(data.city)}`,
+          item: `${APP_CONFIG.BASE_URL}/firme/${this.slugify(data.city)}`,
         });
       }
       breadcrumbItems.push({ name: data.name || "", item: canonicalEntityUrl });
@@ -295,7 +296,7 @@ export class SEOSchemaService {
         address: {
           "@type": "PostalAddress",
           addressLocality: data.city || "Srbija",
-          addressCountry: "RS",
+          addressCountry: resolveCountry(typeof data.city === "string" ? data.city : undefined),
         },
         url: canonicalEntityUrl,
       };
@@ -348,22 +349,22 @@ export class SEOSchemaService {
     if (type === "users") {
       breadcrumbItems.push({
         name: "Majstori",
-        item: "https://svetgradjevine.com/majstori",
+        item: "${APP_CONFIG.BASE_URL}/majstori",
       });
 
       const profession = data.zanimanje || data.profession || data.kategorija;
       if (profession) {
         breadcrumbItems.push({
           name: profession,
-          item: `https://svetgradjevine.com/majstori/${this.slugify(profession)}`,
+          item: `${APP_CONFIG.BASE_URL}/majstori/${this.slugify(profession)}`,
         });
       }
 
       const city = data.location || data.city || data.grad;
       if (city) {
         const cityPath = profession
-          ? `https://svetgradjevine.com/majstori/${this.slugify(profession)}/${this.slugify(city)}`
-          : `https://svetgradjevine.com/majstori/${this.slugify(city)}`;
+          ? `${APP_CONFIG.BASE_URL}/majstori/${this.slugify(profession)}/${this.slugify(city)}`
+          : `${APP_CONFIG.BASE_URL}/majstori/${this.slugify(city)}`;
         breadcrumbItems.push({ name: city, item: cityPath });
       }
 
@@ -384,7 +385,7 @@ export class SEOSchemaService {
         address: {
           "@type": "PostalAddress",
           addressLocality: data.location || data.city || "Srbija",
-          addressCountry: "RS",
+          addressCountry: resolveCountry(typeof data.location === "string" ? data.location : typeof data.city === "string" ? data.city : undefined),
         },
         telephone: data.phone || data.telefon || "",
         url: canonicalEntityUrl,

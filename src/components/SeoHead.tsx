@@ -10,6 +10,7 @@ interface Props {
   type?: 'website' | 'article' | 'job' | 'profile';
   noindex?: boolean;
   jsonLd?: Record<string, any> | Array<Record<string, any>>;
+  hrefLangDe?: boolean;
 }
 
 export default function SeoHead({
@@ -19,7 +20,8 @@ export default function SeoHead({
   url = APP_CONFIG.BASE_URL,
   type = 'website',
   noindex = false,
-  jsonLd
+  jsonLd,
+  hrefLangDe = false,
 }: Props) {
   const fullTitle = useMemo(() => {
     return title.includes('Svet Građevine') ? title : `${title} | Svet Građevine`;
@@ -58,6 +60,7 @@ export default function SeoHead({
       {/* Hreflang — geo targetiranje Srbija / x-default */}
       <link rel="alternate" hrefLang="sr" href={url} />
       <link rel="alternate" hrefLang="x-default" href={url} />
+      {hrefLangDe && <link rel="alternate" hrefLang="de" href={url} />}
 
       {ldJsonTags}
     </Helmet>

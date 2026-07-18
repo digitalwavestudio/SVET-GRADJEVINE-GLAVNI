@@ -199,11 +199,6 @@ function resolveFirestoreQuery(collectionName: string) {
 // Map collection name to detail URL path prefix (reverse of adRoutes detail paths)
 const DETAIL_PATH_MAP: Record<string, string> = {
   jobs: "posao",
-  machines: "gradjevinske-masine",
-  accommodations: "smestaj",
-  caterings: "ketering",
-  plots: "nekretnine",
-  marketplace: "alat-i-oprema",
   companies: "firma",
   users: "majstor",
 };
@@ -211,11 +206,6 @@ const DETAIL_PATH_MAP: Record<string, string> = {
 // Primary canonical path for each collection's listing hub (aliases like /masine resolve here)
 const CANONICAL_PATH_MAP: Record<string, string> = {
   jobs: "/poslovi",
-  machines: "/gradjevinske-masine",
-  marketplace: "/alat-i-oprema",
-  accommodations: "/smestaj",
-  caterings: "/ketering",
-  plots: "/placevi",
   companies: "/firme",
   users: "/majstori",
 };
@@ -771,9 +761,9 @@ async function backgroundPreRenderHomepage(
     const botHtml = `
       <main>
         <h1>Svet Građevine</h1>
-        <p>Najveći građevinski portal na Balkanu. Pronađite posao, mašine, firme, smeštaj i više.</p>
+        <p>Najveći građevinski portal na Balkanu. Pronađite posao, firme, majstore i više.</p>
         <p>${platformDesc}</p>
-        <p>Bez obzira da li tražite iskusnog zidara za renoviranje, rukovaoca bagerom za veliki projekat, ili želite da iznajmite građevinske mašine — na pravom ste mestu. Naša platforma nudi hiljade oglasa iz kategorija: posao u građevini, građevinske mašine, smeštaj za radnike, ketering, građevinsko zemljište, alat i oprema, i više.</p>
+        <p>Bez obzira da li tražite iskusnog zidara za renoviranje, rukovaoca bagerom za veliki projekat, ili želite da pronađete pouzdanu firmu — na pravom ste mestu. Naša platforma nudi hiljade oglasa iz kategorija: posao u građevini, građevinske firme, majstori i više.</p>
         <section>
           <h2>Najnoviji oglasi</h2>
           <ul>${itemsHtml || "<li>Trenutno nema aktivnih oglasa.</li>"}</ul>
@@ -784,7 +774,7 @@ async function backgroundPreRenderHomepage(
     html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
     html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine</title>`);
     html = html.replace("</head>", `
-<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
+<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 </head>`);
     html = html.replace('<div id="root"></div>', `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botHtml}</div>`);
@@ -867,7 +857,7 @@ export const createSpaMiddleware = () => {
         return res.redirect(301, "/majstori");
       }
       if (/^\/masina\/.+~.+/.test(req.path)) {
-        return res.redirect(301, "/gradjevinske-masine");
+        return res.redirect(301, "/poslovi");
       }
 
       const cacheKey = `seo:page:${cacheBuster}:${req.path}${req.query.page ? `?page=${req.query.page}` : ""}`;
@@ -943,43 +933,7 @@ export const createSpaMiddleware = () => {
           label: "Oglasi za posao",
           alwaysListing: true,
         },
-        {
-          path: "/gradjevinske-masine/",
-          coll: "machines",
-          label: "Građevinske mašine",
-        },
-        {
-          path: "/gradjevinske-masine",
-          coll: "machines",
-          label: "Građevinske mašine",
-          alwaysListing: true,
-        },
-        {
-          path: "/masine",
-          coll: "machines",
-          label: "Građevinske mašine",
-          alwaysListing: true,
-        },
-        {
-          path: "/smestaj",
-          coll: "accommodations",
-          label: "Smeštaj za radnike",
-        }, // Handles both /smestaj/id and /smestaj/beograd
-        {
-          path: "/ketering/provajder/",
-          coll: "caterings",
-          label: "Ketering i ugostiteljstvo",
-        },
-        {
-          path: "/ketering",
-          coll: "caterings",
-          label: "Ketering i ugostiteljstvo",
-          alwaysListing: true,
-        },
-        { path: "/placevi", coll: "plots", label: "Građevinsko zemljište" }, // /placevi/:grad and /placevi (Listing)
-        { path: "/nekretnine/", coll: "plots", label: "Građevinsko zemljište" }, // /nekretnine/:id (Detail)
-        { path: "/alat-i-oprema", coll: "marketplace", label: "Alat i građevinska oprema" }, // Handles both
-        { path: "/firma/", coll: "companies", label: "Profil firme" }, // Detail
+        { path: "/firma/", coll: "companies", label: "Profil firme" },
         {
           path: "/firme",
           coll: "companies",
@@ -1040,7 +994,7 @@ export const createSpaMiddleware = () => {
           const ssrResult = await reactSsrPage(ssrUrl);
           if (ssrResult) {
             const { html, dehydratedState, helmetHtml } = ssrResult;
-            const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />`;
+            const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />`;
             let finalHtml = indexHtml;
             finalHtml = finalHtml
               .replace('</head>', `${helmetContent}</head>`)
@@ -1062,16 +1016,16 @@ export const createSpaMiddleware = () => {
         // Clean shell for humans (no SSR — let React hydrate on client)
         const cleanHtml = injectEmptyRootLinks(indexHtml
           .replace("</head>", `<title>Svet Građevine</title>
-<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
+<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 <meta property="og:title" content="Svet Građevine" />
-<meta property="og:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
+<meta property="og:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}/" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Svet Građevine" />
-<meta name="twitter:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
+<meta name="twitter:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`), req.path);
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(cleanHtml));
@@ -1090,7 +1044,11 @@ export const createSpaMiddleware = () => {
           res.setHeader("X-Robots-Tag", "noindex, nofollow");
         }
 
+        // City whitelist: 3+ segment P-SEO URL sa nevalidnim gradom = 404
         const isPseoRoute = !req.path.includes("~");
+        if (isPseoRoute && pathSegments.length >= 3 && !CITIES.includes(lastSegment)) {
+          return res.status(404).send("Not Found");
+        }
 
         const isGeoPage = isPseoRoute && CITIES.includes(lastSegment);
 

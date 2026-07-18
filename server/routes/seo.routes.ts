@@ -223,15 +223,7 @@ seoRouter.get("/sitemap.xml", async (_req, res) => {
 
 // Paginirani sitemap fragmenti
 seoRouter.get("/sitemap-:type.xml", async (req, res) => {
-  try {
-    const { type } = req.params;
-    res.header("Content-Type", "application/xml");
-    res.setHeader("Cache-Control", "public, max-age=86400");
-    res.send(generateFallbackSitemap());
-  } catch (error) {
-    console.error("Sitemap chunk error:", error);
-    res.status(500).send("Error generating sitemap");
-  }
+  res.redirect(301, "/sitemap.xml");
 });
 
 // DinamiÄki robots.txt
