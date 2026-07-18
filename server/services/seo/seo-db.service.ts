@@ -259,7 +259,6 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
   <url><loc>${APP_CONFIG.BASE_URL}/</loc><priority>1.0</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/poslovi</loc><priority>0.9</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/firme</loc><priority>0.8</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/magazin</loc><priority>0.8</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.5</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><priority>0.5</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/paketi</loc><priority>0.6</priority></url>
@@ -269,88 +268,56 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
       for (const slug of deSlugs) {
         xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${slug}</loc><priority>0.7</priority></url>`;
       }
-      const results = await Promise.all(
-        collections.map(async (coll) => {
-          try {
-            let query: import("firebase-admin/firestore").Query = db
-              .collection(coll)
-              .where("status", "==", "active");
-
-            // Specifični filteri za kolekcije
-            if (coll === "users") {
-              // Samo javni profili (majstori, firme, partneri) idu u sitemap
-              query = query.where("role", "in", [
-                "majstor",
-                "poslodavac",
-                "partner",
-                "agencija",
-                "kompanija",
-              ]);
-            }
-
-            const snap = await query
-              .select("category", "updatedAt")
-              .orderBy("createdAt", "desc")
-              .limit(500)
-              .get();
-            return snap.docs
-              .map((doc) => {
-                const data = doc.data();
-                        let path = "";
-                        let urlId = doc.id;
-
-                        switch (coll) {
-                          case "jobs": {
-                            path = "posao";
-                            const t = data.title || data.name || "bez-naslova";
-                            const l = data.location || data.loc || "";
-                            const c = data.company || data.comp || "";
-                            const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
-                            urlId = `${slug}~${doc.id}`;
-                            break;
-                          }
-                          case "companies":
-                            path = "firma";
-                            break;
-                          case "users":
-                            path = "profil";
-                            break;
-                          default:
-                            path = coll;
-                        }
-
-                const imgUrl = data.images?.[0] || data.logo || data.photoURL;
-                const lastMod =
-                  data.updatedAt?.toDate?.()?.toISOString().split("T")[0] ||
-                  data.createdAt?.toDate?.()?.toISOString().split("T")[0] ||
-                  new Date().toISOString().split("T")[0];
-
-                return `
-    <url>
-      <loc>https://svetgradjevine.com/${path}/${urlId}</loc>
-      <lastmod>${lastMod}</lastmod>
-      <changefreq>weekly</changefreq>
-      <priority>${coll === "users" ? "0.6" : "0.7"}</priority>
-      ${
-        imgUrl
-          ? `
-      <image:image>
-        <image:loc>${esc(imgUrl)}</image:loc>
-        <image:title>${esc((data.title || data.name || data.adTitle || "Oglas").substring(0, 100))}</image:title>
-      </image:image>`
-          : ""
-      }
-    </url>`;
-              })
-              .join("");
-          } catch (e) {
-            console.error(`Error processing collection ${coll} for sitemap:`, e);
-            return "";
+      // Poslovi i firme su u listings kolekciji sa type filterom
+      const listingTypes = ["job", "company"];
+      for (const typeVal of listingTypes) {
+        try {
+          const snap = await db.collection("listings")
+            .where("type", "==", typeVal)
+            .where("status", "==", "active")
+            .orderBy("createdAt", "desc")
+            .limit(500)
+            .get();
+          for (const doc of snap.docs) {
+            const data = doc.data();
+            const path = typeVal === "job" ? "posao" : "firma";
+            const t = data.title || data.name || "bez-naslova";
+            const l = data.location || data.loc || "";
+            const c = data.company || data.comp || "";
+            const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
+            const urlId = `${slug}~${doc.id}`;
+            const imgUrl = data.images?.[0] || data.logo;
+            const lastMod = data.updatedAt?.toDate?.()?.toISOString().split("T")[0] ||
+              data.createdAt?.toDate?.()?.toISOString().split("T")[0] ||
+              new Date().toISOString().split("T")[0];
+            xml += `\n    <url>\n      <loc>${APP_CONFIG.BASE_URL}/${path}/${urlId}</loc>\n      <lastmod>${lastMod}</lastmod>\n      <changefreq>monthly</changefreq>\n      <priority>0.6</priority>`;
+            if (imgUrl) xml += `\n      <image:image><image:loc>${imgUrl}</image:loc></image:image>`;
+            xml += `\n    </url>`;
           }
-        })
-      );
-
-      xml += results.join("");
+        } catch (e) {
+          logger.warn(`[Sitemap] listings where type=${typeVal} failed:`, e);
+        }
+      }
+      // Korisnici (majstori)
+      try {
+        const userSnap = await db.collection("users")
+          .where("role", "in", ["majstor", "poslodavac", "partner", "agencija", "kompanija"])
+          .orderBy("createdAt", "desc")
+          .limit(500)
+          .get();
+        for (const doc of userSnap.docs) {
+          const data = doc.data();
+          const imgUrl = data.photoURL || data.avatar;
+          const lastMod = data.updatedAt?.toDate?.()?.toISOString().split("T")[0] ||
+            data.createdAt?.toDate?.()?.toISOString().split("T")[0] ||
+            new Date().toISOString().split("T")[0];
+          xml += `\n    <url>\n      <loc>${APP_CONFIG.BASE_URL}/profil/${doc.id}</loc>\n      <lastmod>${lastMod}</lastmod>\n      <changefreq>monthly</changefreq>\n      <priority>0.5</priority>`;
+          if (imgUrl) xml += `\n      <image:image><image:loc>${imgUrl}</image:loc></image:image>`;
+          xml += `\n    </url>`;
+        }
+      } catch (e) {
+        logger.warn("[Sitemap] users query failed:", e);
+      }
       xml += "\n</urlset>";
       await CacheService.set(cacheKey, xml, 21600000); // 6h cache
       return xml;

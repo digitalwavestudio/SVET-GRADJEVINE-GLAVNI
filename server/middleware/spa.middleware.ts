@@ -11,6 +11,37 @@ const SSR_DIST_DIR = path.resolve(process.cwd(), "dist-ssr");
 const SSR_ENTRY_PATH = path.join(SSR_DIST_DIR, "entry-server.mjs");
 const SSR_CACHE_KEY = `file:///${SSR_ENTRY_PATH.replace(/\\/g, '/')}?v=${Date.now()}`;
 
+// Module-level cache za index.html sa zamenjenim env placeholder-ima
+let _indexHtmlCached: string | null = null;
+async function getIndexHtml(): Promise<string> {
+  if (_indexHtmlCached) return _indexHtmlCached;
+  const distPath = path.resolve(process.cwd(), "dist");
+  const raw = await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
+  _indexHtmlCached = raw
+    .replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+    .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+    .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+    .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+    .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
+  const gaId = (env as any).VITE_GA_MEASUREMENT_ID || (env as any).GA_MEASUREMENT_ID || "G-SVV63518LY";
+  _indexHtmlCached = _indexHtmlCached.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
+  return _indexHtmlCached;
+}
+function getIndexHtmlSync(): string {
+  if (_indexHtmlCached) return _indexHtmlCached;
+  const distPath = path.resolve(process.cwd(), "dist");
+  const raw = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+  _indexHtmlCached = raw
+    .replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+    .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+    .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+    .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+    .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
+  const gaId = (env as any).VITE_GA_MEASUREMENT_ID || (env as any).GA_MEASUREMENT_ID || "G-SVV63518LY";
+  _indexHtmlCached = _indexHtmlCached.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
+  return _indexHtmlCached;
+}
+
 interface SsrResult {
   html: string;
   dehydratedState: unknown;
@@ -796,7 +827,7 @@ export const createSpaMiddleware = () => {
   let cachedIndexHtml: string | null = null;
   let cacheBuster = "1";
   try {
-    const indexHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+      const indexHtml = getIndexHtmlSync();
     const match = indexHtml.match(/\/assets\/index-([^.]+)\.js/);
     if (match) cacheBuster = match[1];
   } catch {}
@@ -853,6 +884,10 @@ export const createSpaMiddleware = () => {
       if (req.path.startsWith("/magazin/")) {
         return res.redirect(301, "/");
       }
+      if (/^\/poslodavac\//.test(req.path)) {
+        // Legacy company profile path indexed by Google → redirect to /poslovi
+        return res.redirect(301, "/poslovi");
+      }
       if (/^\/majstor\/.+~.+/.test(req.path)) {
         return res.redirect(301, "/majstori");
       }
@@ -871,9 +906,9 @@ export const createSpaMiddleware = () => {
         const isBlacklisted = await redis.get(`blacklist_404:${deadIdMatch}`);
         if (isBlacklisted) {
            if (!cachedIndexHtml) {
-             cachedIndexHtml = await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
+             cachedIndexHtml = await getIndexHtml();
            }
-           if (env.NODE_ENV !== "production") console.info(`ðŸ›¡ï¸ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
+           if (env.NODE_ENV !== "production") console.info(`🛡️ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
            return res.status(404).send(cachedIndexHtml);
         }
       }
@@ -909,19 +944,7 @@ export const createSpaMiddleware = () => {
       }
 
       if (!cachedIndexHtml) {
-        cachedIndexHtml = await fs.promises.readFile(
-          path.join(distPath, "index.html"),
-          "utf-8",
-        );
-        // Apply runtime env replacements for %VITE_*% placeholders
-        cachedIndexHtml = cachedIndexHtml
-          .replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
-          .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
-          .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
-          .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
-           .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
-          const gaId = (env as any).VITE_GA_MEASUREMENT_ID || (env as any).GA_MEASUREMENT_ID || "G-SVV63518LY";
-          cachedIndexHtml = cachedIndexHtml.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
+        cachedIndexHtml = await getIndexHtml();
       }
       let html = cachedIndexHtml;
 
