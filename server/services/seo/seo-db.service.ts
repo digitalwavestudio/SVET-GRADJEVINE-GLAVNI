@@ -175,6 +175,12 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
           : stateCategory;
         let itemsHtml = "";
         const itemListElements: Record<string, unknown>[] = [];
+        const escapeHtml = (s: string) => s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
         let idx = 1;
         for (const doc of docs) {
           const data = doc.data ? doc.data() : doc;
@@ -184,7 +190,7 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
             .replace(/đ/g, "dj").replace(/č/g, "c").replace(/ć/g, "c").replace(/š/g, "s")
             .replace(/ž/g, "z").replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
           const detailUrl = `${APP_CONFIG.BASE_URL}/${detailPrefix}/${slugBase}~${id}`;
-          itemsHtml += `<li><a href="${detailUrl}">${t}</a>${data.location || data.loc ? ` - ${data.location || data.loc}` : ""}</li>`;
+          itemsHtml += `<li><a href="${detailUrl}">${escapeHtml(t)}</a>${data.location || data.loc ? ` - ${escapeHtml(data.location || data.loc)}` : ""}</li>`;
           itemListElements.push({ "@type": "ListItem", position: idx++, name: t, url: detailUrl });
         }
         const itemListSchema = {
@@ -194,8 +200,8 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         };
         botHtml = `
           <main>
-            <h1>${title.replace(" | Svet Građevine", "")}</h1>
-            <p>${description}</p>
+            <h1>${escapeHtml(title.replace(" | Svet Građevine", ""))}</h1>
+            <p>${escapeHtml(description)}</p>
             <ul>${itemsHtml || "<li>Trenutno nema oglasa za ovu kategoriju.</li>"}</ul>
             <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
           </main>`;
@@ -250,14 +256,19 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
          xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://svetgradjevine.com/</loc><priority>1.0</priority></url>
-  <url><loc>https://svetgradjevine.com/poslovi</loc><priority>0.9</priority></url>
-  <url><loc>https://svetgradjevine.com/firme</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.com/magazin</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.com/o-nama</loc><priority>0.5</priority></url>
-  <url><loc>https://svetgradjevine.com/kontakt</loc><priority>0.5</priority></url>
-  <url><loc>https://svetgradjevine.com/paketi</loc><priority>0.6</priority></url>
-  <url><loc>https://svetgradjevine.com/majstori</loc><priority>0.8</priority></url>`;
+  <url><loc>${APP_CONFIG.BASE_URL}/</loc><priority>1.0</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/poslovi</loc><priority>0.9</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/firme</loc><priority>0.8</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/magazin</loc><priority>0.8</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.5</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><priority>0.5</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/paketi</loc><priority>0.6</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/majstori</loc><priority>0.8</priority></url>`;
+      // DE GEO hubovi za poslove
+      const deSlugs = ["nemacka", "berlin", "munchen", "hamburg", "koln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "hannover"];
+      for (const slug of deSlugs) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${slug}</loc><priority>0.7</priority></url>`;
+      }
       const results = await Promise.all(
         collections.map(async (coll) => {
           try {

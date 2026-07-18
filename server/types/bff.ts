@@ -10,10 +10,6 @@ import {
 
 export interface HomepageStats {
   totalJobs: number;
-  totalMachines: number;
-  totalAccommodations: number;
-  totalCaterings: number;
-  totalRealEstate: number;
   totalCompanies: number;
   totalUsers: number;
   premiumJobs: number;
@@ -21,8 +17,6 @@ export interface HomepageStats {
   totalAdsCount: number;
   dynamicFirmsCount: number;
   dynamicWorkersCount: number;
-  dynamicMachineryCount: number;
-  dynamicRealEstateCount: number;
   dynamicViewsCount: number;
 }
 
@@ -65,12 +59,7 @@ export interface HomepageDataResult {
   stats: HomepageStats;
   premiumJobs: MappedAdData[];
   urgentJobs: MappedAdData[];
-  latestMachines: Record<string, unknown>[];
-  latestRealEstate: Record<string, unknown>[];
-  latestAccommodations: Record<string, unknown>[];
-  latestCaterings: Record<string, unknown>[];
   latestJobs: Record<string, unknown>[];
-  latestArticles: any[];
 }
 
 export interface DashboardQuickMetrics {

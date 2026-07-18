@@ -2,6 +2,19 @@ import { db } from "../../config/firebase.ts";
 import { CacheService } from "../cache.service.ts";
 import { logger } from "../../utils/logger.ts";
 import { generateBreadcrumbSchema } from "@svet-gradjevine/shared";
+import { GERMAN_SLUGS as deSlugs } from "../../constants/geo.ts";
+
+function slugifyLocation(loc: string): string {
+  return loc.toLowerCase()
+    .replace(/đ/g, "dj").replace(/č/g, "c").replace(/ć/g, "c").replace(/š/g, "s")
+    .replace(/ž/g, "z").replace(/ü/g, "ue").replace(/ö/g, "oe").replace(/ä/g, "ae")
+    .replace(/ß/g, "ss").replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
+
+function resolveCountry(location?: string): string {
+  if (!location) return "RS";
+  return deSlugs.has(slugifyLocation(location)) ? "DE" : "RS";
+}
 
 // Mapira engagementSlug / employmentType na Google JobPosting employmentType vrednosti
 function mapEmploymentType(engagementSlug?: unknown, employmentType?: unknown): string {
@@ -236,7 +249,7 @@ export class SEOSchemaService {
           address: {
             "@type": "PostalAddress",
             addressLocality: data.location || data.city || "Srbija",
-            addressCountry: "RS",
+            addressCountry: resolveCountry(typeof data.location === "string" ? data.location : typeof data.city === "string" ? data.city : undefined),
           },
         },
       };
@@ -327,8 +340,6 @@ export class SEOSchemaService {
       }
 
       schemas.push(schema);
-    }
-
     }
 
     if (type === "users") {
