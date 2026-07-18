@@ -784,7 +784,7 @@ async function backgroundPreRenderHomepage(
     html = html.replace(/<meta name="description"[^>]*\/?>/i, "");
     html = html.replace(/<title>.*?<\/title>/, `<title>Svet Građevine</title>`);
     html = html.replace("</head>", `
-<meta name="description" content="Oglasi u građevinskoj industriji" />
+<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 </head>`);
     html = html.replace('<div id="root"></div>', `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botHtml}</div>`);
@@ -1040,7 +1040,7 @@ export const createSpaMiddleware = () => {
           const ssrResult = await reactSsrPage(ssrUrl);
           if (ssrResult) {
             const { html, dehydratedState, helmetHtml } = ssrResult;
-            const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Oglasi u građevinskoj industriji" />`;
+            const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />`;
             let finalHtml = indexHtml;
             finalHtml = finalHtml
               .replace('</head>', `${helmetContent}</head>`)
@@ -1062,16 +1062,16 @@ export const createSpaMiddleware = () => {
         // Clean shell for humans (no SSR — let React hydrate on client)
         const cleanHtml = injectEmptyRootLinks(indexHtml
           .replace("</head>", `<title>Svet Građevine</title>
-<meta name="description" content="Oglasi u građevinskoj industriji" />
+<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}/" />
 <meta property="og:title" content="Svet Građevine" />
-<meta property="og:description" content="Oglasi u građevinskoj industriji" />
+<meta property="og:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
 <meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}/" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Svet Građevine" />
-<meta name="twitter:description" content="Oglasi u građevinskoj industriji" />
+<meta name="twitter:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas." />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`), req.path);
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(cleanHtml));

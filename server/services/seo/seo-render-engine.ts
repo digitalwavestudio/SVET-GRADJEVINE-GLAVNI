@@ -287,7 +287,7 @@ export class SEORenderEngine {
         derivedDesc = `${hubLabels[pathPart]} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Pregledajte sve oglase i pronađite najbolje ponude.`;
       } else {
         derivedTitle = `Svet Građevine`;
-        derivedDesc = `Oglasi u građevinskoj industriji`;
+        derivedDesc = `Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas.`;
       }
 
       const derivedUrl = `${canonicalBase}${reqPath}`;

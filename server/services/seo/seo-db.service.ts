@@ -12,7 +12,7 @@ export class SEODbService {
     const city = params.city as string;
     const categoryOrCity = params.categoryOrCity as string;
 let title = "Svet Građevine";
-let description = "Oglasi u građevinskoj industriji";
+let description = "Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas.";
     let url = "https://svetgradjevine.com";
 
     let stateCategory = "jobs";
