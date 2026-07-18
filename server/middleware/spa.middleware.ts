@@ -1089,11 +1089,13 @@ export const createSpaMiddleware = () => {
 
         const isGeoPage = isPseoRoute && CITIES.includes(lastSegment);
 
-        const isListingPage =
+        const isDetailPage = fullId.includes("~");
+        const isListingPage = !isDetailPage && (
           matchedRoute.alwaysListing === true ||
           req.path === matchedRoute.path.slice(0, -1) ||
           req.path === matchedRoute.path ||
-          isGeoPage;
+          isGeoPage
+        );
 
 
 
@@ -1273,7 +1275,7 @@ ${breadcrumbHtml}
               /<title>.*?<\/title>/,
               `<title>${title}</title>`,
             );
-            return res.send(ensureHreflang(nonBotHtml, req.path));
+            return res.send(ensureCanonical(ensureHreflang(nonBotHtml, req.path), req.path));
           }
 
           // Generate dynamic metadata solely from route slugs to prevent synchronous database blockage
