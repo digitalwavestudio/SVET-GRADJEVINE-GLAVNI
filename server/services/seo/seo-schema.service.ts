@@ -254,15 +254,18 @@ export class SEOSchemaService {
         },
       };
 
-      if (data.plataMin || data.plataMax || data.salary) {
+      const plataMin = Number(data.plataMin) || 0;
+      const plataMax = Number(data.plataMax) || 0;
+      const salary = Number(data.salary) || 0;
+      if (plataMin > 0 || plataMax > 0 || salary > 0) {
         schema.baseSalary = {
           "@type": "MonetaryAmount",
           currency: "EUR",
           value: {
             "@type": "QuantitativeValue",
-            value: data.salary || data.plataMin || 0,
-            minValue: data.plataMin || 0,
-            maxValue: data.plataMax || data.plataMin || 0,
+            value: salary || plataMin || plataMax,
+            minValue: plataMin || salary,
+            maxValue: plataMax || plataMin || salary,
             unitText: "MONTH",
           },
         };

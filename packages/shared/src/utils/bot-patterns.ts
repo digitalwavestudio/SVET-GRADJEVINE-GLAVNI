@@ -15,6 +15,11 @@ export const WHITELISTED_SEARCH_BOTS = [
   "bingbot",
   "algolia",
   "ahrefs",
+  "yandexbot",
+  "yandex",
+  "baiduspider",
+  "duckduckbot",
+  "duckduckgo",
 ];
 
 export const WHITELISTED_AI_BOTS = [

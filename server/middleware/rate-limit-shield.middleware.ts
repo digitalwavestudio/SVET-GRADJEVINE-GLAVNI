@@ -47,7 +47,7 @@ export const rateLimitShield = async (
     const isWhitelistedBot = isWhitelistedSearch || isWhitelistedAi;
 
     // expensivePaths: Sitemaps, Search, P-SEO listing combos, and Feeds
-    const isPseoPath = ["/poslovi/", "/masine/", "/gradjevinske-masine/", "/smestaj/", "/ketering/", "/placevi/", "/alat-i-oprema/", "/firme/"].some(p => req.path.startsWith(p));
+    const isPseoPath = ["/poslovi/", "/gradjevinske-masine/", "/firme/"].some(p => req.path.startsWith(p));
     const isExpensivePath = 
       req.path.includes("/search") || 
       req.path.includes("/pseo") ||
