@@ -3,6 +3,44 @@ import { CacheService } from "../cache.service.ts";
 import { logger } from "../../utils/logger.ts";
 import { generateBreadcrumbSchema } from "@svet-gradjevine/shared";
 
+// Mapira engagementSlug / employmentType na Google JobPosting employmentType vrednosti
+function mapEmploymentType(engagementSlug?: unknown, employmentType?: unknown): string {
+  if (typeof employmentType === "string" && employmentType.trim()) {
+    return employmentType.trim().toUpperCase();
+  }
+  const slug = typeof engagementSlug === "string" ? engagementSlug.trim().toLowerCase() : "";
+  switch (slug) {
+    case "part-time":
+    case "parttime":
+    case "part_time":
+      return "PART_TIME";
+    case "contract":
+    case "contractor":
+    case "ugovor":
+    case "freelance":
+      return "CONTRACTOR";
+    case "temporary":
+    case "privremeno":
+      return "TEMPORARY";
+    case "intern":
+    case "praksa":
+    case "internship":
+      return "INTERN";
+    case "volunteer":
+    case "volonter":
+      return "VOLUNTEER";
+    case "full-time":
+    case "fulltime":
+    case "full_time":
+    case "stalno":
+    case "naodredjeno":
+    case "odredjeno":
+      return "FULL_TIME";
+    default:
+      return "FULL_TIME";
+  }
+}
+
 export interface SEOEntityData {
   [key: string]: unknown;
   id?: string;
@@ -186,7 +224,7 @@ export class SEOSchemaService {
         validThrough: new Date(
           Date.now() + 60 * 24 * 60 * 60 * 1000,
         ).toISOString(),
-        employmentType: "FULL_TIME",
+        employmentType: mapEmploymentType(data.engagementSlug, data.employmentType),
         hiringOrganization: {
           "@type": "Organization",
           "@id": companyId
