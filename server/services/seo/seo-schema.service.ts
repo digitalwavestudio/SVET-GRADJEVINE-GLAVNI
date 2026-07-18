@@ -5,20 +5,20 @@ import { generateBreadcrumbSchema } from "@svet-gradjevine/shared";
 import { GERMAN_SLUGS as deSlugs } from "../../constants/geo.ts";
 import { APP_CONFIG } from "../../../src/constants/config.ts";
 
-function slugifyLocation(loc: string): string {
+export function slugifyLocation(loc: string): string {
   return loc.toLowerCase()
     .replace(/đ/g, "dj").replace(/č/g, "c").replace(/ć/g, "c").replace(/š/g, "s")
     .replace(/ž/g, "z").replace(/ü/g, "ue").replace(/ö/g, "oe").replace(/ä/g, "ae")
     .replace(/ß/g, "ss").replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
-function resolveCountry(location?: string): string {
+export function resolveCountry(location?: string): string {
   if (!location) return "RS";
   return deSlugs.has(slugifyLocation(location)) ? "DE" : "RS";
 }
 
 // Mapira engagementSlug / employmentType na Google JobPosting employmentType vrednosti
-function mapEmploymentType(engagementSlug?: unknown, employmentType?: unknown): string {
+export function mapEmploymentType(engagementSlug?: unknown, employmentType?: unknown): string {
   if (typeof employmentType === "string" && employmentType.trim()) {
     return employmentType.trim().toUpperCase();
   }

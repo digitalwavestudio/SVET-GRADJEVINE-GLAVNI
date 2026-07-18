@@ -6,6 +6,7 @@ import { db } from "../config/firebase.ts";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { getRedis } from "../utils/redis.ts";
 import { SEORenderEngine } from "../services/seo/seo-render-engine.ts";
+import { resolveCountry, mapEmploymentType } from "../services/seo/seo-schema.service.ts";
 
 const SSR_DIST_DIR = path.resolve(process.cwd(), "dist-ssr");
 const SSR_ENTRY_PATH = path.join(SSR_DIST_DIR, "entry-server.mjs");
@@ -525,7 +526,7 @@ ${jsonLdScript}
       const effectiveTtl = latestDocs.size === 0 ? cacheTtl * 2 : cacheTtl;
       await redis.set(cacheKey, html, "EX", effectiveTtl);
     }
-    return html;
+    return ensureHreflang(html, reqPath);
   } catch (error) {
     console.error("[SPA-Background] Error caching listing hub:", error);
     return null;
@@ -637,6 +638,11 @@ async function backgroundPreRenderDetailPage(
     });
 
     if (collectionName === "jobs") {
+      const adCountry = resolveCountry(adData.city as string || adData.location as string);
+      const adEmployment = mapEmploymentType(adData.engagementSlug, adData.employmentType);
+      const adValidUntil = adData.expiresAt?.toDate?.()?.toISOString() ||
+        adData.validUntil?.toDate?.()?.toISOString() ||
+        new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
       structuredDataList.push({
         "@context": "https://schema.org/",
         "@type": "JobPosting",
@@ -645,10 +651,8 @@ async function backgroundPreRenderDetailPage(
         datePosted:
           adData.createdAt?.toDate?.()?.toISOString() ||
           new Date().toISOString(),
-        validThrough: new Date(
-          Date.now() + 60 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        employmentType: "FULL_TIME",
+        validThrough: adValidUntil,
+        employmentType: adEmployment,
         hiringOrganization: {
           "@type": "Organization",
           name: adData.companyName || "Svet Građevine",
@@ -659,11 +663,12 @@ async function backgroundPreRenderDetailPage(
           address: {
             "@type": "PostalAddress",
             addressLocality: adData.city || "Srbija",
-            addressCountry: "RS",
+            addressCountry: adCountry,
           },
         },
       });
     } else if (collectionName === "companies") {
+      const coCountry = resolveCountry(adData.city as string || adData.location as string);
       structuredDataList.push({
         "@context": "https://schema.org/",
         "@type": "ConstructionBusiness",
@@ -674,7 +679,7 @@ async function backgroundPreRenderDetailPage(
         address: {
           "@type": "PostalAddress",
           addressLocality: adData.city || "Srbija",
-          addressCountry: "RS",
+          addressCountry: coCountry,
         },
       });
     } else if (
@@ -748,7 +753,7 @@ ${structuredDataHtml}
     if (redis) {
       await redis.set(cacheKey, html, "EX", cacheTtl);
     }
-    return html;
+    return ensureHreflang(html, reqPath);
   } catch (error) {
     console.error("[SPA-Background] Error caching detail page:", error);
     return null;
@@ -1051,7 +1056,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`), req.path);
-        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(cleanHtml));
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(ensureHreflang(cleanHtml, req.path)));
       }
 
       if (matchedRoute) {
@@ -1152,7 +1157,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="${baseDesc}" />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`);
-              return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(cleanHtml, req.path));
+              return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(ensureHreflang(cleanHtml, req.path), req.path));
             }
           }
 
@@ -1236,7 +1241,7 @@ ${breadcrumbHtml}
             '<div id="root"></div>',
             `<div id="root"></div>${SEORenderEngine.generateBreadcrumbNav(req.path)}`,
           );
-          return res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400').send(skeletonHtml);
+          return res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400').send(ensureHreflang(skeletonHtml, req.path));
         }
 
         const parts = fullId.split("~");
@@ -1259,7 +1264,7 @@ ${breadcrumbHtml}
               /<title>.*?<\/title>/,
               `<title>${title}</title>`,
             );
-            return res.send(nonBotHtml);
+            return res.send(ensureHreflang(nonBotHtml, req.path));
           }
 
           // Generate dynamic metadata solely from route slugs to prevent synchronous database blockage
@@ -1364,12 +1369,12 @@ ${breadcrumbHtml}
       ];
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
-        const robotsMeta = req.path.startsWith("/profil/") ? `<meta name="robots" content="noindex, follow" />\n` : "";
+        const robotsMeta = req.path.startsWith("/profil/") || req.path.startsWith("/pretraga") ? `<meta name="robots" content="noindex, follow" />\n` : "";
         const passthroughHtml = injectEmptyRootLinks(html, req.path).replace(
           "</head>",
           `${robotsMeta}<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
         );
-        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(passthroughHtml);
+        return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(ensureHreflang(passthroughHtml, req.path));
       }
 
       // Custom 404 for unmatched routes
