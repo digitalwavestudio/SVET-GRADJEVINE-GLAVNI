@@ -2,7 +2,7 @@ export const ROLE_DEFINITIONS = {
   USER: {
     name: "user",
     permissions: ["post_ad", "message", "browse", "view_profile"],
-    description: "Regular marketplace user",
+    // removed marketplace reference
   },
   PARTNER: {
     name: "partner",

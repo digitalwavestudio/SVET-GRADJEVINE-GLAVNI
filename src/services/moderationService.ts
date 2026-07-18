@@ -28,12 +28,7 @@ export interface ModerationQueueResponse {
 
 const COLLECTION_MAP: Record<string, { type: ModerationItemType; label: string; collectionName: string }> = {
   job: { type: 'POSAO', label: 'POSAO', collectionName: 'jobs' },
-  accommodation: { type: 'SMEŠTAJ', label: 'SMEŠTAJ', collectionName: 'accommodations' },
-  catering: { type: 'KETERING', label: 'KETERING', collectionName: 'caterings' },
   company: { type: 'FIRMA', label: 'FIRMA', collectionName: 'companies' },
-  machine: { type: 'MAŠINA', label: 'MAŠINA', collectionName: 'machines' },
-  plot: { type: 'NEKRETNINA', label: 'NEKRETNINA', collectionName: 'plots' },
-  marketplace: { type: 'MAJSTOR', label: 'ALAT I OPREMA', collectionName: 'marketplace' },
 };
 
 export const moderationService = {

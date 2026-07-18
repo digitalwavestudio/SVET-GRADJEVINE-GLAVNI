@@ -8,9 +8,6 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 
 import { useCompanyDetails, useCompanyAdMutations } from '@/src/modules/companies/hooks/useCompanies';
 import { useJobs } from '@/src/modules/jobs';
-import { useMachinesList } from '@/src/modules/machines';
-import { useAccommodationsList } from '@/src/modules/accommodations';
-import { useCateringList } from '@/src/modules/catering';
 import { useRealEstateList } from '@/src/modules/real_estate';
 
 import { generateLocalBusinessSchema, generateBreadcrumbSchema } from '@/src/lib/seoSchema';
@@ -32,18 +29,12 @@ export default function CompanyProfilePage() {
   const { updateCompanyAd } = useCompanyAdMutations();
 
   const { data: jobsData, isLoading: jobsLoading } = useJobs({ authorId: company?.authorId }, { enabled: !!company?.authorId });
-  const { data: machinesData, isLoading: machinesLoading } = useMachinesList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
-  const { data: accData, isLoading: accLoading } = useAccommodationsList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
-  const { data: catData, isLoading: catLoading } = useCateringList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
   const { data: plotsData, isLoading: plotsLoading } = useRealEstateList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
 
   const activeJobs = jobsData?.pages.flatMap(p => p?.items || []) || [];
-  const activeMachines = machinesData?.pages.flatMap(p => p?.items || []) || [];
-  const activeAccommodations = accData?.pages.flatMap(p => p?.items || []) || [];
-  const activeCaterings = catData?.pages.flatMap(p => p?.items || []) || [];
   const activePlots = plotsData?.pages.flatMap(p => p?.items || []) || [];
 
-  const isLoadingCurrentTab = jobsLoading || machinesLoading || accLoading || catLoading || plotsLoading || false;
+  const isLoadingCurrentTab = jobsLoading || plotsLoading || false;
 
   const { isTrackedInSession } = useTrackView(company?.id, 'companies', company?.id);
 

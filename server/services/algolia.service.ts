@@ -27,7 +27,6 @@ export interface AdAlgoliaRecord {
   profession?: string;
   professionSlug?: string;
   beds?: number;
-  accommodationType?: string;
   jobType?: string;
   viewsCount: number;
   categorySlug?: string;
@@ -97,7 +96,6 @@ export interface AlgoliaHit {
   profession?: string;
   professionSlug?: string;
   beds?: number | string;
-  accommodationType?: string;
   jobType?: string;
   viewsCount?: number;
   _distance?: number;
@@ -197,17 +195,8 @@ const getValidIndexName = (indexName: string): string => {
 
   const commonCategories = [
     "jobs",
-    "machines",
-    "accommodations",
-    "caterings",
-    "plots",
-    "marketplace",
     "realEstate",
     "job",
-    "machine",
-    "accommodation",
-    "catering",
-    "plot",
     "articles",
     "magazine",
     "magazine_index",
@@ -343,7 +332,6 @@ export const projectForAlgolia = (doc: Record<string, unknown>): Partial<AdAlgol
     profession: doc.profession as string | undefined,
     professionSlug: doc.professionSlug as string | undefined,
     beds: doc.beds as number | undefined,
-    accommodationType: doc.accommodationType as string | undefined,
     jobType: doc.jobType as string | undefined,
     viewsCount: (doc.viewsCount as number | undefined) || 0,
     categorySlug: doc.categorySlug as string | undefined,

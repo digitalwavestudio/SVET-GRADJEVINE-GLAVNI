@@ -24,7 +24,7 @@ steps:
       - '--port'
       - '8080'
       - '--update-env-vars'
-      - 'NODE_ENV=production,APP_REGION=europe-west3,APP_MODE=api,GEMINI_API_KEY=${_GEMINI_API_KEY},REDIS_URL=${_REDIS_URL}'
+      - 'NODE_ENV=production,APP_REGION=europe-west3,APP_MODE=api,GEMINI_API_KEY=${_GEMINI_API_KEY},REDIS_URL=${_REDIS_URL},VITE_GA_MEASUREMENT_ID=G-SVV63518LY,VITE_ALGOLIA_APP_ID=H5ILSXDMMP,VITE_ALGOLIA_SEARCH_KEY=2a0ec2ece844643f93eea7cac8145b00,VITE_ALGOLIA_INDEX_NAME=listings,VITE_EMAILJS_PUBLIC_KEY=,VITE_EMAILJS_SERVICE_ID='
       - '--min-instances'
       - '1'
       - '--max-instances'

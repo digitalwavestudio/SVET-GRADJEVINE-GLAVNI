@@ -6,11 +6,7 @@ import { queryKeys } from '@/src/lib/queryKeysFactory';
 const prefetchMap: Record<string, () => Promise<any>> = {
   'job': () => import('@/src/modules/jobs'),
   'company': () => import('@/src/modules/companies'),
-  'machine': () => import('@/src/modules/machines'),
-  'accommodation': () => import('@/src/modules/accommodations'),
-  'catering': () => import('@/src/modules/catering'),
-  'realestate': () => import('@/src/modules/real_estate'),
-  'marketplace': () => import('@/src/modules/marketplace')
+  'realestate': () => import('@/src/modules/real_estate')
 };
 
 /**
@@ -56,33 +52,6 @@ export const usePrefetch = () => {
             });
             break;
           }
-          case 'machine': {
-            const { machinesService } = await import('@/src/modules/machines/services/machinesService');
-            await queryClient.prefetchQuery({
-              queryKey: queryKeys.machines.detail(id),
-              queryFn: () => machinesService.getById(id),
-              staleTime,
-            });
-            break;
-          }
-          case 'accommodation': {
-            const { accommodationsService } = await import('@/src/modules/accommodations/services/accommodationsService');
-            await queryClient.prefetchQuery({
-              queryKey: queryKeys.accommodations.detail(id),
-              queryFn: () => accommodationsService.getById(id),
-              staleTime,
-            });
-            break;
-          }
-          case 'catering': {
-            const { cateringService } = await import('@/src/modules/catering/services/cateringService');
-            await queryClient.prefetchQuery({
-              queryKey: queryKeys.catering.detail(id),
-              queryFn: () => cateringService.getById(id),
-              staleTime,
-            });
-            break;
-          }
           case 'realestate': {
             const { realEstateService } = await import('@/src/modules/real_estate/services/realEstateService');
             await queryClient.prefetchQuery({
@@ -92,15 +61,7 @@ export const usePrefetch = () => {
             });
             break;
           }
-          case 'marketplace': {
-            const { marketplaceService } = await import('@/src/modules/marketplace/services/marketplaceService');
-            await queryClient.prefetchQuery({
-              queryKey: queryKeys.marketplace.detail(id),
-              queryFn: () => marketplaceService.getItemById(id),
-              staleTime,
-            });
-            break;
-          }
+
         }
       } catch (err) {
         console.debug(`[SmartPrefetch] Failed prefetching data for ${type}:${id}`, err);

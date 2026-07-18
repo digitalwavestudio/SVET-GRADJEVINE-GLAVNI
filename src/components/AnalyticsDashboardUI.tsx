@@ -1,10 +1,10 @@
 import React from 'react';
 import { TrendingUp, Users, MapPin, Briefcase, ChevronRight, Activity, Cpu } from 'lucide-react';
-import { ACCOMMODATION_TYPES, MARKETPLACE_CATEGORIES, PROFESSIONS, LOCATIONS, } from '@/src/constants/taxonomy';
+import { ACCOMMODATION_TYPES, PROFESSIONS, LOCATIONS } from '@/src/constants/taxonomy';
 import { usePseoInsights } from '@/src/modules/dashboard/hooks/useStats';
 
 interface AnalyticsDashboardUIProps {
-  type: 'jobs' | 'machines' | 'accommodations';
+  type: 'jobs' | 'accommodations';
   zanimanjeSlug?: string;
   gradSlug?: string;
 }
@@ -25,8 +25,6 @@ export function AnalyticsDashboardUI({ type, zanimanjeSlug, gradSlug }: Analytic
     if (type === 'jobs') {
       const profs = Object.values(PROFESSIONS).flat();
       return profs.find(p => p.slug === slug)?.name || slug;
-    } else if (type === 'machines') {
-      return MARKETPLACE_CATEGORIES.find(c => c.slug === slug)?.name || slug;
     } else if (type === 'accommodations') {
       return ACCOMMODATION_TYPES.find(a => a.slug === slug)?.name || slug;
     }
@@ -59,7 +57,6 @@ export function AnalyticsDashboardUI({ type, zanimanjeSlug, gradSlug }: Analytic
 
   const getMetricLabel = () => {
     if (type === 'jobs') return 'Prosečna plata';
-    if (type === 'machines') return 'Prosečna cena najma';
     return 'Prosečna cena';
   };
 
@@ -69,7 +66,7 @@ export function AnalyticsDashboardUI({ type, zanimanjeSlug, gradSlug }: Analytic
         <div>
            <div className="flex items-center gap-2 mb-2">
               <Activity className="text-secondary w-5 h-5" />
-              <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">{type === 'jobs' ? 'Analiza Tržišta Rada' : 'Analiza Tržišta Mašina'}</span>
+              <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">{type === 'jobs' ? 'Analiza Tržišta Rada' : 'Analiza Tržišta Smeštaja'}</span>
            </div>
            <h2 className="text-2xl lg:text-3xl font-black text-white uppercase tracking-tight">
              {name} {gradSlug ? `u mestu ${gradName}` : ''}

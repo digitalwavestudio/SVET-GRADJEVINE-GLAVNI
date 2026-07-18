@@ -35,12 +35,6 @@ const promoteSchema = z.object({
   collection: z.enum([
     "jobs",
     "companies",
-    "machines",
-    "accommodations",
-    "marketplace",
-    "plots",
-    "real_estate",
-    "caterings",
   ]),
   durationDays: z.number().int().min(1).max(365),
   packageId: z.string().optional(),

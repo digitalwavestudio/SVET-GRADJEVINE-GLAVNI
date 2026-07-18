@@ -23,14 +23,9 @@ export class AdminStatsService {
       | "jobs"
       | "companies"
       | "machines"
-      | "accommodations"
       | "masters"
       | "realEstate"
-      | "catering"
-      | "caterings"
-      | "marketplace"
       | "users"
-      | "plots"
       | "premiumPartners",
     change: number,
     isPremium: boolean = false,
@@ -50,13 +45,8 @@ export class AdminStatsService {
       jobs: "totalJobs",
       companies: "companiesCount",
       machines: "machinesCount",
-      accommodations: "accommodationsCount",
       masters: "mastersCount",
       realEstate: "realEstateCount",
-      plots: "realEstateCount",
-      catering: "cateringCount",
-      caterings: "cateringCount",
-      marketplace: "marketplaceCount",
       users: "totalUsers",
       premiumPartners: "premiumPartners",
     };
@@ -201,9 +191,7 @@ export class AdminStatsService {
               activeJobs: 0,
               activeAds: 0,
               totalJobs: 0,
-              accommodationsCount: 0,
               machinesCount: 0,
-              cateringCount: 0,
               realEstateCount: 0,
               companiesCount: 0,
               totalUsers: 0,
@@ -213,7 +201,7 @@ export class AdminStatsService {
               pendingAds: 0
             };
             
-            shardsSnap.forEach(s => { 
+            shardsSnap.forEach(s => {
               const sData = s.data();
               for (const key in shardSums) {
                 shardSums[key] += (sData[key] || 0);
@@ -253,11 +241,8 @@ export class AdminStatsService {
       totalJobs: 135,
       companiesCount: 42,
       machinesCount: 218,
-      accommodationsCount: 96,
       mastersCount: 74,
       realEstateCount: 165,
-      cateringCount: 58,
-      marketplaceCount: 112,
       activeAds: 850,
       pendingAds: 5,
       premiumPartners: 15,
@@ -301,7 +286,7 @@ export class AdminStatsService {
     try {
       // 1. Precise aggregations using count() (Safest & Cheapest - 1 read per 1k docs)
       const counts: Record<string, number> = {};
-      const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace"];
+      const categories = ["job"];
       
       for (const cat of categories) {
         const snap = await db.collection("listings")
@@ -351,12 +336,9 @@ export class AdminStatsService {
         activeAds,
         companiesCount: companiesSnap.data().count,
         machinesCount: counts.total_machines || 0,
-        accommodationsCount: counts.total_accommodations || 0,
-        cateringCount: counts.total_caterings || 0,
-        realEstateCount: (counts.total_plots || 0),
-        marketplaceCount: counts.total_marketplaces || 0,
+        realEstateCount: 0,
         totalUsers: usersSnap.data().count,
-        premiumAds: premiumSnap.size, // Estimation based on safety sample
+        premiumAds: premiumSnap.size,
         lastReconciled: new Date().toISOString(),
         safetySwitch: "active",
         reconcileWarning: premiumSnap.size >= BATCH_SIZE ? "Hard limit reached for premium scan. Use count() for full totals." : undefined

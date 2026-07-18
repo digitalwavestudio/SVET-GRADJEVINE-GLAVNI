@@ -1,18 +1,14 @@
 import { PROFESSIONS, LOCATIONS, ACCOMMODATION_TYPES, KITCHEN_TYPES, REAL_ESTATE_PURPOSES, SECTORS } from "@/src/constants/taxonomy";
 import { MACHINE_SUBCATEGORIES } from "@/src/constants/machineTaxonomy";
 import { 
-  jobSchema, machineSchema, accommodationSchema, cateringSchema, 
-  realEstateSchema, marketplaceSchema, businessProfileSchema as companySchema 
+  jobSchema, 
+  realEstateSchema, businessProfileSchema as companySchema 
 } from '@svet-gradjevine/shared';
 
 export const getValidationSchema = (category: string | null) => {
   switch (category) {
     case 'job': return jobSchema;
-    case 'machines': return machineSchema;
-    case 'accommodation': return accommodationSchema;
-    case 'catering': return cateringSchema;
     case 'plot': return realEstateSchema;
-    case 'marketplace': return marketplaceSchema;
     case 'company': return companySchema;
     default: return null;
   }

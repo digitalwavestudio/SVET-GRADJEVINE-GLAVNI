@@ -12,7 +12,7 @@ const db = getFirestore();
 db.settings({ ignoreUndefinedProperties: true });
 
 async function main() {
-  const categories = ["job", "machine", "accommodation", "catering", "plot", "marketplace"];
+  const categories = ["job"];
   const counts: Record<string, number> = {};
 
   for (const cat of categories) {
@@ -43,10 +43,7 @@ async function main() {
     activeJobs,
     companiesCount: companiesSnap.data().count,
     machinesCount: counts.total_machines || 0,
-    accommodationsCount: counts.total_accommodations || 0,
-    cateringCount: counts.total_caterings || 0,
     realEstateCount: counts.total_plots || 0,
-    marketplaceCount: counts.total_marketplaces || 0,
     totalUsers: usersSnap.data().count,
     lastReconciled: new Date().toISOString(),
     safetySwitch: "active",

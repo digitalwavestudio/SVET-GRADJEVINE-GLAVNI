@@ -24,8 +24,6 @@ vi.mock("../config/firebase.ts", () => {
       count: 1,
       totalJobs: 150,
       machinesCount: 45,
-      accommodationsCount: 30,
-      cateringCount: 20,
       realEstateCount: 60,
       companiesCount: 200,
       premiumPartners: 12,

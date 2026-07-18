@@ -233,11 +233,9 @@ export const getAdById = async (
           const hasTraffic = views >= 50;
           if (hasTraffic) {
             const parentSlug =
-              docData.type === "machine"
-                ? "/masine"
-                : docData.type === "job"
-                  ? "/poslovi"
-                  : "/alat-i-oprema";
+              docData.type === "job"
+                ? "/poslovi"
+                : "/alat-i-oprema";
             return {
               error: "Oglas je obrisan",
               redirect: parentSlug,

@@ -80,43 +80,7 @@ export async function processAiCommand(input: string, context?: unknown): Promis
             return `Tražimo iskusnog ${position} za stalno zaposlenje${loc}. Može se krenuti odmah sa radom! Potrebno je odgovorno obavljanje radnih zadataka, timski rad i poštovanje mera bezbednosti na radu. Kandidat treba da ima najmanje 2 godine iskustva u sličnim poslovima.${salary}${benefits}${contact}`;
         }
 
-        if (category === 'accommodation') {
-            const loc = fd.location || '';
-            const beds = fd.totalBeds || '';
-            const price = fd.price || '';
-            const l = loc ? ` u ${loc}` : '';
-            const p = price ? ` Cena: ${price} EUR.` : '';
-            const bedsTxt = beds ? ` Kapacitet: ${beds} kreveta.` : '';
-            return `Nudimo kvalitetan smeštaj za radnike${l}.${bedsTxt} Smeštaj je opremljen krevetima, ormarima, kuhinjom i kupatilom.${p} Pogodno za duži boravak. Parking i wifi dostupni.`;
-        }
 
-        if (category === 'machines') {
-            const brand = fd.machBrand || '';
-            const model = fd.machModel || '';
-            const m = brand || model ? ` ${brand} ${model}` : '';
-            const price = fd.machPrice ? ` Cena: ${fd.machPrice} EUR.` : fd.machPricePerDay ? ` Cena po danu: ${fd.machPricePerDay} EUR.` : '';
-            return `Izdajem građevinsku mašinu${m} u odličnom stanju. Redovno servisirana, spremna za rad.${price} Dostupna za uvid uživo.`;
-        }
-
-        if (category === 'catering') {
-            const price = fd.catPricePerMeal ? ` Cena po obroku: ${fd.catPricePerMeal} EUR.` : '';
-            const capacity = fd.catDailyCapacityMeals ? ` Kapacitet: ${fd.catDailyCapacityMeals} obroka dnevno.` : '';
-            return `Profesionalna ketering usluga za građevinske radnike. Dnevna ponuda kuvanih obroka, dostava na gradilište. Higijenski ispravno, HACCP standard.${price}${capacity}`;
-        }
-
-        if (category === 'plot') {
-            const loc = fd.location || '';
-            const purpose = fd.plotPurpose || '';
-            const area = fd.plotArea ? ` Površina: ${fd.plotArea} ${fd.plotAreaUnit || 'm2'}.` : '';
-            const price = fd.plotPrice ? ` Cena: ${fd.plotPrice} ${fd.plotCurrency || 'EUR'}.` : '';
-            const l = loc ? ` u ${loc}` : '';
-            return `Ponuda ${purpose}građevinskog zemljišta${l}.${area} Pristup sa asfaltnog puta. Infrastruktura u blizini. Pogodno za gradnju.${price}`;
-        }
-
-        if (category === 'marketplace') {
-            const price = fd.marketValue ? ` Cena: ${fd.marketValue} EUR.` : '';
-            return `Prodajem građevinsku opremu u dobrom stanju. Povoljna cena.${price} Moguć dogovor.`;
-        }
 
         return "";
     }

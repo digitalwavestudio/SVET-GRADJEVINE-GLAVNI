@@ -68,7 +68,6 @@ export class UnifiedSearchService {
       maxPrice: filters.maxPrice,
       professionSlug: filters.professionSlug,
       machineType: filters.machineType,
-      accommodationType: filters.accommodationType,
     };
     // Ukloni undefined/null vrednosti da key bude konzistentan
     const cleanFilters = Object.fromEntries(
@@ -78,14 +77,9 @@ export class UnifiedSearchService {
     const cached = !filters.search ? await CacheService.get<UnifiedSearchResult>(cacheKey) : null;
     if (cached) return cached;
     let entityType = category;
-    if (category && category !== "all" && category !== "marketplace") {
-      if (category === "machines") entityType = "machine";
-      else if (category === "accommodations") entityType = "accommodation";
-      else if (category === "caterings") entityType = "catering";
-      else if (category === "plots") entityType = "plot";
-      else if (category === "companies") entityType = "company";
+    if (category && category !== "all") {
+      if (category === "companies") entityType = "company";
       else if (category === "masters") entityType = "master";
-      else if (category === "realEstate") entityType = "realEstate";
       else if (category === "jobs" || category === "job") entityType = "job";
       else if (category === "magazine" || category === "articles") entityType = "article";
     }
@@ -117,8 +111,6 @@ export class UnifiedSearchService {
     if (filters.isPremium) q = q.where("isPremium", "==", true);
     if (filters.isUrgent) q = q.where("isUrgent", "==", true);
     if (filters.mainCategory) q = q.where("mainCategories", "array-contains", filters.mainCategory);
-    if (filters.type && entityType === "accommodation") q = q.where("typeSlug", "==", filters.type);
-    if (filters.accommodationType) q = q.where("accommodationType", "==", filters.accommodationType);
     if (filters.beds || filters.minBeds) q = q.where("beds", ">=", Number(filters.beds || filters.minBeds));
     if (filters.roomType) q = q.where("roomType", "==", filters.roomType);
     if (filters.parkingAvailable) q = q.where("parkingAvailable", "==", true);
@@ -140,11 +132,7 @@ export class UnifiedSearchService {
     // professionSlug se filtrira client-side (linija 188) — nema Firestore indeksa za sve varijante
     if (filters.minPrice != null) q = q.where("price", ">=", Number(filters.minPrice));
     if (filters.maxPrice != null) q = q.where("price", "<=", Number(filters.maxPrice));
-    if (filters.cateringType) q = q.where("cateringType", "==", filters.cateringType);
     if (filters.kitchenType) q = q.where("kitchenType", "==", filters.kitchenType);
-    if (filters.invoiceAvailable) q = q.where("invoiceAvailable", "==", true);
-    if (filters.minOrder) q = q.where("minOrder", "<=", Number(filters.minOrder));
-    if (filters.dailyCapacity) q = q.where("dailyCapacityMeals", ">=", Number(filters.dailyCapacity));
 
     // Get total count
     let totalHits: number | undefined;

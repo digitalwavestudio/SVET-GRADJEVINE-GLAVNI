@@ -2,25 +2,17 @@ import { parseGlobalSearch, GlobalSearchIntent } from '@/src/services/aiService'
 import { withRetry } from '@/src/lib/retry';
 import {
   Job,
-  CateringOffer,
   RealEstatePlot,
-  Machine,
-  Accommodation,
   Company,
-  Master,
-  MarketplaceItem
+  Master
 } from '@svet-gradjevine/shared';
 import { algoliaSearch, AlgoliaFilters } from '../../../services/algoliaFrontendService';
 
 export type UnifiedSearchEntity =
   | Job
-  | CateringOffer
   | RealEstatePlot
-  | Machine
-  | Accommodation
   | Company
-  | Master
-  | MarketplaceItem;
+  | Master;
 
 export interface SearchResult {
   id: string;
@@ -33,7 +25,7 @@ export interface SearchResult {
   data: UnifiedSearchEntity;
 }
 
-const CATEGORIES = ["jobs", "accommodations", "catering", "companies", "machines", "marketplace", "plots", "masters"] as const;
+const CATEGORIES = ["jobs", "companies", "masters"] as const;
 
 export const unifiedSearchService = {
   /**
@@ -78,11 +70,7 @@ export const unifiedSearchService = {
   async executeStructuredSearch(category: string, intent: GlobalSearchIntent): Promise<SearchResult[]> {
     return withRetry(async () => {
       let entityType = category;
-      if (category === 'machines') entityType = 'machine';
-      else if (category === 'accommodations') entityType = 'accommodation';
-      else if (category === 'caterings') entityType = 'catering';
-      else if (category === 'plots') entityType = 'plot';
-      else if (category === 'companies') entityType = 'company';
+      if (category === 'companies') entityType = 'company';
       else if (category === 'jobs') entityType = 'job';
 
       const filters: AlgoliaFilters = { type: entityType };

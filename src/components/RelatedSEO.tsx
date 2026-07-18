@@ -4,7 +4,7 @@ import { LOCATIONS } from '@/src/constants/taxonomy';
 
 interface RelatedSEOProps {
   locationSlug?: string;
-  currentType: 'jobs' | 'masters' | 'companies' | 'accommodation' | 'machines' | 'catering' | 'plots';
+  currentType: 'jobs' | 'masters' | 'companies';
 }
 
 export const RelatedSEO: React.FC<RelatedSEOProps> = ({ locationSlug, currentType }) => {
@@ -16,10 +16,7 @@ export const RelatedSEO: React.FC<RelatedSEOProps> = ({ locationSlug, currentTyp
     { type: 'jobs', label: `Poslovi u mestu ${cityName}`, path: `/poslovi/${locationSlug}`, icon: 'work' },
     { type: 'masters', label: `Majstori u mestu ${cityName}`, path: `/majstori/${locationSlug}`, icon: 'engineering' },
     { type: 'companies', label: `Firme u mestu ${cityName}`, path: `/firme/${locationSlug}`, icon: 'business' },
-    { type: 'accommodation', label: `Smeštaj u mestu ${cityName}`, path: `/smestaj/${locationSlug}`, icon: 'home_work' },
-    { type: 'machines', label: `Mašine u mestu ${cityName}`, path: `/masine/${locationSlug}`, icon: 'construction' },
-    { type: 'catering', label: `Ketering u mestu ${cityName}`, path: `/ketering/${locationSlug}`, icon: 'restaurant' },
-    { type: 'plots', label: `Placevi u mestu ${cityName}`, path: `/placevi/${locationSlug}`, icon: 'landscape' },
+
   ].filter(link => link.type !== currentType);
 
   return (

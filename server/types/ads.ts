@@ -59,36 +59,6 @@ export interface JobAd extends BaseAd {
   email?: string;
 }
 
-export interface MachineAd extends BaseAd {
-  type: "machine";
-  category: "machines";
-  manufacturer: string;
-  model: string;
-  year?: number;
-  price?: number;
-  currency?: string;
-}
-
-export interface AccommodationAd extends BaseAd {
-  type: "accommodation";
-  category: "accommodations";
-  capacity?: number;
-  pricePerNight?: number;
-}
-
-export interface CateringAd extends BaseAd {
-  type: "catering";
-  category: "caterings";
-  menuType?: string;
-}
-
-export interface PlotAd extends BaseAd {
-  type: "plot";
-  category: "plots";
-  area?: number;
-  purpose?: string;
-}
-
 export interface RealEstateAd extends BaseAd {
   type: "realEstate";
   category: "real_estate";
@@ -97,4 +67,4 @@ export interface RealEstateAd extends BaseAd {
   floor?: number;
 }
 
-export type Listing = JobAd | MachineAd | AccommodationAd | CateringAd | PlotAd | RealEstateAd | BaseAd;
+export type Listing = JobAd | RealEstateAd | BaseAd;

@@ -28,16 +28,7 @@ export const PACKAGES_BY_CATEGORY: Record<string, AdPackage[]> = {
     { id: 'premium', name: 'PREMIUM OGLAS', price: '2.000 SG Kredita (2.000 RSD)', priceNum: 2000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
     { id: 'urgent', name: 'HITNO (URGENT)', price: '4.000 SG Kredita (4.000 RSD)', priceNum: 4000, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
   ],
-  marketplace: [
-    STANDARD_PAID,
-    { id: 'premium', name: 'PREMIUM OGLAS', price: '2.000 SG Kredita (2.000 RSD)', priceNum: 2000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
-    { id: 'urgent', name: 'HITNO (URGENT)', price: '4.000 SG Kredita (4.000 RSD)', priceNum: 4000, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
-  ],
-  machines: [
-    STANDARD_PAID,
-    { id: 'premium', name: 'PREMIUM OGLAS', price: '2.000 SG Kredita (2.000 RSD)', priceNum: 2000, oldPrice: null, desc: '30 dana • Istaknut + Logo', features: ['Na vrhu pretrage', 'Istaknut dizajn i boja'], color: 'secondary', recommended: true },
-    { id: 'urgent', name: 'HITNO (URGENT)', price: '4.000 SG Kredita (4.000 RSD)', priceNum: 4000, oldPrice: null, desc: '15 dana • Najviši prioritet', features: ['Bedž HITNO', 'Prva sekcija na naslovnoj'], color: 'primary' }
-  ]
+
 };
 
 // Fallback for types that might map differently

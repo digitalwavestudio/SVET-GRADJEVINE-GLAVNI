@@ -35,27 +35,7 @@ export const queryKeys = {
     userApplications: (userId: string, role: string) => [...queryKeys.jobs.applications(), 'user', userId, role] as const,
     jobApplications: (jobId: string) => [...queryKeys.jobs.applications(), 'job', jobId] as const,
   },
-  accommodations: {
-    all: ['accommodations'] as const,
-    lists: () => [...queryKeys.accommodations.all, 'list'] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.accommodations.lists(), filters] as const,
-    details: () => [...queryKeys.accommodations.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.accommodations.details(), id] as const,
-  },
-  machines: {
-    all: ['machines'] as const,
-    lists: () => [...queryKeys.machines.all, 'list'] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.machines.lists(), filters] as const,
-    details: () => [...queryKeys.machines.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.machines.details(), id] as const,
-  },
-  catering: {
-    all: ['catering'] as const,
-    lists: () => [...queryKeys.catering.all, 'list'] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.catering.lists(), filters] as const,
-    details: () => [...queryKeys.catering.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.catering.details(), id] as const,
-  },
+
   companies: {
     all: ['companies'] as const,
     lists: () => [...queryKeys.companies.all, 'list'] as const,
@@ -70,13 +50,7 @@ export const queryKeys = {
     details: () => [...queryKeys.masters.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.masters.details(), id] as const,
   },
-  marketplace: {
-    all: ['marketplace'] as const,
-    lists: () => [...queryKeys.marketplace.all, 'list'] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.marketplace.lists(), filters] as const,
-    details: () => [...queryKeys.marketplace.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.marketplace.details(), id] as const,
-  },
+
   realEstate: {
     all: ['realEstate'] as const,
     lists: () => [...queryKeys.realEstate.all, 'list'] as const,

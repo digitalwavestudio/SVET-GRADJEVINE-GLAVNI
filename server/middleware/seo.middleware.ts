@@ -282,15 +282,6 @@ export const botPrerenderMiddleware = async (
           if (meta.hasTraffic) {
             const adRoutes = [
               { path: "/poslovi", coll: "jobs", alwaysListing: true },
-              { path: "/masine", coll: "machines", alwaysListing: true },
-              { path: "/smestaj", coll: "accommodations", alwaysListing: true },
-              { path: "/ketering", coll: "caterings", alwaysListing: true },
-              { path: "/placevi", coll: "plots", alwaysListing: true },
-              {
-                path: "/alat-i-oprema",
-                coll: "marketplace",
-                alwaysListing: true,
-              },
               { path: "/firme", coll: "companies", alwaysListing: true },
               { path: "/majstori", coll: "users", alwaysListing: true },
             ];

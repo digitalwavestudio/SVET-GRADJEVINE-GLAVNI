@@ -72,13 +72,6 @@ export class SEOMetaService {
       const typeToCollection: Record<string, string> = {
         posao: "jobs",
         firma: "companies",
-        nekretnine: "plots",
-        placevi: "plots",
-        "gradjevinske-masine": "machines",
-        masina: "machines",
-        ketering: "caterings",
-        smestaj: "accommodations",
-        "alat-i-oprema": "marketplace",
         majstor: "users",
         profil: "users",
       };
@@ -206,16 +199,6 @@ export class SEOMetaService {
         return `Ovaj poslovni oglas (ID: ${id}) objavljen ${date} nudi poziciju za "${title}" u mestu ${loc} za kompenzaciju: ${price}. ${contact} Kompanija: ${data.companyName || "nepoznata"}.`;
       case "companies":
         return `Ovo je kompanija "${title}" (ID: ${id}) na lokaciji ${loc}. Adresa: ${data.address || "nije navedena"}. PIB: ${data.pib || "nije naveden"}.`;
-      case "plots":
-        return `Ovaj oglas (ID: ${id}) objavljen ${date} nudi na prodaju građevinski plac "${title}" na lokaciji ${loc} po ceni od ${price}. ${contact}`;
-      case "machines":
-        return `Ovaj oglas (ID: ${id}) objavljen ${date} nudi građevinsku mašinu "${title}" na lokaciji ${loc} po ceni od ${price}. ${contact}`;
-      case "accommodations":
-        return `Ovaj oglas (ID: ${id}) objavljen ${date} nudi radnički smeštaj "${title}" u mestu ${loc}. ${contact}`;
-      case "caterings":
-        return `Ovaj oglas (ID: ${id}) objavljen ${date} nudi ketering uslugu "${title}" u mestu ${loc}. ${contact}`;
-      case "marketplace":
-        return `Ovaj oglas (ID: ${id}) objavljen ${date} nudi materijal / alat "${title}" na lokaciji ${loc} po ceni od ${price}. ${contact}`;
       case "users":
         return `Ovo je javni profil korisnika "${title}" (ID: ${id}). Uloga: ${data.role || "korisnik"}. Profesija: ${data.profession || "nije navedeno"}, Lokacija: ${loc}. ${contact}`;
       default:
@@ -243,7 +226,7 @@ export class SEOMetaService {
       creator: {
         "@type": "Organization",
         name: "Svet Građevine",
-        url: "${APP_CONFIG.BASE_URL}",
+        url: APP_CONFIG.BASE_URL,
       },
       license: "https://creativecommons.org/licenses/by/4.0/",
       isAccessibleForFree: true,
@@ -332,30 +315,6 @@ export class SEOMetaService {
         <p itemprop="address"><strong>Adresa:</strong> ${data.address || "N/A"}</p>
         <p itemprop="taxID"><strong>PIB:</strong> ${data.pib || "N/A"}</p>
       `;
-    } else if (
-      type === "plots" ||
-      type === "machines" ||
-      type === "marketplace"
-    ) {
-      itemType =
-        type === "plots"
-          ? "http://schema.org/RealEstateListing"
-          : "http://schema.org/Product";
-      details = `
-        <p itemprop="areaServed"><strong>Lokacija:</strong> ${data.locationSlug || data.location || "Srbija"}</p>
-        <p itemprop="offers" itemscope itemtype="http://schema.org/Offer"><strong>Cena:</strong> <span itemprop="price">${data.price ? data.price : "Po dogovoru"}</span> <meta itemprop="priceCurrency" content="EUR" /></p>
-        ${data.phone ? `<p itemprop="telephone"><strong>Kontakt telefon:</strong> ${data.phone}</p>` : ""}
-      `;
-    } else if (type === "accommodations" || type === "caterings") {
-      itemType =
-        type === "accommodations"
-          ? "http://schema.org/LodgingBusiness"
-          : "http://schema.org/FoodEstablishment";
-      details = `
-        <p itemprop="areaServed"><strong>Lokacija:</strong> ${data.locationSlug || data.city || "Srbija"}</p>
-        <p itemprop="address"><strong>Adresa:</strong> ${data.tacnaLokacija || data.address || "N/A"}</p>
-        ${data.phone ? `<p itemprop="telephone"><strong>Kontakt telefon:</strong> ${data.phone}</p>` : ""}
-      `;
     } else if (type === "users") {
       itemType = "http://schema.org/ProfessionalService";
       details = `
@@ -438,33 +397,6 @@ export class SEOMetaService {
         links += makeLink(
           `/firme/${SEOSchemaService.slugify(industry)}`,
           `Građevinskefirme za: ${industry}`,
-        );
-    } else if (
-      type === "plots" ||
-      type === "machines" ||
-      type === "marketplace"
-    ) {
-      const category = data.category || data.kategorija;
-      const baseRoute =
-        type === "plots"
-          ? "/nekretnine"
-          : type === "machines"
-            ? "/gradjevinske-masine"
-            : "/alat-i-oprema";
-      if (loc)
-        links += makeLink(
-          `${baseRoute}/${SEOSchemaService.slugify(loc)}`,
-          `Ponude u mestu ${loc}`,
-        );
-      if (category)
-        links += makeLink(
-          `${baseRoute}/${SEOSchemaService.slugify(category)}`,
-          `Sve ponude kategorije ${category}`,
-        );
-      if (loc && category)
-        links += makeLink(
-          `${baseRoute}/${SEOSchemaService.slugify(category)}/${SEOSchemaService.slugify(loc)}`,
-          `${category} u mestu ${loc}`,
         );
     } else {
       if (loc)

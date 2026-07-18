@@ -222,11 +222,6 @@ export class AlgoliaSync {
     const baseUrl = "https://svetgradjevine.com";
     switch (category) {
       case "jobs": return `${baseUrl}/posao/${id}`;
-      case "machines": case "ostalo": return `${baseUrl}/gradjevinske-masine/srbija/ostalo/${id}`;
-      case "accommodations": return `${baseUrl}/smestaj/srbija/ostalo/${id}`;
-      case "caterings": return `${baseUrl}/ketering/provajder/${id}`;
-      case "lands": return `${baseUrl}/placevi/srbija/ostalo/${id}`;
-      case "equipments": return `${baseUrl}/alat-i-oprema/srbija/ostalo/${id}`;
       case "masters": return `${baseUrl}/majstori/profil/${id}`;
       case "companies": return `${baseUrl}/firme/profil/${id}`;
       default: return `${baseUrl}/oglas/${id}`;
@@ -242,12 +237,9 @@ export class AlgoliaSync {
     const vitalFields = [
       "title", "price", "location", "locationSlug", "status", "tags", "isPremium", "isUrgent",
       "company", "companyId", "category", "type", "typeSlug", "salary", "plataMin", "plataMax",
-      "kategorija", "potkategorija", "skills", "profession", "professionSlug", "beds", "roomType",
-      "parkingAvailable", "invoiceAvailable", "cuisine", "machineType", "condition", "adType",
-      "categoryId", "fuelType", "weightKg", "area", "purpose", "brand", "model", "city",
-      "mainCategories", "isVerified", "isPremiumPartner", "cateringType",
-      "kitchenType", "dailyCapacityMeals", "minOrder", "accessRoad", "highwayAccess", "railAccess",
-      "freeZone", "accommodationType", "tacnaLokacija", "areaM2", "viewsCount", "geopoint", "_geoloc",
+      "kategorija", "potkategorija", "skills", "profession", "professionSlug", "city",
+      "mainCategories", "isVerified", "isPremiumPartner",
+      "tacnaLokacija", "areaM2", "viewsCount", "geopoint", "_geoloc",
     ];
 
     const changedFields: string[] = [];

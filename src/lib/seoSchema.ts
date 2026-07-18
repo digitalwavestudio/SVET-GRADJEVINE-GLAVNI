@@ -118,13 +118,6 @@ export interface LodgingInput {
   totalRooms?: number | string;
 }
 
-export interface FoodEstablishmentInput {
-  title?: string;
-  description?: string;
-  images?: string[];
-  phone?: string;
-}
-
 export interface MenuItemInput {
   name?: string;
   description?: string;
@@ -452,43 +445,6 @@ export const generateLodgingSchema = (accommodationData: LodgingInput, locationN
     "publicAccess": true,
     ...(accommodationData.totalRooms && { "numberOfRooms": accommodationData.totalRooms }),
     ...additionalFeatures
-  };
-};
-
-export const generateFoodEstablishmentSchema = (cateringData: FoodEstablishmentInput, locationName: string, url: string) => {
-  const locationSlug = locationName?.toLowerCase().replace(/ /g, '-') || "srbija";
-  const placeId = `${BASE_URL}/ketering/${locationSlug}#place`;
-  const cateringId = `${url}#foodestablishment`;
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "FoodEstablishment",
-    "@id": cateringId,
-    "name": sanitizeInput(cateringData.title || ""),
-    "description": sanitizeInput(cateringData.description?.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 300) || `Ketering usluge za radnike: ${cateringData.title} u mestu ${locationName}.`),
-    "image": cateringData.images || [],
-    "location": {
-      "@type": "Place",
-      "@id": placeId,
-      "name": sanitizeInput(locationName || "Srbija"),
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": sanitizeInput(locationName),
-        "addressRegion": "Srbija",
-        "addressCountry": "RS"
-      }
-    },
-    // Backwards compatibility
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": sanitizeInput(locationName),
-      "addressRegion": "Srbija",
-      "addressCountry": "RS"
-    },
-    "telephone": sanitizeInput(cateringData.phone || ""),
-    "url": sanitizeInput(url),
-    "servesCuisine": "Domaća kuhinja",
-    "acceptsReservations": "True"
   };
 };
 

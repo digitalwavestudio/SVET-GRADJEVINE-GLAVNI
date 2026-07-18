@@ -10,13 +10,23 @@ import { SEORenderEngine } from "../services/seo/seo-render-engine.ts";
 import { cacheMiddleware } from "../middleware/cache.middleware.ts";
 
 
+function replaceEnvPlaceholders(html: string): string {
+  return html
+    .replaceAll("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+    .replaceAll("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+    .replaceAll("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+    .replaceAll("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+    .replaceAll("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "")
+    .replaceAll("%VITE_GA_MEASUREMENT_ID%", env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY");
+}
+
 export const seoRouter = Router();
 
-let cacheBuster = "1";
+let cacheBuster = "2";
 try {
   const indexHtml = fs.readFileSync(path.join(process.cwd(), "dist", "index.html"), "utf-8");
   const match = indexHtml.match(/\/assets\/index-([^.]+)\.js/);
-  if (match) cacheBuster = match[1];
+  if (match) cacheBuster = match[1] + "-2";
 } catch {}
 
 // Middleware to inject meta tags
@@ -49,7 +59,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
     if (cachedHtml) {
       res.setHeader("Cache-Control", "public, max-age=3600"); // 1h for humans
       res.setHeader("X-Cache", "HIT");
-      return res.send(cachedHtml);
+      return res.send(replaceEnvPlaceholders(cachedHtml));
     }
   } catch (e) { console.error("[SEO] Cached HTML read error:", e); }
 
@@ -90,7 +100,7 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
 
       res.setHeader("Cache-Control", "public, max-age=600"); // 10 mins cache on fallback to allow fast warm-up
       res.setHeader("X-Cache", "MISS (Cold Cache Fallback)");
-      return res.send(html);
+      return res.send(replaceEnvPlaceholders(html));
     }
 
     // Evaluate ETag via Render Engine to enable 304 Caching
@@ -105,12 +115,13 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
       meta,
     });
 
+    const replacedHtml = replaceEnvPlaceholders(html);
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.setHeader("X-Cache", "MISS");
-    res.send(html);
+    res.send(replacedHtml);
 
     // Cache the HTML for bots/humans for 24h
-    CacheService.set(cacheKey, html, 86400000).catch((e) =>
+    CacheService.set(cacheKey, replacedHtml, 86400000).catch((e) =>
       console.error("Cache set error:", e)
     );
   } catch (error) {

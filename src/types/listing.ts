@@ -1,5 +1,5 @@
 // Blueprint for universal listing (to be used after migration)
-export type ListingType = "job" | "catering" | "accommodation" | "machine" | "master";
+export type ListingType = "job" | "master";
 
 export interface UniversalListing {
   id: string;

@@ -72,6 +72,4 @@ export const getFirmLink = (id: string) => `/firma/${id}`;
 export const getUserLink = (id: string) => `/profil/${id}`;
 export const getMachineLink = (id: string) => `/gradjevinske-masine/${id}`;
 export const getAccommodationLink = (id: string) => `/smestaj/${id}`;
-export const getCateringLink = (id: string) => `/ketering/provajder/${id}`;
 export const getPlotLink = (id: string) => `/placevi/${id}`;
-export const getMarketplaceLink = (id: string) => `/alat-i-oprema/${id}`;

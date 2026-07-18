@@ -3,7 +3,7 @@ import { ParsedSearch } from '@/src/modules/search';
 import { apiClient } from '@/src/lib/apiClient';
 
 export interface GlobalSearchIntent {
-  category?: 'jobs' | 'accommodations' | 'catering' | 'companies' | 'machines' | 'real-estate' | 'marketplace' | 'masters';
+  category?: 'jobs' | 'companies' | 'real-estate' | 'masters';
   subCategory?: string;
   locationSlug?: string;
   minPrice?: number;

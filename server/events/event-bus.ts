@@ -2,26 +2,20 @@ import { EventEmitter } from "events";
 import { getRedis } from "../utils/redis.ts";
 import { randomUUID } from "crypto";
 import { PaymentSagaContext } from "./payment.types.ts";
-import { 
-  Job, 
-  CateringOffer, 
-  RealEstatePlot, 
-  Machine, 
-  Accommodation, 
-  Company, 
-  Master, 
-  MarketplaceItem 
+import {
+  Job,
+  RealEstatePlot,
+  Company,
+  Master,
+  MarketplaceItem
 } from "@svet-gradjevine/shared";
 import { logger } from "../utils/logger.ts";
 
-export type UnifiedAdEntity = 
-  | Job 
-  | CateringOffer 
-  | RealEstatePlot 
-  | Machine 
-  | Accommodation 
-  | Company 
-  | Master 
+export type UnifiedAdEntity =
+  | Job
+  | RealEstatePlot
+  | Company
+  | Master
   | MarketplaceItem;
 
 export const DomainEvents = {

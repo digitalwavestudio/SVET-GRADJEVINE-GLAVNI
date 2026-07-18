@@ -235,11 +235,4 @@ export const ACCESS_ROAD_TYPES: TaxonomyItem[] = [
   { id: 'zemljani', slug: 'zemljani', name: 'Zemljani put' },
 ];
 
-export const MARKETPLACE_CATEGORIES: TaxonomyItem[] = [
-  { id: 'elektricni-alat', slug: 'elektricni-alat', name: 'Električni alat', icon: 'power' },
-  { id: 'rucni-alat', slug: 'rucni-alat', name: 'Ručni alat', icon: 'build' },
-  { id: 'oprema-skele-oplate', slug: 'oprema-skele-oplate', name: 'Oprema (skele, oplate)', icon: 'construction' },
-  { id: 'htz-oprema', slug: 'htz-oprema', name: 'HTZ oprema', icon: 'dry_cleaning' },
-  { id: 'rezervni-delovi', slug: 'rezervni-delovi', name: 'Rezervni delovi', icon: 'settings' },
-  { id: 'ostalo', slug: 'ostalo', name: 'Ostalo', icon: 'more_horiz' },
-];
+

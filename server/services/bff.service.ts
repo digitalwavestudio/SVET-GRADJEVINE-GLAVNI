@@ -1,9 +1,5 @@
 import { 
-  Job, 
-  Machine, 
-  RealEstatePlot, 
-  Accommodation, 
-  CateringOffer 
+  Job
 } from "@svet-gradjevine/shared";
 import { 
   HomepageStats, 

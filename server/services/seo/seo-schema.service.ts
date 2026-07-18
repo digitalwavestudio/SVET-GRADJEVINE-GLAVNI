@@ -183,7 +183,7 @@ export class SEOSchemaService {
     const id = data?.id;
     const schemas: Record<string, unknown>[] = [];
     const breadcrumbItems = [
-      { name: "PoÄetna", item: "${APP_CONFIG.BASE_URL}/" },
+      { name: "Početna", item: `${APP_CONFIG.BASE_URL}/` },
     ];
 
     // Derived Canonical URL for the entity
@@ -200,7 +200,7 @@ export class SEOSchemaService {
     if (type === "jobs") {
       breadcrumbItems.push({
         name: "Poslovi",
-        item: "${APP_CONFIG.BASE_URL}/poslovi",
+        item: `${APP_CONFIG.BASE_URL}/poslovi`,
       });
 
       const profession = data.kategorija || data.zanimanje || data.category;
@@ -239,11 +239,11 @@ export class SEOSchemaService {
           "@id": companyId
             ? `${APP_CONFIG.BASE_URL}/firma/${companyId}#org`
             : undefined,
-          name: data.companyName || "Svet GraÄ‘evine",
-          logo: "${APP_CONFIG.BASE_URL}/logo192.png",
+          name: data.companyName || "Svet Građevine",
+          logo: `${APP_CONFIG.BASE_URL}/logo192.png`,
           url: companyId
             ? `${APP_CONFIG.BASE_URL}/firma/${companyId}`
-            : "${APP_CONFIG.BASE_URL}",
+            : APP_CONFIG.BASE_URL,
         },
         jobLocation: {
           "@type": "Place",
@@ -277,7 +277,7 @@ export class SEOSchemaService {
     if (type === "companies") {
       breadcrumbItems.push({
         name: "Firme",
-        item: "${APP_CONFIG.BASE_URL}/firme",
+        item: `${APP_CONFIG.BASE_URL}/firme`,
       });
       if (data.city) {
         breadcrumbItems.push({
@@ -349,7 +349,7 @@ export class SEOSchemaService {
     if (type === "users") {
       breadcrumbItems.push({
         name: "Majstori",
-        item: "${APP_CONFIG.BASE_URL}/majstori",
+        item: `${APP_CONFIG.BASE_URL}/majstori`,
       });
 
       const profession = data.zanimanje || data.profession || data.kategorija;

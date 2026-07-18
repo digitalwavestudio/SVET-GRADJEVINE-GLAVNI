@@ -20,12 +20,6 @@ export class UnifiedAdsService {
 
   private static readonly CATEGORY_MAP: Record<string, { category: string; entityType: string }> = {
     jobs: { category: "jobs", entityType: "job" },
-    machines: { category: "machines", entityType: "machine" },
-    caterings: { category: "caterings", entityType: "catering" },
-    accommodations: { category: "accommodations", entityType: "accommodation" },
-    plots: { category: "plots", entityType: "plot" },
-    real_estate: { category: "real_estate", entityType: "plot" },
-    marketplace: { category: "marketplace", entityType: "marketplace" },
     companies: { category: "companies", entityType: "company" },
   };
 
@@ -89,10 +83,6 @@ export class UnifiedAdsService {
           const type = data.type || '';
           let typeLabel = 'Oglas';
           if (type === 'job') typeLabel = 'Posao';
-          else if (type === 'accommodation') typeLabel = 'Smestaj';
-          else if (type === 'machine') typeLabel = 'Masina';
-          else if (type === 'catering') typeLabel = 'Ketering';
-          else if (type === 'plot' || type === 'real_estate') typeLabel = 'Plac';
           else if (type === 'company') typeLabel = 'Firma';
           return { ...data, id: doc.id, typeLabel, postType: type || 'other' };
         });
@@ -327,14 +317,9 @@ export class UnifiedAdsService {
     let q: FirebaseFirestore.Query = db.collection(collName);
     if (category === "companies") {
       q = q.where("role", "==", "company");
-    } else if (category !== "all" && category !== "marketplace") {
+    } else if (category !== "all") {
       let entityType = category;
-      if (category === "machines") entityType = "machine";
-      else if (category === "accommodations") entityType = "accommodation";
-      else if (category === "caterings") entityType = "catering";
-      else if (category === "plots" || category === "real_estate") entityType = "plot";
-      else if (category === "realEstate") entityType = "realEstate";
-      else if (category === "jobs") entityType = "job";
+      if (category === "jobs") entityType = "job";
 
       q = q.where("type", "==", entityType).where("status", "==", "active");
     } else {

@@ -20,9 +20,7 @@ export function useRoleStats(role: string) {
 
 export interface AuthorCounts {
   jobs: number;
-  machines: number;
   accommodations: number;
-  catering: number;
   realestate: number;
 }
 
@@ -33,9 +31,7 @@ export function useAuthorCounts(authorId?: string, companyId?: string) {
       if (!authorId)
         return {
           jobs: 0,
-          machines: 0,
           accommodations: 0,
-          catering: 0,
           realestate: 0,
         } as AuthorCounts;
       const queryParams = new URLSearchParams();

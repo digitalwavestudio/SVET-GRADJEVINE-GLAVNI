@@ -99,12 +99,8 @@ statsRouter.get("/pseo-insights", async (req, res, next) => {
           queryRef = queryRef.where("locationSlug", "==", grad);
         }
 
-        if (zanimanje) {
-          if (collection === "jobs") {
-            queryRef = queryRef.where("professionSlug", "==", zanimanje);
-          } else if (collection === "machines") {
-            queryRef = queryRef.where("category", "==", zanimanje);
-          }
+        if (zanimanje && collection === "jobs") {
+          queryRef = queryRef.where("professionSlug", "==", zanimanje);
         }
 
         // Samo limitiramo na top 10 rezultata da izvučemo 'sample' podatke iz kojih ćemo generisati agregacije
@@ -179,10 +175,6 @@ statsRouter.get("/aggregate", async (req, res, next) => {
 
         return {
           totalJobs: globalStats.totalJobs || 0,
-          totalMachines: globalStats.machinesCount || 0,
-          totalAccommodations: globalStats.accommodationsCount || 0,
-          totalCaterings: globalStats.cateringCount || 0,
-          totalRealEstate: globalStats.realEstateCount || 0,
           totalCompanies: globalStats.companiesCount || 0,
           premiumJobs: globalStats.premiumAds || globalStats.premiumPartners || 0,
           urgentJobs: globalStats.urgentAds || 0,
@@ -202,8 +194,6 @@ statsRouter.get("/counts", async (req, res, next) => {
     const stats = await AdminStatsService.getGlobalStats();
     res.json({
       jobs: stats.activeJobs || stats.totalJobs || 0,
-      accommodations: stats.accommodationsCount || 0,
-      machines: stats.machinesCount || 0,
       masters: stats.mastersCount || 0,
     });
   } catch (error) {
@@ -246,37 +236,12 @@ statsRouter.get("/author-counts/:authorId", async (req, res, next) => {
         .count()
         .get()
         .catch(() => ({ data: () => ({ count: 0 }) })),
-      queryListings("machine")
-        .where("authorId", "==", authorId)
-        .count()
-        .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
-      queryListings("accommodation")
-        .where("authorId", "==", authorId)
-        .count()
-        .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
-      queryListings("catering")
-        .where("authorId", "==", authorId)
-        .count()
-        .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
-      queryListings("real_estate")
-        .where("authorId", "==", authorId)
-        .count()
-        .get()
-        .catch(() => ({ data: () => ({ count: 0 }) })),
     ];
 
-    const [jobsSnap, machinesSnap, accsSnap, catsSnap, plotsSnap] =
-      await Promise.all(promises);
+    const [jobsSnap] = await Promise.all(promises);
 
     const result = {
       jobs: (jobsSnap as { data: () => { count: number } }).data().count || 0,
-      machines: (machinesSnap as { data: () => { count: number } }).data().count || 0,
-      accommodations: (accsSnap as { data: () => { count: number } }).data().count || 0,
-      catering: (catsSnap as { data: () => { count: number } }).data().count || 0,
-      realestate: (plotsSnap as { data: () => { count: number } }).data().count || 0,
     };
 
     if (redis) {
@@ -300,11 +265,6 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
     // Validate collection
     const validCollections = [
       "jobs",
-      "machines",
-      "accommodations",
-      "caterings",
-      "plots",
-      "marketplace",
       "companies",
       "masters",
       "users",
@@ -327,23 +287,12 @@ statsRouter.get("/collection/:collectionName", async (req, res, next) => {
         const fieldMap: Record<string, string> = {
           jobs: "activeJobs",
           companies: "companiesCount",
-          machines: "machinesCount",
-          accommodations: "accommodationsCount",
-          real_estate: "realEstateCount",
-          plots: "realEstateCount",
-          caterings: "cateringCount",
-          marketplace: "marketplaceCount",
           users: "totalUsers",
           premium: "premiumPartners",
         };
 
         const typeMap: Record<string, string> = {
           jobs: "job",
-          machines: "machine",
-          accommodations: "accommodation",
-          caterings: "catering",
-          plots: "plot",
-          marketplace: "marketplace",
         };
 
         const countKey = fieldMap[collectionName];

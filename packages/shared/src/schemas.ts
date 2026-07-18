@@ -278,25 +278,7 @@ export const machineSchema = adBaseSchema.extend({
   currency: z.string().default('EUR'),
 });
 
-// TODO: accType needs to be mapped to type in the adapter layer
-export const accommodationSchema = adBaseSchema.extend({
-  accType: z.string().min(1, "Tip smeštaja je obavezan"),
-  price: z.coerce.number().min(1, "Cena mora biti veća od 0"),
-  totalBeds: z.coerce.number().min(1, "Broj kreveta mora biti barem 1"),
-  availableBeds: z.coerce.number().min(0, "Ne može biti negativno"),
-  invoiceAvailable: z.boolean().optional(),
-  parkingAvailable: z.boolean().optional(),
-  wifiAvailable: z.boolean().optional(),
-  address: z.string().optional(),
-});
 
-// TODO: catKitchenType has no matching field in CateringOffer interface — map in adapter layer
-export const cateringSchema = adBaseSchema.extend({
-  catKitchenType: z.string().min(1, "Tip kuhinje je obavezan"),
-  catMinOrder: z.coerce.number().min(1, "Minimalna porudžbina je obavezna"),
-  catPricePerMeal: z.coerce.number().min(1, "Cena po obroku je obavezna"),
-  deliveryAvailable: z.boolean().optional(),
-});
 
 export const realEstateSchema = adBaseSchema.extend({
   area: z.coerce.number().min(1, "Površina mora biti veća od 0"),
@@ -340,15 +322,9 @@ export const realEstateSchema = adBaseSchema.extend({
   plotAccessRoad: z.string().optional(),
 });
 
-// TODO: marketCategory, marketCondition, marketValue don't match MarketplaceItem interface fields — map in adapter layer
-export const marketplaceSchema = adBaseSchema.extend({
-  marketCategory: z.string().min(1, "Kategorija je obavezna"),
-  marketCondition: z.string().min(1, "Stanje je obavezno"),
-  marketValue: z.coerce.number().min(1, "Cena mora biti veća od 0"),
-});
 
 export const moderateAdSchema = z.object({
-  category: z.enum(['jobs', 'machines', 'plots', 'real_estate', 'companies', 'accommodations', 'caterings', 'marketplace']),
+  category: z.enum(['jobs', 'companies']),
   id: z.string().min(1),
   action: z.enum(['approve', 'reject', 'pause', 'active']),
   reason: z.string().optional()
@@ -356,24 +332,12 @@ export const moderateAdSchema = z.object({
 
 export const createAdSchema = z.discriminatedUnion('category', [
   z.object({ category: z.literal('jobs'), data: jobSchema }),
-  z.object({ category: z.literal('machines'), data: machineSchema }),
-  z.object({ category: z.literal('plots'), data: realEstateSchema }),
-  z.object({ category: z.literal('real_estate'), data: realEstateSchema }),
-  z.object({ category: z.literal('companies'), data: businessProfileSchema }),
-  z.object({ category: z.literal('accommodations'), data: accommodationSchema }),
-  z.object({ category: z.literal('caterings'), data: cateringSchema }),
-  z.object({ category: z.literal('marketplace'), data: marketplaceSchema })
+  z.object({ category: z.literal('companies'), data: businessProfileSchema })
 ]);
 
 export const updateAdSchema = z.discriminatedUnion('category', [
   z.object({ category: z.literal('jobs'), data: jobSchema.partial() }),
-  z.object({ category: z.literal('machines'), data: machineSchema.partial() }),
-  z.object({ category: z.literal('plots'), data: realEstateSchema.partial() }),
-  z.object({ category: z.literal('real_estate'), data: realEstateSchema.partial() }),
-  z.object({ category: z.literal('companies'), data: businessProfileSchema.partial() }),
-  z.object({ category: z.literal('accommodations'), data: accommodationSchema.partial() }),
-  z.object({ category: z.literal('caterings'), data: cateringSchema.partial() }),
-  z.object({ category: z.literal('marketplace'), data: marketplaceSchema.partial() })
+  z.object({ category: z.literal('companies'), data: businessProfileSchema.partial() })
 ]);
 
 export const checkoutSchema = z.object({
@@ -431,6 +395,6 @@ export const migrateProfileSchema = z.object({
 });
 
 export const viewMetricSchema = z.object({
-  collectionName: z.enum(['jobs', 'machines', 'properties', 'companies', 'users', 'accommodations', 'caterings', 'plots']),
+  collectionName: z.enum(['jobs', 'companies', 'users']),
   targetId: z.string().min(1)
 });

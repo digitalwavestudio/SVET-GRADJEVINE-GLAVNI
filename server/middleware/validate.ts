@@ -21,10 +21,7 @@ import {
   adminActionSchema,
   migrateProfileSchema,
   machineSchema,
-  accommodationSchema,
-  cateringSchema,
   realEstateSchema,
-  marketplaceSchema,
 } from "@svet-gradjevine/shared";
 
 export const submitVerificationSchema = z.object({
@@ -334,43 +331,7 @@ async function logToDLQ(error: string, req: Request, details: unknown) {
   }
 }
 
-/**
- * Dodatna striktna validacija dolaznih podataka (ingress) za specifične vertikale (mašine, smeštaj, ketering, placevi)
- */
-interface VerticalAdRequestBody {
-  category?: string;
-  data?: unknown;
-}
 
-async function validateVerticalAdData(schema: ZodSchema, body: unknown) {
-  if (schema === createAdSchema || schema === updateAdSchema) {
-    if (body && typeof body === "object") {
-      const parsedBody = body as VerticalAdRequestBody;
-      if (parsedBody.category && parsedBody.data && typeof parsedBody.data === "object") {
-        let verticalSchema: ZodSchema | null = null;
-        if (parsedBody.category === "machines") {
-          verticalSchema = machineSchema;
-        } else if (parsedBody.category === "accommodations") {
-          verticalSchema = accommodationSchema;
-        } else if (parsedBody.category === "caterings") {
-          verticalSchema = cateringSchema;
-        } else if (parsedBody.category === "plots" || parsedBody.category === "real_estate") {
-          verticalSchema = realEstateSchema;
-        } else if (parsedBody.category === "marketplace") {
-          verticalSchema = marketplaceSchema;
-        }
-
-        if (verticalSchema) {
-          if (schema === updateAdSchema) {
-            await (verticalSchema as unknown as { partial: () => ZodSchema }).partial().parseAsync(parsedBody.data);
-          } else {
-            await verticalSchema.parseAsync(parsedBody.data);
-          }
-        }
-      }
-    }
-  }
-}
 
 /**
  * Centrally manages validation of manual endpoints with Serbian error localization
@@ -396,12 +357,11 @@ export const validateRequest = (schema: ZodSchema) => {
 
     try {
       req.body = await schema.parseAsync(req.body);
-      await validateVerticalAdData(schema, req.body);
-      
+
       if (schemaKey !== "unknown_schema" && bodyString) {
         fastValidationCache.set(schemaKey, bodyString, req.body);
       }
-      
+
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -472,8 +432,7 @@ export const validateBody = (schema: ZodSchema) => {
       }
 
       req.body = await schema.parseAsync(req.body);
-      await validateVerticalAdData(schema, req.body);
-      
+
       if (schemaKey !== "unknown_schema" && bodyString) {
         fastValidationCache.set(schemaKey, bodyString, req.body);
       }
@@ -688,7 +647,6 @@ export const autoValidateMiddleware = async (req: Request, res: Response, next: 
     }
 
     req.body = await schema.parseAsync(req.body || {});
-    await validateVerticalAdData(schema, req.body);
 
     if (schema && schemaKey !== "unknown_schema" && bodyString) {
       fastValidationCache.set(schemaKey, bodyString, req.body);

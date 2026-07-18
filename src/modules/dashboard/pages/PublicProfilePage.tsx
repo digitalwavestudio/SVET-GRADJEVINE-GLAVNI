@@ -12,7 +12,7 @@ import { useTrackView } from '@/src/hooks/useTrackView';
 
 import SeoHead from '@/src/components/SeoHead';
 import { APP_CONFIG } from '@/src/constants/config';
-import { getAccommodationLink, getCateringLink, getMachineLink, getPlotLink } from '@/src/lib/routeFilters';
+import { getAccommodationLink } from '@/src/lib/routeFilters';
 import { generateProfessionalServiceSchema } from '@/src/lib/seoSchema';
 import { createPersonSchema, createBreadcrumbSchema } from '@/src/lib/seo/schemas';
 import { usePublicProfileNode } from '@/src/modules/dashboard/hooks/usePublicProfileNode';

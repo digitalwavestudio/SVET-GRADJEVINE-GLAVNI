@@ -7,7 +7,7 @@ interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   targetId: string;
-  targetType: 'JOB' | 'USER' | 'COMPANY' | 'ACCOMMODATION' | 'MACHINE';
+  targetType: 'JOB' | 'USER' | 'COMPANY' | 'ACCOMMODATION';
   targetName: string;
 }
 

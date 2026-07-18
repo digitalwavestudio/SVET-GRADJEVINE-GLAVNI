@@ -60,11 +60,6 @@ router.get("/rss/:category", async (req, res) => {
   const validCategories = [
     "jobs",
     "companies",
-    "machines",
-    "plots",
-    "accommodations",
-    "caterings",
-    "marketplace",
   ];
 
   if (!validCategories.includes(category)) {
@@ -107,11 +102,6 @@ router.get("/rss/:category", async (req, res) => {
       const typeMapping: Record<string, string> = {
         jobs: "posao",
         companies: "firma",
-        plots: "nekretnine",
-        machines: "gradjevinske-masine",
-        caterings: "ketering-provajder",
-        accommodations: "smestaj",
-        marketplace: "alat-i-oprema",
       };
       const mappedType = typeMapping[category] || category;
       const url = `${baseUrl}/${mappedType}/${id}`;

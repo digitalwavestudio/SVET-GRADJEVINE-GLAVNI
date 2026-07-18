@@ -92,17 +92,13 @@ export class AdminCleanupService {
         let category = "listings";
         switch (currentListingData.type) {
           case "job": category = "jobs"; break;
-          case "accommodation": category = "accommodations"; break;
-          case "machine": category = "machines"; break;
-          case "catering": category = "caterings"; break;
-          case "plot": category = "plots"; break;
           case "company": category = "companies"; break;
           case "realEstate": category = "realEstate"; break;
         }
 
         // Stats updates
         await AdminStatsService.updateGlobalStats(
-          category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate",
+          category as "jobs" | "companies" | "realEstate",
           -1,
           currentListingData.isPremium || false,
           oldStatus,

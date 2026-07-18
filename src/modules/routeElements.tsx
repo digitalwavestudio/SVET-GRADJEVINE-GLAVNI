@@ -5,13 +5,11 @@ import { getCoreRouter, getCoreDashboardRouter } from '@/src/modules/core/routes
 import { getJobsRouter } from '@/src/modules/jobs/routes';
 import { getCompaniesRouter } from '@/src/modules/companies/routes';
 import { getRealEstateRouter } from '@/src/modules/real_estate/routes';
-import { getMachinesRouter } from '@/src/modules/machines/routes';
-import { getCateringRouter } from '@/src/modules/catering/routes';
-import { getAccommodationsRouter } from '@/src/modules/accommodations/routes';
+
 import { getDashboardRouter, getDashboardPublicRouter } from '@/src/modules/dashboard/routes';
 import { getAuthRouter, getAuthDashboardRouter } from '@/src/modules/auth/routes';
 import { getToolsDashboardRouter, getToolsPublicRouter } from '@/src/modules/tools/routes';
-import { getMarketplaceRouter, getMarketplaceDashboardRouter } from '@/src/modules/marketplace/routes';
+
 import { getAdsRouter } from '@/src/modules/ads/routes';
 import { getCheckoutRouter } from '@/src/modules/checkout/routes';
 import { getMastersRouter } from '@/src/modules/masters/routes';
@@ -28,10 +26,7 @@ export function getRouteElements() {
         {getJobsRouter()}
         {getCompaniesRouter()}
         {getRealEstateRouter()}
-        {getMachinesRouter()}
-        {getCateringRouter()}
-        {getAccommodationsRouter()}
-        {getMarketplaceRouter()}
+
         {getMastersRouter()}
         {getAdsRouter()}
         {getCheckoutRouter()}
@@ -47,8 +42,6 @@ export function getRouteElements() {
       {getAuthDashboardRouter()}
       {getToolsDashboardRouter()}
       {getCoreDashboardRouter()}
-      {getMarketplaceDashboardRouter()}
-
       <Route element={<MainLayout />}>
         <Route path="*" element={<NotFoundPage />} />
       </Route>

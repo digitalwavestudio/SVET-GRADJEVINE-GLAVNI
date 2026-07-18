@@ -3,7 +3,7 @@ import { Skeleton } from '@/src/components/ui/Skeleton';
 import { Building2, User, Image as ImageIcon, HardHat, Briefcase, Sofa, Utensils, Wrench } from 'lucide-react';
 import { getResponsiveSrcSet } from '@/src/lib/imageOptimization';
 
-type FallbackType = 'default' | 'user' | 'company' | 'ad' | 'machine' | 'real_estate' | 'accommodation' | 'catering' | 'jobs';
+type FallbackType = 'default' | 'user' | 'company' | 'ad' | 'jobs';
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallback?: string;
@@ -19,10 +19,7 @@ const FallbackComponent = ({ type, text, className }: { type: FallbackType, text
     switch (type) {
       case 'user': return <User className="w-1/3 h-1/3 text-white/20" />;
       case 'company': return <Building2 className="w-1/3 h-1/3 text-white/20" />;
-      case 'machine': return <Wrench className="w-1/3 h-1/3 text-white/20" />;
-      case 'real_estate': return <Building2 className="w-1/3 h-1/3 text-white/20" />;
-      case 'accommodation': return <Sofa className="w-1/3 h-1/3 text-white/20" />;
-      case 'catering': return <Utensils className="w-1/3 h-1/3 text-white/20" />;
+
       case 'jobs': return <Briefcase className="w-1/3 h-1/3 text-white/20" />;
       case 'ad': 
       case 'default':
@@ -34,7 +31,6 @@ const FallbackComponent = ({ type, text, className }: { type: FallbackType, text
   const getPatternClass = () => {
     switch(type) {
       case 'jobs': return 'bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:20px_20px]';
-      case 'machine': return 'bg-[linear-gradient(45deg,#ffffff05_25%,transparent_25%,transparent_50%,#ffffff05_50%,#ffffff05_75%,transparent_75%,transparent)] [background-size:40px_40px]';
       case 'real_estate': return 'bg-[linear-gradient(#ffffff05_1px,transparent_1px),linear-gradient(90deg,#ffffff05_1px,transparent_1px)] [background-size:30px_30px]';
       default: return 'bg-white/[0.02]';
     }

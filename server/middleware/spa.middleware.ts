@@ -19,13 +19,13 @@ async function getIndexHtml(): Promise<string> {
   const distPath = path.resolve(process.cwd(), "dist");
   const raw = await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
   _indexHtmlCached = raw
-    .replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
-    .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
-    .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
-    .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
-    .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
-  const gaId = (env as any).VITE_GA_MEASUREMENT_ID || (env as any).GA_MEASUREMENT_ID || "G-SVV63518LY";
-  _indexHtmlCached = _indexHtmlCached.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
+    .replaceAll("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+    .replaceAll("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+    .replaceAll("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+    .replaceAll("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+    .replaceAll("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
+  const gaId = env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY";
+  _indexHtmlCached = _indexHtmlCached.replaceAll("%VITE_GA_MEASUREMENT_ID%", gaId);
   return _indexHtmlCached;
 }
 function getIndexHtmlSync(): string {
@@ -33,13 +33,13 @@ function getIndexHtmlSync(): string {
   const distPath = path.resolve(process.cwd(), "dist");
   const raw = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
   _indexHtmlCached = raw
-    .replace("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
-    .replace("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
-    .replace("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
-    .replace("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
-    .replace("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
-  const gaId = (env as any).VITE_GA_MEASUREMENT_ID || (env as any).GA_MEASUREMENT_ID || "G-SVV63518LY";
-  _indexHtmlCached = _indexHtmlCached.replace("%VITE_GA_MEASUREMENT_ID%", gaId);
+    .replaceAll("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+    .replaceAll("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+    .replaceAll("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+    .replaceAll("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+    .replaceAll("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "");
+  const gaId = env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY";
+  _indexHtmlCached = _indexHtmlCached.replaceAll("%VITE_GA_MEASUREMENT_ID%", gaId);
   return _indexHtmlCached;
 }
 
@@ -217,12 +217,7 @@ function injectEmptyRootLinks(html: string, reqPath: string): string {
 // Map SEO route collection names to Firestore "listings" type discriminator
 const COLLECTION_TO_TYPE: Record<string, string> = {
   jobs: "job",
-  machines: "machine",
   companies: "company",
-  caterings: "catering",
-  accommodations: "accommodation",
-  plots: "plot",
-  marketplace: "marketplace",
 };
 
 function resolveFirestoreQuery(collectionName: string) {
@@ -250,11 +245,6 @@ const CANONICAL_PATH_MAP: Record<string, string> = {
 // Each entity type uses a different field name for category/profession
 const COLLECTION_CATEGORY_FIELD: Record<string, string> = {
   jobs: "professionSlug",
-  machines: "categorySlug",
-  marketplace: "categoryId",
-  accommodations: "typeSlug",
-  caterings: "categorySlug",
-  plots: "typeSlug",
   companies: "mainCategories",
   users: "professionSlug",
 };
@@ -687,9 +677,7 @@ async function backgroundPreRenderDetailPage(
           addressCountry: coCountry,
         },
       });
-    } else if (
-      ["machines", "marketplace", "plots"].includes(collectionName)
-    ) {
+    } else if (false) {
       structuredDataList.push({
         "@context": "https://schema.org/",
         "@type": "Product",
@@ -751,7 +739,7 @@ ${structuredDataHtml}
     if (botSemanticHtml) {
       html = html.replace(
         '<div id="root"></div>',
-        `<div id="root"></div>\n<div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">${botSemanticHtml}</div>`,
+        `<div id="root">${botSemanticHtml}</div>`,
       );
     }
 
@@ -786,9 +774,7 @@ async function backgroundPreRenderHomepage(
       const title = data.title || data.name || "Oglas";
       const slug = title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
       const typeMap: Record<string, string> = {
-        job: "posao", machine: "masina", company: "firma",
-        catering: "ketering", accommodation: "smestaj",
-        plot: "placevi", marketplace: "alat-i-oprema",
+        job: "posao", company: "firma",
       };
       const path = typeMap[data.type] || "oglas";
       const url = `${APP_CONFIG.BASE_URL}/${path}/${slug}~${id}`;
@@ -835,7 +821,7 @@ export const createSpaMiddleware = () => {
   const distPath = path.join(process.cwd(), "dist");
 
   let cachedIndexHtml: string | null = null;
-  let cacheBuster = "1";
+  let cacheBuster = "2";
   try {
       const indexHtml = getIndexHtmlSync();
     const match = indexHtml.match(/\/assets\/index-([^.]+)\.js/);
@@ -929,10 +915,7 @@ export const createSpaMiddleware = () => {
         if (cachedHtml) {
           if (cachedHtml === "404") {
             if (!cachedIndexHtml) {
-              cachedIndexHtml = await fs.promises.readFile(
-                path.join(distPath, "index.html"),
-                "utf-8",
-              );
+              cachedIndexHtml = await getIndexHtml();
             }
             return res.status(404).send(cachedIndexHtml);
           }
@@ -1019,7 +1002,20 @@ export const createSpaMiddleware = () => {
 
       // Homepage: React SSR for bots only (cached in Redis for 2h)
       if (req.path === "/") {
-        const indexHtml = cachedIndexHtml || await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
+        const indexHtml = getIndexHtmlSync();
+        const websiteSearchSchema = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          url: APP_CONFIG.BASE_URL,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: `${APP_CONFIG.BASE_URL}/pretrazivanje?q={search_term_string}`,
+            },
+            "query-input": "required name=search_term_string",
+          },
+        });
         if (isBot) {
           const scheme = req.get('x-forwarded-proto') || 'http';
           const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
@@ -1030,7 +1026,7 @@ export const createSpaMiddleware = () => {
             const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />`;
             let finalHtml = indexHtml;
             finalHtml = finalHtml
-              .replace('</head>', `${helmetContent}</head>`)
+              .replace('</head>', `${helmetContent}<script type="application/ld+json">${websiteSearchSchema}</script>\n</head>`)
               .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
             finalHtml = dedupeHeadTags(ensureCanonical(ensureHreflang(finalHtml, req.path), req.path));
             res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
@@ -1060,6 +1056,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:title" content="Svet Građevine" />
 <meta name="twitter:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
+<script type="application/ld+json">${websiteSearchSchema}</script>
 </head>`), req.path);
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(ensureHreflang(cleanHtml, req.path)));
       }
@@ -1111,7 +1108,7 @@ export const createSpaMiddleware = () => {
               const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
               const ssrResult = await reactSsrPage(ssrUrl);
               if (ssrResult) {
-                const indexHtml = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+                const indexHtml = getIndexHtmlSync();
                 const { html, helmetHtml } = ssrResult;
                 const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
                 let finalHtml = indexHtml;
@@ -1128,7 +1125,7 @@ export const createSpaMiddleware = () => {
               }
 
               // Bot fallback: string-based pre-render
-              const indexHtmlForListingBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+              const indexHtmlForListingBg = getIndexHtmlSync();
 
               // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
               if (isGeoPage && pathSegments.length >= 2) {
@@ -1274,6 +1271,18 @@ ${breadcrumbHtml}
             const nonBotHtml = cachedIndexHtml.replace(
               /<title>.*?<\/title>/,
               `<title>${title}</title>`,
+            ).replace(
+              "</head>",
+              `<meta property="og:title" content="${title}" />
+<meta property="og:description" content="${desc}" />
+<meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
+<meta property="og:url" content="${APP_CONFIG.BASE_URL}${req.path}" />
+<meta property="og:type" content="article" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${desc}" />
+<meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
+</head>`,
             );
             return res.send(ensureCanonical(ensureHreflang(nonBotHtml, req.path), req.path));
           }
@@ -1313,7 +1322,7 @@ ${breadcrumbHtml}
           );
 
           // Pre-render detail page synchronously for bots so first request gets real data
-          const indexHtmlForDetailBg = cachedIndexHtml || fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+          const indexHtmlForDetailBg = getIndexHtmlSync();
           const rendered = await backgroundPreRenderDetailPage(cacheKey, indexHtmlForDetailBg, collectionName, adId, req.path, matchedRoute, CACHE_TTL);
           if (rendered) return res.send(rendered);
 
@@ -1396,7 +1405,6 @@ ${breadcrumbHtml}
           "</head>",
           `<meta name="description" content="Tražena stranica nije pronađena (404)." />
 <meta name="robots" content="noindex, follow" />
-<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />
 </head>`,
         )
         .replace(

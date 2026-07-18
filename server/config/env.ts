@@ -66,6 +66,8 @@ const envSchema = z.object({
   VITE_ALGOLIA_APP_ID: z.string().optional(),
   VITE_ALGOLIA_SEARCH_KEY: z.string().optional(),
   VITE_ALGOLIA_INDEX_NAME: z.string().optional(),
+  VITE_GA_MEASUREMENT_ID: z.string().optional(),
+  GA_MEASUREMENT_ID: z.string().optional(),
   VITE_EMAILJS_PUBLIC_KEY: z.string().optional(),
   VITE_EMAILJS_SERVICE_ID: z.string().optional(),
 });

@@ -16,9 +16,7 @@ export class AdminSettingsService {
     },
     global: {
       pricing: {
-        jobs: { standard: 1000, premium: 2000, urgent: 4000 },
-        marketplace: { standard: 1000, premium: 2000, urgent: 4000 },
-        machines: { standard: 1000, premium: 2000, urgent: 4000 }
+        jobs: { standard: 1000, premium: 2000, urgent: 4000 }
       },
       limits: { max_images_per_ad: 10 },
       messages: { welcome_text: 'Dobrodošli na Svet Građevine', maintenance_mode: false },
@@ -34,10 +32,6 @@ export class AdminSettingsService {
   static async reindexAll(adminId: string) {
     const collections = [
       "jobs",
-      "machines",
-      "accommodations",
-      "caterings",
-      "plots",
       "companies",
       "masters",
     ];

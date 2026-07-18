@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MACHINE_CATEGORIES, MACHINE_SUBCATEGORIES } from '@/src/constants/machineTaxonomy';
-import { TaxonomyItem, ACCOMMODATION_TYPES, KITCHEN_TYPES, LOCATIONS, PROFESSIONS, REAL_ESTATE_PURPOSES, SECTORS, MARKETPLACE_CATEGORIES, PAYMENT_DYNAMICS, BENEFITS } from '@/src/constants/taxonomy';
+import { TaxonomyItem, ACCOMMODATION_TYPES, KITCHEN_TYPES, LOCATIONS, PROFESSIONS, REAL_ESTATE_PURPOSES, SECTORS, PAYMENT_DYNAMICS, BENEFITS } from '@/src/constants/taxonomy';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { Input } from '@/src/components/ui/form/Input';
 import { Select } from '@/src/components/ui/form/Select';
@@ -232,83 +232,6 @@ export function Step1({
           )}
 
           <div className="space-y-8">
-            {selectedCategory === 'accommodation' && (
-              <Select 
-                name="accType" 
-                label="Tip smeštaja" 
-                options={ACCOMMODATION_TYPES.map(t => ({ value: t.slug, label: t.name }))} 
-                icon="apartment" 
-                required 
-              />
-            )}
-
-            {selectedCategory === 'catering' && (
-              <Select 
-                name="catKitchenType" 
-                label="Tip kuhinje" 
-                options={KITCHEN_TYPES.map(t => ({ value: t.id, label: t.name }))} 
-                icon="restaurant" 
-                required 
-              />
-            )}
-
-            {selectedCategory === 'marketplace' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Select 
-                  name="marketCategory" 
-                  label="Kategorija predmeta" 
-                  options={MARKETPLACE_CATEGORIES.map(c => ({ value: c.id, label: c.name }))} 
-                  icon="shopping_basket" 
-                  required 
-                />
-                <Input name="title" label="Naslov oglasa" placeholder="Npr. Drvena oplata 50m2" required />
-              </div>
-            )}
-
-            {selectedCategory === 'machines' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Select 
-                  name="machCategory" 
-                  label="Kategorija mašine" 
-                  options={MACHINE_CATEGORIES.map(c => ({ value: c.id, label: c.name }))} 
-                  icon="precision_manufacturing" 
-                  required 
-                />
-                <Select 
-                  name="machSubCategory" 
-                  label="Podkategorija / Vrsta" 
-                  options={availableSubcategories.map((s) => ({ value: s.id, label: s.name }))} 
-                  icon="category" 
-                  disabled={!machCategory}
-                  required 
-                />
-                <Input name="machBrand" label="Marka mašine" placeholder="Npr. Caterpillar, JCB..." required />
-                <Input name="machModel" label="Model" placeholder="Npr. 320D, 3CX..." required />
-              </div>
-            )}
-
-
-
-            {selectedCategory === 'plot' && (
-              <div className="space-y-6">
-                <label className="block text-[10px] font-black text-[#a2acb9] uppercase tracking-[0.2em] ml-1">Namena zemljišta *</label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {REAL_ESTATE_PURPOSES.map(p => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setValue('plotPurpose', p.id)}
-                      className={`py-6 rounded-[10px] border-2 transition-all font-black uppercase tracking-widest text-xs flex flex-col items-center justify-center gap-3 ${plotPurpose === p.id ? 'bg-secondary border-secondary !text-black shadow-lg shadow-secondary/20' : 'bg-white/5 border-white/5 text-[#a2acb9] hover:border-white/20'}`}
-                    >
-                      <span className="material-symbols-outlined text-3xl">
-                        {p.id === 'građevinsko' ? 'home' : p.id === 'industrijsko' ? 'factory' : 'agriculture'}
-                      </span>
-                      {p.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {selectedCategory !== 'job' && (
               <Select 

@@ -5,11 +5,7 @@ import { jobsService } from '@/src/modules/jobs/services/jobsService';
 import { statsService } from '@/src/services/statsService';
 import { mastersService } from '@/src/modules/masters/services/mastersService';
 import { companiesService } from '@/src/modules/companies/services/companiesService';
-import { machinesService } from '@/src/modules/machines/services/machinesService';
-import { accommodationsService } from '@/src/modules/accommodations/services/accommodationsService';
-import { cateringService } from '@/src/modules/catering/services/cateringService';
 import { realEstateService } from '@/src/modules/real_estate/services/realEstateService';
-import { marketplaceService } from '@/src/modules/marketplace/services/marketplaceService';
 
 function getQC(context: unknown): QueryClient {
   return (context as { queryClient: QueryClient } | undefined)?.queryClient || globalQueryClient;
@@ -73,49 +69,7 @@ export const companiesLoader = ({ params, request, context }: import('react-rout
   return filters;
 };
 
-export const machinesLoader = ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.kategorija && params.kategorija !== 'all') filters.category = params.kategorija;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.machines.list(filters),
-    queryFn: ({ pageParam = null }) => machinesService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-
-  return filters;
-};
-
-export const accommodationsLoader = ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.tip && params.tip !== 'all') filters.type = params.tip;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
-
-  getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.accommodations.list(filters),
-    queryFn: ({ pageParam = null }) => accommodationsService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-
-  return filters;
-};
-
-export const cateringLoader = ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
-
-  getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.catering.list(filters),
-    queryFn: ({ pageParam = null }) => cateringService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-
-  return filters;
-};
 
 export const realEstateLoader = ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -132,17 +86,4 @@ export const realEstateLoader = ({ params, request, context }: import('react-rou
   return filters;
 };
 
-export const marketplaceLoader = ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.kategorija && params.kategorija !== 'all') filters.category = params.kategorija;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
 
-  getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.marketplace.list(filters),
-    queryFn: ({ pageParam = null }) => marketplaceService.getItems(filters, 24, pageParam),
-    initialPageParam: null,
-  });
-
-  return filters;
-};

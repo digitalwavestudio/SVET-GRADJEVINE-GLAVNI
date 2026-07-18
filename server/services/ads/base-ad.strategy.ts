@@ -147,20 +147,8 @@ export class BaseAdStrategy {
             }
           : (rawData as { _geoloc?: unknown })?._geoloc || null,
         imageStatus: hasRawImages ? "processing" : "ready",
-        // Normalize field names for machine category
         adTitle: rawData.adTitle || rawData.title,
       };
-
-      if (this.entityType === "machine") {
-        adData.categoryId = rawData.categoryId || rawData.machCategory || rawData.machSubCategory;
-        adData.adType = rawData.adType || rawData.machAdType;
-        adData.year = rawData.year || rawData.machYear;
-        adData.workingHours = rawData.workingHours || rawData.machHours;
-        adData.price = adData.price || rawData.machPrice;
-        adData.pricePerDay = adData.pricePerDay || rawData.machPricePerDay;
-        adData.fuelType = adData.fuelType || rawData.machFuel;
-        adData.condition = adData.condition || "polovno";
-      }
 
       transaction.set(adRef, adData, { merge: true });
 
@@ -206,7 +194,7 @@ export class BaseAdStrategy {
       await this.afterAdCreated(transaction, adId, rawData, userData, adData);
 
       await AdminStatsService.updateGlobalStats(
-        this.category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate",
+        this.category as "jobs" | "companies" | "realEstate",
         1,
         adData.isPremium || false,
         adData.status,
@@ -366,14 +354,14 @@ export class BaseAdStrategy {
 
       if (oldStatus !== newStatus) {
         await AdminStatsService.updateGlobalStats(
-          this.category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate",
+          this.category as "jobs" | "companies" | "realEstate",
           -1,
           data.isPremium || false,
           oldStatus,
           transaction,
         );
         await AdminStatsService.updateGlobalStats(
-          this.category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate",
+          this.category as "jobs" | "companies" | "realEstate",
           1,
           data.isPremium || false,
           newStatus,
@@ -460,7 +448,7 @@ export class BaseAdStrategy {
       transaction.set(outboxRef, outboxPayloadObj);
 
       await AdminStatsService.updateGlobalStats(
-        this.category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate",
+        this.category as "jobs" | "companies" | "realEstate",
         -1,
         data.isPremium || false,
         data.status,
@@ -530,10 +518,10 @@ export class BaseAdStrategy {
 
       transaction.update(adRef, updateData);
 
-      await AdminStatsService.updateGlobalStats(this.category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate", -1, data.isPremium || false, data.status, transaction);
+      await AdminStatsService.updateGlobalStats(this.category as "jobs" | "companies" | "realEstate", -1, data.isPremium || false, data.status, transaction);
 
       if (action === "approve") {
-        await AdminStatsService.updateGlobalStats(this.category as "jobs" | "accommodations" | "machines" | "caterings" | "plots" | "companies" | "realEstate", 1, data.isPremium || false, "active", transaction);
+        await AdminStatsService.updateGlobalStats(this.category as "jobs" | "companies" | "realEstate", 1, data.isPremium || false, "active", transaction);
       }
 
       const activityId = db.collection("activities").doc().id;

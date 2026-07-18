@@ -12,7 +12,7 @@ const db = getFirestore(admin.app());
 db.settings({ ignoreUndefinedProperties: true });
 
 async function main() {
-  const entities = ["job", "machine", "realEstate", "accommodation", "catering", "article"];
+  const entities = ["job", "realEstate", "article"];
 
   for (const entity of entities) {
     const snap = await db.collection("listings")

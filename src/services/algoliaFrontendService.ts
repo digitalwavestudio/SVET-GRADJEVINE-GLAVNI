@@ -64,19 +64,15 @@ export const algoliaSearch = async (
   }
 
   try {
-    const supportedCategories = ['all', 'listings', 'jobs', 'machines', 'accommodations', 'caterings', 'plots', 'companies', 'masters', 'realEstate', 'marketplace', 'job', 'machine', 'accommodation', 'catering', 'plot', 'company', 'master'];
+    const supportedCategories = ['all', 'listings', 'jobs', 'companies', 'masters', 'realEstate', 'company', 'master'];
     
     if (!supportedCategories.includes(category)) {
       return fallbackBackendSearch(category, filters, pageSize, lastVisibleId);
     }
 
     let entityType = category;
-    if (category && category !== 'all' && category !== 'marketplace') {
-      if (category === 'machines') entityType = 'machine';
-      else if (category === 'accommodations') entityType = 'accommodation';
-      else if (category === 'caterings') entityType = 'catering';
-      else if (category === 'plots') entityType = 'plot';
-      else if (category === 'companies') entityType = 'company';
+    if (category && category !== 'all') {
+      if (category === 'companies') entityType = 'company';
       else if (category === 'masters') entityType = 'master';
       else if (category === 'realEstate') entityType = 'realEstate';
       else if (category === 'jobs') entityType = 'job';
@@ -137,8 +133,6 @@ export const algoliaSearch = async (
     let combinedFilters = 'status:active';
     if (filters.showAllStatuses) combinedFilters = ''; // Assuming we can see all if true
     
-    // Additional accommodation facets
-    if (filters.type && filters.type !== 'all' && entityType === 'accommodation') facetFilters.push(`typeSlug:${filters.type}`);
     if (filters.invoiceAvailable) facetFilters.push(`invoiceAvailable:true`);
     if (filters.parkingAvailable) facetFilters.push(`parkingAvailable:true`);
     

@@ -12,7 +12,6 @@ import {
 import { TrendingUp, Users, Briefcase, CreditCard, Clock, Plus, Tag } from 'lucide-react';
 import { useAuth } from '@/src/context/AuthContext';
 import { useJobs } from '@/src/modules/jobs';
-import { useMarketplaceList } from '@/src/modules/marketplace';
 import { Link } from 'react-router-dom';
 
 const data = [
@@ -29,13 +28,11 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { data: jobsData } = useJobs({ authorId: user?.id });
   const userJobs = jobsData?.pages.flatMap(page => page?.items || []) || [];
-  const { data: marketplaceData } = useMarketplaceList({ authorId: user?.id });
-  const userMarketplaceItems = marketplaceData?.pages.flatMap(page => page?.items || []) || [];
 
   const stats = [
-    { label: 'Ukupro Pregleda', value: (userJobs.reduce((acc, curr) => acc + (curr.viewsCount || 0), 0) + userMarketplaceItems.reduce((acc, curr) => acc + (curr.viewsCount || 0), 0)).toString(), icon: TrendingUp, trend: '+0%', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Prijave', value: '0', icon: Users, trend: '0%', color: 'text-blue-600', bg: 'bg-blue-50' }, // This would need application count
-    { label: 'Aktivni Oglasi', value: (userJobs.length + userMarketplaceItems.length).toString(), icon: Briefcase, trend: '0%', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { label: 'Ukupro Pregleda', value: (userJobs.reduce((acc, curr) => acc + (curr.viewsCount || 0), 0)).toString(), icon: TrendingUp, trend: '+0%', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Prijave', value: '0', icon: Users, trend: '0%', color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Aktivni Oglasi', value: (userJobs.length).toString(), icon: Briefcase, trend: '0%', color: 'text-indigo-600', bg: 'bg-indigo-50' },
     { label: 'Preostali Krediti', value: user?.freeAdsCount?.toString() || '0', icon: CreditCard, trend: '0%', color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
 

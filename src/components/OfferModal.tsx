@@ -14,7 +14,7 @@ export default function OfferModal({ isOpen, onClose, onSend, recipientName }: O
     salary: '',
     startDate: '',
     location: 'BEOGRAD',
-    accommodation: 'DA',
+
     notes: ''
   });
 
@@ -78,27 +78,14 @@ export default function OfferModal({ isOpen, onClose, onSend, recipientName }: O
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-2">DATUM POČETKA</label>
-                <input 
-                  type="date"
-                  value={formData.startDate}
-                  onChange={e => setFormData({...formData, startDate: e.target.value})}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-[10px] py-4 px-5 text-xs font-black text-white uppercase outline-none focus:border-secondary transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-2">SMEŠTAJ</label>
-                <select 
-                  value={formData.accommodation}
-                  onChange={e => setFormData({...formData, accommodation: e.target.value})}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-[10px] py-4 px-5 text-xs font-black text-white uppercase outline-none focus:border-secondary transition-all"
-                >
-                  <option value="DA">OBEZBEĐEN</option>
-                  <option value="NE">NIJE OBEZBEĐEN</option>
-                </select>
-              </div>
+            <div className="space-y-2">
+              <label className="text-[9px] font-black text-white/20 uppercase tracking-widest ml-2">DATUM POČETKA</label>
+              <input 
+                type="date"
+                value={formData.startDate}
+                onChange={e => setFormData({...formData, startDate: e.target.value})}
+                className="w-full bg-white/[0.03] border border-white/10 rounded-[10px] py-4 px-5 text-xs font-black text-white uppercase outline-none focus:border-secondary transition-all"
+              />
             </div>
 
             <div className="space-y-2">

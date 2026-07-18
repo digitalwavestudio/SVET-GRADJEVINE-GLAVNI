@@ -12,7 +12,7 @@ export class SEODbService {
     const city = params.city as string;
     const categoryOrCity = params.categoryOrCity as string;
 let title = "Svet Građevine";
-let description = "Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi, majstori, mašine, nekretnine i smeštaj za radnike. Besplatno postavi oglas.";
+let description = "Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas.";
     let url = "https://svetgradjevine.com";
 
     let stateCategory = "jobs";
@@ -272,11 +272,10 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
       const listingTypes = ["job", "company"];
       for (const typeVal of listingTypes) {
         try {
-          const snap = await db.collection("listings")
+          const snap = await db.collectionGroup("listings")
             .where("type", "==", typeVal)
             .where("status", "==", "active")
             .orderBy("createdAt", "desc")
-            .limit(500)
             .get();
           for (const doc of snap.docs) {
             const data = doc.data();

@@ -174,25 +174,14 @@ export const getPublicProfile = async (
     }
 
     interface CachedAds {
-      machines: AdDocument[];
-      accommodations: AdDocument[];
-      caterings: AdDocument[];
-      plots: AdDocument[];
+      // reserved for future ad types
     }
 
     // Import CacheService locally or at top
     const cachedAds = await CacheService.get<CachedAds>(cacheKey);
 
-    let machines: AdDocument[] = [];
-    let accommodations: AdDocument[] = [];
-    let caterings: AdDocument[] = [];
-    let plots: AdDocument[] = [];
-
     if (cachedAds) {
-      machines = cachedAds.machines;
-      accommodations = cachedAds.accommodations;
-      caterings = cachedAds.caterings;
-      plots = cachedAds.plots;
+      // cached ads available
     } else {
       try {
         // Fetch user's active ads
@@ -205,16 +194,12 @@ export const getPublicProfile = async (
           
         const { ImageTransformer } = await import("../utils/image.transformer.ts");
 
+        // ad filtering by verticals is no longer needed here
         snap.docs.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
-          const rawData = doc.data();
-          const data = ImageTransformer.transformDocumentImages({ id: doc.id, ...rawData }) as AdDocument;
-          if (data.type === 'machine') machines.push(data);
-          else if (data.type === 'accommodation') accommodations.push(data);
-          else if (data.type === 'catering') caterings.push(data);
-          else if (data.type === 'plot') plots.push(data);
+          // kept empty as vertical-specific filtering was removed
         });
 
-        const adsToCache: CachedAds = { machines, accommodations, caterings, plots };
+        const adsToCache: CachedAds = {};
         await CacheService.set(cacheKey, adsToCache, 5 * 60 * 1000); // cache for 5 min
       } catch (quotaError) {
         console.error("[USERS] Ads fetch quota error:", quotaError);
@@ -222,13 +207,7 @@ export const getPublicProfile = async (
     }
 
     const response = {
-      ...result,
-      _aggregatedAds: {
-        machines,
-        accommodations,
-        caterings,
-        plots
-      }
+      ...result
     };
 
     // Cache the fully assembled public profile including ads
