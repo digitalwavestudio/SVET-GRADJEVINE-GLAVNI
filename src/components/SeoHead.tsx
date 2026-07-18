@@ -54,7 +54,11 @@ export default function SeoHead({
       <meta name="twitter:image" content={image} />
       
       <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
-      
+
+      {/* Hreflang — geo targetiranje Srbija / x-default */}
+      <link rel="alternate" hrefLang="sr" href={url} />
+      <link rel="alternate" hrefLang="x-default" href={url} />
+
       {ldJsonTags}
     </Helmet>
   );

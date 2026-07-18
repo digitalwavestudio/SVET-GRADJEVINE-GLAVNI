@@ -3,6 +3,8 @@ import { CacheService } from "../cache.service.ts";
 import { UnifiedSearchService } from "../unified-search.service.ts";
 import { SEOSchemaService } from "./seo-schema.service.ts";
 import { logger, Logger } from "../../utils/logger.ts";
+import { CITIES as cities, displayCity as toCityName } from "../../constants/geo.ts";
+import { APP_CONFIG } from "../../../src/constants/config.ts";
 
 export class SEODbService {
   static async getHubMetaData(hubType: string, params: Record<string, unknown>) {
@@ -13,21 +15,12 @@ let title = "Svet Građevine";
 let description = "Oglasi u građevinskoj industriji";
     let url = "https://svetgradjevine.com";
 
-    const cities = [
-      "beograd",
-      "novi-sad",
-      "nis",
-      "kragujevac",
-      "subotica",
-      "zrenjanin",
-      "pancevo",
-    ];
     let stateCategory = "jobs";
     let stateFilters: Record<string, unknown> = {};
 
     if (hubType === "job_category_city") {
       const displayCat = category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
-      const displayCity = city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
+      const displayCity = toCityName(city);
       title = `Poslovi ${displayCat} u ${displayCity} | Svet Građevine`;
       description = `Tražite posao kao ${displayCat} u gradu ${displayCity}? Pogledajte najnovije oglase za posao na vodećem građevinskom portalu.`;
       url += `/poslovi/${category}/${city}`;
@@ -36,7 +29,7 @@ let description = "Oglasi u građevinskoj industriji";
     } else if (hubType === "job_single_param") {
       const param = categoryOrCity;
       if (cities.includes(param)) {
-        const displayCity = param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
+        const displayCity = toCityName(param);
         title = `Građevinski Poslovi u ${displayCity} | Svet Građevine`;
         description = `Pronađite posao u građevini u gradu ${displayCity}. Pogledajte oglase za zidare, tesare, inženjere i ostale profile.`;
         stateCategory = "jobs";
@@ -50,7 +43,7 @@ let description = "Oglasi u građevinskoj industriji";
       }
       url += `/poslovi/${param}`;
     } else if (hubType === "company_city") {
-      const displayCity = city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
+      const displayCity = toCityName(city);
       title = `Građevinske Firme: ${displayCity} | Svet Građevine`;
       description = `Katalog građevinskih firmi i kompanija u gradu ${displayCity}. Pronađite izvođače, projektante i partnere.`;
       url += `/firme/${city}`;
@@ -58,7 +51,7 @@ let description = "Oglasi u građevinskoj industriji";
       stateFilters = { locationSlug: city };
     } else if (hubType === "master_category_city") {
       const displayCat = category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, " ");
-      const displayCity = city.charAt(0).toUpperCase() + city.slice(1).replace(/-/g, " ");
+      const displayCity = toCityName(city);
       title = `${displayCat}: Majstori i Izvođači u mestu ${displayCity} | Svet Građevine`;
       description = `Tražite profesionalne izvođače za ${displayCat} u gradu ${displayCity}? Pregledajte profile majstora, ocene i kontaktirajte ih direktno.`;
       url += `/majstori/${category}/${city}`;
@@ -67,7 +60,7 @@ let description = "Oglasi u građevinskoj industriji";
     } else if (hubType === "master_single_param") {
       const param = categoryOrCity;
       if (cities.includes(param)) {
-        const displayCity = param.charAt(0).toUpperCase() + param.slice(1).replace(/-/g, " ");
+        const displayCity = toCityName(param);
         title = `Građevinski Majstori u gradu ${displayCity} | Svet Građevine`;
         description = `Katalog građevinskih majstora i izvođača u mestu ${displayCity}. Pronađite molere, zidare, keramičare i druge stručnjake.`;
         stateCategory = "masters";
@@ -111,6 +104,7 @@ let description = "Oglasi u građevinskoj industriji";
         image: "https://www.svetgradjevine.com/og-image.png",
         url,
         initialState: null,
+        botHtml: "",
         structuredData: {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
@@ -127,6 +121,7 @@ let description = "Oglasi u građevinskoj industriji";
         image: "https://www.svetgradjevine.com/og-image.png",
         url,
         initialState: null,
+        botHtml: "",
         structuredData: {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
@@ -163,6 +158,7 @@ let description = "Oglasi u građevinskoj industriji";
 
     try {
       let initialState = null;
+      let botHtml = "";
       try {
         const searchResult = await UnifiedSearchService.search(
           stateCategory,
@@ -170,6 +166,44 @@ let description = "Oglasi u građevinskoj industriji";
           15,
         );
         initialState = { searchResult };
+
+        // Bot-visible lista oglasa (SSR za crawler-e, thin-content fix)
+        const docs = (searchResult as any)?.docs || [];
+        const detailPrefix = stateCategory === "jobs" ? "posao"
+          : stateCategory === "companies" ? "firma"
+          : stateCategory === "masters" ? "profil"
+          : stateCategory === "machines" ? "gradjevinske-masine"
+          : stateCategory === "accommodations" ? "smestaj"
+          : stateCategory === "caterings" ? "ketering/provajder"
+          : stateCategory === "plots" ? "nekretnine"
+          : stateCategory === "marketplace" ? "alat-i-oprema"
+          : stateCategory;
+        let itemsHtml = "";
+        const itemListElements: Record<string, unknown>[] = [];
+        let idx = 1;
+        for (const doc of docs) {
+          const data = doc.data ? doc.data() : doc;
+          const id = doc.id;
+          const t = data.title || data.name || data.adTitle || "Oglas";
+          const slugBase = `${t} ${data.location || data.loc || ""} ${data.comp || data.company || ""}`.toLowerCase()
+            .replace(/đ/g, "dj").replace(/č/g, "c").replace(/ć/g, "c").replace(/š/g, "s")
+            .replace(/ž/g, "z").replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+          const detailUrl = `${APP_CONFIG.BASE_URL}/${detailPrefix}/${slugBase}~${id}`;
+          itemsHtml += `<li><a href="${detailUrl}">${t}</a>${data.location || data.loc ? ` - ${data.location || data.loc}` : ""}</li>`;
+          itemListElements.push({ "@type": "ListItem", position: idx++, name: t, url: detailUrl });
+        }
+        const itemListSchema = {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListElement: itemListElements,
+        };
+        botHtml = `
+          <main>
+            <h1>${title.replace(" | Svet Građevine", "")}</h1>
+            <p>${description}</p>
+            <ul>${itemsHtml || "<li>Trenutno nema oglasa za ovu kategoriju.</li>"}</ul>
+            <script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>
+          </main>`;
       } catch (err) {
         logger.warn("[SEO-Background] Failed to fetch static initial state for hub:", err);
       }
@@ -180,6 +214,7 @@ let description = "Oglasi u građevinskoj industriji";
         image: "https://www.svetgradjevine.com/og-image.png",
         url,
         initialState,
+        botHtml,
         structuredData: {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
@@ -202,6 +237,12 @@ let description = "Oglasi u građevinskoj industriji";
   }
 
   static async generateSitemap() {
+    const esc = (s: unknown): string =>
+      String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     const cacheKey = "seo:sitemap";
     try {
       const cached = await CacheService.get<string>(cacheKey);
@@ -313,8 +354,8 @@ let description = "Oglasi u građevinskoj industriji";
         imgUrl
           ? `
       <image:image>
-        <image:loc>${imgUrl}</image:loc>
-        <image:title>${(data.title || data.name || data.adTitle || "Oglas").substring(0, 100)}</image:title>
+        <image:loc>${esc(imgUrl)}</image:loc>
+        <image:title>${esc((data.title || data.name || data.adTitle || "Oglas").substring(0, 100))}</image:title>
       </image:image>`
           : ""
       }

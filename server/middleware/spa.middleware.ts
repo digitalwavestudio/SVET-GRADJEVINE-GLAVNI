@@ -129,33 +129,28 @@ interface MatchedRoute {
   alwaysListing?: boolean;
 }
 
-const CITIES = [
-  "beograd", "novi-sad", "nis", "kragujevac", "subotica", "zrenjanin",
-  "pancevo", "smederevo", "cacak", "novi-pazar", "kraljevo", "sabac",
-  "uzice", "vranje", "valjevo", "leskovac", "krusevac", "zajecar",
-  "sombor", "pozarevac", "pirot", "bor", "srem", "backa", "banat",
-];
-
-const CITY_DISPLAY: Record<string, string> = {
-  beograd: "Beograd", "novi-sad": "Novi Sad", nis: "Niš",
-  kragujevac: "Kragujevac", subotica: "Subotica", zrenjanin: "Zrenjanin",
-  pancevo: "Pančevo", smederevo: "Smederevo", cacak: "Čačak",
-  "novi-pazar": "Novi Pazar", kraljevo: "Kraljevo", sabac: "Šabac",
-  uzice: "Užice", vranje: "Vranje", valjevo: "Valjevo",
-  leskovac: "Leskovac", krusevac: "Kruševac", zajecar: "Zaječar",
-  sombor: "Sombor", pozarevac: "Požarevac", pirot: "Pirot",
-  bor: "Bor",
-};
-
-function formatCity(slug: string): string {
-  return CITY_DISPLAY[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
-}
+import { CITIES, CITY_DISPLAY, GERMAN_SLUGS, displayCity as formatCity } from "../constants/geo.ts";
 
 // Ensure SSR output always has a canonical link — critical for SEO to avoid duplicate pages
 function ensureCanonical(html: string, reqPath: string): string {
   if (html.includes('rel="canonical"')) return html;
   const canonicalUrl = `${APP_CONFIG.BASE_URL}${reqPath}`;
   return html.replace("</head>", `<link rel="canonical" href="${canonicalUrl}" />\n</head>`);
+}
+
+// Hreflang: sr + x-default uvek, de za nemačke hubove (geo targetiranje SR/DE)
+function ensureHreflang(html: string, reqPath: string): string {
+  if (html.includes('hreflang=')) return html;
+  const base = `${APP_CONFIG.BASE_URL}${reqPath}`;
+  const isGerman = reqPath.split("/").some((seg) => GERMAN_SLUGS.has(seg));
+  const tags = [
+    `<link rel="alternate" hreflang="sr" href="${base}" />`,
+    `<link rel="alternate" hreflang="x-default" href="${base}" />`,
+  ];
+  if (isGerman) {
+    tags.push(`<link rel="alternate" hreflang="de" href="${base}" />`);
+  }
+  return html.replace("</head>", `${tags.join("\n")}\n</head>`);
 }
 
 // Combined dedup of SSR helmet output: ensures only one <title> and one meta description remain
@@ -889,7 +884,7 @@ export const createSpaMiddleware = () => {
              cachedIndexHtml = await fs.promises.readFile(path.join(distPath, "index.html"), "utf-8");
            }
            if (env.NODE_ENV !== "production") console.info(`ðŸ›¡ï¸ [SPA Shield] Soft-404 blocking fetch for known dead ID: ${deadIdMatch}`);
-           return res.send(cachedIndexHtml);
+           return res.status(404).send(cachedIndexHtml);
         }
       }
 
@@ -904,7 +899,7 @@ export const createSpaMiddleware = () => {
                 "utf-8",
               );
             }
-            return res.send(cachedIndexHtml);
+            return res.status(404).send(cachedIndexHtml);
           }
           return res.send(cachedHtml);
         }
@@ -1050,7 +1045,7 @@ export const createSpaMiddleware = () => {
             finalHtml = finalHtml
               .replace('</head>', `${helmetContent}</head>`)
               .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-            finalHtml = dedupeHeadTags(ensureCanonical(finalHtml, req.path));
+            finalHtml = dedupeHeadTags(ensureCanonical(ensureHreflang(finalHtml, req.path), req.path));
             res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
             const redisCache = getRedis();
             if (redisCache) {
@@ -1126,7 +1121,7 @@ export const createSpaMiddleware = () => {
                 finalHtml = finalHtml
                   .replace('</head>', `${helmetContent}</head>`)
                   .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-                finalHtml = ensureCanonical(finalHtml, req.path);
+                finalHtml = ensureCanonical(ensureHreflang(finalHtml, req.path), req.path);
                 res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
                 const redisCache = getRedis();
                 if (redisCache) {

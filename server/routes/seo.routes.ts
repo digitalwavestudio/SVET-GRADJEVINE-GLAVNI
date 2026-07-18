@@ -242,7 +242,8 @@ seoRouter.get("/sitemap.xml", async (_req, res) => {
   try {
     res.header("Content-Type", "application/xml");
     res.setHeader("Cache-Control", "public, max-age=86400");
-    res.send(generateFallbackSitemap());
+    const xml = await SEODbService.generateSitemap();
+    res.send(xml);
   } catch (error) {
     console.error("Sitemap error:", error);
     res.header("Content-Type", "application/xml");
