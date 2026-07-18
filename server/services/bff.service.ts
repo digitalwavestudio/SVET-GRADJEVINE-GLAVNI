@@ -39,11 +39,6 @@ async function computeAndSaveFastPath(result: HomepageDataResult) {
       premiumJobs,
       urgentJobs,
       latestJobs,
-      latestMachines,
-      latestRealEstate,
-      latestAccommodations,
-      latestCaterings,
-      latestArticles,
       stats,
     } = result;
 
@@ -54,11 +49,6 @@ async function computeAndSaveFastPath(result: HomepageDataResult) {
         premiumJobs: premiumJobs || [],
         urgentJobs: urgentJobs || [],
         latestJobs: latestJobs || [],
-        latestMachines: latestMachines || [],
-        latestRealEstate: latestRealEstate || [],
-        latestAccommodations: latestAccommodations || [],
-        latestCaterings: latestCaterings || [],
-        latestArticles: latestArticles || [],
       },
       updatedAt: new Date().toISOString(),
     };
@@ -123,20 +113,12 @@ export const bffService = {
       globalStats,
       premiumAdsData,
       urgentAdsData,
-      machinesData,
-      realEstateData,
-      accommodationsData,
-      cateringsData,
       jobsData,
       realAdsCountData,
     ] = await Promise.allSettled([
       withTimeout(AdminStatsService.getGlobalStats(), 120000, {}),
       withTimeout(UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }), 120000, []),
       withTimeout(UnifiedAdsService.getPromotedAds({ isUrgent: true, limit: 12 }), 120000, []),
-      withTimeout(UnifiedSearchService.search("machines", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
-      withTimeout(UnifiedSearchService.search("realEstate", { status: "active", skipCount: true }, 2), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
-      withTimeout(UnifiedSearchService.search("accommodations", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
-      withTimeout(UnifiedSearchService.search("caterings", { status: "active", skipCount: true }, 3), 120000, { docs: [], lastVisibleId: null, hasMore: false }),
       (async () => {
         try {
           const snap = await db.collection("listings").where("type", "==", "job").where("status", "in", ["active", "approved"]).orderBy("createdAt", "desc").limit(500).get();
@@ -173,10 +155,6 @@ export const bffService = {
       globalStats.status === "fulfilled" ? globalStats.value : {}
     ) as {
       totalJobs?: number,
-      machinesCount?: number,
-      accommodationsCount?: number,
-      cateringCount?: number,
-      realEstateCount?: number,
       companiesCount?: number,
       totalUsers?: number,
       premiumPartners?: number,
@@ -184,25 +162,13 @@ export const bffService = {
     };
 
     const totalJobs = gStats.totalJobs || 0;
-    const totalMachines = gStats.machinesCount || 0;
-    const totalAccommodations = gStats.accommodationsCount || 0;
-    const totalCaterings = gStats.cateringCount || 0;
 
     const realTotalAdsCount = realAdsCountData?.status === "fulfilled" ? (realAdsCountData.value as number) : 0;
 
-    const calculatedAdsCount = realTotalAdsCount > 0 ? realTotalAdsCount : (
-      totalJobs +
-      totalMachines +
-      totalAccommodations +
-      totalCaterings
-    );
+    const calculatedAdsCount = realTotalAdsCount > 0 ? realTotalAdsCount : totalJobs;
 
     const stats: HomepageStats = {
       totalJobs,
-      totalMachines,
-      totalAccommodations,
-      totalCaterings,
-      totalRealEstate: gStats.realEstateCount || 0,
       totalCompanies: gStats.companiesCount || 0,
       totalUsers: gStats.totalUsers || 0,
       premiumJobs: gStats.premiumPartners || 0,
@@ -210,8 +176,6 @@ export const bffService = {
       totalAdsCount: calculatedAdsCount,
       dynamicFirmsCount: gStats.companiesCount || 0,
       dynamicWorkersCount: gStats.totalUsers || 0,
-      dynamicMachineryCount: gStats.machinesCount || 0,
-      dynamicRealEstateCount: gStats.realEstateCount || 0,
       dynamicViewsCount: 0,
     };
 
@@ -324,19 +288,7 @@ export const bffService = {
       return s;
     };
 
-    const latestMachines = buildMappedDocs<Record<string, unknown>>(machinesData).map((m) =>
-      snippet(m, ["id", "title", "images", "listingType", "yearOfManufacture", "workingHours", "location", "price"])
-    );
-    const latestRealEstate = buildMappedDocs<Record<string, unknown>>(realEstateData).map((p) =>
-      snippet(p, ["id", "title", "images", "listingType", "isPremium", "location", "area", "price"])
-    );
-    const latestAccommodations = buildMappedDocs<Record<string, unknown>>(accommodationsData).map((a) =>
-      snippet(a, ["id", "title", "images", "location", "capacity", "rooms", "bathrooms", "hasKitchen", "price"])
-    );
-    const latestCaterings = buildMappedDocs<Record<string, unknown>>(cateringsData).map((c) =>
-      snippet(c, ["id", "title", "companyName", "images", "imagePlaceholders", "location", "price", "mealPrice", "deliveryRadius", "minOrderValue", "maxMealsPerDay"])
-    );
-      const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData)
+    const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData)
         .map((j) =>
         snippet(j, [
           "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
@@ -349,19 +301,13 @@ export const bffService = {
           "viewsCount", "cat", "status"
         ])
       );
-    const latestArticles: any[] = [];
 
     const result: HomepageDataResult = {
       success: true,
       stats,
       premiumJobs,
       urgentJobs,
-      latestMachines,
-      latestRealEstate,
-      latestAccommodations,
-      latestCaterings,
       latestJobs,
-      latestArticles,
     };
 
     if (result.latestJobs && result.latestJobs.length > 0) {

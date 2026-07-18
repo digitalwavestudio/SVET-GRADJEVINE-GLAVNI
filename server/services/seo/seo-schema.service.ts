@@ -176,11 +176,6 @@ export class SEOSchemaService {
     const typeMapping: Record<string, string> = {
       jobs: "posao",
       companies: "firma",
-      plots: "nekretnine",
-      machines: "gradjevinske-masine",
-      caterings: "ketering/provajder",
-      accommodations: "smestaj",
-      marketplace: "alat-i-oprema",
       users: "profil",
     };
     const mappedType = typeMapping[type] || type;
@@ -334,138 +329,6 @@ export class SEOSchemaService {
       schemas.push(schema);
     }
 
-    if (type === "machines" || type === "marketplace" || type === "plots") {
-      const catMapping: Record<string, string[]> = {
-        machines: ["Mašine", "gradjevinske-masine"],
-        marketplace: ["Alat i Oprema", "alat-i-oprema"],
-        plots: ["Placevi", "placevi"],
-      };
-      const catInfo = catMapping[type] || ["Oglasi", "oglasi"];
-      const [catName, catPath] = catInfo;
-
-      breadcrumbItems.push({
-        name: catName,
-        item: `https://svetgradjevine.com/${catPath}`,
-      });
-
-      const subCategory =
-        data.kategorija || data.category || data.subcategory || data.namena;
-      if (subCategory) {
-        breadcrumbItems.push({
-          name: subCategory,
-          item: `https://svetgradjevine.com/${catPath}/${this.slugify(subCategory)}`,
-        });
-      }
-
-      if (data.grad || data.city || data.location) {
-        const loc = data.grad || data.city || data.location || "";
-        const locPath = subCategory
-          ? `https://svetgradjevine.com/${catPath}/${this.slugify(subCategory || "")}/${this.slugify(loc)}`
-          : `https://svetgradjevine.com/${catPath}/lokacija/${this.slugify(loc)}`;
-        breadcrumbItems.push({
-          name: loc,
-          item: locPath,
-        });
-      }
-
-      breadcrumbItems.push({
-        name: data.title || data.name || data.adTitle || "",
-        item: canonicalEntityUrl,
-      });
-
-      schemas.push({
-        "@context": "https://schema.org/",
-        "@type": type === "plots" ? "RealEstateListing" : "Product",
-        name: data.title || data.name || data.adTitle,
-        description: data.description,
-        image: data.images?.[0],
-        offers: {
-          "@type": "Offer",
-          price: data.price || "0",
-          priceCurrency: data.currency || "EUR",
-          availability: "https://schema.org/InStock",
-          url: canonicalEntityUrl,
-        },
-      });
-    }
-
-    if (type === "accommodations") {
-      breadcrumbItems.push({
-        name: "SmeÅ¡taj",
-        item: "https://svetgradjevine.com/smestaj",
-      });
-
-      const accType = data.tip || data.kategorija || data.type;
-      if (accType) {
-        breadcrumbItems.push({
-          name: accType,
-          item: `https://svetgradjevine.com/smestaj/${this.slugify(accType)}`,
-        });
-      }
-
-      const city = data.city || data.grad || data.locationSlug;
-      if (city) {
-        const cityPath = accType
-          ? `https://svetgradjevine.com/smestaj/${this.slugify(accType)}/${this.slugify(city)}`
-          : `https://svetgradjevine.com/smestaj/lokacija/${this.slugify(city)}`;
-        breadcrumbItems.push({ name: city, item: cityPath });
-      }
-
-      breadcrumbItems.push({ name: data.title || "", item: canonicalEntityUrl });
-      schemas.push({
-        "@context": "https://schema.org",
-        "@type": "LodgingBusiness",
-        name: data.title || "",
-        description: data.description,
-        image: data.images?.[0] || "",
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: data.city || data.locationSlug || "Srbija",
-          addressRegion: "Srbija",
-          addressCountry: "RS",
-          streetAddress: data.tacnaLokacija || data.address || "",
-        },
-        telephone: data.telefon || data.contactPhone || data.phone || "",
-        url: canonicalEntityUrl,
-        priceRange: `â‚¬${data.price || 0}`,
-      });
-    }
-
-    if (type === "caterings") {
-      breadcrumbItems.push({
-        name: "Ketering",
-        item: "https://svetgradjevine.com/ketering",
-      });
-
-      const city = data.city || data.grad || data.locationSlug;
-      if (city) {
-        breadcrumbItems.push({
-          name: city,
-          item: `https://svetgradjevine.com/ketering/${this.slugify(city)}`,
-        });
-      }
-
-      breadcrumbItems.push({
-        name: data.title || data.name || "",
-        item: canonicalEntityUrl,
-      });
-      schemas.push({
-        "@context": "https://schema.org",
-        "@type": "FoodEstablishment",
-        name: data.title || data.name || "",
-        description: data.description,
-        image: data.images?.[0] || "",
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: data.city || data.locationSlug || "Srbija",
-          addressRegion: "Srbija",
-          addressCountry: "RS",
-        },
-        telephone: data.telefon || data.contactPhone || data.phone || "",
-        url: canonicalEntityUrl,
-        servesCuisine: "DomaÄ‡a kuhinja",
-        acceptsReservations: "True",
-      });
     }
 
     if (type === "users") {
@@ -593,10 +456,6 @@ export class SEOSchemaService {
       const graph: GraphEntity[] = [];
       const collections = [
         { name: "jobs", type: "JobPosting" },
-        { name: "machines", type: "Product" },
-        { name: "accommodations", type: "LodgingBusiness" },
-        { name: "caterings", type: "FoodEstablishment" },
-        { name: "plots", type: "RealEstateListing" },
         { name: "companies", type: "ConstructionBusiness" },
       ];
 

@@ -172,11 +172,6 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         const detailPrefix = stateCategory === "jobs" ? "posao"
           : stateCategory === "companies" ? "firma"
           : stateCategory === "masters" ? "profil"
-          : stateCategory === "machines" ? "gradjevinske-masine"
-          : stateCategory === "accommodations" ? "smestaj"
-          : stateCategory === "caterings" ? "ketering/provajder"
-          : stateCategory === "plots" ? "nekretnine"
-          : stateCategory === "marketplace" ? "alat-i-oprema"
           : stateCategory;
         let itemsHtml = "";
         const itemListElements: Record<string, unknown>[] = [];
@@ -249,11 +244,6 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
       if (cached) return cached;
       const collections = [
         "jobs",
-        "machines",
-        "accommodations",
-        "caterings",
-        "plots",
-        "marketplace",
         "companies",
         "users",
       ];
@@ -267,11 +257,6 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
   <url><loc>https://svetgradjevine.com/o-nama</loc><priority>0.5</priority></url>
   <url><loc>https://svetgradjevine.com/kontakt</loc><priority>0.5</priority></url>
   <url><loc>https://svetgradjevine.com/paketi</loc><priority>0.6</priority></url>
-  <url><loc>https://svetgradjevine.com/alat-i-oprema</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.com/placevi</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.com/masine</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.com/smestaj</loc><priority>0.8</priority></url>
-  <url><loc>https://svetgradjevine.com/ketering</loc><priority>0.8</priority></url>
   <url><loc>https://svetgradjevine.com/majstori</loc><priority>0.8</priority></url>`;
       const results = await Promise.all(
         collections.map(async (coll) => {
@@ -300,43 +285,28 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
             return snap.docs
               .map((doc) => {
                 const data = doc.data();
-                let path = "";
-                let urlId = doc.id;
+                        let path = "";
+                        let urlId = doc.id;
 
-                switch (coll) {
-                  case "jobs": {
-                    path = "posao";
-                    const t = data.title || data.name || "bez-naslova";
-                    const l = data.location || data.loc || "";
-                    const c = data.company || data.comp || "";
-                    const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
-                    urlId = `${slug}~${doc.id}`;
-                    break;
-                  }
-                  case "companies":
-                    path = "firma";
-                    break;
-                  case "plots":
-                    path = "nekretnine";
-                    break;
-                  case "machines":
-                    path = "gradjevinske-masine";
-                    break;
-                  case "caterings":
-                    path = "ketering/provajder";
-                    break;
-                  case "accommodations":
-                    path = "smestaj";
-                    break;
-                  case "marketplace":
-                    path = "alat-i-oprema";
-                    break;
-                  case "users":
-                    path = "profil";
-                    break;
-                  default:
-                    path = coll;
-                }
+                        switch (coll) {
+                          case "jobs": {
+                            path = "posao";
+                            const t = data.title || data.name || "bez-naslova";
+                            const l = data.location || data.loc || "";
+                            const c = data.company || data.comp || "";
+                            const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
+                            urlId = `${slug}~${doc.id}`;
+                            break;
+                          }
+                          case "companies":
+                            path = "firma";
+                            break;
+                          case "users":
+                            path = "profil";
+                            break;
+                          default:
+                            path = coll;
+                        }
 
                 const imgUrl = data.images?.[0] || data.logo || data.photoURL;
                 const lastMod =

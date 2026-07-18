@@ -33,11 +33,6 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
   const allowedTypes = [
     "posao",
     "firma",
-    "gradjevinske-masine",
-    "smestaj",
-    "ketering/provajder",
-    "placevi",
-    "alat-i-oprema",
     "profil",
   ];
   if (!allowedTypes.includes(type)) return next();
@@ -73,11 +68,6 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
       if (meta.hasTraffic) {
         const adRoutes: { path: string, coll: string }[] = [
           { path: "/poslovi", coll: "jobs" },
-          { path: "/masine", coll: "machines" },
-          { path: "/smestaj", coll: "accommodations" },
-          { path: "/ketering", coll: "caterings" },
-          { path: "/placevi", coll: "plots" },
-          { path: "/alat-i-oprema", coll: "marketplace" },
           { path: "/firme", coll: "companies" },
           { path: "/majstori", coll: "users" },
         ];
@@ -129,11 +119,6 @@ const injectMetaTags = async (req: import("express").Request & { CacheService?: 
   }
 };
 
-seoRouter.get("/ketering/provajder/:id", (req, res, next) => {
-  (req.params as Record<string, string>).type = "ketering/provajder";
-  injectMetaTags(req, res, next);
-});
-
 // Programmatic SEO Routes (Hubs)
 seoRouter.get("/poslovi/:category/:city", (req, res, next) => {
   (req.params as Record<string, string>).type = "pseo_hub";
@@ -165,22 +150,7 @@ seoRouter.get("/majstori/:categoryOrCity", (req, res, next) => {
   injectMetaTags(req, res, next);
 });
 
-// PSEO city hub pages for listing types — registered before /:type/:id to
-// avoid the catch-all treating city slugs as detail page IDs (returns 410)
-const cityHubRoutes = [
-  { path: "/gradjevinske-masine/:city", hubType: "machine_city" },
-  { path: "/masine/:city", hubType: "machine_city_alt" },
-  { path: "/smestaj/:city", hubType: "accommodation_city" },
-  { path: "/placevi/:city", hubType: "plot_city" },
-  { path: "/alat-i-oprema/:city", hubType: "marketplace_city" },
-];
-for (const { path, hubType } of cityHubRoutes) {
-  seoRouter.get(path, (req, res, next) => {
-    (req.params as Record<string, string>).type = "pseo_hub";
-    (req.params as Record<string, string>).hubType = hubType;
-    injectMetaTags(req, res, next);
-  });
-}
+// PSEO city hub pages for listing types (machines, smestaj, placevi, alat) removed — not active on site
 
 seoRouter.get("/:type/:id", injectMetaTags);
 
@@ -369,18 +339,6 @@ const STATIC_SITEMAP_URLS = [
   "/firme/beograd",
   "/firme/novi-sad",
   "/firme/nis",
-  "/masine",
-  "/masine/beograd",
-  "/smestaj",
-  "/smestaj/beograd",
-  "/smestaj/novi-sad",
-  "/ketering",
-  "/ketering/beograd",
-  "/placevi",
-  "/placevi/beograd",
-  "/placevi/novi-sad",
-  "/alat-i-oprema",
-  "/alat-i-oprema/beograd",
   "/majstori",
   "/majstori/beograd",
   "/majstori/novi-sad",
