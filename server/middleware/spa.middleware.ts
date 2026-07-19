@@ -997,7 +997,7 @@ export const createSpaMiddleware = () => {
 </head>`,
         );
         html = injectEmptyRootLinks(html, req.path);
-        return res.send(ensureHreflang(html, req.path));
+        return res.send(dedupeHeadTags(ensureHreflang(html, req.path)));
       }
 
       // Homepage: React SSR for all visitors (cached in Redis for 2h)
