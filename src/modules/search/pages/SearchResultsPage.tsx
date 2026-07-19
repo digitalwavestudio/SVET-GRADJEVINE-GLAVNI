@@ -41,7 +41,7 @@ export default function SearchResultsPage() {
             {res.image || res.imageStatus === 'processing' ? (
               <OptimizedImage 
                 src={res.image} 
-                fallbackType="real_estate"
+                fallbackType="default"
                 alt={res.title}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 containerClassName="w-full h-full"

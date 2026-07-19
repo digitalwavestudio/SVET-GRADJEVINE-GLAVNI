@@ -7,7 +7,6 @@ import {
   RealEstatePlot,
   Company,
   Master,
-  MarketplaceItem
 } from "@svet-gradjevine/shared";
 import { logger } from "../utils/logger.ts";
 
@@ -15,8 +14,7 @@ export type UnifiedAdEntity =
   | Job
   | RealEstatePlot
   | Company
-  | Master
-  | MarketplaceItem;
+  | Master;
 
 export const DomainEvents = {
   JOB_CREATED: "JOB_CREATED",

@@ -31,7 +31,6 @@ const FallbackComponent = ({ type, text, className }: { type: FallbackType, text
   const getPatternClass = () => {
     switch(type) {
       case 'jobs': return 'bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:20px_20px]';
-      case 'real_estate': return 'bg-[linear-gradient(#ffffff05_1px,transparent_1px),linear-gradient(90deg,#ffffff05_1px,transparent_1px)] [background-size:30px_30px]';
       default: return 'bg-white/[0.02]';
     }
   };

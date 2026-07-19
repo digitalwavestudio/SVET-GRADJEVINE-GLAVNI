@@ -78,12 +78,8 @@ export function useAdSubmit({ editId, adId, userId, showSuccess, showError, rese
       }
       queryClient.invalidateQueries({ queryKey: queryKeys.ads.all });
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: queryKeys.machines.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accommodations.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.catering.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.masters.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.marketplace.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.realEstate.all });
     }
   });

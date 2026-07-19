@@ -5,31 +5,19 @@ import { LOCATIONS } from '@/src/constants/taxonomy';
 
 interface CompanyAdsTabsContentProps {
   activeJobs: any[];
-  activeMachines: any[];
-  activeAccommodations: any[];
-  activeCaterings: any[];
-  activePlots: any[];
   isLoading: boolean;
 }
 
 export function CompanyAdsTabsContent({
   activeJobs,
-  activeMachines,
-  activeAccommodations,
-  activeCaterings,
-  activePlots,
   isLoading
 }: CompanyAdsTabsContentProps) {
 
   const allAds = useMemo(() => {
     const mapped: any[] = [];
     activeJobs.forEach(j => mapped.push({ ...j, _type: 'job', _link: `/posao/${j.id}` }));
-    activeMachines.forEach(m => mapped.push({ ...m, _type: 'machine', _link: `/gradjevinske-masine/${m.id}` }));
-    activeAccommodations.forEach(a => mapped.push({ ...a, _type: 'accommodation', _link: `/smestaj/oglas/${a.id}` }));
-    activeCaterings.forEach(c => mapped.push({ ...c, _type: 'catering', _link: `/ketering/provajder/${c.id}` }));
-    activePlots.forEach(p => mapped.push({ ...p, _type: 'realestate', _link: `/placevi/oglas/${p.id}` }));
     return mapped;
-  }, [activeJobs, activeMachines, activeAccommodations, activeCaterings, activePlots]);
+  }, [activeJobs]);
 
   const itemsPerPage = 10;
   const [visibleCount, setVisibleCount] = useState(itemsPerPage);
@@ -38,8 +26,7 @@ export function CompanyAdsTabsContent({
 
   const typeLabel = (t: string) => {
     const map: Record<string, string> = {
-      job: 'Posao', machine: 'Mehanizacija', accommodation: 'Smestaj',
-      catering: 'Ketering', realestate: 'Plac'
+      job: 'Posao',
     };
     return map[t] || t;
   };
@@ -47,10 +34,6 @@ export function CompanyAdsTabsContent({
   const typeColor = (t: string) => {
     const map: Record<string, string> = {
       job: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-      machine: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
-      accommodation: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      catering: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-      realestate: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
     };
     return map[t] || 'bg-white/10 text-white/60 border-white/10';
   };

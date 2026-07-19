@@ -8,7 +8,6 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 
 import { useCompanyDetails, useCompanyAdMutations } from '@/src/modules/companies/hooks/useCompanies';
 import { useJobs } from '@/src/modules/jobs';
-import { useRealEstateList } from '@/src/modules/real_estate';
 
 import { generateLocalBusinessSchema, generateBreadcrumbSchema } from '@/src/lib/seoSchema';
 import { APP_CONFIG } from '@/src/constants/config';
@@ -29,12 +28,10 @@ export default function CompanyProfilePage() {
   const { updateCompanyAd } = useCompanyAdMutations();
 
   const { data: jobsData, isLoading: jobsLoading } = useJobs({ authorId: company?.authorId }, { enabled: !!company?.authorId });
-  const { data: plotsData, isLoading: plotsLoading } = useRealEstateList({ authorId: company?.authorId }, { enabled: !!company?.authorId });
 
   const activeJobs = jobsData?.pages.flatMap(p => p?.items || []) || [];
-  const activePlots = plotsData?.pages.flatMap(p => p?.items || []) || [];
 
-  const isLoadingCurrentTab = jobsLoading || plotsLoading || false;
+  const isLoadingCurrentTab = jobsLoading || false;
 
   const { isTrackedInSession } = useTrackView(company?.id, 'companies', company?.id);
 
@@ -256,10 +253,6 @@ export default function CompanyProfilePage() {
           <div className="mt-10 md:mt-16">
             <CompanyAdsTabsContent
               activeJobs={activeJobs}
-              activeMachines={activeMachines}
-              activeAccommodations={activeAccommodations}
-              activeCaterings={activeCaterings}
-              activePlots={activePlots}
               isLoading={isLoadingCurrentTab}
             />
           </div>

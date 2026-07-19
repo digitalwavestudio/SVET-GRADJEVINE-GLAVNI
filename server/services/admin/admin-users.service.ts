@@ -211,7 +211,7 @@ export class AdminUsersService {
           if (v === null || v === undefined || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
             safe[k] = v;
           } else if (Array.isArray(v)) {
-            safe[k] = v.filter(i => i === null || typeof i === 'string' || typeof i === 'number' || typeof i === 'boolean');
+            safe[k] = (v as unknown[]).filter(i => i === null || typeof i === 'string' || typeof i === 'number' || typeof i === 'boolean');
           } else if (typeof v === 'object') {
             try { JSON.stringify(v); safe[k] = v; } catch { safe[k] = String(v); }
           }

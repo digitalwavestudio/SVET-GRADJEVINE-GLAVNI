@@ -375,66 +375,8 @@ export default function PublicProfilePage() {
              </div>
 
              {/* Right Column: Sidebar */}
-             <div className="space-y-8">
-                {/* User Ads Section */}
-                {(userAds?.machines?.length || 0) > 0 || (userAds?.accommodations?.length || 0) > 0 || (userAds?.caterings?.length || 0) > 0 || (userAds?.plots?.length || 0) > 0 ? (
-                  <section className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10 space-y-8">
-                    <div className="flex items-center gap-4">
-                      <h2 className="text-xs font-black text-white/20 uppercase tracking-[0.4em]">AKTIVNI OGLASI</h2>
-                      <div className="flex-1 h-px bg-white/5"></div>
-                    </div>
-
-                    <div className="space-y-4">
-                      {userAds?.machines?.map((machine: Record<string, unknown>, idx: number) => (
-                        <Link key={String(machine.id ?? idx)} to={getMachineLink(String(machine.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
-                          <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-secondary group-hover:scale-110 transition-transform flex-shrink-0">
-                            <span className="material-symbols-outlined text-2xl">precision_manufacturing</span>
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="text-xs font-black text-white uppercase tracking-tight truncate group-hover:text-secondary">{String(machine.adTitle || '')}</h4>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">MAŠINE</p>
-                          </div>
-                        </Link>
-                      ))}
-
-                      {userAds?.accommodations?.map((acc: Record<string, unknown>, idx: number) => (
-                        <Link key={String(acc.id ?? idx)} to={getAccommodationLink(String(acc.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
-                          <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
-                            <span className="material-symbols-outlined text-2xl">home_work</span>
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="text-xs font-black text-white uppercase tracking-tight truncate group-hover:text-secondary">{String(acc.title || '')}</h4>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">SMEŠTAJ</p>
-                          </div>
-                        </Link>
-                      ))}
-
-                      {userAds?.caterings?.map((cat: Record<string, unknown>, idx: number) => (
-                        <Link key={String(cat.id ?? idx)} to={getCateringLink(String(cat.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
-                          <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform flex-shrink-0">
-                            <span className="material-symbols-outlined text-2xl">restaurant</span>
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="text-xs font-black text-white uppercase tracking-tight truncate group-hover:text-secondary">{String(cat.title || '')}</h4>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">KETERING</p>
-                          </div>
-                        </Link>
-                      ))}
-
-                      {userAds?.plots?.map((plot: Record<string, unknown>, idx: number) => (
-                        <Link key={String(plot.id ?? idx)} to={getPlotLink(String(plot.id))} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-[10px] hover:border-secondary/30 transition-all group">
-                          <div className="w-12 h-12 bg-white/5 rounded-[10px] flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform flex-shrink-0">
-                            <span className="material-symbols-outlined text-2xl">landscape</span>
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="text-xs font-black text-white uppercase tracking-tight truncate group-hover:text-secondary">{String(plot.title || '')}</h4>
-                            <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1">PLAC</p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
+              <div className="space-y-8">
+                {/* User Ads Section — samo poslovi i firme */}
                 <section className="bg-[#0A0F14] border border-white/5 rounded-[10px] p-10">
                    <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-8">DRUŠTVENE MREŽE</h3>
                    <div className="space-y-4">

@@ -15,7 +15,6 @@ import {
   SECTORS,
   LOCATIONS,
   REAL_ESTATE_PURPOSES,
-  MARKETPLACE_CATEGORIES,
 } from "@/src/constants/taxonomy";
 import { MACHINE_CATEGORIES } from "@/src/constants/machineTaxonomy";
 import { COMPANY_MAIN_CATEGORIES } from "@/src/constants/companyTaxonomy";
@@ -246,31 +245,6 @@ export const HeroFilters: React.FC<HeroFiltersProps> = ({
                   placeholder="Cela Srbija"
                   icon={<MapPin size={20} />}
                   label="Lokacija za isporuku"
-                />
-              </div>
-            ) : activeTab === "alat-i-oprema" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <CustomSelect
-                  value={selectedMarketCat}
-                  onChange={setSelectedMarketCat}
-                  options={MARKETPLACE_CATEGORIES.map((s: any) => ({
-                    value: s.id,
-                    label: s.name,
-                  }))}
-                  placeholder="Sve kategorije alata i opreme"
-                  icon={<Store size={20} />}
-                  label="Kategorija"
-                />
-                <CustomSelect
-                  value={selectedLocation}
-                  onChange={setSelectedLocation}
-                  options={LOCATIONS.map((l: any) => ({
-                    value: l.slug,
-                    label: l.name,
-                  }))}
-                  placeholder="Cela Srbija"
-                  icon={<MapPin size={20} />}
-                  label="Lokacija preuzimanja"
                 />
               </div>
             ) : null}

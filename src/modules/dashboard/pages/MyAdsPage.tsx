@@ -7,10 +7,7 @@ import EmptyState from '@/src/components/ui/EmptyState';
 import { useAuth } from '@/src/context/AuthContext';
 import { useMyAds, useMyAdsMutations } from '@/src/modules/dashboard/hooks/useMyAds';
 import PromoteModal from '../components/PromoteModal';
-import { MachineAdsList } from '../components/details/MachineAdsList';
-import { PlotAdsList } from '../components/details/PlotAdsList';
 import { OtherAdsList } from '../components/details/OtherAdsList';
-import { MachineAdData } from '../types/ads';
 import { AdsListSkeleton } from '../components/details/AdsListSkeleton';
 import { DashboardConfirmDialog, DashboardConfirmDialogProps } from '../components/DashboardConfirmDialog';
 import { DashboardAlertDialog, DashboardAlertDialogProps } from '../components/DashboardAlertDialog';
@@ -31,7 +28,7 @@ export default function MyAdsPage() {
     isError,
     error
   } = useMyAds(user?.id, debouncedQuery);
-  const adsData = ads as MachineAdData[];
+  const adsData = ads as any[];
   const { deleteAd, approveAd } = useMyAdsMutations(user?.id);
 
   const { ref, inView } = useInView({
@@ -128,9 +125,7 @@ export default function MyAdsPage() {
     return true;
   });
 
-  const plotAds = filteredAds.filter((ad) => ad.postType === 'plot');
-  const machineAds = filteredAds.filter((ad) => ad.postType === 'machine');
-  const otherAds = filteredAds.filter((ad) => ad.postType !== 'plot' && ad.postType !== 'machine');
+  const otherAds = filteredAds;
 
   return (
     <DashboardLayout>
@@ -170,28 +165,10 @@ export default function MyAdsPage() {
         )}
 
         {!loading && filteredAds.length > 0 && (
-          <div className="space-y-12">
-            
-            {/* === GRAĐEVINSKE MAŠINE (PREMIUM B2B MANAGEMENT) === */}
-            <MachineAdsList 
-              ads={machineAds} 
-              onPromote={handleOpenPromote}
-              onApprove={handleApprove}
-              onDelete={handleDelete}
-            />
-            
-            {/* === PLACEVI / INVESTICIONE LOKACIJE === */}
-            <PlotAdsList 
-              ads={plotAds} 
-              onPromote={handleOpenPromote}
-              onApprove={handleApprove}
-              onDelete={handleDelete}
-            />
-
-            {/* === OSTALI OGLASI === */}
+          <>
             <OtherAdsList
               ads={otherAds}
-              showTitle={plotAds.length > 0 || machineAds.length > 0}
+              showTitle={false}
               onPromote={handleOpenPromote}
               onApprove={handleApprove}
               onDelete={handleDelete}
@@ -207,7 +184,7 @@ export default function MyAdsPage() {
                 </div>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
 

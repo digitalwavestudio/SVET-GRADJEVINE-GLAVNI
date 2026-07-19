@@ -4,7 +4,6 @@ import NotFoundPage from '@/src/modules/core/pages/NotFoundPage';
 import { getCoreRouter, getCoreDashboardRouter } from '@/src/modules/core/routes';
 import { getJobsRouter } from '@/src/modules/jobs/routes';
 import { getCompaniesRouter } from '@/src/modules/companies/routes';
-import { getRealEstateRouter } from '@/src/modules/real_estate/routes';
 
 import { getDashboardRouter, getDashboardPublicRouter } from '@/src/modules/dashboard/routes';
 import { getAuthRouter, getAuthDashboardRouter } from '@/src/modules/auth/routes';
@@ -25,7 +24,6 @@ export function getRouteElements() {
         {getCoreRouter()}
         {getJobsRouter()}
         {getCompaniesRouter()}
-        {getRealEstateRouter()}
 
         {getMastersRouter()}
         {getAdsRouter()}

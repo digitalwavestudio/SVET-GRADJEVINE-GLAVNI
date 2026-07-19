@@ -5,7 +5,6 @@ import { jobsService } from '@/src/modules/jobs/services/jobsService';
 import { statsService } from '@/src/services/statsService';
 import { mastersService } from '@/src/modules/masters/services/mastersService';
 import { companiesService } from '@/src/modules/companies/services/companiesService';
-import { realEstateService } from '@/src/modules/real_estate/services/realEstateService';
 
 function getQC(context: unknown): QueryClient {
   return (context as { queryClient: QueryClient } | undefined)?.queryClient || globalQueryClient;
@@ -70,20 +69,5 @@ export const companiesLoader = ({ params, request, context }: import('react-rout
 };
 
 
-
-export const realEstateLoader = ({ params, request, context }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const filters: Record<string, string> = { ...Object.fromEntries(url.searchParams.entries()) };
-  if (params.namena && params.namena !== 'all') filters.purpose = params.namena;
-  if (params.grad && params.grad !== 'all') filters.location = params.grad;
-
-  getQC(context).prefetchInfiniteQuery({
-    queryKey: queryKeys.realEstate.list(filters),
-    queryFn: ({ pageParam = null }) => realEstateService.fetchFiltered(filters, 20, pageParam),
-    initialPageParam: null,
-  });
-
-  return filters;
-};
 
 

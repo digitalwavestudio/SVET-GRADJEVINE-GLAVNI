@@ -6,7 +6,6 @@ import { queryKeys } from '@/src/lib/queryKeysFactory';
 const prefetchMap: Record<string, () => Promise<any>> = {
   'job': () => import('@/src/modules/jobs'),
   'company': () => import('@/src/modules/companies'),
-  'realestate': () => import('@/src/modules/real_estate')
 };
 
 /**
@@ -48,15 +47,6 @@ export const usePrefetch = () => {
             await queryClient.prefetchQuery({
               queryKey: queryKeys.companies.detail(id),
               queryFn: () => companiesService.getById(id),
-              staleTime,
-            });
-            break;
-          }
-          case 'realestate': {
-            const { realEstateService } = await import('@/src/modules/real_estate/services/realEstateService');
-            await queryClient.prefetchQuery({
-              queryKey: queryKeys.realEstate.detail(id),
-              queryFn: () => realEstateService.getById(id),
               staleTime,
             });
             break;

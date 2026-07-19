@@ -266,8 +266,6 @@ Disallow: /moj-profil/
 Disallow: /poruke/
 Disallow: /checkout/
 Disallow: /auth/
-Disallow: /prijava
-Disallow: /registracija
 Disallow: /*?search=*
 Disallow: /*?q=*
 Disallow: /*?sort=*
@@ -304,7 +302,7 @@ Allow: /
 Disallow: /api/
 Disallow: /dashboard/
 
-Sitemap: ${req.protocol}://${req.get("host")}/sitemap.xml
+Sitemap: ${APP_CONFIG.BASE_URL}/sitemap.xml
 `
     : `
 User-agent: *

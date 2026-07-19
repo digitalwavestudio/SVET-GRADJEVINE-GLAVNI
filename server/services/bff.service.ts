@@ -344,13 +344,14 @@ export const bffService = {
             async () => {
           const userDoc = await internalUserLoader.load(userId);
           return {
+            wallet: null,
             user: userDoc || null,
           };
             },
             5 * 60 * 1000 // 5 minuta TTL
           );
 
-          const { user } = cachedWalletUser || { user: null };
+          const { user } = cachedWalletUser || { wallet: null, user: null };
           const uData = user || {};
           let fetchedRoles: string[] = [];
           if (uData.roles && Array.isArray(uData.roles)) {
@@ -427,6 +428,7 @@ export const bffService = {
         const { internalUserLoader } = await import("../utils/dataloader.ts");
         const userDoc = await internalUserLoader.load(userId);
         return {
+          wallet: null,
           user: userDoc || null,
         };
       },

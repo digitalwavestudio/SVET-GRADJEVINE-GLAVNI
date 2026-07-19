@@ -48,9 +48,7 @@ export const bulkRecordEvents = async (
         }
         if (event.targetId && event.collectionName) {
           promises.push(
-            db.collection(event.collectionName).doc(event.targetId).update({
-              viewsCount: admin.firestore.FieldValue.increment(1),
-            }).catch(() => {}),
+            (async () => { try { await db.collection(event.collectionName).doc(event.targetId).update({ viewsCount: admin.firestore.FieldValue.increment(1) }); } catch {} })(),
           );
         }
         processed++;

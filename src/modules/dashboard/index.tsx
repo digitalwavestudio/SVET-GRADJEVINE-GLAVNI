@@ -49,11 +49,10 @@ const Dashboard = () => {
     };
 
     const combined = [
-      ...userJobs.map(j => ({ ...j, dashboardType: 'job' as const })),
-      ...userMarketplaceItems.map(m => ({ ...m, dashboardType: 'market' as const }))
+      ...userJobs.map(j => ({ ...j, dashboardType: 'job' as const }))
     ].sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));
     return combined.slice(0, 5);
-  }, [userJobs, userMarketplaceItems]);
+  }, [userJobs]);
 
   return (
     <div className="p-4 md:p-8 space-y-8 bg-gray-50/50 min-h-screen">

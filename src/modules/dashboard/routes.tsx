@@ -17,7 +17,6 @@ const DashboardModule = lazy(() => import(/* webpackPrefetch: true, webpackChunk
 const StatsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-stats" */ './pages/StatsPage'));
 const PublicProfilePage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-public-profile" */ './pages/PublicProfilePage'));
 const NotificationsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-notifications" */ './pages/NotificationsPage'));
-const ConstructionSitePage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-construction" */ '../real_estate/pages/ConstructionSitePage'));
 
 /**
  * Enterprise Prefetching Strategy:
@@ -47,10 +46,6 @@ export const prefetchDashboard = () => {
   }
 };
 
-const MyAccommodationCapacitiesPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-capacities" */ './pages/MyAccommodationCapacitiesPage'));
-const MyCateringOrdersPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-orders" */ './pages/MyCateringOrdersPage'));
-const MyCateringDeliveryPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-delivery" */ './pages/MyCateringDeliveryPage'));
-const MyMachinesReservationsPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-reservations" */ './pages/MyMachinesReservationsPage'));
 const MyCompanyPage = lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "dashboard-company" */ '../companies/pages/MyCompanyPage'));
 
 
@@ -62,11 +57,6 @@ export const getDashboardRouter = () => [
   <Route key="prijave" path="/moj-profil/prijave" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />,
   <Route key="omiljeni" path="/moj-profil/omiljeni" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />,
   <Route key="pretrage" path="/moj-profil/pretrage" element={<ProtectedRoute><SavedSearchesPage /></ProtectedRoute>} />,
-  <Route key="kapaciteti" path="/moj-profil/kapaciteti" element={<ProtectedRoute><MyAccommodationCapacitiesPage /></ProtectedRoute>} />,
-  <Route key="narudzbine" path="/moj-profil/narudzbine" element={<ProtectedRoute><MyCateringOrdersPage /></ProtectedRoute>} />,
-  <Route key="dostava" path="/moj-profil/dostava" element={<ProtectedRoute><MyCateringDeliveryPage /></ProtectedRoute>} />,
-  <Route key="rezervacije" path="/moj-profil/rezervacije" element={<ProtectedRoute><MyMachinesReservationsPage /></ProtectedRoute>} />,
-  <Route key="gradiliste" path="/moj-profil/gradiliste" element={<ProtectedRoute><ConstructionSitePage /></ProtectedRoute>} />,
   <Route key="firma" path="/moj-profil/firma" element={<ProtectedRoute><MyCompanyPage /></ProtectedRoute>} />,
   <Route key="poruke" path="/poruke" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />,
   <Route key="poruke-id" path="/poruke/:convId" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />,

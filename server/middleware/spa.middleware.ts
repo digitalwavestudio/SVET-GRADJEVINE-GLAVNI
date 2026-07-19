@@ -678,20 +678,7 @@ async function backgroundPreRenderDetailPage(
         },
       });
     } else if (false) {
-      structuredDataList.push({
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        name: adData.title || adData.name,
-        description: desc,
-        image: image,
-        offers: {
-          "@type": "Offer",
-          price: adData.price || "0",
-          priceCurrency: adData.currency || "EUR",
-          availability: "https://schema.org/InStock",
-          url: canonicalUrl,
-        },
-      });
+      // dead code — kept for future product schema
     }
 
     const detailTs = adData.updatedAt?.toDate?.() || adData.createdAt?.toDate?.();
@@ -992,15 +979,28 @@ export const createSpaMiddleware = () => {
 
       if (staticMetas[req.path]) {
         const meta = staticMetas[req.path];
+        const pageUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
         html = html.replace(
           "</head>",
-          `<title>${meta.title}</title>\n<meta name="description" content="${meta.desc}" />\n<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
+          `<title>${meta.title}</title>
+<meta name="description" content="${meta.desc}" />
+<link rel="canonical" href="${pageUrl}" />
+<meta property="og:title" content="${meta.title}" />
+<meta property="og:description" content="${meta.desc}" />
+<meta property="og:image" content="${APP_CONFIG.OG_IMAGE_DEFAULT}" />
+<meta property="og:url" content="${pageUrl}" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${meta.title}" />
+<meta name="twitter:description" content="${meta.desc}" />
+<meta name="twitter:image" content="${APP_CONFIG.OG_IMAGE_DEFAULT}" />
+</head>`,
         );
         html = injectEmptyRootLinks(html, req.path);
         return res.send(ensureHreflang(html, req.path));
       }
 
-      // Homepage: React SSR for bots only (cached in Redis for 2h)
+      // Homepage: React SSR for all visitors (cached in Redis for 2h)
       if (req.path === "/") {
         const indexHtml = getIndexHtmlSync();
         const websiteSearchSchema = JSON.stringify({
@@ -1016,33 +1016,33 @@ export const createSpaMiddleware = () => {
             "query-input": "required name=search_term_string",
           },
         });
-        if (isBot) {
-          const scheme = req.get('x-forwarded-proto') || 'http';
-          const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
-          const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
-          const ssrResult = await reactSsrPage(ssrUrl);
-          if (ssrResult) {
-            const { html, dehydratedState, helmetHtml } = ssrResult;
-            const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />`;
-            let finalHtml = indexHtml;
-            finalHtml = finalHtml
-              .replace('</head>', `${helmetContent}<script type="application/ld+json">${websiteSearchSchema}</script>\n</head>`)
-              .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-            finalHtml = dedupeHeadTags(ensureCanonical(ensureHreflang(finalHtml, req.path), req.path));
-            res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-            const redisCache = getRedis();
-            if (redisCache) {
-              redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
-            }
-            return res.send(finalHtml);
-          }
 
-          // Fallback: string-based pre-render for bots
-          const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
-          if (rendered) return res.send(dedupeHeadTags(ensureHreflang(rendered, req.path)));
+        // Try React SSR for everyone, fall back to clean shell if it fails
+        const scheme = req.get('x-forwarded-proto') || 'http';
+        const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+        const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+        const ssrResult = await reactSsrPage(ssrUrl);
+        if (ssrResult) {
+          const { html, dehydratedState, helmetHtml } = ssrResult;
+          const helmetContent = helmetHtml || `<title>Svet Građevine</title>\n<meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />`;
+          let finalHtml = indexHtml;
+          finalHtml = finalHtml
+            .replace('</head>', `${helmetContent}<script type="application/ld+json">${websiteSearchSchema}</script>\n</head>`)
+            .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+          finalHtml = dedupeHeadTags(ensureCanonical(ensureHreflang(finalHtml, req.path), req.path));
+          res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+          const redisCache = getRedis();
+          if (redisCache) {
+            redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
+          }
+          return res.send(finalHtml);
         }
 
-        // Clean shell for humans (no SSR — let React hydrate on client)
+        // Fallback: string-based pre-render
+        const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
+        if (rendered) return res.send(dedupeHeadTags(ensureHreflang(rendered, req.path)));
+
+        // Clean shell if all SSR fails
         const cleanHtml = injectEmptyRootLinks(indexHtml
           .replace("</head>", `<title>Svet Građevine</title>
 <meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
@@ -1101,58 +1101,57 @@ export const createSpaMiddleware = () => {
 
         if (isListingPage) {
           if (collectionName) {
-            if (isBot) {
-              // React SSR for bots only
-              const scheme = req.get('x-forwarded-proto') || 'http';
-              const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
-              const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
-              const ssrResult = await reactSsrPage(ssrUrl);
-              if (ssrResult) {
-                const indexHtml = getIndexHtmlSync();
-                const { html, helmetHtml } = ssrResult;
-                const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
-                let finalHtml = indexHtml;
-                finalHtml = finalHtml
-                  .replace('</head>', `${helmetContent}</head>`)
-                  .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-                finalHtml = ensureCanonical(ensureHreflang(finalHtml, req.path), req.path);
-                res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
-                const redisCache = getRedis();
-                if (redisCache) {
-                  redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
-                }
-                return res.send(finalHtml);
+            // React SSR for all visitors (cached in Redis)
+            const scheme = req.get('x-forwarded-proto') || 'http';
+            const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+            const ssrUrl = `${scheme}://${host}${req.originalUrl || req.path}`;
+            const ssrResult = await reactSsrPage(ssrUrl);
+            if (ssrResult) {
+              const indexHtml = getIndexHtmlSync();
+              const { html, helmetHtml } = ssrResult;
+              const helmetContent = helmetHtml || `<title>${matchedRoute.label} | Svet Građevine</title>\n<meta name="description" content="${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu." />`;
+              let finalHtml = indexHtml;
+              finalHtml = finalHtml
+                .replace('</head>', `${helmetContent}</head>`)
+                .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+              finalHtml = ensureCanonical(ensureHreflang(finalHtml, req.path), req.path);
+              res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+              const redisCache = getRedis();
+              if (redisCache) {
+                redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
               }
+              return res.send(finalHtml);
+            }
 
-              // Bot fallback: string-based pre-render
-              const indexHtmlForListingBg = getIndexHtmlSync();
+            // Fallback: string-based pre-render
+            const indexHtmlForListingBg = getIndexHtmlSync();
 
-              // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
-              if (isGeoPage && pathSegments.length >= 2) {
-                citySlug = lastSegment;
-                if (pathSegments.length >= 3) {
-                  categorySlug = pathSegments[pathSegments.length - 2];
-                }
-              } else if (pathSegments.length === 2 && isPseoRoute) {
-                categorySlug = pathSegments[1];
+            // Extract geo filter params from P-SEO hub paths: /poslovi/zidar/beograd
+            if (isGeoPage && pathSegments.length >= 2) {
+              citySlug = lastSegment;
+              if (pathSegments.length >= 3) {
+                categorySlug = pathSegments[pathSegments.length - 2];
               }
+            } else if (pathSegments.length === 2 && isPseoRoute) {
+              categorySlug = pathSegments[1];
+            }
 
-              const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
-              const cursor = req.query.cursor as string | undefined;
-              const rendered = await backgroundPreRenderListingHub(
-                cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL,
-                categorySlug, citySlug, pageNum, cursor
-              );
-              if (rendered) return res.send(rendered);
-            } else {
-              // Non-bot fallback: serve clean SPA shell with meta tags
-              const fullTitle = `${matchedRoute.label} | Svet Građevine`;
-              const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
-              const canonicalPath = isPseoRoute ? req.path : (CANONICAL_PATH_MAP[collectionName] || req.path);
-              html = html.replace(/<meta name="description"[^>]*\/?>/gi, "");
-              const cleanHtml = html
-                .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
-                .replace("</head>", `
+            const pageNum = parseInt((req.query.page as string) || "1", 10) || 1;
+            const cursor = req.query.cursor as string | undefined;
+            const rendered = await backgroundPreRenderListingHub(
+              cacheKey, indexHtmlForListingBg, collectionName, matchedRoute, req.path, CACHE_TTL,
+              categorySlug, citySlug, pageNum, cursor
+            );
+            if (rendered) return res.send(rendered);
+
+            // Clean SPA shell fallback with meta tags
+            const fullTitle = `${matchedRoute.label} | Svet Građevine`;
+            const baseDesc = `${matchedRoute.label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente.`;
+            const canonicalPath = isPseoRoute ? req.path : (CANONICAL_PATH_MAP[collectionName] || req.path);
+            html = html.replace(/<meta name="description"[^>]*\/?>/gi, "");
+            const cleanHtml = html
+              .replace(/<title>.*?<\/title>/, `<title>${fullTitle}</title>`)
+              .replace("</head>", `
 <meta name="description" content="${matchedRoute.label} - Pregledajte sve oglase. Svet Građevine je vodeći građevinski portal na Balkanu." />
 <link rel="canonical" href="${APP_CONFIG.BASE_URL}${canonicalPath}" />
 <meta property="og:title" content="${fullTitle}" />
@@ -1165,8 +1164,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="${baseDesc}" />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 </head>`);
-              return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(ensureHreflang(cleanHtml, req.path), req.path));
-            }
+            return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(ensureHreflang(cleanHtml, req.path), req.path));
           }
 
           // Build breadcrumb for geo pages with 3 levels
@@ -1256,18 +1254,17 @@ ${breadcrumbHtml}
         const adId = parts.length > 1 ? parts[parts.length - 1] : fullId;
 
         if (adId && collectionName) {
-          // If not bot, we return the cached static index.html instantly so browser can bootstrap Fast.
-          // Inject a basic title from slug so AhrefsSpeedTest and other non-bot crawlers see a page title.
+          // Derive readable title from slug before branching
+          const slugPart = fullId.includes("~") ? fullId.split("~")[0] : adId;
+          const readableTitle = slugPart
+            .split("-")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(" ");
+          const title = `${readableTitle} | Svet Građevine`;
+          const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet Građevine. Najveći građevinski portal i berza na Balkanu.`;
+
+          // If not bot, return cached static index.html instantly so browser can bootstrap Fast.
           if (!isBot && cachedIndexHtml) {
-            let slugPart = adId;
-            if (fullId.includes("~")) {
-              slugPart = fullId.split("~")[0];
-            }
-            const readableTitle = slugPart
-              .split("-")
-              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-              .join(" ");
-            const title = `${readableTitle} | Svet Građevine`;
             const nonBotHtml = cachedIndexHtml.replace(
               /<title>.*?<\/title>/,
               `<title>${title}</title>`,
@@ -1288,17 +1285,6 @@ ${breadcrumbHtml}
           }
 
           // Generate dynamic metadata solely from route slugs to prevent synchronous database blockage
-          let slugPart = adId;
-          if (fullId.includes("~")) {
-            slugPart = fullId.split("~")[0];
-          }
-          const readableTitle = slugPart
-            .split("-")
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(" ");
-
-          const title = `${readableTitle} | Svet Građevine`;
-          const desc = `Pogledajte detalje za oglas ${readableTitle} na portalu Svet Građevine. Najveći građevinski portal i berza na Balkanu.`;
           const canonicalUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
           const defaultImage = "https://www.svetgradjevine.com/og-image.png";
 
