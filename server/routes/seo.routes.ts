@@ -310,7 +310,7 @@ Disallow: /
 `;
 
   res.header("Content-Type", "text/plain");
-  res.header("Cache-Control", "public, max-age=86400");
+  res.header("Cache-Control", "public, max-age=3600");
   res.send(rules.trim());
 });
 
