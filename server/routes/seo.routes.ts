@@ -182,7 +182,7 @@ seoRouter.get("/:type/:id", injectMetaTags);
 
 // Fallback dynamic OG image generator
 seoRouter.get("/og-image", (req, res) => {
-  const title = (req.query.title as string) || "Svet GraÄ‘evine";
+  const title = (req.query.title as string) || "Svet Građevine";
   const location = (req.query.location as string) || "Srbija";
 
   // Basic SVG structure for a beautiful fallback OG card
@@ -216,15 +216,15 @@ seoRouter.get("/og-image", (req, res) => {
     <!-- Location badge -->
     <rect x="80" y="320" width="auto" height="48" rx="8" fill="#ffffff" fill-opacity="0.1" />
     <text x="100" y="352" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#aaaaaa" letter-spacing="2" text-transform="uppercase">
-      ðŸ“Œ ${location}
+      📍 ${location}
     </text>
 
     <!-- Logo / Brand at bottom -->
     <text x="80" y="550" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="800" fill="#F59E0B" letter-spacing="-0.5">
-      SVET GRAÄEVINE
+      SVET GRAĐEVINE
     </text>
     <text x="360" y="550" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="500" fill="#666666">
-      â€¢ NajveÄ‡i graÄ‘evinski portal na Balkanu
+      • Najveći građevinski portal na Balkanu
     </text>
   </svg>`;
 

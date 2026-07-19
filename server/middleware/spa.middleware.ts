@@ -997,7 +997,7 @@ export const createSpaMiddleware = () => {
           `<title>${meta.title}</title>\n<meta name="description" content="${meta.desc}" />\n<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
         );
         html = injectEmptyRootLinks(html, req.path);
-        return res.send(html);
+        return res.send(ensureHreflang(html, req.path));
       }
 
       // Homepage: React SSR for bots only (cached in Redis for 2h)
@@ -1039,7 +1039,7 @@ export const createSpaMiddleware = () => {
 
           // Fallback: string-based pre-render for bots
           const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
-          if (rendered) return res.send(dedupeHeadTags(rendered));
+          if (rendered) return res.send(dedupeHeadTags(ensureHreflang(rendered, req.path)));
         }
 
         // Clean shell for humans (no SSR — let React hydrate on client)
@@ -1326,7 +1326,7 @@ ${breadcrumbHtml}
           const rendered = await backgroundPreRenderDetailPage(cacheKey, indexHtmlForDetailBg, collectionName, adId, req.path, matchedRoute, CACHE_TTL);
           if (rendered) return res.send(rendered);
 
-          return res.send(injectEmptyRootLinks(skeletonHtml, req.path));
+          return res.send(ensureHreflang(injectEmptyRootLinks(skeletonHtml, req.path), req.path));
         }
       }
 

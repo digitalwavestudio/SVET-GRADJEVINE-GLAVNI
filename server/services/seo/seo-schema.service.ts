@@ -402,7 +402,7 @@ export class SEOSchemaService {
       if (data.skills && Array.isArray(data.skills)) {
         schema.hasOfferCatalog = {
           "@type": "OfferCatalog",
-          name: "VeÅ¡tine i Usluge",
+          name: "Veštine i Usluge",
           itemListElement: data.skills.map((skill: string, idx: number) => ({
             "@type": "OfferCatalog",
             position: idx + 1,

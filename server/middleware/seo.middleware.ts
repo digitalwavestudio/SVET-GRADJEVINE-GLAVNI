@@ -1,6 +1,7 @@
 ﻿import { Request, Response, NextFunction } from "express";
 import { APP_CONFIG } from "../../src/constants/config.ts";
 import { env } from "../config/env.ts";
+import { GERMAN_SLUGS } from "../constants/geo.ts";
 import { getRedis } from "../utils/redis.ts";
 import { SEOMetaService } from "../services/seo/seo-meta.service.ts";
 import { eventBus } from "../events/event-bus.ts";
@@ -270,7 +271,24 @@ export const botPrerenderMiddleware = async (
           paginationTags,
           isBotPayload: true,
         });
-        return res.send(genericHtml);
+        const base = `${APP_CONFIG.BASE_URL}${req.path}`;
+        const isGerman = req.path.split("/").some((seg) => GERMAN_SLUGS.has(seg));
+        const hfTags = [
+          `<link rel="alternate" hreflang="sr" href="${base}" />`,
+          `<link rel="alternate" hreflang="x-default" href="${base}" />`,
+        ];
+        if (isGerman) hfTags.push(`<link rel="alternate" hreflang="de" href="${base}" />`);
+        let safeHtml = genericHtml
+          .replaceAll("%VITE_ALGOLIA_APP_ID%", env.VITE_ALGOLIA_APP_ID || env.ALGOLIA_APP_ID || "")
+          .replaceAll("%VITE_ALGOLIA_SEARCH_KEY%", env.VITE_ALGOLIA_SEARCH_KEY || env.ALGOLIA_API_KEY || "")
+          .replaceAll("%VITE_ALGOLIA_INDEX_NAME%", env.VITE_ALGOLIA_INDEX_NAME || env.ALGOLIA_INDEX_NAME || "listings")
+          .replaceAll("%VITE_EMAILJS_PUBLIC_KEY%", env.VITE_EMAILJS_PUBLIC_KEY || "")
+          .replaceAll("%VITE_EMAILJS_SERVICE_ID%", env.VITE_EMAILJS_SERVICE_ID || "")
+          .replaceAll("%VITE_GA_MEASUREMENT_ID%", env.VITE_GA_MEASUREMENT_ID || env.GA_MEASUREMENT_ID || "G-SVV63518LY");
+        if (!safeHtml.includes("hreflang=")) {
+          safeHtml = safeHtml.replace("</head>", `${hfTags.join("\n")}\n</head>`);
+        }
+        return res.send(safeHtml);
       }
 
       meta = await SEOMetaService.getAdMetaData(baseEntity, idSegment, req.path);
