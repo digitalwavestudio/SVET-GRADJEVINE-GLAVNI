@@ -253,6 +253,13 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         "companies",
         "users",
       ];
+
+      // Top gradovi (RS + DE) i zanimanja za geo hub sitemap
+      const topCities = ["beograd", "novi-sad", "nis", "kragujevac", "subotica", "pancevo", "cacak", "kraljevo", "novi-pazar", "sabac", "leskovac", "krusevac", "uzice", "vranje", "valjevo"];
+      const deSlugs = ["nemacka", "berlin", "munchen", "hamburg", "koln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "hannover"];
+      const allCities = [...topCities, ...deSlugs];
+      const topProfessions = ["zidar", "tesar", "armirac", "moler", "keramicar", "fizicki-radnik", "vozac", "bagerista", "elektricar", "vodoinstalater", "gipsar", "fasader", "betonirac", "monter", "inzenjer"];
+
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
          xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -263,10 +270,20 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
   <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><priority>0.5</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.6</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/majstori</loc><priority>0.8</priority></url>`;
-      // DE GEO hubovi za poslove
-      const deSlugs = ["nemacka", "berlin", "munchen", "hamburg", "koln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "hannover"];
-      for (const slug of deSlugs) {
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${slug}</loc><priority>0.7</priority></url>`;
+      // Geo hubovi: poslovi (samo grad)
+      for (const city of allCities) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${city}</loc><priority>0.7</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/firme/${city}</loc><priority>0.6</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${city}</loc><priority>0.6</priority></url>`;
+      }
+      // Geo hubovi: poslovi (zanat) i poslovi (zanat + grad)
+      for (const prof of topProfessions) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}</loc><priority>0.7</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}</loc><priority>0.6</priority></url>`;
+        for (const city of allCities) {
+          xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}/${city}</loc><priority>0.7</priority></url>`;
+          xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}/${city}</loc><priority>0.6</priority></url>`;
+        }
       }
       // Poslovi i firme su u listings kolekciji sa type filterom
       const listingTypes = ["job", "company"];
