@@ -258,7 +258,16 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
       const rsCities = ["beograd", "novi-sad", "nis", "kragujevac", "subotica", "zrenjanin", "pancevo", "smederevo", "cacak", "novi-pazar", "kraljevo", "sabac", "uzice", "vranje", "valjevo", "leskovac", "krusevac", "zajecar", "sombor", "pozarevac", "pirot", "bor"];
       const deSlugs = ["nemacka", "berlin", "munchen", "muenchen", "hamburg", "koln", "koeln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "nuernberg", "hannover"];
       const allCities = [...rsCities, ...deSlugs];
-      const topProfessions = ["zidar", "tesar", "armirac", "moler", "keramicar", "gipsar", "fasader", "fizicki-radnik", "elektricar", "vodoinstalater", "betonirac", "krovopokrivac", "zavarivac", "vozac-kamiona", "rukovalac-bagerom"];
+      const professionSlugs = [...new Set([
+        "zidar", "tesar", "armirac", "univerzalac-majstor", "krovopokrivac", "betonirac", "masinski-malter", "fizicki-radnik", "pomocni-radnik",
+        "rukovalac-kranom", "rukovalac-bagerom", "rukovalac-viljuskarom", "rukovalac-telehenderom", "rukovalac-valjkom", "rukovalac-finiserom", "rukovalac-gradjevinskim-masinama", "vozac-kamiona", "dispecer-transporta",
+        "moler", "gipsar", "fasader", "keramicar", "parketar", "pvc-i-alu-stolar", "majstor-za-listele", "majstor-za-kosuljicu", "majstor-za-ravnajuci-sloj", "izolater", "podopolagac", "monter-kamena",
+        "vodoinstalater", "elektricar", "elektroinstalater-slabe-struje", "instalater-grejanja", "instalater-solarnih-panela", "instalater-protivpozarnih-sistema", "telekomunikacioni-instalater", "gasni-instalater", "tehnicar-pametnih-kuca", "hvac-tehnicar",
+        "zavarivac", "bravar", "limar", "montazer-celicnih-konstrukcija", "industrijski-monter", "antikorozista", "peskirac", "busac-betona",
+        "asfalter", "putar", "cevopolagac", "betonac-za-puteve-i-tunele", "radnik-na-hidrogradnji", "geobusac", "bunardzija", "radnik-na-niskogradnji",
+        "gradjevinski-inzenjer-visokogradnja", "gradjevinski-inzenjer-niskogradnja", "arhitekta-projektant", "geodeta-geometar", "sef-gradilista", "projekt-menadzer", "nadzorni-organ", "saradnik-za-bzr", "specijalista-za-rusenje",
+        "cuvar-gradilista", "radnik-na-ciscenju", "bastovan"
+      ])];
 
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -277,7 +286,7 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${city}</loc><priority>0.6</priority></url>`;
       }
       // Geo hubovi: poslovi (zanat) i poslovi (zanat + grad)
-      for (const prof of topProfessions) {
+      for (const prof of professionSlugs) {
         xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}</loc><priority>0.7</priority></url>`;
         xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}</loc><priority>0.6</priority></url>`;
         for (const city of allCities) {
