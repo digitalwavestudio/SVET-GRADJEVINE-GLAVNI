@@ -971,10 +971,6 @@ export const createSpaMiddleware = () => {
           title: "Kontakt | Svet Građevine",
           desc: "Kontaktirajte nas za saradnju, oglašavanje ili tehničku podršku.",
         },
-        "/cenovnik": {
-          title: "Cenovnik oglašavanja | Svet Građevine",
-          desc: "Detaljan pregled cena za isticanje oglasa i banersko oglašavanje.",
-        },
       };
 
       if (staticMetas[req.path]) {
@@ -1376,9 +1372,20 @@ ${breadcrumbHtml}
       const isSpaPassthrough = spaPassthroughPrefixes.some(p => req.path.startsWith(p));
       if (isSpaPassthrough) {
         const robotsMeta = req.path.startsWith("/profil/") || req.path.startsWith("/pretraga") ? `<meta name="robots" content="noindex, follow" />\n` : "";
+        const pageUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
+        const ogMeta = `<meta property="og:title" content="Svet Gra\u0111evine" />
+<meta property="og:description" content="Vode\u0107a gra\u0111evinska platforma u Srbiji - poslovi, firme, majstori." />
+<meta property="og:image" content="${APP_CONFIG.BASE_URL}/og-image.png" />
+<meta property="og:url" content="${pageUrl}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Svet Gra\u0111evine" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Svet Gra\u0111evine" />
+<meta name="twitter:description" content="Vode\u0107a gra\u0111evinska platforma u Srbiji." />
+`;
         const passthroughHtml = injectEmptyRootLinks(html, req.path).replace(
           "</head>",
-          `${robotsMeta}<link rel="canonical" href="${APP_CONFIG.BASE_URL}${req.path}" />\n</head>`,
+          `${robotsMeta}${ogMeta}<link rel="canonical" href="${pageUrl}" />\n</head>`,
         );
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(ensureHreflang(passthroughHtml, req.path));
       }

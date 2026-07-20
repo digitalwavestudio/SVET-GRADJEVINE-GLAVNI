@@ -303,6 +303,8 @@ Disallow: /api/
 Disallow: /dashboard/
 
 Sitemap: ${APP_CONFIG.BASE_URL}/sitemap.xml
+LLMs: ${APP_CONFIG.BASE_URL}/llms.txt
+LLMs-full: ${APP_CONFIG.BASE_URL}/llms-full.txt
 `
     : `
 User-agent: *
@@ -313,6 +315,35 @@ Disallow: /
   res.header("Cache-Control", "public, max-age=3600");
   res.send(rules.trim());
 });
+
+// GEO / AI Feeds
+seoRouter.get(
+  "/llms.txt",
+  cacheMiddleware(3600000, "llms_txt"),
+  async (req, res) => {
+    try {
+      const txt = await SEOSchemaService.generateLlmTxt();
+      res.header("Content-Type", "text/plain; charset=utf-8");
+      res.send(txt);
+    } catch (e) {
+      res.status(500).send("Failed to generate llms.txt");
+    }
+  },
+);
+
+seoRouter.get(
+  "/llms-full.txt",
+  cacheMiddleware(3600000, "llms_full"),
+  async (req, res) => {
+    try {
+      const txt = await SEOSchemaService.generateLlmFullTxt();
+      res.header("Content-Type", "text/plain; charset=utf-8");
+      res.send(txt);
+    } catch (e) {
+      res.status(500).send("Failed to generate llms-full.txt");
+    }
+  },
+);
 
 // AI Knowledge Graph Feeds
 seoRouter.get(
@@ -364,7 +395,6 @@ const STATIC_SITEMAP_URLS = [
   "/za-poslodavce",
   "/onama",
   "/kontakt",
-  "/magazin",
 ];
 
 function generateFallbackSitemap(): string {

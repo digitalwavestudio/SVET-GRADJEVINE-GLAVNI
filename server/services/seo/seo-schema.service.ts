@@ -520,6 +520,152 @@ export class SEOSchemaService {
     }
   }
 
+  static async generateLlmTxt(): Promise<string> {
+    const cacheKey = "seo:llms-txt";
+    try {
+      const cached = await CacheService.get<string>(cacheKey);
+      if (cached) return cached;
+    } catch { /* ignore */ }
+
+    let lines: string[] = [
+      "# Svet Gra\u0111evine",
+      "> Serbia's #1 platform for construction jobs, companies, and master tradesmen.",
+      "",
+      "## Jobs",
+    ];
+
+    try {
+      const jobs = await db
+        .collection("jobs")
+        .where("status", "==", "active")
+        .orderBy("createdAt", "desc")
+        .limit(100)
+        .get();
+      for (const doc of jobs.docs) {
+        const d = doc.data() as Record<string, unknown>;
+        const title = (d.title as string) || "Job";
+        const loc = (d.location as string) || (d.city as string) || "";
+        const company = (d.companyName as string) || "";
+        const slug = doc.id;
+        const url = `${APP_CONFIG.BASE_URL}/posao/${slug}`;
+        const meta = [title, loc ? `(${loc})` : "", company ? `- ${company}` : ""].filter(Boolean).join(" ");
+        lines.push(`- [${meta}](${url})`);
+      }
+    } catch { /* ignore */ }
+
+    lines.push("", "## Companies");
+
+    try {
+      const companies = await db
+        .collection("companies")
+        .where("status", "==", "active")
+        .orderBy("createdAt", "desc")
+        .limit(100)
+        .get();
+      for (const doc of companies.docs) {
+        const d = doc.data() as Record<string, unknown>;
+        const name = (d.name as string) || (d.title as string) || "Company";
+        const loc = (d.city as string) || "";
+        const slug = doc.id;
+        const url = `${APP_CONFIG.BASE_URL}/firma/${slug}`;
+        lines.push(`- [${name}${loc ? ` (${loc})` : ""}](${url})`);
+      }
+    } catch { /* ignore */ }
+
+    lines.push("", "## Master Tradesmen", "");
+    try {
+      const users = await db
+        .collection("users")
+        .where("role", "==", "majstor")
+        .where("status", "==", "active")
+        .orderBy("createdAt", "desc")
+        .limit(100)
+        .get();
+      for (const doc of users.docs) {
+        const d = doc.data() as Record<string, unknown>;
+        const name = (d.name as string) || (d.title as string) || "Master";
+        const loc = (d.location as string) || (d.city as string) || "";
+        const prof = (d.profession as string) || (d.zanimanje as string) || "";
+        const slug = doc.id;
+        const url = `${APP_CONFIG.BASE_URL}/profil/${slug}`;
+        lines.push(`- [${name}${prof ? ` - ${prof}` : ""}${loc ? ` (${loc})` : ""}](${url})`);
+      }
+    } catch { /* ignore */ }
+
+    const result = lines.join("\n");
+    await CacheService.set(cacheKey, result, 3600000).catch(() => {});
+    return result;
+  }
+
+  static async generateLlmFullTxt(): Promise<string> {
+    const cacheKey = "seo:llms-full-txt";
+    try {
+      const cached = await CacheService.get<string>(cacheKey);
+      if (cached) return cached;
+    } catch { /* ignore */ }
+
+    const sections: string[] = [
+      "# Svet Gra\u0111evine - Full Content",
+      "> Complete listing of all active entities on the platform.",
+      "",
+      "---",
+      "",
+    ];
+
+    sections.push("## Jobs\n");
+    try {
+      const jobs = await db
+        .collection("jobs")
+        .where("status", "==", "active")
+        .orderBy("createdAt", "desc")
+        .limit(200)
+        .get();
+      for (const doc of jobs.docs) {
+        const d = doc.data() as Record<string, unknown>;
+        const title = (d.title as string) || "Untitled";
+        const loc = (d.location as string) || (d.city as string) || "Serbia";
+        const company = (d.companyName as string) || "Unknown";
+        const desc = ((d.description as string) || "").substring(0, 1000);
+        const salary = [d.plataMin, d.plataMax].filter((v) => Number(v) > 0).join(" - ");
+        const url = `${APP_CONFIG.BASE_URL}/posao/${doc.id}`;
+        sections.push(`### ${title}`);
+        sections.push(`- **Company:** ${company}`);
+        sections.push(`- **Location:** ${loc}`);
+        if (salary) sections.push(`- **Salary:** ${salary} EUR`);
+        sections.push(`- **URL:** ${url}`);
+        if (desc) sections.push(`\n${desc}\n`);
+        sections.push("---\n");
+      }
+    } catch { /* ignore */ }
+
+    sections.push("## Companies\n");
+    try {
+      const companies = await db
+        .collection("companies")
+        .where("status", "==", "active")
+        .orderBy("createdAt", "desc")
+        .limit(200)
+        .get();
+      for (const doc of companies.docs) {
+        const d = doc.data() as Record<string, unknown>;
+        const name = (d.name as string) || (d.title as string) || "Untitled";
+        const loc = (d.city as string) || "";
+        const desc = ((d.description as string) || "").substring(0, 1000);
+        const url = `${APP_CONFIG.BASE_URL}/firma/${doc.id}`;
+        sections.push(`### ${name}`);
+        if (loc) sections.push(`- **Location:** ${loc}`);
+        if (d.website) sections.push(`- **Website:** ${d.website}`);
+        sections.push(`- **URL:** ${url}`);
+        if (desc) sections.push(`\n${desc}\n`);
+        sections.push("---\n");
+      }
+    } catch { /* ignore */ }
+
+    const result = sections.join("\n");
+    await CacheService.set(cacheKey, result, 3600000).catch(() => {});
+    return result;
+  }
+
   static async generateKnowledgeGraphXML() {
     const feed = await this.generateKnowledgeGraph();
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<knowledgeGraph xmlns="https://schema.org/">\n`;

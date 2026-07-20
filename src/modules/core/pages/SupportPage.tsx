@@ -2,9 +2,49 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DashboardLayout } from '@/src/modules/core';
 import { APP_CONFIG } from '@/src/constants/config';
+import { createFAQSchema } from '@/src/lib/seo/schemas';
+import { useDocumentHead } from '@/src/hooks/useDocumentHead';
 
 export default function SupportPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const faqItems = [
+    { 
+      q: 'Kako funkcioni\u0161e verifikacija oglasa i profila?', 
+      a: 'Svi oglasi i profili gra\u0111evinskih firmi i samostalnih majstora prolaze kroz detaljnu manuelnu proveru na\u0161ih administratora radi spre\u010davanja prevarnih radnji i osiguranja visokog kvaliteta podataka. Provera se obi\u010dno zavr\u0161ava u roku od nekoliko sati (najkasnije 24 sata). Nakon uspe\u0161ne verifikacije, Va\u0161 oglas postaje javan, a Va\u0161 profil dobija oznaku poverenja.' 
+    },
+    { 
+      q: 'Koji su uslovi za ogla\u0161avanje gra\u0111evinskih firmi i samostalnih majstora?', 
+      a: 'Gra\u0111evinske firme mogu kreirati detaljne profile sa portfoliom radova, ocenama i aktivnim oglasima za posao. Samostalni majstori mogu kreirati profil gde navode svoje specifi\u010dne ve\u0161tine, licencu i dostupnost. Svaki profil dobija besplatne osnovne oglase pri registraciji, dok se napredne funkcije napla\u0107uju kroz kredite.' 
+    },
+    { 
+      q: 'Kako funkcioni\u0161e sistem upita i poruka (Nadzorni centar)?', 
+      a: 'Nadzorni centar je Va\u0161e glavno \u010dvori\u0161te za komunikaciju. Kada klijent ili poslodavac po\u0161alje upit preko nekog od Va\u0161ih oglasa, poruka sti\u017ee direktno u Va\u0161e sandu\u010de. Notifikacije Vas obave\u0161tavaju u realnom vremenu, a kompletna istorija dopisivanja ostaje bezbedno sa\u010duvana na platformi.' 
+    },
+    { 
+      q: 'Da li je profesionalni CV generator potpuno besplatan za radnike?', 
+      a: 'Da! Na\u0161 cilj je da pomognemo gra\u0111evinskim radnicima da se predstave na najbolji mogu\u0107i na\u010din. Svi registrovani radnici imaju neograni\u010den i besplatan pristup alatu za kreiranje profesionalnog CV-ja. Mo\u017eete uneti svoje ve\u0161tine, obrazovanje, radno iskustvo i sertifikate, a platforma \u0107e Vam izgenerisati moderan PDF dokument koji mo\u017eete preuzeti i poslati bilo kom poslodavcu.' 
+    },
+    { 
+      q: 'Kako mogu da reklamiram sme\u0161taj za radnike ili gra\u0111evinsku ma\u0161inu?', 
+      a: 'Na stranici "Novi Oglas" odaberite namensku kategoriju (Sme\u0161taj za radnike ili Ma\u0161ine). Unesite sve relevantne podatke (kapacitet kreveta, opremljenost kuhinje, parking mesta za sme\u0161taj, ili tehni\u010dke specifikacije, radne sate i cenu za ma\u0161ine). Oglasi su optimizovani za pretragu kako bi ih gra\u0111evinske firme i investitori lako prona\u0161li.' 
+    },
+    { 
+      q: '\u0160ta sve dobijam aktivacijom Premium paketa za firme?', 
+      a: 'Premium paket za firme otklju\u010dava pun potencijal platforme: dobijate neograni\u010den broj oglasa za posao, prioritetno isticanje na vrhu pretrage, naprednu analitiku poseta i klikova na Va\u0161 profil u realnom vremenu, direktan pristup na\u0161oj bazi kandidata sa njihovim CV-jevima, kao i namensku podr\u0161ku za sve administrativne zahteve.' 
+    },
+  ];
+
+  const faqSchema = createFAQSchema(faqItems.map(item => ({
+    question: item.q,
+    answer: item.a
+  })));
+
+  useDocumentHead({
+    title: "Centar za podr\u0161ku | Svet Gra\u0111evine",
+    description: "Kontaktirajte nas putem emaila, telefona ili pogledajte \u010desto postavljana pitanja.",
+    jsonLd: faqSchema
+  });
 
   const contactCards = [
     { 
@@ -30,33 +70,6 @@ export default function SupportPage() {
       desc: 'Naš tim je dostupan za pozive. Vikendom i praznicima koristite isključivo email.',
       action: '/kontakt', // Link to contact form
       actionLabel: 'POGLEDAJTE DETALJE'
-    },
-  ];
-
-  const faqs = [
-    { 
-      q: 'Kako funkcioniše verifikacija oglasa i profila?', 
-      a: 'Svi oglasi i profili građevinskih firmi i samostalnih majstora prolaze kroz detaljnu manuelnu proveru naših administratora radi sprečavanja prevarnih radnji i osiguranja visokog kvaliteta podataka. Provera se obično završava u roku od nekoliko sati (najkasnije 24 sata). Nakon uspešne verifikacije, Vaš oglas postaje javan, a Vaš profil dobija oznaku poverenja.' 
-    },
-    { 
-      q: 'Koji su uslovi za oglašavanje građevinskih firmi i samostalnih majstora?', 
-      a: 'Građevinske firme mogu kreirati detaljne profile sa portfoliom radova, ocenama i aktivnim oglasima za posao. Samostalni majstori mogu kreirati profil gde navode svoje specifične veštine, licencu i dostupnost. Svaki profil dobija besplatne osnovne oglase pri registraciji, dok se napredne funkcije (isticanje oglasa na vrhu, sponzorisani oglasi i direktna promocija) naplaćuju kroz kredite.' 
-    },
-    { 
-      q: 'Kako funkcioniše sistem upita i poruka (Nadzorni centar)?', 
-      a: 'Nadzorni centar je Vaše glavno čvorište za komunikaciju. Kada klijent ili poslodavac pošalje upit preko nekog od Vaših oglasa (bilo za posao, smeštaj, mašine ili usluge), poruka stiže direktno u Vaše sanduče. Notifikacije Vas obaveštavaju u realnom vremenu, a kompletna istorija dopisivanja i poslatih ponuda ostaje bezbedno sačuvana na platformi.' 
-    },
-    { 
-      q: 'Da li je profesionalni CV generator potpuno besplatan za radnike?', 
-      a: 'Da! Naš cilj je da pomognemo građevinskim radnicima da se predstave na najbolji mogući način. Svi registrovani radnici imaju neograničen i besplatan pristup alatu za kreiranje profesionalnog CV-ja. Možete uneti svoje veštine, obrazovanje, radno iskustvo i sertifikate, a platforma će Vam izgenerisati moderno dizajniran i struktuiran PDF dokument koji možete preuzeti i poslati bilo kom poslodavcu.' 
-    },
-    { 
-      q: 'Kako mogu da reklamiram smeštaj za radnike ili građevinsku mašinu?', 
-      a: 'Na stranici "Novi Oglas" odaberite namensku kategoriju (Smeštaj za radnike ili Mašine). Unesite sve relevantne podatke (kapacitet kreveta, opremljenost kuhinje, parking mesta za smeštaj, ili tehničke specifikacije, radne sate i cenu za mašine). Oglasi su optimizovani za pretragu kako bi ih građevinske firme i investitori lako pronašli.' 
-    },
-    { 
-      q: 'Šta sve dobijam aktivacijom Premium paketa za firme?', 
-      a: 'Premium paket za firme otključava pun potencijal platforme: dobijate neograničen broj oglasa za posao, prioritetno isticanje na vrhu pretrage (featured status), naprednu analitiku poseta i klikova na Vaš profil u realnom vremenu, direktan pristup našoj bazi kandidata sa njihovim CV-jevima, kao i namensku podršku za sve administrativne zahteve.' 
     },
   ];
 
@@ -137,7 +150,7 @@ export default function SupportPage() {
             ČESTO POSTAVLJANA PITANJA
           </h3>
           <div className="space-y-4">
-            {faqs.map((faq, i) => {
+            {faqItems.map((faq, i) => {
               const isOpen = openFaq === i;
               return (
                 <div 

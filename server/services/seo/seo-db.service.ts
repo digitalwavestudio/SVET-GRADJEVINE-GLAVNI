@@ -261,7 +261,7 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
   <url><loc>${APP_CONFIG.BASE_URL}/firme</loc><priority>0.8</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.5</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><priority>0.5</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/paketi</loc><priority>0.6</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.6</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/majstori</loc><priority>0.8</priority></url>`;
       // DE GEO hubovi za poslove
       const deSlugs = ["nemacka", "berlin", "munchen", "hamburg", "koln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "hannover"];

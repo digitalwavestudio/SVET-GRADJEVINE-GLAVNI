@@ -67,6 +67,26 @@ export function Step1({
           break;
         }
       }
+    } else {
+      const normalizedText = opis.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
+      let found = false;
+      for (const loc of LOCATIONS) {
+        if (found) break;
+        const n = loc.name.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
+        const declensions = [n, n + 'u'];
+        for (const variant of declensions) {
+          const idx = normalizedText.indexOf(variant);
+          if (idx !== -1) {
+            const before = normalizedText[idx - 1] || '';
+            const after = normalizedText[idx + variant.length] || '';
+            if (!before.match(/[a-z0-9]/) && !after.match(/[a-z0-9]/)) {
+              setValue('location', loc.slug, { shouldDirty: true, shouldValidate: true });
+              found = true;
+              break;
+            }
+          }
+        }
+      }
     }
 
     const isplataMatch = opis.match(/Isplata:\s*(.+?)(?:\n|$)/i);
