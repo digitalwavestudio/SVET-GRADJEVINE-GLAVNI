@@ -48,7 +48,7 @@ export function Step1({
       return val.trim();
     };
 
-    const m = opis.match(/Satnica:\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
+    const m = opis.match(/Satnica[\s:-]+\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
     if (m) {
       const v = m[1].replace(',', '.').replace(/\s+/g, '');
       if (v !== (plataMin ?? '')) {
@@ -89,7 +89,7 @@ export function Step1({
       }
     }
 
-    const isplataMatch = opis.match(/Isplata:\s*(.+?)(?:\n|$)/i);
+    const isplataMatch = opis.match(/Isplata[\s:-]+\s*(.+?)(?:\n|$)/i);
     if (isplataMatch && isplataMatch[1].trim()) {
       const slug = mapPaymentDynamics(isplataMatch[1].trim());
       if (slug) {
@@ -104,9 +104,9 @@ export function Step1({
       { regex: /Smeštaj:\s*(da|ne|dostupan|nije)/i, slug: 'smestaj' },
       { regex: /Prevoz:\s*(da|ne|dostupan|nije)/i, slug: 'prevoz' },
       { regex: /Hrana:\s*(da|ne|dostupan|nije)/i, slug: 'topli-obrok' },
-      { regex: /\*{0,2}(?:Obezbe.d.en\s+smeštaj|Smeštaj\s+obezbe.d.en|Smeštaj\s+dostupan|Smeštaj\s+osiguran)\*{0,2}/i, slug: 'smestaj' },
-      { regex: /\*{0,2}(?:Obezbe.d.en\s+prevoz|Prevoz\s+obezbe.d.en|Prevoz\s+dostupan)\*{0,2}/i, slug: 'prevoz' },
-      { regex: /\*{0,2}(?:Obezbe.d.en\s+topli\s+obrok|Obezbe.d.en(a)?\s+hrana|Hrana\s+obezbe.d.en(a)?|Topli\s+obrok)\*{0,2}/i, slug: 'topli-obrok' },
+      { regex: /Obezbe.d.en\s+(?:je\s+)?smeštaj|Smeštaj\s+(?:je\s+)?(?:obezbe.d.en|dostupan|osiguran|besplatan)/i, slug: 'smestaj' },
+      { regex: /Obezbe.d.en\s+(?:je\s+)?prevoz|Prevoz\s+(?:je\s+)?(?:obezbe.d.en|dostupan)/i, slug: 'prevoz' },
+      { regex: /Obezbe.d.en\s+(?:je\s+)?(?:topli\s+)?obrok|Topli\s+obrok\s+(?:je\s+)?(?:obezbe.d.en|dostupan)|Obezbe.d.en(a)?\s+(?:je\s+)?hrana|Hrana\s+(?:je\s+)?obezbe.d.en(a)?/i, slug: 'topli-obrok' },
     ];
 
     for (const { regex, slug } of benefitRules) {
