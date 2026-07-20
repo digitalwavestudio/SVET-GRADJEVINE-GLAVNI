@@ -48,12 +48,18 @@ export function Step1({
       return val.trim();
     };
 
-    const m = opis.match(/Satnica[\s:-]+\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
-    if (m) {
-      const v = m[1].replace(',', '.').replace(/\s+/g, '');
+    const satnicaMatch = opis.match(/Satnica[\s:-]+\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
+    if (satnicaMatch) {
+      const v = satnicaMatch[1].replace(',', '.').replace(/\s+/g, '');
       if (v !== (plataMin ?? '')) {
         setValue('plataMin', v, { shouldDirty: true });
         setValue('isNegotiable', false, { shouldDirty: true });
+      }
+    } else {
+      const negotiable = /po\s+dogovoru|dogovor|pozovi|pozovite|cena\s+po\s+dogovoru|kontakt\s+za\s+cenu/i.test(opis);
+      setValue('isNegotiable', true, { shouldDirty: true });
+      if (negotiable) {
+        setValue('plataMin', '', { shouldDirty: true });
       }
     }
 
