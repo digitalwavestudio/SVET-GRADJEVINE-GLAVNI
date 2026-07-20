@@ -9,6 +9,7 @@ import { moderationService } from '@/src/services/moderationService';
 import { apiClient } from '@/src/lib/apiClient';
 
 import { getValidationSchema, getAutoTitle } from '@/src/modules/ads/utils/adUtils';
+import { LOCATIONS } from '@/src/constants/taxonomy';
 import { applyPayloadTransform } from '@/src/modules/ads/hooks/usePostAdControllerPayload';
 import { usePostAdStore } from '@/src/modules/ads/stores/usePostAdStore';
 import { mapEditItemToFormData } from '@/src/modules/ads/utils/adMappers';
@@ -256,6 +257,27 @@ export interface AdFormData {
   [key: string]: string | boolean | string[] | (string | File)[] | { label: string; url: string }[] | Record<string, boolean> | undefined | null | number;
 }
 
+function extractLocation(text: string): string | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const loc of LOCATIONS) {
+    const cityLower = loc.name.toLowerCase();
+    const patterns = [
+      new RegExp(`\\b(?:u|na|iz)\\s+${cityLower}\\b`, 'i'),
+      new RegExp(`\\b${cityLower}a\\b`, 'i'),
+      new RegExp(`\\b${cityLower}u\\b`, 'i'),
+      new RegExp(`\\b${cityLower}e\\b`, 'i'),
+      new RegExp(`\\b${cityLower}i\\b`, 'i'),
+      new RegExp(`\\b${cityLower}om\\b`, 'i'),
+      new RegExp(`\\b${cityLower}\\b`, 'i'),
+    ];
+    if (patterns.some(p => p.test(lower))) {
+      return loc.name;
+    }
+  }
+  return null;
+}
+
 export function usePostAdController({ initialPackage, editId, editType, editFlag, launchMode }: UsePostAdControllerProps) {
   const { showSuccess, showError } = useToast();
   const { user, updateUser } = useAuth();
@@ -315,6 +337,12 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     resolver: async (values, context, options) => {
       const schema = getValidationSchema(selectedCategory);
       if (schema) {
+        if (!values.location && values.opis) {
+          const extracted = extractLocation(values.opis);
+          if (extracted) {
+            values.location = extracted;
+          }
+        }
         return (zodResolver(schema) as any as import('react-hook-form').Resolver<AdFormData>)(values, context, options);
       }
       return { values: values, errors: {} } as import('react-hook-form').ResolverResult<AdFormData>;
@@ -393,6 +421,11 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
       setIsSubmitting(true);
       try {
         const sData = { ...data };
+
+        if (!sData.location && sData.opis && selectedCategory === 'job') {
+          const extracted = extractLocation(sData.opis);
+          if (extracted) sData.location = extracted;
+        }
 
         const schema = getValidationSchema(selectedCategory);
         if (schema) {
