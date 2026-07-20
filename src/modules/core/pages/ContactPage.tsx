@@ -6,6 +6,26 @@ import { APP_CONFIG } from '@/src/constants/config';
 import { useToast } from '@/src/context/ToastContext';
 import { trackEvent } from '@/src/lib/analytics';
 
+const contactPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Kontakt | Svet Gra\u0111evine",
+  description: "Kontaktirajte nas za saradnju, ogla\u0161avanje ili tehni\u010dku podr\u0161ku.",
+  url: `${APP_CONFIG.BASE_URL}/kontakt`,
+  mainEntity: {
+    "@type": "Organization",
+    name: "Svet Gra\u0111evine",
+    url: APP_CONFIG.BASE_URL,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+381-66-27-55-32",
+      contactType: "customer support",
+      email: APP_CONFIG.SUPPORT_EMAIL,
+      availableLanguage: ["Serbian"]
+    }
+  }
+};
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: 'Opšti upit', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +68,7 @@ export default function ContactPage() {
         title="Kontakt | Svet Građevine"
         description="Kontaktirajte tim Svet Građevine za saradnju, reklamiranje ili podršku. Tu smo za sve vaše potrebe u građevinskoj industriji."
         type="website"
+        jsonLd={contactPageSchema}
       />
       {/* Hero Section */}
       <header className="blueprint-pattern pt-48 pb-24 px-8 relative overflow-hidden border-b border-white/5">

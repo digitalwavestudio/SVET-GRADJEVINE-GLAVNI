@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Building, Home, Users, Briefcase } from 'lucide-react';
 import SeoHead from '@/src/components/SeoHead';
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
+import { APP_CONFIG } from '@/src/constants/config';
 
 export default function AboutPage() {
   const { data: bffData } = useHomepageData();
@@ -13,12 +14,28 @@ export default function AboutPage() {
     { icon: Briefcase, label: 'Aktivnih oglasa', value: stats?.totalAdsCount ?? 0 },
   ];
 
+const aboutPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  name: "O nama | Svet Gra\u0111evine",
+  description: "Svet Gra\u0111evine je vode\u0107a platforma za gra\u0111evinsku industriju u Srbiji.",
+  url: `${APP_CONFIG.BASE_URL}/o-nama`,
+  mainEntity: {
+    "@type": "Organization",
+    name: "Svet Gra\u0111evine",
+    url: APP_CONFIG.BASE_URL,
+    logo: `${APP_CONFIG.BASE_URL}/logo.png`,
+    description: "Vode\u0107a gra\u0111evinska platforma u Srbiji koja povezuje firme, majstore i poslodavce."
+  }
+};
+
   return (
     <div className="bg-surface text-on-surface min-h-screen pt-24 pb-16">
       <SeoHead 
         title="O nama | Svet Građevine"
         description="Svet Građevine je vodeća platforma za građevinsku industriju u Srbiji. Povezujemo firme, majstore i poslodavce na jednom mestu."
         type="website"
+        jsonLd={aboutPageSchema}
       />
       <div className="container-custom max-w-5xl mx-auto">
         <motion.div

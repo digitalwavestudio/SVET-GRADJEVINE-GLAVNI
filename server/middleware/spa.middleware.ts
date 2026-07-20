@@ -976,6 +976,37 @@ export const createSpaMiddleware = () => {
       if (staticMetas[req.path]) {
         const meta = staticMetas[req.path];
         const pageUrl = `${APP_CONFIG.BASE_URL}${req.path}`;
+        const schemaType = req.path === "/o-nama" ? "AboutPage" : req.path === "/kontakt" ? "ContactPage" : "WebPage";
+        const pageSchema = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": schemaType,
+          name: meta.title,
+          description: meta.desc,
+          url: pageUrl,
+          ...(req.path === "/kontakt" ? {
+            mainEntity: {
+              "@type": "Organization",
+              name: "Svet Gra\u0111evine",
+              url: APP_CONFIG.BASE_URL,
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: "+381-66-27-55-32",
+                contactType: "customer support",
+                email: APP_CONFIG.SUPPORT_EMAIL,
+                availableLanguage: ["Serbian"]
+              }
+            }
+          } : {}),
+          ...(req.path === "/o-nama" ? {
+            mainEntity: {
+              "@type": "Organization",
+              name: "Svet Gra\u0111evine",
+              url: APP_CONFIG.BASE_URL,
+              logo: `${APP_CONFIG.BASE_URL}/logo.png`,
+              description: "Vode\u0107a gra\u0111evinska platforma u Srbiji koja povezuje firme, majstore i poslodavce."
+            }
+          } : {})
+        });
         html = html.replace(
           "</head>",
           `<title>${meta.title}</title>
@@ -990,6 +1021,7 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:title" content="${meta.title}" />
 <meta name="twitter:description" content="${meta.desc}" />
 <meta name="twitter:image" content="${APP_CONFIG.OG_IMAGE_DEFAULT}" />
+<script type="application/ld+json">${pageSchema}</script>
 </head>`,
         );
         html = injectEmptyRootLinks(html, req.path);
