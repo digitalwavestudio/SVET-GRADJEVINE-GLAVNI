@@ -258,7 +258,7 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
       const rsCities = ["beograd", "novi-sad", "nis", "kragujevac", "subotica", "zrenjanin", "pancevo", "smederevo", "cacak", "novi-pazar", "kraljevo", "sabac", "uzice", "vranje", "valjevo", "leskovac", "krusevac", "zajecar", "sombor", "pozarevac", "pirot", "bor"];
       const deSlugs = ["nemacka", "berlin", "munchen", "muenchen", "hamburg", "koln", "koeln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "nuernberg", "hannover"];
       const allCities = [...rsCities, ...deSlugs];
-      const topProfessions = ["zidar", "tesar", "armirac", "moler", "keramicar", "fizicki-radnik", "vozac", "bagerista", "elektricar", "vodoinstalater", "gipsar", "fasader", "betonirac", "monter", "inzenjer"];
+      const topProfessions = ["zidar", "tesar", "armirac", "moler", "keramicar", "gipsar", "fasader", "fizicki-radnik", "elektricar", "vodoinstalater", "betonirac", "krovopokrivac", "zavarivac", "vozac-kamiona", "rukovalac-bagerom"];
 
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
