@@ -254,10 +254,10 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         "users",
       ];
 
-      // Top gradovi (RS + DE) i zanimanja za geo hub sitemap
-      const topCities = ["beograd", "novi-sad", "nis", "kragujevac", "subotica", "pancevo", "cacak", "kraljevo", "novi-pazar", "sabac", "leskovac", "krusevac", "uzice", "vranje", "valjevo"];
-      const deSlugs = ["nemacka", "berlin", "munchen", "hamburg", "koln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "hannover"];
-      const allCities = [...topCities, ...deSlugs];
+      // Svi gradovi (RS + DE) i zanimanja za geo hub sitemap
+      const rsCities = ["beograd", "novi-sad", "nis", "kragujevac", "subotica", "zrenjanin", "pancevo", "smederevo", "cacak", "novi-pazar", "kraljevo", "sabac", "uzice", "vranje", "valjevo", "leskovac", "krusevac", "zajecar", "sombor", "pozarevac", "pirot", "bor"];
+      const deSlugs = ["nemacka", "berlin", "munchen", "muenchen", "hamburg", "koln", "koeln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "nuernberg", "hannover"];
+      const allCities = [...rsCities, ...deSlugs];
       const topProfessions = ["zidar", "tesar", "armirac", "moler", "keramicar", "fizicki-radnik", "vozac", "bagerista", "elektricar", "vodoinstalater", "gipsar", "fasader", "betonirac", "monter", "inzenjer"];
 
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
