@@ -104,6 +104,9 @@ export function Step1({
       { regex: /Smeštaj:\s*(da|ne|dostupan|nije)/i, slug: 'smestaj' },
       { regex: /Prevoz:\s*(da|ne|dostupan|nije)/i, slug: 'prevoz' },
       { regex: /Hrana:\s*(da|ne|dostupan|nije)/i, slug: 'topli-obrok' },
+      { regex: /\*{0,2}(?:Obezbe.d.en\s+smeštaj|Smeštaj\s+obezbe.d.en|Smeštaj\s+dostupan|Smeštaj\s+osiguran)\*{0,2}/i, slug: 'smestaj' },
+      { regex: /\*{0,2}(?:Obezbe.d.en\s+prevoz|Prevoz\s+obezbe.d.en|Prevoz\s+dostupan)\*{0,2}/i, slug: 'prevoz' },
+      { regex: /\*{0,2}(?:Obezbe.d.en\s+topli\s+obrok|Obezbe.d.en(a)?\s+hrana|Hrana\s+obezbe.d.en(a)?|Topli\s+obrok)\*{0,2}/i, slug: 'topli-obrok' },
     ];
 
     for (const { regex, slug } of benefitRules) {

@@ -278,6 +278,46 @@ function extractLocation(text: string): string | null {
   return null;
 }
 
+function extractProfession(text: string): { id: string; sector: string } | null {
+  if (!text) return null;
+  const normal = (s: string) => s.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
+  const normalized = normal(text);
+
+  const entries: { id: string; sector: string; variants: string[] }[] = [];
+  for (const [sector, items] of Object.entries(PROFESSIONS)) {
+    for (const item of items) {
+      const variants: string[] = [];
+      for (const name of [item.name, item.shortName]) {
+        if (!name) continue;
+        const n = normal(name);
+        if (n.length < 3) continue;
+        variants.push(n);
+        variants.push(n + 'a');
+        variants.push(n + 'u');
+        variants.push(n + 'e');
+        variants.push(n + 'i');
+        variants.push(n + 'om');
+      }
+      entries.push({ id: item.id, sector, variants });
+    }
+  }
+
+  entries.sort((a, b) => b.variants[0]?.length ?? 0 - a.variants[0]?.length ?? 0);
+
+  for (const entry of entries) {
+    for (const v of entry.variants) {
+      const idx = normalized.indexOf(v);
+      if (idx === -1) continue;
+      const before = normalized[idx - 1] || ' ';
+      const after = normalized[idx + v.length] || ' ';
+      if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
+        return { id: entry.id, sector: entry.sector };
+      }
+    }
+  }
+  return null;
+}
+
 export function usePostAdController({ initialPackage, editId, editType, editFlag, launchMode }: UsePostAdControllerProps) {
   const { showSuccess, showError } = useToast();
   const { user, updateUser } = useAuth();
@@ -337,10 +377,17 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     resolver: async (values, context, options) => {
       const schema = getValidationSchema(selectedCategory);
       if (schema) {
-        if (!values.location && values.opis) {
-          const extracted = extractLocation(values.opis);
-          if (extracted) {
-            values.location = extracted;
+        if (values.opis) {
+          if (!values.location) {
+            const extracted = extractLocation(values.opis);
+            if (extracted) values.location = extracted;
+          }
+          if (!values.profession || !values.sector) {
+            const extracted = extractProfession(values.opis);
+            if (extracted) {
+              values.profession = extracted.id;
+              values.sector = extracted.sector;
+            }
           }
         }
         return (zodResolver(schema) as any as import('react-hook-form').Resolver<AdFormData>)(values, context, options);
@@ -422,9 +469,18 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
       try {
         const sData = { ...data };
 
-        if (!sData.location && sData.opis && selectedCategory === 'job') {
-          const extracted = extractLocation(sData.opis);
-          if (extracted) sData.location = extracted;
+        if (sData.opis && selectedCategory === 'job') {
+          if (!sData.location) {
+            const extracted = extractLocation(sData.opis);
+            if (extracted) sData.location = extracted;
+          }
+          if (!sData.profession || !sData.sector) {
+            const extracted = extractProfession(sData.opis);
+            if (extracted) {
+              sData.profession = extracted.id;
+              sData.sector = extracted.sector;
+            }
+          }
         }
 
         const schema = getValidationSchema(selectedCategory);
