@@ -96,6 +96,8 @@ export const PROFESSIONS: Record<string, TaxonomyItem[]> = {
     { id: 'majstor-za-kosuljicu', slug: 'majstor-za-kosuljicu', name: 'Majstor za košuljicu', shortName: 'Majstor za košuljicu' },
     { id: 'majstor-za-ravnajuci-sloj', slug: 'majstor-za-ravnajuci-sloj', name: 'Majstor za ravnajući sloj', shortName: 'Majstor za ravnajući sloj' },
     { id: 'izolater', slug: 'izolater', name: 'Izolater (Termo/Hidro izolacija)', shortName: 'Izolater' },
+    { id: 'hidroizolater', slug: 'hidroizolater', name: 'Hidroizolater', shortName: 'Hidroizolater' },
+    { id: 'majstor-za-hidroizolaciju', slug: 'majstor-za-hidroizolaciju', name: 'Majstor za hidroizolaciju', shortName: 'Majstor za hidroizolaciju' },
     { id: 'podopolagac', slug: 'podopolagac', name: 'Podopolagač (Epoksidni podovi, linoleum)', shortName: 'Podopolagač' },
     { id: 'monter-kamena', slug: 'monter-kamena', name: 'Monter kamena', shortName: 'Monter kamena' },
     { id: 'fizicki-radnik', slug: 'fizicki-radnik', name: 'Fizički radnik', shortName: 'Fizički radnik' },
