@@ -17,6 +17,9 @@ const COUNTRY_KEYWORDS: Record<string, string> = {
   'skopje': 'Skoplje',
   'rumunija': 'Temišvar',
   'temisvar': 'Temišvar',
+  'svajcarska': 'Švajcarska',
+  'švajcarska': 'Švajcarska',
+  'switzerland': 'Švajcarska',
 };
 
 export function extractLocation(text: string): string | null {
