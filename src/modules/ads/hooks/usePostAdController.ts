@@ -377,20 +377,21 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
     resolver: async (values, context, options) => {
       const schema = getValidationSchema(selectedCategory);
       if (schema) {
-        if (values.opis) {
-          if (!values.location) {
-            const extracted = extractLocation(values.opis);
-            if (extracted) values.location = extracted;
+        const enriched = { ...values } as AdFormData;
+        if (enriched.opis) {
+          if (!enriched.location) {
+            const extracted = extractLocation(enriched.opis);
+            if (extracted) enriched.location = extracted;
           }
-          if (!values.profession || !values.sector) {
-            const extracted = extractProfession(values.opis);
+          if (!enriched.profession || !enriched.sector) {
+            const extracted = extractProfession(enriched.opis);
             if (extracted) {
-              values.profession = extracted.id;
-              values.sector = extracted.sector;
+              enriched.profession = extracted.id;
+              enriched.sector = extracted.sector;
             }
           }
         }
-        return (zodResolver(schema) as any as import('react-hook-form').Resolver<AdFormData>)(values, context, options);
+        return (zodResolver(schema) as any as import('react-hook-form').Resolver<AdFormData>)(enriched, context, options);
       }
       return { values: values, errors: {} } as import('react-hook-form').ResolverResult<AdFormData>;
     },
