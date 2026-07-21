@@ -12,7 +12,7 @@ interface SuccessStateProps {
 
 export const SuccessState: React.FC<SuccessStateProps> = ({ type, packageName, onReset }) => {
   return (
-    <div className="fixed inset-0 z-50 bg-[#0B1219] text-white flex flex-col pt-32 pb-20 px-6 overflow-hidden font-body items-center justify-center text-center">
+    <div className="fixed inset-0 z-50 bg-[#0B1219] text-white flex flex-col px-6 overflow-hidden font-body items-center justify-center text-center">
       <Confetti
         recycle={false}
         numberOfPieces={500}

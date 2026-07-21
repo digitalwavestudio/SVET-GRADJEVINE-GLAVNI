@@ -410,10 +410,10 @@ export default function JobDetailsPage() {
                   Satnica
                 </span>
               </div>
-              <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 tracking-tight leading-none py-1 drop-shadow-[0_2px_10px_rgba(251,191,36,0.15)]">
+                <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 tracking-tight leading-none py-1 drop-shadow-[0_2px_10px_rgba(251,191,36,0.15)]">
                   {jobData.isNegotiable 
                     ? 'Pozvati' 
-                    : jobData.plataMin != null
+                    : jobData.plataMin != null && jobData.plataMin !== '' && Number(jobData.plataMin) > 0
                       ? `${Number(jobData.plataMin).toLocaleString()}${jobData.plataMax != null && Number(jobData.plataMax) > 0 ? ` - ${Number(jobData.plataMax).toLocaleString()}` : ''} €`
                       : 'Po dogovoru'}
               </span>
