@@ -5,6 +5,13 @@ import {
   realEstateSchema, businessProfileSchema as companySchema 
 } from '@svet-gradjevine/shared';
 
+const COUNTRY_KEYWORDS: Record<string, string> = {
+  'njemacka': 'Berlin',
+  'njemačka': 'Berlin',
+  'deutschland': 'Berlin',
+  'germany': 'Berlin',
+};
+
 export function extractLocation(text: string): string | null {
   if (!text) return null;
   const lower = text.toLowerCase();
@@ -20,6 +27,11 @@ export function extractLocation(text: string): string | null {
       new RegExp(`\\b${cityLower}\\b`, 'i'),
     ];
     if (patterns.some(p => p.test(lower))) return loc.name;
+  }
+  for (const [keyword, city] of Object.entries(COUNTRY_KEYWORDS)) {
+    if (lower.includes(keyword)) return city;
+    const stem = keyword.slice(0, -1);
+    if (stem.length >= 5 && lower.includes(stem)) return city;
   }
   return null;
 }
@@ -41,6 +53,22 @@ export function extractProfession(text: string): { id: string; sector: string } 
           const before = normalized[idx - 1] || ' ';
           const after = normalized[idx + v.length] || ' ';
           if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
+            return { id: item.id, sector };
+          }
+        }
+      }
+      // Fallback: proveri substringove imena (hvata "instalater" u "vodeoinstalateri")
+      for (const name of [item.name, item.shortName]) {
+        if (!name) continue;
+        const n = normal(name);
+        if (n.length < 8) continue;
+        for (let start = 0; start <= n.length - 6; start++) {
+          const sub = n.substring(start, start + 6);
+          if (sub.length < 6) continue;
+          const idx = normalized.indexOf(sub);
+          if (idx === -1) continue;
+          const before = normalized[idx - 1] || ' ';
+          if (!/[a-z0-9]/.test(before)) {
             return { id: item.id, sector };
           }
         }

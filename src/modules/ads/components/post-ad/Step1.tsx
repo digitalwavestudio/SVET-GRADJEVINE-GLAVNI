@@ -11,7 +11,7 @@ import { Textarea } from '@/src/components/ui/form/Textarea';
 import { StepProps } from '@/src/modules/ads/components/post-ad/types';
 import { AiMagicInput } from './AiMagicInput';
 import { AiJobScore } from './AiJobScore';
-import { extractProfession } from '@/src/modules/ads/utils/adUtils';
+import { extractProfession, extractLocation } from '@/src/modules/ads/utils/adUtils';
 
 export function Step1({
   setSelectedCategory,
@@ -75,23 +75,11 @@ export function Step1({
         }
       }
     } else {
-      const normalizedText = opis.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
-      let found = false;
-      for (const loc of LOCATIONS) {
-        if (found) break;
-        const n = loc.name.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
-        const declensions = [n, n + 'u'];
-        for (const variant of declensions) {
-          const idx = normalizedText.indexOf(variant);
-          if (idx !== -1) {
-            const before = normalizedText[idx - 1] || '';
-            const after = normalizedText[idx + variant.length] || '';
-            if (!before.match(/[a-z0-9]/) && !after.match(/[a-z0-9]/)) {
-              setValue('location', loc.slug, { shouldDirty: true, shouldValidate: true });
-              found = true;
-              break;
-            }
-          }
+      const foundCity = extractLocation(opis);
+      if (foundCity) {
+        const match = LOCATIONS.find(l => l.name.toLowerCase() === foundCity.toLowerCase());
+        if (match) {
+          setValue('location', match.slug, { shouldDirty: true, shouldValidate: true });
         }
       }
     }
