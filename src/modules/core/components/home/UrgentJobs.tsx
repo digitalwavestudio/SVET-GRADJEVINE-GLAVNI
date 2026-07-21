@@ -44,7 +44,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                 <span className="material-symbols-outlined text-[#ff512f] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>bolt</span>
               </div>
               <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-7xl font-[1000] md:font-[950] uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4 leading-tight">HITNI<br className="md:hidden" /> OGLASI</h2>
-              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-xl font-medium leading-relaxed">Ponude i poslovi koji zahtevaju najbržu reakciju na tržištu.</p>
+              <p className="text-on-surface-variant text-base sm:text-lg md:text-xl max-w-xl font-medium leading-relaxed">Poslovi koji zahtevaju brzu prijavu i hitno angažovanje radnika.</p>
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>

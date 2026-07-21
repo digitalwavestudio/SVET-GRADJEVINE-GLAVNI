@@ -23,7 +23,7 @@ export const JobsUrgent: React.FC<JobsUrgentProps> = ({ jobs, isExpanded, setIsE
               <span className="material-symbols-outlined text-[#ff512f] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>local_fire_department</span>
             </div>
             <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#ff512f_0%,#ffffff_60%)] mb-4">HITNI POSLOVI</h2>
-            <p className="text-on-surface-variant text-lg max-w-xl">Ponude i poslovi koji zahtevaju najbržu reakciju na tržištu.</p>
+            <p className="text-on-surface-variant text-lg max-w-xl">Poslovi koji zahtevaju brzu prijavu i hitno angažovanje radnika.</p>
             <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
           </div>
         </div>
