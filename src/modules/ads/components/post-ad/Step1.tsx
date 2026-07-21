@@ -85,7 +85,7 @@ export function Step1({
     }
 
     const prof = extractProfession(opis);
-    if (prof && (!getValues('profession') || !getValues('sector'))) {
+    if (prof) {
       setValue('profession', prof.id, { shouldDirty: true });
       setValue('sector', prof.sector, { shouldDirty: true });
     }
