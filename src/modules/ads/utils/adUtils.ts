@@ -5,6 +5,51 @@ import {
   realEstateSchema, businessProfileSchema as companySchema 
 } from '@svet-gradjevine/shared';
 
+export function extractLocation(text: string): string | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const loc of LOCATIONS) {
+    const cityLower = loc.name.toLowerCase();
+    const patterns = [
+      new RegExp(`\\b(?:u|na|iz)\\s+${cityLower}\\b`, 'i'),
+      new RegExp(`\\b${cityLower}a\\b`, 'i'),
+      new RegExp(`\\b${cityLower}u\\b`, 'i'),
+      new RegExp(`\\b${cityLower}e\\b`, 'i'),
+      new RegExp(`\\b${cityLower}i\\b`, 'i'),
+      new RegExp(`\\b${cityLower}om\\b`, 'i'),
+      new RegExp(`\\b${cityLower}\\b`, 'i'),
+    ];
+    if (patterns.some(p => p.test(lower))) return loc.name;
+  }
+  return null;
+}
+
+export function extractProfession(text: string): { id: string; sector: string } | null {
+  if (!text) return null;
+  const normal = (s: string) => s.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
+  const normalized = normal(text);
+  for (const [sector, items] of Object.entries(PROFESSIONS)) {
+    for (const item of items) {
+      for (const name of [item.name, item.shortName]) {
+        if (!name) continue;
+        const n = normal(name);
+        if (n.length < 3) continue;
+        const variants = [n, n + 'a', n + 'u', n + 'e', n + 'i', n + 'om'];
+        for (const v of variants) {
+          const idx = normalized.indexOf(v);
+          if (idx === -1) continue;
+          const before = normalized[idx - 1] || ' ';
+          const after = normalized[idx + v.length] || ' ';
+          if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
+            return { id: item.id, sector };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
 export const getValidationSchema = (category: string | null) => {
   switch (category) {
     case 'job': return jobSchema;

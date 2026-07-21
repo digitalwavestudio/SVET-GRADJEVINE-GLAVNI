@@ -11,6 +11,7 @@ import { Textarea } from '@/src/components/ui/form/Textarea';
 import { StepProps } from '@/src/modules/ads/components/post-ad/types';
 import { AiMagicInput } from './AiMagicInput';
 import { AiJobScore } from './AiJobScore';
+import { extractProfession } from '@/src/modules/ads/utils/adUtils';
 
 export function Step1({
   setSelectedCategory,
@@ -93,6 +94,12 @@ export function Step1({
           }
         }
       }
+    }
+
+    const prof = extractProfession(opis);
+    if (prof && (!getValues('profession') || !getValues('sector'))) {
+      setValue('profession', prof.id, { shouldDirty: true });
+      setValue('sector', prof.sector, { shouldDirty: true });
     }
 
     const isplataMatch = opis.match(/Isplata[\s:-]+\s*(.+?)(?:\n|$)/i);

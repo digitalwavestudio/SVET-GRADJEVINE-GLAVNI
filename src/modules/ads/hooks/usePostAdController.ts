@@ -8,8 +8,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { moderationService } from '@/src/services/moderationService';
 import { apiClient } from '@/src/lib/apiClient';
 
-import { getValidationSchema, getAutoTitle } from '@/src/modules/ads/utils/adUtils';
-import { LOCATIONS } from '@/src/constants/taxonomy';
+import { getValidationSchema, getAutoTitle, extractLocation, extractProfession } from '@/src/modules/ads/utils/adUtils';
 import { applyPayloadTransform } from '@/src/modules/ads/hooks/usePostAdControllerPayload';
 import { usePostAdStore } from '@/src/modules/ads/stores/usePostAdStore';
 import { mapEditItemToFormData } from '@/src/modules/ads/utils/adMappers';
@@ -255,67 +254,6 @@ export interface AdFormData {
   companyPortfolioImages?: (string | File)[];
   plotInfrastructure?: Record<string, boolean>;
   [key: string]: string | boolean | string[] | (string | File)[] | { label: string; url: string }[] | Record<string, boolean> | undefined | null | number;
-}
-
-function extractLocation(text: string): string | null {
-  if (!text) return null;
-  const lower = text.toLowerCase();
-  for (const loc of LOCATIONS) {
-    const cityLower = loc.name.toLowerCase();
-    const patterns = [
-      new RegExp(`\\b(?:u|na|iz)\\s+${cityLower}\\b`, 'i'),
-      new RegExp(`\\b${cityLower}a\\b`, 'i'),
-      new RegExp(`\\b${cityLower}u\\b`, 'i'),
-      new RegExp(`\\b${cityLower}e\\b`, 'i'),
-      new RegExp(`\\b${cityLower}i\\b`, 'i'),
-      new RegExp(`\\b${cityLower}om\\b`, 'i'),
-      new RegExp(`\\b${cityLower}\\b`, 'i'),
-    ];
-    if (patterns.some(p => p.test(lower))) {
-      return loc.name;
-    }
-  }
-  return null;
-}
-
-function extractProfession(text: string): { id: string; sector: string } | null {
-  if (!text) return null;
-  const normal = (s: string) => s.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
-  const normalized = normal(text);
-
-  const entries: { id: string; sector: string; variants: string[] }[] = [];
-  for (const [sector, items] of Object.entries(PROFESSIONS)) {
-    for (const item of items) {
-      const variants: string[] = [];
-      for (const name of [item.name, item.shortName]) {
-        if (!name) continue;
-        const n = normal(name);
-        if (n.length < 3) continue;
-        variants.push(n);
-        variants.push(n + 'a');
-        variants.push(n + 'u');
-        variants.push(n + 'e');
-        variants.push(n + 'i');
-        variants.push(n + 'om');
-      }
-      entries.push({ id: item.id, sector, variants });
-    }
-  }
-
-  entries.sort((a, b) => b.variants[0]?.length ?? 0 - a.variants[0]?.length ?? 0);
-
-  for (const entry of entries) {
-    for (const v of entry.variants) {
-      const idx = normalized.indexOf(v);
-      if (idx === -1) continue;
-      const before = normalized[idx - 1] || ' ';
-      const after = normalized[idx + v.length] || ' ';
-      if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
-        return { id: entry.id, sector: entry.sector };
-      }
-    }
-  }
-  return null;
 }
 
 export function usePostAdController({ initialPackage, editId, editType, editFlag, launchMode }: UsePostAdControllerProps) {
