@@ -36,10 +36,18 @@ export function extractLocation(text: string): string | null {
   return null;
 }
 
+const PROFESSION_KEYWORDS: Record<string, { id: string; sector: string }> = {
+  'hidroizolacija': { id: 'hidroizolater', sector: 'zavrsni-radovi' },
+  'termoizolacija': { id: 'izolater', sector: 'zavrsni-radovi' },
+};
+
 export function extractProfession(text: string): { id: string; sector: string } | null {
   if (!text) return null;
   const normal = (s: string) => s.toLowerCase().replace(/š/g, 's').replace(/đ/g, 'dj').replace(/č/g, 'c').replace(/ć/g, 'c').replace(/ž/g, 'z');
   const normalized = normal(text);
+  for (const [keyword, prof] of Object.entries(PROFESSION_KEYWORDS)) {
+    if (normalized.includes(keyword)) return prof;
+  }
   for (const [sector, items] of Object.entries(PROFESSIONS)) {
     for (const item of items) {
       for (const name of [item.name, item.shortName]) {
@@ -68,7 +76,8 @@ export function extractProfession(text: string): { id: string; sector: string } 
           const idx = normalized.indexOf(sub);
           if (idx === -1) continue;
           const before = normalized[idx - 1] || ' ';
-          if (!/[a-z0-9]/.test(before)) {
+          const after = normalized[idx + sub.length] || ' ';
+          if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) {
             return { id: item.id, sector };
           }
         }
