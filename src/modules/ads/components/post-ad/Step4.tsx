@@ -139,7 +139,7 @@ export function Step4({
       const min = formData.plataMin ? Number(formData.plataMin).toLocaleString("sr-RS") : "0";
       const max = formData.plataMax ? Number(formData.plataMax).toLocaleString("sr-RS") : "0";
       const dynSlug = formData.dinamikaIsplate || "";
-      const typeLabel = dynSlug === "po-satu" ? "sat" : dynSlug === "mesecna" ? "mesec" : dynSlug === "dnevna" ? "dan" : dynSlug === "nedeljna" ? "nedelja" : dynSlug === "po-m2" ? "m2" : "";
+      const typeLabel = dynSlug === "satnica" ? "sat" : dynSlug === "po-satu" ? "sat" : dynSlug === "mesecna" ? "mesec" : dynSlug === "dnevna" ? "dan" : dynSlug === "nedeljna" ? "nedelja" : dynSlug === "po-m2" ? "m2" : "";
       
       if (formData.plataMin && formData.plataMax) {
         return `${min} - ${max} EUR${typeLabel ? ` / ${typeLabel}` : ''}`;

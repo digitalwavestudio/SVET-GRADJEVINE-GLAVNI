@@ -49,12 +49,13 @@ export function Step1({
       return val.trim();
     };
 
-    const satnicaMatch = opis.match(/Satnica[\s:-]+\s*(\d+(?:[.,]\s*\d+)?)\s*(?:eur|€)?/i);
+    const satnicaMatch = opis.match(/Satnica[\s:-]+\s*(\d+(?:[.,]\s*\d+)?(?:\s*-\s*\d+(?:[.,]\s*\d+)?)?)\s*(?:eur|€)?/i);
     if (satnicaMatch) {
       const v = satnicaMatch[1].replace(',', '.').replace(/\s+/g, '');
       if (v !== (plataMin ?? '')) {
         setValue('plataMin', v, { shouldDirty: true });
         setValue('isNegotiable', false, { shouldDirty: true });
+        setValue('dinamikaIsplate', 'satnica', { shouldDirty: true });
       }
     } else {
       const negotiable = /po\s+dogovoru|dogovor|pozovi|pozovite|cena\s+po\s+dogovoru|kontakt\s+za\s+cenu/i.test(opis);
@@ -91,7 +92,7 @@ export function Step1({
     }
 
     const isplataMatch = opis.match(/Isplata[\s:-]+\s*(.+?)(?:\n|$)/i);
-    if (isplataMatch && isplataMatch[1].trim()) {
+    if (isplataMatch && isplataMatch[1].trim() && !satnicaMatch) {
       const slug = mapPaymentDynamics(isplataMatch[1].trim());
       if (slug) {
         setValue('dinamikaIsplate', slug, { shouldDirty: true });

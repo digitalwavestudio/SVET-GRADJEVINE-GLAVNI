@@ -212,6 +212,7 @@ export const PROFESSIONS: Record<string, TaxonomyItem[]> = {
 // Deleted LOCATIONS here because it was moved above for consistency
 
 export const PAYMENT_DYNAMICS: TaxonomyItem[] = [
+  { id: 'satnica', slug: 'satnica', name: 'Sat' },
   { id: 'dnevna', slug: 'dnevna', name: 'Dnevna isplata' },
   { id: 'nedeljna', slug: 'nedeljna', name: 'Nedeljna isplata' },
   { id: 'na-15-dana', slug: 'na-15-dana', name: 'Na 15 dana' },
