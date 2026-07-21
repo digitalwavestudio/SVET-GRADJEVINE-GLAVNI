@@ -49,6 +49,11 @@ export function extractLocation(text: string): string | null {
 const PROFESSION_KEYWORDS: Record<string, { id: string; sector: string }> = {
   'hidroizolacija': { id: 'hidroizolater', sector: 'zavrsni-radovi' },
   'termoizolacija': { id: 'izolater', sector: 'zavrsni-radovi' },
+  'fizicke radnike': { id: 'fizicki-radnik', sector: 'gruba-gradnja' },
+  'fizickog radnika': { id: 'fizicki-radnik', sector: 'gruba-gradnja' },
+  'fizickim radnicima': { id: 'fizicki-radnik', sector: 'gruba-gradnja' },
+  'pomocne radnike': { id: 'pomocni-radnik', sector: 'gruba-gradnja' },
+  'pomocnog radnika': { id: 'pomocni-radnik', sector: 'gruba-gradnja' },
 };
 
 export function extractProfession(text: string): { id: string; sector: string } | null {
