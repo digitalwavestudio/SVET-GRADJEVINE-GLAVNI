@@ -161,7 +161,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         {(ad.plataMin != null || ad.plataMax != null) ? (
                           <div className="flex flex-col items-end gap-1">
                             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Satnica</span>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-2xl md:text-[28px] font-sans leading-none tracking-tight">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-3xl md:text-[28px] font-sans leading-none tracking-tight">
                               {ad.plataMin ? `${ad.plataMin}${ad.plataMax != null ? ` – ${ad.plataMax}` : ''}` : ad.plataMax} €
                             </span>
                           </div>

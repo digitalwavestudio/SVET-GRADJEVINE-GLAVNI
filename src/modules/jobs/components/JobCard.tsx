@@ -227,7 +227,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               {(job.isNegotiable || job.plataMin != null || job.plataMax != null || job.sal || job.salary) ? (
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Satnica</span>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-2xl md:text-[28px] font-sans leading-none tracking-tight">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-3xl md:text-[28px] font-sans leading-none tracking-tight">
                     {getSalaryDisplay()}
                   </span>
                 </div>
