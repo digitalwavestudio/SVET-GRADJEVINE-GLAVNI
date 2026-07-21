@@ -69,7 +69,7 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
                 </div>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-4xl font-medium leading-relaxed relative text-center md:text-left mx-auto md:mx-0">
-                Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova i zaposlenih.
+                Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova, zaposlenih i novih poslovnih prilika u građevinskom sektoru.
               </p>
             </div>
 

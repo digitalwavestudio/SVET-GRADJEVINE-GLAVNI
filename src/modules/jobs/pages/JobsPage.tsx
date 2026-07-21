@@ -524,7 +524,7 @@ const { data, isLoading: loadingJobs, hasNextPage, fetchNextPage, isFetchingNext
       <StandardPageHero
         title="Više od"
         titleAccent="oglasnika."
-        subtitle="Partner građevinske industrije. Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova i zaposlenih."
+        subtitle="Partner građevinske industrije. Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova, zaposlenih i novih poslovnih prilika u građevinskom sektoru."
         stats={[
               { label: "AKTIVNI OGLASI", value: `+${(jobStats?.total ?? totalJobsCount).toLocaleString()}`, icon: "work" },
         ]}
