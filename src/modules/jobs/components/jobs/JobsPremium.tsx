@@ -24,7 +24,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
               <span className="material-symbols-outlined text-[#D4AF37] text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>workspace_premium</span>
             </div>
             <h2 className="font-headline text-5xl md:text-6xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#D4AF37_0%,#ffffff_60%)] mb-4">PREMIUM POSLOVI</h2>
-            <p className="text-on-surface-variant text-lg max-w-xl">Najbolje rangirani i istaknuti oglasi proverenih kompanija.</p>
+            <p className="text-on-surface-variant text-lg max-w-xl">Najistaknutije poslovne prilike vodećih kompanija u građevinskoj industriji.</p>
             <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
           </div>
         </div>
