@@ -38,6 +38,19 @@ export function extractLocation(text: string): string | null {
     ];
     if (patterns.some(p => p.test(lower))) return loc.name;
   }
+  const CITY_VARIANTS: Record<string, string> = {
+    'novom sadu': 'Novi Sad',
+    'novog sada': 'Novi Sad',
+    'novim sadom': 'Novi Sad',
+    'backoj palanci': 'Bačka Palanka',
+    'sremskoj mitrovici': 'Sremska Mitrovica',
+    'crnoj gori': 'Crna Gora',
+    'bosni i hercegovini': 'Bosna i Hercegovina',
+    'severnoj makedoniji': 'Severna Makedonija',
+  };
+  for (const [variant, city] of Object.entries(CITY_VARIANTS)) {
+    if (lower.includes(variant)) return city;
+  }
   for (const [keyword, city] of Object.entries(COUNTRY_KEYWORDS)) {
     if (lower.includes(keyword)) return city;
     const stem = keyword.slice(0, -1);
