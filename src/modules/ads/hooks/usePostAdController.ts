@@ -613,12 +613,18 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
 
     const isNegotiable = watch('isNegotiable');
 
-    const isValid = await trigger(fieldsToValidate);
+    let isValid = false;
+    try {
+      if (selectedCategory === 'job' && step === 1) {
+        isValid = true;
+      } else {
+        isValid = await trigger(fieldsToValidate);
+      }
+    } catch { isValid = true; }
     if (isValid) {
       if (selectedCategory === 'job' && step === 1) {
         setStep(4);
       } else if (selectedCategory === 'job') {
-        // Fallback for job category
         setStep(step + 1);
       } else {
         setStep(step + 1);
