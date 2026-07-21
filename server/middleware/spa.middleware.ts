@@ -1058,7 +1058,7 @@ export const createSpaMiddleware = () => {
             .replace('</head>', `${helmetContent}<script type="application/ld+json">${websiteSearchSchema}</script>\n</head>`)
             .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
           finalHtml = dedupeHeadTags(ensureCanonical(ensureHreflang(finalHtml, req.path), req.path));
-          res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+          res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=86400");
           const redisCache = getRedis();
           if (redisCache) {
             redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
@@ -1143,7 +1143,7 @@ export const createSpaMiddleware = () => {
                 .replace('</head>', `${helmetContent}</head>`)
                 .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
               finalHtml = ensureCanonical(ensureHreflang(finalHtml, req.path), req.path);
-              res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+              res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=86400");
               const redisCache = getRedis();
               if (redisCache) {
                 redisCache.set(cacheKey, finalHtml, "EX", CACHE_TTL).catch(() => {});
@@ -1275,7 +1275,7 @@ ${breadcrumbHtml}
             '<div id="root"></div>',
             `<div id="root"></div>${SEORenderEngine.generateBreadcrumbNav(req.path)}`,
           );
-          return res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400').send(ensureHreflang(skeletonHtml, req.path));
+          return res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=86400').send(ensureHreflang(skeletonHtml, req.path));
         }
 
         const parts = fullId.split("~");
