@@ -611,10 +611,9 @@ export function usePostAdController({ initialPackage, editId, editType, editFlag
       fieldsToValidate = commonStep3Fields;
     }
 
-    const isNegotiable = watch('isNegotiable');
-
     let isValid = false;
     try {
+      const isNegotiable = watch('isNegotiable');
       if (selectedCategory === 'job' && step === 1) {
         isValid = true;
       } else {
