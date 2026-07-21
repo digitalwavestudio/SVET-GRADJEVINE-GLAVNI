@@ -10,6 +10,13 @@ const COUNTRY_KEYWORDS: Record<string, string> = {
   'njemačka': 'Berlin',
   'deutschland': 'Berlin',
   'germany': 'Berlin',
+  'bosna': 'Sarajevo',
+  'bosnia': 'Sarajevo',
+  'hercegovina': 'Sarajevo',
+  'makedonija': 'Skoplje',
+  'skopje': 'Skoplje',
+  'rumunija': 'Temišvar',
+  'temisvar': 'Temišvar',
 };
 
 export function extractLocation(text: string): string | null {
@@ -31,7 +38,7 @@ export function extractLocation(text: string): string | null {
   for (const [keyword, city] of Object.entries(COUNTRY_KEYWORDS)) {
     if (lower.includes(keyword)) return city;
     const stem = keyword.slice(0, -1);
-    if (stem.length >= 5 && lower.includes(stem)) return city;
+    if (stem.length >= 4 && lower.includes(stem)) return city;
   }
   return null;
 }
