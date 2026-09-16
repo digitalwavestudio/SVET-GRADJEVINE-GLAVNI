@@ -1,13 +1,12 @@
 // 🛡️ [SECURITY-ENT-GUARD] Provereno i zasticeno od regresije
 import { env } from "../config/env.ts";
-import { getRedis, getRawRedis } from "../utils/redis.ts";
+import { getRedis, getRawRedis, createWorkerRedisConnection } from "../utils/redis.ts";
 import { db } from "../config/firebase.ts";
 import { FieldValue } from "firebase-admin/firestore";
 import { Logger } from "../utils/logger.ts";
 import { LockManager } from "./lock.service.ts";
 import { v4 as uuidv4 } from "uuid";
 import { Worker, Job } from "bullmq";
-import { defaultConnection } from "../utils/queue.ts";
 import { QueueService, JobType } from "./queue.service.ts";
 const logger = new Logger({ module: "ChatBufferService" });
 
@@ -42,8 +41,9 @@ export class ChatBufferService {
       }
     }
 
-    if (defaultConnection) {
-      logger.info(`[ChatBuffer] Starting worker on queue: chat (Host: ${(defaultConnection as any)?.options?.host || 'unknown'})`);
+    const workerConnection = createWorkerRedisConnection();
+    if (workerConnection) {
+      logger.info(`[ChatBuffer] Starting worker on queue: chat (Host: ${(workerConnection as any)?.options?.host || 'unknown'})`);
       this.worker = new Worker(
         "chat",
         async (job: Job) => {
@@ -51,7 +51,7 @@ export class ChatBufferService {
             await this.flushBufferToFirestore();
           }
         },
-        { connection: defaultConnection!,
+        { connection: workerConnection as any,
           concurrency: 1,
           lockDuration: 300000,
           lockRenewTime: 30000,

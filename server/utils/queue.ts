@@ -1,6 +1,6 @@
 import { Queue, Worker, QueueEvents, Job } from "bullmq";
 import { env } from "../config/env.ts";
-import { getRawRedis } from "./redis.ts";
+import { createWorkerRedisConnection, getRawRedis } from "./redis.ts";
 import { logger } from "../utils/logger.ts";
 
 // Use shared Redis instance so all BullMQ Workers/Queues share 1 connection instead of N.
@@ -36,7 +36,8 @@ export function createQueue(name: string) {
  * Pomoćna funkcija za kreiranje radnika sa deljenom konekcijom.
  */
 export function createWorker(name: string, processor: import("bullmq").Processor, options: Omit<import("bullmq").WorkerOptions, "connection"> = {}) {
-  if (!defaultConnection) {
+  const workerConnection = createWorkerRedisConnection();
+  if (!workerConnection) {
     logger.warn(`[Queue] Skipping worker ${name} initialization because Redis is missing.`);
     return null;
   }
@@ -45,6 +46,7 @@ export function createWorker(name: string, processor: import("bullmq").Processor
     lockDuration: 300000, // 5 minutes default
     lockRenewTime: 30000,  // Proactive auto-renew every 30s
     ...options,
-    connection: defaultConnection,
+    // BullMQ koristi ugnežđenu kopiju ioredis paketa, pa je kastovanje veze ovde namerno lokalizovano.
+    connection: workerConnection as any,
   });
 }

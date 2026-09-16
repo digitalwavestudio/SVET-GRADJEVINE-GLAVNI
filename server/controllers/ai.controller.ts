@@ -22,13 +22,17 @@ export async function askAi(req: Request, res: Response) {
 }
 
 export async function dashboardAssist(req: Request, res: Response) {
-  const { message } = req.body;
+  const { message, temperature } = req.body;
   if (!message || typeof message !== "string") {
     return res.json({ response: "Nema upita" });
   }
 
+  const safeTemperature = typeof temperature === "number" && Number.isFinite(temperature)
+    ? Math.min(Math.max(temperature, 0), 1)
+    : 0.1;
+
   try {
-    const text = await callGemini(message);
+    const text = await callGemini(message, safeTemperature);
     res.json({ response: text });
   } catch (error) {
     console.error("Error in dashboardAssist:", error);

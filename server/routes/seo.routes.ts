@@ -390,10 +390,6 @@ const STATIC_SITEMAP_URLS = [
   "/majstori/beograd",
   "/majstori/novi-sad",
   "/majstori/nis",
-  "/kompanije",
-  "/radnici",
-  "/za-poslodavce",
-  "/onama",
   "/kontakt",
 ];
 

@@ -536,16 +536,18 @@ export class SEOSchemaService {
 
     try {
       const jobs = await db
-        .collection("jobs")
+        .collectionGroup("listings")
+        .where("type", "==", "job")
         .where("status", "==", "active")
         .orderBy("createdAt", "desc")
+        .select("title", "location", "loc", "comp", "company", "companyName")
         .limit(100)
         .get();
       for (const doc of jobs.docs) {
         const d = doc.data() as Record<string, unknown>;
         const title = (d.title as string) || "Job";
-        const loc = (d.location as string) || (d.city as string) || "";
-        const company = (d.companyName as string) || "";
+        const loc = (d.location as string) || (d.loc as string) || "";
+        const company = (d.company as string) || (d.comp as string) || (d.companyName as string) || "";
         const slug = doc.id;
         const url = `${APP_CONFIG.BASE_URL}/posao/${slug}`;
         const meta = [title, loc ? `(${loc})` : "", company ? `- ${company}` : ""].filter(Boolean).join(" ");
@@ -557,15 +559,17 @@ export class SEOSchemaService {
 
     try {
       const companies = await db
-        .collection("companies")
+        .collectionGroup("listings")
+        .where("type", "==", "company")
         .where("status", "==", "active")
         .orderBy("createdAt", "desc")
+        .select("title", "name", "location", "loc")
         .limit(100)
         .get();
       for (const doc of companies.docs) {
         const d = doc.data() as Record<string, unknown>;
         const name = (d.name as string) || (d.title as string) || "Company";
-        const loc = (d.city as string) || "";
+        const loc = (d.location as string) || (d.loc as string) || "";
         const slug = doc.id;
         const url = `${APP_CONFIG.BASE_URL}/firma/${slug}`;
         lines.push(`- [${name}${loc ? ` (${loc})` : ""}](${url})`);
@@ -615,17 +619,19 @@ export class SEOSchemaService {
     sections.push("## Jobs\n");
     try {
       const jobs = await db
-        .collection("jobs")
+        .collectionGroup("listings")
+        .where("type", "==", "job")
         .where("status", "==", "active")
         .orderBy("createdAt", "desc")
+        .select("title", "location", "loc", "comp", "company", "companyName", "description", "opis", "plataMin", "plataMax")
         .limit(200)
         .get();
       for (const doc of jobs.docs) {
         const d = doc.data() as Record<string, unknown>;
         const title = (d.title as string) || "Untitled";
-        const loc = (d.location as string) || (d.city as string) || "Serbia";
-        const company = (d.companyName as string) || "Unknown";
-        const desc = ((d.description as string) || "").substring(0, 1000);
+        const loc = (d.location as string) || (d.loc as string) || "Serbia";
+        const company = (d.company as string) || (d.comp as string) || (d.companyName as string) || "Unknown";
+        const desc = ((d.description as string) || (d.opis as string) || "").substring(0, 1000);
         const salary = [d.plataMin, d.plataMax].filter((v) => Number(v) > 0).join(" - ");
         const url = `${APP_CONFIG.BASE_URL}/posao/${doc.id}`;
         sections.push(`### ${title}`);
@@ -641,16 +647,18 @@ export class SEOSchemaService {
     sections.push("## Companies\n");
     try {
       const companies = await db
-        .collection("companies")
+        .collectionGroup("listings")
+        .where("type", "==", "company")
         .where("status", "==", "active")
         .orderBy("createdAt", "desc")
+        .select("title", "name", "location", "loc", "description", "opis", "website")
         .limit(200)
         .get();
       for (const doc of companies.docs) {
         const d = doc.data() as Record<string, unknown>;
         const name = (d.name as string) || (d.title as string) || "Untitled";
-        const loc = (d.city as string) || "";
-        const desc = ((d.description as string) || "").substring(0, 1000);
+        const loc = (d.location as string) || (d.loc as string) || "";
+        const desc = ((d.description as string) || (d.opis as string) || "").substring(0, 1000);
         const url = `${APP_CONFIG.BASE_URL}/firma/${doc.id}`;
         sections.push(`### ${name}`);
         if (loc) sections.push(`- **Location:** ${loc}`);

@@ -19,7 +19,6 @@ function isNetworkError(err: Error & { code?: string | number }): boolean {
     msg.includes("enotfound") ||
     msg.includes("max number of clients") ||
     msg.includes("quota") ||
-    msg.includes("limit") ||
     msg.includes("bandwidth") ||
     msg.includes("usage") ||
     msg.includes("overlimit") ||
@@ -81,8 +80,10 @@ class MockPipeline {
 
 class InMemoryFallback {
   private static readonly MAX_KEYS = 10000;
+  private static readonly MAX_RATE_LIMIT_KEYS = 5000;
   private map = new Map<string, string | Set<string>>();
   private timeouts = new Map<string, NodeJS.Timeout>();
+  private rateLimitCounters = new Map<string, { count: number; reset: number }>();
 
   private maybeEvict(): void {
     if (this.map.size < InMemoryFallback.MAX_KEYS) return;
@@ -321,10 +322,25 @@ class InMemoryFallback {
         return "0000000000000000000000000000000000000000";
     }
     if (cmd === 'eval' || cmd === 'evalsha') {
-        // Mock success for common rate-limiting LUA scripts
-        // rate-limit-redis expects an array [count, resetTimeMs] 
-        // or for fixed window [count, remaining]
-        return [1, 1000]; 
+        // Lokalni brojač za rate-limit skripte, kako rezervni režim ne bi propuštao sve zahteve.
+        const key = String(args[1] ?? "rate-limit");
+        const requestedWindowMs = Number(args[2] ?? 60000);
+        const windowMs = Number.isFinite(requestedWindowMs) && requestedWindowMs > 0 ? requestedWindowMs : 60000;
+        const now = Date.now();
+        const existing = this.rateLimitCounters.get(key);
+        const counter = !existing || now >= existing.reset
+          ? { count: 0, reset: now + windowMs }
+          : existing;
+        counter.count += 1;
+        this.rateLimitCounters.set(key, counter);
+        if (this.rateLimitCounters.size > InMemoryFallback.MAX_RATE_LIMIT_KEYS) {
+          for (const [storedKey, storedCounter] of this.rateLimitCounters.entries()) {
+            if (now >= storedCounter.reset) {
+              this.rateLimitCounters.delete(storedKey);
+            }
+          }
+        }
+        return [counter.count, counter.reset];
     }
     return null;
   }
@@ -364,6 +380,10 @@ function hasConfigMethod(client: object): client is ConfigurableRedis {
   return "config" in client && typeof (client as any).config === "function";
 }
 
+function getTlsOptions(url: string) {
+  return url.startsWith("rediss://") ? { tls: {} } : {};
+}
+
 function createResilientClient(urlOrClient: string | Redis, options: ResilientClientOptions = {}): ResilientRedis {
   const { isMain: userIsMain, ...redisOptions } = options;
   const isMain = userIsMain ?? (typeof urlOrClient !== "string");
@@ -382,6 +402,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
 
   const client = typeof urlOrClient === "string"
     ? new Redis(urlOrClient, {
+        ...getTlsOptions(urlOrClient),
         ...redisOptions,
         lazyConnect: true,
         enableOfflineQueue: true, // Required for BullMQ Worker stability
@@ -498,8 +519,7 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
               return null;
             }
             // Ako klijent slučajno nije spreman, odmah pokušavamo izvršenje;
-            // pošto je isključena offline linija (enableOfflineQueue: false), ioredis će trenutno
-            // baciti grešku, što će naš catch blok obraditi i prebaciti u in-memory mod bez ikakvog čekanja.
+            // ioredis će grešku vratiti pozivaocu, a catch blok ispod prelazi u in-memory mod.
             const EXCLUDE_TIMEOUT_COMMANDS = [
               "on", "once", "off", "emit", "addListener", "removeListener",
               "pipeline", "multi", "subscribe", "psubscribe", "xread", "xreadgroup",
@@ -559,9 +579,6 @@ function createResilientClient(urlOrClient: string | Redis, options: ResilientCl
 
 function getRedisUrl(): string | null {
   if (env.REDIS_URL) {
-    if (env.REDIS_URL.startsWith("rediss://")) {
-      return "redis://" + env.REDIS_URL.slice(9);
-    }
     return env.REDIS_URL;
   }
   if (env.REDIS_HOST) {
@@ -580,6 +597,7 @@ export function getRawRedis(): Redis | null {
   const url = getRedisUrl();
   if (!rawRedis && url) {
     const client = new Redis(url, {
+      ...getTlsOptions(url),
       lazyConnect: true,
       enableOfflineQueue: true, // Required for BullMQ Worker stability
       maxRetriesPerRequest: null,
@@ -607,6 +625,11 @@ export function getRawRedis(): Redis | null {
     rawRedis = client;
   }
   return rawRedis;
+}
+
+export function createWorkerRedisConnection(): Redis | null {
+  const raw = getRawRedis();
+  return raw ? raw.duplicate() : null;
 }
 
 export function getRedis(): ResilientRedis {
@@ -642,6 +665,7 @@ export function getSubRedis(): ResilientRedis {
   if (!subRedis) {
     if (url) {
       const rawSub = new Redis(url, {
+        ...getTlsOptions(url),
         lazyConnect: true,
         maxRetriesPerRequest: null,
         connectTimeout: 5000,
@@ -668,6 +692,7 @@ export function getStreamRedis(): ResilientRedis {
   if (!streamRedis) {
     if (url) {
       const rawStream = new Redis(url, {
+        ...getTlsOptions(url),
         lazyConnect: true,
         maxRetriesPerRequest: null,
         connectTimeout: 5000,

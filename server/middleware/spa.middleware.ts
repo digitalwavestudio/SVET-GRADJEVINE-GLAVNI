@@ -168,6 +168,51 @@ const PROFESSION_SLUGS = new Set<string>(
   Object.values(PROFESSIONS).flatMap((cats) => cats.map((c) => c.slug)),
 );
 
+function stripSeoHtml(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.replace(/<[^>]*>?/gm, " ").replace(/\s+/g, " ").trim();
+}
+
+function truncateSeoSummary(value: string, maxLength: number): string {
+  const text = value.trim();
+  if (text.length <= maxLength) return text;
+  const slice = text.slice(0, maxLength + 1);
+  const sentenceEnd = Math.max(slice.lastIndexOf(". "), slice.lastIndexOf("! "), slice.lastIndexOf("? "));
+  if (sentenceEnd > maxLength * 0.45) return slice.slice(0, sentenceEnd + 1).trim();
+  const wordEnd = slice.lastIndexOf(" ");
+  if (wordEnd > maxLength * 0.45) return slice.slice(0, wordEnd).trim();
+  return slice.slice(0, maxLength).trim();
+}
+
+async function fetchDetailSeoMeta(collectionName: string, adId: string): Promise<{ seoTitle: string; seoDescription: string; image: string } | null> {
+  try {
+    const adDoc = await resolveFirestoreDoc(collectionName, adId);
+    if (!adDoc.exists) return null;
+    const adData = adDoc.data() as Record<string, any> | undefined;
+    if (!adData || adData.status === "deleted" || adData.status === "inactive") return null;
+
+    const baseTitle = stripSeoHtml(adData.title || adData.name) || "Oglas";
+    const location = stripSeoHtml(adData.location || adData.city);
+    const min = Number(adData.plataMin);
+    const max = Number(adData.plataMax);
+    const salary = Number.isFinite(min) && min > 0
+      ? `${min.toLocaleString()}${Number.isFinite(max) && max > 0 && max !== min ? ` - ${max.toLocaleString()}` : ""} €`
+      : stripSeoHtml(adData.salary);
+    const benefits = Array.isArray(adData.benefits)
+      ? adData.benefits.filter((benefit: unknown): benefit is string => typeof benefit === "string").slice(0, 3).join(", ")
+      : "";
+    const details = stripSeoHtml(adData.description || adData.opis);
+    const summary = details || `${baseTitle}${location ? ` u ${location}` : ""}.${salary ? ` Plata: ${salary}.` : ""}${benefits ? ` Nudi se: ${benefits}.` : ""} Pogledajte uslove i prijavite se direktno.`;
+    return {
+      seoTitle: truncateSeoSummary(`${baseTitle}${location ? ` | ${location}` : ""}${salary ? ` | ${salary}` : ""}`, 60),
+      seoDescription: truncateSeoSummary(summary, 155).replace(/"/g, "&quot;"),
+      image: adData.images?.[0] || adData.logo || `${APP_CONFIG.BASE_URL}/api/seo/og-image?title=${encodeURIComponent(baseTitle)}&location=${encodeURIComponent(location || "Srbija")}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // Ensure SSR output always has a canonical link — critical for SEO to avoid duplicate pages
 function ensureCanonical(html: string, reqPath: string): string {
   if (html.includes('rel="canonical"')) return html;
@@ -408,17 +453,22 @@ async function backgroundPreRenderListingHub(
 
     const isPseoPage = !!categorySlug || !!citySlug;
     const canonicalReqPath = isPseoPage ? reqPath : (CANONICAL_PATH_MAP[collectionName] || reqPath);
-    const currentPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${canonicalReqPath}?page=${page}` : `${APP_CONFIG.BASE_URL}${canonicalReqPath}`;
-    const prevPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${canonicalReqPath}?page=${page - 1}` : null;
+    const isEmptyHub = latestDocs.size === 0;
+    const hubSegments = reqPath.split("/").filter(Boolean);
+    const parentHubPath = hubSegments.length > 1 ? `/${hubSegments[0]}` : reqPath;
+    const canonicalHubPath = isEmptyHub ? parentHubPath : canonicalReqPath;
+    const currentPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${canonicalHubPath}?page=${page}` : `${APP_CONFIG.BASE_URL}${canonicalHubPath}`;
+    const prevPageUrl = page > 1 ? `${APP_CONFIG.BASE_URL}${canonicalHubPath}?page=${page - 1}` : null;
     let nextPageUrl = null;
     if (latestDocs.size === pageSize) {
       const lastDocId = latestDocs.docs[latestDocs.docs.length - 1].id;
-      nextPageUrl = `${APP_CONFIG.BASE_URL}${canonicalReqPath}?page=${page + 1}&cursor=${lastDocId}`;
+      nextPageUrl = `${APP_CONFIG.BASE_URL}${canonicalHubPath}?page=${page + 1}&cursor=${lastDocId}`;
     }
 
     let paginationLinks = `<link rel="canonical" href="${currentPageUrl}" />`;
     if (prevPageUrl) paginationLinks += `\n<link rel="prev" href="${prevPageUrl}" />`;
     if (nextPageUrl) paginationLinks += `\n<link rel="next" href="${nextPageUrl}" />`;
+    const robotsContent = isEmptyHub ? "noindex, follow" : "index, follow";
 
     const platformDesc = "Svet Građevine je vodeći građevinski portal na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente širom regiona.";
     const botListHtml = `
@@ -435,7 +485,9 @@ async function backgroundPreRenderListingHub(
           </main>`;
 
     const title = `${label} | Svet Građevine`;
-    const desc = `${label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente širom regiona.`;
+    const desc = isEmptyHub
+      ? `${label} trenutno nema aktivnih oglasa. Pogledajte najnovije oglase na roditeljskoj strani Svet Građevine.`
+      : `${label} na Svet Građevine - vodećem građevinskom portalu na Balkanu. Povezujemo izvođače, poslodavce, majstore i klijente širom regiona.`;
 
     const baseUrl = APP_CONFIG.BASE_URL;
     const bcPathParts = reqPath.split("/").filter(Boolean);
@@ -495,6 +547,7 @@ async function backgroundPreRenderListingHub(
       "</head>",
       `
 <meta name="description" content="${desc}" />
+<meta name="robots" content="${robotsContent}" />
 <meta name="lastmod" content="${lastmod}" />
 ${paginationLinks}
 <meta property="og:title" content="${title}" />
@@ -518,7 +571,7 @@ ${jsonLdScript}
     );
 
     if (redis) {
-      const effectiveTtl = latestDocs.size === 0 ? cacheTtl * 2 : cacheTtl;
+      const effectiveTtl = isEmptyHub ? Math.min(cacheTtl, 600) : cacheTtl;
       await redis.set(cacheKey, html, "EX", effectiveTtl);
     }
     return ensureHreflang(html, reqPath);
@@ -563,19 +616,15 @@ async function backgroundPreRenderDetailPage(
 
     const baseTitle = adData.title || adData.name || "Oglas";
     const title = `${baseTitle} | Svet Građevine`;
-    let desc =
-      adData.description ||
-      adData.requirements ||
-      adData.conditions ||
-      "";
-    if (typeof desc === "string") {
-      desc = desc
-        .substring(0, 160)
-        .replace(/<[^>]*>?/gm, "")
-        .replace(/"/g, "&quot;");
-    } else {
-      desc = "Detalji oglasa na portalu Svet Građevine.";
-    }
+    let desc = truncateSeoSummary(
+      stripSeoHtml(
+        adData.description ||
+        adData.requirements ||
+        adData.conditions ||
+        ""
+      ) || "Detalji oglasa na portalu Svet Građevine.",
+      160,
+    ).replace(/"/g, "&quot;");
 
     const image =
       adData.images?.[0] ||
@@ -1293,20 +1342,29 @@ ${breadcrumbHtml}
 
           // If not bot, return cached static index.html instantly so browser can bootstrap Fast.
           if (!isBot && cachedIndexHtml) {
+            const detailMeta = await Promise.race([
+              fetchDetailSeoMeta(collectionName, adId),
+              new Promise<null>((resolve) => setTimeout(() => resolve(null), 800)),
+            ]);
+            const metaTitle = detailMeta?.seoTitle || title;
+            const metaDescription = detailMeta?.seoDescription || desc;
+            const metaImage = detailMeta?.image || "https://www.svetgradjevine.com/og-image.png";
             const nonBotHtml = cachedIndexHtml.replace(
               /<title>.*?<\/title>/,
-              `<title>${title}</title>`,
+              `<title>${metaTitle}</title>`,
             ).replace(
               "</head>",
-              `<meta property="og:title" content="${title}" />
-<meta property="og:description" content="${desc}" />
-<meta property="og:image" content="https://www.svetgradjevine.com/og-image.png" />
+              `<meta name="description" content="${metaDescription}" />
+<meta property="og:title" content="${metaTitle}" />
+<meta property="og:description" content="${metaDescription}" />
+<meta property="og:image" content="${metaImage}" />
+<meta property="og:image:alt" content="${detailMeta ? detailMeta.seoTitle : readableTitle}" />
 <meta property="og:url" content="${APP_CONFIG.BASE_URL}${req.path}" />
 <meta property="og:type" content="article" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="${title}" />
-<meta name="twitter:description" content="${desc}" />
-<meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
+<meta name="twitter:title" content="${metaTitle}" />
+<meta name="twitter:description" content="${metaDescription}" />
+<meta name="twitter:image" content="${metaImage}" />
 </head>`,
             );
             return res.send(ensureCanonical(ensureHreflang(nonBotHtml, req.path), req.path));

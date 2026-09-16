@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { parseAdIntentFrontend, processAiCommand } from '@/src/lib/aiService';
+import { AI_AD_DESCRIPTION_TEMPERATURE, buildJobAdPrompt } from '@/src/modules/ads/utils/aiAdPrompt';
 
 export function AiMagicInput({ 
   selectedCategory, 
@@ -39,46 +40,24 @@ export function AiMagicInput({
       }
 
       // 2. Generate description
-      const details = [];
       const fd = getValues();
-      if (fd.profession) details.push(`Pozicija: ${fd.profession}`);
-      if (fd.location) details.push(`Lokacija: ${fd.location}`);
-      if (fd.plataMin || fd.plataMax) details.push(`Zarada: ${fd.plataMin || ''}${fd.plataMin && fd.plataMax ? ' - ' : ''}${fd.plataMax || ''} EUR`);
-      if (fd.benefits?.length) details.push(`Benefiti: ${fd.benefits.join(', ')}`);
-      // Uvek šaljemo korisnikov tekst da bi AI video ručne izmene (npr. Radno vreme, Isplata)
-      details.push(`Korisnikov tekst oglasa:\n${opis}`);
+      const prompt = buildJobAdPrompt({
+        profession: fd.profession,
+        sector: fd.sector,
+        location: fd.location,
+        plataMin: fd.plataMin,
+        plataMax: fd.plataMax,
+        salaryType: fd.salaryType,
+        dinamikaIsplate: fd.dinamikaIsplate,
+        isNegotiable: fd.isNegotiable,
+        benefits: fd.benefits,
+        contactPhone: fd.kontaktTelefon || fd.phone,
+        userText: opis,
+      });
 
-      const prompt = `Napiši tekst za oglas za posao na osnovu sledećih podataka. 
-
-PODACI SA FORME I IZ TEKSTA:
-${details.map(d => `- ${d}`).join('\n')}
-
-Format mora biti TAČNO ovakav (ako podatak postoji u tekstu upiši ga, ako ne postoji upiši samo znak ? bez ikakvih zagrada):
-
-NAZIV POZICIJE VELIKIM SLOVIMA (Samo naziv, npr. ZIDARI)
-
-Mesto rada: ?
-Satnica: ?
-Isplata: ?
-Radno vreme: ?
-
-Smeštaj: ?
-Prevoz: ?
-Hrana: ?
-
-PRAVILA:
-1. NIKAKVE zagrade (kao što su [] ili {}) ne smeju da se nađu u tvom odgovoru! Ako nešto fali, ostavi isključivo samo znak ?
-2. Naslov neka bude tačna pozicija koju korisnik traži (npr. ZIDARI). NEMOJ dodavati brojeve (npr. "2 ZIDARA") ako korisnik nije naveo tačan broj!
-3. Nema nikakvih reči pre Naslova (nema "Evo oglasa", "Tražimo").
-4. Ako korisnik navede neke specifične zahteve ili detalje u svom tekstu, dodaj ih na kraju ispod benefita.
-5. Završi oglas isključivo ovom rečenicom: "Može se krenuti odmah sa radom! Za sve ostale informacije i više detalja pozvati na broj telefona."`;
-
-      const responseText = await processAiCommand(prompt);
+      const responseText = await processAiCommand(prompt, undefined, { temperature: AI_AD_DESCRIPTION_TEMPERATURE });
       let cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
-      const adStart = cleanText.match(/(Tražimo|Potreban|Potrebni|Pozivamo|Zaposljavamo|Trazimo)/i);
-      if (adStart && adStart.index && adStart.index > 0) {
-        cleanText = cleanText.slice(adStart.index);
-      }
+      cleanText = cleanText.replace(/^(evo (predloga|oglasa)[^:\n]*:?|predlog oglasa:?)/i, '').trim();
       setValue('opis', cleanText, { shouldValidate: true, shouldDirty: true });
 
     } catch (err) {

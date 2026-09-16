@@ -118,7 +118,7 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
               activeIndex === i ? 'border-secondary scale-95' : 'border-transparent hover:border-white/20'
             }`}
           >
-            <img loading="lazy" decoding="async" width={200} height={200} src={img} alt="thumbnail" className="w-full h-full object-cover" />
+            <img loading="lazy" decoding="async" width={200} height={200} src={img} alt={`${title || 'Oglas'} slika ${i + 1}`} className="w-full h-full object-cover" />
             {activeIndex !== i && <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors" />}
           </button>
         ))}
@@ -188,7 +188,7 @@ export default function MediaGallery({ images, title, imageStatus }: MediaGaller
                     activeIndex === i ? 'border-secondary scale-95' : 'border-transparent'
                   }`}
                 >
-                  <img src={img} className="w-full h-full object-cover" alt="thumbnail" />
+                  <img src={img} className="w-full h-full object-cover" alt={`${title || 'Oglas'} slika ${i + 1}`} />
                 </button>
               ))}
             </div>

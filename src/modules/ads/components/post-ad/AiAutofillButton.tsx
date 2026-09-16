@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { processAiCommand } from '@/src/lib/aiService';
+import { AI_AD_DESCRIPTION_TEMPERATURE, buildJobAdPrompt } from '@/src/modules/ads/utils/aiAdPrompt';
 
 export function AiAutofillButton({ selectedCategory }: { selectedCategory: string }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,35 +13,24 @@ export function AiAutofillButton({ selectedCategory }: { selectedCategory: strin
     setError(null);
 
     const formData = getValues();
-    const details: string[] = [];
-    if (formData.profession) details.push(`Pozicija: ${formData.profession}`);
-    if (formData.sector) details.push(`Sektor: ${formData.sector}`);
-    if (formData.location) details.push(`Lokacija: ${formData.location}`);
-    if (formData.plataMin || formData.plataMax) details.push(`Zarada: ${formData.plataMin || ''}${formData.plataMin && formData.plataMax ? ' - ' : ''}${formData.plataMax || ''} EUR`);
-    if (formData.dinamikaIsplate) details.push(`Isplata: ${formData.dinamikaIsplate}`);
-    if (formData.benefits?.length) details.push(`Benefiti: ${formData.benefits.join(', ')}`);
-
-    const prompt = `Napiši tekst za posao na Svet Građevine (srpski jezik).
-
-Podaci koje moraš ugraditi:
-${details.map(d => `- ${d}`).join('\n')}
-
-Kategorija: ${selectedCategory}
-
-PRAVILA:
-1. Tekst kreće DIREKTNO — ništa pre "Tražimo...", nema "Oglas za posao", nema "Pozicija:", nema uvoda.
-2. Samo konkretno, nema generičkih rečenica.
-3. Završi sa "Može se krenuti odmah sa radom! Za sve ostale informacije i više detalja pozvati na broj telefona."
-4. Samo običan tekst, nema zvezdica, nema markdowna.`;
+    const prompt = buildJobAdPrompt({
+      profession: formData.profession,
+      sector: formData.sector,
+      location: formData.location,
+      plataMin: formData.plataMin,
+      plataMax: formData.plataMax,
+      salaryType: formData.salaryType,
+      dinamikaIsplate: formData.dinamikaIsplate,
+      isNegotiable: formData.isNegotiable,
+      benefits: formData.benefits,
+      contactPhone: formData.kontaktTelefon || formData.phone,
+      userText: formData.opis,
+    });
 
     try {
-      const responseText = await processAiCommand(prompt);
+      const responseText = await processAiCommand(prompt, undefined, { temperature: AI_AD_DESCRIPTION_TEMPERATURE });
       let cleanText = responseText.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
-      // Ukloni uvodne headere - sve do prvog "Tražimo", "Potreban", "Pozicija" itd
-      const adStart = cleanText.match(/(Tražimo|Potreban|Potrebni|Pozivamo|Zaposljavamo|Trazimo)/i);
-      if (adStart && adStart.index && adStart.index > 0) {
-        cleanText = cleanText.slice(adStart.index);
-      }
+      cleanText = cleanText.replace(/^(evo (predloga|oglasa)[^:\n]*:?|predlog oglasa:?)/i, '').trim();
       setValue('opis', cleanText, { shouldValidate: true, shouldDirty: true });
     } catch (err) {
       console.error("Greška pri generisanju opisa:", err);

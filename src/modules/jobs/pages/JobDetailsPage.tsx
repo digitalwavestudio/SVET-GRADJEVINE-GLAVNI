@@ -10,7 +10,7 @@ import { PAYMENT_DYNAMICS } from '@/src/constants/taxonomy';
 import { useAuth } from '@/src/context/AuthContext';
 import { useMessages } from '@/src/context/MessagesContext';
 import { useTrackView } from '@/src/hooks/useTrackView';
-import { buildJobUrl, extractJobId } from '@/src/lib/seo';
+import { buildJobUrl, extractJobId, buildJobSeoTitle, buildJobSeoDescription } from '@/src/lib/seo';
 import { generateJobSchema, generateBreadcrumbSchema } from '@/src/lib/seoSchema';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { SimilarJobsSlider } from '@/src/modules/jobs/components/jobs/SimilarJobsSlider';
@@ -106,21 +106,21 @@ export default function JobDetailsPage() {
   const phoneNumber = jobData?.phone || jobData?.telefon || '';
 
   const cleanDescription = useMemo(() => {
-    if (!jobData?.description) return '';
-    const clean = jobData.description.replace(/<[^>]*>?/gm, '');
+    if (!displayDescription) return '';
+    const clean = displayDescription.replace(/<[^>]*>?/gm, '');
     return clean;
-  }, [jobData?.description]);
+  }, [displayDescription]);
 
   const seoSchema = useMemo(() => {
     if (!jobData) return null;
-    return generateJobSchema(jobData);
-  }, [jobData, location.pathname]);
+    return generateJobSchema({ ...jobData, description: displayDescription });
+  }, [jobData, displayDescription, location.pathname]);
 
   const breadcrumbSchema = useMemo(() => {
     if (!jobData) return null;
     return generateBreadcrumbSchema([
       { name: "Početna", url: `${APP_CONFIG.BASE_URL}/` },
-      { name: "Poslovi", url: `${APP_CONFIG.BASE_URL}/posao` },
+      { name: "Poslovi", url: `${APP_CONFIG.BASE_URL}/poslovi` },
       { name: jobData.title || 'Oglas', url: `${APP_CONFIG.BASE_URL}/posao/${jobData.id}` }
     ]);
   }, [jobData]);
@@ -251,8 +251,8 @@ export default function JobDetailsPage() {
   return (
     <div className="min-h-screen bg-[#0B0F19] font-sans text-white selection:bg-yellow-500 selection:!text-black pb-20 md:pb-0">
       <SeoHead
-        title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : `${displayTitle} ${jobData.location ? `- ${jobData.location}` : ''} - Svet Građevine`}
-        description={cleanDescription.substring(0, 160)}
+        title={user?.isAdmin ? `${displayTitle} (MODERACIJA) - Svet Građevine` : buildJobSeoTitle({ title: displayTitle, location: jobData.location, salary: jobData.salary, plataMin: jobData.plataMin, plataMax: jobData.plataMax, salaryType: jobData.salaryType, dinamikaIsplate: jobData.dinamikaIsplate, isNegotiable: jobData.isNegotiable, benefits: jobData.benefits })}
+        description={buildJobSeoDescription({ title: displayTitle, location: jobData.location, salary: jobData.salary, plataMin: jobData.plataMin, plataMax: jobData.plataMax, salaryType: jobData.salaryType, dinamikaIsplate: jobData.dinamikaIsplate, isNegotiable: jobData.isNegotiable, benefits: jobData.benefits, description: displayDescription })}
         image={jobData?.logo || jobData?.companyLogo || APP_CONFIG.OG_IMAGE_DEFAULT}
         url={buildJobUrl(jobData)}
         type="job"
@@ -298,7 +298,7 @@ export default function JobDetailsPage() {
                 {jobData.logo || jobData.companyLogo || companyDetails?.logo ? (
                   <img 
                     src={jobData.logo || jobData.companyLogo || companyDetails?.logo} 
-                    alt={formatCompanyName(jobData.comp || jobData.companyName || companyDetails?.companyName || jobData.authorName || 'Logo')} 
+                    alt={`${formatCompanyName(jobData.comp || jobData.companyName || companyDetails?.companyName || jobData.authorName || 'Kompanija')} logo${jobData.location ? ` - ${jobData.location}` : ''}`}
                     className="w-full h-full object-contain"
                   />
                 ) : (

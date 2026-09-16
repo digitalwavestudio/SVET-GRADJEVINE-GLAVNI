@@ -6,20 +6,23 @@ import {
 } from '@svet-gradjevine/shared';
 
 const COUNTRY_KEYWORDS: Record<string, string> = {
-  'njemacka': 'Berlin',
-  'njemačka': 'Berlin',
-  'deutschland': 'Berlin',
-  'germany': 'Berlin',
-  'bosna': 'Sarajevo',
-  'bosnia': 'Sarajevo',
-  'hercegovina': 'Sarajevo',
-  'makedonija': 'Skoplje',
-  'skopje': 'Skoplje',
-  'rumunija': 'Temišvar',
-  'temisvar': 'Temišvar',
+  'njemacka': 'Nemačka',
+  'njemačka': 'Nemačka',
+  'deutschland': 'Nemačka',
+  'germany': 'Nemačka',
+  'bosna': 'Bosna i Hercegovina',
+  'bosnia': 'Bosna i Hercegovina',
+  'hercegovina': 'Bosna i Hercegovina',
+  'makedonija': 'Severna Makedonija',
+  'rumunija': 'Rumunija',
   'svajcarska': 'Švajcarska',
   'švajcarska': 'Švajcarska',
   'switzerland': 'Švajcarska',
+};
+
+const CITY_ALIASES: Record<string, string> = {
+  'skopje': 'Skoplje',
+  'temisvar': 'Temišvar',
 };
 
 export function extractLocation(text: string): string | null {
@@ -50,6 +53,9 @@ export function extractLocation(text: string): string | null {
   };
   for (const [variant, city] of Object.entries(CITY_VARIANTS)) {
     if (lower.includes(variant)) return city;
+  }
+  for (const [alias, city] of Object.entries(CITY_ALIASES)) {
+    if (lower.includes(alias)) return city;
   }
   for (const [keyword, city] of Object.entries(COUNTRY_KEYWORDS)) {
     if (lower.includes(keyword)) return city;

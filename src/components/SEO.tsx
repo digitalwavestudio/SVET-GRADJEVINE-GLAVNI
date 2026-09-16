@@ -16,7 +16,7 @@ export function SEO({
   title,
   description,
   canonicalUrl,
-  ogImage = `${APP_CONFIG.BASE_URL}/og-image.jpg`,
+  ogImage = APP_CONFIG.OG_IMAGE_DEFAULT,
   ogType = 'website',
   twitterCard = 'summary_large_image',
   jsonLd,

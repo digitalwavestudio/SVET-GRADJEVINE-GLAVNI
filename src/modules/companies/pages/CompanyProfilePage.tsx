@@ -72,7 +72,7 @@ export default function CompanyProfilePage() {
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Početna", url: `${APP_CONFIG.BASE_URL}/` },
     { name: "Firme", url: `${APP_CONFIG.BASE_URL}/firme` },
-    { name: company.name, url: window.location.href }
+    { name: company.name, url: `${APP_CONFIG.BASE_URL}/firma/${company.id || id}` }
   ]);
 
   return (
@@ -128,7 +128,7 @@ export default function CompanyProfilePage() {
             <div className="relative w-fit">
               <div className="w-24 h-24 md:w-52 md:h-52 bg-white p-2 md:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-[#0a111a] flex items-center justify-center overflow-hidden group">
                 {company.logo ? (
-                  <img width="800" height="600" decoding="async" src={company.logo} alt="Logo" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <img width="800" height="600" decoding="async" src={company.logo} alt={`${company.name} logo${company.locationSlug ? ` - ${LOCATIONS.find(l => l.slug === company.locationSlug)?.name || company.locationSlug}` : ''}`} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                 ) : (
                   <span className="text-3xl md:text-7xl font-black text-gray-200">{company.name?.charAt(0) || 'C'}</span>
                 )}

@@ -1,5 +1,5 @@
 import { Queue, Worker, Job } from "bullmq";
-import { getRawRedis } from "./redis.ts";
+import { createWorkerRedisConnection, getRawRedis } from "./redis.ts";
 import { defaultConnection } from "./queue.ts";
 import { logger } from "./logger.ts";
 import { env } from "../config/env.ts";
@@ -26,6 +26,11 @@ export const SystemCron = {
     cronQueue = new Queue("system-cron", { connection: defaultConnection! });
 
     // Worker koji ce pokretati zadatke
+    const workerConnection = createWorkerRedisConnection();
+    if (!workerConnection) {
+      logger.warn("[SystemCron] Redis connection failed, cron skipping.");
+      return;
+    }
     cronWorker = new Worker(
       "system-cron",
       async (job: Job) => {
@@ -37,7 +42,7 @@ export const SystemCron = {
           logger.warn(`[SystemCron] Unknown job executed: ${job.name}`);
         }
       },
-      { connection: defaultConnection!, 
+      { connection: workerConnection as any,
         concurrency: 10,
         lockDuration: 300000,
         lockRenewTime: 30000,

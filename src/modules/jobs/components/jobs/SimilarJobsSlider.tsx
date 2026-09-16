@@ -109,7 +109,7 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
                       <OptimizedImage
                         src={job.logo}
                         fallbackType="company"
-                        alt="Logo"
+                        alt={`${job.authorSnapshot?.companyName || job.authorSnapshot?.displayName || job.comp || job.companyName || 'Kompanija'} logo${job.location || job.loc ? ` - ${job.location || job.loc}` : ''}`}
                         className="w-full h-full object-cover"
                         containerClassName="w-full h-full"
                         loading="lazy"

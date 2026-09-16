@@ -112,7 +112,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
             <OptimizedImage
               src={job.logo}
               placeholder={job.logoPlaceholder}
-              alt="Logo"
+              alt={`${companyNameDisplay} logo${friendlyLoc && friendlyLoc !== 'Srbija' ? ` - ${friendlyLoc}` : ''}`}
               className="w-full h-full object-contain rounded-full"
               width={64}
               height={64}

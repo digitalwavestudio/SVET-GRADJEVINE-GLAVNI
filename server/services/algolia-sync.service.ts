@@ -1,7 +1,6 @@
 import { Logger } from "../utils/logger.ts";
 import { Worker, Job as BullJob } from "bullmq";
-import { defaultConnection } from "../utils/queue.ts";
-import { getRawRedis } from "../utils/redis.ts";
+import { createWorkerRedisConnection } from "../utils/redis.ts";
 import { db, admin } from "../config/firebase.ts";
 import {
   syncJobToIndex,
@@ -35,8 +34,8 @@ export class AlgoliaSync {
   private static worker: Worker;
 
   static async init() {
-    const sharedClient = getRawRedis();
-    if (!sharedClient) {
+    const workerConnection = createWorkerRedisConnection();
+    if (!workerConnection) {
       Logger.withContext().warn("Redis missing. Sync BullMQ Worker skipped.");
       return;
     }
@@ -48,7 +47,7 @@ export class AlgoliaSync {
       async (job: BullJob) => {
         await this.processJob(job);
       },
-      { connection: defaultConnection!, concurrency: 3, lockDuration: 300000, lockRenewTime: 30000 },
+      { connection: workerConnection as any, concurrency: 3, lockDuration: 300000, lockRenewTime: 30000 },
     );
   }
 

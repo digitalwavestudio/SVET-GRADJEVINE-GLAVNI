@@ -4,7 +4,7 @@ import { env } from "../config/env.ts";
 import { eventBus } from "../events/event-bus.ts";
 import { Logger, logger } from "../utils/logger.ts";
 import { TraceContext } from "../utils/trace.ts";
-import { defaultConnection } from "../utils/queue.ts";
+import { createWorkerRedisConnection } from "../utils/redis.ts";
 import { JobType } from "./queue.service.ts";
  
 export class OutboxWorker {
@@ -12,7 +12,8 @@ export class OutboxWorker {
   private static MAX_ATTEMPTS = 5;
 
   static async start() {
-    if (!defaultConnection) {
+    const workerConnection = createWorkerRedisConnection();
+    if (!workerConnection) {
       Logger.withContext().warn("Redis missing — outbox worker ne radi.");
       return;
     }
@@ -27,7 +28,7 @@ export class OutboxWorker {
         }
       },
       {
-        connection: defaultConnection,
+        connection: workerConnection as any,
         concurrency: 5,
       },
     );

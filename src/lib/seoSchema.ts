@@ -126,6 +126,32 @@ export interface MenuItemInput {
   nutrition?: string;
 }
 
+const COUNTRY_BY_LOCATION_SLUG: Record<string, string> = {
+  nemacka: 'DE', berlin: 'DE', munchen: 'DE', muenchen: 'DE', hamburg: 'DE', koln: 'DE', koeln: 'DE',
+  frankfurt: 'DE', stuttgart: 'DE', dortmund: 'DE', leipzig: 'DE', dresden: 'DE', bremen: 'DE',
+  hannover: 'DE', nuernberg: 'DE', nurnberg: 'DE', duesseldorf: 'DE',
+  austrija: 'AT', bec: 'AT', grac: 'AT', linz: 'AT', salzburg: 'AT',
+  hrvatska: 'HR', zagreb: 'HR', split: 'HR', rijeka: 'HR', osijek: 'HR', zadar: 'HR', pula: 'HR', dubrovnik: 'HR',
+  slovenija: 'SI', ljubljana: 'SI', maribor: 'SI', celje: 'SI', koper: 'SI',
+  'crna-gora': 'ME', podgorica: 'ME', niksic: 'ME', bar: 'ME', budva: 'ME', tivat: 'ME',
+  svajcarska: 'CH',
+  'bosna-i-hercegovina': 'BA', sarajevo: 'BA', 'banja-luka': 'BA', tuzla: 'BA', mostar: 'BA',
+  bijeljina: 'BA', zenica: 'BA', doboj: 'BA', prijedor: 'BA', trebinje: 'BA',
+  'severna-makedonija': 'MK', skopje: 'MK',
+  rumunija: 'RO', temisvar: 'RO',
+};
+
+const COUNTRY_LEVEL_LOCATION_SLUGS = new Set([
+  'nemacka', 'austrija', 'hrvatska', 'slovenija', 'crna-gora', 'svajcarska',
+  'bosna-i-hercegovina', 'severna-makedonija', 'rumunija',
+  'ostalo-u-srbiji', 'rad-na-terenu', 'ostalo-u-inostranstvu', 'srbija',
+]);
+
+function resolveJobCountryCode(locationSlug?: string): string {
+  if (!locationSlug) return 'RS';
+  return COUNTRY_BY_LOCATION_SLUG[locationSlug.trim().toLowerCase()] || 'RS';
+}
+
 export const generateJobSchema = (jobData: JobPostingSchema) => {
   const companyUrl = jobData.companyId ? `${BASE_URL}/firma/${jobData.companyId}` : BASE_URL;
   const organizationId = `${companyUrl}#organization`;
@@ -135,7 +161,10 @@ export const generateJobSchema = (jobData: JobPostingSchema) => {
   const jobUrl = `${BASE_URL}/posao/${jobData.id}`;
   const productId = `${jobUrl}#perk-equipment`;
 
-  const coords = CITY_COORDS[locationSlug] || CITY_COORDS['beograd'];
+  const locationName = jobData.location || "Srbija";
+  const countryCode = resolveJobCountryCode(locationSlug);
+  const isCountryLevelLocation = COUNTRY_LEVEL_LOCATION_SLUGS.has(locationSlug);
+  const coords = CITY_COORDS[locationSlug];
 
   const jobSchema: Record<string, unknown> = {
     "@type": "JobPosting",
@@ -152,11 +181,11 @@ export const generateJobSchema = (jobData: JobPostingSchema) => {
     "jobLocation": {
       "@type": "Place",
       "@id": placeId,
-      "name": sanitizeInput(jobData.location || "Srbija"),
+      "name": sanitizeInput(locationName),
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": sanitizeInput(jobData.location || "Srbija"),
-        "addressCountry": "RS"
+        ...(isCountryLevelLocation ? {} : { "addressLocality": sanitizeInput(locationName) }),
+        "addressCountry": countryCode
       }
     },
     "datePosted": (jobData.createdAt && typeof jobData.createdAt === 'object' && 'toDate' in jobData.createdAt && typeof jobData.createdAt.toDate === 'function')
@@ -196,18 +225,20 @@ export const generateJobSchema = (jobData: JobPostingSchema) => {
     {
       "@type": "LocalBusiness",
       "@id": branchId,
-      "name": `${sanitizeInput(jobData.companyName || "Firma")} - ${sanitizeInput(jobData.location || "Srbija")}`,
+      "name": `${sanitizeInput(jobData.companyName || "Firma")} - ${sanitizeInput(locationName)}`,
       "parentOrganization": { "@id": organizationId },
       "url": companyUrl,
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": coords.lat,
-        "longitude": coords.lng
-      },
+      ...(coords ? {
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": coords.lat,
+          "longitude": coords.lng
+        }
+      } : {}),
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": sanitizeInput(jobData.location || "Srbija"),
-        "addressCountry": "RS"
+        ...(isCountryLevelLocation ? {} : { "addressLocality": sanitizeInput(locationName) }),
+        "addressCountry": countryCode
       },
       "makesOffer": {
         "@type": "Offer",

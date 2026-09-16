@@ -16,7 +16,7 @@ interface Props {
 export default function SeoHead({
   title,
   description = 'Oglasi u građevinskoj industriji',
-  image = `${APP_CONFIG.BASE_URL}/og-image.jpg`,
+  image = APP_CONFIG.OG_IMAGE_DEFAULT,
   url = APP_CONFIG.BASE_URL,
   type = 'website',
   noindex = false,

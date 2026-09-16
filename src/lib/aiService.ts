@@ -49,14 +49,15 @@ function formatContact(fd: Record<string, any>): string {
   return phone ? ` Prijave na broj telefona: ${phone}.` : '';
 }
 
-export async function processAiCommand(input: string, context?: unknown): Promise<string> {
+export async function processAiCommand(input: string, context?: unknown, options?: { temperature?: number }): Promise<string> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
         const response = await apiClient.post<{response: string}>('/ai/dashboard-assist', {
            message: input,
-           context
+           context,
+           temperature: options?.temperature,
         }, { signal: controller.signal });
         clearTimeout(timeout);
         return response.response || "";

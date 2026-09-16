@@ -1,4 +1,5 @@
 import { sanitizeRichText } from '@/src/lib/sanitize';
+import { APP_CONFIG } from '@/src/constants/config';
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import CtaSection from '@/src/components/CtaSection';
@@ -218,13 +219,14 @@ export default function HomePage() {
         title={isSearchActive ? `AI Pretraga: ${query} | Svet Građevine` : "Svet Građevine | Najveća mreža građevinskih poslova i radnika"}
         description="Pronađite najbolje građevinske poslove, pouzdane majstore i radnike. Platforma koja povezuje poslodavce i zaposlene u građevinskoj industriji Srbije i regiona."
         type="website"
+        url={APP_CONFIG.BASE_URL}
         jsonLd={[WEBSITE_SCHEMA, ORGANIZATION_SCHEMA]}
       />
       
       {!isSearchActive && (
         <StandardPageHero
-          title="Više od"
-          titleAccent="oglasnika."
+          title="Građevinski poslovi,"
+          titleAccent="majstori i firme."
           subtitle="Partner građevinske industrije. Svet Građevine je platforma koja povezuje građevinske firme, majstore i radnike na jednom mestu. Naša misija je da olakšamo pronalaženje poslova, zaposlenih i novih poslovnih prilika u građevinskom sektoru."
           stats={[
             { label: "AKTIVNI OGLASI", value: isLoadingBff ? "..." : `+${totalAdsCount.toLocaleString()}`, icon: "work" },

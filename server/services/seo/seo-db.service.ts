@@ -269,55 +269,69 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         "cuvar-gradilista", "radnik-na-ciscenju", "bastovan"
       ])];
 
+      const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
          xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>${APP_CONFIG.BASE_URL}/</loc><priority>1.0</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/poslovi</loc><priority>0.9</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/firme</loc><priority>0.8</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.5</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><priority>0.5</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><priority>0.6</priority></url>
-  <url><loc>${APP_CONFIG.BASE_URL}/majstori</loc><priority>0.8</priority></url>`;
-      // Geo hubovi: poslovi (samo grad)
+  <url><loc>${APP_CONFIG.BASE_URL}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/poslovi</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/firme</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>${APP_CONFIG.BASE_URL}/majstori</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`;
+      // Geo hubovi: gradovi i zanimanja navedeni su odvojeno. Kombinacije profesija
+      // i gradova otkrivaju se preko internih linkova, umesto da se unapred
+      // indeksiraju hiljade potencijalno praznih kombinacija.
       for (const city of allCities) {
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${city}</loc><priority>0.7</priority></url>`;
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/firme/${city}</loc><priority>0.6</priority></url>`;
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${city}</loc><priority>0.6</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/firme/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
       }
-      // Geo hubovi: poslovi (zanat) i poslovi (zanat + grad)
+      // Hubovi po zanimanju. Kombinacije zanimanje + grad nisu u mapi dok se ne
+      // potvrde aktivnim oglasima, kako prazne strane ne bi trošile indeksiranje.
       for (const prof of professionSlugs) {
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}</loc><priority>0.7</priority></url>`;
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}</loc><priority>0.6</priority></url>`;
-        for (const city of allCities) {
-          xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}/${city}</loc><priority>0.7</priority></url>`;
-          xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}/${city}</loc><priority>0.6</priority></url>`;
-        }
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
       }
-      // Poslovi i firme su u listings kolekciji sa type filterom
+      // Poslovi i firme su u listings kolekciji sa type filterom. Stranice se
+      // čitaju u ograničenim paketima kako mapa ne bi čitala celu kolekciju odjednom.
       const listingTypes = ["job", "company"];
+      const maxSitemapListingsPerType = 1000;
       for (const typeVal of listingTypes) {
         try {
-          const snap = await db.collectionGroup("listings")
-            .where("type", "==", typeVal)
-            .where("status", "==", "active")
-            .orderBy("createdAt", "desc")
-            .get();
-          for (const doc of snap.docs) {
-            const data = doc.data();
-            const path = typeVal === "job" ? "posao" : "firma";
-            const t = data.title || data.name || "bez-naslova";
-            const l = data.location || data.loc || "";
-            const c = data.company || data.comp || "";
-            const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
-            const urlId = `${slug}~${doc.id}`;
-            const imgUrl = data.images?.[0] || data.logo;
-            const lastMod = data.updatedAt?.toDate?.()?.toISOString().split("T")[0] ||
-              data.createdAt?.toDate?.()?.toISOString().split("T")[0] ||
-              new Date().toISOString().split("T")[0];
-            xml += `\n    <url>\n      <loc>${APP_CONFIG.BASE_URL}/${path}/${urlId}</loc>\n      <lastmod>${lastMod}</lastmod>\n      <changefreq>monthly</changefreq>\n      <priority>0.6</priority>`;
-            if (imgUrl) xml += `\n      <image:image><image:loc>${imgUrl}</image:loc></image:image>`;
-            xml += `\n    </url>`;
+          let fetchedListings = 0;
+          let lastListing: FirebaseFirestore.QueryDocumentSnapshot | null = null;
+          while (fetchedListings < maxSitemapListingsPerType) {
+            let listingsQuery = db.collectionGroup("listings")
+              .where("type", "==", typeVal)
+              .where("status", "==", "active")
+              .orderBy("createdAt", "desc")
+              .select("title", "name", "location", "loc", "company", "comp", "images", "logo", "updatedAt", "createdAt")
+              .limit(500);
+            if (lastListing) {
+              listingsQuery = listingsQuery.startAfter(lastListing);
+            }
+            const snap = await listingsQuery.get();
+            if (snap.empty) break;
+            for (const doc of snap.docs) {
+              const data = doc.data();
+              const path = typeVal === "job" ? "posao" : "firma";
+              const t = data.title || data.name || "bez-naslova";
+              const l = data.location || data.loc || "";
+              const c = data.company || data.comp || "";
+              const slug = SEOSchemaService.slugify(`${t} ${l} ${c}`.trim());
+              const urlId = `${slug}~${doc.id}`;
+              const imgUrl = data.images?.[0] || data.logo;
+              const lastMod = data.updatedAt?.toDate?.()?.toISOString().split("T")[0] ||
+                data.createdAt?.toDate?.()?.toISOString().split("T")[0] ||
+                new Date().toISOString().split("T")[0];
+              xml += `\n    <url>\n      <loc>${APP_CONFIG.BASE_URL}/${path}/${urlId}</loc>\n      <lastmod>${lastMod}</lastmod>\n      <changefreq>monthly</changefreq>\n      <priority>0.6</priority>`;
+              if (imgUrl) xml += `\n      <image:image><image:loc>${imgUrl}</image:loc></image:image>`;
+              xml += `\n    </url>`;
+            }
+            fetchedListings += snap.docs.length;
+            lastListing = snap.docs[snap.docs.length - 1];
+            if (snap.docs.length < 500) break;
           }
         } catch (e) {
           logger.warn(`[Sitemap] listings where type=${typeVal} failed:`, e);
