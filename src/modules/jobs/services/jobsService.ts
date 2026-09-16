@@ -107,8 +107,8 @@ export const jobsService = {
 
       // Extract string cursor
       const cursorId = typeof lastVisible === 'string' ? lastVisible : (lastVisible as { id: string } | null)?.id || null;
-      // Use large page size to get all results — backend sorts in-memory so cursor doesn't work anyway
-      const pageSizeToUse = _pageSize || 500;
+      // Serverska paginacija sada radi i za glavnu i za filtriranu listu, pa je dovoljan normalan paket.
+      const pageSizeToUse = _pageSize && _pageSize > 0 ? _pageSize : 24;
 
       const data = isEmptyFilter && !filters?.searchQuery
         ? await apiClient.get<JobSearchApiResponse>(`/jobs?pageSize=${pageSizeToUse}${cursorId ? `&cursor=${cursorId}` : ''}`)

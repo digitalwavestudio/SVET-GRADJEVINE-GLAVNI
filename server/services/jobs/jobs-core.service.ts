@@ -10,43 +10,40 @@ import { TraceContext } from "../../utils/trace.ts";
 import { AdminStatsService } from "../admin/admin-stats.service.ts";
 
 export class JobsCoreService {
-  static async getPublicJobs(limit: number = 100, cursor?: string) {
+  static async getPublicJobs(limit: number = 21, cursor?: string) {
     const db = getDb();
+    const pageSize = Math.min(Math.max(Math.floor(limit) - 1, 1), 100);
 
     try {
-      const snap = await db
+      let query = db
         .collection("listings")
         .where("type", "==", "job")
         .where("status", "==", "active")
+        .orderBy("createdAt", "desc")
         .select(
-          "title", "name", "description", "price", "location", "loc",
-          "type", "status", "createdAt", "images", "isPremium", "isUrgent",
+          "title", "name", "price", "location", "loc",
+          "type", "status", "createdAt", "isPremium", "isUrgent",
           "comp", "salary", "sal", "logo", "plataMin", "plataMax",
           "salaryType", "benefits", "benefiti", "rawBenefits",
           "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
-        )
-        .get();
+        );
 
-      let docs = snap.docs.map((doc: firebaseAdmin.firestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
-      docs.sort((a: any, b: any) => {
-        if (a.isPremium && !b.isPremium) return -1;
-        if (!a.isPremium && b.isPremium) return 1;
-        if (a.isUrgent && !b.isUrgent) return -1;
-        if (!a.isUrgent && b.isUrgent) return 1;
-        const ta = a.createdAt?.toDate?.()?.getTime() || new Date(a.createdAt).getTime() || 0;
-        const tb = b.createdAt?.toDate?.()?.getTime() || new Date(b.createdAt).getTime() || 0;
-        return tb - ta;
-      });
-      docs = docs.slice(0, limit);
+      if (cursor && cursor.length <= 128) {
+        const cursorDoc = await db.collection("listings").doc(cursor).get();
+        if (cursorDoc.exists) {
+          query = query.startAfter(cursorDoc);
+        }
+      }
 
-      const pageSize = limit - 1;
-      const cursorDocId = docs.length > pageSize ? docs[pageSize - 1].id : null;
+      const snap = await query.limit(pageSize + 1).get();
+      const docs = snap.docs.slice(0, pageSize).map((doc) => ({ id: doc.id, ...doc.data() }));
+      const hasMore = snap.docs.length > pageSize;
+      const lastVisible = hasMore && docs.length > 0 ? (docs[docs.length - 1] as { id: string }).id : null;
 
       return {
         docs,
-        _cursorDocId: cursorDocId,
-        lastVisible: cursorDocId,
-        hasMore: docs.length > pageSize,
+        lastVisible,
+        hasMore,
       };
     } catch (err: any) {
       console.error("[JOBS] getPublicJobs error:", err?.message || err);

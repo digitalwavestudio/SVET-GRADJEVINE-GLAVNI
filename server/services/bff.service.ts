@@ -24,6 +24,16 @@ const L1_HOMEPAGE_TTL = 900_000; // 15min in-memory cache
 
 let lastFastPathWrite = 0;
 const FAST_PATH_DEBOUNCE = 300_000; // 5min debounce
+const HOMEPAGE_JOB_FIELDS = [
+  "title", "name", "createdAt", "typeSlug", "isPremium", "isUrgent",
+  "loc", "location",
+  "sal", "salary", "plataMin", "plataMax", "salaryType",
+  "comp", "company", "companyName", "companyId", "isCompanyVerified",
+  "logo", "logoPlaceholder", "authorName",
+  "benefits", "benefiti", "rawBenefits",
+  "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
+  "viewsCount", "cat", "status",
+] as const;
 
 async function computeAndSaveFastPath(result: HomepageDataResult) {
   const now = Date.now();
@@ -110,39 +120,17 @@ export const bffService = {
       premiumAdsData,
       urgentAdsData,
       jobsData,
-      realAdsCountData,
     ] = await Promise.allSettled([
       withTimeout(AdminStatsService.getGlobalStats(), 120000, {}),
       withTimeout(UnifiedAdsService.getPromotedAds({ isPremium: true, limit: 12 }), 120000, []),
       withTimeout(UnifiedAdsService.getPromotedAds({ isUrgent: true, limit: 12 }), 120000, []),
       (async () => {
         try {
-          const snap = await db.collection("listings").where("type", "==", "job").where("status", "in", ["active", "approved"]).orderBy("createdAt", "desc").limit(500).get();
+          const snap = await db.collection("listings").where("type", "==", "job").where("status", "in", ["active", "approved"]).orderBy("createdAt", "desc").select(...HOMEPAGE_JOB_FIELDS).limit(20).get();
           return { docs: snap.docs.map(d => ({ id: d.id, ...d.data() })), lastVisibleId: snap.docs.length > 0 ? snap.docs[snap.docs.length - 1].id : null, hasMore: false, totalHits: snap.docs.length };
         } catch (e) {
           console.error("[BFF] Direct jobs query failed:", e);
           return { docs: [], lastVisibleId: null, hasMore: false, totalHits: 0 };
-        }
-      })(),
-      (async () => {
-        try {
-          // Probaj efikasni count() aggregation
-          const countSnap = await db.collection("listings")
-            .where("status", "in", ["active", "approved"])
-            .count()
-            .get();
-          return countSnap.data().count;
-        } catch (_e) {
-          try {
-            // Fallback: select samo __name__ (minimal read) - bez .count() 
-            const snap = await db.collection("listings")
-              .where("status", "in", ["active", "approved"])
-              .select()
-              .get();
-            return snap.size;
-          } catch (_e2) {
-            return 0;
-          }
         }
       })(),
     ]);
@@ -150,6 +138,7 @@ export const bffService = {
     const gStats = (
       globalStats.status === "fulfilled" ? globalStats.value : {}
     ) as {
+      activeAds?: number,
       totalJobs?: number,
       companiesCount?: number,
       totalUsers?: number,
@@ -158,10 +147,7 @@ export const bffService = {
     };
 
     const totalJobs = gStats.totalJobs || 0;
-
-    const realTotalAdsCount = realAdsCountData?.status === "fulfilled" ? (realAdsCountData.value as number) : 0;
-
-    const calculatedAdsCount = realTotalAdsCount > 0 ? realTotalAdsCount : totalJobs;
+    const totalAdsCount = gStats.activeAds || totalJobs;
 
     const stats: HomepageStats = {
       totalJobs,
@@ -169,7 +155,7 @@ export const bffService = {
       totalUsers: gStats.totalUsers || 0,
       premiumJobs: gStats.premiumPartners || 0,
       urgentJobs: gStats.urgentAds || 0,
-      totalAdsCount: calculatedAdsCount,
+      totalAdsCount,
       dynamicFirmsCount: gStats.companiesCount || 0,
       dynamicWorkersCount: gStats.totalUsers || 0,
       dynamicViewsCount: 0,
@@ -185,7 +171,7 @@ export const bffService = {
         const snap = await db.collection("listings")
           .where("status", "==", "active")
           .where("isPremium", "==", true)
-          .limit(100)
+          .limit(20)
           .get();
         if (!snap.empty) {
           premiumJobsRaw = snap.docs.map((doc) => {
@@ -215,7 +201,7 @@ export const bffService = {
           .where("status", "==", "active")
           .where("isUrgent", "==", true)
           .orderBy("createdAt", "desc")
-          .limit(100)
+          .limit(20)
           .get();
         if (!snap.empty) {
           urgentJobsRaw = snap.docs.map((doc) => {
@@ -286,16 +272,7 @@ export const bffService = {
 
     const latestJobs = buildMappedDocs<Record<string, unknown>>(jobsData)
         .map((j) =>
-        snippet(j, [
-          "id", "title", "images", "createdAt", "typeSlug", "isPremium", "isUrgent",
-          "loc", "location",
-          "sal", "salary", "plataMin", "plataMax", "salaryType",
-          "comp", "company", "companyName", "companyId", "isCompanyVerified",
-          "logo", "logoPlaceholder", "authorName",
-          "benefits", "benefiti", "rawBenefits",
-          "smestaj", "prevoz", "hrana", "housing", "transport", "food", "topliObrok",
-          "viewsCount", "cat", "status"
-        ])
+        snippet(j, [...HOMEPAGE_JOB_FIELDS])
       );
 
     const result: HomepageDataResult = {

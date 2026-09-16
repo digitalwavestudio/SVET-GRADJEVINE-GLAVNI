@@ -13,12 +13,11 @@ export const getPublicJobs = async (
   next: NextFunction,
 ) => {
   try {
-    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 20, 1), 1000);
+    const pageSize = Math.min(Math.max(Number(req.query.pageSize) || 20, 1), 100);
     const limit = pageSize + 1;
     const platform = req.headers["x-client-platform"];
     const cursor = (req.query.cursor as string) || undefined;
 
-    console.info("[JOBS_CTRL] getPublicJobs called, calling JobsService.getPublicJobs...");
     const result = await JobsService.getPublicJobs(limit, cursor);
 
     // Non-blocking timeout (3s) for AdminStatsService fallback
@@ -39,8 +38,7 @@ export const getPublicJobs = async (
 
     if (finalResult.hasMore) {
       finalResult.docs = result.docs.slice(0, pageSize);
-      // Koristi cursorDocId koji je servis izračunao PRE sortiranja
-      finalResult.lastVisible = (result as any)._cursorDocId || null;
+      finalResult.lastVisible = result.lastVisible || null;
     }
 
     if (platform === "mobile" && result && result.docs) {
