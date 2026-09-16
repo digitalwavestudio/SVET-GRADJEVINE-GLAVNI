@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import rateLimit, { Options } from "express-rate-limit";
+import rateLimit, { MemoryStore, Options } from "express-rate-limit";
 import { RedisStore } from "rate-limit-redis";
 import { getRedis } from "../utils/redis.ts";
 
@@ -104,7 +104,7 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  store: getStore("auth"),
+  store: new MemoryStore(),
   message: {
     status: 429,
     message: "Previše autorizacijskih zahteva sa ove adrese. Molimo sačekajte 15 minuta i pokušajte ponovo.",
@@ -158,7 +158,7 @@ export const adCreationLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  store: getStore("ad_create"),
+  store: new MemoryStore(),
   validate: false,
   keyGenerator: (req: Request, _res: Response) => {
     // If the user is authenticated, use their UID
@@ -189,7 +189,7 @@ export const chatMessagingLimiter = rateLimit({
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  store: getStore("chat_messaging"),
+  store: new MemoryStore(),
   validate: false,
   keyGenerator: (req: Request, _res: Response) => {
     if (req.user && req.user.uid) {
@@ -200,6 +200,80 @@ export const chatMessagingLimiter = rateLimit({
   message: {
     status: 429,
     message: "Poslali ste previše poruka u kratkom vremenskom periodu. Dozvoljeno je maksimalno 20 poruka u minuti.",
+  },
+  handler,
+});
+
+/**
+ * Support Ticket Limiter
+ * Public contact forms write directly to the database, so keep this strict.
+ * 5 tickets per 15 minutes per IP.
+ */
+export const supportTicketLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: new MemoryStore(),
+  validate: false,
+  keyGenerator: (req: Request) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+    return ip || req.socket.remoteAddress || req.ip || 'unknown_ip';
+  },
+  message: {
+    status: 429,
+    message: "Poslali ste previše poruka podršci. Molimo sačekajte 15 minuta i pokušajte ponovo.",
+  },
+  handler,
+});
+
+/**
+ * Job Application Limiter
+ * Authenticated applications should not be flooded, even by a compromised account.
+ * 10 applications per 1 minute per user or IP.
+ */
+export const jobApplyLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: new MemoryStore(),
+  validate: false,
+  keyGenerator: (req: Request, _res: Response) => {
+    if (req.user && req.user.uid) {
+      return req.user.uid;
+    }
+    return req.ip || "unknown_ip";
+  },
+  message: {
+    status: 429,
+    message: "Poslali ste previše prijava u kratkom vremenskom periodu. Molimo sačekajte minut.",
+  },
+  handler,
+});
+
+/**
+ * Cache Bust Limiter
+ * Cache clearing is admin-only and expensive, so keep it strict.
+ * 5 requests per 1 minute per user or IP.
+ */
+export const cacheBustLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: new MemoryStore(),
+  validate: false,
+  keyGenerator: (req: Request, _res: Response) => {
+    if (req.user && req.user.uid) {
+      return req.user.uid;
+    }
+    return req.ip || "unknown_ip";
+  },
+  message: {
+    status: 429,
+    message: "Previše zahteva za brisanje keša. Molimo sačekajte minut.",
   },
   handler,
 });
@@ -237,7 +311,7 @@ export const telemetryLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
-  store: getStore("telemetry"),
+  store: new MemoryStore(),
   validate: false,
   keyGenerator: (req: Request, _res: Response) => {
     if (req.user && req.user.uid) {

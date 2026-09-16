@@ -42,7 +42,9 @@ import {
   apiLimiter,
   heavyOperationsLimiter,
   adminTriggerLimiter,
+  telemetryLimiter,
 } from "../middleware/rate-limit.middleware.ts";
+import { sanitizeInput } from "../../src/lib/sanitize.ts";
 
 import { requireAdmin, requireAuth, authMiddleware } from "../middleware/auth.middleware.ts";
 import { RateLimiterService } from "../services/rate-limiter.service.ts";
@@ -197,62 +199,92 @@ apiRouter.get("/stream", requireAuth, (req, res) => {
 apiRouter.use(autoValidateMiddleware);
 apiRouter.use(apiLimiter);
 
-// Optional Turnstile Middleware (Anti-Spam Forme)
+// Turnstile Middleware (Anti-Spam Forme)
+// Enforcement is explicit and path-scoped. It stays off until the frontend sends
+// Turnstile tokens, because enabling it sooner would block legitimate users.
+const TURNSTILE_SENSITIVE_PATHS = [
+  "/api/support/tickets",
+  "/api/jobs/apply",
+  "/api/jobs/create",
+  "/api/users/init",
+  "/api/ads",
+];
+let turnstileMissingSecretLogged = false;
+
 apiRouter.use(async (req, res, next) => {
-  if (req.method === "POST" && req.headers["x-turnstile-response"]) {
-    const token = req.headers["x-turnstile-response"] as string;
-    const ip =
-      req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown";
-    const ipStr = Array.isArray(ip) ? ip[0] : ip;
+  if (req.method !== "POST") {
+    return next();
+  }
 
-    try {
-      const secretKey = env.TURNSTILE_SECRET_KEY;
-      if (!secretKey) {
-        logger.warn(
-          "[Turnstile] TURNSTILE_SECRET_KEY is not configured on server.",
-        );
-        return next();
-      }
+  const path = req.originalUrl.split("?")[0];
+  const isSensitive = TURNSTILE_SENSITIVE_PATHS.some(
+    (sensitivePath) => path === sensitivePath || path.startsWith(`${sensitivePath}/`),
+  );
+  if (!isSensitive) {
+    return next();
+  }
 
-      const response = await fetch(
-        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            secret: secretKey,
-            response: token,
-            remoteip: ipStr,
-          }).toString(),
-        },
-      );
+  if (env.TURNSTILE_ENFORCED !== "true") {
+    return next();
+  }
 
-      const body = (await response.json()) as {
-        success: boolean;
-        "error-codes"?: string[];
-      };
-      if (!body.success) {
-        logger.warn(
-          `[Turnstile] Verification failed from ${ipStr}:`,
-          body["error-codes"],
-        );
-        await RateLimiterService.blockIp(ipStr, 1);
-        return res.status(403).json({
-          error: "Turnstile verifikacija nije uspela",
-          details: body["error-codes"],
-        });
-      }
-    } catch (err) {
-      console.error("[Turnstile] Error during verification:", err);
-      return res
-        .status(403)
-        .json({
-          error:
-            "Turnstile verifikacijski servis trenutno nedostupan ili neuspešan",
-        });
+  const secretKey = env.TURNSTILE_SECRET_KEY;
+  if (!secretKey) {
+    if (!turnstileMissingSecretLogged) {
+      logger.error("[Turnstile] Enforcement is enabled, but TURNSTILE_SECRET_KEY is missing.");
+      turnstileMissingSecretLogged = true;
     }
+    return res.status(503).json({ error: "Zaštita od spama nije podešena" });
+  }
+
+  const token = req.headers["x-turnstile-response"] as string | undefined;
+  if (!token) {
+    return res.status(403).json({ error: "Nedostaje Turnstile verifikacija" });
+  }
+
+  const ip =
+    req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown";
+  const ipStr = Array.isArray(ip) ? ip[0] : ip;
+
+  try {
+    const response = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          secret: secretKey,
+          response: token,
+          remoteip: ipStr,
+        }).toString(),
+      },
+    );
+
+    const body = (await response.json()) as {
+      success: boolean;
+      "error-codes"?: string[];
+    };
+    if (!body.success) {
+      logger.warn(
+        `[Turnstile] Verification failed from ${ipStr}:`,
+        body["error-codes"],
+      );
+      await RateLimiterService.blockIp(ipStr, 1);
+      return res.status(403).json({
+        error: "Turnstile verifikacija nije uspela",
+        details: body["error-codes"],
+      });
+    }
+  } catch (err) {
+    console.error("[Turnstile] Error during verification:", err);
+    return res
+      .status(403)
+      .json({
+        error:
+          "Turnstile verifikacijski servis trenutno nedostupan ili neuspešan",
+      });
   }
   next();
 });
@@ -413,23 +445,69 @@ apiRouter.use("/feed", publicActivityRouter);
 apiRouter.use("/construction", requireAuth, constructionRouter);
 
 // Frontend error logging (used by entry-client.tsx window.onerror handler)
-apiRouter.post("/dev/log-error", async (req, res) => {
-  const { message, source, lineno, colno, stack } = req.body || {};
-  console.error(`[FRONTEND ERROR] ${message || "unknown"}`, { source, lineno, colno, stack });
-  res.json({ success: true });
-});
 
-apiRouter.post("/logs", async (req, res) => {
-  const { level, message, context, uid, url } = req.body;
-  const logPrefix = `[FRONTEND LOG] [${level || "INFO"}]`;
-  if (level === "error" || level === "ERROR") {
-    console.error(`${logPrefix} ${message}`, { context, uid, url });
+const MAX_FRONTEND_LOG_BYTES = 8192;
+const MAX_FRONTEND_LOG_CONTEXT_BYTES = 2048;
+
+function sanitizeFrontendLogString(value: unknown, maxLength: number): string {
+  return sanitizeInput(String(value ?? "")).slice(0, maxLength);
+}
+
+function sanitizeFrontendLogContext(value: unknown): unknown {
+  try {
+    const serialized = JSON.stringify(value ?? null);
+    if (serialized.length > MAX_FRONTEND_LOG_CONTEXT_BYTES) {
+      return serialized.slice(0, MAX_FRONTEND_LOG_CONTEXT_BYTES);
+    }
+    return JSON.parse(serialized);
+  } catch {
+    return null;
+  }
+}
+
+apiRouter.post("/logs", telemetryLimiter, async (req, res) => {
+  const body = req.body || {};
+  const allowedKeys = ["level", "message", "context", "uid", "url"];
+  if (Object.keys(body).some((key) => !allowedKeys.includes(key))) {
+    return res.status(400).json({ error: "Nepoznata polja u log poruci" });
+  }
+
+  const { level = "info", message, context, uid, url } = body;
+  if (level !== "info" && level !== "warn" && level !== "error") {
+    return res.status(400).json({ error: "Neispravan nivo log poruke" });
+  }
+  if (typeof message !== "string" || message.trim().length === 0 || message.length > 2000) {
+    return res.status(400).json({ error: "Neispravna log poruka" });
+  }
+
+  let serialized = "";
+  try {
+    serialized = JSON.stringify(body);
+  } catch {
+    return res.status(400).json({ error: "Neispravan log sadržaj" });
+  }
+  if (serialized.length > MAX_FRONTEND_LOG_BYTES) {
+    return res.status(413).json({ error: "Log poruka je prevelika" });
+  }
+
+  const safeMessage = sanitizeFrontendLogString(message, 2000);
+  const safeContext = sanitizeFrontendLogContext(context);
+  const safeUid = uid === undefined ? undefined : sanitizeFrontendLogString(uid, 128);
+  const safeUrl = url === undefined ? undefined : sanitizeFrontendLogString(url, 2048);
+  const logPrefix = `[FRONTEND LOG] [${level.toUpperCase()}]`;
+  if (level === "error") {
+    console.error(`${logPrefix} ${safeMessage}`, { context: safeContext, uid: safeUid, url: safeUrl });
+    // Anonymous browser errors are visible in server logs, but only authenticated
+    // reports are persisted to Firestore. This prevents public database writes.
+    if (!req.user) {
+      return res.json({ success: true });
+    }
     try {
       const payload = {
         jobType: "frontend_error_sentry_fallback",
-        error: message,
+        error: safeMessage,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        payload: { context, uid, url, level },
+        payload: { context: safeContext, uid: safeUid, url: safeUrl, level },
         status: "pending_review",
         source: "frontend",
         batchId: `frontend_err_${Date.now()}`,
@@ -439,7 +517,7 @@ apiRouter.post("/logs", async (req, res) => {
       console.error("Failed to write frontend log to DLQ", err);
     }
   } else {
-    console.info(`${logPrefix} ${message}`, { context, uid, url });
+    console.info(`${logPrefix} ${safeMessage}`, { context: safeContext, uid: safeUid, url: safeUrl });
   }
   res.json({ success: true });
 });

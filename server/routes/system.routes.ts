@@ -1,18 +1,26 @@
 import { Router } from "express";
 import { getReqUser } from "../utils/request.ts";
 import { db, admin } from "../config/firebase.ts";
-import { requireAuth } from "../middleware/auth.middleware.ts";
+import { requireAdmin, requireAuth } from "../middleware/auth.middleware.ts";
+import { validateRequest } from "../middleware/validate.ts";
+import { cacheBustLimiter } from "../middleware/rate-limit.middleware.ts";
 import { z } from "zod";
 
 export const systemRouter = Router();
 
-systemRouter.get("/bust-cache", async (_req, res) => {
+const bustCacheSchema = z.object({
+  scope: z.enum(["homepage", "all"]).optional().default("all"),
+});
+
+systemRouter.post("/bust-cache", requireAuth, requireAdmin, cacheBustLimiter, validateRequest(bustCacheSchema), async (req, res) => {
   try {
     const { clearL1HomepageCache } = await import("../services/bff.service.ts");
     clearL1HomepageCache();
-    const { CacheService } = await import("../services/cache.service.ts");
-    await CacheService.clear().catch(() => {});
-    res.json({ success: true, message: "Cache obrisan" });
+    if (req.body?.scope === "all") {
+      const { CacheService } = await import("../services/cache.service.ts");
+      await CacheService.clear().catch(() => {});
+    }
+    res.json({ success: true, scope: req.body?.scope || "all", message: "Cache obrisan" });
   } catch (err) {
     res.status(500).json({ error: "Greška pri brisanju keša" });
   }

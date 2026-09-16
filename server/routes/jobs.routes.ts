@@ -1,6 +1,6 @@
 import { env } from "../config/env.ts";
 import express from "express";
-import { adCreationLimiter } from "../middleware/rate-limit.middleware.ts";
+import { adCreationLimiter, jobApplyLimiter } from "../middleware/rate-limit.middleware.ts";
 import {
   getPublicJobs,
   searchJobs,
@@ -47,6 +47,6 @@ jobsRouter.get("/applied/:jobId", authMiddleware, checkApplied);
 jobsRouter.get("/:id", getJobById);
 jobsRouter.post("/search", validateRequest(jobSearchSchema), searchJobs);
 jobsRouter.post("/create", authMiddleware, adCreationLimiter, validateRequest(createJobSchema), createJob);
-jobsRouter.post("/apply", authMiddleware, validateRequest(applicationSchema), applyJob);
+jobsRouter.post("/apply", authMiddleware, jobApplyLimiter, validateRequest(applicationSchema), applyJob);
 jobsRouter.patch("/:id", authMiddleware, validateAdOwnership, validateRequest(updateJobSchema), updateJob);
 jobsRouter.delete("/:id", authMiddleware, validateAdOwnership, deleteJob);

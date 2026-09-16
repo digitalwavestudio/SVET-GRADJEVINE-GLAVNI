@@ -43,6 +43,10 @@ const envSchema = z.object({
   DISABLE_FIRESTORE_QUOTA_CHECK: z.string().optional(),
   SECURITY_IP_PEPPER: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(),
+  TURNSTILE_SITE_KEY: z.string().optional(),
+  TURNSTILE_ENFORCED: z.enum(["true", "false"]).optional().default("false"),
+  SECURITY_MODE: z.enum(["standard", "strict"]).optional().default("standard"),
+  DISABLE_PREWARM: z.enum(["true", "false"]).optional().default("false"),
   BILLING_SERVICE_URL: z.string().optional().default("http://localhost:4001"),
   GEMINI_API_KEY: z.string().optional(),
   BIGQUERY_PROJECT_ID: z.string().optional(),
@@ -70,6 +74,7 @@ const envSchema = z.object({
   GA_MEASUREMENT_ID: z.string().optional(),
   VITE_EMAILJS_PUBLIC_KEY: z.string().optional(),
   VITE_EMAILJS_SERVICE_ID: z.string().optional(),
+  VITE_TURNSTILE_SITE_KEY: z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);
@@ -80,6 +85,49 @@ if (!_env.success) {
 }
 
 export const env = _env.data;
+
+if (env.NODE_ENV === "production") {
+  if (!env.REDIS_URL) {
+    throw new Error("REDIS_URL je obavezan u produkciji");
+  }
+  if (!env.APP_URL.startsWith("https://")) {
+    throw new Error("APP_URL mora da koristi https u produkciji");
+  }
+
+  const recommended = {
+    TURNSTILE_SECRET_KEY: env.TURNSTILE_SECRET_KEY,
+    SENTRY_DSN: env.SENTRY_DSN,
+    SMTP_HOST: env.SMTP_HOST,
+    SMTP_USER: env.SMTP_USER,
+    SMTP_PASS: env.SMTP_PASS,
+    ALGOLIA_APP_ID: env.ALGOLIA_APP_ID,
+    ALGOLIA_API_KEY: env.ALGOLIA_API_KEY,
+  };
+  const missingRecommended = Object.entries(recommended)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+  if (missingRecommended.length > 0) {
+    console.warn(`Upozorenje: nedostaju opcione produkcijske integracije: ${missingRecommended.join(", ")}`);
+  }
+
+  if (env.SECURITY_MODE === "strict") {
+    const required = {
+      TURNSTILE_SECRET_KEY: env.TURNSTILE_SECRET_KEY,
+      SECURITY_IP_PEPPER: env.SECURITY_IP_PEPPER,
+      SENTRY_DSN: env.SENTRY_DSN,
+      SMTP_HOST: env.SMTP_HOST,
+      SMTP_USER: env.SMTP_USER,
+      SMTP_PASS: env.SMTP_PASS,
+    };
+    const missingRequired = Object.entries(required)
+      .filter(([, value]) => !value)
+      .map(([key]) => key);
+    if (missingRequired.length > 0) {
+      throw new Error(`Strogi bezbednosni režim zahteva: ${missingRequired.join(", ")}`);
+    }
+  }
+}
+
 
 // Parse the ADMIN_EMAILS safely
 let parsedAdminEmails: string[] = [];
