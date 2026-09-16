@@ -1,3 +1,4 @@
+import { sanitizeRichText } from '@/src/lib/sanitize';
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { apiClient } from '@/src/lib/apiClient';
@@ -395,7 +396,7 @@ export default function AiSearchPage() {
                 
                 <div className="relative z-10">
                   <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
-                     dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.summary) }} 
+                     dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.summary)) }} 
                   />
                   
                   {structuredAnswer.bullets.length > 0 && (
@@ -405,7 +406,7 @@ export default function AiSearchPage() {
                           {/* Zamena emojija sa prelepim okruglim Material ikonama */}
                           {getBulletIcon(bullet.emoji)}
                           <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
-                             dangerouslySetInnerHTML={{ __html: applyBoldRules(bullet.text) }} 
+                             dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(bullet.text)) }} 
                           />
                         </div>
                       ))}
@@ -414,7 +415,7 @@ export default function AiSearchPage() {
                   
                    {structuredAnswer.closing && (
                     <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5"
-                       dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.closing) }} 
+                       dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.closing)) }} 
                     />
                   )}
 

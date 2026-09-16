@@ -1,3 +1,4 @@
+import { sanitizeRichText } from '@/src/lib/sanitize';
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import CtaSection from '@/src/components/CtaSection';
@@ -792,7 +793,7 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
             
             <div className="relative z-10">
               <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
-                 dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.summary) }} 
+                 dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.summary)) }} 
               />
               
               {structuredAnswer.bullets.length > 0 && (
@@ -801,7 +802,7 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
                     <div key={i} className="flex items-start gap-4">
                       <span className="text-xl shrink-0 mt-0.5">{bullet.emoji}</span>
                       <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
-                         dangerouslySetInnerHTML={{ __html: applyBoldRules(bullet.text) }} 
+                         dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(bullet.text)) }} 
                       />
                     </div>
                   ))}
@@ -810,7 +811,7 @@ function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
               
                {structuredAnswer.closing && (
                 <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5"
-                   dangerouslySetInnerHTML={{ __html: applyBoldRules(structuredAnswer.closing) }} 
+                   dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.closing)) }} 
                 />
               )}
 
