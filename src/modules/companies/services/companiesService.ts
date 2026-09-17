@@ -71,11 +71,13 @@ export const companiesService = {
     });
   },
 
-  async create(data: Partial<Company>) {
+  async create(data: Partial<Company>, turnstileToken?: string | null) {
     return withRetry(async () => {
       const auth = (await import('firebase/auth')).getAuth();
       if (!auth.currentUser) throw new Error('Niste prijavljeni.');
-      const result = await apiClient.post<{ id: string }>('/ads/create', { category: 'companies', data });
+      const result = await apiClient.post<{ id: string }>('/ads/create', { category: 'companies', data }, {
+        headers: turnstileToken ? { 'x-turnstile-response': turnstileToken } : undefined,
+      });
       return result.id;
     });
   },

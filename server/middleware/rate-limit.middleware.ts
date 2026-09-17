@@ -128,12 +128,12 @@ export const jobSearchLimiter = rateLimit({
 
 /**
  * AI Public Limiter
- * Public AI search/chat is expensive, so keep it strict per IP.
- * 10 requests per 1 minute.
+ * Public AI search/chat is expensive, but 10-30/min blocks normal users.
+ * 60 requests per 1 minute — cached results won't hit Gemini, so this is safe.
  */
 export const aiPublicLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 10,
+  max: 60,
   standardHeaders: true,
   legacyHeaders: false,
   store: getStore("ai_public"),

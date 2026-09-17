@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/src/lib/apiClient';
+import { useTurnstile, turnstileHeaders } from '@/src/components/TurnstileProvider';
 import { dashboardKeys, queryKeys } from '@/src/lib/queryKeysFactory';
 
 interface UseAdSubmitParams {
@@ -21,6 +22,7 @@ export function useAdSubmit({ editId, adId, userId, showSuccess, showError, rese
   const [submittedPackage, setSubmittedPackage] = useState<string | null>(null);
   const [createdAdId, setCreatedAdId] = useState<string | null>(null);
   const [showDepositPrompt, setShowDepositPrompt] = useState(false);
+  const { execute: executeTurnstile } = useTurnstile();
 
   const submitMutation = useMutation({
     mutationFn: async ({ categoryToApi, payload, sData }: { categoryToApi: string; payload: any; sData: any }) => {
@@ -28,11 +30,12 @@ export function useAdSubmit({ editId, adId, userId, showSuccess, showError, rese
       if (!navigator.onLine) {
         throw new Error("Niste povezani na mrežu. Sve akcije objavljivanja i izmene oglasnog prostora su privremeno obustavljene.");
       }
+      const turnstileToken = await executeTurnstile();
       if (editId) {
-        await apiClient.patch(`/ads/${editId}`, { category: categoryToApi, data: payload });
+        await apiClient.patch(`/ads/${editId}`, { category: categoryToApi, data: payload }, { headers: turnstileHeaders(turnstileToken) });
         return { isEdit: true, id: editId, sData };
       } else {
-        const result = await apiClient.post<any>('/ads/create', { category: categoryToApi, data: { ...payload, id: adId } });
+        const result = await apiClient.post<any>('/ads/create', { category: categoryToApi, data: { ...payload, id: adId } }, { headers: turnstileHeaders(turnstileToken) });
         if (!result?.id) {
           throw new Error("Sistem nije vratio ID oglasa. Oglas možda nije sačuvan. Pokušajte ponovo.");
         }

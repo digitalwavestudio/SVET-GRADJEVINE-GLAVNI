@@ -197,7 +197,11 @@ apiRouter.get("/stream", requireAuth, (req, res) => {
 
 // Apply auto validation and standard security middleware
 apiRouter.use(autoValidateMiddleware);
-apiRouter.use(apiLimiter);
+// AI routes have their own aiPublicLimiter/aiAccountLimiter — skip global apiLimiter for them
+apiRouter.use((req, res, next) => {
+  if (req.path.startsWith("/ai")) return next();
+  apiLimiter(req, res, next);
+});
 
 // Turnstile Middleware (Anti-Spam Forme)
 // Enforcement is explicit and path-scoped. It stays off until the frontend sends

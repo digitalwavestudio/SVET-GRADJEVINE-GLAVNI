@@ -5,6 +5,7 @@ import { MessagesProvider } from '@/src/context/MessagesContext';
 import { BrandProvider } from '@/src/context/BrandContext';
 import { ToastProvider } from '@/src/context/ToastContext';
 import { VisibilityAbortProvider } from '@/src/context/VisibilityAbortContext';
+import { TurnstileProvider } from '@/src/components/TurnstileProvider';
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -14,7 +15,9 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children
           <AuthProvider>
             <MessagesProvider>
               <VisibilityAbortProvider>
-                {children}
+                <TurnstileProvider>
+                  {children}
+                </TurnstileProvider>
               </VisibilityAbortProvider>
             </MessagesProvider>
           </AuthProvider>

@@ -8,6 +8,7 @@ import { getLazyAuth } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
 import { getErrorMessage } from '@/src/lib/utils';
 import { passwordRegex } from '@svet-gradjevine/shared';
+import { useTurnstile, turnstileHeaders } from '@/src/components/TurnstileProvider';
 
 type AuthTab = 'login' | 'register';
 
@@ -17,6 +18,7 @@ export default function AuthPage() {
   const { loginWithGoogle, loginWithEmail, user, loading: authLoading } = useAuth();
   const { logoUrl } = useBrandLogo();
   const { addToast } = useToast();
+  const { execute: executeTurnstile } = useTurnstile();
   const [tab, setTab] = useState<AuthTab>('register');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -142,13 +144,14 @@ export default function AuthPage() {
       };
 
       const token = await user.getIdToken();
+      const turnstileToken = await executeTurnstile();
       let res;
       let retries = 3;
       while (retries > 0) {
         try {
           res = await fetch('/api/users/init', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...turnstileHeaders(turnstileToken) },
             body: JSON.stringify(userDoc)
           });
           if (res.ok) break;

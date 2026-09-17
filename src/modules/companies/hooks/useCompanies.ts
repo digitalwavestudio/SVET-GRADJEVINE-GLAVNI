@@ -8,6 +8,7 @@ import {
 import { companiesService, Company } from "@/src/modules/companies/services/companiesService";
 import { Company as CompanyAd } from "@/src/modules/companies/types/models";
 import { queryKeys } from "@/src/lib/queryKeysFactory";
+import { useTurnstile } from "@/src/components/TurnstileProvider";
 
 export function useCompanyDetails(id: string | undefined) {
   return useQuery({
@@ -71,10 +72,11 @@ export function useCompaniesList(
 
 export function useCompanyAdMutations() {
   const queryClient = useQueryClient();
+  const { execute: executeTurnstile } = useTurnstile();
 
   const addMutation = useMutation({
-    mutationFn: (data: Omit<CompanyAd, "id" | "createdAt">) =>
-      companiesService.create(data),
+    mutationFn: async (data: Omit<CompanyAd, "id" | "createdAt">) =>
+      companiesService.create(data, await executeTurnstile()),
     onSuccess: () => {
       // Optimizacija: bez invalidateQueries liste, oslanjamo se na setQueryData za detail (ili cache isteče)
     },

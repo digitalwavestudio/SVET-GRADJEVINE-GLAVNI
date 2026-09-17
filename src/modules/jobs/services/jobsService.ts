@@ -180,6 +180,7 @@ export const jobsService = {
     applicantPhone?: string;
     applicantName?: string;
     applicantEmail?: string;
+    turnstileToken?: string | null;
   }): Promise<void> {
     return withRetry(async () => {
       await apiClient.post<void>('/jobs/apply', {
@@ -188,6 +189,8 @@ export const jobsService = {
         employerId: contract.employerId,
         coverLetter: contract.coverLetter,
         applicantPhone: contract.applicantPhone
+      }, {
+        headers: contract.turnstileToken ? { 'x-turnstile-response': contract.turnstileToken } : undefined,
       });
     });
   },

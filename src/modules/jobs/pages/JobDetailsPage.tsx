@@ -18,6 +18,7 @@ import { JobApplicationModal } from '@/src/modules/jobs/components/jobs/JobAppli
 import { useJobDetails, useJobMutations, useCheckApplied, useSimilarJobs } from '@/src/modules/jobs/hooks/useJobs';
 import '@/src/modules/jobs/styles/similarJobs.css';
 import { useFavoriteIds } from '@/src/modules/dashboard/hooks/useFavorites';
+import { useTurnstile } from '@/src/components/TurnstileProvider';
 import MediaGallery from '@/src/modules/core/components/details/MediaGallery';
 import { StickyDetailCTABar } from '@/src/components/layout/StickyDetailCTABar';
 import AdminCommandCenter from '@/src/modules/jobs/components/jobs/AdminCommandCenter';
@@ -87,6 +88,7 @@ export default function JobDetailsPage() {
   const [applicationPhone, setApplicationPhone] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const { data: appliedResult } = useCheckApplied(actualId, user?.id || '');
+  const { execute: executeTurnstile } = useTurnstile();
   const hasApplied = !!appliedResult;
   const { data: similarJobsResult, isLoading: loadingSimilar } = useSimilarJobs(actualId, jobData?.locationSlug, jobData?.professionSlug, jobData?.profession, jobData?.title);
   const similarJobs = (similarJobsResult as any[]) || [];
@@ -152,11 +154,12 @@ export default function JobDetailsPage() {
 
   const handleApplicationSubmit = async () => {
     if (!user) {
-      setApplicationMessage('Morate biti prijavljeni da biste se prijavili na oglas.');
+      navigate('/prijava');
       return;
     }
     setIsApplying(true);
     try {
+      const turnstileToken = await executeTurnstile();
       await applyToJob({
         jobId: jobData.id,
         jobTitle: jobData.title || 'Oglas',
@@ -165,7 +168,8 @@ export default function JobDetailsPage() {
         applicantName: user.displayName || 'Korisnik',
         applicantEmail: user.email || '',
         coverLetter: applicationMessage,
-        applicantPhone: applicationPhone
+        applicantPhone: applicationPhone,
+        turnstileToken,
       });
       setShowApplicationModal(false);
     } catch (e) {

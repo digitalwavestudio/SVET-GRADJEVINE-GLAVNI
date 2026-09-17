@@ -270,6 +270,7 @@ export interface ApplyToJobVariables {
   applicantEmail?: string;
   coverLetter?: string;
   applicantPhone?: string;
+  turnstileToken?: string | null;
 }
 
 export function useJobMutations() {

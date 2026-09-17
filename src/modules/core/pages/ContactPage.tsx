@@ -5,6 +5,7 @@ import SeoHead from '@/src/components/SeoHead';
 import { APP_CONFIG } from '@/src/constants/config';
 import { useToast } from '@/src/context/ToastContext';
 import { trackEvent } from '@/src/lib/analytics';
+import { useTurnstile, turnstileHeaders } from '@/src/components/TurnstileProvider';
 
 const contactPageSchema = {
   "@context": "https://schema.org",
@@ -31,6 +32,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { addToast } = useToast();
+  const { execute: executeTurnstile } = useTurnstile();
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +43,10 @@ export default function ContactPage() {
     
     setIsSubmitting(true);
     try {
+      const turnstileToken = await executeTurnstile();
       const response = await fetch('/api/support/tickets', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...turnstileHeaders(turnstileToken) },
         body: JSON.stringify(formData)
       });
 

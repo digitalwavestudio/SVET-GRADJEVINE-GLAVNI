@@ -9,7 +9,7 @@ const router = Router();
 const aiQuerySchema = z.object({
   query: z.string().min(1).max(500),
   page: z.coerce.number().int().min(1).max(100).optional(),
-  pageSize: z.coerce.number().int().min(1).max(24).optional(),
+  pageSize: z.coerce.number().int().min(1).max(100).optional(),
 });
 const aiMessageSchema = z.object({
   message: z.string().min(1).max(4000),

@@ -6,6 +6,7 @@ import logoImage from '@/src/assets/images/logo.webp';
 import { useToast } from '@/src/context/ToastContext';
 import { getLazyAuth } from '@/src/lib/firebase';
 import { UI_TOKENS } from '@/src/lib/uiTokens';
+import { useTurnstile, turnstileHeaders } from '@/src/components/TurnstileProvider';
 import { passwordRegex } from '@svet-gradjevine/shared';
 
 export default function RegisterPage() {
@@ -13,6 +14,7 @@ export default function RegisterPage() {
   const location = useLocation();
   const { loginWithGoogle, user, loading: authLoading } = useAuth();
   const { addToast } = useToast();
+  const { execute: executeTurnstile } = useTurnstile();
   const { logoUrl } = useBrandLogo();
   const [formData, setFormData] = useState({
     email: '',
@@ -109,13 +111,14 @@ export default function RegisterPage() {
       };
 
       const token = await user.getIdToken();
+      const turnstileToken = await executeTurnstile();
       let res;
       let retries = 3;
       while (retries > 0) {
         try {
           res = await fetch('/api/users/init', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...turnstileHeaders(turnstileToken) },
               body: JSON.stringify({...userDoc, _honeypot: formData._honeypot})
           });
           if (res.ok) break;

@@ -74,32 +74,41 @@ export class SSEService {
   }
 
   static subscribe(req: Request, res: Response, uid: string) {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    // Ensure that nginx doesn't buffer server sent events
-    res.setHeader('X-Accel-Buffering', 'no');
-    res.flushHeaders();
+    try {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      // Ensure that nginx doesn't buffer server sent events
+      res.setHeader('X-Accel-Buffering', 'no');
+      res.flushHeaders();
 
-    const sendEvent = (data: SSEEvent) => {
-      res.write(`event: ${data.type}\ndata: ${JSON.stringify(data.payload)}\n\n`);
-    };
+      const sendEvent = (data: SSEEvent) => {
+        try {
+          res.write(`event: ${data.type}\ndata: ${JSON.stringify(data.payload)}\n\n`);
+        } catch {}
+      };
 
-    const heartBeat = setInterval(() => {
-      res.write(":\n\n");
-    }, 15000);
+      const heartBeat = setInterval(() => {
+        try {
+          res.write(":\n\n");
+        } catch {}
+      }, 15000);
 
-    const onEvent = (data: SSEEvent) => {
-      sendEvent(data);
-    };
+      const onEvent = (data: SSEEvent) => {
+        sendEvent(data);
+      };
 
-    this.events.on(uid, onEvent);
+      this.events.on(uid, onEvent);
 
-    req.on("close", () => {
-      clearInterval(heartBeat);
-      this.events.off(uid, onEvent);
-      res.end();
-    });
+      req.on("close", () => {
+        clearInterval(heartBeat);
+        this.events.off(uid, onEvent);
+        try { res.end(); } catch {}
+      });
+    } catch (err) {
+      console.error("[SSE] subscribe error:", err);
+      try { res.status(500).end(); } catch {}
+    }
   }
 
   static hasActiveConnection(uid: string): boolean {

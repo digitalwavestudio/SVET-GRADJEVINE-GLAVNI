@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/src/context/AuthContext';
 import { getPackageById } from '@/src/constants/adPackages';
 import { PaymentInstructions } from '@/src/modules/ads';
+import { useTurnstile, turnstileHeaders } from '@/src/components/TurnstileProvider';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const [step, setStep] = useState<'info' | 'payment'>('info');
   const [isLoading, setIsLoading] = useState(false);
   const [createdAdId, setCreatedAdId] = useState<string | null>(null);
+  const { execute: executeTurnstile } = useTurnstile();
 
   const premiumPartnerPkg = getPackageById('company', 'premium_partner');
 
@@ -22,12 +24,14 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
     try {
       const { getAuth } = await import('firebase/auth');
       const token = await getAuth().currentUser?.getIdToken();
+      const turnstileToken = await executeTurnstile();
       
       const res = await fetch('/api/ads/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          ...turnstileHeaders(turnstileToken),
         },
         body: JSON.stringify({ 
           category: 'companies', 

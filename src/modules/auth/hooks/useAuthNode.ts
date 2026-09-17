@@ -7,6 +7,7 @@ import { User, UserRole } from '@/src/modules/core/types/user';
 import { apiClient } from '@/src/lib/apiClient';
 import { queryClient } from '@/src/lib/queryClient';
 import { favoritesKeys } from '@/src/modules/dashboard/hooks/useFavorites';
+import { getTurnstileToken, turnstileHeaders } from '@/src/components/TurnstileProvider';
 
 const CACHE_KEY = 'svet_gradjevine_user_cache';
 
@@ -46,7 +47,8 @@ const syncUserStats = async (role: string) => {
     const authInst = await getLazyAuth();
     const token = await authInst.currentUser?.getIdToken();
     if (!token) return;
-    await apiClient.post('/users/init', { role });
+    const { getTurnstileToken, turnstileHeaders } = await import('@/src/components/TurnstileProvider');
+    await apiClient.post('/users/init', { role }, { headers: turnstileHeaders(await getTurnstileToken()) });
   } catch (e) {
     console.warn('[AUTH] Failed to initialize user stats', e);
   }
@@ -243,11 +245,11 @@ export function useAuthNode() {
             // kreiramo ga odmah da prekinemo redirect loop na mobilnom
             if (!claims?.role && firebaseUser && !autoInitAttempted.current) {
                autoInitAttempted.current = true;
-               try {
+                try {
                    const token = await firebaseUser.getIdToken();
                    const initRes = await fetch('/api/users/init', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...turnstileHeaders(await getTurnstileToken()) },
                       body: JSON.stringify({
                          email: firebaseUser.email,
                          uid: firebaseUser.uid,
@@ -364,7 +366,7 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
     const token = await firebaseUser.getIdToken();
     const initRes = await fetch('/api/users/init', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...turnstileHeaders(await getTurnstileToken()) },
       body: JSON.stringify({
         email: firebaseUser.email,
         uid: firebaseUser.uid,
@@ -519,7 +521,9 @@ const initUser = async (firebaseUser: FirebaseUser, role?: string) => {
         uid: firebaseUser.uid
       };
       
-      await apiClient.post('/users/init', newUser);
+      await apiClient.post('/users/init', newUser, {
+        headers: turnstileHeaders(await getTurnstileToken()),
+      });
     })();
   }, []);
 
