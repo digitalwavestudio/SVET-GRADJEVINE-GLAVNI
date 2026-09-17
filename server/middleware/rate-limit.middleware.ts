@@ -56,11 +56,12 @@ const getStore = (prefix: string) => {
 
 /**
  * General API Rate Limiter
- * 60 requests per 1 minute
+ * 200 requests per 1 minute — homepage alone makes 5-10 calls per load,
+ * plus retries and "load more" clicks. 60 was too aggressive.
  */
 export const apiLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 60,
+  max: 200,
   standardHeaders: true,
   legacyHeaders: false,
   store: getStore("api"),
