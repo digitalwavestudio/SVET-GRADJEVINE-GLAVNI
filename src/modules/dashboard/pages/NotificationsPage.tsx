@@ -4,6 +4,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { apiClient } from '@/src/lib/apiClient';
 import { formatDistanceToNow } from 'date-fns';
 import { srLatn } from 'date-fns/locale';
+import { parseFirestoreDate } from '@/src/lib/format';
 
 interface Activity {
   id: string;
@@ -46,11 +47,7 @@ export default function NotificationsPage() {
   };
 
   const parseDate = (createdAt: any): Date => {
-    if (!createdAt) return new Date();
-    if (typeof createdAt.toDate === 'function') return createdAt.toDate();
-    if (typeof createdAt === 'string' || typeof createdAt === 'number') return new Date(createdAt);
-    if (createdAt._seconds) return new Date(createdAt._seconds * 1000);
-    return new Date();
+    return parseFirestoreDate(createdAt) || new Date();
   };
 
   return (

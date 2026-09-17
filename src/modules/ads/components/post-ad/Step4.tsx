@@ -10,6 +10,7 @@ import { getPackagesByCategory } from "@/src/constants/adPackages";
 import { useAuth } from "@/src/context/AuthContext";
 import { useSystemConfig } from "@/src/hooks/useSystemConfig";
 import { useGlobalSettings } from "@/src/modules/admin/hooks/useGlobalSettings";
+import PackageCard from "@/src/modules/ads/components/post-ad/PackageCard";
 
 export function Step4({
   selectedCategory,
@@ -399,202 +400,61 @@ export function Step4({
 
         {/* THREE SEPARATE, HARDCODED CARDS IN THE GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch justify-center">
-          
-          {/* CARD 1: STANDARD PACKAGE */}
           {standardPkg && (
-            <div
-              onClick={() => setValue("paket", "standard")}
-              className={`relative p-6 rounded-[24px] text-center border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
-                ${isStandardSelected 
-                  ? "border-blue-500/80 bg-gradient-to-b from-[#0c1835]/70 to-[#050814]/70 shadow-[0_0_40px_rgba(59,130,246,0.25)] ring-1 ring-blue-500/30 scale-[1.02] -translate-y-2 z-10" 
-                  : "border-white/5 bg-slate-900/30 hover:border-blue-500/30 hover:bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-2"
-                }`}
-            >
-              <div className="space-y-4 relative z-10">
-                <div>
-                  <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isStandardSelected ? "text-blue-400" : "text-white"}`}>
-                    STANDARD
-                  </h4>
-                  <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider opacity-65">
-                    Standardno prikazivanje
-                  </p>
-                </div>
-
-                <div className="py-2 border-y border-white/5 flex flex-col items-center justify-center gap-1">
-                  <span className={`font-black text-3xl tracking-tight ${standardPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
-                    1.000
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">
-                    SG KREDITA (RSD)
-                  </span>
-                </div>
-
-                <ul className="space-y-3 py-2">
-                  {[
-                    "Osnovna pozicija u oglasniku",
-                    "30 dana trajanje oglasa"
-                  ].map((f: string, i: number) => (
-                    <li key={i} className="flex flex-row items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 text-left">
-                      <span className="material-symbols-outlined text-[16px] text-green-500 shrink-0">
-                        check_circle
-                      </span>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                className={`w-full py-3 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-6 relative z-10 
-                  ${isStandardSelected 
-                    ? "bg-white text-black font-black hover:bg-slate-100" 
-                    : "border border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
-                  }`}
-              >
-                {isStandardSelected ? "Izabran" : "Izaberi ovaj paket"}
-              </button>
-            </div>
+            <PackageCard
+              title="STANDARD"
+              subtitle="Standardno prikazivanje"
+              price={standardPkg.priceNum.toLocaleString("sr-RS")}
+              features={["Osnovna pozicija u oglasniku", "30 dana trajanje oglasa"]}
+              tone="standard"
+              selected={isStandardSelected}
+              discounted={standardPkg.isDiscounted}
+              selectLabel="Izaberi ovaj paket"
+              onSelect={() => setValue("paket", "standard")}
+            />
           )}
 
-          {/* CARD 2: PREMIUM PACKAGE */}
           {premiumPkg && (
-            <div
-              onClick={() => setValue("paket", premiumPkg.id)}
-              className={`relative p-6 md:py-8 rounded-[24px] text-center border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer md:scale-[1.08] z-20
-                ${isPremiumSelected 
-                  ? "border-secondary bg-gradient-to-b from-[#1c140a]/80 to-[#070502]/80 shadow-[0_0_55px_rgba(254,191,13,0.3)] ring-1 ring-secondary/50 -translate-y-2" 
-                  : "border-secondary/20 bg-slate-900/30 hover:border-secondary/50 hover:bg-[#1a150c]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-2"
-                }`}
-            >
-              {/* Premium Glow effect */}
-              {isPremiumSelected && (
-                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none transition-transform duration-700 bg-secondary/10 blur-[40px]"></div>
-              )}
-
-              {premiumPkg.recommended && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#FEBF0D] to-[#F8A010] text-black text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] px-6 py-1.5 rounded-full shadow-[0_0_25px_rgba(254,191,13,0.6)] whitespace-nowrap z-30 flex items-center gap-1.5 border border-white/30">
-                  <span className="material-symbols-outlined text-[14px] animate-bounce" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                  PREPORUČENO
-                </div>
-              )}
-
-              <div className="space-y-4 relative z-10">
-                <div>
-                  <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isPremiumSelected ? "text-secondary font-black drop-shadow-[0_0_15px_rgba(254,191,13,0.3)]" : "text-secondary/90"} flex justify-center items-center gap-2`}>
-                    PREMIUM OGLAS
-                    <span className="material-symbols-outlined text-lg animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-                  </h4>
-                  <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider opacity-65">
-                    Za ozbiljnije oglašivače
-                  </p>
-                </div>
-
-                <div className="py-2 border-y border-white/5 flex flex-col items-center justify-center gap-1">
-                  <span className={`font-black text-3xl tracking-tight ${premiumPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
-                    2.000
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">
-                    SG KREDITA (RSD)
-                  </span>
-                </div>
-
-                <ul className="space-y-3 py-2">
-                  {[
-                    "Naslovna strana",
-                    "Uvek na vrhu pretrage",
-                    "Poseban dizajn i boja",
-                    "Bedž PREMIUM",
-                    "30 dana trajanje oglasa"
-                  ].map((f: string, i: number) => (
-                    <li key={i} className="flex flex-row items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 text-left">
-                      <span className="material-symbols-outlined text-[16px] text-green-500 shrink-0">
-                        check_circle
-                      </span>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                className={`w-full py-3 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-6 relative z-10 
-                  ${isPremiumSelected 
-                    ? "bg-gradient-to-r from-secondary via-yellow-400 to-secondary text-black font-black hover:brightness-110 shadow-[0_0_20px_rgba(254,191,13,0.3)]" 
-                    : "border border-secondary/20 text-secondary/80 hover:bg-secondary/5"
-                  }`}
-              >
-                {isPremiumSelected ? "Izabran" : "Izaberi Premium"}
-              </button>
-            </div>
+            <PackageCard
+              title="PREMIUM OGLAS"
+              subtitle="Za ozbiljnije oglašivače"
+              price={premiumPkg.priceNum.toLocaleString("sr-RS")}
+              features={[
+                "Naslovna strana",
+                "Uvek na vrhu pretrage",
+                "Poseban dizajn i boja",
+                "Bedž PREMIUM",
+                "30 dana trajanje oglasa",
+              ]}
+              tone="premium"
+              selected={isPremiumSelected}
+              recommended={premiumPkg.recommended}
+              discounted={premiumPkg.isDiscounted}
+              selectLabel="Izaberi Premium"
+              header={<span className="material-symbols-outlined text-lg animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>}
+              onSelect={() => setValue("paket", premiumPkg.id)}
+            />
           )}
 
-          {/* CARD 3: URGENT / HITNO PACKAGE */}
           {urgentPkg && (
-            <div
-              onClick={() => setValue("paket", "urgent")}
-              className={`relative p-6 rounded-[24px] text-center border backdrop-blur-xl transition-all duration-500 flex flex-col justify-between cursor-pointer 
-                ${isUrgentSelected 
-                  ? "border-blue-500 bg-gradient-to-b from-[#0b1b3f]/80 to-[#040915]/80 shadow-[0_0_45px_rgba(59,130,246,0.3)] ring-1 ring-blue-500/50 scale-[1.02] -translate-y-2 z-10" 
-                  : "border-blue-500/10 bg-slate-900/30 hover:border-blue-500/40 hover:bg-slate-900/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-2"
-                }`}
-            >
-              {/* Blue Glow effect */}
-              {isUrgentSelected && (
-                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none transition-transform duration-700 bg-blue-500/10 blur-[40px]"></div>
-              )}
-
-              <div className="space-y-4 relative z-10">
-                <div>
-                  <h4 className={`font-black uppercase tracking-widest text-lg md:text-xl mb-1 ${isUrgentSelected ? "text-blue-400 font-black drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-white"}`}>
-                    HITNO (URGENT)
-                  </h4>
-                  <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider opacity-65">
-                    Najviši prioritet
-                  </p>
-                </div>
-
-                <div className="py-2 border-y border-white/5 flex flex-col items-center justify-center gap-1">
-                  <span className={`font-black text-3xl tracking-tight ${urgentPkg.isDiscounted ? "text-red-500" : "text-white"}`}>
-                    4.000
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-black uppercase tracking-widest">
-                    SG KREDITA (RSD)
-                  </span>
-                </div>
-
-                <ul className="space-y-3 py-2">
-                  {[
-                    "Naslovna strana",
-                    "Uvek na vrhu pretrage",
-                    "Poseban dizajn i boja",
-                    "Bedž Hitno",
-                    "7 dana trajanje oglasa"
-                  ].map((f: string, i: number) => (
-                    <li key={i} className="flex flex-row items-center gap-3 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/80 text-left">
-                      <span className="material-symbols-outlined text-[16px] text-green-500 shrink-0">
-                        check_circle
-                      </span>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                className={`w-full py-3 rounded-xl text-xs uppercase tracking-widest font-black transition-all duration-300 mt-6 relative z-10 
-                  ${isUrgentSelected 
-                    ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 text-white font-black hover:brightness-110 shadow-[0_0_20px_rgba(59,130,246,0.3)]" 
-                    : "border border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
-                  }`}
-              >
-                {isUrgentSelected ? "Izabran" : "Izaberi ovaj paket"}
-              </button>
-            </div>
+            <PackageCard
+              title="HITNO (URGENT)"
+              subtitle="Najviši prioritet"
+              price={urgentPkg.priceNum.toLocaleString("sr-RS")}
+              features={[
+                "Naslovna strana",
+                "Uvek na vrhu pretrage",
+                "Poseban dizajn i boja",
+                "Bedž Hitno",
+                "7 dana trajanje oglasa",
+              ]}
+              tone="urgent"
+              selected={isUrgentSelected}
+              discounted={urgentPkg.isDiscounted}
+              selectLabel="Izaberi ovaj paket"
+              onSelect={() => setValue("paket", "urgent")}
+            />
           )}
-
         </div>
 
         {/* SaaS Checkout / Kasa (Screenshot 2 layout style with high glassmorphism) */}

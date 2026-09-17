@@ -3,10 +3,12 @@
   "short_name": "SG",
   "description": "Premijum platforma za građevinsku industriju. Pronađite majstore, materijale, mašine i poslove brzo i lako.",
   "start_url": "/",
+  "id": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0A0F14",
-  "theme_color": "#FFAD3A",
+  "theme_color": "#0F1923",
   "categories": ["business", "productivity", "utilities"],
   "icons": [
     {

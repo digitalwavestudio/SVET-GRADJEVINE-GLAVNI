@@ -2,6 +2,7 @@ import { OptimizedImage } from '@/src/components/OptimizedImage';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '@/src/lib/analytics';
+import { formatSalaryText, getJobBenefitFlags } from '@/src/lib/format';
 
 interface SimilarJobsSliderProps {
   jobData: any;
@@ -142,27 +143,24 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
               {/* Meta Tags */}
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {(() => {
-                  const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
-                  const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
-                  const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
-                  const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
+                  const { smestaj: hasSmestaj, prevoz: hasPrevoz, hrana: hasHrana } = getJobBenefitFlags(job);
 
                   return (
                     <>
                       {hasSmestaj && (
-                        <div className="flex items-center gap-1 bg-green-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[9px] text-green-400 font-bold uppercase tracking-wider border border-green-500/20 shrink-0">
+                        <div className="flex items-center gap-1 bg-green-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[11px] text-green-400 font-bold uppercase tracking-wider border border-green-500/20 shrink-0">
                           <span className="material-symbols-outlined text-[12px] shrink-0">home</span> Smeštaj
                         </div>
                       )}
                       
                       {hasPrevoz && (
-                        <div className="flex items-center gap-1 bg-blue-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[9px] text-blue-400 font-bold uppercase tracking-wider border border-blue-500/20 shrink-0">
+                        <div className="flex items-center gap-1 bg-blue-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[11px] text-blue-400 font-bold uppercase tracking-wider border border-blue-500/20 shrink-0">
                           <span className="material-symbols-outlined text-[12px] shrink-0">commute</span> Prevoz
                         </div>
                       )}
                       
                       {hasHrana && (
-                        <div className="flex items-center gap-1 bg-yellow-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[9px] text-yellow-400 font-bold uppercase tracking-wider border border-yellow-500/20 shrink-0">
+                        <div className="flex items-center gap-1 bg-yellow-500/10 backdrop-blur-sm px-2 py-1 rounded-lg text-[11px] text-yellow-400 font-bold uppercase tracking-wider border border-yellow-500/20 shrink-0">
                           <span className="material-symbols-outlined text-[12px] shrink-0">restaurant</span> Hrana
                         </div>
                       )}
@@ -174,15 +172,9 @@ export function SimilarJobsSlider({ jobData, displaySimilarJobs, buildJobUrl }: 
               {/* Footer: Salary & Action */}
               <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-white/40 text-[9px] uppercase tracking-widest mb-0.5 font-bold">Satnica</p>
+                  <p className="text-white/40 text-[11px] uppercase tracking-widest mb-0.5 font-bold">Satnica</p>
                   <p className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 font-black text-lg sm:text-xl truncate">
-                    {job.isNegotiable ? 'Pozvati' : job.plataMin != null && job.plataMin !== '' && Number(job.plataMin) > 0
-                      ? `${Number(job.plataMin).toLocaleString()}${job.plataMax != null && Number(job.plataMax) > 0 ? ` - ${Number(job.plataMax).toLocaleString()}` : ''} €`
-                      : job.sal 
-                        ? `${job.sal} €`
-                        : job.salary
-                          ? `${job.salary} €`
-                          : 'Po dogovoru'}
+                    {formatSalaryText(job) || 'Po dogovoru'}
                   </p>
                 </div>
                 <div className="w-9 h-9 rounded-full bg-white/[0.03] backdrop-blur-sm flex items-center justify-center text-white/50 group-hover:bg-yellow-400 group-hover:text-black transition-all duration-300 -rotate-45 group-hover:rotate-0 border border-white/[0.08] group-hover:border-yellow-400 shrink-0 shadow-sm">

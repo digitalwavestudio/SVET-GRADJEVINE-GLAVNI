@@ -1,4 +1,3 @@
-import { sanitizeRichText } from '@/src/lib/sanitize';
 import { APP_CONFIG } from '@/src/constants/config';
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
@@ -19,41 +18,12 @@ import { JobFilters } from '@/src/modules/jobs/components/jobs/JobFilters';
 import { JobsUrgent } from '@/src/modules/jobs/components/jobs/JobsUrgent';
 import { JobsPremium } from '@/src/modules/jobs/components/jobs/JobsPremium';
 import { BrainIllustration } from '@/src/components/BrainIllustration';
+import { OptimizedImage } from '@/src/components/OptimizedImage';
 import shieldMaster from '@/src/assets/images/shield-master.png';
 import { useJobs, usePremiumJobs } from '@/src/modules/jobs/hooks/useJobs';
-
-interface ListingItem {
-  id: string;
-  title: string;
-  location: string;
-  loc?: string;
-  salary: string;
-  plataMin?: number;
-  plataMax?: number;
-  salaryType?: string;
-  company: string;
-  companyName?: string;
-  comp?: string;
-  description: string;
-  isPremium: boolean;
-  isUrgent: boolean;
-  createdAt: string;
-  logo?: string;
-  logoPlaceholder?: string;
-}
-
-interface AiResponse {
-  answer: string;
-  parsedIntent?: {
-    vertikala: string;
-    zanimanje: string;
-    lokacija: string;
-    tipPosla: string;
-  };
-  confidence?: number;
-  count: number;
-  listings?: ListingItem[];
-}
+import { usePrefetch } from '@/src/hooks/usePrefetch';
+import AiCompactCard from '@/src/modules/core/components/home/AiCompactCard';
+import type { AiResponse, ListingItem } from '@/src/modules/core/components/home/aiFormat';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -184,7 +154,7 @@ export default function HomePage() {
     navigate(to, { state });
   };
 
-  const prefetchPlaceholder = () => {};
+  const prefetch = usePrefetch();
 
   // Filter listings based on active filter chips
   const filteredListings = useMemo(() => {
@@ -256,10 +226,15 @@ export default function HomePage() {
               {/* Veliki logo - prelep i zatamnjen sa laganim disanjem */}
               <div className="relative group/logo flex items-center justify-center">
                 <div className="absolute inset-0 bg-secondary/10 rounded-full blur-[50px] scale-95 animate-pulse"></div>
-                <img 
+                <OptimizedImage
                   src={shieldMaster} 
                   alt="Svet Građevine" 
+                  width={500}
+                  height={500}
+                  sizes="(max-width: 768px) 220px, 280px"
                   className="w-[220px] md:w-[280px] h-auto object-contain relative z-10 drop-shadow-[0_4px_30px_rgba(254,191,13,0.25)] animate-pulse" 
+                  containerClassName="relative z-10"
+                  fallbackType="default"
                 />
               </div>
 
@@ -339,7 +314,7 @@ export default function HomePage() {
                         <JobCard 
                           job={item} 
                           viewMode="grid" 
-                          prefetch={prefetchPlaceholder} 
+                          prefetch={prefetch}
                         />
                       </div>
                     ))}
@@ -365,7 +340,7 @@ export default function HomePage() {
                               key={job.id} 
                               job={job} 
                               viewMode="list" 
-                              prefetch={prefetchPlaceholder} 
+                              prefetch={prefetch}
                             />
                           ))}
                         </div>
@@ -388,7 +363,7 @@ export default function HomePage() {
               jobs={urgentJobs}
               isExpanded={isUrgentExpanded}
               setIsExpanded={setIsUrgentExpanded}
-              prefetch={prefetchPlaceholder}
+              prefetch={prefetch}
               getInitials={getInitials}
               hasMore={false}
               loadMore={() => {}}
@@ -402,7 +377,7 @@ export default function HomePage() {
               jobs={premiumJobs}
               isExpanded={isPremiumExpanded}
               setIsExpanded={setIsPremiumExpanded}
-              prefetch={prefetchPlaceholder}
+              prefetch={prefetch}
               getInitials={getInitials}
               hasMore={false}
               loadMore={() => {}}
@@ -439,7 +414,7 @@ export default function HomePage() {
             ) : displayedJobs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch auto-rows-fr">
                 {displayedJobs.map((job: any) => (
-                  <JobCard key={job.id} job={job} viewMode="grid" prefetch={prefetchPlaceholder} />
+                  <JobCard key={job.id} job={job} viewMode="grid" prefetch={prefetch}/>
                 ))}
               </div>
             ) : (
@@ -518,492 +493,5 @@ export default function HomePage() {
 // ============================================================================
 // POMOĆNI VIZUELNI ELEMENTI ZA AI SEARCH (COMPACT CARD, CHIPS, PARSERI)
 // ============================================================================
-
-function extractIntent(query: string, listings: ListingItem[]) {
-  const q = query.toLowerCase();
-  let lokacija = '';
-  let zanimanje = '';
-  
-  const gradovi = ['beograd', 'nis', 'niš', 'novi sad', 'novi-sad', 'subotica', 'kragujevac', 'krusevac', 'kruševac', 'cacak', 'čačak', 'valjevo', 'nemačka', 'nemacka', 'hrvatska', 'slovenija', 'zlatibor'];
-  for (const g of gradovi) {
-    if (q.includes(g)) {
-      lokacija = g.charAt(0).toUpperCase() + g.slice(1);
-      if (lokacija === 'Nis') lokacija = 'Niš';
-      if (lokacija === 'Nemacka') lokacija = 'Nemačka';
-      if (lokacija === 'Novi sad') lokacija = 'Novi Sad';
-      break;
-    }
-  }
-  
-  if (!lokacija && listings.length > 0) {
-    const locs = listings.map(l => l.location).filter(Boolean);
-    if (locs.length > 0) {
-      const mostCommon = locs.sort((a,b) =>
-        locs.filter(v => v===a).length - locs.filter(v => v===b).length
-      ).pop();
-      lokacija = mostCommon || 'Srbija';
-    } else {
-      lokacija = 'Srbija';
-    }
-  } else if (!lokacija) {
-    lokacija = 'Srbija';
-  }
-
-  const zanimanja = ['tesar', 'armirač', 'armirac', 'zidar', 'moler', 'fasader', 'keramicar', 'keramičar', 'vodoinstalater', 'električar', 'elektricar', 'krovopokrivač', 'krovopokrivac', 'rukovalac', 'bravar', 'stolar', 'gipsar'];
-  for (const z of zanimanja) {
-    if (q.includes(z)) {
-      zanimanje = z.charAt(0).toUpperCase() + z.slice(1);
-      if (zanimanje === 'Armirac') zanimanje = 'Armirač';
-      if (zanimanje === 'Keramicar') zanimanje = 'Keramičar';
-      if (zanimanje === 'Elektricar') zanimanje = 'Električar';
-      break;
-    }
-  }
-  
-  if (!zanimanje && listings.length > 0) {
-    const firstTitle = listings[0].title;
-    zanimanje = firstTitle.split('—')[0]?.split('-')[0]?.trim() || firstTitle.split(' ')[0];
-  }
-  
-  return {
-    vertical: 'Poslovi',
-    profession: zanimanje || 'Građevinski radnik',
-    location: lokacija
-  };
-}
-
-function extractStats(listings: ListingItem[]) {
-  if (listings.length === 0) {
-    return { locations: 'Nema', rates: 'Nema', professions: 'Nema' };
-  }
-
-  const locs = Array.from(new Set(listings.map(l => l.location).filter(Boolean)));
-  const locationsStr = locs.slice(0, 3).join(', ') + (locs.length > 3 ? '...' : '');
-
-  let minRate = Infinity;
-  let maxRate = -Infinity;
-  let currency = '€/h';
-  
-  listings.forEach(l => {
-    if (!l.salary) return;
-    const matches = l.salary.match(/\d+/g);
-    if (matches) {
-      matches.forEach(numStr => {
-        const num = parseInt(numStr, 10);
-        if (num > 0 && num < 100) {
-          if (num < minRate) minRate = num;
-          if (num > maxRate) maxRate = num;
-        }
-      });
-    }
-  });
-
-  const ratesStr = minRate !== Infinity && maxRate !== -Infinity
-    ? `${minRate}–${maxRate} ${currency}`
-    : 'Dogovor';
-
-  const titles = Array.from(new Set(listings.map(l => l.title.split('—')[0]?.split('-')[0]?.trim() || l.title.split(' ')[0]).filter(Boolean)));
-  const professionsStr = titles.slice(0, 3).join(', ') + (titles.length > 3 ? '...' : '');
-
-  return {
-    locations: locationsStr,
-    rates: ratesStr,
-    professions: professionsStr
-  };
-}
-
-function applyBoldRules(text: string) {
-  let parsed = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white tracking-wide">$1</strong>');
-  parsed = parsed.replace(/\*/g, '');
-
-  // Boldovanje satnica i cena (boja: zlatno-žuta text-secondary)
-  parsed = parsed.replace(/(\b\d+[-–]\d+\s*(?:evra|€|eur)\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
-  parsed = parsed.replace(/(satnicom|satnic[a-z]*)/gi, '<strong class="font-bold text-secondary">$1</strong>');
-
-  // Boldovanje pogodnosti (boja: bela text-white)
-  parsed = parsed.replace(/(smeštaj[a-z]*|smestaj[a-z]*|obrok[a-z]*|hran[a-z]*|prevoz[a-z]*|viz[a-z]*|radn[a-z]* dozvol[a-z]*|dokumentacij[a-z]*)/gi, '<strong class="font-bold text-white">$1</strong>');
-
-  // Boldovanje svih lokacija (Srbija, Nemačka, Beograd, Borča, Zlatibor...) u belu boju
-  parsed = parsed.replace(/(\b(?:Srbija|Sloveniji|Slovenija|Hrvatskoj|Hrvatska|Nemačkoj|Nemačka|Austrija|Beogradu|Beograd|Borča|Zlatiboru|Zlatibor|Negotinu|Negotin|Sremskoj\s+Mitrovici|Sremska\s+Mitrovica|Subotici|Subotica|Nišu|Niš|Hvaru|Hvar|Splitu|Split|Zagrebu|Zagreb|Novi\s+Sad|Kragujevac|Kruševac|Zrenjanin|Inostranstvu|Inostranstvo)\b)/gi, '<strong class="font-bold text-white tracking-wide">$1</strong>');
-
-  return parsed;
-}
-
-function parseMarkdown(text: string) {
-  if (!text) return '';
-
-  // 1. Pripremamo tekst ubacivanjem preloma reda i crtica ispred gradova/lokacija koji imaju dvotačku
-  let formattedText = text;
-  formattedText = formattedText.replace(/(?<!\n-\s+)(\b(?:Beogradu|Sloveniji|Zlatiboru|Negotinu|Hrvatskoj|Sremskoj\s+Mitrovici|Subotici|Srbiji|Inostranstvu)\b\s*:)/g, '\n- $1');
-
-  // 2. Podelimo celi tekst po novim redovima
-  const lines = formattedText.split('\n').map(l => l.trim()).filter(Boolean);
-  
-  const listItems = lines.map((line, idx) => {
-    // Provera da li je to pod-stavka koja počinje sa crticom
-    if (line.startsWith('-')) {
-      const content = line.substring(1).trim();
-      const parsed = applyBoldRules(content);
-      return `<li class="relative pl-8 py-1.5 text-slate-300 leading-relaxed font-body text-base md:text-lg list-none transition-all hover:text-white">
-        <span class="absolute left-3 top-[15px] w-1.5 h-1.5 bg-secondary/60 rounded-full"></span>
-        ${parsed}
-      </li>`;
-    }
-
-    // Provera za prvu rečenicu (rezime)
-    const lower = line.toLowerCase();
-    if (idx === 0 && (lower.startsWith('pronađeno je') || lower.startsWith('pronadjeno je'))) {
-      const cleanUpper = line.replace(/\*\*/g, '').replace(/\*/g, '').toUpperCase();
-      return `<li class="relative pl-6 py-2 list-none"><strong class="font-black text-secondary uppercase tracking-wider text-base md:text-lg">${cleanUpper}</strong></li>`;
-    }
-
-    // Obična linija teksta
-    const parsed = applyBoldRules(line);
-    return `<li class="relative pl-6 py-1.5 text-slate-300 leading-relaxed font-body text-base md:text-lg list-none transition-all hover:text-white">
-      <span class="absolute left-0 top-[13px] w-1.5 h-1.5 bg-secondary rounded-full"></span>
-      ${parsed}
-    </li>`;
-  });
-
-  return `<ul class="space-y-3">${listItems.join('')}</ul>`;
-}
-
-function AiCompactCard({ query, data }: { query: string; data: AiResponse }) {
-  const listings = data.listings || [];
-  const stats = useMemo(() => extractStats(listings), [listings]);
-  const intent = data.parsedIntent;
-  const confidence = data.confidence || 0;
-
-  const structuredAnswer = useMemo(() => {
-    if (!data.answer) return null;
-    try {
-      return JSON.parse(data.answer) as { summary: string; bullets: Array<{ emoji: string; text: string }>; closing: string };
-    } catch {
-      return { summary: data.answer, bullets: [], closing: '' };
-    }
-  }, [data.answer]);
-
-  const handleCopy = () => {
-    if (!structuredAnswer) return;
-    const text = `${structuredAnswer.summary}\n\n${structuredAnswer.bullets.map(b => `${b.emoji} ${b.text}`).join('\n')}\n\n${structuredAnswer.closing}`;
-    navigator.clipboard.writeText(text);
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
-
-  return (
-    <div className="w-full relative">
-      {/* Ujedinjeni AI Kontejner sa Mockup-a */}
-      <div className="bg-[#0c1520]/80 border border-white/10 rounded-[28px] p-6 md:p-8 mb-8 shadow-xl shadow-black/40 relative z-10 w-full text-left">
-        {/* Gornji red: Header + Understanding Card (Grid layout da se desni boks raširi) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-0">
-          {/* Levo: Header informacije */}
-          <div className="lg:col-span-7 flex flex-col justify-start">
-            <div className="mb-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
-                  <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
-                </div>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-1 leading-tight">
-                Pronađeno {data.count} oglasa
-              </h1>
-              <p className="text-white/40 text-base mb-4">za <span className="text-[#febf0d] font-bold">{query}</span></p>
-            </div>
-            
-            <div className="hidden sm:flex flex-col sm:flex-row gap-2 sm:gap-2">
-              <button
-                onClick={handleCopy}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
-              >
-                <span className="material-symbols-outlined text-sm">content_copy</span>
-                Kopiraj sažetak
-              </button>
-              <button
-                onClick={handleShare}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/10 transition-all shadow-md w-full sm:w-auto"
-              >
-                <span className="material-symbols-outlined text-sm">share</span>
-                Podeli
-              </button>
-            </div>
-          </div>
-
-          {/* Desno: AI Understanding Card (Raširen pomoću lg:col-span-5) */}
-          {intent && (
-            <div className="lg:col-span-5 bg-[#121c27]/45 border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-inner min-h-[190px]">
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary">AI RAZUMEVANJE UPITA</h3>
-                </div>
-                <div className="flex flex-col md:flex-row md:items-baseline gap-0 md:gap-2 mb-4">
-                  <span className="text-6xl font-extrabold text-teal-400 leading-none">{confidence}%</span>
-                  <span className="text-sm md:text-base text-white/60 font-bold">pouzdanost</span>
-                </div>
-              </div>
-              <div className="space-y-3 relative z-10 text-white/95 text-base">
-                <div className="flex items-start gap-2.5">
-                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-white/60 mr-1.5">Vertikala:</span>
-                    <span className="text-white font-semibold break-words">{intent.vertikala}</span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-white/60 mr-1.5">Zanimanje:</span>
-                    <span className="text-white font-semibold break-words">{intent.zanimanje}</span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-white/60 mr-1.5">Lokacija:</span>
-                    <span className="text-white font-semibold break-words">{intent.lokacija}</span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <span className="material-symbols-outlined text-teal-400 text-xl font-bold shrink-0 mt-0.5">check</span>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-white/60 mr-1.5">Tip posla:</span>
-                    <span className="text-white font-semibold break-words">{intent.tipPosla}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Horizontalni Divider */}
-        <div className="border-t border-white/10 mt-[-50px] mb-4 w-full lg:w-[58%]"></div>
-
-        {/* Donji deo: AI Odgovor */}
-        {structuredAnswer && (
-          <div className="relative z-10 mt-20 md:mt-2">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-secondary text-sm">smart_toy</span>
-              </div>
-              <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-secondary font-headline">AI ODGOVOR</h3>
-            </div>
-            
-            <div className="relative z-10">
-              <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
-                 dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.summary)) }} 
-              />
-              
-              {structuredAnswer.bullets.length > 0 && (
-                <div className="space-y-4 mb-4">
-                  {structuredAnswer.bullets.map((bullet, i) => (
-                    <div key={i} className="flex items-start gap-4">
-                      <span className="text-xl shrink-0 mt-0.5">{bullet.emoji}</span>
-                      <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
-                         dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(bullet.text)) }} 
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-               {structuredAnswer.closing && (
-                <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5"
-                   dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.closing)) }} 
-                />
-              )}
-
-              {/* Pilule sa statistikama */}
-              <div className="flex flex-col sm:flex-row gap-2 mt-5 pt-4 border-t border-white/5">
-                <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
-                  <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                  AI pouzdanost: {confidence}%
-                </span>
-                <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
-                  <span className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
-                  Vreme pretrage: 2.4s
-                </span>
-                <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg text-xs md:text-sm font-bold shadow-md">
-                  Izvori podataka: {listings.length + 7}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 mb-8 text-left relative z-10">
-        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>work</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">ZANIMANJE</span>
-            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{intent?.zanimanje || query || '-'}</p>
-            <p className="text-white/40 text-xs font-headline">Glavna pretraga</p>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
-            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">LOKACIJE</span>
-            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{intent?.lokacija || stats.locations}</p>
-            <p className="text-white/40 text-xs font-headline">{listings.length} oglasa</p>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">SATNICE</span>
-            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{stats.rates}</p>
-            <p className="text-white/40 text-xs font-headline">Prosečna satnica</p>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-b from-[#101a26]/95 to-[#0b131e]/95 border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col items-center text-center md:flex-row md:items-center md:text-left gap-2 md:gap-4 hover:border-secondary/40 transition-all duration-300 shadow-[0_15px_35px_rgba(0,0,0,0.65)] min-w-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary shrink-0">
-            <span className="material-symbols-outlined text-xl md:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>inventory_2</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-white/40 block mb-0.5 font-headline">UKUPNO OGLASA</span>
-            <p className="text-white font-bold text-base md:text-lg font-headline truncate">{data.count || listings.length}</p>
-            <p className="text-white/40 text-xs font-headline">Aktivnih oglasa</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-interface FilterChipsProps {
-  listings: ListingItem[];
-  activeFilters: string[];
-  setActiveFilters: React.Dispatch<React.SetStateAction<string[]>>;
-}
-
-function FilterChips({ listings, activeFilters, setActiveFilters }: FilterChipsProps) {
-  const locs = useMemo(() => {
-    return Array.from(new Set(listings.map(l => l.location).filter(Boolean)));
-  }, [listings]);
-
-  const hasHighRate = useMemo(() => {
-    return listings.some(l => {
-      if (!l.salary) return false;
-      const nums = l.salary.match(/\d+/g);
-      if (!nums) return false;
-      return nums.some(n => {
-        const val = parseInt(n, 10);
-        return val >= 10 && val < 100;
-      });
-    });
-  }, [listings]);
-
-  const hasAccommodation = useMemo(() => {
-    return listings.some(l => {
-      const textToSearch = `${l.title} ${l.comp || ''} ${l.description || ''}`.toLowerCase();
-      return textToSearch.includes('smeštaj') || textToSearch.includes('smestaj') || textToSearch.includes('smeštajem');
-    });
-  }, [listings]);
-
-  const toggleFilter = (filter: string) => {
-    if (activeFilters.includes(filter)) {
-      setActiveFilters(activeFilters.filter(f => f !== filter));
-    } else {
-      setActiveFilters([...activeFilters, filter]);
-    }
-  };
-
-  return (
-    <div className="hidden md:flex flex-col gap-3 py-4 border-b border-white/[0.06] relative z-20">
-      <span className="text-[11px] font-headline font-black uppercase tracking-widest text-secondary block font-headline">
-        Brzo filtriranje oglasa:
-      </span>
-      <div className="flex flex-wrap items-center gap-2.5 overflow-x-auto scrollbar-none pb-1 font-headline">
-        {locs.map(loc => (
-          <button
-            key={loc}
-            onClick={() => toggleFilter(loc)}
-            className={`h-11 px-5 rounded-[12px] border text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shrink-0 select-none cursor-pointer ${
-              activeFilters.includes(loc)
-                ? 'bg-secondary/10 border-secondary text-secondary shadow-gold-glow-subtle'
-                : 'bg-[#111827]/40 border-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.02]'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-            {loc}
-          </button>
-        ))}
-
-        {listings.some(l => l.isPremium) && (
-          <button
-            onClick={() => toggleFilter('premium')}
-            className={`h-11 px-5 rounded-[12px] border text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shrink-0 select-none cursor-pointer ${
-              activeFilters.includes('premium')
-                ? 'bg-secondary/10 border-secondary text-secondary shadow-gold-glow-subtle'
-                : 'bg-[#111827]/40 border-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.02]'
-            }`}
-          >
-            <span className="text-sm">⭐</span>
-            Premium
-          </button>
-        )}
-
-        {listings.some(l => l.isUrgent) && (
-          <button
-            onClick={() => toggleFilter('hitno')}
-            className={`h-11 px-5 rounded-[12px] border text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shrink-0 select-none cursor-pointer ${
-              activeFilters.includes('hitno')
-                ? 'bg-red-500/10 border-red-500/30 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                : 'bg-[#111827]/40 border-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.02]'
-            }`}
-          >
-            <span className="text-sm">🔥</span>
-            Hitno
-          </button>
-        )}
-
-        {hasHighRate && (
-          <button
-            onClick={() => toggleFilter('satnica10')}
-            className={`h-11 px-5 rounded-[12px] border text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shrink-0 select-none cursor-pointer ${
-              activeFilters.includes('satnica10')
-                ? 'bg-secondary/10 border-secondary text-secondary shadow-gold-glow-subtle'
-                : 'bg-[#111827]/40 border-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.02]'
-            }`}
-          >
-            <span className="text-sm">💶</span>
-            Satnica ≥ 10€/h
-          </button>
-        )}
-
-        {hasAccommodation && (
-          <button
-            onClick={() => toggleFilter('smestaj')}
-            className={`h-11 px-5 rounded-[12px] border text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shrink-0 select-none cursor-pointer ${
-              activeFilters.includes('smestaj')
-                ? 'bg-secondary/10 border-secondary text-secondary shadow-gold-glow-subtle'
-                : 'bg-[#111827]/40 border-white/5 text-slate-300 hover:border-white/20 hover:bg-white/[0.02]'
-            }`}
-          >
-            <span className="text-sm">🏠</span>
-            Smeštaj obezbeđen
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
 
 

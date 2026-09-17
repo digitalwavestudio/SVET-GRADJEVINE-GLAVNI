@@ -12,8 +12,8 @@ html {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-headline: "Montserrat", sans-serif;
-  --font-body: "Poppins", sans-serif;
-  --font-label: "Poppins", sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --color-tertiary-container: #e77600;
   --color-primary-fixed: #d2e4ff;
@@ -252,74 +252,11 @@ input, textarea {
   100% { transform: translateX(calc(-50% - 1rem)); }
 }
 
-@keyframes blink {
-  0%, 100% { 
-    opacity: 1; 
-    filter: brightness(1) drop-shadow(0 0 2px rgba(254, 191, 13, 0.3));
-  }
-  50% { 
-    opacity: 0.6; 
-    filter: brightness(1.2) drop-shadow(0 0 10px rgba(251, 140, 0, 0.8));
-    color: #fb8c00; /* Topla narandžasta */
-  }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.animate-blink {
-  animation: blink 1.5s ease-in-out infinite;
-}
-
-
-@layer utilities {
-  /* Centralizovana klasa za uniforman izgled svih dugmića od sada pa nadalje */
-  .btn-standard {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    /* rounded-[10px] retained via border-radius */
-  }
-}
-
 /* Globalno pravilo "na silu" da novi dugmići ne budu previše zaobljeni (ako se zaboravi tag) */
 @layer base {
   button:not(.rounded-full):not([class*="w-10 h-10"]):not([class*="w-12 h-12"]):not([class*="w-14 h-14"]):not([class*="w-8 h-8"]) {
     border-radius: 10px;
   }
-}
-
-  @keyframes slide-up {
-    0% { transform: translateY(100%); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-
-  @keyframes fade-in-up {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes chevron-bounce {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(4px); }
-  }
-
-  @keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 12px rgba(254,191,13,0.4); }
-  50% { box-shadow: 0 0 20px rgba(254,191,13,0.6); }
-}
-
-@keyframes fade-in-up {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes chevron-bounce {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(4px); }
 }
 
 @layer utilities {
@@ -328,15 +265,10 @@ input, textarea {
   .animate-chevron-bounce { animation: chevron-bounce 1s ease-in-out infinite; }
   .shadow-gold-glow-subtle { box-shadow: 0 0 10px rgba(254,191,13,0.15); }
   .animate-pulse-gold { animation: pulse-gold 2s infinite; }
-  .animate-marquee { animation: scroll 40s linear infinite; }
   /* Touch target utility */
   .touch-target { @apply min-h-[48px] min-w-[48px] flex items-center justify-center; }
   /* Skeleton base */
   .skeleton { @apply bg-white/10 rounded-md; }
-  /* Fluid typography utilities */
-  .fluid-text-sm { font-size: clamp(0.875rem, 1.5vw, 1rem); }
-  .fluid-text-base { font-size: clamp(1rem, 2vw, 1.125rem); }
-  .fluid-text-lg { font-size: clamp(1.125rem, 2.5vw, 1.25rem); }
 @media (max-width: 640px) {
   .max-w-7xl {
     max-width: 100% !important;
@@ -363,17 +295,6 @@ input, textarea {
     height: auto !important;
   }
 
-  .max-w-7xl {
-    max-width: 100% !important;
-  }
-  .px-8 {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-  .px-6 {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-  }
   [class*="max-w-"] {
     max-width: 100% !important;
   }

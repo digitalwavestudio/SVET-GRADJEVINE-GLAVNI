@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { initGA, trackPageView } from '@/src/lib/analytics';
@@ -18,6 +18,8 @@ const PageLoader = () => (
 );
 
 export function RootLayout() {
+  const [serviceWorkerUpdateAvailable, setServiceWorkerUpdateAvailable] = useState(false);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((reg) => {
@@ -26,8 +28,7 @@ export function RootLayout() {
           if (newSW) {
             newSW.addEventListener('statechange', () => {
               if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                newSW.postMessage({ type: 'SKIP_WAITING' });
-                window.location.reload();
+                setServiceWorkerUpdateAvailable(true);
               }
             });
           }
@@ -80,6 +81,28 @@ export function RootLayout() {
         <Suspense fallback={<PageLoader />}>
           <Outlet />
         </Suspense>
+
+        {serviceWorkerUpdateAvailable && (
+          <div role="status" className="fixed bottom-6 left-1/2 z-[999] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-[12px] border border-secondary/30 bg-surface-container-high px-4 py-3 shadow-2xl backdrop-blur-xl">
+            <p className="text-sm font-bold text-white">Dostupna je nova verzija aplikacije.</p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="flex-1 rounded-[10px] bg-secondary px-4 py-2 text-xs font-black uppercase tracking-widest text-black hover:bg-yellow-400"
+              >
+                Osveži sada
+              </button>
+              <button
+                type="button"
+                onClick={() => setServiceWorkerUpdateAvailable(false)}
+                className="flex-1 rounded-[10px] border border-white/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-white/70 hover:bg-white/5 hover:text-white"
+              >
+                Kasnije
+              </button>
+            </div>
+          </div>
+        )}
 
         <AiChatWidget />
       </div>

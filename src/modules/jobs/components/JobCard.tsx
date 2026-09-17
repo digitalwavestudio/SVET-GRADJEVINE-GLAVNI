@@ -1,49 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BENEFITS, LOCATIONS } from '@/src/constants/taxonomy';
+import { LOCATIONS } from '@/src/constants/taxonomy';
 import { buildJobUrl } from '@/src/lib/seo';
 import { OptimizedImage } from '@/src/components/OptimizedImage';
-import { PremiumBadge } from '@/src/components/ui/PremiumBadge';
-
-const getInitials = (name?: string) => {
-  if (!name) return "SG";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) {
-    return parts[0].substring(0, 2).toUpperCase();
-  }
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-};
+import { StatusBadge } from '@/src/components/ui/PremiumBadge';
+import { formatCompanyName, formatLocationName, formatSalaryText, getJobBenefitFlags, isNewJob, parseFirestoreDate } from '@/src/lib/format';
 
 export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; viewMode: 'list' | 'grid'; prefetch: (t: string, id?: string) => void }) => {
-  const parseDate = (val: any) => {
-    if (!val) return null;
-    if (typeof val === 'object' && val !== null && typeof val.toDate === 'function') return val.toDate();
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d;
-  };
-  const createdDate = parseDate(job.createdAt);
-
-  const friendlyLoc = LOCATIONS.find(l => l.slug === job.loc || l.slug === job.location)?.name || job.loc || job.location || 'Srbija';
+  const createdDate = parseFirestoreDate(job.createdAt);
+  const friendlyLoc = formatLocationName(job, LOCATIONS);
+  const salaryText = formatSalaryText(job) || 'Po dogovoru';
 
   const getSalaryDisplay = () => {
-    if (job.isNegotiable) {
-      return 'Pozvati';
-    }
-
-    let salaryText = '';
-    if (job.plataMin != null && Number(job.plataMin) > 0) {
-      const min = Number(job.plataMin).toLocaleString();
-      const max = job.plataMax != null && Number(job.plataMax) > 0 && job.plataMax !== job.plataMin 
-        ? `-${Number(job.plataMax).toLocaleString()}` 
-        : '';
-      salaryText = `${min}${max} €`;
-    } else {
-      salaryText = job.sal || job.salary || 'Po dogovoru';
-    }
-
-    // Fix redundant ranges like "5-5" -> "5" or "1000-1000" -> "1000"
-    salaryText = salaryText.replace(/(\d+)\s*-\s*\1/g, '$1');
-
     // Style currency symbols to be smaller and slightly transparent
     const parts = salaryText.split(/(€|eur|din|rsd)/i);
     if (parts.length > 1) {
@@ -62,19 +30,8 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
     return salaryText;
   };
 
-  const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
-
-  const companyNameDisplay = job.authorSnapshot?.companyName || job.authorSnapshot?.displayName || job.comp || job.company || job.companyName || 'Svet Građevine Član';
-
-  const titleParts = (job.title || '').split(/\s*—\s*|\s*-\s*/);
-  const sektor = titleParts[0] || '';
-
-  const grad = titleParts[1] || '';
-  const cleanTitle = grad ? `${sektor} ${grad}` : sektor;
-
-  const firstSpaceIdx = companyNameDisplay.indexOf(' ');
-  const compRow1 = firstSpaceIdx !== -1 ? companyNameDisplay.substring(0, firstSpaceIdx) : companyNameDisplay;
-  const compRow2 = firstSpaceIdx !== -1 ? companyNameDisplay.substring(firstSpaceIdx + 1) : '';
+  const isNovo = isNewJob(job.createdAt);
+  const companyNameDisplay = formatCompanyName(job);
 
   const isPremium = job.isPremium;
   const isUrgent = job.isUrgent || job.isHitno;
@@ -132,17 +89,13 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         {(isUrgent || isPremium || isNovo) && (
           <div className="flex items-center gap-1.5 mb-2 pr-[68px] md:hidden">
             {isUrgent && (
-                <span className="backdrop-blur-sm bg-red-500/8 text-red-400/80 border border-red-500/15 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 w-max">
-                <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
-              </span>
+              <StatusBadge variant="urgent">Hitno</StatusBadge>
             )}
             {isPremium && (
-              <span className="backdrop-blur-sm bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(254,191,13,0.3)]">
-                <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium
-              </span>
+              <StatusBadge variant="premium">Premium</StatusBadge>
             )}
             {isNovo && (
-              <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-sm uppercase tracking-[0.1em] shadow-md">NOVO</span>
+              <StatusBadge variant="new">Novo</StatusBadge>
             )}
           </div>
         )}
@@ -160,17 +113,13 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
           {(isUrgent || isPremium || isNovo) && (
             <div className="hidden md:flex items-center gap-1.5 shrink-0 mt-1">
               {isUrgent && (
-              <span className="backdrop-blur-sm bg-red-500/8 text-red-400/80 border border-red-500/15 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 w-max">
-                  <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
-                </span>
+                <StatusBadge variant="urgent">Hitno</StatusBadge>
               )}
               {isPremium && (
-                <span className="backdrop-blur-sm bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(254,191,13,0.3)]">
-                  <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> Premium
-                </span>
+                <StatusBadge variant="premium">Premium</StatusBadge>
               )}
               {isNovo && (
-                <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-[0.1em] shadow-md">NOVO</span>
+                <StatusBadge variant="new">Novo</StatusBadge>
               )}
             </div>
           )}
@@ -192,32 +141,29 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               </span>
             )}
             {job.isCompanyVerified && (
-              <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+              <span className="material-symbols-outlined text-green-500 text-xs font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
             )}
           </div>
         </div>
 
         {(() => {
-          const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
-          const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
-          const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
-          const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
+          const { smestaj: hasSmestaj, prevoz: hasPrevoz, hrana: hasHrana } = getJobBenefitFlags(job);
           return (
             <div className="mt-auto relative z-10 flex items-end justify-between min-h-[48px] pt-4">
               {/* Left side: Badges or Views */}
               <div className="flex flex-col gap-1.5">
                 {hasSmestaj && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                     <span className="material-symbols-outlined text-[13px] text-green-400">home</span> Smeštaj
                   </span>
                 )}
                 {hasPrevoz && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                     <span className="material-symbols-outlined text-[13px] text-blue-400">commute</span> Prevoz
                   </span>
                 )}
                 {hasHrana && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                     <span className="material-symbols-outlined text-[13px] text-yellow-400">restaurant</span> Hrana
                   </span>
                 )}
@@ -226,13 +172,13 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
               {/* Right side: Salary */}
               {(job.isNegotiable || job.plataMin != null || job.plataMax != null || job.sal || job.salary) ? (
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Satnica</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Satnica</span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-3xl md:text-[28px] font-sans leading-none tracking-tight">
                     {getSalaryDisplay()}
                   </span>
                 </div>
               ) : (
-                <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest shrink-0 mb-1">Po dogovoru</span>
+                <span className="text-slate-400 text-[11px] font-bold uppercase tracking-widest shrink-0 mb-1">Po dogovoru</span>
               )}
             </div>
           );

@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { JobCard } from '@/src/modules/jobs/components/JobCard';
+import { usePrefetch } from '@/src/hooks/usePrefetch';
 
 export default function JobsSection({ latestJobs = [] }: any) {
-  const prefetch = useCallback((_type: string, _id?: string) => {}, []);
+  const prefetch = usePrefetch();
 
   return (
     <section className="py-12 md:py-24 bg-surface-container-lowest">

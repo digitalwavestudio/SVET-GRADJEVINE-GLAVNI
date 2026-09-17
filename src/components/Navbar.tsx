@@ -90,7 +90,7 @@ export default function Navbar() {
       <div className="absolute top-full mt-2 w-max left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 group-active/tooltip:opacity-100 transition-all duration-300 scale-90 group-hover/tooltip:scale-100 group-focus/tooltip:scale-100 group-active/tooltip:scale-100 z-50">
         <div className="bg-[#0b131a]/95 backdrop-blur-md border border-white/10 p-4 md:p-5 rounded-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.5)] whitespace-nowrap md:min-w-[260px] flex flex-col items-start text-left light-nav-tooltip">
           <div className="flex items-center gap-2.5 mb-2">
-            <img src={logoImage} alt="Svet Građevine Logo" className="h-5 md:h-6 w-auto object-contain drop-shadow-md flex-shrink-0" />
+            <img src={logoImage} alt="Svet Građevine Logo" width={500} height={300} className="h-5 md:h-6 w-auto object-contain drop-shadow-md flex-shrink-0" />
             <span className="text-secondary font-black text-[11px] md:text-[12px] uppercase tracking-widest">USKORO!</span>
           </div>
           <p className="text-white/90 text-[12px] md:text-[13px] font-medium tracking-wide">Ova sekcija stiže uskoro!</p>
@@ -112,6 +112,8 @@ export default function Navbar() {
               <img
                 src={logoImage}
                 alt="Svet Građevine Logo"
+                width={500}
+                height={300}
                 className="h-8 sm:h-10 md:h-14 w-auto object-contain"
               />
             </Link>
@@ -147,7 +149,7 @@ export default function Navbar() {
                       {profileSrc && !imgError ? (
                         <img
                           src={profileSrc}
-                          alt="Profile"
+                          alt={`${displayName || 'Korisnik'} profilna slika`}
                           className="w-full h-full object-cover"
                           onError={() => setImgError(true)}
                         />
@@ -163,7 +165,7 @@ export default function Navbar() {
                           <div className="relative flex items-center gap-3">
                             <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 border border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden shrink-0 shadow-lg">
                               {profileSrc && !imgError ? (
-                                <img src={profileSrc} alt="Profile" className="w-full h-full object-cover" onError={() => setImgError(true)} />
+                                <img src={profileSrc} alt={`${displayName || 'Korisnik'} profilna slika`} className="w-full h-full object-cover" onError={() => setImgError(true)} />
                               ) : (
                                 <span className="text-sm font-black text-white tracking-wider">{userInitial}</span>
                               )}
@@ -172,7 +174,7 @@ export default function Navbar() {
                               {displayName ? (
                                 <>
                                   {(user as any)?.role && (
-                                    <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">{(user as any).role === 'standard' ? 'SG ČLAN' : (user as any).role}</span>
+                                    <span className="block text-[11px] text-secondary font-bold uppercase tracking-[0.2em] mb-0.5">{(user as any).role === 'standard' ? 'SG ČLAN' : (user as any).role}</span>
                                   )}
                                   <span className="block text-sm text-white font-black truncate leading-tight">{displayName}</span>
                                 </>
@@ -196,9 +198,9 @@ export default function Navbar() {
                                 >
                                   <span className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${active ? "h-6 bg-secondary" : "h-0 bg-secondary group-hover/item:h-5"}`} />
                                   <span className={`material-symbols-outlined text-[20px] transition-all duration-200 group-hover/item:scale-110 ${active ? "text-secondary opacity-100" : "opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary"}`}>{item.icon}</span>
-                                  <span className="text-[11px] font-black tracking-wider uppercase flex-1">{item.label}</span>
+                                  <span className="text-[11px] font-bold tracking-wider uppercase flex-1">{item.label}</span>
                                   {item.badge && (
-                                    <span className="bg-secondary text-black text-[10px] font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center leading-none flex items-center justify-center">{item.badge}</span>
+                                    <span className="bg-secondary text-black text-[11px] font-bold px-1.5 py-0.5 rounded-md min-w-[20px] text-center leading-none flex items-center justify-center">{item.badge}</span>
                                   )}
                                 </Link>
                               );
@@ -211,12 +213,12 @@ export default function Navbar() {
                             <Link to="/podesavanja" className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 w-[250px] mx-auto">
                               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-secondary rounded-r-full transition-all duration-300" />
                               <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:text-secondary transition-all duration-200 group-hover/item:scale-110 shrink-0">settings</span>
-                              <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Podešavanja</span>
+                              <span className="text-[11px] font-bold tracking-wider uppercase flex-1 text-left">Podešavanja</span>
                             </Link>
                             <button type="button" onClick={() => logout()} className="group/item relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-red-400/80 hover:text-red-400 hover:bg-red-500/10 w-[250px] mx-auto text-left">
                               <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 group-hover/item:w-1 group-hover/item:h-5 bg-red-500 rounded-r-full transition-all duration-300" />
                               <span className="material-symbols-outlined text-[20px] opacity-60 group-hover/item:opacity-100 group-hover/item:scale-110 transition-all duration-200 shrink-0">logout</span>
-                              <span className="text-[11px] font-black tracking-wider uppercase flex-1 text-left">Odjava</span>
+                              <span className="text-[11px] font-bold tracking-wider uppercase flex-1 text-left">Odjava</span>
                             </button>
                           </div>
                         </div>
@@ -280,7 +282,7 @@ export default function Navbar() {
                     {profileSrc && !imgError ? (
                       <img
                         src={profileSrc}
-                        alt="Profile"
+                        alt={`${displayName || 'Korisnik'} profilna slika`}
                         className="w-full h-full object-cover"
                         onError={() => setImgError(true)}
                       />
@@ -289,7 +291,7 @@ export default function Navbar() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="block text-[9px] text-secondary font-black uppercase tracking-[0.2em] mb-0.5">Prijavljeni ste kao</span>
+                    <span className="block text-[11px] text-secondary font-bold uppercase tracking-[0.2em] mb-0.5">Prijavljeni ste kao</span>
                     <span className="block text-sm text-white font-black truncate leading-tight">{displayName || ((user as any).role === 'standard' ? 'SG ČLAN' : (user as any).role)}</span>
                   </div>
                 </div>

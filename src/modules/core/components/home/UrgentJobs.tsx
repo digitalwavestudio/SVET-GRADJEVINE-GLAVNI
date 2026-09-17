@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { buildJobUrl } from '@/src/lib/seo';
+import { StatusBadge } from '@/src/components/ui/PremiumBadge';
+import { OptimizedImage } from '@/src/components/OptimizedImage';
+import { getJobBenefitFlags, isNewJob } from '@/src/lib/format';
 
 const typeLabels: Record<string, string> = {
   job: 'POSLOVI',
@@ -25,13 +28,6 @@ const buildAdUrl = (ad: any) => {
 
 export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: any) {
   const navigate = useNavigate();
-
-  const parseDate = (val: any) => {
-    if (!val) return null;
-    if (typeof val === 'object' && val !== null && typeof val.toDate === 'function') return val.toDate();
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d;
-  };
 
   return (<>
     {/* Hitni Oglasi */}
@@ -65,8 +61,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
             ) : urgentJobs && urgentJobs.length > 0 ? (
               urgentJobs.slice(0, 12).map((ad: any) => {
                 const url = buildAdUrl(ad);
-                const createdDate = parseDate(ad.createdAt);
-                const isNovo = createdDate && (new Date().getTime() - createdDate.getTime() < 48 * 60 * 60 * 1000);
+                const isNovo = isNewJob(ad.createdAt);
                 return (
                   <div 
                     key={ad.id}
@@ -90,18 +85,25 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                       <div className="flex justify-between items-start mb-0">
                         <div className="flex flex-col gap-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="backdrop-blur-sm bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(239,68,68,0.25)] w-max">
-                              <span className="material-symbols-outlined text-[10px]">local_fire_department</span> Hitno
-                            </span>
+                            <StatusBadge variant="urgent">Hitno</StatusBadge>
                             {isNovo && (
-                              <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-md uppercase tracking-[0.1em] shadow-md">NOVO</span>
+                              <StatusBadge variant="new">Novo</StatusBadge>
                             )}
                           </div>
                         </div>
                         
                         <div className="w-[56px] h-[56px] min-w-[56px] max-w-[56px] md:w-[64px] md:h-[64px] md:min-w-[64px] md:max-w-[64px] bg-white rounded-full p-1.5 shrink-0 group-hover:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
                           {ad.logo ? (
-                            <img width="800" height="600" decoding="async" loading="lazy" src={ad.logo} className="w-full h-full object-contain rounded-full" alt={`Logo firme ${ad.authorSnapshot?.companyName || ad.authorSnapshot?.displayName || ad.comp || ''}`} referrerPolicy="no-referrer" />
+                            <OptimizedImage
+                              src={ad.logo}
+                              alt={`Logo firme ${ad.authorSnapshot?.companyName || ad.authorSnapshot?.displayName || ad.comp || ''}`}
+                              width={64}
+                              height={64}
+                              sizes="64px"
+                              className="w-full h-full object-contain rounded-full"
+                              containerClassName="w-full h-full"
+                              fallbackType="company"
+                            />
                           ) : (
                             <span className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xs">{(ad.authorSnapshot?.companyName?.charAt(0) || ad.authorSnapshot?.displayName?.charAt(0) || ad.comp?.charAt(0) || 'S')}</span>
                           )}
@@ -122,31 +124,28 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                             {ad.authorSnapshot?.companyName || ad.authorSnapshot?.displayName || ad.comp || 'Svet Građevine'}
                           </span>
                           {ad.isCompanyVerified && (
-                            <span className="material-symbols-outlined text-green-500 text-[12px] font-black" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                            <span className="material-symbols-outlined text-green-500 text-xs font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                           )}
                         </div>
                       </div>
 
                       {(() => {
-                        const b = ad.benefits || ad.benefiti || [];
-                        const hasSmestaj = b.includes('smestaj');
-                        const hasPrevoz = b.includes('prevoz');
-                        const hasHrana = b.includes('topli-obrok') || b.includes('hrana');
+                        const { smestaj: hasSmestaj, prevoz: hasPrevoz, hrana: hasHrana } = getJobBenefitFlags(ad);
                         if (!hasSmestaj && !hasPrevoz && !hasHrana) return null;
                         return (
                           <div className="flex flex-col gap-1.5 mb-3 relative z-10">
                             {hasSmestaj && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                                 <span className="material-symbols-outlined text-[13px] text-green-400">home</span> Smeštaj
                               </span>
                             )}
                             {hasPrevoz && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                                 <span className="material-symbols-outlined text-[13px] text-blue-400">commute</span> Prevoz
                               </span>
                             )}
                             {hasHrana && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                                 <span className="material-symbols-outlined text-[13px] text-yellow-400">restaurant</span> Hrana
                               </span>
                             )}
@@ -160,13 +159,13 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         </span>
                         {(ad.plataMin != null || ad.plataMax != null) ? (
                           <div className="flex flex-col items-end gap-1">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Satnica</span>
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Satnica</span>
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] font-black text-3xl md:text-[28px] font-sans leading-none tracking-tight">
                               {ad.plataMin ? `${ad.plataMin}${ad.plataMax != null ? ` – ${ad.plataMax}` : ''}` : ad.plataMax} €
                             </span>
                           </div>
                         ) : (
-                          <span className="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Po dogovoru</span>
+                          <span className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">Po dogovoru</span>
                         )}
                       </div>
                     </div>

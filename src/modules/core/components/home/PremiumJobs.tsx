@@ -1,27 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { buildJobUrl } from '@/src/lib/seo';
-import { UI_TOKENS } from '@/src/lib/uiTokens';
-import { LOCATIONS, PROFESSIONS, CORE_SECTORS } from '@/src/constants/taxonomy';
-
-const getFriendlyLocation = (job: any) => {
-  const slug = job.locationSlug || job.location || job.loc || job.lokacijaStr;
-  if (!slug) return 'Srbija';
-  
-  if (typeof slug === 'string') {
-    const cleanSlug = slug.toLowerCase().trim();
-    const found = LOCATIONS.find(l => l.slug === cleanSlug || l.id === cleanSlug);
-    if (found) return found.name;
-    return slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
-  }
-  
-  if (typeof slug === 'object' && slug !== null) {
-    if ('name' in slug) return (slug as any).name;
-    if ('address' in slug) return (slug as any).address;
-  }
-  
-  return 'Srbija';
-};
+import { OptimizedImage } from '@/src/components/OptimizedImage';
+import { formatSalaryText, getJobBenefitFlags } from '@/src/lib/format';
+import { StatusBadge } from '@/src/components/ui/PremiumBadge';
 
 const getFriendlyCategory = (job: any) => {
   if (job.type === 'job') return 'Građevinski posao';
@@ -33,50 +15,6 @@ const getFriendlyCategory = (job: any) => {
   return 'Premium oglas';
 };
 
-const getFriendlySalary = (job: any) => {
-  if (job.isNegotiable) {
-    return 'Pozvati';
-  }
-  const min = job.plataMin;
-  const max = job.plataMax;
-  
-  if (min !== undefined && min !== null && min !== '') {
-    const minVal = Number(min);
-    if (!isNaN(minVal)) {
-      if (max !== undefined && max !== null && max !== '') {
-        const maxVal = Number(max);
-        if (!isNaN(maxVal)) {
-          if (minVal === maxVal) return `${minVal.toLocaleString()} €`;
-          return `${minVal.toLocaleString()} - ${maxVal.toLocaleString()} €`;
-        }
-      }
-      return `Od ${minVal.toLocaleString()} €`;
-    }
-  }
-  
-  if (max !== undefined && max !== null && max !== '') {
-    const maxVal = Number(max);
-    if (!isNaN(maxVal)) {
-      return `Do ${maxVal.toLocaleString()} €`;
-    }
-  }
-  
-  const oldSalary = job.salary || job.sal || job.price;
-  if (oldSalary) {
-    if (typeof oldSalary === 'number') return `${oldSalary.toLocaleString()} €`;
-    if (typeof oldSalary === 'string') {
-      let clean = oldSalary.replace(/€/g, '').trim();
-      if (!clean.endsWith('€') && !clean.endsWith('E') && !clean.endsWith('e')) {
-        clean = clean + ' €';
-      }
-      return clean;
-    }
-    return oldSalary;
-  }
-  
-  return null;
-};
-
 export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
   return (<>
     {/* PREMIUM OGLASI SECTION */}
@@ -86,7 +24,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#D4AF37] font-black tracking-[0.2em] md:tracking-[0.3em] uppercase text-[9px] min-[360px]:text-[10px] md:text-xs block">Ekskluzivne Prilike</span>
+                <span className="text-[#D4AF37] font-bold tracking-[0.2em] md:tracking-[0.3em] uppercase text-[11px] md:text-xs block">Ekskluzivne Prilike</span>
                 <span className="material-symbols-outlined text-[#D4AF37] text-xl md:text-2xl -mt-0.5" style={{ fontVariationSettings: '"FILL" 1' }}>workspace_premium</span>
               </div>
               <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-[1000] md:font-[950] uppercase tracking-tighter text-transparent bg-clip-text bg-[linear-gradient(110deg,#D4AF37_0%,#ffffff_60%)] mb-4 leading-tight drop-shadow-sm">PREMIUM<br className="md:hidden" /> PONUDA</h2>
@@ -96,7 +34,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           </div>
           <div className="overflow-hidden relative w-full py-8 -my-8">
             {premiumJobs && premiumJobs.length > 0 ? (
-            <div className="flex gap-8 animate-[scroll_60s_linear_infinite] md:animate-[scroll_150s_linear_infinite] hover:[animation-play-state:paused] w-max">
+            <div className="flex gap-8 animate-[scroll_60s_linear_infinite] md:animate-[scroll_150s_linear_infinite] hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none w-max">
               {Array(4).fill(premiumJobs).flat().map((job: any, idx: number) => {
                 const url = (() => {
                   try {
@@ -135,7 +73,16 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       {/* Logo */}
                       <div className="w-[64px] h-[64px] min-w-[64px] max-w-[64px] md:w-[72px] md:h-[72px] md:min-w-[72px] md:max-w-[72px] bg-white rounded-full p-1.5 shrink-0 group-hover/card:scale-105 transition-transform duration-500 shadow-sm relative z-10 flex items-center justify-center overflow-hidden">
                         {job.logo ? (
-                          <img width="800" height="600" decoding="async" src={job?.logo} alt={`${displayTitle} - Logo`} className="w-full h-full object-contain rounded-full" loading="lazy" />
+                          <OptimizedImage
+                            src={job?.logo}
+                            alt={`${displayTitle} - Logo`}
+                            width={72}
+                            height={72}
+                            sizes="72px"
+                            className="w-full h-full object-contain rounded-full"
+                            containerClassName="w-full h-full"
+                            fallbackType="company"
+                          />
                         ) : (
                           <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-slate-800 font-black text-lg md:text-2xl">
                             {job.authorSnapshot?.companyName?.charAt(0) || job.authorSnapshot?.displayName?.charAt(0) || job.comp?.charAt(0) || displayTitle.charAt(0) || 'P'}
@@ -146,14 +93,13 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       {/* Title & Desc */}
                       <div className="flex-1 min-w-0 font-sans text-left">
                         <div className="flex flex-col md:flex-row md:items-center justify-between md:gap-2 gap-1.5 mb-2 relative z-10 w-full items-start md:flex-wrap">
-                          <span className="backdrop-blur-sm bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 text-[9px] md:text-[10px] font-black px-2 md:px-2.5 py-0.5 md:py-1 rounded-md uppercase tracking-widest flex items-center gap-1 shadow-[0_0_14px_rgba(254,191,13,0.3)]">
-                            <span className="material-symbols-outlined text-[10px] md:text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span> 
+                          <StatusBadge variant="premium">
                             {job.type === 'company' || job.isPremiumPartner ? 'Premium Partner' : 'Premium Oglas'}
-                          </span>
+                          </StatusBadge>
                           {/* Category Badge on Mobile/Desktop */}
-                          <span className="bg-white/5 border border-white/10 text-slate-300 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider whitespace-nowrap shadow-sm">
+                          <StatusBadge variant="info" className="px-2.5 py-1 whitespace-nowrap">
                             {getFriendlyCategory(job)}
-                          </span>
+                          </StatusBadge>
                         </div>
                         
                         <h3 className="text-xl md:text-2xl font-black text-white group-hover/card:text-secondary transition-colors duration-300 mb-1 uppercase break-words tracking-tight leading-tight">
@@ -170,7 +116,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                             {job.authorSnapshot?.companyName || job.authorSnapshot?.displayName || job.comp || 'Svet Građevine'}
                           </span>
                           {job.isCompanyVerified && (
-                            <span className="material-symbols-outlined text-green-500 text-[12px] font-black ml-1.5 align-middle" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                            <span className="material-symbols-outlined text-green-500 text-xs font-bold ml-1.5 align-middle" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                           )}
                         </div>
                         
@@ -183,27 +129,23 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                     {/* Middle Row: Tags */}
                     <div className="flex flex-col gap-2 w-full relative z-10 py-3 md:py-6">
                       {(() => {
-                        const benefitsSlugs = job.benefits || job.benefiti || job.rawBenefits || [];
-                        const hasSmestaj = benefitsSlugs.includes('smestaj') || job.smestaj === true || job.housing === true;
-                        const hasPrevoz = benefitsSlugs.includes('prevoz') || job.prevoz === true || job.transport === true;
-                        const hasHrana = benefitsSlugs.includes('topli-obrok') || benefitsSlugs.includes('hrana') || job.hrana === true || job.food === true || job.topliObrok === true;
-
+                        const { smestaj: hasSmestaj, prevoz: hasPrevoz, hrana: hasHrana } = getJobBenefitFlags(job);
                         if (!hasSmestaj && !hasPrevoz && !hasHrana) return null;
 
                         return (
                           <div className="flex flex-col gap-1.5">
                             {hasSmestaj && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                                 <span className="material-symbols-outlined text-[13px] text-green-400">home</span> Smeštaj
                               </span>
                             )}
                             {hasPrevoz && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                                 <span className="material-symbols-outlined text-[13px] text-blue-400">commute</span> Prevoz
                               </span>
                             )}
                             {hasHrana && (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[10px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 text-slate-300 text-[11px] rounded-md font-bold uppercase tracking-wider shadow-sm w-full">
                                 <span className="material-symbols-outlined text-[13px] text-yellow-400">restaurant</span> Hrana
                               </span>
                             )}
@@ -219,13 +161,13 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                         {job.type === 'company' || job.isPremiumPartner ? 'POGLEDAJ FIRMU' : 'POGLEDAJ OGLAS'}
                         <span className="material-symbols-outlined text-sm">arrow_forward</span>
                       </div>
-                      {getFriendlySalary(job) && (
+                      {formatSalaryText(job) && (
                         <div className="flex flex-col items-end justify-center min-w-[90px] w-full md:w-auto">
-                          <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                          <span className="text-[11px] md:text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 leading-none">
                             {job.salaryType === 'hourly' ? 'Satnica' : 'Plata'}
                           </span>
                           <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-[#FFF5D6] text-2xl md:text-[28px] font-black font-sans leading-none tracking-tight whitespace-nowrap">
-                            {getFriendlySalary(job)}
+                            {formatSalaryText(job)}
                           </span>
                         </div>
                       )}

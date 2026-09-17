@@ -9,6 +9,7 @@ import { AiSearchBar } from '@/src/components/AiSearchBar';
 import { LOCATIONS, SECTORS, PROFESSIONS, BENEFITS } from '@/src/constants/taxonomy';
 import { FilterSidebar, FilterClearButton, FilterSection, FilterToggle, FilterRadio, FilterCTA } from '@/src/modules/core/components/filters/FilterComponents';
 import { LocationCombobox } from '@/src/components/LocationCombobox';
+import { applyBoldRules } from '@/src/modules/core/components/home/aiFormat';
 
 interface ListingItem {
   id: string;
@@ -65,34 +66,6 @@ const TABS = [
   { id: 'masine', label: 'Mašine', icon: 'agriculture' },
   { id: 'alati', label: 'Alati', icon: 'construction' },
 ];
-
-function applyBoldRules(text: string) {
-  let parsed = text.replace(/\*\*(.*?)\*\*/g, (_, content) => {
-    if (/\b(?:Srbij[iaue]|Slovenij[iaue]|Hrvatsk[oiaeu]|Nemačk[oiaeu]|Austrij[iaue]|Beograd[ua]?|Borč[iau]?|Zlatibor[ua]?|Negotin[au]?|Subotic[iau]?|Niš[ua]?|Hvar[ua]?|Split[ua]?|Zagreb[au]?|Kragujevac[au]?|Kruševac[au]?|Zrenjanin[au]?|Sremsk[aeiou]\s+Mitrovic[aeiou]?|Nov[iom]?\s+Sad[ua]?|Pančev[oau]?|Pancev[oau]?|Inostranstv[ou]|Inostranstva|Crn[aeiou]\s+Gor[aeiou]?|Bosn[aeiou]?|Makedonij[iaue]?|Rumunij[iaue]?|Mađarsk[aeiou]?|Madarsk[aeiou]?|Bugarsk[aeiou]?)\b/i.test(content)) {
-      return `<strong class="font-bold text-white tracking-wide">${content}</strong>`;
-    }
-    if (/\d+[.,]?\d*\s*(?:€|eur|evra)/i.test(content)) {
-      return `<strong class="font-bold text-secondary tracking-wide">${content}</strong>`;
-    }
-    if (/(smeštaj|smestaj|obrok|hrana|prevoz|viz|radn[a-z]* dozvol|dokumentacija|radn[a-z]* oprema|alat|oprema)/i.test(content)) {
-      return `<strong class="font-bold text-white">${content}</strong>`;
-    }
-    if (/(satnica|plata)/i.test(content)) {
-      return `<strong class="font-bold text-secondary">${content}</strong>`;
-    }
-    return `<strong class="font-bold text-white tracking-wide">${content}</strong>`;
-  });
-  parsed = parsed.replace(/\*/g, '');
-  parsed = parsed.replace(/(\b(?:Srbij[iaue]|Slovenij[iaue]|Hrvatsk[oiaeu]|Nemačk[oiaeu]|Austrij[iaue]|Beograd[ua]?|Borč[iau]?|Zlatibor[ua]?|Negotin[au]?|Subotic[iau]?|Niš[ua]?|Hvar[ua]?|Split[ua]?|Zagreb[au]?|Kragujevac[au]?|Kruševac[au]?|Zrenjanin[au]?|Sremsk[aeiou]\s+Mitrovic[aeiou]?|Nov[iom]?\s+Sad[ua]?|Pančev[oau]?|Pancev[oau]?|Inostranstv[ou]|Inostranstva|Crn[aeiou]\s+Gor[aeiou]?|Bosn[aeiou]?|Makedonij[iaue]?|Rumunij[iaue]?|Mađarsk[aeiou]?|Madarsk[aeiou]?|Bugarsk[aeiou]?)\b)/gi, '<strong class="font-bold text-white tracking-wide">$1</strong>');
-  parsed = parsed.replace(/(smeštaj[a-z]*|smestaj[a-z]*|obrok[a-z]*|hran[a-z]*|prevoz[a-z]*|viz[a-z]*|radn[a-z]* dozvol[a-z]*|dokumentacij[a-z]*|radn[a-z]* oprem[a-z]*|alata?|oprem[a-z]*)/gi, '<strong class="font-bold text-white">$1</strong>');
-  parsed = parsed.replace(/(\b\d+\s*oglas[aeiou]\b)/gi, '<strong class="font-bold text-white">$1</strong>');
-  parsed = parsed.replace(/(\b\d+[.,]\d+\s*[-–]\s*\d+[.,]\d+\s*(?:€|eur|evra)?\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
-  parsed = parsed.replace(/(\b\d+\s*[-–]\s*\d+\s*(?:€|eur|evra)\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
-  parsed = parsed.replace(/(\b\d+[.,]?\d*\s*(?:€|eur|evra)\b)/gi, '<strong class="font-bold text-secondary tracking-wide">$1</strong>');
-  parsed = parsed.replace(/za posao (\w+)/gi, 'za posao <strong class="font-bold text-white uppercase tracking-wide">$1</strong>');
-  parsed = parsed.replace(/ZA '(\w+)' PO LOKACIJAMA/gi, "ZA '<strong class=\"font-bold text-white uppercase tracking-wide\">$1</strong>' PO LOKACIJAMA");
-  return parsed;
-}
 
 const getBulletIcon = (_emoji: string) => null;
 
@@ -299,7 +272,7 @@ export default function AiSearchPage() {
                       <span className="material-symbols-outlined text-secondary text-xl">smart_toy</span>
                     </div>
                     <div>
-                      <span className="text-[10px] font-black tracking-[0.4em] uppercase text-secondary">AI PRETRAGA ✨</span>
+                      <span className="text-[11px] font-bold tracking-[0.4em] uppercase text-secondary">AI PRETRAGA</span>
                     </div>
                   </div>
                   <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-1 leading-tight">
@@ -396,7 +369,7 @@ export default function AiSearchPage() {
                 
                 <div className="relative z-10">
                   <p className="text-white/90 leading-relaxed mb-4 text-base md:text-lg" 
-                     dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.summary)) }} 
+                     dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.summary, { detailed: true })) }}
                   />
                   
                   {structuredAnswer.bullets.length > 0 && (
@@ -406,7 +379,7 @@ export default function AiSearchPage() {
                           {/* Zamena emojija sa prelepim okruglim Material ikonama */}
                           {getBulletIcon(bullet.emoji)}
                           <p className="text-white/80 text-base md:text-lg leading-relaxed pt-1"
-                             dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(bullet.text)) }} 
+                             dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(bullet.text, { detailed: true })) }}
                           />
                         </div>
                       ))}
@@ -415,7 +388,7 @@ export default function AiSearchPage() {
                   
                    {structuredAnswer.closing && (
                     <p className="text-white/60 text-base mt-4 pt-4 border-t border-white/5"
-                       dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.closing)) }} 
+                       dangerouslySetInnerHTML={{ __html: sanitizeRichText(applyBoldRules(structuredAnswer.closing, { detailed: true })) }}
                     />
                   )}
 

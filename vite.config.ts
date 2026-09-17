@@ -110,6 +110,8 @@ export default defineConfig(({mode}) => {
       isProd && VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
+        // Manifest se čita iz public/manifest.json, da ne postoje dve različite PWA konfiguracije.
+        manifest: false,
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}'],
           skipWaiting: true,
@@ -154,15 +156,6 @@ export default defineConfig(({mode}) => {
               }
             }
           ]
-        },
-        manifest: {
-          name: 'Svet Građevine',
-          short_name: 'Građevina',
-          description: 'Oglasi u građevinskoj industriji',
-          theme_color: '#121212',
-          background_color: '#0A0F14',
-          display: 'standalone',
-          lang: 'sr-RS'
         }
       })
     ].filter(Boolean),
