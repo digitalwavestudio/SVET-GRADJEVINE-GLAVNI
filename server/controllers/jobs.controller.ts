@@ -69,7 +69,7 @@ export const searchJobs = async (
     const ipStr = Array.isArray(ip) ? ip[0] : ip;
     const platform = req.headers["x-client-platform"];
 
-    const pageSize = Math.min(Math.max(Number(validated?.pageSize) || 20, 1), 1000);
+    const pageSize = Math.min(Math.max(Number(validated?.pageSize) || 20, 1), 100);
 
     // Keširanje za premium/urgent poslove — i na naslovnoj (pageSize=6) i na /poslovi (pageSize=12)
     const cacheablePremium =

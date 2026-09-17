@@ -19,7 +19,7 @@ export class ChatBufferService {
   private static STREAM_KEY = "chat:buffer:stream";
   private static CONSUMER_GROUP = "chat_flusher_group";
   private static CONSUMER_NAME = `flusher_${Math.random().toString(36).substring(7)}`;
-  private static BATCH_SIZE = 250;
+  private static BATCH_SIZE = 150;
   private static INTERVAL_MS = 60000;
   private static worker: Worker | null = null;
 
@@ -148,7 +148,7 @@ export class ChatBufferService {
       const streamData = results[0][1];
       const batch = db.batch();
       let operationsCount = 0;
-      
+      const processedStreamIds: string[] = [];
       interface ConvBatchUpdate {
         lastMessage: string;
         lastMessageAt: Date;
@@ -168,11 +168,11 @@ export class ChatBufferService {
         }
 
         if (!payloadStr) {
-           await redis.xack(this.STREAM_KEY, this.CONSUMER_GROUP, streamId);
-           continue;
+            processedStreamIds.push(streamId);
+            continue;
         }
 
-        const msg: {
+        let parsedPayload: {
           msgId: string;
           chatId: string;
           senderId: string;
@@ -181,8 +181,25 @@ export class ChatBufferService {
           offerData: any | null;
           partnerId: string;
           timestamp: number;
-        } = JSON.parse(payloadStr);
-        const { msgId, chatId, senderId, content, type, offerData, partnerId, timestamp } = msg;
+        };
+        try {
+          parsedPayload = JSON.parse(payloadStr);
+        } catch {
+          processedStreamIds.push(streamId);
+          continue;
+        }
+        const { msgId, chatId, senderId, content, type, offerData, partnerId, timestamp } = parsedPayload;
+        if (!msgId || !chatId || !senderId || typeof content !== "string") {
+          processedStreamIds.push(streamId);
+          continue;
+        }
+
+        const dedupeKey = `chat:processed:${msgId}`;
+        const isNewMessage = await redis.set(dedupeKey, "1", "EX", 86400, "NX").catch(() => "OK");
+        if (!isNewMessage) {
+          processedStreamIds.push(streamId);
+          continue;
+        }
 
         const convRef = db.collection("conversations").doc(chatId);
         const msgRef = convRef.collection("messages").doc(msgId);
@@ -207,20 +224,21 @@ export class ChatBufferService {
         });
 
         if (partnerId) {
-            userUnreads.set(partnerId, (userUnreads.get(partnerId) || 0) + 1);
+          userUnreads.set(partnerId, (userUnreads.get(partnerId) || 0) + 1);
         }
+        processedStreamIds.push(streamId);
       }
       
       for (const [chatId, updateData] of convUpdates.entries()) {
           if (operationsCount >= 450) break;
           const convRef = db.collection("conversations").doc(chatId);
-          batch.update(convRef, {
+          batch.set(convRef, {
               lastMessage: updateData.lastMessage,
               lastMessageAt: updateData.lastMessageAt,
               lastSenderId: updateData.lastSenderId,
               updatedAt: updateData.updatedAt,
               [`unreadCount.${updateData.partnerId}`]: FieldValue.increment(userUnreads.get(updateData.partnerId) || 0)
-          });
+          }, { merge: true });
           operationsCount++;
       }
 
@@ -233,9 +251,10 @@ export class ChatBufferService {
 
       if (operationsCount > 0) {
           await batch.commit();
-          const streamIdsToAck = streamData.map((s: [string, string[]]) => s[0]);
-          await redis.xack(this.STREAM_KEY, this.CONSUMER_GROUP, ...streamIdsToAck);
-          logger.info(`[ChatBufferFlusher] Batch-flushed ${streamIdsToAck.length} chat messages.`);
+          if (processedStreamIds.length > 0) {
+            await redis.xack(this.STREAM_KEY, this.CONSUMER_GROUP, ...processedStreamIds);
+          }
+          logger.info(`[ChatBufferFlusher] Batch-flushed ${processedStreamIds.length} chat messages.`);
       }
 
     } catch (e: any) {

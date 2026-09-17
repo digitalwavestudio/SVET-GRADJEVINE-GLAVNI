@@ -8,7 +8,7 @@ import { AuditService, AuditAction } from "./audit.service.ts";
 import { Logger } from "../utils/logger.ts";
 import { AppError, BadRequestError } from "../utils/appError.ts";
 import { eventBus, DomainEvents } from "../events/event-bus.ts";
-import { BaseAdStrategy } from "./ads/base-ad.strategy.ts";
+import { BaseAdStrategy, sanitizeClientAdFields } from "./ads/base-ad.strategy.ts";
 import { Listing } from "../types/ads.ts";
 
 /**
@@ -94,7 +94,7 @@ export class UnifiedAdsService {
     }
   }
 
-  static async updateAdById(id: string, updates: Record<string, any>, user: { uid: string; isAdmin?: boolean; role?: string }) {
+  static async updateAdById(id: string, rawUpdates: Record<string, any>, user: { uid: string; isAdmin?: boolean; role?: string }) {
     const adRef = db.collection("listings").doc(id);
     const snap = await adRef.get();
 
@@ -110,6 +110,7 @@ export class UnifiedAdsService {
     }
 
     // Clean invalid local images
+    const updates = sanitizeClientAdFields(rawUpdates, { allowStatus: ["active", "draft", "archived"] });
     if (Array.isArray(updates.images)) {
       updates.images = (updates.images as string[]).filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
     }

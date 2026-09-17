@@ -127,6 +127,55 @@ export const jobSearchLimiter = rateLimit({
 });
 
 /**
+ * AI Public Limiter
+ * Public AI search/chat is expensive, so keep it strict per IP.
+ * 10 requests per 1 minute.
+ */
+export const aiPublicLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: getStore("ai_public"),
+  validate: false,
+  keyGenerator: (req: Request) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+    return ip || req.socket.remoteAddress || req.ip || 'unknown_ip';
+  },
+  message: {
+    status: 429,
+    message: "Previše AI upita u kratkom vremenu. Molimo sačekajte minut.",
+  },
+  handler,
+});
+
+/**
+ * AI Account Limiter
+ * Authenticated AI actions for posting and dashboard assistance.
+ * 30 requests per 1 minute per user or IP.
+ */
+export const aiAccountLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: getStore("ai_account"),
+  validate: false,
+  keyGenerator: (req: Request, _res: Response) => {
+    if (req.user && req.user.uid) {
+      return req.user.uid;
+    }
+    return req.ip || "unknown_ip";
+  },
+  message: {
+    status: 429,
+    message: "Previše AI zahteva u kratkom vremenu. Molimo sačekajte minut.",
+  },
+  handler,
+});
+
+/**
  * Auth Rate Limiter (Login, Register)
  * 10 requests per 15 minutes
  */

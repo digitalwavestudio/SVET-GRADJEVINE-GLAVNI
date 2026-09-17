@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { parseSearchQuery, searchAndAnswer, callGemini, chatWithGemini, parseAdIntent, gradeAd } from "../services/ai-search.service.ts";
+import { CacheService } from "../services/cache.service.ts";
 
 export async function searchIntent(req: Request, res: Response) {
   const { query } = req.body;
@@ -17,7 +18,16 @@ export async function askAi(req: Request, res: Response) {
     return res.json({ answer: "", count: 0, page: 1, pageSize: 10, totalPages: 0, error: "Nema upita" });
   }
 
-  const result = await searchAndAnswer(query, page || 1, pageSize || 10);
+  const safePage = page || 1;
+  const safePageSize = pageSize || 10;
+  const cacheKey = `ai_ask_v1_${query.trim().toLowerCase()}_${safePage}_${safePageSize}`;
+  const cached = await CacheService.get<Awaited<ReturnType<typeof searchAndAnswer>>>(cacheKey).catch(() => null);
+  if (cached) {
+    return res.json(cached);
+  }
+
+  const result = await searchAndAnswer(query, safePage, safePageSize);
+  await CacheService.set(cacheKey, result, 300000).catch(() => {});
   res.json(result);
 }
 

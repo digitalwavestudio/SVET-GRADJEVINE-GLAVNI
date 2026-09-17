@@ -44,6 +44,10 @@ export interface UnifiedSearchResult {
 
 const ALGOLIA_PAGE_CURSOR_PREFIX = "algolia-page:";
 
+function isValidDocumentCursor(lastVisibleId?: string): boolean {
+  return !!lastVisibleId && !lastVisibleId.startsWith(ALGOLIA_PAGE_CURSOR_PREFIX) && /^[A-Za-z0-9_-]{1,128}$/.test(lastVisibleId);
+}
+
 function parseAlgoliaPageCursor(lastVisibleId?: string): number {
   if (!lastVisibleId?.startsWith(ALGOLIA_PAGE_CURSOR_PREFIX)) return 0;
   const page = Number(lastVisibleId.slice(ALGOLIA_PAGE_CURSOR_PREFIX.length));
@@ -126,26 +130,14 @@ export class UnifiedSearchService {
     pageSize: number = 20,
     lastVisibleId?: string,
   ): Promise<UnifiedSearchResult> {
-    // Cache key koristi SAMO stabilne filtere — bez paginationa i search query-a
-    // Ovo drastično povećava cache hit rate (sa ~0% na 80%+)
-    const stableFilters: Record<string, unknown> = {
-      type: filters.type,
-      locationSlug: filters.locationSlug || filters.location,
-      isPremium: filters.isPremium,
-      isUrgent: filters.isUrgent,
-      isVerified: filters.isVerified,
-      authorId: filters.authorId,
-      companyId: filters.companyId,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
-      professionSlug: filters.professionSlug,
-      machineType: filters.machineType,
-    };
-    // Ukloni undefined/null vrednosti da key bude konzistentan
-    const cleanFilters = Object.fromEntries(
-      Object.entries(stableFilters).filter(([_, v]) => v != null && v !== undefined)
+    // Cache key koristi sve stabilne filtere, paginaciju i tekst pretrage.
+    // Ovo sprečava da različite pretrage dobiju tuđ keširani rezultat.
+    const cacheableFilters = Object.fromEntries(
+      Object.entries({ ...filters, search: filters.search || "" })
+        .filter(([_, v]) => v != null && v !== undefined)
+        .sort(([a], [b]) => a.localeCompare(b))
     );
-    const cacheKey = `search_v5:${category}:${pageSize}:${lastVisibleId || "first"}:${JSON.stringify(cleanFilters)}:${filters.search || ""}`;
+    const cacheKey = `search_v6:${category}:${pageSize}:${lastVisibleId || "first"}:${JSON.stringify(cacheableFilters)}`;
     const cached = !filters.search ? await CacheService.get<UnifiedSearchResult>(cacheKey) : null;
     if (cached) return cached;
     let entityType = category;
@@ -162,16 +154,20 @@ export class UnifiedSearchService {
         const algoliaResult = await searchJobsIndex(filters.search, algoliaPage, [], pageSize);
         if (algoliaResult) {
           const docs: UnifiedSearchDoc[] = [];
-          for (const hit of algoliaResult.hits || []) {
-            if (!hit?.objectID) continue;
-            const snapshot = await db.collection("listings").doc(hit.objectID).get();
-            if (!snapshot.exists) continue;
+          const snapshots = await Promise.all(
+            (algoliaResult.hits || []).map((hit) => {
+              if (!hit?.objectID) return null;
+              return db.collection("listings").doc(hit.objectID).get().catch(() => null);
+            }),
+          );
+          snapshots.forEach((snapshot) => {
+            if (!snapshot || !snapshot.exists) return;
             const data = { id: snapshot.id, ...snapshot.data() } as UnifiedSearchDoc & Record<string, any>;
-            if (data.type !== "job") continue;
-            if (data.status !== "active" && data.status !== "approved") continue;
-            if (!matchesStructuredTextFilters(data, filters)) continue;
+            if (data.type !== "job") return;
+            if (data.status !== "active" && data.status !== "approved") return;
+            if (!matchesStructuredTextFilters(data, filters)) return;
             docs.push(ImageTransformer.transformDocumentImages(data) as UnifiedSearchDoc);
-          }
+          });
 
           docs.sort((a, b) => {
             const aP = (a as any).isPremium ? 1 : 0;
@@ -244,31 +240,31 @@ export class UnifiedSearchService {
     if (filters.minPrice != null) q = q.where("price", ">=", Number(filters.minPrice));
     if (filters.maxPrice != null) q = q.where("price", "<=", Number(filters.maxPrice));
     if (filters.kitchenType) q = q.where("kitchenType", "==", filters.kitchenType);
+    const filteredQuery = q;
 
-    // Get total count
+    // Brojač koristi iste filtere kao i upit sa podacima.
     let totalHits: number | undefined;
     try {
-      if (category === "masters" || entityType === "master") {
-        const countSnap = await db.collection("users").where("role", "==", "majstor").count().get();
-        totalHits = countSnap.data().count;
-      } else {
-        let countQ: FirebaseFirestore.Query = db.collection("listings");
-        if (entityType && entityType !== "all") countQ = countQ.where("type", "==", entityType);
-        const countSnap = await countQ.count().get();
-        totalHits = countSnap.data().count;
-      }
+      const countSnap = await filteredQuery.count().get();
+      totalHits = countSnap.data().count;
     } catch (e) {
       console.error(`[UnifiedSearch] count query failed:`, e);
     }
 
-    q = q.orderBy("createdAt", "desc");
+    q = filteredQuery.orderBy("createdAt", "desc");
     const queryLimit = needsLargeBatch ? Math.max(pageSize, 1000) : pageSize + 1;
     q = q.limit(queryLimit);
 
     if (lastVisibleId) {
+      if (!isValidDocumentCursor(lastVisibleId)) {
+        return { docs: [], lastVisibleId: null, hasMore: false, warning: "Neispravan kursor pretrage" };
+      }
       const lastColl = (category === "masters" || entityType === "master") ? "users" : "listings";
       const lastDoc = await db.collection(lastColl).doc(lastVisibleId).get();
-      if (lastDoc.exists) q = q.startAfter(lastDoc);
+      if (!lastDoc.exists) {
+        return { docs: [], lastVisibleId: null, hasMore: false, warning: "Neispravan kursor pretrage" };
+      }
+      q = q.startAfter(lastDoc);
     }
 
     try {

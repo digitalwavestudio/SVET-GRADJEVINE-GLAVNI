@@ -93,6 +93,30 @@ export class OutboxWorker {
 
           if (isTerminalFailure) {
             iLogger.error(`Message ${msg.id} moved to DLQ`, { error: error.message });
+            try {
+              if (msg.id) {
+                await db.collection("outbox").doc(msg.id).update({
+                  status: "failed",
+                  attempts: nextAttempts,
+                  error: String(error?.message || error).slice(0, 2000),
+                  updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+              }
+              await db.collection("dlq").add({
+                jobType: "outbox_terminal_failure",
+                status: "pending_review",
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                error: String(error?.message || error).slice(0, 2000),
+                payload: {
+                  outboxId: msg.id || null,
+                  type: msg.type || null,
+                  attempts: nextAttempts,
+                },
+              });
+            } catch (dlqError) {
+              iLogger.error(`Failed to persist terminal outbox failure ${msg.id}`, { error: dlqError });
+            }
+            return;
           } else {
             iLogger.warn(`Retry ${nextAttempts}/${this.MAX_ATTEMPTS} for ${msg.id}`, { error: error.message });
             throw error;

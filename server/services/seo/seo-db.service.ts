@@ -248,26 +248,6 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
     try {
       const cached = await CacheService.get<string>(cacheKey);
       if (cached) return cached;
-      const collections = [
-        "jobs",
-        "companies",
-        "users",
-      ];
-
-      // Svi gradovi (RS + DE) i zanimanja za geo hub sitemap
-      const rsCities = ["beograd", "novi-sad", "nis", "kragujevac", "subotica", "zrenjanin", "pancevo", "smederevo", "cacak", "novi-pazar", "kraljevo", "sabac", "uzice", "vranje", "valjevo", "leskovac", "krusevac", "zajecar", "sombor", "pozarevac", "pirot", "bor"];
-      const deSlugs = ["nemacka", "berlin", "munchen", "muenchen", "hamburg", "koln", "koeln", "frankfurt", "stuttgart", "dortmund", "leipzig", "dresden", "bremen", "duesseldorf", "nurnberg", "nuernberg", "hannover"];
-      const allCities = [...rsCities, ...deSlugs];
-      const professionSlugs = [...new Set([
-        "zidar", "tesar", "armirac", "univerzalac-majstor", "krovopokrivac", "betonirac", "masinski-malter", "fizicki-radnik", "pomocni-radnik",
-        "rukovalac-kranom", "rukovalac-bagerom", "rukovalac-viljuskarom", "rukovalac-telehenderom", "rukovalac-valjkom", "rukovalac-finiserom", "rukovalac-gradjevinskim-masinama", "vozac-kamiona", "dispecer-transporta",
-        "moler", "gipsar", "fasader", "keramicar", "parketar", "pvc-i-alu-stolar", "majstor-za-listele", "majstor-za-kosuljicu", "majstor-za-ravnajuci-sloj", "izolater", "podopolagac", "monter-kamena",
-        "vodoinstalater", "elektricar", "elektroinstalater-slabe-struje", "instalater-grejanja", "instalater-solarnih-panela", "instalater-protivpozarnih-sistema", "telekomunikacioni-instalater", "gasni-instalater", "tehnicar-pametnih-kuca", "hvac-tehnicar",
-        "zavarivac", "bravar", "limar", "montazer-celicnih-konstrukcija", "industrijski-monter", "antikorozista", "peskirac", "busac-betona",
-        "asfalter", "putar", "cevopolagac", "betonac-za-puteve-i-tunele", "radnik-na-hidrogradnji", "geobusac", "bunardzija", "radnik-na-niskogradnji",
-        "gradjevinski-inzenjer-visokogradnja", "gradjevinski-inzenjer-niskogradnja", "arhitekta-projektant", "geodeta-geometar", "sef-gradilista", "projekt-menadzer", "nadzorni-organ", "saradnik-za-bzr", "specijalista-za-rusenje",
-        "cuvar-gradilista", "radnik-na-ciscenju", "bastovan"
-      ])];
 
       const today = new Date().toISOString().split("T")[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -279,20 +259,13 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
   <url><loc>${APP_CONFIG.BASE_URL}/o-nama</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/kontakt</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>${APP_CONFIG.BASE_URL}/majstori</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`;
-      // Geo hubovi: gradovi i zanimanja navedeni su odvojeno. Kombinacije profesija
-      // i gradova otkrivaju se preko internih linkova, umesto da se unapred
-      // indeksiraju hiljade potencijalno praznih kombinacija.
-      for (const city of allCities) {
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/firme/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
-      }
-      // Hubovi po zanimanju. Kombinacije zanimanje + grad nisu u mapi dok se ne
-      // potvrde aktivnim oglasima, kako prazne strane ne bi trošile indeksiranje.
-      for (const prof of professionSlugs) {
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
-        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
-      }
+      const jobCities = new Set<string>();
+      const jobProfessions = new Set<string>();
+      const jobCombos = new Set<string>();
+      const companyCities = new Set<string>();
+      const masterCities = new Set<string>();
+      const masterProfessions = new Set<string>();
+      const masterCombos = new Set<string>();
       // Poslovi i firme su u listings kolekciji sa type filterom. Stranice se
       // čitaju u ograničenim paketima kako mapa ne bi čitala celu kolekciju odjednom.
       const listingTypes = ["job", "company"];
@@ -306,7 +279,7 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
               .where("type", "==", typeVal)
               .where("status", "==", "active")
               .orderBy("createdAt", "desc")
-              .select("title", "name", "location", "loc", "company", "comp", "images", "logo", "updatedAt", "createdAt")
+              .select("title", "name", "location", "loc", "locationSlug", "professionSlug", "company", "comp", "images", "logo", "updatedAt", "createdAt")
               .limit(500);
             if (lastListing) {
               listingsQuery = listingsQuery.startAfter(lastListing);
@@ -315,6 +288,15 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
             if (snap.empty) break;
             for (const doc of snap.docs) {
               const data = doc.data();
+              const locationSlug = typeof data.locationSlug === "string" && data.locationSlug ? data.locationSlug : null;
+              const professionSlug = typeof data.professionSlug === "string" && data.professionSlug ? data.professionSlug : null;
+              if (typeVal === "job") {
+                if (locationSlug) jobCities.add(locationSlug);
+                if (professionSlug) jobProfessions.add(professionSlug);
+                if (locationSlug && professionSlug) jobCombos.add(`${professionSlug}/${locationSlug}`);
+              } else if (locationSlug) {
+                companyCities.add(locationSlug);
+              }
               const path = typeVal === "job" ? "posao" : "firma";
               const t = data.title || data.name || "bez-naslova";
               const l = data.location || data.loc || "";
@@ -342,10 +324,18 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         const userSnap = await db.collection("users")
           .where("role", "in", ["majstor", "poslodavac", "partner", "agencija", "kompanija"])
           .orderBy("createdAt", "desc")
+          .select("name", "title", "location", "city", "locationSlug", "profession", "professionSlug", "photoURL", "avatar", "updatedAt", "createdAt")
           .limit(500)
           .get();
         for (const doc of userSnap.docs) {
           const data = doc.data();
+          if (data.role === "majstor") {
+            const locationSlug = typeof data.locationSlug === "string" && data.locationSlug ? data.locationSlug : null;
+            const professionSlug = typeof data.professionSlug === "string" && data.professionSlug ? data.professionSlug : null;
+            if (locationSlug) masterCities.add(locationSlug);
+            if (professionSlug) masterProfessions.add(professionSlug);
+            if (locationSlug && professionSlug) masterCombos.add(`${professionSlug}/${locationSlug}`);
+          }
           const imgUrl = data.photoURL || data.avatar;
           const lastMod = data.updatedAt?.toDate?.()?.toISOString().split("T")[0] ||
             data.createdAt?.toDate?.()?.toISOString().split("T")[0] ||
@@ -356,6 +346,28 @@ let description = "Svet Građevine – vodeći građevinski portal za Srbiju i N
         }
       } catch (e) {
         logger.warn("[Sitemap] users query failed:", e);
+      }
+      // Hubovi se dodaju samo kada aktivni podaci potvrde da nisu prazni.
+      for (const city of [...jobCities].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+      }
+      for (const prof of [...jobProfessions].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${prof}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+      }
+      for (const combo of [...jobCombos].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/poslovi/${combo}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+      }
+      for (const city of [...companyCities].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/firme/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
+      }
+      for (const city of [...masterCities].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${city}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
+      }
+      for (const prof of [...masterProfessions].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${prof}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
+      }
+      for (const combo of [...masterCombos].sort()) {
+        xml += `\n  <url><loc>${APP_CONFIG.BASE_URL}/majstori/${combo}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>`;
       }
       xml += "\n</urlset>";
       await CacheService.set(cacheKey, xml, 21600000); // 6h cache

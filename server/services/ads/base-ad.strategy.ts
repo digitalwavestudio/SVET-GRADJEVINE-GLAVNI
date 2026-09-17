@@ -6,6 +6,55 @@ import { Logger } from "../../utils/logger.ts";
 import { AppError, BadRequestError } from "../../utils/appError.ts";
 import { eventBus, DomainEvents } from "../../events/event-bus.ts";
 import { Listing, AdStatus } from "../../types/ads.ts";
+import { businessProfileSchema, jobSchema } from "@svet-gradjevine/shared";
+
+const CLIENT_AD_FIELD_ALLOWLIST = new Set([
+  ...Object.keys(jobSchema.shape),
+  ...Object.keys(businessProfileSchema.shape),
+  "id",
+  "paket",
+  "adTitle",
+]);
+
+const PRIVILEGED_AD_FIELDS = new Set([
+  "type",
+  "authorId",
+  "authorSnapshot",
+  "comp",
+  "logo",
+  "isCompanyVerified",
+  "moderationStatus",
+  "isPremium",
+  "isUrgent",
+  "isPremiumPartner",
+  "premiumUntil",
+  "urgentUntil",
+  "viewsCount",
+  "applicantsCount",
+  "searchKeywords",
+  "_geoloc",
+  "imageStatus",
+  "createdAt",
+  "updatedAt",
+]);
+
+export function sanitizeClientAdFields(rawData: unknown, options: { allowStatus?: readonly string[] } = {}): Record<string, any> {
+  if (!rawData || typeof rawData !== "object") return {};
+  const picked: Record<string, any> = {};
+  for (const [key, value] of Object.entries(rawData as Record<string, any>)) {
+    if (CLIENT_AD_FIELD_ALLOWLIST.has(key) && !PRIVILEGED_AD_FIELDS.has(key)) {
+      picked[key] = value;
+    }
+  }
+
+  const requestedStatus = typeof picked.status === "string" ? picked.status : "";
+  if (options.allowStatus?.includes(requestedStatus)) {
+    picked.status = requestedStatus;
+  } else {
+    delete picked.status;
+  }
+  return picked;
+}
 
 export class BaseAdStrategy {
   protected logger = new Logger({ service: "BaseAdStrategy" });
@@ -38,51 +87,59 @@ export class BaseAdStrategy {
       if (!userSnap.exists) throw new BadRequestError("Korisnik nije pronađen");
       const userData = userSnap.data() as any;
 
-      const isPaidPackage = !!rawData.paket;
+      const clientData = sanitizeClientAdFields(rawData, { allowStatus: ["active", "draft"] });
+      const isPaidPackage = !!clientData.paket;
 
       const sysConfigRef = db.collection("system").doc("config");
       const sysConfigDoc = await transaction.get(sysConfigRef);
       const sysConfig = sysConfigDoc.exists ? sysConfigDoc.data() : null;
 
-      let packagePrice = this.resolvePackagePrice(rawData.paket);
+      let packagePrice = this.resolvePackagePrice(clientData.paket);
       const catKey = this.category === 'job' ? 'jobs' : this.category;
-      if (sysConfig?.pricing?.[catKey]?.[rawData.paket]) {
-        packagePrice = sysConfig.pricing[catKey][rawData.paket];
+      if (sysConfig?.pricing?.[catKey]?.[clientData.paket]) {
+        packagePrice = sysConfig.pricing[catKey][clientData.paket];
       }
 
       if (sysConfig?.holidayModeActive && packagePrice > 0) {
         const applicable = sysConfig.applicablePackages || [];
-        if (applicable.includes("all") || applicable.includes(rawData.paket)) {
-            const discountPercentage = sysConfig.discountPercentage || 0;
-            const discountAmount = Math.floor(packagePrice * (discountPercentage / 100));
-            packagePrice = Math.max(0, packagePrice - discountAmount);
+        if (applicable.includes("all") || applicable.includes(clientData.paket)) {
+          const discountPercentage = sysConfig.discountPercentage || 0;
+          const discountAmount = Math.floor(packagePrice * (discountPercentage / 100));
+          packagePrice = Math.max(0, packagePrice - discountAmount);
         }
       }
 
       const currentWalletBalance = userData.walletBalance ?? userData.partnerBalance ?? 0;
       
-      if (isPaidPackage && packagePrice <= 0 && rawData.paket !== "free") {
-        throw new BadRequestError(`Nepoznat paket: "${rawData.paket}". Dozvoljeni paketi su: standard, premium, urgent.`);
+      if (isPaidPackage && packagePrice <= 0 && clientData.paket !== "free") {
+        throw new BadRequestError(`Nepoznat paket: "${clientData.paket}". Dozvoljeni paketi su: standard, premium, urgent.`);
       }
       if (currentWalletBalance < packagePrice) {
         throw new BadRequestError(`Nemate dovoljno sredstava u Wallet-u za izabrani paket. Cena je ${packagePrice} SG Kredita, a vaš balans iznosi ${currentWalletBalance} SG Kredita. Molimo dopunite wallet.`);
       }
 
-      if (Array.isArray(rawData.images)) {
-        rawData.images = rawData.images.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
+      if (Array.isArray(clientData.images)) {
+        clientData.images = clientData.images.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
       }
-      if (Array.isArray(rawData.companyPortfolioImages)) {
-        rawData.companyPortfolioImages = rawData.companyPortfolioImages.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
+      if (Array.isArray(clientData.companyPortfolioImages)) {
+        clientData.companyPortfolioImages = clientData.companyPortfolioImages.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
       }
 
-      const adId = rawData.id || db.collection("listings").doc().id;
+      const requestedId = typeof clientData.id === "string" && clientData.id.trim() ? clientData.id.trim() : null;
+      const adId = requestedId || db.collection("listings").doc().id;
       const adRef = db.collection("listings").doc(adId);
+      if (requestedId) {
+        const existingAd = await transaction.get(adRef);
+        if (existingAd.exists) {
+          throw new BadRequestError("Oglas sa ovim ID-jem već postoji. Koristite izmenu oglasa.");
+        }
+      }
 
       const hasRawImages =
-        (rawData.images || []).some((url: string) => url.includes("/raw/")) ||
-        (rawData.portfolioImages || []).some((url: string) => url.includes("/raw/"));
+        (clientData.images || []).some((url: string) => url.includes("/raw/")) ||
+        (clientData.portfolioImages || []).some((url: string) => url.includes("/raw/"));
 
-      const textToIndex = `${rawData.title || ""} ${rawData.name || ""} ${rawData.description || ""} ${rawData.manufacturer || ""} ${rawData.model || ""}`.toLowerCase();
+      const textToIndex = `${clientData.title || ""} ${clientData.name || ""} ${clientData.description || ""} ${clientData.manufacturer || ""} ${clientData.model || ""}`.toLowerCase();
       const searchKeywords = Array.from(
         new Set(textToIndex.split(/[\s,._-]+/).filter((w) => w.length > 2)),
       );
@@ -116,7 +173,7 @@ export class BaseAdStrategy {
       }
 
       const adData: any = {
-        ...rawData,
+        ...clientData,
         id: adId,
         authorId: uid,
         authorSnapshot,
@@ -132,38 +189,38 @@ export class BaseAdStrategy {
         isCompanyVerified: (userData as { isVerified?: boolean })?.isVerified || false,
         status: "active" as AdStatus,
         moderationStatus: "approved",
-        isPremium: rawData.paket === "premium",
-        isUrgent: rawData.paket === "urgent",
+        isPremium: clientData.paket === "premium",
+        isUrgent: clientData.paket === "urgent",
         ...(premiumUntil ? { premiumUntil } : {}),
         ...(urgentUntil ? { urgentUntil } : {}),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         viewsCount: 0,
         searchKeywords: searchKeywords.slice(0, 50),
-        _geoloc: (rawData as { location?: { coordinates?: { lat: number, lng: number } } })?.location?.coordinates
+        _geoloc: (clientData as { location?: { coordinates?: { lat: number, lng: number } } })?.location?.coordinates
           ? {
-              lat: (rawData as { location: { coordinates: { lat: number } } }).location.coordinates.lat,
-              lng: (rawData as { location: { coordinates: { lng: number } } }).location.coordinates.lng,
+              lat: (clientData as { location: { coordinates: { lat: number } } }).location.coordinates.lat,
+              lng: (clientData as { location: { coordinates: { lng: number } } }).location.coordinates.lng,
             }
-          : (rawData as { _geoloc?: unknown })?._geoloc || null,
+          : (clientData as { _geoloc?: unknown })?._geoloc || null,
         imageStatus: hasRawImages ? "processing" : "ready",
-        adTitle: rawData.adTitle || rawData.title,
+        adTitle: clientData.adTitle || clientData.title,
       };
 
       transaction.set(adRef, adData, { merge: true });
 
       if (isPaidPackage) {
         const transRef = db.collection("transactions").doc();
-        const adTitle = rawData.title || rawData.adTitle || rawData.name || "";
+        const adTitle = clientData.title || clientData.adTitle || clientData.name || "";
         transaction.set(transRef, {
           userId: uid,
           adId: adId,
           type: "ad_payment_wallet",
-          packageId: rawData.paket,
+          packageId: clientData.paket,
           amount: -packagePrice,
           currency: "RSD",
           status: "completed",
-          description: `Plaćen oglas${adTitle ? ` - ${adTitle}` : ''} (${rawData.paket})`,
+          description: `Plaćen oglas${adTitle ? ` - ${adTitle}` : ''} (${clientData.paket})`,
           referenceNumber: `SG-${adId.slice(0, 8).toUpperCase()}`,
           createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         });
@@ -181,7 +238,7 @@ export class BaseAdStrategy {
       const outboxRef = db.collection("outbox").doc();
       const outboxPayloadObj = {
         type: DomainEvents.AD_CREATED,
-        payload: { category: this.category, id: adId, uid, title: rawData.title || rawData.adTitle || rawData.name || "" },
+        payload: { category: this.category, id: adId, uid, title: clientData.title || clientData.adTitle || clientData.name || "" },
         status: "pending",
         attempts: 0,
         createdAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
@@ -213,7 +270,7 @@ export class BaseAdStrategy {
         id: adId,
         data: adData,
         userEmail: userData.email || "",
-        package: rawData.paket || null,
+        package: clientData.paket || null,
         packagePrice,
         outboxDocId: outboxRef.id,
         outboxPayload: outboxPayloadObj,
@@ -279,11 +336,12 @@ export class BaseAdStrategy {
   }
 
   public async updateAd(id: string, rawData: any, uid: string) {
-    if (Array.isArray(rawData.images)) {
-      rawData.images = rawData.images.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
+    const clientData = sanitizeClientAdFields(rawData, { allowStatus: ["active", "draft", "archived"] });
+    if (Array.isArray(clientData.images)) {
+      clientData.images = clientData.images.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
     }
-    if (Array.isArray(rawData.companyPortfolioImages)) {
-      rawData.companyPortfolioImages = rawData.companyPortfolioImages.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
+    if (Array.isArray(clientData.companyPortfolioImages)) {
+      clientData.companyPortfolioImages = clientData.companyPortfolioImages.filter((url: string) => !url.startsWith("blob:") && !url.startsWith("data:"));
     }
 
     const result = await db.runTransaction(async (transaction) => {
@@ -293,25 +351,25 @@ export class BaseAdStrategy {
 
       const data = snap.data() as any;
       const oldStatus = data.status;
-      const newStatus = rawData.status || oldStatus;
+      const newStatus = clientData.status || oldStatus;
 
       if (data.authorId !== uid) {
         throw new BadRequestError("Niste vlasnik oglasa");
       }
 
       const hasRawImages =
-        (rawData.images || []).some((url: string) => url.includes("/raw/")) ||
-        (rawData.portfolioImages || []).some((url: string) => url.includes("/raw/"));
+        (clientData.images || []).some((url: string) => url.includes("/raw/")) ||
+        (clientData.portfolioImages || []).some((url: string) => url.includes("/raw/"));
 
       const updateData: any = {
-        ...rawData,
+        ...clientData,
         updatedAt: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
         imageStatus: hasRawImages ? "processing" : "ready",
-        ...((rawData as { location?: { coordinates?: { lat: number, lng: number } } })?.location?.coordinates
+        ...((clientData as { location?: { coordinates?: { lat: number, lng: number } } })?.location?.coordinates
           ? {
               _geoloc: {
-                lat: (rawData as { location: { coordinates: { lat: number } } }).location.coordinates.lat,
-                lng: (rawData as { location: { coordinates: { lng: number } } }).location.coordinates.lng,
+                lat: (clientData as { location: { coordinates: { lat: number } } }).location.coordinates.lat,
+                lng: (clientData as { location: { coordinates: { lng: number } } }).location.coordinates.lng,
               },
             }
           : {}),
