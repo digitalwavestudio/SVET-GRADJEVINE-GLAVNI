@@ -410,7 +410,7 @@ apiRouter.use("/admin", requireAdmin, adminRouter);
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/user", usersRouter); // For backwards compatibility
-apiRouter.use("/jobs", firestoreLimiter, heavyOperationsLimiter, jobsRouter);
+apiRouter.use("/jobs", firestoreLimiter, jobsRouter);
 apiRouter.use("/metrics", metricsRouter);
 
 apiRouter.use("/media", heavyOperationsLimiter, mediaRouter);

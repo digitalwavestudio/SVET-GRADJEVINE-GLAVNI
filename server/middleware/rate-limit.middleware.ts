@@ -90,6 +90,43 @@ export const heavyOperationsLimiter = rateLimit({
 });
 
 /**
+ * Job Read Limiter (public job list and job details)
+ * Paginated reads are cheap, but public pages and SSR can issue several
+ * parallel requests. Keep this higher than the heavy write/search limiter.
+ * 60 requests per 1 minute.
+ */
+export const jobReadLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: getStore("job_read"),
+  message: {
+    status: 429,
+    message: "Previše zahteva za oglase u kratkom vremenu. Molimo sačekajte minut.",
+  },
+  handler,
+});
+
+/**
+ * Job Search Limiter (public filtered job search)
+ * Search can touch Algolia plus Firestore, so keep it lower than plain reads.
+ * 30 requests per 1 minute.
+ */
+export const jobSearchLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: getStore("job_search"),
+  message: {
+    status: 429,
+    message: "Previše pretraga poslova u kratkom vremenu. Molimo sačekajte minut.",
+  },
+  handler,
+});
+
+/**
  * Auth Rate Limiter (Login, Register)
  * 10 requests per 15 minutes
  */

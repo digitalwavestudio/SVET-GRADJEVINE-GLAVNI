@@ -13,8 +13,14 @@ export class JobsCoreService {
   static async getPublicJobs(limit: number = 21, cursor?: string) {
     const db = getDb();
     const pageSize = Math.min(Math.max(Math.floor(limit) - 1, 1), 100);
+    const cacheKey = `public_jobs_v1_${pageSize}_${cursor || "first"}`;
 
     try {
+      const cached = await CacheService.get<{ docs: unknown[]; lastVisible: string | null; hasMore: boolean }>(cacheKey).catch(() => null);
+      if (cached) {
+        return cached;
+      }
+
       let query = db
         .collection("listings")
         .where("type", "==", "job")
@@ -39,12 +45,14 @@ export class JobsCoreService {
       const docs = snap.docs.slice(0, pageSize).map((doc) => ({ id: doc.id, ...doc.data() }));
       const hasMore = snap.docs.length > pageSize;
       const lastVisible = hasMore && docs.length > 0 ? (docs[docs.length - 1] as { id: string }).id : null;
-
-      return {
+      const result = {
         docs,
         lastVisible,
         hasMore,
       };
+
+      await CacheService.set(cacheKey, result, 60 * 1000).catch(() => null);
+      return result;
     } catch (err: any) {
       console.error("[JOBS] getPublicJobs error:", err?.message || err);
       return { docs: [], lastVisible: null, hasMore: false, warning: err?.message };

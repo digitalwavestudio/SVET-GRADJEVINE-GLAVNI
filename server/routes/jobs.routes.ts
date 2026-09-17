@@ -1,6 +1,6 @@
 import { env } from "../config/env.ts";
 import express from "express";
-import { adCreationLimiter, jobApplyLimiter } from "../middleware/rate-limit.middleware.ts";
+import { adCreationLimiter, heavyOperationsLimiter, jobApplyLimiter, jobReadLimiter, jobSearchLimiter } from "../middleware/rate-limit.middleware.ts";
 import {
   getPublicJobs,
   searchJobs,
@@ -29,7 +29,7 @@ const updateJobSchema = jobSchema.partial();
 
 export const jobsRouter = express.Router();
 
-jobsRouter.get("/", (req, res, next) => {
+jobsRouter.get("/", jobReadLimiter, (req, res, next) => {
   if (env.NODE_ENV !== "production") { console.info("[JOBS_ROUTE] GET /api/jobs called, originalUrl:", req.originalUrl); }
   next();
 }, getPublicJobs);
@@ -44,9 +44,9 @@ jobsRouter.patch(
 );
 jobsRouter.get("/applied/:jobId", authMiddleware, checkApplied);
 
-jobsRouter.get("/:id", getJobById);
-jobsRouter.post("/search", validateRequest(jobSearchSchema), searchJobs);
-jobsRouter.post("/create", authMiddleware, adCreationLimiter, validateRequest(createJobSchema), createJob);
-jobsRouter.post("/apply", authMiddleware, jobApplyLimiter, validateRequest(applicationSchema), applyJob);
+jobsRouter.get("/:id", jobReadLimiter, getJobById);
+jobsRouter.post("/search", jobSearchLimiter, validateRequest(jobSearchSchema), searchJobs);
+jobsRouter.post("/create", authMiddleware, heavyOperationsLimiter, adCreationLimiter, validateRequest(createJobSchema), createJob);
+jobsRouter.post("/apply", authMiddleware, heavyOperationsLimiter, jobApplyLimiter, validateRequest(applicationSchema), applyJob);
 jobsRouter.patch("/:id", authMiddleware, validateAdOwnership, validateRequest(updateJobSchema), updateJob);
 jobsRouter.delete("/:id", authMiddleware, validateAdOwnership, deleteJob);

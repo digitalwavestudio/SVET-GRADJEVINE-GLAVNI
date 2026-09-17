@@ -87,8 +87,9 @@ export const queryClient = new QueryClient({
       const errObj = error && typeof error === 'object' ? error as { status?: number; statusCode?: number; response?: { status?: number }; message?: string } : null;
       const status = errObj?.status || errObj?.statusCode || errObj?.response?.status;
       const errMsg = String(errObj?.message || '').toLowerCase();
-      // Ne prikazuj toast za 404, network greške i abort (korisnik ne treba da vidi ovo)
-      if (status === 404 || errMsg.includes('404') || errMsg.includes('not found') || errMsg.includes('failed to fetch') || errMsg.includes('network') || errMsg.includes('abort')) {
+      // Ne prikazuj toast za 404, network greške, abort i privremeni 429 limit.
+      // Komponente i dalje prikazuju svoje inline stanje greške.
+      if (status === 404 || status === 429 || errMsg.includes('404') || errMsg.includes('429') || errMsg.includes('previše zahteva') || errMsg.includes('not found') || errMsg.includes('failed to fetch') || errMsg.includes('network') || errMsg.includes('abort')) {
         console.warn('[React Query] Suppressed error toast:', error);
         return;
       }
@@ -129,7 +130,13 @@ export const queryClient = new QueryClient({
       // Sprečava waterfall mount-ovanje komponenata (ZADATAK 8)
       refetchOnMount: false,
       // Ne pokušavaj stalno ako je not-found ili mreža spora
-      retry: 1,
+      retry: (failureCount, error) => {
+        const errObj = error && typeof error === 'object' ? error as { status?: number; statusCode?: number; response?: { status?: number } } : null;
+        const status = errObj?.status || errObj?.statusCode || errObj?.response?.status;
+        // 429 se ne ponavlja automatski jer bi ponavljanje samo punilo limit.
+        if (status === 429) return false;
+        return failureCount < 1;
+      },
       refetchOnReconnect: false, // sprečava udar na server nakon gubljenja i vraćanja konekcije
       // Rerender Shield: TanStack Query (v5) podrazumevano koristi 'tracked' režim za automatsko praćenje korišćenih propertija
       // Enterprise Optimization: Sprečava referentne promene za identične JSON strukture (eliminiše nepotrebne re-rendere)
