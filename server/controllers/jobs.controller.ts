@@ -34,7 +34,7 @@ export const getPublicJobs = async (
       isOptimized?: boolean;
       total?: number;
       activeJobs?: number;
-    } = { ...result, hasMore: result.docs.length > pageSize, total: globalStats.totalJobs || 0, activeJobs: globalStats.activeJobs ?? globalStats.totalJobs ?? 0 };
+    } = { ...result, hasMore: result.hasMore, total: globalStats.totalJobs || 0, activeJobs: globalStats.activeJobs ?? globalStats.totalJobs ?? 0 };
 
     if (finalResult.hasMore) {
       finalResult.docs = result.docs.slice(0, pageSize);
