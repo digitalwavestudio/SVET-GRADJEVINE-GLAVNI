@@ -216,7 +216,7 @@ export class UnifiedAdsService {
       return await this.getCachedMetadata(cacheKey, fastPathDoc, async () => {
           let query = db
             .collection("listings")
-            .where("status", "==", "active");
+            .where("status", "in", ["active", "approved"]);
 
           if (options.isUrgent) query = query.where("isUrgent", "==", true);
           if (options.isPremium) query = query.where("isPremium", "==", true);
@@ -322,9 +322,9 @@ export class UnifiedAdsService {
       let entityType = category;
       if (category === "jobs") entityType = "job";
 
-      q = q.where("type", "==", entityType).where("status", "==", "active");
+      q = q.where("type", "==", entityType).where("status", "in", ["active", "approved"]);
     } else {
-      q = q.where("status", "==", "active");
+      q = q.where("status", "in", ["active", "approved"]);
     }
 
     q = q.orderBy("createdAt", "desc");

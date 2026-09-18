@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
 
     // 3. Cold Path: Unified Fetch
     const [listings, events] = await Promise.all([
-      db.collectionGroup("listings").where("status", "==", "active").orderBy("createdAt", "desc").limit(10).get(),
+      db.collectionGroup("listings").where("status", "in", ["active", "approved"]).orderBy("createdAt", "desc").limit(10).get(),
       db.collection("events").orderBy("createdAt", "desc").limit(5).get()
     ]);
 
@@ -77,7 +77,7 @@ router.get("/rss/:category", async (req, res) => {
 
     const snapshot = await db
       .collection(category)
-      .where("status", "==", "active")
+      .where("status", "in", ["active", "approved"])
       .orderBy("createdAt", "desc")
       .limit(50)
       .get();

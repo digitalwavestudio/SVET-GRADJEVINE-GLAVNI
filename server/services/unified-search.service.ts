@@ -203,7 +203,7 @@ export class UnifiedSearchService {
       if (entityType && entityType !== "all") q = q.where("type", "==", entityType);
     }
 
-    if (!filters.showAllStatuses) q = q.where("status", "==", "active");
+    if (!filters.showAllStatuses) q = q.where("status", "in", ["active", "approved"]);
 
     const targetedLoc = filters.locationSlug || filters.location;
     if (targetedLoc && targetedLoc !== "SVE") {

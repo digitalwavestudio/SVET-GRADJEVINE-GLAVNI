@@ -78,9 +78,9 @@ export async function chatWithGemini(messages: {role: "user" | "model", content:
        
        if (foundProf) {
          try {
-           const snap = await db.collection("listings")
-            .where("type", "==", "job")
-            .where("status", "==", "active")
+            const snap = await db.collection("listings")
+             .where("type", "==", "job")
+             .where("status", "in", ["active", "approved"])
             .where("searchKeywords", "array-contains", foundProf)
             .get();
             
@@ -110,9 +110,9 @@ export async function chatWithGemini(messages: {role: "user" | "model", content:
        } else {
            // Opšta prosečna satnica
            try {
-               const snap = await db.collection("listings")
-                .where("type", "==", "job")
-                .where("status", "==", "active")
+                const snap = await db.collection("listings")
+                 .where("type", "==", "job")
+                 .where("status", "in", ["active", "approved"])
                 .orderBy("createdAt", "desc")
                 .limit(50)
                 .get();
@@ -279,7 +279,7 @@ Vrati SAMO {"profession": ..., "city": ..., "keywords": [...], "tipPosla": "..."
       queryDesc = "type=job, status=active, orderBy createdAt desc (najnoviji)";
       snap = await db.collection("listings")
         .where("type", "==", "job")
-        .where("status", "==", "active")
+        .where("status", "in", ["active", "approved"])
         .orderBy("createdAt", "desc")
         .limit(5).get();
     }

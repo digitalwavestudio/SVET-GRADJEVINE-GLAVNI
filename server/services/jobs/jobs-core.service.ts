@@ -24,7 +24,7 @@ export class JobsCoreService {
       let query = db
         .collection("listings")
         .where("type", "==", "job")
-        .where("status", "==", "active")
+        .where("status", "in", ["active", "approved"])
         .orderBy("createdAt", "desc")
         .select(
           "title", "name", "price", "location", "loc",
