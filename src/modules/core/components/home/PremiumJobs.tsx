@@ -34,7 +34,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           </div>
           <div className="overflow-hidden relative w-full py-8 -my-8">
             {premiumJobs && premiumJobs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {premiumJobs.map((job: any, idx: number) => {
                 const url = (() => {
                   try {
