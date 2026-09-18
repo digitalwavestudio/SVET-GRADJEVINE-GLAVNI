@@ -5,7 +5,7 @@ import { Calculator, ArrowRight } from 'lucide-react';
 export default function CalculatorBanner() {
   return (
     <section className="py-8 md:py-16 bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
         <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-slate-950 border border-white/10 rounded-[10px] py-8 md:py-16 px-6 md:px-12 shadow-sm">
           {/* Subtle Background Glow */}
           <div className="absolute top-0 right-0 w-1/3 h-full bg-secondary/5 blur-[120px] rounded-full pointer-events-none"></div>

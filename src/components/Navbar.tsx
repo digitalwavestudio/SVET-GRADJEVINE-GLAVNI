@@ -105,7 +105,7 @@ export default function Navbar() {
   return (
     <>
 <nav className={`bg-surface/40 backdrop-blur-2xl fixed top-0 left-0 w-full z-[200] border-b border-white/5 h-24 transition-all`}>
-      <div className="flex justify-between items-center px-4 sm:px-8 h-full max-w-7xl mx-auto w-full">
+      <div className="flex justify-between items-center px-4 sm:px-8 h-full max-w-screen-2xl mx-auto w-full">
 
           <div className="flex items-center gap-2 -ml-5 sm:ml-0">
             <Link to="/" className="flex items-center group">

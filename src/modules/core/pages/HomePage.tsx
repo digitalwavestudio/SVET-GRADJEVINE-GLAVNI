@@ -216,7 +216,7 @@ export default function HomePage() {
       )}
 
       {isSearchActive && (
-        <div className={`max-w-7xl mx-auto px-4 md:px-8 pb-24 relative z-30 min-h-[400px] flex flex-col items-center justify-start w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        <div className={`max-w-screen-2xl mx-auto px-4 md:px-8 pb-24 relative z-30 min-h-[400px] flex flex-col items-center justify-start w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           aiLoading ? 'mt-24 md:mt-36' : 'mt-28 md:mt-32'
         }`}>
           {/* Učitavanje / Skeleton State */}
@@ -393,7 +393,7 @@ export default function HomePage() {
           </div>
 
           {/* Aktivna ponuda - full width, 4-col grid */}
-          <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20">
+          <div className="max-w-screen-2xl mx-auto px-4 md:px-8 py-12 md:py-20">
 
             {/* Header */}
             <div className="flex justify-between items-end mb-8 border-b border-white/5 pb-4">
@@ -455,7 +455,7 @@ export default function HomePage() {
             )}
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
             <VerticalCTA 
               title="TRAŽITE RADNIKE?"
               description="POSTAVITE OGLAS ZA POSAO I PRONAĐITE NAJBOLJE MAJSTORE, INŽENJERE I STRUČNE TIMOVE ZA VAŠE PROJEKTE."
@@ -484,7 +484,7 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
             <div className="h-px w-full bg-white/10"></div>
           </div>
 

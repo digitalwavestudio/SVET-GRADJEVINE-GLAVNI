@@ -32,7 +32,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
   return (<>
     {/* Hitni Oglasi */}
       <section className="py-12 md:py-24 bg-surface-container-low">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
           <div className="flex justify-between items-start mb-12">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
