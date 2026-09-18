@@ -137,11 +137,18 @@ export default function HomePage() {
     const rest = allJobs.filter((j: any) => !ids.has(j.id));
     return [...urgent, ...premium, ...rest];
   }, [allJobs, premiumJobsAll]);
-  useEffect(() => setVisibleCount(20), [allJobsPremiumFirst]);
+  const prevJobsLenRef = useRef(allJobsPremiumFirst.length);
+  useEffect(() => {
+    if (prevJobsLenRef.current !== allJobsPremiumFirst.length) {
+      prevJobsLenRef.current = allJobsPremiumFirst.length;
+    } else {
+      setVisibleCount(20);
+    }
+  }, [allJobsPremiumFirst]);
   const displayedJobs = useMemo(() => allJobsPremiumFirst.slice(0, visibleCount), [allJobsPremiumFirst, visibleCount]);
   const hasMore = visibleCount < allJobsPremiumFirst.length || !!hasNextPage;
   const loadMore = useCallback(() => {
-    const nextCount = visibleCount + 20;
+    const nextCount = visibleCount + 24;
     setVisibleCount(nextCount);
     if (nextCount >= allJobsPremiumFirst.length && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
