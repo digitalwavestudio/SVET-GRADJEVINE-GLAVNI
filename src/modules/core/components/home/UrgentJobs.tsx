@@ -32,7 +32,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
   return (<>
     {/* Hitni Oglasi */}
       <section className="py-12 md:py-24 bg-surface-container-low">
-        <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex justify-between items-start mb-12">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-3">
@@ -44,7 +44,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {isLoading ? (
               // Skeletons during loading
               [...Array(12)].map((_, i) => (

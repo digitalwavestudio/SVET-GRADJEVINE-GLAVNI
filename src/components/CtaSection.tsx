@@ -127,7 +127,7 @@ export default function CtaSection() {
           <span className="material-symbols-outlined text-[400px] text-white select-none">architecture</span>
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#0F1923] to-transparent"></div>
-        <div className="relative z-10 w-full max-w-screen-2xl mx-auto px-4 md:px-8 min-w-0">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 min-w-0">
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full min-w-0">
             <div className="lg:col-span-7 flex flex-col space-y-6 min-w-0">
               <h1 className="font-headline text-4xl min-[360px]:text-5xl md:text-[4rem] lg:text-[4.5rem] font-[1000] md:font-[950] uppercase tracking-tighter text-white leading-[1.05] relative w-full min-w-0 drop-shadow-sm">

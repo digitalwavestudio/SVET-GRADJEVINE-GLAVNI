@@ -7,7 +7,7 @@ export default function JobsSection({ latestJobs = [] }: any) {
 
   return (
     <section className="py-12 md:py-24 bg-surface-container-lowest">
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
           <div className="max-w-2xl">

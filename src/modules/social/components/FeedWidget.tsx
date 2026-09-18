@@ -83,7 +83,7 @@ export function FeedWidget({ className = "" }: FeedWidgetProps) {
   if (isLoading) {
     return (
       <section className={`${className}`}>
-        <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h2 className="text-lg md:text-xl font-black font-headline uppercase tracking-wider text-secondary mb-6">
             Aktivnosti
           </h2>
@@ -109,7 +109,7 @@ export function FeedWidget({ className = "" }: FeedWidgetProps) {
 
   return (
     <section className={`${className}`}>
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg md:text-xl font-black font-headline uppercase tracking-wider text-secondary">
             Aktivnosti

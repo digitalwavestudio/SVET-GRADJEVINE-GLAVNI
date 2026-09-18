@@ -49,7 +49,7 @@ export default function HeroSection({ isSearchActive = false, isLoading = false 
           </div>
         </div>
 
-        <div className={`relative z-10 max-w-screen-2xl mx-auto px-4 md:px-8 w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        <div className={`relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isSearchActive ? 'mt-0' : 'mt-0 md:mt-[110px]'
         }`}>
           <div
