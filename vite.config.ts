@@ -84,16 +84,8 @@ export default defineConfig(({mode}) => {
           '<style>\n      #root:empty { background-color: #0F1923; min-height: 100vh; }\n    </style>',
           '<style>' + criticalCss + '</style>'
         );
-        // Defer full CSS — load async via preload (non-blocking) to avoid render-blocking
-        html = html.replace(
-          /<link rel="stylesheet"[^>]*href="\/assets\/index-[^"]+\.css"[^>]*>/,
-          (match) => {
-            const href = match.match(/href="([^"]+)"/)?.[1];
-            if (!href) return match;
-            const id = 'full-css';
-            return `<link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"><noscript>${match}<\/noscript>`;
-          }
-        );
+        // Full CSS loads normally (render-blocking) — prevents FOUC
+        // Previous deferred loading caused 10-15s of unstyled content
         return html;
       },
     },
