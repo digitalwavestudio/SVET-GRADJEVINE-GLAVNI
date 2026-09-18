@@ -92,7 +92,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
       {/* BACKGROUND BLOBS REMOVED AS REQUESTED */}
 
-      <div className="max-w-7xl mx-auto w-full flex justify-center items-center mb-8 sm:mb-20 relative z-10 mt-2 sm:mt-10">
+      <div className="max-w-[1400px] mx-auto w-full flex justify-center items-center mb-8 sm:mb-20 relative z-10 mt-2 sm:mt-10">
         <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
           <img src={logoUrl || logoImage} alt="Svet Građevine" className="!h-16 md:!h-32 !w-auto max-w-[200px] md:max-w-none object-contain drop-shadow-md mx-auto" />
         </Link>

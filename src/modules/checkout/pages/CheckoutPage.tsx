@@ -162,7 +162,7 @@ export default function CheckoutPage() {
     <div className="bg-[#070B0F] min-h-screen text-white font-sans selection:bg-secondary selection:!text-black flex flex-col">
       <Navbar />
       
-      <div className="flex-1 my-10 max-w-7xl mx-auto w-full px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-32">
+      <div className="flex-1 my-10 max-w-[1400px] mx-auto w-full px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-32">
         {/* Left: Form */}        <div className="lg:col-span-7 bg-[#0A0F14] border border-white/5 rounded-[10px] p-4 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden h-max">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 blur-[80px] rounded-full pointer-events-none"></div>

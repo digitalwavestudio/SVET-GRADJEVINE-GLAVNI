@@ -77,7 +77,7 @@ function CompaniesPage() {
         </div>
       </StandardPageHero>
 
-      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+      <section className="max-w-[1400px] mx-auto px-4 md:px-8 py-12">
         {loading && companies.length === 0 ? (
           <ListingSkeleton count={6} viewMode="grid" />
         ) : companies.length === 0 ? (

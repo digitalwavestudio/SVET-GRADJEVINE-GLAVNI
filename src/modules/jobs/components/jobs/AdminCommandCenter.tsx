@@ -16,7 +16,7 @@ export default function AdminCommandCenter({ jobData, deleteJob }: AdminCommandC
            style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(239,68,68,0.5) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-red-500/5 rounded-full blur-[80px] pointer-events-none"></div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 bg-red-500/[0.02] p-5 sm:p-8 lg:p-10 rounded-2xl border border-red-500/10 backdrop-blur-3xl shadow-2xl shadow-red-950/20">
           <div className="flex flex-col md:flex-row items-center gap-4 lg:gap-6 text-center md:text-left w-full lg:w-auto">
             <div className="w-12 h-12 lg:w-16 lg:h-16 shrink-0 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]">

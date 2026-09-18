@@ -22,7 +22,7 @@ function LogoRow({ items, reverse }: { items: string[]; reverse?: boolean }) {
 export default function TrustSection() {
   return (
     <section className="bg-[#0B1420] py-16 border-t border-white/5 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full mb-16">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 w-full mb-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {TRUST_ITEMS.map((item, i) => (
             <div key={i} className="text-center p-4 md:p-6 flex flex-col items-center justify-center">
@@ -36,7 +36,7 @@ export default function TrustSection() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full mb-10 text-center">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 w-full mb-10 text-center">
         <p className="text-[10px] md:text-sm font-black text-white/30 uppercase tracking-[0.4em] md:tracking-[0.2em]">
           Poverenje su nam ukazali
         </p>

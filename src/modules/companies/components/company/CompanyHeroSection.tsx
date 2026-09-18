@@ -7,7 +7,7 @@ interface CompanyHeroSectionProps {
 
 export function CompanyHeroSection({ company }: CompanyHeroSectionProps) {
   return (
-    <section className="relative max-w-7xl mx-auto w-full h-[35vh] md:h-[55vh] min-h-[180px] md:min-h-[450px] overflow-hidden rounded-b-[10px]">
+    <section className="relative max-w-[1400px] mx-auto w-full h-[35vh] md:h-[55vh] min-h-[180px] md:min-h-[450px] overflow-hidden rounded-b-[10px]">
       {/* Cover slika */}
       <motion.div 
         initial={{ scale: 1.1 }}

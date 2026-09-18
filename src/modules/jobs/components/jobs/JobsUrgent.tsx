@@ -15,7 +15,7 @@ interface JobsUrgentProps {
 export const JobsUrgent: React.FC<JobsUrgentProps> = ({ jobs, isExpanded, setIsExpanded, prefetch, getInitials, hasMore, loadMore, loadingMore }) => {
   return (
     <section className="py-20 bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-[1400px] mx-auto px-8">
         <div className="flex justify-between items-start mb-12">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-3">

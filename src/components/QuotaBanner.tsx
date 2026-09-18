@@ -18,7 +18,7 @@ const QuotaBanner: React.FC = () => {
       className="bg-amber-900/40 border-b border-amber-500/30 backdrop-blur-sm overflow-hidden transition-all duration-300"
       id="quota-banner"
     >
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4 text-sm text-amber-100">
+      <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between gap-4 text-sm text-amber-100">
         <div className="flex items-center gap-3">
           <div className="p-1.5 bg-amber-500/20 rounded-[10px]">
             <AlertCircle className="w-4 h-4 text-amber-500" />

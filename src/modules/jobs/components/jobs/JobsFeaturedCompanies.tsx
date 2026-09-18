@@ -15,7 +15,7 @@ export const JobsFeaturedCompanies: React.FC<JobsFeaturedCompaniesProps> = ({ co
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-secondary/10 to-transparent"></div>
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-secondary/[0.03] via-transparent to-transparent"></div>
       
-      <div className="max-w-7xl mx-auto px-8 relative z-10 mb-16">
+      <div className="max-w-[1400px] mx-auto px-8 relative z-10 mb-16">
   
       </div>
       

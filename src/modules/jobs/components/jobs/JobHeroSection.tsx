@@ -41,7 +41,7 @@ export function JobHeroSection({
         initial={{ x: -50, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="max-w-7xl mx-auto px-8 py-16 relative z-10 flex flex-col md:flex-row gap-12 items-start"
+        className="max-w-[1400px] mx-auto px-8 py-16 relative z-10 flex flex-col md:flex-row gap-12 items-start"
       >
         <div className="flex-1">
           <div className="flex flex-wrap gap-2 mb-6">

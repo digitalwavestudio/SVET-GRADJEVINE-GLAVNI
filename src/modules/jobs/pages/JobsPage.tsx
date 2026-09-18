@@ -537,7 +537,7 @@ const { data, isLoading: loadingJobs, hasNextPage, fetchNextPage, isFetchingNext
       {/* FACT-SHEET P-SEO DASHBOARD */}
       {((grad && grad !== 'all') || (zanimanje && zanimanje !== 'SVE')) && (
         <Suspense>
-          <section className="max-w-7xl mx-auto px-4 md:px-8 py-8" aria-labelledby="pseo-insights-title">
+          <section className="max-w-[1400px] mx-auto px-4 md:px-8 py-8" aria-labelledby="pseo-insights-title">
             <AnalyticsDashboardUI 
               type="jobs" 
               zanimanjeSlug={!zanimanje || zanimanje === 'SVE' ? undefined : zanimanje} 
@@ -572,7 +572,7 @@ const { data, isLoading: loadingJobs, hasNextPage, fetchNextPage, isFetchingNext
       />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-20">
+      <main className="max-w-[1400px] mx-auto px-4 md:px-8 py-12 md:py-20">
         <div className="flex flex-col lg:flex-row-reverse gap-8">
 
           {/* Sidebar Filters */}
@@ -695,7 +695,7 @@ const { data, isLoading: loadingJobs, hasNextPage, fetchNextPage, isFetchingNext
         const gradName = hasGrad ? LOCATIONS.find(l => l.slug === grad)?.name : null;
         
         return (
-          <section className="max-w-7xl mx-auto px-4 md:px-8 py-16 border-t border-white/5">
+          <section className="max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {hasZanimanje && sameProfessionLocations.length > 0 && (
                 <div>

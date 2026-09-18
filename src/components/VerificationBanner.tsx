@@ -33,7 +33,7 @@ export const VerificationBanner: React.FC = () => {
 
   return (
     <div className="bg-amber-50 border-b border-amber-100 overflow-hidden transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="max-w-[1400px] mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-3 text-amber-800">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <p className="text-sm font-medium">

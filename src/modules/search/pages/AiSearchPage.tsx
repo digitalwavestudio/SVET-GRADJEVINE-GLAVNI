@@ -216,7 +216,7 @@ export default function AiSearchPage() {
   const prefetch = useCallback(() => {}, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pt-28 md:pt-36 pb-16">
+    <div className="max-w-[1400px] mx-auto px-4 pt-28 md:pt-36 pb-16">
       {loading && (
         <div className="w-full transition-all duration-[650ms] ease-[cubic-bezier(0.16,1,0.3,1)] mt-6 md:mt-10">
           <div className="bg-gradient-to-br from-[#0c1e3d]/95 to-[#071329]/85 backdrop-blur-3xl border border-white/10 rounded-[28px] py-14 px-6 md:px-12 text-center space-y-7 shadow-[0_15px_50px_rgba(0,0,0,0.85)] relative overflow-hidden flex flex-col items-center justify-center min-h-[390px] w-full animate-fade-in">

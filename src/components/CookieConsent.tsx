@@ -22,7 +22,7 @@ export default function CookieConsent() {
         <div
           className="fixed bottom-0 left-0 w-full z-[9999] p-4 md:p-6 animate-slide-up"
         >
-          <div className="max-w-7xl mx-auto bg-slate-900 border border-white/10 shadow-2xl rounded-[10px] p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden backdrop-blur-xl">
+          <div className="max-w-[1400px] mx-auto bg-slate-900 border border-white/10 shadow-2xl rounded-[10px] p-6 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden backdrop-blur-xl">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-orange-500/10 mix-blend-overlay pointer-events-none"></div>
             
             <div className="flex items-center gap-4 relative z-10 w-full md:w-auto">

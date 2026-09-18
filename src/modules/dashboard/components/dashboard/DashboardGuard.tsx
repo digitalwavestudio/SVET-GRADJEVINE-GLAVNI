@@ -488,7 +488,7 @@ export default class DashboardGuard extends Component<Props, State> {
       ];
 
       return (
-        <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 bg-gray-50/50 min-h-screen">
+        <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8 bg-gray-50/50 min-h-screen">
           {/* Calming Warning Banner */}
           <div className="bg-amber-50 border border-amber-200/60 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">

@@ -226,7 +226,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-10">
+      <div className="max-w-[1400px] mx-auto space-y-10">
         {user?.syncStatus === 'syncing' && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}

@@ -267,7 +267,7 @@ export default function JobDetailsPage() {
         <AdminCommandCenter jobData={jobData} deleteJob={deleteJob} />
       )}
 
-      <div className={`hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${user?.isAdmin ? 'mt-8' : 'mt-32'} mb-8`}>
+      <div className={`hidden md:block max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 ${user?.isAdmin ? 'mt-8' : 'mt-32'} mb-8`}>
         <Breadcrumbs items={[
           { label: 'Poslovi', path: '/poslovi' },
           ...(jobData.locationSlug ? [{ label: jobData.location, path: `/poslovi/${jobData.locationSlug}` }] : []),
@@ -277,7 +277,7 @@ export default function JobDetailsPage() {
       </div>
 
       {/* Modern Header Hero */}
-      <div className={`max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mb-8 sm:mb-12 ${user?.isAdmin ? 'mt-8 md:mt-0' : 'mt-28 md:mt-12'}`}>
+      <div className={`max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 mb-8 sm:mb-12 ${user?.isAdmin ? 'mt-8 md:mt-0' : 'mt-28 md:mt-12'}`}>
         <div className={`relative border backdrop-blur-xl rounded-3xl p-5 sm:p-8 lg:p-12 overflow-hidden shadow-2xl transition-all duration-500 ${
           jobData.isPremium
             ? 'border-yellow-500/20 bg-gradient-to-b from-yellow-500/[0.02] to-transparent shadow-[0_0_50px_-12px_rgba(234,179,8,0.12)]'
@@ -398,7 +398,7 @@ export default function JobDetailsPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-4 flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-10" itemScope itemType="https://schema.org/JobPosting">
+      <main className="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-4 flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-10" itemScope itemType="https://schema.org/JobPosting">
         <meta itemProp="title" content={displayTitle} />
         <meta itemProp="datePosted" content={getDatePosted()} />
 
@@ -677,7 +677,7 @@ export default function JobDetailsPage() {
       </main>
 
       {similarJobs && similarJobs.length > 0 && (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12 w-full border-t border-white/5 mt-8 sm:mt-12 relative z-10">
+        <div className="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12 w-full border-t border-white/5 mt-8 sm:mt-12 relative z-10">
           <SimilarJobsSlider
             jobData={jobData}
             displaySimilarJobs={similarJobs}

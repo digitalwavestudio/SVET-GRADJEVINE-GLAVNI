@@ -29,7 +29,7 @@ export default function CommunityPage() {
         description="Povežite se sa najboljim stručnjacima i pratite relevantan sadržaj iz sveta građevine."
       />
       
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-[1400px] mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

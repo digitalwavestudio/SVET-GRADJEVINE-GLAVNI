@@ -5,7 +5,7 @@ export default function AboutSection({ totalAdsCount, dynamicFirmsCount, dynamic
   return (<>
     {/* O Nama / Partneri */}
       <section className="py-12 md:py-24 bg-surface border-t border-outline-variant/10">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
               <h2 className="font-headline text-4xl min-[360px]:text-5xl md:text-[3.5rem] lg:text-[4rem] font-[1000] md:font-[950] uppercase tracking-tighter mb-4 leading-[1.05] drop-shadow-sm">GRADIMO VEZE KOJE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-[#FFF5D6] to-secondary">POKREĆU GRAĐEVINSKU INDUSTRIJU</span></h2>

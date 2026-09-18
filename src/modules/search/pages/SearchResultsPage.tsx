@@ -106,7 +106,7 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col min-h-screen">
+    <div className="max-w-[1400px] mx-auto px-4 py-24 flex flex-col min-h-screen">
       <div className="mb-12 shrink-0">
         <div className="flex items-center gap-3 mb-4">
           <Link to="/" className="text-white/40 hover:text-white transition-colors">

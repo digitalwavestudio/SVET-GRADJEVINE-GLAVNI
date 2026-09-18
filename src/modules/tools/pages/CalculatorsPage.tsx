@@ -160,7 +160,7 @@ const renderCalculator = () => {
       {/* Hero */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-secondary/5 blur-[120px] rounded-full pointer-events-none -mt-64 -mr-64"></div>
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="max-w-[1400px] mx-auto px-6 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
             <div className="max-w-2xl">
               <span className="inline-block py-1 px-3 rounded-[10px] bg-secondary/10 border border-secondary/20 text-secondary text-[10px] font-black tracking-[0.2em] uppercase mb-6">

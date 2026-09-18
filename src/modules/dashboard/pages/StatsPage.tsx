@@ -99,7 +99,7 @@ export default function StatsPage() {
     <div className="bg-surface min-h-screen pt-32 pb-24">
       <Breadcrumbs items={breadcrumbItems} />
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-[1400px] mx-auto px-6">
         {/* Header */}
         <div className="mb-20 text-center">
           <motion.span 

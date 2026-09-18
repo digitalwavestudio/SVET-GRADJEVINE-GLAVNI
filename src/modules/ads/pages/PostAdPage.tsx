@@ -96,7 +96,7 @@ export default function PostAdPage() {
 
       {/* BACKGROUND BLOBS REMOVED AS REQUESTED */}
 
-      <div className={`mx-auto px-4 md:px-6 relative z-10 mt-16 transition-all duration-500 ${step === 4 ? 'max-w-7xl' : 'max-w-4xl'}`}>
+      <div className={`mx-auto px-4 md:px-6 relative z-10 mt-16 transition-all duration-500 ${step === 4 ? 'max-w-[1400px]' : 'max-w-4xl'}`}>
         <div className="mb-16 text-center">
           <motion.div
             initial={{ y: -20, opacity: 0 }}

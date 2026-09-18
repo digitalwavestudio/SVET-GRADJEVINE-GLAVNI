@@ -87,7 +87,7 @@ export default function CompanyProfilePage() {
       
       {isAdmin && company && (
         <div className="bg-slate-900 border-b border-white/10 p-3 relative z-50 mt-24">
-          <div className="max-w-7xl mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-white">
+          <div className="max-w-[1400px] mx-auto px-8 flex flex-wrap items-center justify-between gap-4 text-white">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Moderacija Firme</span>
@@ -123,7 +123,7 @@ export default function CompanyProfilePage() {
         <CompanyHeroSection company={company} />
 
         {/* Logo overlap - pola u heroju */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
           <div className="-mt-36 md:-mt-24 mb-4 md:mb-6">
             <div className="relative w-fit">
               <div className="w-24 h-24 md:w-52 md:h-52 bg-white p-2 md:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-[#0a111a] flex items-center justify-center overflow-hidden group">
@@ -197,7 +197,7 @@ export default function CompanyProfilePage() {
         </div>
 
         {/* PAGE CONTENT */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-2 lg:py-8">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-2 lg:py-8">
           <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16">
             
             {/* MAIN CONTENT COLUMN (8 cols) */}

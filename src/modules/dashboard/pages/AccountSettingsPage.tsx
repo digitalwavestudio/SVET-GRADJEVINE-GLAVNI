@@ -50,7 +50,7 @@ export default function AccountSettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-10 px-4 pb-16">
+      <div className="max-w-[1400px] mx-auto space-y-10 px-4 pb-16">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
