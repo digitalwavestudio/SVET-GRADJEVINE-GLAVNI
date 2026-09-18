@@ -129,14 +129,14 @@ export default function HomePage() {
   const [visibleCount, setVisibleCount] = useState(20);
   const allJobsPremiumFirst = useMemo(() => {
     const ids = new Set<string>();
-    // urgent iz allJobs
-    const urgent = allJobs.filter((j: any) => j.isUrgent && !ids.has(j.id) && ids.add(j.id));
-    // premium iz dedicated upita
+    // 1. Svi hitni iz BFF-a — prvi u listi
+    const urgent = urgentJobs.filter((j: any) => !ids.has(j.id) && ids.add(j.id));
+    // 2. Svi premium — ne filtriramo protiv hitnih da bi se svi prikazali
     const premium = premiumJobsAll.filter((j: any) => !ids.has(j.id) && ids.add(j.id));
-    // ostali
+    // 3. Ostali iz allJobs — bez duplikata (ni hitni ni premium)
     const rest = allJobs.filter((j: any) => !ids.has(j.id));
     return [...urgent, ...premium, ...rest];
-  }, [allJobs, premiumJobsAll]);
+  }, [allJobs, premiumJobsAll, urgentJobs]);
   const prevJobsLenRef = useRef(allJobsPremiumFirst.length);
   useEffect(() => {
     if (allJobsPremiumFirst.length < prevJobsLenRef.current) {
