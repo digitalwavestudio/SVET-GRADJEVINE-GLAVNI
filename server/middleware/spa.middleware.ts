@@ -1119,7 +1119,7 @@ export const createSpaMiddleware = () => {
         const rendered = await backgroundPreRenderHomepage(cacheKey, indexHtml, CACHE_TTL);
         if (rendered) return res.send(dedupeHeadTags(ensureHreflang(rendered, req.path)));
 
-        // Clean shell if all SSR fails
+        // Clean shell if all SSR fails — branded loading skeleton so it doesn't look broken
         const cleanHtml = injectEmptyRootLinks(indexHtml
           .replace("</head>", `<title>Svet Građevine</title>
 <meta name="description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
@@ -1134,7 +1134,30 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:description" content="Svet Građevine – vodeći građevinski portal za Srbiju i Nemačku. Poslovi u građevini, građevinske firme i majstori. Besplatno postavi oglas." />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
 <script type="application/ld+json">${websiteSearchSchema}</script>
-</head>`), req.path);
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#fff}
+.sg-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#16213e;border-bottom:1px solid #2a2a4a}
+.sg-logo{font-size:20px;font-weight:700;color:#e94560}
+.sg-search{flex:1;max-width:500px;margin:0 20px;padding:10px 16px;border-radius:8px;border:1px solid #2a2a4a;background:#0f3460;color:#fff}
+.sg-hero{text-align:center;padding:60px 24px 40px}
+.sg-hero h1{font-size:32px;font-weight:800;margin-bottom:12px}
+.sg-hero h1 span{color:#e94560}
+.sg-skeleton{animation:sg-pulse 1.5s ease-in-out infinite}
+.sg-card{background:#16213e;border-radius:12px;padding:16px;margin:8px 0;border:1px solid #2a2a4a}
+.sg-line{height:14px;border-radius:7px;background:#2a2a4a;margin:8px 0}
+.sg-line.w60{width:60%}.sg-line.w80{width:80%}.sg-line.w40{width:40%}
+.sg-spinner{width:40px;height:40px;border:4px solid #2a2a4a;border-top-color:#e94560;border-radius:50%;animation:sg-spin .8s linear infinite;margin:40px auto}
+.sg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;max-width:1200px;margin:0 auto;padding:0 24px}
+@keyframes sg-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes sg-spin{to{transform:rotate(360deg)}}
+</style>
+</head>`)
+          .replace('<div id="root"></div>', `<div id="root">
+<header class="sg-nav"><span class="sg-logo">Svet Gradjevine</span><input class="sg-search" placeholder="Pretraži oglase..." readonly><span></span></header>
+<section class="sg-hero"><h1>GRAĐEVINSKI <span>POSLOVI</span>,<br>MAJSTORI I FIRME.</h1><p>Učitavanje sadržaja...</p><div class="sg-spinner"></div></section>
+<section class="sg-grid"><div class="sg-card sg-skeleton"><div class="sg-line w80"></div><div class="sg-line w60"></div><div class="sg-line w40"></div></div><div class="sg-card sg-skeleton"><div class="sg-line w80"></div><div class="sg-line w60"></div><div class="sg-line w40"></div></div><div class="sg-card sg-skeleton"><div class="sg-line w80"></div><div class="sg-line w60"></div><div class="sg-line w40"></div></div></section>
+</div>`), req.path);
         return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(dedupeHeadTags(ensureHreflang(cleanHtml, req.path)));
       }
 
@@ -1240,7 +1263,28 @@ export const createSpaMiddleware = () => {
 <meta name="twitter:title" content="${fullTitle}" />
 <meta name="twitter:description" content="${baseDesc}" />
 <meta name="twitter:image" content="https://www.svetgradjevine.com/og-image.png" />
-</head>`);
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#fff}
+.sg-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#16213e;border-bottom:1px solid #2a2a4a}
+.sg-logo{font-size:20px;font-weight:700;color:#e94560}
+.sg-hero{text-align:center;padding:40px 24px}
+.sg-hero h1{font-size:28px;font-weight:700;margin-bottom:8px}
+.sg-skeleton{animation:sg-pulse 1.5s ease-in-out infinite}
+.sg-card{background:#16213e;border-radius:12px;padding:16px;margin:8px 0;border:1px solid #2a2a4a}
+.sg-line{height:14px;border-radius:7px;background:#2a2a4a;margin:8px 0}
+.sg-line.w60{width:60%}.sg-line.w80{width:80%}.sg-line.w40{width:40%}
+.sg-spinner{width:40px;height:40px;border:4px solid #2a2a4a;border-top-color:#e94560;border-radius:50%;animation:sg-spin .8s linear infinite;margin:30px auto}
+.sg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;max-width:1200px;margin:0 auto;padding:0 24px}
+@keyframes sg-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes sg-spin{to{transform:rotate(360deg)}}
+</style>
+</head>`)
+            .replace('<div id="root"></div>', `<div id="root">
+<header class="sg-nav"><span class="sg-logo">Svet Gradjevine</span></header>
+<section class="sg-hero"><h1>${matchedRoute.label}</h1><p>Učitavanje oglasa...</p><div class="sg-spinner"></div></section>
+<section class="sg-grid"><div class="sg-card sg-skeleton"><div class="sg-line w80"></div><div class="sg-line w60"></div><div class="sg-line w40"></div></div><div class="sg-card sg-skeleton"><div class="sg-line w80"></div><div class="sg-line w60"></div><div class="sg-line w40"></div></div><div class="sg-card sg-skeleton"><div class="sg-line w80"></div><div class="sg-line w60"></div><div class="sg-line w40"></div></div></section>
+</div>`);
             return res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300').send(injectEmptyRootLinks(ensureHreflang(cleanHtml, req.path), req.path));
           }
 
