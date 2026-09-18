@@ -308,7 +308,7 @@ export default function HomePage() {
               {/* Listings Output */}
               <div className="w-full">
                 {filteredListings.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch auto-rows-fr mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch auto-rows-fr mt-4">
                     {filteredListings.map((item, idx) => (
                       <div 
                         key={item.id} 
@@ -413,13 +413,13 @@ export default function HomePage() {
 
             {/* 4-col grid */}
             {loadingAllJobs && displayedJobs.length === 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div key={i} className="bg-white/5 border border-white/5 rounded-[10px] h-44 animate-pulse" />
                 ))}
               </div>
             ) : displayedJobs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch auto-rows-fr">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch auto-rows-fr">
                 {displayedJobs.map((job: any) => (
                   <JobCard key={job.id} job={job} viewMode="grid" prefetch={prefetch}/>
                 ))}
