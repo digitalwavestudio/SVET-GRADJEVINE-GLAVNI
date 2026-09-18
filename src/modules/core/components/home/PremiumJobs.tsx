@@ -34,8 +34,8 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
           </div>
           <div className="overflow-hidden relative w-full py-8 -my-8">
             {premiumJobs && premiumJobs.length > 0 ? (
-            <div className="flex gap-8 animate-[scroll_60s_linear_infinite] md:animate-[scroll_150s_linear_infinite] hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none w-max">
-              {Array(4).fill(premiumJobs).flat().map((job: any, idx: number) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              {premiumJobs.map((job: any, idx: number) => {
                 const url = (() => {
                   try {
                     if (job.type === 'company' || job.isPremiumPartner) return `/firma/${job.id}`;
@@ -62,7 +62,7 @@ export default function PremiumJobs({ premiumJobs, handleCardClick }: any) {
                       handleCardClick(url, { job });
                     }
                   }}
-                  className="group/card relative flex flex-col shrink-0 min-h-[320px] md:h-[400px] rounded-[16px] transition-all duration-500 overflow-hidden border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1 w-[90vw] min-w-[270px] sm:min-w-[340px] md:min-w-[620px] md:w-[620px] cursor-pointer"
+                  className="group/card relative flex flex-col shrink-0 min-h-[320px] md:h-[400px] rounded-[16px] transition-all duration-500 overflow-hidden border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1 w-full cursor-pointer"
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 z-0"></div>
                   <div className="p-5 md:p-7 flex flex-col w-full h-full relative flex-1 z-10">

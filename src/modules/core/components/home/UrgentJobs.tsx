@@ -44,7 +44,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
               <div className="w-24 h-1.5 bg-secondary mt-6 rounded-full"></div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {isLoading ? (
               // Skeletons during loading
               [...Array(12)].map((_, i) => (
