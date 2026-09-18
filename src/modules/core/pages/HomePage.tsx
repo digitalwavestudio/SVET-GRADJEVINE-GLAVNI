@@ -139,12 +139,11 @@ export default function HomePage() {
   }, [allJobs, premiumJobsAll]);
   const prevJobsLenRef = useRef(allJobsPremiumFirst.length);
   useEffect(() => {
-    if (prevJobsLenRef.current !== allJobsPremiumFirst.length) {
-      prevJobsLenRef.current = allJobsPremiumFirst.length;
-    } else {
+    if (allJobsPremiumFirst.length < prevJobsLenRef.current) {
       setVisibleCount(20);
     }
-  }, [allJobsPremiumFirst]);
+    prevJobsLenRef.current = allJobsPremiumFirst.length;
+  }, [allJobsPremiumFirst.length]);
   const displayedJobs = useMemo(() => allJobsPremiumFirst.slice(0, visibleCount), [allJobsPremiumFirst, visibleCount]);
   const hasMore = visibleCount < allJobsPremiumFirst.length || !!hasNextPage;
   const loadMore = useCallback(() => {
