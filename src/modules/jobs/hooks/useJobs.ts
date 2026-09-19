@@ -68,7 +68,7 @@ export function usePremiumJobs(
     queryKey: [...queryKeys.jobs.premium(), filters, limit],
     queryFn: async ({ pageParam = null }) =>
       jobsService.fetchJobs(
-        { ...filters, isPremium: true },
+        { ...filters, isPremium: true, status: "active" },
         pageParam as string | null,
         limit,
       ) as Promise<JobsListResponse>,
@@ -89,7 +89,7 @@ export function useUrgentJobs(
     queryKey: [...queryKeys.jobs.urgent(), filters, limit],
     queryFn: async ({ pageParam = null }) =>
       jobsService.fetchJobs(
-        { ...filters, isUrgent: true },
+        { ...filters, isUrgent: true, status: "active" },
         pageParam as string | null,
         limit,
       ) as Promise<JobsListResponse>,

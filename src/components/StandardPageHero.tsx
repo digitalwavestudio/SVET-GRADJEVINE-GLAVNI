@@ -36,7 +36,7 @@ export function StandardPageHero({
   overlayGradient = 'linear-gradient(to right, rgba(5, 15, 25, 0.98) 0%, rgba(5, 15, 25, 0.8) 35%, rgba(5, 15, 25, 0.2) 100%)',
 }: StandardPageHeroProps) {
   return (
-    <section className="relative min-h-[480px] sm:min-h-[520px] md:min-h-screen md:h-screen flex flex-col items-start bg-surface-container-lowest border-b border-white/5 glass-panel gold-glow">
+    <section className="relative min-h-[480px] sm:min-h-[520px] md:min-h-screen md:h-screen flex flex-col items-start bg-surface-container-lowest border-b border-white/5 glass-panel">
       {/* Background Layer */}
       {/* Background Layer */}
       <div className="absolute inset-0 z-0 text-white">
