@@ -9,7 +9,7 @@ import { AiSearchBar } from '@/src/components/AiSearchBar';
 import SeoHead from '@/src/components/SeoHead';
 import CalculatorBanner from '@/src/modules/core/components/home/CalculatorBanner';
 import AboutSection from '@/src/modules/core/components/home/AboutSection';
-import { FeedWidget } from '@/src/modules/social';
+
 import { useHomepageData } from '@/src/modules/core/hooks/useHomepageData';
 import { ORGANIZATION_SCHEMA, WEBSITE_SCHEMA } from '@/src/lib/seo/schemas';
 import { apiClient } from '@/src/lib/apiClient';
@@ -466,10 +466,6 @@ export default function HomePage() {
 
           <div className="scroll-fade-in">
             <CalculatorBanner />
-          </div>
-
-          <div className="scroll-fade-in">
-            <FeedWidget className="py-12 md:py-16" />
           </div>
 
           <div className="scroll-fade-in">
