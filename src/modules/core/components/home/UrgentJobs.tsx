@@ -65,7 +65,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                 return (
                   <div 
                     key={ad.id}
-                    className="group relative flex flex-col shrink-0 h-full rounded-[16px] transition-all duration-500 overflow-hidden border border-red-500/30 bg-gradient-to-br from-red-500/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(239,68,68,0.05)] hover:border-red-500/60 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] hover:-translate-y-1"
+                    className="group relative flex flex-col shrink-0 h-full rounded-[16px] transition-all duration-500 overflow-hidden border border-[#ff512f]/30 bg-gradient-to-br from-[#ff512f]/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(255,81,47,0.05)] hover:border-[#ff512f]/60 hover:shadow-[0_0_30px_rgba(255,81,47,0.2)] hover:-translate-y-1"
                   >
                     <Link 
                       to={url} 
@@ -79,7 +79,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                       aria-label={`Pogledaj oglas ${ad.title}`}
                     />
                     
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50 z-0"></div>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#ff512f] to-transparent opacity-50 z-0"></div>
                     
                     <div className="p-5 flex flex-col w-full h-full relative z-20 pointer-events-none">
                       <div className="flex justify-between items-start mb-0">
@@ -110,7 +110,7 @@ export default function UrgentJobs({ urgentJobs, handleCardClick, isLoading }: a
                         </div>
                       </div>
 
-                        <h3 className="text-xl md:text-2xl font-black text-white group-hover/card:text-red-400 transition-colors duration-300 -mt-4 mb-1 uppercase break-words tracking-tight leading-tight">
+                        <h3 className="text-xl md:text-2xl font-black text-white group-hover/card:text-[#ff512f] transition-colors duration-300 -mt-4 mb-1 uppercase break-words tracking-tight leading-tight">
                           {(() => {
                             const t = ad.title?.replace(' — ', ' ') || 'Hitno';
                             const i = t.lastIndexOf(' ');

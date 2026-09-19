@@ -39,14 +39,14 @@ export const JobsUrgent: React.FC<JobsUrgentProps> = ({ jobs, isExpanded, setIsE
               <button 
                 onClick={() => loadMore?.()}
                 disabled={loadingMore}
-                className="bg-red-500/10 text-red-500 border border-red-500/30 px-6 py-2 rounded font-bold text-sm uppercase tracking-widest hover:bg-red-500/20 transition-all disabled:opacity-50"
+                className="bg-[#ff512f]/10 text-[#ff512f] border border-[#ff512f]/30 px-6 py-2 rounded font-bold text-sm uppercase tracking-widest hover:bg-[#ff512f]/20 transition-all disabled:opacity-50"
               >
                 {loadingMore ? 'Učitavanje...' : 'Učitaj još'}
               </button>
             )}
             <button 
               onClick={() => setIsExpanded(!isExpanded)}
-              className="group flex items-center gap-2 text-red-500 font-bold text-sm uppercase tracking-widest transition-all hover:text-red-400 ml-auto"
+              className="group flex items-center gap-2 text-[#ff512f] font-bold text-sm uppercase tracking-widest transition-all hover:text-[#ff512f]/80 ml-auto"
             >
               <div className="flex items-center gap-2 transition-transform duration-300 group-hover:scale-105 origin-right">
                 <span>{isExpanded ? 'Zatvori hitne poslove' : 'Otvori sve hitne poslove'}</span>
