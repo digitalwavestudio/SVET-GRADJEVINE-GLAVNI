@@ -12,7 +12,7 @@ export default function Footer() {
 
   return (
     <footer role="contentinfo" className="bg-[#070b14] w-full pt-4 md:pt-14 pb-4 md:pb-10 px-4 sm:px-8 border-t border-white/5 relative overflow-hidden">
-      <div className="max-w-[1920px] mx-auto w-full relative z-10">
+      <div className="max-w-[1400px] mx-auto w-full relative z-10">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-10 gap-x-2 gap-y-8 lg:gap-x-2 mb-4 lg:mb-6">
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-4 pr-0 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left lg:-mt-6">
