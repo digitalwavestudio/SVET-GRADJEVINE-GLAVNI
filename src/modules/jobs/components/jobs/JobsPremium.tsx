@@ -30,7 +30,7 @@ export const JobsPremium: React.FC<JobsPremiumProps> = ({ jobs, isExpanded, setI
         </div>
         
         {jobs.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch auto-rows-fr">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch auto-rows-fr">
             {(isExpanded ? jobs : jobs.slice(0, 4)).map((job) => (
               <JobCard key={job.id} job={job} viewMode="grid" prefetch={prefetch} />
             ))}

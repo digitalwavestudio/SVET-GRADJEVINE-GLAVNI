@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 type StatusBadgeVariant = 'urgent' | 'premium' | 'new' | 'info';
 
 const STATUS_BADGE_STYLES: Record<StatusBadgeVariant, string> = {
-  urgent: 'backdrop-blur-sm bg-red-500/10 text-red-300 border border-red-500/20',
+  urgent: 'backdrop-blur-sm bg-[#ff512f]/10 text-[#ff512f] border border-[#ff512f]/20',
   premium: 'backdrop-blur-sm bg-gradient-to-r from-secondary/20 to-secondary/5 text-secondary border border-secondary/30 shadow-[0_0_14px_rgba(254,191,13,0.3)]',
   new: 'bg-green-500 text-white',
   info: 'bg-white/5 border border-white/10 text-slate-300 shadow-sm',

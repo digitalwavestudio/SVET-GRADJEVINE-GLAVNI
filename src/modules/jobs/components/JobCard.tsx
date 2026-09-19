@@ -43,7 +43,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
         isPremium
           ? 'border border-secondary/30 bg-gradient-to-br from-secondary/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(254,191,13,0.1)] hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:-translate-y-1'
           : isUrgent
-            ? 'border border-red-500/15 bg-gradient-to-br from-red-500/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(239,68,68,0.03)] hover:border-red-500/30 hover:shadow-[0_0_20px_rgba(239,68,68,0.08)] hover:-translate-y-1'
+            ? 'border border-[#ff512f]/15 bg-gradient-to-br from-[#ff512f]/5 via-slate-900 to-slate-950 shadow-[0_4px_20px_rgba(255,81,47,0.05)] hover:border-[#ff512f]/30 hover:shadow-[0_0_20px_rgba(255,81,47,0.08)] hover:-translate-y-1'
             : 'border border-white/10 bg-white/[0.02] shadow-lg hover:bg-white/[0.04] hover:border-blue-400/30 hover:shadow-[0_0_30px_rgba(96,165,250,0.15)] hover:-translate-y-1'
       }`}
     >
@@ -59,7 +59,7 @@ export const JobCard = React.memo(({ job, viewMode, prefetch }: { job: any; view
       />
 
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent to-transparent opacity-50 z-0 ${
-        isPremium ? 'via-secondary' : isUrgent ? 'via-red-500' : 'via-white/20'
+        isPremium ? 'via-secondary' : isUrgent ? 'via-[#ff512f]' : 'via-white/20'
       }`}></div>
 
       <div className="p-4 md:p-5 flex flex-col w-full flex-1 relative z-20 pointer-events-none">
